@@ -148,7 +148,7 @@
                 "properties": {
                     "cph-ng.comparing.oleSize": {
                         "type": "number",
-                        "default": 2,
+                        "default": 3,
                         "markdownDescription": "%cph-ng.configuration.comparing.properties.oleSize.markdownDescription%"
                     },
                     "cph-ng.comparing.regardPEAsAC": {
@@ -158,7 +158,7 @@
                     },
                     "cph-ng.comparing.ignoreError": {
                         "type": "boolean",
-                        "default": false,
+                        "default": true,
                         "markdownDescription": "%cph-ng.configuration.comparing.properties.ignoreError.markdownDescription%"
                     }
                 }
