@@ -24,10 +24,10 @@ This is the next generation of the
 | Intelligent Judge       | ✅                    | ✅                       |
 | Competitive Companion   | ✅                    | ✅                       |
 | Local Problem Support   | ✅                    | ✅                       |
-| Language Support        | ✅ C/C++ and 8 others | ❌ Only C/C++            |
+| Language Support        | ✅ C/C++ and 8 other | ❌ Only C/C++            |
 | Auto-submit Integration | ✅                    | ❌                       |
 | Load Local Testcases    | ❌                    | ✅                       |
-| Supported Result        | ❌ Only 3             | ✅ AC and 10 others [^1] |
+| Supported Result        | ❌ Only 3             | ✅ AC and 10 other [^1] |
 | Store Result and Time   | ❌                    | ✅                       |
 | Cache compiled program  | ❌                    | ✅ [^2]                  |
 | SPJ support             | ❌                    | ✅                       |
