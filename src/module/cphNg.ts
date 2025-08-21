@@ -373,9 +373,20 @@ export class CphNg {
         if (!Settings.comparing.ignoreError && stderr) {
             return { verdict: TCVerdicts.RE, msg: '' };
         }
+        const fixedOutput = stdout
+            .trimEnd()
+            .split('\n')
+            .map((line) => line.trimEnd())
+            .join('\n');
+        const fixedAnswer = answer
+            .trimEnd()
+            .split('\n')
+            .map((line) => line.trimEnd())
+            .join('\n');
         if (
             Settings.comparing.oleSize &&
-            stdout.length >= answer.length * Settings.comparing.oleSize
+            fixedOutput.length >=
+                fixedAnswer.length * Settings.comparing.oleSize
         ) {
             return { verdict: TCVerdicts.OLE, msg: '' };
         }
@@ -388,16 +399,6 @@ export class CphNg {
         if (compressOutput !== compressAnswer) {
             return { verdict: TCVerdicts.WA, msg: '' };
         }
-        const fixedOutput = stdout
-            .trimEnd()
-            .split('\n')
-            .map((line) => line.trimEnd())
-            .join('\n');
-        const fixedAnswer = answer
-            .trimEnd()
-            .split('\n')
-            .map((line) => line.trimEnd())
-            .join('\n');
         if (fixedOutput !== fixedAnswer && !Settings.comparing.regardPEAsAC) {
             return { verdict: TCVerdicts.PE, msg: '' };
         }
