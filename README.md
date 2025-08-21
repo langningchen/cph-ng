@@ -18,8 +18,8 @@ This is the next generation of the
 
 ## Comparison with CPH
 
-| Feature                 | CPH                   | CPH-NG                   |
-| ----------------------- | --------------------- | ------------------------ |
+| Feature                 | CPH                  | CPH-NG                  |
+| ----------------------- | -------------------- | ----------------------- |
 | Automatic Compilation   | ✅                    | ✅                       |
 | Intelligent Judge       | ✅                    | ✅                       |
 | Competitive Companion   | ✅                    | ✅                       |
@@ -27,7 +27,7 @@ This is the next generation of the
 | Language Support        | ✅ C/C++ and 8 others | ❌ Only C/C++            |
 | Auto-submit Integration | ✅                    | ❌                       |
 | Load Local Testcases    | ❌                    | ✅                       |
-| Supported Result        | ❌ Only 3             | ✅ AC and 10 other [^1] |
+| Supported Result        | ❌ Only 3             | ✅ AC and 10 others [^1] |
 | Store Result and Time   | ❌                    | ✅                       |
 | Cache compiled program  | ❌                    | ✅ [^2]                  |
 | SPJ support             | ❌                    | ✅                       |
