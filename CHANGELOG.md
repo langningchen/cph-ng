@@ -2,6 +2,11 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.1.3
+
+- **fix**: fixed OLE logic.
+- **feat**: changed default value of cph-ng.comparing.oleSize to 3
+
 ## 0.1.2
 
 - **fix**: prevent the window from becoming unresponsive when old problem data

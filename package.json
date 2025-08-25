@@ -2,7 +2,7 @@
     "name": "cph-ng",
     "displayName": "CPH NG",
     "description": "The next generation of CPH.",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "license": "AGPL-3.0-only",
     "publisher": "langningchen",
     "icon": "res/cph-ng.png",
