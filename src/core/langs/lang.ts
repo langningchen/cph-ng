@@ -26,9 +26,9 @@ export class Lang {
         _ac: AbortController,
         _forceCompile?: boolean,
     ): Promise<LangCompileResult> {
-        throw new Error('Method not implemented.');
+        throw new Error('Compile method not implemented.');
     }
     public runCommand(_target: string): string {
-        throw new Error('Method not implemented.');
+        throw new Error('Run method not implemented.');
     }
 }
