@@ -21,6 +21,7 @@ import Settings from '../../utils/settings';
 import { Lang, LangCompileResult } from './lang';
 import { basename, extname, join } from 'path';
 import { type } from 'os';
+import { extensionUri } from '../../utils/global';
 
 export class LangCpp extends Lang {
     private logger: Logger = new Logger('langCpp');
@@ -50,8 +51,8 @@ export class LangCpp extends Lang {
         }
 
         let compileCommands = [''];
-        const wrapperPath = join(this._extensionUri.fsPath, 'res', 'wrapper.c');
-        const hookPath = join(this._extensionUri.fsPath, 'res', 'hook.c');
+        const wrapperPath = join(extensionUri.fsPath, 'res', 'wrapper.c');
+        const hookPath = join(extensionUri.fsPath, 'res', 'hook.c');
         const isCpp = ext === '.cpp';
         const prefix = isCpp
             ? `${Settings.compilation.cppCompiler} ${Settings.compilation.cppArgs}`

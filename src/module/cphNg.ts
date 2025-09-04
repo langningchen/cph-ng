@@ -88,10 +88,10 @@ export class CphNg {
     private onProblemChange: ProblemChangeCallback[];
     private runAbortController?: AbortController;
 
-    constructor(_extensionUri: vscode.Uri) {
+    constructor() {
         this.logger.trace('constructor');
         this._canImport = false;
-        this.compiler = new Compiler(_extensionUri);
+        this.compiler = new Compiler();
         this.runner = new Runner();
         this.checker = new Checker();
         this.onProblemChange = [];

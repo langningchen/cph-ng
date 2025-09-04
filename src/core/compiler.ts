@@ -23,13 +23,12 @@ import { promisify } from 'util';
 import * as vscode from 'vscode';
 import Settings from '../utils/settings';
 import { Logger } from '../utils/io';
+import { extensionUri } from '../utils/global';
 
 const execAsync = promisify(exec);
 
 export class Compiler {
     private logger: Logger = new Logger('compiler');
-
-    constructor(private readonly _extensionUri: vscode.Uri) {}
 
     public async getExecutablePath(filePath: string): Promise<string> {
         this.logger.trace('getExecutablePath', { filePath });
@@ -77,8 +76,8 @@ export class Compiler {
                 type: ext,
             });
         }
-        const wrapperPath = join(this._extensionUri.fsPath, 'res', 'wrapper.c');
-        const hookPath = join(this._extensionUri.fsPath, 'res', 'hook.c');
+        const wrapperPath = join(extensionUri.fsPath, 'res', 'wrapper.c');
+        const hookPath = join(extensionUri.fsPath, 'res', 'hook.c');
         const isCpp = ext === '.cpp';
         const prefix = isCpp
             ? `${Settings.compilation.cppCompiler} ${Settings.compilation.cppArgs}`

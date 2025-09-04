@@ -27,6 +27,7 @@ import { SidebarProvider } from './module/sidebarProvider';
 import { isRunningVerdict } from './utils/types';
 import LlmTcRunner from './ai/llmTcRunner';
 import LlmFileReader from './ai/llmFileReader';
+import { setExtensionUri } from './utils/global';
 
 class ExtensionManager {
     private logger: Logger = new Logger('extension');
@@ -39,6 +40,7 @@ class ExtensionManager {
     public async activate(context: vscode.ExtensionContext) {
         this.logger.info('Activating CPH-NG extension');
         try {
+            setExtensionUri(context.extensionUri);
             if (Settings.cache.cleanOnStartup) {
                 this.logger.info('Cleaning cache on startup');
                 await rm(Settings.cache.directory, {
@@ -73,7 +75,7 @@ class ExtensionManager {
                 await vscode.window.showTextDocument(document);
                 this.updateContext();
             });
-            this.cphNg = new CphNg(context.extensionUri);
+            this.cphNg = new CphNg();
             this.cphNg.addProblemChangeListener(() => {
                 this.logger.trace('Problem change detected');
                 this.updateContext();

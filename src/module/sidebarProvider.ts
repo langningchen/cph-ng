@@ -22,6 +22,7 @@ import * as msgs from '../webview/msgs';
 import { io, Logger } from '../utils/io';
 import { access, constants } from 'fs/promises';
 import Companion from './companion';
+import { extensionUri } from '../utils/global';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'cphNgSidebar';
@@ -29,11 +30,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     private logger: Logger = new Logger('sidebar');
 
     constructor(
-        private readonly _extensionUri: vscode.Uri,
         private helper: CphNg,
         private companion: Companion,
     ) {
-        this.logger.trace('constructor', { _extensionUri });
+        this.logger.trace('constructor');
         helper.addProblemChangeListener((problem, canImport) => {
             this.logger.debug('Problem change listener triggered', {
                 problem,
@@ -60,7 +60,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.options = {
             enableScripts: true,
-            localResourceRoots: [this._extensionUri],
+            localResourceRoots: [extensionUri],
         };
 
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
@@ -215,9 +215,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     private _getHtmlForWebview(webview: vscode.Webview): string {
         this.logger.trace('_getHtmlForWebview', { webview });
         const getUri = (filename: string) =>
-            webview.asWebviewUri(
-                vscode.Uri.joinPath(this._extensionUri, filename),
-            );
+            webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, filename));
         let isDarkMode =
             vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark
                 ? true
