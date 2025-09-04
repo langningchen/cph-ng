@@ -15,13 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { access, constants, unlink } from 'fs/promises';
-import { Logger } from '../../utils/io';
+import { access, constants, readFile, unlink } from 'fs/promises';
+import { io, Logger } from '../../utils/io';
 import Settings from '../../utils/settings';
 import { Lang, LangCompileResult } from './lang';
-import { basename, extname, join } from 'path';
+import { basename, dirname, extname, join } from 'path';
 import { type } from 'os';
 import { extensionUri } from '../../utils/global';
+import { TCVerdicts } from '../../utils/types.backend';
+import * as vscode from 'vscode';
+import { SHA256 } from 'crypto-js';
+import { FileWithHash } from '../../utils/types';
+import { execAsync, exists } from '../../utils/exec';
 
 export class LangCpp extends Lang {
     private logger: Logger = new Logger('langCpp');
@@ -29,20 +34,38 @@ export class LangCpp extends Lang {
     public compileHashSuffix(): string {
         return Settings.compilation.cppCompiler + Settings.compilation.cppArgs;
     }
-    public async compile(src: string): Promise<LangCompileResult> {
-        this.logger.trace('compile', { src });
-        const ext = extname(src);
-        const base = basename(src, ext);
+    public async compile(
+        src: FileWithHash,
+        ac: AbortController,
+        forceCompile?: boolean,
+    ): Promise<LangCompileResult> {
+        this.logger.trace('compile', { src, forceCompile });
+
         const outputPath = join(
             Settings.cache.directory,
             'bin',
-            base + (type() === 'Windows_NT' ? '.exe' : ''),
+            basename(src.path, extname(src.path)) +
+                (type() === 'Windows_NT' ? '.exe' : ''),
         );
+        const hash = SHA256(
+            (await readFile(src.path)).toString() +
+                Settings.compilation.cppCompiler +
+                Settings.compilation.cppArgs,
+        ).toString();
+
+        if (
+            forceCompile === false ||
+            (forceCompile !== true &&
+                src.hash === hash &&
+                (await exists(outputPath)))
+        ) {
+            return {
+                verdict: TCVerdicts.UKE,
+                msg: '',
+                data: { outputPath, hash },
+            };
+        }
         try {
-            await access(outputPath, constants.F_OK);
-            this.logger.debug('Output file exists, removing it', {
-                outputPath,
-            });
             await unlink(outputPath);
         } catch {
             this.logger.debug('Output file does not exist, skipping removal', {
@@ -50,36 +73,43 @@ export class LangCpp extends Lang {
             });
         }
 
-        let compileCommands = [''];
-        const wrapperPath = join(extensionUri.fsPath, 'res', 'wrapper.c');
-        const hookPath = join(extensionUri.fsPath, 'res', 'hook.c');
-        const isCpp = ext === '.cpp';
-        const prefix = isCpp
-            ? `${Settings.compilation.cppCompiler} ${Settings.compilation.cppArgs}`
-            : `${Settings.compilation.cCompiler} ${Settings.compilation.cArgs}`;
-        if (Settings.compilation.useWrapper) {
-            const compiler = isCpp
-                ? Settings.compilation.cppCompiler
-                : Settings.compilation.cCompiler;
-            const obj = `${outputPath}.o`;
-            const wrapperObj = `${outputPath}.wrapper.o`;
-            const linkObjects = [obj, wrapperObj];
-            const compileCommands = [
-                `${prefix} "${filePath}" -c -o "${obj}"`,
-                `${compiler} -fPIC -c "${wrapperPath}" -o "${wrapperObj}"`,
-            ];
-            if (Settings.compilation.useHook) {
-                const hookObj = `${outputPath}.hook.o`;
-                linkObjects.push(hookObj);
+        const {
+            cppCompiler: compiler,
+            cppArgs: args,
+            objcopy,
+            useWrapper,
+            useHook,
+            timeout,
+        } = Settings.compilation;
+        try {
+            const compileCommands = [];
+            const postCommands = [];
+            if (useWrapper) {
+                const obj = `${outputPath}.o`;
+                const wrapperObj = `${outputPath}.wrapper.o`;
+                const linkObjects = [obj, wrapperObj];
+
                 compileCommands.push(
-                    `${compiler} -fPIC -Wno-attributes -c "${hookPath}" -o "${hookObj}"`,
+                    `${compiler} ${args} "${src.path}" -c -o "${obj}"`,
+                    `${compiler} -fPIC -c "${join(extensionUri.fsPath, 'res', 'wrapper.c')}" -o "${wrapperObj}"`,
+                );
+                if (useHook) {
+                    const hookObj = `${outputPath}.hook.o`;
+                    linkObjects.push(hookObj);
+                    compileCommands.push(
+                        `${compiler} -fPIC -Wno-attributes -c "${join(extensionUri.fsPath, 'res', 'hook.c')}" -o "${hookObj}"`,
+                    );
+                }
+                postCommands.push(
+                    `${objcopy} --redefine-sym main=original_main "${obj}"`,
+                    `${compiler} ${args} ${linkObjects.map((o) => `"${o}"`).join(' ')} -o "${outputPath}"` +
+                        (type() === 'Linux' ? ' -ldl' : ''),
+                );
+            } else {
+                compileCommands.push(
+                    `${compiler} ${args} "${src.path}" -o "${outputPath}"`,
                 );
             }
-            const postCommands = [
-                `${Settings.compilation.objcopy} --redefine-sym main=original_main "${obj}"`,
-                `${prefix} ${linkObjects.map((o) => `"${o}"`).join(' ')} -o "${outputPath}"` +
-                    (type() === 'Linux' ? ' -ldl' : ''),
-            ];
             this.logger.info('Starting compilation', {
                 compileCommands,
                 postCommands,
@@ -87,49 +117,46 @@ export class LangCpp extends Lang {
             const results = await Promise.all(
                 compileCommands.map((cmd) =>
                     execAsync(cmd, {
-                        timeout: Settings.compilation.timeout,
-                        cwd: dirname(filePath),
-                        signal: abortController.signal,
+                        timeout,
+                        cwd: dirname(src.path),
+                        signal: ac.signal,
                     }),
                 ),
             );
             for (const cmd of postCommands) {
                 results.push(
                     await execAsync(cmd, {
-                        timeout: Settings.compilation.timeout,
-                        cwd: dirname(filePath),
-                        signal: abortController.signal,
+                        timeout,
+                        cwd: dirname(src.path),
+                        signal: ac.signal,
                     }),
                 );
             }
             this.logger.debug('Compilation completed successfully', {
-                filePath,
+                path: src.path,
                 outputPath,
             });
-            return results
+            io.compilationMsg = results
                 .map((result) => (result.stderr ? result.stderr.trim() : ''))
                 .filter((msg) => msg)
                 .join('\n\n');
-        }
-        try {
-            this.logger.info('Starting compilation', { compileCommands });
-            const command = `${prefix} "${filePath}" -o "${outputPath}"`;
-            this.logger.debug('Executing compile command', { command });
-            const { stderr } = await execAsync(command, {
-                timeout: Settings.compilation.timeout,
-                cwd: dirname(filePath),
-                signal: abortController.signal,
-            });
-            this.logger.debug('Compilation completed successfully', {
-                filePath,
-                outputPath,
-            });
-            return stderr;
+            return {
+                verdict: await access(outputPath, constants.X_OK)
+                    .then(() => TCVerdicts.UKE)
+                    .catch(() => TCVerdicts.CE),
+                msg: '',
+                data: { outputPath, hash },
+            };
         } catch (e) {
             this.logger.error('Compilation failed', e);
-            return (e as Error).message;
+            if (ac.signal.aborted) {
+                this.logger.warn('Compilation aborted by user');
+                return {
+                    verdict: TCVerdicts.RJ,
+                    msg: vscode.l10n.t('Compilation aborted by user.'),
+                };
+            }
+            return { verdict: TCVerdicts.CE, msg: (e as Error).message };
         }
-
-        return { outputPath };
     }
 }

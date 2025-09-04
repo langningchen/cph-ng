@@ -30,9 +30,7 @@ import { basename, dirname, extname, join, relative } from 'path';
 import * as vscode from 'vscode';
 import { gunzipSync, gzipSync } from 'zlib';
 import { Checker } from '../core/checker';
-import { Compiler } from '../core/compiler';
 import { io, Logger } from '../utils/io';
-import { Runner } from '../core/runner';
 import Settings from '../utils/settings';
 import {
     tcIo2Path,
@@ -42,11 +40,12 @@ import {
 } from '../utils/types.backend';
 import {
     EmbeddedProblem,
-    FileWithHash,
     isExpandVerdict,
     isRunningVerdict,
     Problem,
     TC,
+    TCIO,
+    TCVerdict,
 } from '../utils/types';
 import Result, { assignResult } from '../utils/result';
 import { renderTemplate } from '../utils/strTemplate';
@@ -61,29 +60,29 @@ import {
     extractEmbedded,
 } from '../utils/embedded';
 import { FolderChooser } from '../utils/folderChooser';
+import { Lang, LangCompileResult } from '../core/langs/lang';
+import { createReadStream } from 'fs';
+import { spawn } from 'child_process';
 
 type ProblemChangeCallback = (
     problem: Problem | undefined,
     canImport: boolean,
 ) => void;
 
-type DoCompileResult = Result<{
-    outputPath: string;
-    hash: string;
-}>;
 type CompileResult = Result<{
-    outputPath: string;
-    hash: string;
-    checkerOutputPath?: string;
-    checkerHash?: string;
+    src: NonNullable<LangCompileResult['data']>;
+    checker?: NonNullable<LangCompileResult['data']>;
 }>;
+type RunnerResult = Result<undefined> & {
+    time: number;
+    stdout: string;
+    stderr: string;
+};
 
 export class CphNg {
     private logger: Logger = new Logger('cphNg');
     private _problem?: Problem;
     private _canImport: boolean;
-    private compiler: Compiler;
-    private runner: Runner;
     private checker: Checker;
     private onProblemChange: ProblemChangeCallback[];
     private runAbortController?: AbortController;
@@ -91,8 +90,6 @@ export class CphNg {
     constructor() {
         this.logger.trace('constructor');
         this._canImport = false;
-        this.compiler = new Compiler();
-        this.runner = new Runner();
         this.checker = new Checker();
         this.onProblemChange = [];
     }
@@ -182,70 +179,10 @@ export class CphNg {
             .substring(64 - 6);
     }
 
-    private async doCompile(
-        file: FileWithHash,
+    private async compile(
+        lang: Lang,
         compile?: boolean,
-        useWrapper: boolean = false,
-    ): Promise<DoCompileResult> {
-        this.logger.trace('doCompile', file);
-        const hash = SHA256(
-            (await readFile(file.path)).toString() +
-                Settings.compilation.cppCompiler +
-                Settings.compilation.cppArgs,
-        ).toString();
-        const outputPath = await this.compiler.getExecutablePath(file.path);
-        const hasOutputFile = async () =>
-            await access(outputPath, constants.X_OK)
-                .then(() => true)
-                .catch(() => false);
-
-        if (
-            (file.hash !== hash ||
-                !(await hasOutputFile()) ||
-                compile === true) &&
-            compile !== false
-        ) {
-            this.logger.info('Source hash mismatch or output file missing', {
-                file,
-                hash,
-                outputPath,
-            });
-            const compileResult = await this.compiler.compile(
-                file.path,
-                outputPath,
-                this.runAbortController!,
-                useWrapper,
-            );
-            if (this.runAbortController?.signal.aborted) {
-                this.logger.warn('Compilation aborted by user', { file });
-                return {
-                    verdict: TCVerdicts.RJ,
-                    msg: vscode.l10n.t('Compilation aborted by user.'),
-                };
-            }
-            if (!(await hasOutputFile())) {
-                this.logger.error('Compilation failed, output file not found', {
-                    file,
-                    outputPath,
-                });
-                return {
-                    verdict: TCVerdicts.CE,
-                    msg: compileResult,
-                };
-            }
-        }
-        this.logger.debug('Compilation successful', { file, outputPath });
-        return {
-            verdict: TCVerdicts.UKE,
-            msg: '',
-            data: {
-                outputPath,
-                hash,
-            },
-        };
-    }
-
-    private async compile(compile?: boolean): Promise<CompileResult> {
+    ): Promise<CompileResult> {
         try {
             const problem = this._problem!;
             const editor = vscode.window.visibleTextEditors.find(
@@ -254,47 +191,51 @@ export class CphNg {
             if (editor) {
                 await editor.document.save();
             }
-            const compileResult = await this.doCompile(
+            const compileResult = await lang.compile(
                 problem.src,
+                this.runAbortController!,
                 compile,
-                Settings.compilation.useWrapper,
             );
             if (compileResult.verdict !== TCVerdicts.UKE) {
-                return compileResult;
+                return { ...compileResult, data: { src: compileResult.data! } };
             }
             problem.src.hash = compileResult.data!.hash;
             if (!problem.checker) {
-                return compileResult;
+                return { ...compileResult, data: { src: compileResult.data! } };
             }
 
-            if (!['.c', '.cpp'].includes(extname(problem.checker.path))) {
+            const checkerLang = Lang.getLang(problem.checker.path);
+            if (!checkerLang) {
                 return {
-                    verdict: TCVerdicts.UKE,
-                    msg: '',
+                    ...compileResult,
                     data: {
-                        outputPath: compileResult.data!.outputPath,
-                        hash: compileResult.data!.hash,
-                        checkerOutputPath: problem.checker?.path,
+                        src: compileResult.data!,
+                        checker: { outputPath: problem.checker.path, hash: '' },
                     },
                 };
             }
 
-            const checkerCompileResult = await this.doCompile(
+            const checkerCompileResult = await checkerLang.compile(
                 problem.checker,
+                this.runAbortController!,
                 compile,
             );
             if (checkerCompileResult.verdict !== TCVerdicts.UKE) {
-                return checkerCompileResult;
+                return {
+                    ...checkerCompileResult,
+                    data: {
+                        src: compileResult.data!,
+                        checker: checkerCompileResult.data,
+                    },
+                };
             }
             problem.checker.hash = checkerCompileResult.data!.hash;
             return {
                 verdict: TCVerdicts.UKE,
                 msg: '',
                 data: {
-                    outputPath: compileResult.data!.outputPath,
-                    hash: compileResult.data!.hash,
-                    checkerOutputPath: checkerCompileResult.data!.outputPath,
-                    checkerHash: checkerCompileResult.data!.hash,
+                    src: compileResult.data!,
+                    checker: checkerCompileResult.data,
                 },
             };
         } catch (e) {
@@ -304,7 +245,152 @@ export class CphNg {
             };
         }
     }
-    private async run(outputPath: string, tc: TC, checkerOutputPath?: string) {
+    private async doRun(
+        runCommand: string,
+        timeLimit: number,
+        stdin: TCIO,
+        abortController: AbortController,
+    ): Promise<RunnerResult> {
+        this.logger.trace('runExecutable', {
+            runCommand,
+            timeLimit,
+            stdin,
+        });
+        this.logger.info('Running executable', runCommand);
+        return new Promise((resolve) => {
+            const startTime = Date.now();
+            const child = spawn(runCommand, [], {
+                stdio: ['pipe', 'pipe', 'pipe'],
+                cwd: dirname(runCommand),
+                signal: abortController.signal,
+            });
+
+            let stdout = '';
+            let stderr = '';
+            let killed = false;
+
+            const killTimeout = setTimeout(() => {
+                killed = true;
+                this.logger.warn('Killing process due to timeout', {
+                    runCommand,
+                    timeLimit,
+                });
+                child.kill('SIGKILL');
+            }, timeLimit + Settings.runner.timeAddition);
+
+            child.stdout.on('data', (data) => {
+                stdout += data.toString();
+                this.logger.debug('Process stdout', { data: data.toString() });
+            });
+
+            child.stderr.on('data', (data) => {
+                stderr += data.toString();
+                this.logger.debug('Process stderr', { data: data.toString() });
+            });
+
+            const commonResolve = (verdict: TCVerdict, msg: string) => {
+                const endTime = Date.now();
+                clearTimeout(killTimeout);
+                this.logger.debug('Process completed', {
+                    verdict,
+                    msg,
+                    duration: endTime - startTime,
+                });
+                let time = endTime - startTime;
+                const match = stderr.match(
+                    /-----CPH DATA STARTS-----(\{.*\})-----/,
+                );
+                if (match) {
+                    try {
+                        const data = JSON.parse(match[1]);
+                        time = data.time / 1000.0;
+                    } catch (e) {
+                        this.logger.error('Failed to parse wrapper data', e);
+                    }
+                    stderr = stderr.replace(match[0], '').trimEnd();
+                }
+                resolve({
+                    verdict,
+                    msg,
+                    stdout,
+                    stderr,
+                    time,
+                } satisfies RunnerResult);
+            };
+
+            child.on('close', (code, signal) => {
+                if (killed) {
+                    commonResolve(
+                        TCVerdicts.TLE,
+                        vscode.l10n.t('Killed due to timeout'),
+                    );
+                } else if (code) {
+                    commonResolve(
+                        TCVerdicts.RE,
+                        vscode.l10n.t('Process exited with code: {code}.', {
+                            code,
+                        }),
+                    );
+                } else if (signal) {
+                    commonResolve(
+                        TCVerdicts.RE,
+                        vscode.l10n.t('Process exited with signal: {signal}.', {
+                            signal,
+                        }),
+                    );
+                } else {
+                    commonResolve(TCVerdicts.UKE, '');
+                }
+            });
+
+            child.on('error', (e: Error) => {
+                this.logger.error('Process error', e);
+                commonResolve(
+                    abortController.signal.aborted
+                        ? TCVerdicts.RJ
+                        : TCVerdicts.SE,
+                    e.message,
+                );
+            });
+
+            if (stdin.useFile) {
+                const inputStream = createReadStream(stdin.path, {
+                    encoding: 'utf8',
+                });
+
+                inputStream.on('data', (chunk) => {
+                    child.stdin.write(chunk);
+                    this.logger.debug('Writing to stdin', { chunk });
+                });
+
+                inputStream.on('end', () => {
+                    child.stdin.end();
+                    this.logger.debug('Input stream ended');
+                });
+
+                inputStream.on('error', (e: Error) => {
+                    this.logger.error('Input stream error', e);
+                    commonResolve(
+                        TCVerdicts.SE,
+                        vscode.l10n.t('Input file read failed: {msg}.', {
+                            msg: e.message,
+                        }),
+                    );
+                });
+            } else {
+                child.stdin.write(stdin.data);
+                child.stdin.end();
+                this.logger.debug('Input written to stdin', {
+                    stdin: stdin.data,
+                });
+            }
+        });
+    }
+    private async run(
+        lang: Lang,
+        tc: TC,
+        compileData: NonNullable<CompileResult['data']>,
+    ) {
         const problem = this._problem!;
         const result = tc.result!;
         const abortController = this.runAbortController!;
@@ -312,8 +398,9 @@ export class CphNg {
             result.verdict = TCVerdicts.JG;
             this.emitProblemChange();
 
-            const runResult = await this.runner.runExecutable(
-                outputPath,
+            const runCommand = lang.runCommand(compileData.src.outputPath);
+            const runResult = await this.doRun(
+                runCommand,
                 problem.timeLimit,
                 tc.stdin,
                 abortController,
@@ -360,9 +447,9 @@ export class CphNg {
                 this.emitProblemChange();
                 assignResult(
                     result,
-                    checkerOutputPath
+                    compileData.checker
                         ? await this.checker.runChecker(
-                              checkerOutputPath,
+                              compileData.checker.outputPath,
                               tc,
                               abortController,
                           )
@@ -949,6 +1036,16 @@ export class CphNg {
         const problem = this._problem!;
         this.runAbortController && this.runAbortController.abort();
         this.runAbortController = new AbortController();
+        const srcLang = Lang.getLang(problem.src.path);
+        if (!srcLang) {
+            io.error(
+                vscode.l10n.t(
+                    'Cannot determine the programming language of the source file: {file}.',
+                    { file: basename(problem.src.path) },
+                ),
+            );
+            return;
+        }
 
         const tc = problem.tcs[idx];
         tc.result = {
@@ -962,7 +1059,7 @@ export class CphNg {
         this.emitProblemChange();
         const result = tc.result;
 
-        const compileResult = await this.compile(compile);
+        const compileResult = await this.compile(srcLang, compile);
         if (compileResult.verdict !== TCVerdicts.UKE) {
             io.compilationMsg = compileResult.msg;
             result.verdict = TCVerdicts.CE;
@@ -973,11 +1070,7 @@ export class CphNg {
         }
         const compileData = compileResult.data!;
 
-        await this.run(
-            compileData.outputPath,
-            tc,
-            compileData.checkerOutputPath,
-        );
+        await this.run(srcLang, tc, compileData);
         tc.isExpand = isExpandVerdict(result.verdict);
         this.saveProblem();
         this.runAbortController = undefined;
@@ -992,7 +1085,16 @@ export class CphNg {
         }
         this.runAbortController && this.runAbortController.abort();
         this.runAbortController = new AbortController();
-
+        const srcLang = Lang.getLang(problem.src.path);
+        if (!srcLang) {
+            io.error(
+                vscode.l10n.t(
+                    'Cannot determine the programming language of the source file: {file}.',
+                    { file: basename(problem.src.path) },
+                ),
+            );
+            return;
+        }
         for (const tc of problem.tcs) {
             tc.result = {
                 verdict: TCVerdicts.CP,
@@ -1005,7 +1107,7 @@ export class CphNg {
         }
         this.emitProblemChange();
 
-        const compileResult = await this.compile(compile);
+        const compileResult = await this.compile(srcLang, compile);
         if (compileResult.verdict !== TCVerdicts.UKE) {
             io.compilationMsg = compileResult.msg;
             for (const tc of problem.tcs) {
@@ -1031,11 +1133,7 @@ export class CphNg {
                     continue;
                 }
             }
-            await this.run(
-                compileData.outputPath,
-                tc,
-                compileData.checkerOutputPath,
-            );
+            await this.run(srcLang, tc, compileData);
             if (!hasExpandStatus) {
                 tc.isExpand = isExpandVerdict(tc.result!.verdict);
                 this.emitProblemChange();
@@ -1248,6 +1346,16 @@ export class CphNg {
         }
         this.runAbortController && this.runAbortController.abort();
         this.runAbortController = new AbortController();
+        const srcLang = Lang.getLang(problem.src.path);
+        if (!srcLang) {
+            io.error(
+                vscode.l10n.t(
+                    'Cannot determine the programming language of the source file: {file}.',
+                    { file: basename(problem.src.path) },
+                ),
+            );
+            return;
+        }
 
         const cleanUp = () => {
             problem.bfCompare!.running = false;
@@ -1264,7 +1372,7 @@ export class CphNg {
         problem.bfCompare.running = true;
         problem.bfCompare.msg = vscode.l10n.t('Compiling solution...');
         this.emitProblemChange();
-        const solutionCompileResult = await this.compile(compile);
+        const solutionCompileResult = await this.compile(srcLang, compile);
         if (solutionCompileResult.verdict !== TCVerdicts.UKE) {
             io.compilationMsg = solutionCompileResult.msg;
             problem.bfCompare.msg = vscode.l10n.t(
@@ -1276,8 +1384,9 @@ export class CphNg {
 
         problem.bfCompare.msg = vscode.l10n.t('Compiling generator...');
         this.emitProblemChange();
-        const generatorCompileResult = await this.doCompile(
+        const generatorCompileResult = await srcLang.compile(
             problem.bfCompare.generator,
+            this.runAbortController,
             compile,
         );
         if (generatorCompileResult.verdict !== TCVerdicts.UKE) {
@@ -1292,8 +1401,9 @@ export class CphNg {
 
         problem.bfCompare.msg = vscode.l10n.t('Compiling brute force...');
         this.emitProblemChange();
-        const bruteForceCompileResult = await this.doCompile(
+        const bruteForceCompileResult = await srcLang.compile(
             problem.bfCompare.bruteForce,
+            this.runAbortController,
             compile,
         );
         if (bruteForceCompileResult.verdict !== TCVerdicts.UKE) {
@@ -1321,7 +1431,7 @@ export class CphNg {
                 { cnt },
             );
             this.emitProblemChange();
-            const generatorRunResult = await this.runner.runExecutable(
+            const generatorRunResult = await this.doRun(
                 generatorCompileResult.data!.outputPath,
                 Settings.bfCompare.generatorTimeLimit,
                 { useFile: false, data: '' },
@@ -1344,7 +1454,7 @@ export class CphNg {
                 { cnt },
             );
             this.emitProblemChange();
-            const bruteForceRunResult = await this.runner.runExecutable(
+            const bruteForceRunResult = await this.doRun(
                 bruteForceCompileResult.data!.outputPath,
                 Settings.bfCompare.bruteForceTimeLimit,
                 { useFile: false, data: generatorRunResult.stdout },
@@ -1382,11 +1492,7 @@ export class CphNg {
                     msg: '',
                 },
             } satisfies TC;
-            await this.run(
-                solutionCompileResult.data!.outputPath,
-                tempTc,
-                solutionCompileResult.data!.checkerOutputPath,
-            );
+            await this.run(srcLang, tempTc, solutionCompileResult.data!);
             if (tempTc.result?.verdict !== TCVerdicts.AC) {
                 if (tempTc.result?.verdict !== TCVerdicts.RJ) {
                     problem.tcs.push(tempTc);

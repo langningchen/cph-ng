@@ -16,17 +16,17 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import Result from '../../utils/result';
+import { FileWithHash } from '../../utils/types';
 
-export type LangCompileResult = Result<
-    { cmd: string } | { outputPath: string }
->;
+export type LangCompileResult = Result<{ outputPath: string; hash: string }>;
 
 export class Lang {
     public extensions: string[] = [];
-    public compileHashSuffix(): string {
-        throw new Error('Method not implemented.');
-    }
-    public async compile(_src: string): Promise<LangCompileResult> {
+    public async compile(
+        _src: FileWithHash,
+        _ac: AbortController,
+        _forceCompile?: boolean,
+    ): Promise<LangCompileResult> {
         throw new Error('Method not implemented.');
     }
     public runCommand(_target: string): string {
