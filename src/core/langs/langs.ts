@@ -27,17 +27,21 @@ const logger = new Logger('langs');
 
 export class Langs {
     public static langs: Lang[] = [new LangCpp(), new LangC(), new LangJava()];
-    public static getLang(filePath: string): Lang | null {
+    public static getLang(
+        filePath: string,
+        ignoreError: boolean = false,
+    ): Lang | null {
         logger.trace('getLang', { filePath });
         const ext = extname(filePath).toLowerCase().slice(1);
         const lang = this.langs.find((lang) => lang.extensions.includes(ext));
         if (!lang) {
-            io.error(
-                vscode.l10n.t(
-                    'Cannot determine the programming language of the source file: {file}.',
-                    { file: basename(filePath) },
-                ),
-            );
+            ignoreError ||
+                io.error(
+                    vscode.l10n.t(
+                        'Cannot determine the programming language of the source file: {file}.',
+                        { file: basename(filePath) },
+                    ),
+                );
             return null;
         }
         return lang;

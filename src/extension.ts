@@ -314,7 +314,7 @@ class ExtensionManager {
                 this.cphNg.problem?.bfCompare?.generator?.path === filePath
             ) {
                 this.logger.debug('Generator file is active', { filePath });
-            } else if (Langs.getLang(filePath) !== undefined) {
+            } else if (Langs.getLang(filePath, true) !== undefined) {
                 this.logger.debug('Source file is active', { filePath });
                 if (this.cphNg.problem?.src.path !== filePath) {
                     this.logger.trace(
