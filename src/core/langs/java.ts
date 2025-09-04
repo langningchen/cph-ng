@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { access, constants, readFile, unlink, mkdir } from 'fs/promises';
+import { access, constants, readFile, unlink } from 'fs/promises';
 import { io, Logger } from '../../utils/io';
 import Settings from '../../utils/settings';
 import { Lang, LangCompileResult } from './lang';
@@ -67,7 +67,7 @@ export class LangJava extends Lang {
         try {
             await unlink(classPath);
         } catch {
-            this.logger.debug('Class file does not exist, skipping removal', {
+            this.logger.debug('Output file does not exist, skipping removal', {
                 classPath,
             });
         }
@@ -79,7 +79,7 @@ export class LangJava extends Lang {
         } = Settings.compilation;
 
         try {
-            this.logger.info('Starting Java compilation', {
+            this.logger.info('Starting compilation', {
                 compiler,
                 args,
                 src: src.path,
@@ -95,7 +95,7 @@ export class LangJava extends Lang {
                 timeout,
             );
 
-            this.logger.debug('Java compilation completed successfully', {
+            this.logger.debug('Compilation completed successfully', {
                 path: src.path,
                 classPath,
             });
@@ -110,9 +110,9 @@ export class LangJava extends Lang {
                 data: { outputPath: classPath, hash },
             };
         } catch (e) {
-            this.logger.error('Java compilation failed', e);
+            this.logger.error('Compilation failed', e);
             if (ac.signal.aborted) {
-                this.logger.warn('Java compilation aborted by user');
+                this.logger.warn('Compilation aborted by user');
                 return {
                     verdict: TCVerdicts.RJ,
                     msg: vscode.l10n.t('Compilation aborted by user.'),
