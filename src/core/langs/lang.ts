@@ -19,7 +19,6 @@ import Result from '../../utils/result';
 import { FileWithHash } from '../../utils/types';
 
 export type LangCompileResult = Result<{ outputPath: string; hash: string }>;
-
 export class Lang {
     public extensions: string[] = [];
     public async compile(
@@ -31,14 +30,5 @@ export class Lang {
     }
     public runCommand(_target: string): string {
         throw new Error('Method not implemented.');
-    }
-
-    public static langs: Lang[] = [];
-    public static getLang(filePath: string): Lang | null {
-        const ext = filePath.split('.').pop();
-        if (!ext) {
-            return null;
-        }
-        return this.langs.find((lang) => lang.extensions.includes(ext)) || null;
     }
 }

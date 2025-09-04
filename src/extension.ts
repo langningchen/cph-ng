@@ -81,7 +81,6 @@ class ExtensionManager {
                 this.updateContext();
             });
             this.sidebarProvider = new SidebarProvider(
-                context.extensionUri,
                 this.cphNg,
                 this.companion,
             );

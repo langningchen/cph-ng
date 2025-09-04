@@ -63,6 +63,7 @@ import { FolderChooser } from '../utils/folderChooser';
 import { Lang, LangCompileResult } from '../core/langs/lang';
 import { createReadStream } from 'fs';
 import { spawn } from 'child_process';
+import { Langs } from '../core/langs/langs';
 
 type ProblemChangeCallback = (
     problem: Problem | undefined,
@@ -204,7 +205,7 @@ export class CphNg {
                 return { ...compileResult, data: { src: compileResult.data! } };
             }
 
-            const checkerLang = Lang.getLang(problem.checker.path);
+            const checkerLang = Langs.getLang(problem.checker.path);
             if (!checkerLang) {
                 return {
                     ...compileResult,
@@ -1036,14 +1037,8 @@ export class CphNg {
         const problem = this._problem!;
         this.runAbortController && this.runAbortController.abort();
         this.runAbortController = new AbortController();
-        const srcLang = Lang.getLang(problem.src.path);
+        const srcLang = Langs.getLang(problem.src.path);
         if (!srcLang) {
-            io.error(
-                vscode.l10n.t(
-                    'Cannot determine the programming language of the source file: {file}.',
-                    { file: basename(problem.src.path) },
-                ),
-            );
             return;
         }
 
@@ -1085,14 +1080,8 @@ export class CphNg {
         }
         this.runAbortController && this.runAbortController.abort();
         this.runAbortController = new AbortController();
-        const srcLang = Lang.getLang(problem.src.path);
+        const srcLang = Langs.getLang(problem.src.path);
         if (!srcLang) {
-            io.error(
-                vscode.l10n.t(
-                    'Cannot determine the programming language of the source file: {file}.',
-                    { file: basename(problem.src.path) },
-                ),
-            );
             return;
         }
         for (const tc of problem.tcs) {
@@ -1346,14 +1335,8 @@ export class CphNg {
         }
         this.runAbortController && this.runAbortController.abort();
         this.runAbortController = new AbortController();
-        const srcLang = Lang.getLang(problem.src.path);
+        const srcLang = Langs.getLang(problem.src.path);
         if (!srcLang) {
-            io.error(
-                vscode.l10n.t(
-                    'Cannot determine the programming language of the source file: {file}.',
-                    { file: basename(problem.src.path) },
-                ),
-            );
             return;
         }
 
