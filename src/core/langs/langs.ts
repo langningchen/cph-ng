@@ -20,11 +20,13 @@ import { io, Logger } from '../../utils/io';
 import { basename, extname } from 'path';
 import { Lang } from './lang';
 import { LangCpp } from './cpp';
+import { LangC } from './c';
+import { LangJava } from './java';
 
 const logger = new Logger('langs');
 
 export class Langs {
-    public static langs: Lang[] = [new LangCpp()];
+    public static langs: Lang[] = [new LangCpp(), new LangC(), new LangJava()];
     public static getLang(filePath: string): Lang | null {
         logger.trace('getLang', { filePath });
         const ext = extname(filePath).toLowerCase().slice(1);

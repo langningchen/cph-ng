@@ -19,21 +19,19 @@ import { access, constants, readFile, unlink } from 'fs/promises';
 import { io, Logger } from '../../utils/io';
 import Settings from '../../utils/settings';
 import { Lang, LangCompileResult } from './lang';
-import { basename, dirname, extname, join } from 'path';
+import { basename, extname, join } from 'path';
 import { type } from 'os';
-import { extensionUri } from '../../utils/global';
 import { TCVerdicts } from '../../utils/types.backend';
 import * as vscode from 'vscode';
 import { SHA256 } from 'crypto-js';
 import { FileWithHash } from '../../utils/types';
 import { exists } from '../../utils/exec';
-import { spawn } from 'child_process';
 
-export class LangCpp extends Lang {
-    private logger: Logger = new Logger('langCpp');
-    public extensions = ['cpp', 'cc', 'cxx', 'c++'];
+export class LangC extends Lang {
+    private logger: Logger = new Logger('langC');
+    public extensions = ['c'];
     public compileHashSuffix(): string {
-        return Settings.compilation.cppCompiler + Settings.compilation.cppArgs;
+        return Settings.compilation.cCompiler + Settings.compilation.cArgs;
     }
     public async compile(
         src: FileWithHash,
@@ -50,8 +48,8 @@ export class LangCpp extends Lang {
         );
         const hash = SHA256(
             (await readFile(src.path)).toString() +
-                Settings.compilation.cppCompiler +
-                Settings.compilation.cppArgs,
+                Settings.compilation.cCompiler +
+                Settings.compilation.cArgs,
         ).toString();
 
         if (
@@ -75,92 +73,35 @@ export class LangCpp extends Lang {
         }
 
         const {
-            cppCompiler: compiler,
-            cppArgs: args,
-            objcopy,
-            useWrapper,
-            useHook,
+            cCompiler: compiler,
+            cArgs: args,
             timeout,
         } = Settings.compilation;
-        try {
-            const compileCommands: string[][] = [];
-            const postCommands: string[][] = [];
-            if (useWrapper) {
-                const obj = `${outputPath}.o`;
-                const wrapperObj = `${outputPath}.wrapper.o`;
-                const linkObjects = [obj, wrapperObj];
 
-                const compilerArgs = args.split(/\s+/).filter(Boolean);
-                compileCommands.push(
-                    [compiler, ...compilerArgs, src.path, '-c', '-o', obj],
-                    [
-                        compiler,
-                        '-fPIC',
-                        '-c',
-                        join(extensionUri.fsPath, 'res', 'wrapper.c'),
-                        '-o',
-                        wrapperObj,
-                    ],
-                );
-                if (useHook) {
-                    const hookObj = `${outputPath}.hook.o`;
-                    linkObjects.push(hookObj);
-                    compileCommands.push([
-                        compiler,
-                        '-fPIC',
-                        '-Wno-attributes',
-                        '-c',
-                        join(extensionUri.fsPath, 'res', 'hook.c'),
-                        '-o',
-                        hookObj,
-                    ]);
-                }
-                postCommands.push(
-                    [objcopy, '--redefine-sym', 'main=original_main', obj],
-                    [
-                        compiler,
-                        ...compilerArgs,
-                        ...linkObjects,
-                        '-o',
-                        outputPath,
-                        ...(type() === 'Linux' ? ['-ldl'] : []),
-                    ],
-                );
-            } else {
-                const compilerArgs = args.split(/\s+/).filter(Boolean);
-                compileCommands.push([
-                    compiler,
-                    ...compilerArgs,
-                    src.path,
-                    '-o',
-                    outputPath,
-                ]);
-            }
+        try {
             this.logger.info('Starting compilation', {
-                compileCommands,
-                postCommands,
+                compiler,
+                args,
+                src: src.path,
+                outputPath,
             });
 
-            const compileResults = await Promise.all(
-                compileCommands.map((cmd) =>
-                    Lang.runCommand(cmd, src.path, ac, timeout),
-                ),
+            const compilerArgs = args.split(/\s+/).filter(Boolean);
+
+            const result = await Lang.runCommand(
+                [compiler, ...compilerArgs, src.path, '-o', outputPath],
+                src.path,
+                ac,
+                timeout,
             );
-            const postResults = await Promise.all(
-                postCommands.map((cmd) =>
-                    Lang.runCommand(cmd, src.path, ac, timeout),
-                ),
-            );
-            const results = [...compileResults, ...postResults];
 
             this.logger.debug('Compilation completed successfully', {
                 path: src.path,
                 outputPath,
             });
-            io.compilationMsg = results
-                .map((result) => result.stderr.trim())
-                .filter((msg) => msg)
-                .join('\n\n');
+
+            io.compilationMsg = result.stderr.trim();
+
             return {
                 verdict: await access(outputPath, constants.X_OK)
                     .then(() => TCVerdicts.UKE)

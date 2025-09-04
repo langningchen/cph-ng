@@ -72,6 +72,18 @@ class CompilationSection extends SettingsSection {
     get cppArgs(): string {
         return this.get('cppArgs') as string;
     }
+    get javaCompiler(): string {
+        return this.get('javaCompiler') as string;
+    }
+    get javaArgs(): string {
+        return this.get('javaArgs') as string;
+    }
+    get javaRunner(): string {
+        return this.get('javaRunner') as string;
+    }
+    get javaRunArgs(): string {
+        return this.get('javaRunArgs') as string;
+    }
     get objcopy(): string {
         return this.get('objcopy') as string;
     }

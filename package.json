@@ -139,6 +139,26 @@
                         "default": "-O2 -std=c++14 -Wall -DCPH",
                         "markdownDescription": "%cph-ng.configuration.compilation.properties.cppArgs.markdownDescription%"
                     },
+                    "cph-ng.compilation.javaCompiler": {
+                        "type": "string",
+                        "default": "javac",
+                        "markdownDescription": "%cph-ng.configuration.compilation.properties.javaCompiler.markdownDescription%"
+                    },
+                    "cph-ng.compilation.javaArgs": {
+                        "type": "string",
+                        "default": "-cp .",
+                        "markdownDescription": "%cph-ng.configuration.compilation.properties.javaArgs.markdownDescription%"
+                    },
+                    "cph-ng.compilation.javaRunner": {
+                        "type": "string",
+                        "default": "java",
+                        "markdownDescription": "%cph-ng.configuration.compilation.properties.javaRunner.markdownDescription%"
+                    },
+                    "cph-ng.compilation.javaRunArgs": {
+                        "type": "string",
+                        "default": "",
+                        "markdownDescription": "%cph-ng.configuration.compilation.properties.javaRunArgs.markdownDescription%"
+                    },
                     "cph-ng.compilation.objcopy": {
                         "type": "string",
                         "default": "objcopy",

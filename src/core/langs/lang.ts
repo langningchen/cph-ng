@@ -15,11 +15,39 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { spawn } from 'child_process';
 import Result from '../../utils/result';
 import { FileWithHash } from '../../utils/types';
+import { dirname } from 'path';
 
 export type LangCompileResult = Result<{ outputPath: string; hash: string }>;
 export class Lang {
+    protected static runCommand(
+        cmd: string[],
+        srcPath: string,
+        ac: AbortController,
+        timeout: number,
+    ): Promise<{ stdout: string; stderr: string; code: number }> {
+        return new Promise((resolve, reject) => {
+            const child = spawn(cmd[0], cmd.slice(1), {
+                cwd: dirname(srcPath),
+                signal: ac.signal,
+            });
+            let stdout = '';
+            let stderr = '';
+            child.stdout.on('data', (data) => (stdout += data.toString()));
+            child.stderr.on('data', (data) => (stderr += data.toString()));
+            child.on('close', (code) => {
+                resolve({ stdout, stderr, code: code ?? 0 });
+            });
+            child.on('error', reject);
+            const timer = setTimeout(() => {
+                child.kill('SIGKILL');
+                reject(new Error('Compilation timeout'));
+            }, timeout);
+            child.on('close', () => clearTimeout(timer));
+        });
+    }
     public extensions: string[] = [];
     public async compile(
         _src: FileWithHash,
