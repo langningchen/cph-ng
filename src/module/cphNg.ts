@@ -1263,10 +1263,6 @@ export class CphNg {
             canSelectFiles: true,
             canSelectFolders: false,
             canSelectMany: false,
-            filters: {
-                [vscode.l10n.t('Available files')]: ['exe', 'c', 'cpp'],
-                [vscode.l10n.t('All files')]: ['*'],
-            },
             title: vscode.l10n.t('Select {fileType} File', {
                 fileType:
                     fileType === 'checker'

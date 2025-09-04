@@ -28,6 +28,7 @@ import { isRunningVerdict } from './utils/types';
 import LlmTcRunner from './ai/llmTcRunner';
 import LlmFileReader from './ai/llmFileReader';
 import { setExtensionUri } from './utils/global';
+import { Langs } from './core/langs/langs';
 
 class ExtensionManager {
     private logger: Logger = new Logger('extension');
@@ -313,8 +314,8 @@ class ExtensionManager {
                 this.cphNg.problem?.bfCompare?.generator?.path === filePath
             ) {
                 this.logger.debug('Generator file is active', { filePath });
-            } else if (['.cpp', '.c'].includes(extname(filePath))) {
-                this.logger.debug('C/C++ file is active', { filePath });
+            } else if (Langs.getLang(filePath) !== undefined) {
+                this.logger.debug('Source file is active', { filePath });
                 if (this.cphNg.problem?.src.path !== filePath) {
                     this.logger.trace(
                         'Last source file',

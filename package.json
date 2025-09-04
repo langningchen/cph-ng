@@ -485,39 +485,39 @@
             {
                 "command": "cph-ng.createProblem",
                 "key": "ctrl+alt+b",
-                "when": "resourceExtname =~ /\\.(cpp|c)$/ && !cph-ng.hasProblem && !cph-ng.canImport"
+                "when": "!cph-ng.hasProblem && !cph-ng.canImport"
             },
             {
                 "command": "cph-ng.importProblem",
                 "key": "ctrl+alt+b",
-                "when": "resourceExtname =~ /\\.(cpp|c)$/ && !cph-ng.hasProblem && cph-ng.canImport"
+                "when": "!cph-ng.hasProblem && cph-ng.canImport"
             },
             {
                 "command": "cph-ng.runTestCases",
                 "key": "ctrl+alt+b",
-                "when": "resourceExtname =~ /\\.(cpp|c)$/ && cph-ng.hasProblem && !cph-ng.isRunning"
+                "when": "cph-ng.hasProblem && !cph-ng.isRunning"
             },
             {
                 "command": "cph-ng.stopTestCases",
                 "key": "ctrl+alt+b",
-                "when": "resourceExtname =~ /\\.(cpp|c)$/ && cph-ng.hasProblem && cph-ng.isRunning"
+                "when": "cph-ng.hasProblem && cph-ng.isRunning"
             }
         ],
         "menus": {
             "editor/title": [
                 {
                     "command": "cph-ng.createProblem",
-                    "when": "resourceExtname =~ /\\.(cpp|c)$/ && !cph-ng.hasProblem",
+                    "when": "!cph-ng.hasProblem",
                     "group": "navigation"
                 },
                 {
                     "command": "cph-ng.runTestCases",
-                    "when": "resourceExtname =~ /\\.(cpp|c)$/ && cph-ng.hasProblem && !cph-ng.isRunning",
+                    "when": "cph-ng.hasProblem && !cph-ng.isRunning",
                     "group": "navigation"
                 },
                 {
                     "command": "cph-ng.stopTestCases",
-                    "when": "resourceExtname =~ /\\.(cpp|c)$/ && cph-ng.hasProblem && cph-ng.isRunning",
+                    "when": "cph-ng.hasProblem && cph-ng.isRunning",
                     "group": "navigation"
                 }
             ]
