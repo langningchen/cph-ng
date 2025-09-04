@@ -399,9 +399,8 @@ export class CphNg {
             result.verdict = TCVerdicts.JG;
             this.emitProblemChange();
 
-            const runCommand = lang.runCommand(compileData.src.outputPath);
             const runResult = await this.doRun(
-                runCommand,
+                await lang.runCommand(compileData.src.outputPath),
                 problem.timeLimit,
                 tc.stdin,
                 abortController,

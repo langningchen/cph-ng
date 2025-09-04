@@ -28,7 +28,7 @@ export class Lang {
     ): Promise<LangCompileResult> {
         throw new Error('Compile method not implemented.');
     }
-    public runCommand(_target: string): string {
+    public async runCommand(_target: string): Promise<string> {
         throw new Error('Run method not implemented.');
     }
 }

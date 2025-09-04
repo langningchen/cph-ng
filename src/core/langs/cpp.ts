@@ -159,4 +159,7 @@ export class LangCpp extends Lang {
             return { verdict: TCVerdicts.CE, msg: (e as Error).message };
         }
     }
+    public async runCommand(target: string): Promise<string> {
+        return target;
+    }
 }
