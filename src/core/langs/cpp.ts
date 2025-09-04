@@ -26,7 +26,8 @@ import { TCVerdicts } from '../../utils/types.backend';
 import * as vscode from 'vscode';
 import { SHA256 } from 'crypto-js';
 import { FileWithHash } from '../../utils/types';
-import { execAsync, exists } from '../../utils/exec';
+import { exists } from '../../utils/exec';
+import { spawn } from 'child_process';
 
 export class LangCpp extends Lang {
     private logger: Logger = new Logger('langCpp');
@@ -82,62 +83,110 @@ export class LangCpp extends Lang {
             timeout,
         } = Settings.compilation;
         try {
-            const compileCommands = [];
-            const postCommands = [];
+            const compileCommands: string[][] = [];
+            const postCommands: string[][] = [];
             if (useWrapper) {
                 const obj = `${outputPath}.o`;
                 const wrapperObj = `${outputPath}.wrapper.o`;
                 const linkObjects = [obj, wrapperObj];
 
+                const compilerArgs = args.split(/\s+/).filter(Boolean);
                 compileCommands.push(
-                    `${compiler} ${args} "${src.path}" -c -o "${obj}"`,
-                    `${compiler} -fPIC -c "${join(extensionUri.fsPath, 'res', 'wrapper.c')}" -o "${wrapperObj}"`,
+                    [compiler, ...compilerArgs, src.path, '-c', '-o', obj],
+                    [
+                        compiler,
+                        '-fPIC',
+                        '-c',
+                        join(extensionUri.fsPath, 'res', 'wrapper.c'),
+                        '-o',
+                        wrapperObj,
+                    ],
                 );
                 if (useHook) {
                     const hookObj = `${outputPath}.hook.o`;
                     linkObjects.push(hookObj);
-                    compileCommands.push(
-                        `${compiler} -fPIC -Wno-attributes -c "${join(extensionUri.fsPath, 'res', 'hook.c')}" -o "${hookObj}"`,
-                    );
+                    compileCommands.push([
+                        compiler,
+                        '-fPIC',
+                        '-Wno-attributes',
+                        '-c',
+                        join(extensionUri.fsPath, 'res', 'hook.c'),
+                        '-o',
+                        hookObj,
+                    ]);
                 }
                 postCommands.push(
-                    `${objcopy} --redefine-sym main=original_main "${obj}"`,
-                    `${compiler} ${args} ${linkObjects.map((o) => `"${o}"`).join(' ')} -o "${outputPath}"` +
-                        (type() === 'Linux' ? ' -ldl' : ''),
+                    [objcopy, '--redefine-sym', 'main=original_main', obj],
+                    [
+                        compiler,
+                        ...compilerArgs,
+                        ...linkObjects,
+                        '-o',
+                        outputPath,
+                        ...(type() === 'Linux' ? ['-ldl'] : []),
+                    ],
                 );
             } else {
-                compileCommands.push(
-                    `${compiler} ${args} "${src.path}" -o "${outputPath}"`,
-                );
+                const compilerArgs = args.split(/\s+/).filter(Boolean);
+                compileCommands.push([
+                    compiler,
+                    ...compilerArgs,
+                    src.path,
+                    '-o',
+                    outputPath,
+                ]);
             }
             this.logger.info('Starting compilation', {
                 compileCommands,
                 postCommands,
             });
-            const results = await Promise.all(
-                compileCommands.map((cmd) =>
-                    execAsync(cmd, {
-                        timeout,
+
+            const runCommand = (
+                cmd: string[],
+            ): Promise<{ stdout: string; stderr: string; code: number }> => {
+                return new Promise((resolve, reject) => {
+                    const child = spawn(cmd[0], cmd.slice(1), {
                         cwd: dirname(src.path),
                         signal: ac.signal,
-                    }),
-                ),
+                    });
+                    let stdout = '';
+                    let stderr = '';
+                    child.stdout.on(
+                        'data',
+                        (data) => (stdout += data.toString()),
+                    );
+                    child.stderr.on(
+                        'data',
+                        (data) => (stderr += data.toString()),
+                    );
+                    child.on('close', (code) => {
+                        resolve({ stdout, stderr, code: code ?? 0 });
+                    });
+                    child.on('error', reject);
+                    const timer = setTimeout(() => {
+                        child.kill('SIGKILL');
+                        reject(new Error('Compilation timeout'));
+                    }, timeout);
+                    child.on('close', () => clearTimeout(timer));
+                });
+            };
+
+            const compileResults = await Promise.all(
+                compileCommands.map(runCommand),
             );
-            for (const cmd of postCommands) {
-                results.push(
-                    await execAsync(cmd, {
-                        timeout,
-                        cwd: dirname(src.path),
-                        signal: ac.signal,
-                    }),
-                );
+            const postResults = await Promise.all(postCommands.map(runCommand));
+            const results = [...compileResults, ...postResults];
+
+            const failed = results.find((r) => r.code !== 0);
+            if (failed) {
+                throw new Error(`Compilation failed: ${failed.stderr}`);
             }
             this.logger.debug('Compilation completed successfully', {
                 path: src.path,
                 outputPath,
             });
             io.compilationMsg = results
-                .map((result) => (result.stderr ? result.stderr.trim() : ''))
+                .map((result) => result.stderr.trim())
                 .filter((msg) => msg)
                 .join('\n\n');
             return {
