@@ -41,9 +41,9 @@ export class Lang {
                 clearTimeout(timer);
                 resolve({ stdout, stderr, code: code ?? 0 });
             });
-            child.on('error', () => {
+            child.on('error', (e: Error) => {
                 clearTimeout(timer);
-                reject();
+                reject(e);
             });
             const timer = setTimeout(() => {
                 child.kill('SIGKILL');
