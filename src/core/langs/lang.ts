@@ -38,14 +38,17 @@ export class Lang {
             child.stdout.on('data', (data) => (stdout += data.toString()));
             child.stderr.on('data', (data) => (stderr += data.toString()));
             child.on('close', (code) => {
+                clearTimeout(timer);
                 resolve({ stdout, stderr, code: code ?? 0 });
             });
-            child.on('error', reject);
+            child.on('error', () => {
+                clearTimeout(timer);
+                reject();
+            });
             const timer = setTimeout(() => {
                 child.kill('SIGKILL');
                 reject(new Error('Compilation timeout'));
             }, timeout);
-            child.on('close', () => clearTimeout(timer));
         });
     }
     public extensions: string[] = [];
