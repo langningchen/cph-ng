@@ -97,7 +97,7 @@ export class LangCpp extends Lang {
                         compiler,
                         '-fPIC',
                         '-c',
-                        join(extensionUri.fsPath, 'res', 'wrapper.c'),
+                        join(extensionUri.fsPath, 'res', 'wrapper.cpp'),
                         '-o',
                         wrapperObj,
                     ],
@@ -110,7 +110,7 @@ export class LangCpp extends Lang {
                         '-fPIC',
                         '-Wno-attributes',
                         '-c',
-                        join(extensionUri.fsPath, 'res', 'hook.c'),
+                        join(extensionUri.fsPath, 'res', 'hook.cpp'),
                         '-o',
                         hookObj,
                     ]);
