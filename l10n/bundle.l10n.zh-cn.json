@@ -106,6 +106,7 @@
     "Running test case {idx} using CPH-NG...": "正在使用 CPH-NG 运行测试用例 {idx}...",
     "Runtime Error": "运行时错误",
     "Select a folder to save the problem source file": "选择一个文件夹以保存题目源文件",
+    "Select location to save": "选择保存位置",
     "Select test cases to add": "选择要添加的测试用例",
     "Select {fileType} File": "选择{fileType}文件",
     "Skipped": "已跳过",

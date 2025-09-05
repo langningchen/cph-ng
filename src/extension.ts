@@ -73,7 +73,10 @@ class ExtensionManager {
                 });
                 this.cphNg.problem = problem;
                 await this.cphNg.saveProblem();
-                await vscode.window.showTextDocument(document);
+                await vscode.window.showTextDocument(
+                    document,
+                    Settings.companion.showPanel,
+                );
                 this.updateContext();
             });
             this.cphNg = new CphNg();

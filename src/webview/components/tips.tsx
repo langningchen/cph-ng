@@ -62,6 +62,14 @@ const Tips = () => {
                 } satisfies OpenSettingsMsg),
         },
         { msg: t('tipMessage8') },
+        {
+            msg: t('tipMessage9'),
+            action: () =>
+                vscode.postMessage({
+                    type: 'openSettings',
+                    item: 'cph-ng.compilation.useWrapper',
+                } satisfies OpenSettingsMsg),
+        },
     ];
     const [idx, setIdx] = useState(
         Math.floor(Math.random() * tipMessages.length),

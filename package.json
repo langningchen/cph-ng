@@ -324,11 +324,11 @@
                             89,
                             91
                         ],
-                        "markdownEnumDescriptions": [
-                            "%cph-ng.configuration.companion.properties.submitLanguage.enumDescriptions.-1%",
-                            "%cph-ng.configuration.companion.properties.submitLanguage.enumDescriptions.54%",
-                            "%cph-ng.configuration.companion.properties.submitLanguage.enumDescriptions.89%",
-                            "%cph-ng.configuration.companion.properties.submitLanguage.enumDescriptions.91%"
+                        "enumItemLabels": [
+                            "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.-1%",
+                            "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.54%",
+                            "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.89%",
+                            "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.91%"
                         ]
                     },
                     "cph-ng.companion.addTimestamp": {
@@ -340,6 +340,50 @@
                         "type": "boolean",
                         "default": false,
                         "markdownDescription": "%cph-ng.configuration.companion.properties.chooseSaveFolder.markdownDescription%"
+                    },
+                    "cph-ng.companion.showPanel": {
+                        "type": "number",
+                        "default": -1,
+                        "markdownDescription": "%cph-ng.configuration.companion.properties.showPanel.markdownDescription%",
+                        "enum": [
+                            -1,
+                            -2,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9
+                        ],
+                        "enumItemLabels": [
+                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.-1%",
+                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.-2%",
+                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.1%",
+                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.2%",
+                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.3%",
+                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.4%",
+                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.5%",
+                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.6%",
+                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.7%",
+                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.8%",
+                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.9%"
+                        ],
+                        "markdownEnumDescriptions": [
+                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.-1%",
+                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.-2%",
+                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.1%",
+                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.2%",
+                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.3%",
+                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.4%",
+                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.5%",
+                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.6%",
+                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.7%",
+                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.8%",
+                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.9%"
+                        ]
                     }
                 }
             },

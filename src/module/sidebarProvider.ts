@@ -126,6 +126,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                         const compareTcMsg = msg as msgs.CompareTcMsg;
                         this.helper.compareTc(compareTcMsg.idx);
                         break;
+                    case 'toggleTcFile':
+                        const toggleTcFileMsg = msg as msgs.ToggleTcFileMsg;
+                        this.helper.toggleTcFile(
+                            toggleTcFileMsg.idx,
+                            toggleTcFileMsg.ext,
+                        );
+                        break;
                     case 'delTc':
                         const delTcMsg = msg as msgs.DelTcMsg;
                         await this.helper.delTc(delTcMsg.idx);

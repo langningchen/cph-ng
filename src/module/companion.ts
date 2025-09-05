@@ -105,6 +105,10 @@ class Companion {
         requestData: string,
         onCreateProblem: OnCreateProblem,
     ) {
+        if (requestData.trim() === '') {
+            this.logger.warn('Empty request data, ignoring');
+            return;
+        }
         this.logger.trace('processProblem', { requestData });
         try {
             const problem = CphCapable.toProblem(

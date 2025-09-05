@@ -68,6 +68,11 @@ export interface CompareTcMsg {
     type: 'compareTc';
     idx: number;
 }
+export interface ToggleTcFileMsg {
+    type: 'toggleTcFile';
+    idx: number;
+    ext: string;
+}
 export interface DelTcMsg {
     type: 'delTc';
     idx: number;

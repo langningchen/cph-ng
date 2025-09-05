@@ -18,6 +18,7 @@
 import * as vscode from 'vscode';
 import Settings from './settings';
 import { io, Logger } from './io';
+import { join, relative } from 'path';
 
 export class FolderChooser {
     private static logger: Logger = new Logger('folderChooser');
@@ -78,8 +79,10 @@ export class FolderChooser {
 
         const selected = await vscode.window.showQuickPick(
             subfolders.map((subfolder) => ({
-                label: vscode.workspace.asRelativePath(subfolder.uri),
-                description: subfolder.folder.name,
+                label: join(
+                    subfolder.folder.name,
+                    relative(subfolder.folder.uri.fsPath, subfolder.uri.fsPath),
+                ),
                 details: subfolder.uri.fsPath,
             })),
             {
@@ -90,7 +93,7 @@ export class FolderChooser {
         if (!selected) {
             return null;
         }
-        return vscode.Uri.file(selected.description);
+        return vscode.Uri.file(selected.details);
     }
 
     static async chooseFolder(title: string): Promise<vscode.Uri | null> {

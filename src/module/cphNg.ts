@@ -1246,6 +1246,34 @@ export class CphNg {
             );
         }
     }
+    public async toggleTcFile(idx: number, ext: string): Promise<void> {
+        if (!this.checkProblem() || !this.checkIdx(idx)) {
+            return;
+        }
+        const problem = this._problem!;
+        const tc = problem.tcs[idx];
+        if (tc.stdin.useFile) {
+            tc.stdin = { useFile: false, data: await tcIo2Str(tc.stdin) };
+        } else {
+            const tempFilePath = await vscode.window
+                .showSaveDialog({
+                    defaultUri: vscode.Uri.file(
+                        join(
+                            dirname(problem.src.path),
+                            `${basename(problem.src.path, extname(problem.src.path))}-${idx + 1}.${ext}`,
+                        ),
+                    ),
+                    saveLabel: vscode.l10n.t('Select location to save'),
+                })
+                .then((uri) => (uri ? uri.fsPath : undefined));
+            if (!tempFilePath) {
+                return;
+            }
+            await writeFile(tempFilePath, tc.stdin.data || '');
+            tc.stdin = { useFile: true, path: tempFilePath };
+        }
+        this.saveProblem();
+    }
     public async delTc(idx: number): Promise<void> {
         if (!this.checkProblem() || !this.checkIdx(idx)) {
             return;

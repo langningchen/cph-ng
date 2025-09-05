@@ -17,6 +17,7 @@
 
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ClearIcon from '@mui/icons-material/Clear';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DifferenceIcon from '@mui/icons-material/Difference';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
@@ -45,6 +46,7 @@ interface CodeMirrorSectionProps {
     value: TCIO;
     onBlur?: (value: string) => void;
     onChooseFile?: () => void;
+    onToggleFile?: () => void;
     outputActions?: OutputActions;
     readOnly?: boolean;
 }
@@ -106,6 +108,7 @@ const TcDataView = ({
     value,
     onBlur,
     onChooseFile,
+    onToggleFile,
     outputActions,
     readOnly,
 }: CodeMirrorSectionProps) => {
@@ -171,6 +174,13 @@ const TcDataView = ({
                             name={t('tcDataView.compare')}
                             icon={DifferenceIcon}
                             onClick={outputActions.onCompare}
+                        />
+                    )}
+                    {onToggleFile && (
+                        <CphButton
+                            name={t('tcDataView.toggleFile')}
+                            icon={ChangeCircleIcon}
+                            onClick={onToggleFile}
                         />
                     )}
                     {internalValue.useFile ? (

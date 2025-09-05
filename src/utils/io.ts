@@ -84,11 +84,14 @@ export class Io {
     }
 
     set compilationMsg(msg: string) {
-        const logger = new Logger('compilation');
-        logger.info('Setting compilation message:', msg);
+        this.logger.info('Setting compilation message', msg);
         compilationChannel.clear();
         compilationChannel.appendLine(msg);
-        compilationChannel.show();
+        if (msg.trim()) {
+            compilationChannel.show();
+        } else {
+            compilationChannel.hide();
+        }
         this._compilationMsg = msg;
     }
 

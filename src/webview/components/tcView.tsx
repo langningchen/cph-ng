@@ -31,6 +31,7 @@ import {
     CompareTcMsg,
     DelTcMsg,
     RunTcMsg,
+    ToggleTcFileMsg,
     UpdateTcMsg,
 } from '../msgs';
 import CphButton from './cphButton';
@@ -51,7 +52,7 @@ const TcView = ({ tc, idx }: TcViewProp) => {
     const emitUpdate = () =>
         vscode.postMessage({
             type: 'updateTc',
-            idx: idx,
+            idx,
             tc,
         } satisfies UpdateTcMsg);
 
@@ -108,7 +109,7 @@ const TcView = ({ tc, idx }: TcViewProp) => {
                                 e.stopPropagation();
                                 vscode.postMessage({
                                     type: 'runTc',
-                                    idx: idx,
+                                    idx,
                                     compile: e.altKey
                                         ? false
                                         : e.ctrlKey
@@ -125,7 +126,7 @@ const TcView = ({ tc, idx }: TcViewProp) => {
                                 e.stopPropagation();
                                 vscode.postMessage({
                                     type: 'delTc',
-                                    idx: idx,
+                                    idx,
                                 } satisfies DelTcMsg);
                             }}
                         />
@@ -150,10 +151,17 @@ const TcView = ({ tc, idx }: TcViewProp) => {
                                 onChooseFile={() =>
                                     vscode.postMessage({
                                         type: 'chooseTcFile',
-                                        idx: idx,
+                                        idx,
                                         label: 'stdin',
                                     } satisfies ChooseTcFileMsg)
                                 }
+                                onToggleFile={() => {
+                                    vscode.postMessage({
+                                        type: 'toggleTcFile',
+                                        idx,
+                                        ext: 'in',
+                                    } satisfies ToggleTcFileMsg);
+                                }}
                             />
                             <TcDataView
                                 label={t('tcView.answer')}
@@ -168,9 +176,16 @@ const TcView = ({ tc, idx }: TcViewProp) => {
                                 onChooseFile={() => {
                                     vscode.postMessage({
                                         type: 'chooseTcFile',
-                                        idx: idx,
+                                        idx,
                                         label: 'answer',
                                     } satisfies ChooseTcFileMsg);
+                                }}
+                                onToggleFile={() => {
+                                    vscode.postMessage({
+                                        type: 'toggleTcFile',
+                                        idx,
+                                        ext: 'ans',
+                                    } satisfies ToggleTcFileMsg);
                                 }}
                             />
                         </CphFlex>
@@ -194,15 +209,29 @@ const TcView = ({ tc, idx }: TcViewProp) => {
                                             onCompare: () => {
                                                 vscode.postMessage({
                                                     type: 'compareTc',
-                                                    idx: idx,
+                                                    idx,
                                                 } satisfies CompareTcMsg);
                                             },
+                                        }}
+                                        onToggleFile={() => {
+                                            vscode.postMessage({
+                                                type: 'toggleTcFile',
+                                                idx,
+                                                ext: 'out',
+                                            } satisfies ToggleTcFileMsg);
                                         }}
                                     />
                                     <TcDataView
                                         label={t('tcView.stderr')}
                                         value={tc.result.stderr}
                                         readOnly={true}
+                                        onToggleFile={() => {
+                                            vscode.postMessage({
+                                                type: 'toggleTcFile',
+                                                idx,
+                                                ext: 'err',
+                                            } satisfies ToggleTcFileMsg);
+                                        }}
                                     />
                                     <TcDataView
                                         label={t('tcView.message')}
