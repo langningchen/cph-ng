@@ -88,7 +88,7 @@ export class LangC extends Lang {
 
             const compilerArgs = args.split(/\s+/).filter(Boolean);
 
-            const result = await Lang.runCommand(
+            const result = await Lang.run(
                 [compiler, ...compilerArgs, src.path, '-o', outputPath],
                 src.path,
                 ac,
@@ -121,8 +121,8 @@ export class LangC extends Lang {
             return { verdict: TCVerdicts.CE, msg: (e as Error).message };
         }
     }
-    public async runCommand(target: string): Promise<string> {
+    public async runCommand(target: string): Promise<string[]> {
         this.logger.trace('runCommand', { target });
-        return target;
+        return [target];
     }
 }

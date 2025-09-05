@@ -247,7 +247,7 @@ export class CphNg {
         }
     }
     private async doRun(
-        runCommand: string,
+        runCommand: string[],
         timeLimit: number,
         stdin: TCIO,
         abortController: AbortController,
@@ -260,9 +260,9 @@ export class CphNg {
         this.logger.info('Running executable', runCommand);
         return new Promise((resolve) => {
             const startTime = Date.now();
-            const child = spawn(runCommand, [], {
+            const child = spawn(runCommand[0], runCommand.slice(1), {
                 stdio: ['pipe', 'pipe', 'pipe'],
-                cwd: dirname(runCommand),
+                cwd: dirname(runCommand[0]),
                 signal: abortController.signal,
             });
 
@@ -1438,7 +1438,7 @@ export class CphNg {
             );
             this.emitProblemChange();
             const generatorRunResult = await this.doRun(
-                generatorCompileResult.data!.outputPath,
+                [generatorCompileResult.data!.outputPath],
                 Settings.bfCompare.generatorTimeLimit,
                 { useFile: false, data: '' },
                 this.runAbortController,
@@ -1461,7 +1461,7 @@ export class CphNg {
             );
             this.emitProblemChange();
             const bruteForceRunResult = await this.doRun(
-                bruteForceCompileResult.data!.outputPath,
+                [bruteForceCompileResult.data!.outputPath],
                 Settings.bfCompare.bruteForceTimeLimit,
                 { useFile: false, data: generatorRunResult.stdout },
                 this.runAbortController,

@@ -22,7 +22,7 @@ import { dirname } from 'path';
 
 export type LangCompileResult = Result<{ outputPath: string; hash: string }>;
 export class Lang {
-    protected static runCommand(
+    protected static run(
         cmd: string[],
         srcPath: string,
         ac: AbortController,
@@ -56,7 +56,7 @@ export class Lang {
     ): Promise<LangCompileResult> {
         throw new Error('Compile method not implemented.');
     }
-    public async runCommand(_target: string): Promise<string> {
+    public async runCommand(_target: string): Promise<string[]> {
         throw new Error('Run method not implemented.');
     }
 }

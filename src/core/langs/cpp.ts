@@ -143,13 +143,11 @@ export class LangCpp extends Lang {
 
             const compileResults = await Promise.all(
                 compileCommands.map((cmd) =>
-                    Lang.runCommand(cmd, src.path, ac, timeout),
+                    Lang.run(cmd, src.path, ac, timeout),
                 ),
             );
             const postResults = await Promise.all(
-                postCommands.map((cmd) =>
-                    Lang.runCommand(cmd, src.path, ac, timeout),
-                ),
+                postCommands.map((cmd) => Lang.run(cmd, src.path, ac, timeout)),
             );
             const results = [...compileResults, ...postResults];
 
@@ -180,8 +178,8 @@ export class LangCpp extends Lang {
             return { verdict: TCVerdicts.CE, msg: (e as Error).message };
         }
     }
-    public async runCommand(target: string): Promise<string> {
+    public async runCommand(target: string): Promise<string[]> {
         this.logger.trace('runCommand', { target });
-        return target;
+        return [target];
     }
 }

@@ -88,7 +88,7 @@ export class LangJava extends Lang {
 
             const compilerArgs = args.split(/\s+/).filter(Boolean);
 
-            const result = await Lang.runCommand(
+            const result = await Lang.run(
                 [compiler, ...compilerArgs, '-d', classDir, src.path],
                 src.path,
                 ac,
@@ -122,13 +122,13 @@ export class LangJava extends Lang {
         }
     }
 
-    public async runCommand(target: string): Promise<string> {
+    public async runCommand(target: string): Promise<string[]> {
         this.logger.trace('runCommand', { target });
         const classDir = dirname(target);
         const className = basename(target, '.class');
         const { javaRunner: runner, javaRunArgs: runArgs } =
             Settings.compilation;
         const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
-        return [runner, ...runArgsArray, '-cp', classDir, className].join(' ');
+        return [runner, ...runArgsArray, '-cp', classDir, className];
     }
 }
