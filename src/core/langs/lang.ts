@@ -37,6 +37,10 @@ export class Lang {
             let stderr = '';
             child.stdout.on('data', (data) => (stdout += data.toString()));
             child.stderr.on('data', (data) => (stderr += data.toString()));
+            const timer = setTimeout(() => {
+                child.kill('SIGKILL');
+                reject(new Error('Compilation timeout'));
+            }, timeout);
             child.on('close', (code) => {
                 clearTimeout(timer);
                 resolve({ stdout, stderr, code: code ?? 0 });
@@ -45,10 +49,6 @@ export class Lang {
                 clearTimeout(timer);
                 reject(e);
             });
-            const timer = setTimeout(() => {
-                child.kill('SIGKILL');
-                reject(new Error('Compilation timeout'));
-            }, timeout);
         });
     }
     public extensions: string[] = [];
