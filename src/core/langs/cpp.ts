@@ -19,7 +19,7 @@ import { access, constants, readFile, unlink } from 'fs/promises';
 import { io, Logger } from '../../utils/io';
 import Settings from '../../utils/settings';
 import { Lang, LangCompileResult } from './lang';
-import { basename, dirname, extname, join } from 'path';
+import { basename, extname, join } from 'path';
 import { type } from 'os';
 import { extensionUri } from '../../utils/global';
 import { TCVerdicts } from '../../utils/types.backend';
@@ -27,14 +27,10 @@ import * as vscode from 'vscode';
 import { SHA256 } from 'crypto-js';
 import { FileWithHash } from '../../utils/types';
 import { exists } from '../../utils/exec';
-import { spawn } from 'child_process';
 
 export class LangCpp extends Lang {
     private logger: Logger = new Logger('langCpp');
     public extensions = ['cpp', 'cc', 'cxx', 'c++'];
-    public compileHashSuffix(): string {
-        return Settings.compilation.cppCompiler + Settings.compilation.cppArgs;
-    }
     public async compile(
         src: FileWithHash,
         ac: AbortController,

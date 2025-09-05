@@ -29,11 +29,6 @@ import { exists } from '../../utils/exec';
 export class LangJava extends Lang {
     private logger: Logger = new Logger('langJava');
     public extensions = ['java'];
-    public compileHashSuffix(): string {
-        return (
-            Settings.compilation.javaCompiler + Settings.compilation.javaArgs
-        );
-    }
     public async compile(
         src: FileWithHash,
         ac: AbortController,

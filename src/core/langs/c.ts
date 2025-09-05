@@ -30,9 +30,6 @@ import { exists } from '../../utils/exec';
 export class LangC extends Lang {
     private logger: Logger = new Logger('langC');
     public extensions = ['c'];
-    public compileHashSuffix(): string {
-        return Settings.compilation.cCompiler + Settings.compilation.cArgs;
-    }
     public async compile(
         src: FileWithHash,
         ac: AbortController,
