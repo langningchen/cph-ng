@@ -87,6 +87,7 @@
     "cph-ng.configuration.problem.title": "题目",
     "cph-ng.configuration.runner.properties.stderrThreshold.markdownDescription": "设置将标准错误输出（stderr）写入文件的**阈值**（单位为**字节**）。如果 stderr 输出大小超过此阈值，它将被重定向到文件以防止因大输出而导致的性能问题。设置为 `0` 则始终将 stderr 写入文件，设置为 `-1` 则完全禁用写入文件。",
     "cph-ng.configuration.runner.properties.timeAddition.markdownDescription": "在执行期间，为每个测试用例的时间限制添加额外的时间（单位为**毫秒**）。例如，如果一个测试用例的时间限制为 `1000ms`，此值为 `1000ms`，那么你的程序将被允许运行 `2000ms`，之后才会被终止。这对于应对轻微的开销或系统差异非常有用。",
+    "cph-ng.configuration.runner.properties.useRunner.markdownDescription": "**此选项仅适用于 C++ 程序。**启用后，将使用一个运行器来执行程序，以提供更准确的资源测量。（不要与 `#cphNg.compilation.useWrapper#` 选项同时使用）",
     "cph-ng.configuration.runner.title": "运行器",
     "cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.auto": "自动匹配 VSCode 颜色主题。",
     "cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.dark": "始终使用深色模式，无论 VSCode 主题如何。",

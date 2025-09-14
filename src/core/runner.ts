@@ -86,15 +86,27 @@ export class Runner {
         stdin: TCIO,
         abortController: AbortController,
     ): Promise<RunnerResult> {
-        return ProcessResultHandler.toRunner(
-            await ProcessExecutor.execute({
-                cmd,
-                timeout: timeLimit + Settings.runner.timeAddition,
-                stdin,
-                ac: abortController,
-            }),
-            abortController,
-        );
+        if (Settings.runner.useRunner) {
+            return ProcessResultHandler.toRunner(
+                await ProcessExecutor.executeWithRunner({
+                    cmd,
+                    timeout: timeLimit + Settings.runner.timeAddition,
+                    stdin,
+                    ac: abortController,
+                }),
+                abortController,
+            );
+        } else {
+            return ProcessResultHandler.toRunner(
+                await ProcessExecutor.execute({
+                    cmd,
+                    timeout: timeLimit + Settings.runner.timeAddition,
+                    stdin,
+                    ac: abortController,
+                }),
+                abortController,
+            );
+        }
     }
 
     private static async runWithInteractor(
