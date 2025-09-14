@@ -15,12 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import assert from 'assert';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { createReadStream } from 'fs';
-import { dirname } from 'path';
+import { SHA256 } from 'crypto-js';
+import * as fs from 'fs';
+import { createReadStream, createWriteStream } from 'fs';
+import * as koffi from 'koffi';
+import path, { dirname } from 'path';
 import { cwd } from 'process';
 import { pipeline } from 'stream/promises';
 import Logger from '../helpers/logger';
+import Settings from '../modules/settings';
+import { extensionPath } from '../utils/global';
 import { TCIO } from '../utils/types';
 
 interface ProcessExecutorOptions {
@@ -48,8 +54,112 @@ interface ProcessInfo {
     startTime: number;
 }
 
+interface RunInfo {
+    error: boolean;
+    timeout: boolean;
+    time_used: number;
+    memory_used: number;
+    exit_code: number;
+}
+
 export default class ProcessExecutor {
     private static logger: Logger = new Logger('processExecutor');
+
+    private static _runner: koffi.IKoffiLib;
+    private static _run: koffi.KoffiFunc<
+        (
+            exec: string,
+            input: string,
+            output: string,
+            time_limit: number,
+        ) => RunInfo
+    >;
+    public static _loadRunner() {
+        koffi.struct('RunInfo', {
+            error: koffi.types.bool,
+            timeout: koffi.types.bool,
+            time_used: koffi.types.size_t,
+            memory_used: koffi.types.size_t,
+            exit_code: koffi.types.uint8,
+        });
+        ProcessExecutor._runner = koffi.load(
+            path.resolve(extensionPath, 'res', 'runner.dll'),
+        );
+        ProcessExecutor._run = ProcessExecutor._runner.func(
+            'RunInfo run(const char*, const char*, const char*, size_t)',
+        );
+    }
+    public static async executeWithRunner(
+        options: ProcessExecutorOptions,
+    ): Promise<ProcessResult> {
+        this.logger.trace('executeWithRunner', options);
+        if (!ProcessExecutor._runner) {
+            this._loadRunner();
+        }
+        assert(options.stdin);
+        const { cmd, stdin, ac, timeout } = options;
+
+        const hash = SHA256(`${cmd.join(' ')}-${Date.now()}-${Math.random()}`)
+            .toString()
+            .substring(0, 8);
+
+        const ioDir = path.join(Settings.cache.directory, 'io');
+        const outputFile = path.join(ioDir, `${hash}.out`);
+        const inputFile = stdin.useFile
+            ? stdin.path
+            : path.join(ioDir, `${hash}.in`);
+        if (!stdin.useFile) {
+            await pipeline(stdin.data, createWriteStream(inputFile));
+        }
+        const result = ProcessExecutor._run(
+            cmd.join(' '),
+            inputFile,
+            outputFile,
+            timeout || 1000000000,
+        );
+        console.log('Runner result', result);
+        if (result.error) {
+            return {
+                exitCode: null,
+                signal: null,
+                stdout: '',
+                stderr: '',
+                killed: false,
+                startTime: 0,
+                endTime: 0,
+            };
+        } else if (result.timeout) {
+            return {
+                exitCode: null,
+                signal: 'SIGKILL',
+                stdout: '',
+                stderr: '',
+                killed: true,
+                startTime: 0,
+                endTime: 0,
+            };
+        } else if (result.exit_code !== 0) {
+            return {
+                exitCode: result.exit_code,
+                signal: null,
+                stdout: fs.readFileSync(outputFile, 'utf8'),
+                stderr: '',
+                killed: false,
+                startTime: 0,
+                endTime: result.time_used / 1e4,
+            };
+        } else {
+            return {
+                exitCode: result.exit_code,
+                signal: null,
+                stdout: fs.readFileSync(outputFile, 'utf8'),
+                stderr: '',
+                killed: false,
+                startTime: 0,
+                endTime: result.time_used / 1e4,
+            };
+        }
+    }
 
     public static async execute(
         options: ProcessExecutorOptions,

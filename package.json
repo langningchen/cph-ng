@@ -202,6 +202,11 @@
                         "type": "number",
                         "default": 1000,
                         "markdownDescription": "%cph-ng.configuration.runner.properties.stderrThreshold.markdownDescription%"
+                    },
+                    "cph-ng.runner.useRunner": {
+                        "type": "boolean",
+                        "default": false,
+                        "markdownDescription": "%cph-ng.configuration.runner.properties.useRunner.markdownDescription%"
                     }
                 }
             },
@@ -667,10 +672,12 @@
         "crypto-js": "^4.2.0",
         "elements": "link:../.local/share/pnpm/global/5/node_modules/@vscode-elements/elements",
         "i18next": "^25.5.2",
+        "koffi": "^2.14.1",
         "natural-orderby": "^5.0.0",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
         "react-i18next": "^15.7.3",
         "react-textarea-autosize": "^8.5.9"
-    }
+    },
+    "packageManager": "pnpm@10.16.0+sha512.8066e7b034217b700a9a4dbb3a005061d641ba130a89915213a10b3ca4919c19c037bec8066afdc559b89635fdb806b16ea673f2468fbb28aabfa13c53e3f769"
 }
