@@ -797,6 +797,7 @@ export default class CphNg {
             verdict: TCVerdicts.CP,
             stdout: { useFile: false, data: '' },
             stderr: { useFile: false, data: '' },
+            memory: undefined,
             time: 0,
             msg: '',
         };
@@ -845,6 +846,7 @@ export default class CphNg {
                 verdict: TCVerdicts.CP,
                 stdout: { useFile: false, data: '' },
                 stderr: { useFile: false, data: '' },
+                memory: undefined,
                 time: 0,
                 msg: '',
             };
@@ -1289,6 +1291,7 @@ export default class CphNg {
                     verdict: TCVerdicts.CP,
                     stdout: { useFile: false, data: '' },
                     stderr: { useFile: false, data: '' },
+                    memory: undefined,
                     time: 0,
                     msg: '',
                 },
