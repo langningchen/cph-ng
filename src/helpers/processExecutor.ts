@@ -54,7 +54,7 @@ interface ProcessInfo {
     startTime: number;
 }
 
-interface RunInfo {
+export interface RunInfo {
     error: boolean;
     timeout: boolean;
     time_used: number;
@@ -91,7 +91,7 @@ export default class ProcessExecutor {
     }
     public static async executeWithRunner(
         options: ProcessExecutorOptions,
-    ): Promise<ProcessResult> {
+    ): Promise<RunInfo & { stdout: string }> {
         this.logger.trace('executeWithRunner', options);
         if (!ProcessExecutor._runner) {
             this._loadRunner();
@@ -118,47 +118,7 @@ export default class ProcessExecutor {
             timeout || 1000000000,
         );
         console.log('Runner result', result);
-        if (result.error) {
-            return {
-                exitCode: null,
-                signal: null,
-                stdout: '',
-                stderr: '',
-                killed: false,
-                startTime: 0,
-                endTime: 0,
-            };
-        } else if (result.timeout) {
-            return {
-                exitCode: null,
-                signal: 'SIGKILL',
-                stdout: '',
-                stderr: '',
-                killed: true,
-                startTime: 0,
-                endTime: 0,
-            };
-        } else if (result.exit_code !== 0) {
-            return {
-                exitCode: result.exit_code,
-                signal: null,
-                stdout: fs.readFileSync(outputFile, 'utf8'),
-                stderr: '',
-                killed: false,
-                startTime: 0,
-                endTime: result.time_used / 1e4,
-            };
-        } else {
-            return {
-                exitCode: result.exit_code,
-                signal: null,
-                stdout: fs.readFileSync(outputFile, 'utf8'),
-                stderr: '',
-                killed: false,
-                startTime: 0,
-                endTime: result.time_used / 1e4,
-            };
-        }
+        return { ...result, stdout: fs.readFileSync(outputFile, 'utf8') };
     }
 
     public static async execute(
