@@ -163,6 +163,14 @@ OS: ${release()}`;
             );
             context.subscriptions.push(
                 vscode.commands.registerCommand(
+                    'cph-ng.compileRunner',
+                    async () => {
+                        await CphNg.compileRunner();
+                    },
+                ),
+            );
+            context.subscriptions.push(
+                vscode.commands.registerCommand(
                     'cph-ng.importFromCph',
                     async () => CphCapable.importFromCph(),
                 ),
@@ -244,6 +252,7 @@ OS: ${release()}`;
                 ),
             );
 
+            vscode.commands.executeCommand('cph-ng.compileRunner');
             ExtensionManager.updateContext();
             ExtensionManager.logger.info(
                 'CPH-NG extension activated successfully',

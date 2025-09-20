@@ -31,6 +31,7 @@ import { Lang } from './langs/lang';
 
 type RunnerResult = Result<undefined> & {
     time: number;
+    memory: number | undefined;
     stdout: string;
     stderr: string;
 };
@@ -86,15 +87,24 @@ export class Runner {
         stdin: TCIO,
         abortController: AbortController,
     ): Promise<RunnerResult> {
-        return ProcessResultHandler.toRunner(
-            await ProcessExecutor.execute({
+        if (Settings.runner.useRunner) {
+            return await ProcessExecutor.executeWithRunner({
                 cmd,
                 timeout: timeLimit + Settings.runner.timeAddition,
                 stdin,
                 ac: abortController,
-            }),
-            abortController,
-        );
+            });
+        } else {
+            return ProcessResultHandler.toRunner(
+                await ProcessExecutor.execute({
+                    cmd,
+                    timeout: timeLimit + Settings.runner.timeAddition,
+                    stdin,
+                    ac: abortController,
+                }),
+                abortController,
+            );
+        }
     }
 
     private static async runWithInteractor(
@@ -142,6 +152,7 @@ export class Runner {
             ...(intProcessResult.verdict !== TCVerdicts.UKE
                 ? intProcessResult
                 : solProcessResult),
+            memory: undefined,
             time: solProcessResult.time,
             stdout: await readFile(outputFile, 'utf-8'),
             stderr: solProcessResult.stderr,
@@ -168,6 +179,7 @@ export class Runner {
                 compileData.interactor?.outputPath,
             );
             result.time = runResult.time;
+            result.memory = runResult.memory;
             result.verdict = TCVerdicts.JGD;
             if (tc.answer.useFile) {
                 result.stdout = {

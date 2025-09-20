@@ -47,6 +47,7 @@ export type TCIO =
 
 export interface TCResult {
     verdict: TCVerdict;
+    memory: number | undefined;
     time: number;
     stdout: TCIO;
     stderr: TCIO;

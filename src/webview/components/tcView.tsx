@@ -109,6 +109,15 @@ const TcView = ({ tc, idx }: TcViewProp) => {
                                 <CphText>{tc.result?.verdict.name}</CphText>
                             </Tooltip>
                         </CphFlex>
+                        {!!tc.result?.memory && (
+                            <Chip
+                                label={t('tcView.memory', {
+                                    memory: tc.result.memory.toFixed(1),
+                                })}
+                                size={'small'}
+                                sx={{ marginLeft: 'auto', fontSize: '0.8rem' }}
+                            />
+                        )}
                         {!!tc.result?.time && (
                             <Chip
                                 label={t('tcView.time', {

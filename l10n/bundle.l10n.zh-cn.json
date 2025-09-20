@@ -100,6 +100,7 @@
     "Problem file {file} not found.": "未找到题目文件 {file}。",
     "Process exited with code: {code}.": "进程退出代码：{code}。",
     "Process exited with signal: {signal}.": "进程退出信号：{signal}。",
+    "Process failed to start": "进程启动失败",
     "Read Problem File": "读取题目文件",
     "Reading {fileDescription} file...": "正在读取 {fileDescription} 文件...",
     "Rejected": "已拒绝",
