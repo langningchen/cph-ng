@@ -36,6 +36,7 @@ import { Runner } from '../core/runner';
 import FolderChooser from '../helpers/folderChooser';
 import Io from '../helpers/io';
 import Logger from '../helpers/logger';
+import ProcessExecutor from '../helpers/processExecutor';
 import {
     buildEmbeddedBlock,
     EMBEDDED_FOOTER,
@@ -93,6 +94,9 @@ export default class CphNg {
         CphNg.emitProblemChange();
     }
 
+    public static async compileRunner() {
+        await ProcessExecutor.loadRunner();
+    }
     public static addProblemChangeListener(callback: ProblemChangeCallback) {
         CphNg.onProblemChange.push(callback);
     }

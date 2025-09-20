@@ -20,14 +20,16 @@ import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { SHA256 } from 'crypto-js';
 import * as fs from 'fs';
 import { createReadStream, createWriteStream } from 'fs';
-import * as koffi from 'koffi';
 import path, { dirname } from 'path';
 import { cwd } from 'process';
 import { pipeline } from 'stream/promises';
+import * as vscode from 'vscode';
 import Logger from '../helpers/logger';
 import Settings from '../modules/settings';
 import { extensionPath } from '../utils/global';
+import Result from '../utils/result';
 import { TCIO } from '../utils/types';
+import { TCVerdicts } from '../utils/types.backend';
 
 interface ProcessExecutorOptions {
     cmd: string[];
@@ -54,49 +56,86 @@ interface ProcessInfo {
     startTime: number;
 }
 
-export interface RunInfo {
-    error: boolean;
-    timeout: boolean;
-    time_used: number;
-    memory_used: number;
-    exit_code: number;
-}
+type RunInfo =
+    | {
+          error: false;
+          timeout: boolean;
+          time_used: number;
+          memory_used: number;
+          exit_code: number;
+      }
+    | {
+          error: true;
+          error_type: number;
+          error_code: number;
+      };
 
 export default class ProcessExecutor {
     private static logger: Logger = new Logger('processExecutor');
 
-    private static _runner: koffi.IKoffiLib;
-    private static _run: koffi.KoffiFunc<
-        (
-            exec: string,
-            input: string,
-            output: string,
-            time_limit: number,
-        ) => RunInfo
-    >;
-    public static _loadRunner() {
-        koffi.struct('RunInfo', {
-            error: koffi.types.bool,
-            timeout: koffi.types.bool,
-            time_used: koffi.types.size_t,
-            memory_used: koffi.types.size_t,
-            exit_code: koffi.types.uint8,
-        });
-        ProcessExecutor._runner = koffi.load(
-            path.resolve(extensionPath, 'res', 'runner.dll'),
-        );
-        ProcessExecutor._run = ProcessExecutor._runner.func(
-            'RunInfo run(const char*, const char*, const char*, size_t)',
-        );
+    private static _runner: string | null = null;
+    private static _supported_platform() {
+        return ['win32'].includes(process.platform);
+    }
+    public static async loadRunner() {
+        if (process.platform === 'win32') {
+            ProcessExecutor._runner = path.join(
+                extensionPath,
+                'res',
+                'runner.exe',
+            );
+            if (fs.existsSync(ProcessExecutor._runner)) {
+                return;
+            }
+            await ProcessExecutor.execute({
+                cmd: [
+                    Settings.compilation.cppCompiler,
+                    '-lpsapi',
+                    '-ladvapi32',
+                    '-static',
+                    '-o',
+                    ProcessExecutor._runner,
+                    path.join(extensionPath, 'res', 'runner.cpp'),
+                ],
+            });
+        }
     }
     public static async executeWithRunner(
         options: ProcessExecutorOptions,
-    ): Promise<RunInfo & { stdout: string }> {
-        this.logger.trace('executeWithRunner', options);
-        if (!ProcessExecutor._runner) {
-            this._loadRunner();
+    ): Promise<
+        Result<undefined> & {
+            time: number;
+            memory: number;
+            stdout: string;
+            stderr: string;
         }
+    > {
+        this.logger.trace('executeWithRunner', options);
+
         assert(options.stdin);
+        if (!ProcessExecutor._supported_platform()) {
+            return {
+                verdict: TCVerdicts.SE,
+                msg: `runner is unsupported for ${process.platform}`,
+                time: 0,
+                memory: 0,
+                stdout: '',
+                stderr: '',
+            };
+        }
+        if (
+            !ProcessExecutor._runner ||
+            !fs.existsSync(ProcessExecutor._runner)
+        ) {
+            return {
+                verdict: TCVerdicts.SE,
+                msg: 'Runner is not compiled',
+                time: 0,
+                memory: 0,
+                stdout: '',
+                stderr: '',
+            };
+        }
         const { cmd, stdin, ac, timeout } = options;
 
         const hash = SHA256(`${cmd.join(' ')}-${Date.now()}-${Math.random()}`)
@@ -111,14 +150,112 @@ export default class ProcessExecutor {
         if (!stdin.useFile) {
             await pipeline(stdin.data, createWriteStream(inputFile));
         }
-        const result = ProcessExecutor._run(
-            cmd.join(' '),
-            inputFile,
-            outputFile,
-            timeout || 1000000000,
-        );
-        console.log('Runner result', result);
-        return { ...result, stdout: fs.readFileSync(outputFile, 'utf8') };
+        const proce = await this.createProcess({
+            cmd: [
+                ProcessExecutor._runner,
+                cmd.join(' '),
+                inputFile,
+                outputFile,
+                (timeout || 1e18)?.toString(),
+            ],
+        });
+        const acListener = () => {
+            proce.child.stdin.write('abort\n');
+            proce.child.stdin.end();
+        };
+        ac?.signal.addEventListener('abort', acListener);
+        return new Promise(async (resolve) => {
+            proce.child.on('close', (code, signal) => {
+                ac?.signal.removeEventListener('abort', acListener);
+                if (ac?.signal.aborted) {
+                    resolve({
+                        verdict: TCVerdicts.RJ,
+                        msg: '',
+                        time: 0,
+                        memory: 0,
+                        stdout: '',
+                        stderr: '',
+                    });
+                    return;
+                }
+                try {
+                    this.logger.trace('Runner output:', proce.stdout);
+                    const runInfo = JSON.parse(proce.stdout);
+                    assert(runInfo satisfies RunInfo);
+                    if (runInfo.error) {
+                        resolve({
+                            verdict: TCVerdicts.SE,
+                            msg: `Runner error: type=${runInfo.error_type} code=${runInfo.error_code}`,
+                            time: 0,
+                            memory: 0,
+                            stdout: '',
+                            stderr: '',
+                        });
+                        return;
+                    }
+                    const time_used = runInfo.time_used / 1e4;
+                    const memory_used = runInfo.memory_used / 1024.0 / 1024.0;
+                    const stdout = fs.readFileSync(outputFile, 'utf8');
+                    if (runInfo.timeout) {
+                        resolve({
+                            verdict: TCVerdicts.TLE,
+                            msg: vscode.l10n.t('Killed due to timeout'),
+                            time: time_used,
+                            memory: memory_used,
+                            stdout,
+                            stderr: '',
+                        });
+                    } else if (runInfo.exit_code) {
+                        resolve({
+                            verdict: TCVerdicts.RE,
+                            msg: vscode.l10n.t(
+                                'Process exited with code: {code}.',
+                                {
+                                    code: runInfo.exit_code,
+                                },
+                            ),
+                            time: time_used,
+                            memory: memory_used,
+                            stdout,
+                            stderr: '',
+                        });
+                    } else {
+                        resolve({
+                            verdict: TCVerdicts.AC,
+                            msg: '',
+                            time: time_used,
+                            memory: memory_used,
+                            stdout,
+                            stderr: '',
+                        });
+                    }
+                } catch (error) {
+                    resolve({
+                        verdict: TCVerdicts.SE,
+                        msg: 'Runner output is not valid',
+                        time: 0,
+                        memory: 0,
+                        stdout: '',
+                        stderr: '',
+                    });
+                }
+            });
+            proce.child.on('error', (error) => {
+                ac?.signal.removeEventListener('abort', acListener);
+                resolve({
+                    ...(ac?.signal.aborted
+                        ? { verdict: TCVerdicts.RJ, msg: '' }
+                        : {
+                              verdict: TCVerdicts.SE,
+                              msg: vscode.l10n.t('Process failed to start'),
+                          }),
+                    time: 0,
+                    memory: 0,
+                    stdout: '',
+                    stderr: '',
+                });
+            });
+        });
     }
 
     public static async execute(
@@ -200,6 +337,7 @@ export default class ProcessExecutor {
             child: spawn(cmd[0], cmd.slice(1), {
                 cwd: cmd[0] ? dirname(cmd[0]) : cwd(),
                 signal: ac?.signal,
+                killSignal: 'SIGTERM',
             }),
             stdout: '',
             stderr: '',

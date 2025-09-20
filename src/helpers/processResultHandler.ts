@@ -21,7 +21,7 @@ import Settings from '../modules/settings';
 import Result from '../utils/result';
 import { TCVerdict } from '../utils/types';
 import { TCVerdicts } from '../utils/types.backend';
-import { ProcessResult, RunInfo } from './processExecutor';
+import { ProcessResult } from './processExecutor';
 
 export interface WrapperData {
     time: number;
@@ -100,43 +100,6 @@ export class ProcessResultHandler {
             memory: undefined,
             stdout: result.stdout,
             stderr: cleanStderr,
-        };
-    }
-    public static RunInfo2Runner(
-        result: RunInfo & { stdout: string },
-        abortController?: AbortController,
-        ignoreExitCode: boolean = false,
-    ): Result<undefined> & {
-        time: number;
-        memory: number;
-        stdout: string;
-        stderr: string;
-    } {
-        let verdict: TCVerdict = TCVerdicts.UKE;
-        let msg: string = '';
-
-        if (result.error) {
-            verdict = abortController?.signal.aborted
-                ? TCVerdicts.RJ
-                : TCVerdicts.SE;
-            msg = vscode.l10n.t('Process failed to start');
-            // TODO: add more detailed error message
-        } else if (result.timeout) {
-            verdict = TCVerdicts.TLE;
-            msg = vscode.l10n.t('Killed due to timeout');
-        } else if (!ignoreExitCode && result.exit_code !== 0) {
-            verdict = TCVerdicts.RE;
-            msg = vscode.l10n.t('Process exited with code: {code}.', {
-                code: result.exit_code,
-            });
-        }
-        return {
-            verdict,
-            msg,
-            time: result.time_used / 1e4,
-            memory: result.memory_used / 1024.0 / 1024.0,
-            stdout: result.stdout,
-            stderr: '',
         };
     }
 

@@ -88,15 +88,12 @@ export class Runner {
         abortController: AbortController,
     ): Promise<RunnerResult> {
         if (Settings.runner.useRunner) {
-            return ProcessResultHandler.RunInfo2Runner(
-                await ProcessExecutor.executeWithRunner({
-                    cmd,
-                    timeout: timeLimit + Settings.runner.timeAddition,
-                    stdin,
-                    ac: abortController,
-                }),
-                abortController,
-            );
+            return await ProcessExecutor.executeWithRunner({
+                cmd,
+                timeout: timeLimit + Settings.runner.timeAddition,
+                stdin,
+                ac: abortController,
+            });
         } else {
             return ProcessResultHandler.toRunner(
                 await ProcessExecutor.execute({
