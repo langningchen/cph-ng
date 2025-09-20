@@ -523,6 +523,10 @@
                 "title": "CPH-NG: Version Info"
             },
             {
+                "command": "cph-ng.compileRunner",
+                "title": "%cph-ng.commands.compileRunner%"
+            },
+            {
                 "command": "cph-ng.importFromCph",
                 "title": "%cph-ng.commands.importFromCph%"
             },
