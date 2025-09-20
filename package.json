@@ -676,7 +676,6 @@
         "crypto-js": "^4.2.0",
         "elements": "link:../.local/share/pnpm/global/5/node_modules/@vscode-elements/elements",
         "i18next": "^25.5.2",
-        "koffi": "^2.14.1",
         "natural-orderby": "^5.0.0",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
