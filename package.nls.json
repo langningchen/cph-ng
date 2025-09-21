@@ -5,6 +5,7 @@
     "cph-ng.commands.exportToEmbedded": "CPH-NG: Export to Embedded",
     "cph-ng.commands.importFromCph": "CPH-NG: Import from CPH",
     "cph-ng.commands.migrateFromCph": "CPH-NG: Migrate CPH Folder",
+    "cph-ng.commands.repairDataFiles": "CPH-NG: Repair Data Files",
     "cph-ng.commands.importProblem": "CPH-NG: Import Problem",
     "cph-ng.commands.loadTestCases": "CPH-NG: Load Test Cases",
     "cph-ng.commands.runTestCases": "CPH-NG: Run Test Cases",

@@ -523,7 +523,7 @@
             },
             {
                 "command": "cph-ng.migrateFromCph",
-                "title": "%cph-ng.commands.migrateFromCph%"
+                "title": "%cph-ng.commands.repairDataFiles%"
             },
             {
                 "command": "cph-ng.createProblem",

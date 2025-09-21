@@ -5,6 +5,7 @@
     "cph-ng.commands.exportToEmbedded": "CPH-NG: 导出到嵌入式",
     "cph-ng.commands.importFromCph": "CPH-NG: 从 CPH 导入",
     "cph-ng.commands.migrateFromCph": "CPH-NG: 迁移 CPH 文件夹",
+    "cph-ng.commands.repairDataFiles": "CPH-NG: 修复数据文件",
     "cph-ng.commands.importProblem": "CPH-NG: 导入题目",
     "cph-ng.commands.loadTestCases": "CPH-NG: 加载测试用例",
     "cph-ng.commands.runTestCases": "CPH-NG: 运行所有测试用例",

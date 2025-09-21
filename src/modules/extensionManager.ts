@@ -170,7 +170,7 @@ OS: ${release()}`;
             context.subscriptions.push(
                 vscode.commands.registerCommand(
                     'cph-ng.migrateFromCph',
-                    async () => CphNg.migrateWorkspace(),
+                    async () => CphNg.repairDataFiles(),
                 ),
             );
             context.subscriptions.push(
