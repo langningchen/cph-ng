@@ -17,11 +17,11 @@
 
 import { readFile } from 'fs/promises';
 import { join } from 'path';
-import { gunzipSync } from 'zlib';
 import * as vscode from 'vscode';
+import { gunzipSync } from 'zlib';
+import Logger from '../helpers/logger';
 import { migration, OldProblem } from './migration';
 import { Problem } from './types';
-import Logger from '../helpers/logger';
 
 const logger = new Logger('problemLoader');
 
@@ -30,14 +30,14 @@ const logger = new Logger('problemLoader');
  * @param binFilePath Path to the .bin file
  * @returns Promise that resolves to the loaded Problem or undefined if loading fails
  */
-export async function loadProblemFromBinFile(binFilePath: string): Promise<Problem | undefined> {
+export async function loadProblemFromBinFile(
+    binFilePath: string,
+): Promise<Problem | undefined> {
     logger.trace('loadProblemFromBinFile', { binFilePath });
     try {
         const data = await readFile(binFilePath);
         const problem = migration(
-            JSON.parse(
-                gunzipSync(data).toString(),
-            ) satisfies OldProblem,
+            JSON.parse(gunzipSync(data).toString()) satisfies OldProblem,
         );
         logger.debug('Loaded problem from bin file', {
             binFilePath,
@@ -45,7 +45,10 @@ export async function loadProblemFromBinFile(binFilePath: string): Promise<Probl
         });
         return problem;
     } catch (error) {
-        logger.error('Failed to load problem from bin file', { binFilePath, error });
+        logger.error('Failed to load problem from bin file', {
+            binFilePath,
+            error,
+        });
         return undefined;
     }
 }
@@ -58,7 +61,7 @@ export async function loadProblemFromBinFile(binFilePath: string): Promise<Probl
 export async function scanForBinFiles(folder: vscode.Uri): Promise<string[]> {
     logger.trace('scanForBinFiles', { folder });
     const binFiles: string[] = [];
-    
+
     try {
         const entries = await vscode.workspace.fs.readDirectory(folder);
         for (const [name, type] of entries) {
@@ -72,8 +75,11 @@ export async function scanForBinFiles(folder: vscode.Uri): Promise<string[]> {
             }
         }
     } catch (error) {
-        logger.error('Failed to scan directory for bin files', { folder, error });
+        logger.error('Failed to scan directory for bin files', {
+            folder,
+            error,
+        });
     }
-    
+
     return binFiles;
 }

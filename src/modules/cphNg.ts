@@ -28,7 +28,7 @@ import {
 import { orderBy } from 'natural-orderby';
 import { basename, dirname, extname, join, relative } from 'path';
 import * as vscode from 'vscode';
-import { gunzipSync, gzipSync } from 'zlib';
+import { gzipSync } from 'zlib';
 import { version } from '../../package.json';
 import { Lang, LangCompileResult } from '../core/langs/lang';
 import Langs from '../core/langs/langs';
@@ -42,8 +42,10 @@ import {
     EMBEDDED_HEADER,
     extractEmbedded,
 } from '../utils/embedded';
-import { migration, OldProblem } from '../utils/migration';
-import { loadProblemFromBinFile, scanForBinFiles } from '../utils/problemLoader';
+import {
+    loadProblemFromBinFile,
+    scanForBinFiles,
+} from '../utils/problemLoader';
 import Result from '../utils/result';
 import { renderTemplate } from '../utils/strTemplate';
 import {
@@ -334,11 +336,6 @@ export default class CphNg {
                     binFile,
                 );
             } else {
-                Io.warn(
-                    vscode.l10n.t('Parse problem file {file} failed.', {
-                        file: basename(binFile),
-                    }),
-                );
                 CphNg.problem = undefined;
             }
         } catch (e) {
@@ -1335,7 +1332,7 @@ export default class CphNg {
 
     public static async repairDataFiles(): Promise<void> {
         CphNg.logger.trace('repairDataFiles');
-        
+
         // Get the current workspace folder
         const currentWorkspace = vscode.workspace.workspaceFolders?.[0];
         if (!currentWorkspace) {
@@ -1343,15 +1340,17 @@ export default class CphNg {
             return;
         }
 
-        CphNg.logger.info('Starting data file repair in workspace', { 
-            workspace: currentWorkspace.fsPath 
+        CphNg.logger.info('Starting data file repair in workspace', {
+            currentWorkspace,
         });
 
         // Find .cph-ng folders in the current workspace
         const cphNgFolders = await CphNg.findCphNgFolders(currentWorkspace.uri);
         if (cphNgFolders.length === 0) {
             Io.info(
-                vscode.l10n.t('No .cph-ng folders found in the current workspace.'),
+                vscode.l10n.t(
+                    'No .cph-ng folders found in the current workspace.',
+                ),
             );
             return;
         }
@@ -1372,9 +1371,15 @@ export default class CphNg {
             return;
         }
 
-        CphNg.logger.debug('Found problem files to repair', { count: allBinFiles.length });
+        CphNg.logger.debug('Found problem files to repair', {
+            count: allBinFiles.length,
+        });
 
-        const repairedProblems: { original: Problem; repaired: Problem; binPath: string }[] = [];
+        const repairedProblems: {
+            original: Problem;
+            repaired: Problem;
+            binPath: string;
+        }[] = [];
         let repairedCount = 0;
 
         for (const binFilePath of allBinFiles) {
@@ -1385,34 +1390,42 @@ export default class CphNg {
             }
 
             // Repair the problem paths
-            const repairedProblem = await CphNg.repairProblemPaths(originalProblem, currentWorkspace.uri);
-            
+            const repairedProblem = await CphNg.repairProblemPaths(
+                originalProblem,
+                currentWorkspace.uri,
+            );
+
             // Check if any paths were actually changed
             if (CphNg.hasPathChanges(originalProblem, repairedProblem)) {
-                repairedProblems.push({ 
-                    original: originalProblem, 
-                    repaired: repairedProblem, 
-                    binPath: binFilePath 
+                repairedProblems.push({
+                    original: originalProblem,
+                    repaired: repairedProblem,
+                    binPath: binFilePath,
                 });
             }
         }
 
         if (repairedProblems.length === 0) {
             Io.info(
-                vscode.l10n.t('All problem files are already correctly configured for this workspace.'),
+                vscode.l10n.t(
+                    'All problem files are already correctly configured for this workspace.',
+                ),
             );
             return;
         }
 
         // Show repair preview to user
         const shouldRepair = await vscode.window.showInformationMessage(
-            vscode.l10n.t('Found {count} problem files with outdated paths. Repair them?', {
-                count: repairedProblems.length,
-            }),
+            vscode.l10n.t(
+                'Found {count} problem files with outdated paths. Repair them?',
+                {
+                    count: repairedProblems.length,
+                },
+            ),
             { modal: true },
             vscode.l10n.t('Repair All'),
             vscode.l10n.t('Show Details'),
-            vscode.l10n.t('Cancel')
+            vscode.l10n.t('Cancel'),
         );
 
         if (shouldRepair === vscode.l10n.t('Cancel') || !shouldRepair) {
@@ -1428,9 +1441,15 @@ export default class CphNg {
                         vscode.l10n.t('Number of test cases: {cnt}', {
                             cnt: item.repaired.tcs.length,
                         }),
-                        item.repaired.checker ? vscode.l10n.t('Special Judge') : '',
-                        item.repaired.interactor ? vscode.l10n.t('Interactive') : '',
-                        item.repaired.bfCompare ? vscode.l10n.t('Brute Force Comparison') : '',
+                        item.repaired.checker
+                            ? vscode.l10n.t('Special Judge')
+                            : '',
+                        item.repaired.interactor
+                            ? vscode.l10n.t('Interactive')
+                            : '',
+                        item.repaired.bfCompare
+                            ? vscode.l10n.t('Brute Force Comparison')
+                            : '',
                     ]
                         .join(' ')
                         .trim(),
@@ -1440,7 +1459,7 @@ export default class CphNg {
                 })),
                 {
                     canPickMany: true,
-                    title: vscode.l10n.t('Select problems to repair (paths will be updated)'),
+                    title: vscode.l10n.t('Select problems to repair'),
                 },
             );
 
@@ -1450,7 +1469,9 @@ export default class CphNg {
             }
 
             // Update the list to only include selected problems
-            const selectedProblems = chosenIdx.map((idx) => repairedProblems[idx.value]);
+            const selectedProblems = chosenIdx.map(
+                (idx) => repairedProblems[idx.value],
+            );
             repairedProblems.length = 0;
             repairedProblems.push(...selectedProblems);
         }
@@ -1462,16 +1483,16 @@ export default class CphNg {
                 const data = gzipSync(Buffer.from(JSON.stringify(problem)));
                 await writeFile(binPath, data);
                 repairedCount++;
-                CphNg.logger.info('Successfully repaired problem', { 
+                CphNg.logger.info('Successfully repaired problem', {
                     problemName: problem.name,
                     binPath,
-                    srcPath: problem.src.path
+                    srcPath: problem.src.path,
                 });
             } catch (error) {
-                CphNg.logger.error('Failed to repair problem', { 
+                CphNg.logger.error('Failed to repair problem', {
                     problemName: problem.name,
                     binPath,
-                    error
+                    error,
                 });
                 Io.warn(
                     vscode.l10n.t('Failed to repair problem: {name}', {
@@ -1482,44 +1503,65 @@ export default class CphNg {
         }
 
         Io.info(
-            vscode.l10n.t('Repair completed. {count} problem files repaired successfully.', {
-                count: repairedCount,
-            }),
+            vscode.l10n.t(
+                'Repair completed. {count} problem files repaired successfully.',
+                {
+                    count: repairedCount,
+                },
+            ),
         );
     }
 
-    private static async findCphNgFolders(workspaceUri: vscode.Uri): Promise<vscode.Uri[]> {
+    private static async findCphNgFolders(
+        workspaceUri: vscode.Uri,
+    ): Promise<vscode.Uri[]> {
         const cphNgFolders: vscode.Uri[] = [];
-        
+
         try {
-            const entries = await vscode.workspace.fs.readDirectory(workspaceUri);
+            const entries =
+                await vscode.workspace.fs.readDirectory(workspaceUri);
             for (const [name, type] of entries) {
                 if (type === vscode.FileType.Directory) {
                     if (name === '.cph-ng') {
-                        cphNgFolders.push(vscode.Uri.joinPath(workspaceUri, name));
+                        cphNgFolders.push(
+                            vscode.Uri.joinPath(workspaceUri, name),
+                        );
                     } else {
                         // Recursively search in subdirectories
-                        const subfolderUri = vscode.Uri.joinPath(workspaceUri, name);
-                        const subCphNgFolders = await CphNg.findCphNgFolders(subfolderUri);
+                        const subfolderUri = vscode.Uri.joinPath(
+                            workspaceUri,
+                            name,
+                        );
+                        const subCphNgFolders =
+                            await CphNg.findCphNgFolders(subfolderUri);
                         cphNgFolders.push(...subCphNgFolders);
                     }
                 }
             }
         } catch (error) {
-            CphNg.logger.error('Failed to scan directory for .cph-ng folders', { workspaceUri, error });
+            CphNg.logger.error('Failed to scan directory for .cph-ng folders', {
+                workspaceUri,
+                error,
+            });
         }
-        
+
         return cphNgFolders;
     }
 
-    private static async repairProblemPaths(problem: Problem, workspaceUri: vscode.Uri): Promise<Problem> {
+    private static async repairProblemPaths(
+        problem: Problem,
+        workspaceUri: vscode.Uri,
+    ): Promise<Problem> {
         const repairedProblem: Problem = { ...problem };
-        
+
         // Repair source file path
         if (problem.src.path) {
             repairedProblem.src = {
                 ...problem.src,
-                path: await CphNg.findBestMatchingFile(problem.src.path, workspaceUri)
+                path: await CphNg.findBestMatchingFile(
+                    problem.src.path,
+                    workspaceUri,
+                ),
             };
         }
 
@@ -1527,7 +1569,10 @@ export default class CphNg {
         if (problem.checker?.path) {
             repairedProblem.checker = {
                 ...problem.checker,
-                path: await CphNg.findBestMatchingFile(problem.checker.path, workspaceUri)
+                path: await CphNg.findBestMatchingFile(
+                    problem.checker.path,
+                    workspaceUri,
+                ),
             };
         }
 
@@ -1535,7 +1580,10 @@ export default class CphNg {
         if (problem.interactor?.path) {
             repairedProblem.interactor = {
                 ...problem.interactor,
-                path: await CphNg.findBestMatchingFile(problem.interactor.path, workspaceUri)
+                path: await CphNg.findBestMatchingFile(
+                    problem.interactor.path,
+                    workspaceUri,
+                ),
             };
         }
 
@@ -1546,7 +1594,10 @@ export default class CphNg {
             }
             repairedProblem.bfCompare.generator = {
                 ...problem.bfCompare.generator,
-                path: await CphNg.findBestMatchingFile(problem.bfCompare.generator.path, workspaceUri)
+                path: await CphNg.findBestMatchingFile(
+                    problem.bfCompare.generator.path,
+                    workspaceUri,
+                ),
             };
         }
 
@@ -1556,17 +1607,23 @@ export default class CphNg {
             }
             repairedProblem.bfCompare.bruteForce = {
                 ...problem.bfCompare.bruteForce,
-                path: await CphNg.findBestMatchingFile(problem.bfCompare.bruteForce.path, workspaceUri)
+                path: await CphNg.findBestMatchingFile(
+                    problem.bfCompare.bruteForce.path,
+                    workspaceUri,
+                ),
             };
         }
 
         return repairedProblem;
     }
 
-    private static async findBestMatchingFile(originalPath: string, workspaceUri: vscode.Uri): Promise<string> {
+    private static async findBestMatchingFile(
+        originalPath: string,
+        workspaceUri: vscode.Uri,
+    ): Promise<string> {
         const fileName = basename(originalPath);
         const workspacePath = workspaceUri.fsPath;
-        
+
         // If the original path is already within the workspace and exists, keep it
         if (originalPath.startsWith(workspacePath)) {
             try {
@@ -1576,47 +1633,79 @@ export default class CphNg {
                 // File doesn't exist, continue searching
             }
         }
-        
+
         // Search for the file in the workspace
-        const foundFiles = await CphNg.searchFileInWorkspace(fileName, workspaceUri);
-        
+        const foundFiles = await CphNg.searchFileInWorkspace(
+            fileName,
+            workspaceUri,
+        );
+
         if (foundFiles.length > 0) {
             // Return the first match (could be improved with better matching logic)
             return foundFiles[0];
         }
-        
+
         // If no matching file found, create a path in the workspace root
         return join(workspacePath, fileName);
     }
 
-    private static async searchFileInWorkspace(fileName: string, workspaceUri: vscode.Uri): Promise<string[]> {
+    private static async searchFileInWorkspace(
+        fileName: string,
+        workspaceUri: vscode.Uri,
+    ): Promise<string[]> {
         const foundFiles: string[] = [];
-        
+
         try {
-            const entries = await vscode.workspace.fs.readDirectory(workspaceUri);
+            const entries =
+                await vscode.workspace.fs.readDirectory(workspaceUri);
             for (const [name, type] of entries) {
                 if (type === vscode.FileType.File && name === fileName) {
                     foundFiles.push(join(workspaceUri.fsPath, name));
-                } else if (type === vscode.FileType.Directory && !name.startsWith('.')) {
+                } else if (
+                    type === vscode.FileType.Directory &&
+                    !name.startsWith('.')
+                ) {
                     // Recursively search in subdirectories (excluding hidden folders)
-                    const subfolderUri = vscode.Uri.joinPath(workspaceUri, name);
-                    const subFiles = await CphNg.searchFileInWorkspace(fileName, subfolderUri);
+                    const subfolderUri = vscode.Uri.joinPath(
+                        workspaceUri,
+                        name,
+                    );
+                    const subFiles = await CphNg.searchFileInWorkspace(
+                        fileName,
+                        subfolderUri,
+                    );
                     foundFiles.push(...subFiles);
                 }
             }
         } catch (error) {
-            CphNg.logger.error('Failed to search file in workspace', { fileName, workspaceUri, error });
+            CphNg.logger.error('Failed to search file in workspace', {
+                fileName,
+                workspaceUri,
+                error,
+            });
         }
-        
+
         return foundFiles;
     }
 
-    private static hasPathChanges(original: Problem, repaired: Problem): boolean {
+    private static hasPathChanges(
+        original: Problem,
+        repaired: Problem,
+    ): boolean {
         if (original.src.path !== repaired.src.path) return true;
         if (original.checker?.path !== repaired.checker?.path) return true;
-        if (original.interactor?.path !== repaired.interactor?.path) return true;
-        if (original.bfCompare?.generator?.path !== repaired.bfCompare?.generator?.path) return true;
-        if (original.bfCompare?.bruteForce?.path !== repaired.bfCompare?.bruteForce?.path) return true;
+        if (original.interactor?.path !== repaired.interactor?.path)
+            return true;
+        if (
+            original.bfCompare?.generator?.path !==
+            repaired.bfCompare?.generator?.path
+        )
+            return true;
+        if (
+            original.bfCompare?.bruteForce?.path !==
+            repaired.bfCompare?.bruteForce?.path
+        )
+            return true;
         return false;
     }
 }
