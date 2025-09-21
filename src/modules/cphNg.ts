@@ -431,6 +431,9 @@ export default class CphNg {
         if (CphNg.problem === undefined) {
             await CphNg.loadProblemFromEmbedded(cppFile);
         }
+        if (CphNg.problem) {
+            CphNg.problem.src.path = cppFile;
+        }
     }
     public static async editProblemDetails(
         title: string,
