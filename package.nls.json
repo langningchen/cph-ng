@@ -4,7 +4,7 @@
     "cph-ng.commands.deleteProblem": "CPH-NG: Delete Problem",
     "cph-ng.commands.exportToEmbedded": "CPH-NG: Export to Embedded",
     "cph-ng.commands.importFromCph": "CPH-NG: Import from CPH",
-    "cph-ng.commands.migrateFromCph": "CPH-NG: Migrate from CPH",
+    "cph-ng.commands.migrateFromCph": "CPH-NG: Migrate CPH Folder",
     "cph-ng.commands.importProblem": "CPH-NG: Import Problem",
     "cph-ng.commands.loadTestCases": "CPH-NG: Load Test Cases",
     "cph-ng.commands.runTestCases": "CPH-NG: Run Test Cases",
