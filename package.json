@@ -522,7 +522,7 @@
                 "title": "%cph-ng.commands.importFromCph%"
             },
             {
-                "command": "cph-ng.migrateFromCph",
+                "command": "cph-ng.repairDataFiles",
                 "title": "%cph-ng.commands.repairDataFiles%"
             },
             {

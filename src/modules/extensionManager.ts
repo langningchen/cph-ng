@@ -169,7 +169,7 @@ OS: ${release()}`;
             );
             context.subscriptions.push(
                 vscode.commands.registerCommand(
-                    'cph-ng.migrateFromCph',
+                    'cph-ng.repairDataFiles',
                     async () => CphNg.repairDataFiles(),
                 ),
             );
