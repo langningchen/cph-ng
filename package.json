@@ -522,6 +522,10 @@
                 "title": "%cph-ng.commands.importFromCph%"
             },
             {
+                "command": "cph-ng.migrateFromCph",
+                "title": "%cph-ng.commands.migrateFromCph%"
+            },
+            {
                 "command": "cph-ng.createProblem",
                 "title": "%cph-ng.commands.createProblem%",
                 "icon": "$(rocket)"

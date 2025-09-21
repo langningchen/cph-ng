@@ -158,4 +158,190 @@ export default class CphCapable {
             await CphNg.saveProblem(problem);
         }
     }
+
+    public static async migrateFromCph(): Promise<void> {
+        this.logger.trace('migrateFromCph');
+        
+        // Get the current workspace folder
+        const currentWorkspace = vscode.workspace.workspaceFolders?.[0];
+        if (!currentWorkspace) {
+            Io.error(vscode.l10n.t('No workspace folder is open.'));
+            return;
+        }
+
+        // Select the source CPH folder
+        const sourceCphFolder = await FolderChooser.chooseFolder(
+            vscode.l10n.t(
+                'Select the source .cph folder to migrate from',
+            ),
+        );
+        if (!sourceCphFolder) {
+            this.logger.info('No source folder selected, aborting migration');
+            return;
+        }
+
+        // Select the target folder within current workspace
+        const targetFolder = await FolderChooser.chooseFolder(
+            vscode.l10n.t(
+                'Select the target folder in current workspace to migrate to',
+            ),
+        );
+        if (!targetFolder) {
+            this.logger.info('No target folder selected, aborting migration');
+            return;
+        }
+
+        this.logger.info('Starting migration', { 
+            sourceCphFolder: sourceCphFolder.fsPath, 
+            targetFolder: targetFolder.fsPath 
+        });
+
+        const probFiles = await vscode.workspace.fs.readDirectory(sourceCphFolder);
+        this.logger.debug('Read source directory contents', { probFiles });
+        
+        const problems: Problem[] = [];
+        const migrationInfo: { original: Problem; migrated: Problem }[] = [];
+
+        for (const [name, type] of probFiles) {
+            if (type === vscode.FileType.File && name.endsWith('.prob')) {
+                const probFilePath = join(sourceCphFolder.fsPath, name);
+                const originalProblem = await this.loadProblem(probFilePath);
+                if (originalProblem) {
+                    // Create a migrated version with updated paths
+                    const originalSrcPath = originalProblem.src.path;
+                    const srcFileName = basename(originalSrcPath);
+                    const newSrcPath = join(targetFolder.fsPath, srcFileName);
+                    
+                    const migratedProblem: Problem = {
+                        ...originalProblem,
+                        src: { 
+                            path: newSrcPath,
+                            hash: originalProblem.src.hash 
+                        }
+                    };
+
+                    // If there are checker/interactor files, migrate them too
+                    if (originalProblem.checker) {
+                        const checkerFileName = basename(originalProblem.checker.path);
+                        migratedProblem.checker = {
+                            path: join(targetFolder.fsPath, checkerFileName),
+                            hash: originalProblem.checker.hash
+                        };
+                    }
+
+                    if (originalProblem.interactor) {
+                        const interactorFileName = basename(originalProblem.interactor.path);
+                        migratedProblem.interactor = {
+                            path: join(targetFolder.fsPath, interactorFileName),
+                            hash: originalProblem.interactor.hash
+                        };
+                    }
+
+                    if (originalProblem.bfCompare?.generator) {
+                        const generatorFileName = basename(originalProblem.bfCompare.generator.path);
+                        migratedProblem.bfCompare = {
+                            ...originalProblem.bfCompare,
+                            generator: {
+                                path: join(targetFolder.fsPath, generatorFileName),
+                                hash: originalProblem.bfCompare.generator.hash
+                            }
+                        };
+                    }
+
+                    if (originalProblem.bfCompare?.bruteForce) {
+                        const bruteForceFileName = basename(originalProblem.bfCompare.bruteForce.path);
+                        if (!migratedProblem.bfCompare) {
+                            migratedProblem.bfCompare = { ...originalProblem.bfCompare };
+                        }
+                        migratedProblem.bfCompare.bruteForce = {
+                            path: join(targetFolder.fsPath, bruteForceFileName),
+                            hash: originalProblem.bfCompare.bruteForce.hash
+                        };
+                    }
+
+                    problems.push(migratedProblem);
+                    migrationInfo.push({ original: originalProblem, migrated: migratedProblem });
+                    this.logger.info('Prepared problem for migration', { 
+                        probFilePath,
+                        originalSrcPath,
+                        newSrcPath
+                    });
+                } else {
+                    this.logger.warn('Failed to load problem for migration', {
+                        probFilePath,
+                    });
+                }
+            }
+        }
+
+        if (problems.length === 0) {
+            Io.info(
+                vscode.l10n.t('No problem files found in the selected folder.'),
+            );
+            return;
+        }
+
+        // Show migration preview to user
+        const chosenIdx = await vscode.window.showQuickPick(
+            problems.map((p, idx) => {
+                const info = migrationInfo[idx];
+                return {
+                    label: p.name,
+                    description: [
+                        vscode.l10n.t('Number of test cases: {cnt}', {
+                            cnt: p.tcs.length,
+                        }),
+                        p.checker ? vscode.l10n.t('Special Judge') : '',
+                        p.interactor ? vscode.l10n.t('Interactive') : '',
+                        p.bfCompare ? vscode.l10n.t('Brute Force Comparison') : '',
+                    ]
+                        .join(' ')
+                        .trim(),
+                    detail: `${basename(info.original.src.path)} → ${basename(info.migrated.src.path)}`,
+                    picked: true,
+                    value: idx,
+                };
+            }),
+            {
+                canPickMany: true,
+                title: vscode.l10n.t('Select problems to migrate (paths will be updated)'),
+            },
+        );
+
+        if (!chosenIdx || chosenIdx.length === 0) {
+            this.logger.info('No problems selected for migration, aborting');
+            return;
+        }
+
+        this.logger.info('Selected problems for migration', { chosenIdx });
+        const selectedProblems = chosenIdx.map((idx) => problems[idx.value]);
+        let migratedCount = 0;
+
+        for (const problem of selectedProblems) {
+            try {
+                await CphNg.saveProblem(problem);
+                migratedCount++;
+                this.logger.info('Successfully migrated problem', { 
+                    problemName: problem.name,
+                    srcPath: problem.src.path
+                });
+            } catch (error) {
+                this.logger.error('Failed to migrate problem', { 
+                    problemName: problem.name,
+                    error
+                });
+                Io.warn(
+                    vscode.l10n.t('Failed to migrate problem: {name}', {
+                        name: problem.name,
+                    }),
+                );
+            }
+        }
+
+        Io.info(
+            vscode.l10n.t('Migration completed. {count} problems migrated successfully.', {
+                count: migratedCount,
+            }),
+        );
+    }
 }
