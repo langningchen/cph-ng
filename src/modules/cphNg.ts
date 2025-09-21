@@ -43,6 +43,7 @@ import {
     extractEmbedded,
 } from '../utils/embedded';
 import { migration, OldProblem } from '../utils/migration';
+import { loadProblemFromBinFile, scanForBinFiles } from '../utils/problemLoader';
 import Result from '../utils/result';
 import { renderTemplate } from '../utils/strTemplate';
 import {
@@ -323,7 +324,6 @@ export default class CphNg {
     }
     private static async loadProblemFromBin(binFile: string): Promise<void> {
         try {
-            const { loadProblemFromBinFile } = await import('../utils/problemLoader');
             const problem = await loadProblemFromBinFile(binFile);
             if (problem) {
                 CphNg.problem = problem;
@@ -1369,9 +1369,6 @@ export default class CphNg {
             sourceCphNgFolder: sourceCphNgFolder.fsPath, 
             targetFolder: targetFolder.fsPath 
         });
-
-        // Import utilities
-        const { scanForBinFiles, loadProblemFromBinFile } = await import('../utils/problemLoader');
 
         // Recursively scan the .cph-ng folder structure for .bin files
         const binFiles = await scanForBinFiles(sourceCphNgFolder);

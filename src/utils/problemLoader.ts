@@ -16,7 +16,9 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { readFile } from 'fs/promises';
+import { join } from 'path';
 import { gunzipSync } from 'zlib';
+import * as vscode from 'vscode';
 import { migration, OldProblem } from './migration';
 import { Problem } from './types';
 import Logger from '../helpers/logger';
@@ -53,14 +55,11 @@ export async function loadProblemFromBinFile(binFilePath: string): Promise<Probl
  * @param folder URI of the folder to scan
  * @returns Promise that resolves to an array of .bin file paths
  */
-export async function scanForBinFiles(folder: any): Promise<string[]> {
+export async function scanForBinFiles(folder: vscode.Uri): Promise<string[]> {
     logger.trace('scanForBinFiles', { folder });
     const binFiles: string[] = [];
     
     try {
-        const vscode = await import('vscode');
-        const { join } = await import('path');
-        
         const entries = await vscode.workspace.fs.readDirectory(folder);
         for (const [name, type] of entries) {
             if (type === vscode.FileType.File && name.endsWith('.bin')) {
