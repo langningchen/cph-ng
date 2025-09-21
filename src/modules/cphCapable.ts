@@ -25,6 +25,8 @@ import Io from '../helpers/io';
 import Logger from '../helpers/logger';
 import { Problem } from '../utils/types';
 import CphNg from './cphNg';
+import { gunzipSync } from 'zlib';
+import { migration, OldProblem } from '../utils/migration';
 
 export interface CphProblem {
     name: string;
@@ -159,6 +161,49 @@ export default class CphCapable {
         }
     }
 
+    private static async scanForBinFiles(folder: vscode.Uri): Promise<string[]> {
+        this.logger.trace('scanForBinFiles', { folder });
+        const binFiles: string[] = [];
+        
+        try {
+            const entries = await vscode.workspace.fs.readDirectory(folder);
+            for (const [name, type] of entries) {
+                if (type === vscode.FileType.File && name.endsWith('.bin')) {
+                    binFiles.push(join(folder.fsPath, name));
+                } else if (type === vscode.FileType.Directory) {
+                    // Recursively scan subdirectories
+                    const subFolder = vscode.Uri.joinPath(folder, name);
+                    const subBinFiles = await this.scanForBinFiles(subFolder);
+                    binFiles.push(...subBinFiles);
+                }
+            }
+        } catch (error) {
+            this.logger.error('Failed to scan directory for bin files', { folder, error });
+        }
+        
+        return binFiles;
+    }
+
+    private static async loadCphNgProblem(binFilePath: string): Promise<Problem | undefined> {
+        this.logger.trace('loadCphNgProblem', { binFilePath });
+        try {
+            const data = await readFile(binFilePath);
+            const problem = migration(
+                JSON.parse(
+                    gunzipSync(data).toString(),
+                ) satisfies OldProblem,
+            );
+            this.logger.debug('Loaded CPH-NG problem from bin file', {
+                binFilePath,
+                problem,
+            });
+            return problem;
+        } catch (error) {
+            this.logger.error('Failed to load CPH-NG problem', { binFilePath, error });
+            return undefined;
+        }
+    }
+
     public static async migrateFromCph(): Promise<void> {
         this.logger.trace('migrateFromCph');
         
@@ -169,13 +214,13 @@ export default class CphCapable {
             return;
         }
 
-        // Select the source CPH folder
-        const sourceCphFolder = await FolderChooser.chooseFolder(
+        // Select the source CPH-NG folder
+        const sourceCphNgFolder = await FolderChooser.chooseFolder(
             vscode.l10n.t(
-                'Select the source .cph folder to migrate from',
+                'Select the source .cph-ng folder to migrate from',
             ),
         );
-        if (!sourceCphFolder) {
+        if (!sourceCphNgFolder) {
             this.logger.info('No source folder selected, aborting migration');
             return;
         }
@@ -192,85 +237,83 @@ export default class CphCapable {
         }
 
         this.logger.info('Starting migration', { 
-            sourceCphFolder: sourceCphFolder.fsPath, 
+            sourceCphNgFolder: sourceCphNgFolder.fsPath, 
             targetFolder: targetFolder.fsPath 
         });
 
-        const probFiles = await vscode.workspace.fs.readDirectory(sourceCphFolder);
-        this.logger.debug('Read source directory contents', { probFiles });
+        // Recursively scan the .cph-ng folder structure for .bin files
+        const binFiles = await this.scanForBinFiles(sourceCphNgFolder);
+        this.logger.debug('Found bin files', { binFiles });
         
         const problems: Problem[] = [];
         const migrationInfo: { original: Problem; migrated: Problem }[] = [];
 
-        for (const [name, type] of probFiles) {
-            if (type === vscode.FileType.File && name.endsWith('.prob')) {
-                const probFilePath = join(sourceCphFolder.fsPath, name);
-                const originalProblem = await this.loadProblem(probFilePath);
-                if (originalProblem) {
-                    // Create a migrated version with updated paths
-                    const originalSrcPath = originalProblem.src.path;
-                    const srcFileName = basename(originalSrcPath);
-                    const newSrcPath = join(targetFolder.fsPath, srcFileName);
-                    
-                    const migratedProblem: Problem = {
-                        ...originalProblem,
-                        src: { 
-                            path: newSrcPath,
-                            hash: originalProblem.src.hash 
+        for (const binFilePath of binFiles) {
+            const originalProblem = await this.loadCphNgProblem(binFilePath);
+            if (originalProblem) {
+                // Create a migrated version with updated paths
+                const originalSrcPath = originalProblem.src.path;
+                const srcFileName = basename(originalSrcPath);
+                const newSrcPath = join(targetFolder.fsPath, srcFileName);
+                
+                const migratedProblem: Problem = {
+                    ...originalProblem,
+                    src: { 
+                        path: newSrcPath,
+                        hash: originalProblem.src.hash 
+                    }
+                };
+
+                // If there are checker/interactor files, migrate them too
+                if (originalProblem.checker) {
+                    const checkerFileName = basename(originalProblem.checker.path);
+                    migratedProblem.checker = {
+                        path: join(targetFolder.fsPath, checkerFileName),
+                        hash: originalProblem.checker.hash
+                    };
+                }
+
+                if (originalProblem.interactor) {
+                    const interactorFileName = basename(originalProblem.interactor.path);
+                    migratedProblem.interactor = {
+                        path: join(targetFolder.fsPath, interactorFileName),
+                        hash: originalProblem.interactor.hash
+                    };
+                }
+
+                if (originalProblem.bfCompare?.generator) {
+                    const generatorFileName = basename(originalProblem.bfCompare.generator.path);
+                    migratedProblem.bfCompare = {
+                        ...originalProblem.bfCompare,
+                        generator: {
+                            path: join(targetFolder.fsPath, generatorFileName),
+                            hash: originalProblem.bfCompare.generator.hash
                         }
                     };
-
-                    // If there are checker/interactor files, migrate them too
-                    if (originalProblem.checker) {
-                        const checkerFileName = basename(originalProblem.checker.path);
-                        migratedProblem.checker = {
-                            path: join(targetFolder.fsPath, checkerFileName),
-                            hash: originalProblem.checker.hash
-                        };
-                    }
-
-                    if (originalProblem.interactor) {
-                        const interactorFileName = basename(originalProblem.interactor.path);
-                        migratedProblem.interactor = {
-                            path: join(targetFolder.fsPath, interactorFileName),
-                            hash: originalProblem.interactor.hash
-                        };
-                    }
-
-                    if (originalProblem.bfCompare?.generator) {
-                        const generatorFileName = basename(originalProblem.bfCompare.generator.path);
-                        migratedProblem.bfCompare = {
-                            ...originalProblem.bfCompare,
-                            generator: {
-                                path: join(targetFolder.fsPath, generatorFileName),
-                                hash: originalProblem.bfCompare.generator.hash
-                            }
-                        };
-                    }
-
-                    if (originalProblem.bfCompare?.bruteForce) {
-                        const bruteForceFileName = basename(originalProblem.bfCompare.bruteForce.path);
-                        if (!migratedProblem.bfCompare) {
-                            migratedProblem.bfCompare = { ...originalProblem.bfCompare };
-                        }
-                        migratedProblem.bfCompare.bruteForce = {
-                            path: join(targetFolder.fsPath, bruteForceFileName),
-                            hash: originalProblem.bfCompare.bruteForce.hash
-                        };
-                    }
-
-                    problems.push(migratedProblem);
-                    migrationInfo.push({ original: originalProblem, migrated: migratedProblem });
-                    this.logger.info('Prepared problem for migration', { 
-                        probFilePath,
-                        originalSrcPath,
-                        newSrcPath
-                    });
-                } else {
-                    this.logger.warn('Failed to load problem for migration', {
-                        probFilePath,
-                    });
                 }
+
+                if (originalProblem.bfCompare?.bruteForce) {
+                    const bruteForceFileName = basename(originalProblem.bfCompare.bruteForce.path);
+                    if (!migratedProblem.bfCompare) {
+                        migratedProblem.bfCompare = { ...originalProblem.bfCompare };
+                    }
+                    migratedProblem.bfCompare.bruteForce = {
+                        path: join(targetFolder.fsPath, bruteForceFileName),
+                        hash: originalProblem.bfCompare.bruteForce.hash
+                    };
+                }
+
+                problems.push(migratedProblem);
+                migrationInfo.push({ original: originalProblem, migrated: migratedProblem });
+                this.logger.info('Prepared problem for migration', { 
+                    binFilePath,
+                    originalSrcPath,
+                    newSrcPath
+                });
+            } else {
+                this.logger.warn('Failed to load problem for migration', {
+                    binFilePath,
+                });
             }
         }
 
