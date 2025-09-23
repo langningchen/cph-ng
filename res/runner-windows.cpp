@@ -16,7 +16,7 @@ SECURITY_ATTRIBUTES saAttr;
 HANDLE hInputFile = INVALID_HANDLE_VALUE;
 HANDLE hOutputFile = INVALID_HANDLE_VALUE;
 FILETIME startTime, exitTime, kernelTime, userTime;
-size_t t_kernel, t_user;
+size_t start, end;
 PROCESS_MEMORY_COUNTERS pmc;
 DWORD exitCode;
 
@@ -114,8 +114,8 @@ int main(int argc, char* argv[]) {
         print_error(get_process_times_failed, GetLastError());
         goto clean;
     }
-    t_kernel = (uint64_t(kernelTime.dwHighDateTime) << 32) + kernelTime.dwLowDateTime;
-    t_user = (uint64_t(userTime.dwHighDateTime) << 32) + userTime.dwLowDateTime;
+    start = (uint64_t(startTime.dwHighDateTime) << 32) + startTime.dwLowDateTime;
+    end = (uint64_t(exitTime.dwHighDateTime) << 32) + exitTime.dwLowDateTime;
     if (!GetProcessMemoryInfo(pi.hProcess, &pmc, sizeof(pmc))) {
         print_error(get_process_memory_info_failed, GetLastError());
         goto clean;
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
     GetExitCodeProcess(pi.hProcess, &exitCode);
     if (sta == terminated)
         goto clean;
-    print_info(false, t_kernel + t_user, pmc.PeakWorkingSetSize, exitCode);
+    print_info(false, end - start, pmc.PeakPagefileUsage + pmc.PeakWorkingSetSize, exitCode);
 
 clean:
     do_clean();
