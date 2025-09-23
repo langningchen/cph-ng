@@ -75,18 +75,14 @@ export default class ProcessExecutor {
 
     private static _runner: string | null = null;
     private static _supported_platform() {
-        return ['win32'].includes(process.platform);
+        return ['win32', 'linux'].includes(process.platform);
     }
     public static async loadRunner() {
+        ProcessExecutor._runner = path.join(extensionPath, 'res', 'runner.a');
+        if (fs.existsSync(ProcessExecutor._runner)) {
+            return;
+        }
         if (process.platform === 'win32') {
-            ProcessExecutor._runner = path.join(
-                extensionPath,
-                'res',
-                'runner.exe',
-            );
-            if (fs.existsSync(ProcessExecutor._runner)) {
-                return;
-            }
             await ProcessExecutor.execute({
                 cmd: [
                     Settings.compilation.cppCompiler,
@@ -95,7 +91,19 @@ export default class ProcessExecutor {
                     '-static',
                     '-o',
                     ProcessExecutor._runner,
-                    path.join(extensionPath, 'res', 'runner.cpp'),
+                    path.join(extensionPath, 'res', 'runner-windows.cpp'),
+                    path.join(extensionPath, 'res', 'runner.h'),
+                ],
+            });
+        } else if (process.platform === 'linux') {
+            await ProcessExecutor.execute({
+                cmd: [
+                    Settings.compilation.cppCompiler,
+                    '-pthread',
+                    '-o',
+                    ProcessExecutor._runner,
+                    path.join(extensionPath, 'res', 'runner-linux.cpp'),
+                    path.join(extensionPath, 'res', 'runner.h'),
                 ],
             });
         }
