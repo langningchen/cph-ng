@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
         close(hInputFile);
         close(hOutputFile);
 
-        execl(exec, NULL);
+        execl(exec, exec, NULL);
 
         exit(127);
     } else {
