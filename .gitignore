@@ -1,4 +1,4 @@
 dist
 node_modules
 *.vsix
-res/runner.exe
+res/runner.a

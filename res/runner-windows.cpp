@@ -7,39 +7,7 @@
 #include <thread>
 #include <string>
 
-enum RunError {
-    could_not_open_input_file,
-    could_not_create_output_file,
-    create_process_failed,
-    terminate_process_failed,
-    get_process_times_failed,
-    get_process_memory_info_failed,
-    get_exit_code_failed,
-    unknown_error
-};
-
-enum RunStatus {
-    init,
-    running,
-    finished,
-    terminated
-};
-
-void print_info(bool timeout, size_t time_used, size_t memory_used, DWORD exit_code) {
-    std::cout << "{\"error\":false";
-    std::cout << ",\"timeout\":" << (timeout ? "true" : "false");
-    std::cout << ",\"time_used\":" << time_used;
-    std::cout << ",\"memory_used\":" << memory_used;
-    std::cout << ",\"exit_code\":" << exit_code;
-    std::cout << "}" << std::endl;
-}
-
-void print_error(RunError error, DWORD error_code) {
-    std::cout << "{\"error\":true";
-    std::cout << ",\"error_type\":" << error;
-    std::cout << ",\"error_code\":" << error_code;
-    std::cout << "}" << std::endl;
-}
+#include "runner.h"
 
 RunStatus sta;
 STARTUPINFOA si;
@@ -48,7 +16,7 @@ SECURITY_ATTRIBUTES saAttr;
 HANDLE hInputFile = INVALID_HANDLE_VALUE;
 HANDLE hOutputFile = INVALID_HANDLE_VALUE;
 FILETIME startTime, exitTime, kernelTime, userTime;
-size_t start, end;
+size_t t_kernel, t_user;
 PROCESS_MEMORY_COUNTERS pmc;
 DWORD exitCode;
 
@@ -146,8 +114,8 @@ int main(int argc, char* argv[]) {
         print_error(get_process_times_failed, GetLastError());
         goto clean;
     }
-    start = (uint64_t(startTime.dwHighDateTime) << 32) + startTime.dwLowDateTime;
-    end = (uint64_t(exitTime.dwHighDateTime) << 32) + exitTime.dwLowDateTime;
+    t_kernel = (uint64_t(kernelTime.dwHighDateTime) << 32) + kernelTime.dwLowDateTime;
+    t_user = (uint64_t(userTime.dwHighDateTime) << 32) + userTime.dwLowDateTime;
     if (!GetProcessMemoryInfo(pi.hProcess, &pmc, sizeof(pmc))) {
         print_error(get_process_memory_info_failed, GetLastError());
         goto clean;
@@ -155,7 +123,7 @@ int main(int argc, char* argv[]) {
     GetExitCodeProcess(pi.hProcess, &exitCode);
     if (sta == terminated)
         goto clean;
-    print_info(false, end - start, pmc.PeakPagefileUsage + pmc.PeakWorkingSetSize, exitCode);
+    print_info(false, t_kernel + t_user, pmc.PeakWorkingSetSize, exitCode);
 
 clean:
     do_clean();
