@@ -187,7 +187,7 @@ export default class ProcessExecutor {
                     return;
                 }
                 try {
-                    this.logger.trace('Runner output:', proce.stdout);
+                    this.logger.info('Runner output:', proce.stdout);
                     const runInfo = JSON.parse(proce.stdout);
                     assert(runInfo satisfies RunInfo);
                     if (runInfo.error) {
