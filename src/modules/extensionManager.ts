@@ -25,6 +25,7 @@ import LlmTcRunner from '../ai/llmTcRunner';
 import Langs from '../core/langs/langs';
 import Io from '../helpers/io';
 import Logger from '../helpers/logger';
+import ProcessExecutor from '../helpers/processExecutor';
 import Companion from '../modules/companion';
 import CphCapable from '../modules/cphCapable';
 import SidebarProvider from '../modules/sidebarProvider';
@@ -164,7 +165,7 @@ OS: ${release()}`;
                 vscode.commands.registerCommand(
                     'cph-ng.compileRunner',
                     async () => {
-                        await CphNg.compileRunner();
+                        await ProcessExecutor.loadRunner();
                     },
                 ),
             );
