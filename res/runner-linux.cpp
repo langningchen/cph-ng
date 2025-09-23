@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
         while (true) {
             clock_gettime(CLOCK_MONOTONIC, &current_time);
             size_t elapsed_ms = (current_time.tv_sec - start_time.tv_sec) * 1000 +
-                                (current_time.tv_nsec - start_time.tv_nsec) / 1000;
+                                (current_time.tv_nsec - start_time.tv_nsec) / 1000000;
 
             if (elapsed_ms >= time_limit_ms) {
                 timeout_occurred = true;
