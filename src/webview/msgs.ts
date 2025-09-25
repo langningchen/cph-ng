@@ -31,6 +31,7 @@ export interface EditProblemDetailsMsg {
     title: string;
     url: string;
     timeLimit: number;
+    memoryLimit: number;
 }
 export interface DelProblemMsg {
     type: 'delProblem';

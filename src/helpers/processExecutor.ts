@@ -34,6 +34,7 @@ import { TCVerdicts } from '../utils/types.backend';
 interface ProcessExecutorOptions {
     cmd: string[];
     timeout?: number;
+    memoryLimit?: number;
     stdin?: TCIO;
     ac?: AbortController;
 }
@@ -221,6 +222,18 @@ export default class ProcessExecutor {
                                     code: runInfo.exit_code,
                                 },
                             ),
+                            time: time_used,
+                            memory: memory_used,
+                            stdout,
+                            stderr: '',
+                        });
+                    } else if (
+                        options.memoryLimit &&
+                        memory_used > options.memoryLimit
+                    ) {
+                        resolve({
+                            verdict: TCVerdicts.MLE,
+                            msg: '',
                             time: time_used,
                             memory: memory_used,
                             stdout,

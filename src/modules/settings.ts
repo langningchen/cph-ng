@@ -201,6 +201,9 @@ class ProblemSection extends SettingsSection {
     get defaultTimeLimit(): number {
         return this.get('defaultTimeLimit') as number;
     }
+    get defaultMemoryLimit(): number {
+        return this.get('defaultMemoryLimit') as number;
+    }
     get foundMatchTestCaseBehavior(): 'ask' | 'always' | 'never' {
         return this.get('foundMatchTestCaseBehavior') as
             | 'ask'
