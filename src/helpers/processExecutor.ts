@@ -188,8 +188,7 @@ export default class ProcessExecutor {
                 }
                 try {
                     this.logger.info('Runner output:', proce.stdout);
-                    const runInfo = JSON.parse(proce.stdout);
-                    assert(runInfo satisfies RunInfo);
+                    const runInfo = JSON.parse(proce.stdout) as RunInfo;
                     if (runInfo.error) {
                         resolve({
                             verdict: TCVerdicts.SE,

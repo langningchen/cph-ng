@@ -5,6 +5,7 @@ enum RunError {
     could_not_create_output_file,
     create_process_failed,
     terminate_process_failed,
+    wait_for_process_failed,
     get_process_times_failed,
     get_process_memory_info_failed,
     get_exit_code_failed,

@@ -96,13 +96,21 @@ int main(int argc, char* argv[]) {
         goto clean;
     sta = running;
 
-    if (WaitForSingleObject(pi.hProcess, time_limit) == WAIT_TIMEOUT) {
+    DWORD wait_result = WaitForSingleObject(pi.hProcess, time_limit);
+    if (wait_result == WAIT_FAILED) {
+        print_error(wait_for_process_failed, GetLastError());
+        goto clean;
+    } else if (wait_result == WAIT_TIMEOUT) {
         if (!TerminateProcess(pi.hProcess, 1)) {
             print_error(terminate_process_failed, GetLastError());
             goto clean;
         }
         WaitForSingleObject(pi.hProcess, 1000);
-        print_info(true, time_limit * 10000, 0, 0);
+        if (!GetProcessMemoryInfo(pi.hProcess, &pmc, sizeof(pmc))) {
+            print_error(get_process_memory_info_failed, GetLastError());
+            goto clean;
+        }
+        print_info(true, time_limit * 10000, pmc.PeakPagefileUsage + pmc.PeakWorkingSetSize, 0);
         goto clean;
     }
 
