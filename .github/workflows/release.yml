@@ -89,7 +89,7 @@ jobs:
         run: |
           VERSION="${{ github.event.inputs.version }}"
 
-          CHANGELOG_CONTENT=$(awk "/^## $VERSION$/{flag=1; next} /^## /{flag=0} flag" CHANGELOG.md | sed '/^$/d' | head -20)
+          CHANGELOG_CONTENT=$(awk "/^## $VERSION$/{flag=1; next} (/^## / || /^<details>/){flag=0} flag" CHANGELOG.md)
 
           if [ -z "$CHANGELOG_CONTENT" ]; then
             echo "Warning: No changelog content found for version $VERSION"

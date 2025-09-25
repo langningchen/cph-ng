@@ -104,7 +104,7 @@ export default class CphNg {
     public static async getBinByCpp(cppPath: string): Promise<string> {
         const workspaceFolder = vscode.workspace.workspaceFolders
             ? vscode.workspace.workspaceFolders[0].uri.fsPath
-            : '';
+            : dirname(cppPath);
         const dir = renderTemplate(Settings.problem.problemFilePath, [
             ['workspace', workspaceFolder],
             ['dirname', dirname(cppPath)],
@@ -175,7 +175,7 @@ export default class CphNg {
                 src: result.data!,
             };
             if (problem.checker) {
-                const checkerLang = Langs.getLang(problem.checker.path);
+                const checkerLang = Langs.getLang(problem.checker.path, true);
                 if (!checkerLang) {
                     data.checker = {
                         outputPath: problem.checker.path,
@@ -195,7 +195,10 @@ export default class CphNg {
                 }
             }
             if (problem.interactor) {
-                const interactorLang = Langs.getLang(problem.interactor.path);
+                const interactorLang = Langs.getLang(
+                    problem.interactor.path,
+                    true,
+                );
                 if (!interactorLang) {
                     data.interactor = {
                         outputPath: problem.interactor.path,

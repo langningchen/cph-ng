@@ -55,8 +55,8 @@ class Companion {
     >;
     private static pendingSubmitResolve?: () => void;
 
-    constructor() {
-        Companion.logger.trace('constructor');
+    public static init() {
+        Companion.logger.trace('init');
         Companion.server = createServer((request, response) => {
             let requestData = '';
 
