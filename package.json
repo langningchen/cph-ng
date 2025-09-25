@@ -522,6 +522,10 @@
                 "title": "%cph-ng.commands.importFromCph%"
             },
             {
+                "command": "cph-ng.repairDataFiles",
+                "title": "%cph-ng.commands.repairDataFiles%"
+            },
+            {
                 "command": "cph-ng.createProblem",
                 "title": "%cph-ng.commands.createProblem%",
                 "icon": "$(rocket)"
