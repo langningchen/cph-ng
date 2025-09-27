@@ -162,6 +162,9 @@ class RunnerSection extends SettingsSection {
     get stderrThreshold(): number {
         return this.get('stderrThreshold') as number;
     }
+    get useRunner(): boolean {
+        return this.get('useRunner') as boolean;
+    }
 }
 
 class ComparingSection extends SettingsSection {
@@ -197,6 +200,9 @@ class ProblemSection extends SettingsSection {
     }
     get defaultTimeLimit(): number {
         return this.get('defaultTimeLimit') as number;
+    }
+    get defaultMemoryLimit(): number {
+        return this.get('defaultMemoryLimit') as number;
     }
     get foundMatchTestCaseBehavior(): 'ask' | 'always' | 'never' {
         return this.get('foundMatchTestCaseBehavior') as

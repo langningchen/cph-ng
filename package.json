@@ -202,6 +202,11 @@
                         "type": "number",
                         "default": 1000,
                         "markdownDescription": "%cph-ng.configuration.runner.properties.stderrThreshold.markdownDescription%"
+                    },
+                    "cph-ng.runner.useRunner": {
+                        "type": "boolean",
+                        "default": false,
+                        "markdownDescription": "%cph-ng.configuration.runner.properties.useRunner.markdownDescription%"
                     }
                 }
             },
@@ -247,6 +252,11 @@
                         "type": "number",
                         "default": 1000,
                         "markdownDescription": "%cph-ng.configuration.problem.properties.defaultTimeLimit.markdownDescription%"
+                    },
+                    "cph-ng.problem.defaultMemoryLimit": {
+                        "type": "number",
+                        "default": 512,
+                        "markdownDescription": "%cph-ng.configuration.problem.properties.defaultMemoryLimit.markdownDescription%"
                     },
                     "cph-ng.problem.foundMatchTestCaseBehavior": {
                         "type": "string",
@@ -516,6 +526,10 @@
             {
                 "command": "cph-ng.versionInfo",
                 "title": "CPH-NG: Version Info"
+            },
+            {
+                "command": "cph-ng.compileRunner",
+                "title": "%cph-ng.commands.compileRunner%"
             },
             {
                 "command": "cph-ng.importFromCph",

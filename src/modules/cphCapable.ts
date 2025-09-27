@@ -64,6 +64,7 @@ export default class CphCapable {
                 isExpand: false,
             })),
             timeLimit: cphProblem.timeLimit,
+            memoryLimit: cphProblem.memoryLimit,
             src: { path: cphProblem.srcPath },
         } satisfies Problem;
         this.logger.info('Converted CphProblem to Problem', { problem });

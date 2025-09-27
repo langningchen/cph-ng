@@ -83,6 +83,7 @@ export default class SidebarProvider implements vscode.WebviewViewProvider {
                             editProblemDetailsMsg.title,
                             editProblemDetailsMsg.url,
                             editProblemDetailsMsg.timeLimit,
+                            editProblemDetailsMsg.memoryLimit,
                         );
                         break;
                     case 'delProblem':

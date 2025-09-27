@@ -92,7 +92,6 @@ export default class CphNg {
         CphNg._canImport = canImport;
         CphNg.emitProblemChange();
     }
-
     public static addProblemChangeListener(callback: ProblemChangeCallback) {
         CphNg.onProblemChange.push(callback);
     }
@@ -258,6 +257,7 @@ export default class CphNg {
                 src: { path: filePath },
                 tcs: [],
                 timeLimit: Settings.problem.defaultTimeLimit,
+                memoryLimit: Settings.problem.defaultMemoryLimit,
             };
             CphNg.saveProblem(CphNg.problem);
         } catch (e) {
@@ -380,6 +380,7 @@ export default class CphNg {
                         isExpand: false,
                     })),
                     timeLimit: embeddedProblem.timeLimit,
+                    memoryLimit: embeddedProblem.memoryLimit,
                 };
                 if (embeddedProblem.spjCode) {
                     CphNg.problem.checker = {
@@ -437,6 +438,7 @@ export default class CphNg {
         title: string,
         url: string,
         timeLimit: number,
+        memoryLimit: number,
     ): Promise<void> {
         if (!CphNg.checkProblem()) {
             return;
@@ -445,6 +447,7 @@ export default class CphNg {
         problem.name = title;
         problem.url = url;
         problem.timeLimit = timeLimit;
+        problem.memoryLimit = memoryLimit;
         CphNg.saveProblem(problem);
     }
     public static async saveProblem(problem: Problem): Promise<void> {
@@ -483,6 +486,7 @@ export default class CphNg {
                     })),
                 ),
                 timeLimit: problem.timeLimit,
+                memoryLimit: problem.memoryLimit,
             };
             if (problem.checker) {
                 embeddedProblem.spjCode = await readFile(
@@ -800,6 +804,7 @@ export default class CphNg {
             verdict: TCVerdicts.CP,
             stdout: { useFile: false, data: '' },
             stderr: { useFile: false, data: '' },
+            memory: undefined,
             time: 0,
             msg: '',
         };
@@ -848,6 +853,7 @@ export default class CphNg {
                 verdict: TCVerdicts.CP,
                 stdout: { useFile: false, data: '' },
                 stderr: { useFile: false, data: '' },
+                memory: undefined,
                 time: 0,
                 msg: '',
             };
@@ -1292,6 +1298,7 @@ export default class CphNg {
                     verdict: TCVerdicts.CP,
                     stdout: { useFile: false, data: '' },
                     stderr: { useFile: false, data: '' },
+                    memory: undefined,
                     time: 0,
                     msg: '',
                 },
