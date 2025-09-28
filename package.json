@@ -253,6 +253,11 @@
                         "default": 1000,
                         "markdownDescription": "%cph-ng.configuration.problem.properties.defaultTimeLimit.markdownDescription%"
                     },
+                    "cph-ng.problem.defaultMemoryLimit": {
+                        "type": "number",
+                        "default": 512,
+                        "markdownDescription": "%cph-ng.configuration.problem.properties.defaultMemoryLimit.markdownDescription%"
+                    },
                     "cph-ng.problem.foundMatchTestCaseBehavior": {
                         "type": "string",
                         "default": "always",

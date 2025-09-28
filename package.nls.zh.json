@@ -75,6 +75,7 @@
     "cph-ng.configuration.cphCapable.properties.enabled.markdownDescription": "启用从 Competitive Programming Helper (CPH) 到 CPH-NG 的**问题数据导入**。这简化了将问题定义和测试用例导入扩展的过程，减少了手动设置。",
     "cph-ng.configuration.cphCapable.title": "CPH 能力",
     "cph-ng.configuration.problem.properties.clearBeforeLoad.markdownDescription": "指定在从 ZIP 文件或文件夹加载新测试用例之前是否清除当前测试用例。",
+    "cph-ng.configuration.problem.properties.defaultMemoryLimit.markdownDescription": "设置将应用于扩展中新创建问题的**默认内存限制**（单位为**MB**）。如果未提供问题的特定内存限制，将使用此值，以确保在执行期间有一个基准的内存使用限制。",
     "cph-ng.configuration.problem.properties.defaultTimeLimit.markdownDescription": "设置将应用于扩展中新创建问题的**默认时间限制**（单位为**毫秒**）。如果未提供问题的特定时间限制，将使用此值，以确保执行有一个基准。",
     "cph-ng.configuration.problem.properties.deleteAfterUnzip.markdownDescription": "指定是否在解压后删除 ZIP 文件。",
     "cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.always": "始终自动使用找到的文件而不提示。",
