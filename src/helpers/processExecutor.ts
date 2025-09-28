@@ -19,7 +19,7 @@ import assert from 'assert';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { SHA256 } from 'crypto-js';
 import * as fs from 'fs';
-import { createReadStream, createWriteStream } from 'fs';
+import { createReadStream } from 'fs';
 import path, { dirname } from 'path';
 import { cwd } from 'process';
 import { pipeline } from 'stream/promises';
@@ -156,7 +156,7 @@ export default class ProcessExecutor {
             ? stdin.path
             : path.join(ioDir, `${hash}.in`);
         if (!stdin.useFile) {
-            await pipeline(stdin.data, createWriteStream(inputFile));
+            fs.writeFileSync(inputFile, stdin.data);
         }
         const proce = await this.createProcess({
             cmd: [
