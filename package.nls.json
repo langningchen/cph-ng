@@ -1,6 +1,5 @@
 {
     "cph-ng.commands.addTestCase": "CPH-NG: Add Test Case",
-    "cph-ng.commands.compileRunner": "CPH-NG: Compile Runner",
     "cph-ng.commands.createProblem": "CPH-NG: Create Problem",
     "cph-ng.commands.deleteProblem": "CPH-NG: Delete Problem",
     "cph-ng.commands.exportToEmbedded": "CPH-NG: Export to Embedded",

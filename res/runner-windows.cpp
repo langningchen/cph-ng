@@ -1,139 +1,113 @@
 #include <windows.h>
 #include <psapi.h>
-#include <cstdint>
-#include <stdio.h>
-#include <csignal>
 #include <iostream>
+#include <cstdint>
+#include <cstdlib>
 #include <thread>
-#include <string>
+#include <algorithm>
+#include <io.h>
 
 #include "runner.h"
 
-RunStatus sta;
-STARTUPINFOA si;
-PROCESS_INFORMATION pi;
-SECURITY_ATTRIBUTES saAttr;
-HANDLE hInputFile = INVALID_HANDLE_VALUE;
-HANDLE hOutputFile = INVALID_HANDLE_VALUE;
-FILETIME startTime, exitTime, kernelTime, userTime;
-size_t start, end;
-PROCESS_MEMORY_COUNTERS pmc;
-DWORD exitCode;
+PROCESS_INFORMATION pi = {0};
+bool killed = false;
 
-void do_clean() {
-    sta = finished;
-
-    if (hInputFile != INVALID_HANDLE_VALUE)
-        CloseHandle(hInputFile);
-    if (hOutputFile != INVALID_HANDLE_VALUE)
-        CloseHandle(hOutputFile);
+void safe_close(HANDLE &h)
+{
+    if (h != INVALID_HANDLE_VALUE)
+        CloseHandle(h), h = INVALID_HANDLE_VALUE;
+}
+void kill_child_win(int)
+{
+    killed = true;
     if (pi.hProcess != NULL)
-        CloseHandle(pi.hProcess);
-    if (pi.hThread != NULL)
-        CloseHandle(pi.hThread);
+        TerminateProcess(pi.hProcess, 1);
 }
 
-int main(int argc, char* argv[]) {
-    const char* exec = argv[1];
-    const char* in_file = argv[2];
-    const char* out_file = argv[3];
-    const size_t time_limit = atoi(argv[4]);
-
-    std::thread exit_listener([]() {
-        std::string input;
-        std::getline(std::cin, input);
-        std::cout << "cleaning up...";
-        if (sta == init) {
-            sta = terminated;
-        } else if (sta == running) {
-            sta = terminated;
-            TerminateProcess(pi.hProcess, 1);
-            WaitForSingleObject(pi.hProcess, 1000);
+void stdin_listener()
+{
+    char control_char;
+    int fd = _fileno(stdin);
+    while (_read(fd, &control_char, 1) > 0)
+        if (control_char == 'k')
+        {
+            kill_child_win(0);
+            return;
         }
-        do_clean();
-        exit(0);
-    });
+}
 
-    sta = init;
+int main(int argc, char *argv[])
+{
+    if (argc < 5)
+        print_error(argument_error, 0);
+    const char *exec = argv[1];
+    const char *in_file = argv[2];
+    const char *out_file = argv[3];
+    const char *err_file = argv[4];
+
+    std::thread listener_thread(stdin_listener);
+    listener_thread.detach();
+
+    HANDLE hInputFile = INVALID_HANDLE_VALUE, hOutputFile = INVALID_HANDLE_VALUE, hErrorFile = INVALID_HANDLE_VALUE;
+    STARTUPINFOA si;
+    SECURITY_ATTRIBUTES saAttr;
 
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
-    ZeroMemory(&pi, sizeof(pi));
 
     saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
     saAttr.bInheritHandle = TRUE;
     saAttr.lpSecurityDescriptor = NULL;
 
-    hInputFile = CreateFileA(in_file, GENERIC_READ, FILE_SHARE_READ, &saAttr,
-                             OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hInputFile == INVALID_HANDLE_VALUE) {
+    if ((hInputFile = CreateFileA(in_file, GENERIC_READ, FILE_SHARE_READ, &saAttr,
+                                  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)
         print_error(could_not_open_input_file, GetLastError());
-        goto clean;
-    }
-    if (sta == terminated)
-        goto clean;
-    hOutputFile = CreateFileA(out_file, GENERIC_WRITE, FILE_SHARE_READ, &saAttr,
-                              CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hOutputFile == INVALID_HANDLE_VALUE) {
+    if ((hOutputFile = CreateFileA(out_file, GENERIC_WRITE, FILE_SHARE_READ, &saAttr,
+                                   CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)
         print_error(could_not_create_output_file, GetLastError());
-        goto clean;
-    }
-    if (sta == terminated)
-        goto clean;
+    if ((hErrorFile = CreateFileA(err_file, GENERIC_WRITE, FILE_SHARE_READ, &saAttr,
+                                  CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)
+        print_error(could_not_create_error_file, GetLastError());
+
     si.dwFlags = STARTF_USESTDHANDLES;
     si.hStdInput = hInputFile;
     si.hStdOutput = hOutputFile;
-    si.hStdError = hOutputFile;
+    si.hStdError = hErrorFile;
+
+    char cmdLine[2048];
+    strncpy(cmdLine, exec, sizeof(cmdLine) - 1);
+    cmdLine[sizeof(cmdLine) - 1] = '\0';
+
     if (!CreateProcessA(
-            NULL, (LPSTR)exec, NULL, NULL,
-            TRUE, CREATE_NO_WINDOW, NULL, NULL,
-            &si, &pi)) {
+            NULL,
+            cmdLine,
+            NULL, NULL,
+            TRUE,
+            CREATE_NO_WINDOW,
+            NULL,
+            NULL,
+            &si, &pi))
         print_error(create_process_failed, GetLastError());
-        goto clean;
-    }
 
-    if (sta == terminated)
-        goto clean;
-    sta = running;
+    safe_close(hInputFile);
+    safe_close(hOutputFile);
+    safe_close(hErrorFile);
 
-    DWORD wait_result = WaitForSingleObject(pi.hProcess, time_limit);
-    if (wait_result == WAIT_FAILED) {
+    DWORD wait_result = WaitForSingleObject(pi.hProcess, INFINITE);
+    if (wait_result == WAIT_FAILED)
         print_error(wait_for_process_failed, GetLastError());
-        goto clean;
-    } else if (wait_result == WAIT_TIMEOUT) {
-        if (!TerminateProcess(pi.hProcess, 1)) {
-            print_error(terminate_process_failed, GetLastError());
-            goto clean;
-        }
-        WaitForSingleObject(pi.hProcess, 1000);
-        if (!GetProcessMemoryInfo(pi.hProcess, &pmc, sizeof(pmc))) {
-            print_error(get_process_memory_info_failed, GetLastError());
-            goto clean;
-        }
-        print_info(true, time_limit * 10000, pmc.PeakPagefileUsage + pmc.PeakWorkingSetSize, 0);
-        goto clean;
-    }
 
-    if (sta == terminated)
-        goto clean;
-    sta = finished;
-
-    if (!GetProcessTimes(pi.hProcess, &startTime, &exitTime, &kernelTime, &userTime)) {
-        print_error(get_process_times_failed, GetLastError());
-        goto clean;
-    }
-    start = (uint64_t(startTime.dwHighDateTime) << 32) + startTime.dwLowDateTime;
-    end = (uint64_t(exitTime.dwHighDateTime) << 32) + exitTime.dwLowDateTime;
-    if (!GetProcessMemoryInfo(pi.hProcess, &pmc, sizeof(pmc))) {
-        print_error(get_process_memory_info_failed, GetLastError());
-        goto clean;
-    }
+    FILETIME startTime, exitTime, kernelTime, userTime;
+    PROCESS_MEMORY_COUNTERS pmc;
+    DWORD exitCode = 0;
+    if (!GetProcessTimes(pi.hProcess, &startTime, &exitTime, &kernelTime, &userTime))
+        print_error(get_process_usage_failed, GetLastError());
+    if (!GetProcessMemoryInfo(pi.hProcess, &pmc, sizeof(pmc)))
+        print_error(get_process_usage_failed, GetLastError());
     GetExitCodeProcess(pi.hProcess, &exitCode);
-    if (sta == terminated)
-        goto clean;
-    print_info(false, end - start, pmc.PeakPagefileUsage + pmc.PeakWorkingSetSize, exitCode);
-
-clean:
-    do_clean();
+    print_info(killed,
+               std::max(0.001, ((*(uint64_t *)&kernelTime) + (*(uint64_t *)&userTime)) / 10000.0),
+               pmc.PeakWorkingSetSize / 1024.0 / 1024.0,
+               exitCode, 0);
     return 0;
 }

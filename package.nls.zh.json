@@ -1,6 +1,5 @@
 {
     "cph-ng.commands.addTestCase": "CPH-NG: 添加测试用例",
-    "cph-ng.commands.compileRunner": "CPH-NG: 编译运行器",
     "cph-ng.commands.createProblem": "CPH-NG: 创建题目",
     "cph-ng.commands.deleteProblem": "CPH-NG: 删除题目",
     "cph-ng.commands.exportToEmbedded": "CPH-NG: 导出到嵌入式",

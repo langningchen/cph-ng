@@ -25,7 +25,6 @@ import LlmTcRunner from '../ai/llmTcRunner';
 import Langs from '../core/langs/langs';
 import Io from '../helpers/io';
 import Logger from '../helpers/logger';
-import ProcessExecutor from '../helpers/processExecutor';
 import Companion from '../modules/companion';
 import CphCapable from '../modules/cphCapable';
 import SidebarProvider from '../modules/sidebarProvider';
@@ -164,14 +163,6 @@ OS: ${release()}`;
             );
             context.subscriptions.push(
                 vscode.commands.registerCommand(
-                    'cph-ng.compileRunner',
-                    async () => {
-                        await ProcessExecutor.loadRunner();
-                    },
-                ),
-            );
-            context.subscriptions.push(
-                vscode.commands.registerCommand(
                     'cph-ng.importFromCph',
                     async () => CphCapable.importFromCph(),
                 ),
@@ -253,7 +244,6 @@ OS: ${release()}`;
                 ),
             );
 
-            vscode.commands.executeCommand('cph-ng.compileRunner');
             ExtensionManager.updateContext();
             ExtensionManager.logger.info(
                 'CPH-NG extension activated successfully',
@@ -309,10 +299,13 @@ OS: ${release()}`;
         ExtensionManager.logger.trace('checkActiveFile');
         try {
             const editor = vscode.window.activeTextEditor;
-            if (!editor || editor.document.uri.scheme !== 'file') {
+            if (!editor) {
                 CphNg.problem = undefined;
                 CphNg.canImport = false;
                 ExtensionManager.updateContext();
+                return;
+            }
+            if (editor.document.uri.scheme !== 'file') {
                 return;
             }
 

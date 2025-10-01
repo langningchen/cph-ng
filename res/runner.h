@@ -1,36 +1,34 @@
 #include <iostream>
 
-enum RunError {
+enum RunError
+{
     could_not_open_input_file,
     could_not_create_output_file,
+    could_not_create_error_file,
     create_process_failed,
-    terminate_process_failed,
     wait_for_process_failed,
-    get_process_times_failed,
-    get_process_memory_info_failed,
-    get_exit_code_failed,
+    get_process_usage_failed,
+    argument_error,
     unknown_error
 };
 
-enum RunStatus {
-    init,
-    running,
-    finished,
-    terminated
-};
-
-void print_info(bool timeout, size_t time_used, size_t memory_used, unsigned long exit_code) {
-    std::cout << "{\"error\":false";
-    std::cout << ",\"timeout\":" << (timeout ? "true" : "false");
-    std::cout << ",\"time_used\":" << time_used;
-    std::cout << ",\"memory_used\":" << memory_used;
-    std::cout << ",\"exit_code\":" << exit_code;
-    std::cout << "}" << std::endl;
+void print_info(bool killed, long double time, long double memory, unsigned long exitCode, unsigned long signal)
+{
+    std::cout << "{\"error\":false"
+              << ",\"killed\":" << (killed ? "true" : "false")
+              << ",\"time\":" << time
+              << ",\"memory\":" << memory
+              << ",\"exitCode\":" << exitCode
+              << ",\"signal\":" << signal
+              << "}" << std::endl;
+    std::exit(0);
 }
 
-void print_error(RunError error, int error_code) {
-    std::cout << "{\"error\":true";
-    std::cout << ",\"error_type\":" << error;
-    std::cout << ",\"error_code\":" << error_code;
-    std::cout << "}" << std::endl;
+void print_error(RunError error, int error_code)
+{
+    std::cout << "{\"error\":true"
+              << ",\"error_type\":" << error
+              << ",\"error_code\":" << error_code
+              << "}" << std::endl;
+    std::exit(0);
 }

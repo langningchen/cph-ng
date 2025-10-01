@@ -90,25 +90,23 @@ export class Runner {
         stdin: TCIO,
         abortController: AbortController,
     ): Promise<RunnerResult> {
-        if (Settings.runner.useRunner) {
-            return await ProcessExecutor.executeWithRunner({
-                cmd,
-                timeout: timeLimit + Settings.runner.timeAddition,
-                memoryLimit,
-                stdin,
-                ac: abortController,
-            });
-        } else {
-            return ProcessResultHandler.toRunner(
-                await ProcessExecutor.execute({
-                    cmd,
-                    timeout: timeLimit + Settings.runner.timeAddition,
-                    stdin,
-                    ac: abortController,
-                }),
-                abortController,
-            );
-        }
+        return ProcessResultHandler.toRunner(
+            Settings.runner.useRunner
+                ? await ProcessExecutor.executeWithRunner({
+                      cmd,
+                      timeout: timeLimit + Settings.runner.timeAddition,
+                      memoryLimit,
+                      stdin,
+                      ac: abortController,
+                  })
+                : await ProcessExecutor.execute({
+                      cmd,
+                      timeout: timeLimit + Settings.runner.timeAddition,
+                      stdin,
+                      ac: abortController,
+                  }),
+            abortController,
+        );
     }
 
     private static async runWithInteractor(
@@ -221,6 +219,8 @@ export class Runner {
             if (assignResult(result, runResult)) {
             } else if (result.time && result.time > problem.timeLimit) {
                 result.verdict = TCVerdicts.TLE;
+            } else if (result.memory && result.memory > problem.memoryLimit) {
+                result.verdict = TCVerdicts.MLE;
             } else {
                 result.verdict = TCVerdicts.CMP;
                 CphNg.emitProblemChange();
