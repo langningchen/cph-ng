@@ -27,7 +27,7 @@ import { Problem as Problem_0_1_1 } from './types/0.1.1';
 const logger = new Logger('migration');
 
 export type OldProblem =
-    | Problem_0_2_0
+    | Problem_0_2_1
     | Problem_0_1_1
     | Problem_0_1_0
     | Problem_0_0_5
