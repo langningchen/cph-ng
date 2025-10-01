@@ -108,6 +108,7 @@ export default class Problems {
                         isExpand: false,
                     })),
                     timeLimit: embeddedProblem.timeLimit,
+                    memoryLimit: embeddedProblem.memoryLimit,
                     timeElapsed: 0,
                 };
                 if (embeddedProblem.spjCode) {
