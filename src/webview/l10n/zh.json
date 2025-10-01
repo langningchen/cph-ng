@@ -49,6 +49,7 @@
     "problemTitle.interact": "交互",
     "problemTitle.memoryLimit": "{{memory}} MB",
     "problemTitle.specialJudge": "SPJ",
+    "problemTitle.timeElapsed": "已用时间",
     "problemTitle.timeLimit": "{{time}} 毫秒",
     "tcDataView.clearFile": "清空文件",
     "tcDataView.compare": "与答案比较",

@@ -36,3 +36,13 @@ body,
         opacity: 0;
     }
 }
+
+.defaultBlur {
+    filter: blur(4px);
+    transition: filter 0.2s;
+    cursor: pointer;
+    display: inline-block;
+}
+.defaultBlur:hover {
+    filter: none;
+}

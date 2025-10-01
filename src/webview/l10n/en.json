@@ -49,6 +49,7 @@
     "problemTitle.interact": "Interact",
     "problemTitle.memoryLimit": "{{memory}} MB",
     "problemTitle.specialJudge": "SPJ",
+    "problemTitle.timeElapsed": "Time Elapsed",
     "problemTitle.timeLimit": "{{time}} ms",
     "tcDataView.clearFile": "Clear File",
     "tcDataView.compare": "Compare with answer",

@@ -28,7 +28,6 @@ import {
 import { orderBy } from 'natural-orderby';
 import { basename, dirname, extname, join, relative } from 'path';
 import * as vscode from 'vscode';
-import { gunzipSync, gzipSync } from 'zlib';
 import { version } from '../../package.json';
 import { Lang, LangCompileResult } from '../core/langs/lang';
 import Langs from '../core/langs/langs';
@@ -36,13 +35,12 @@ import { Runner } from '../core/runner';
 import FolderChooser from '../helpers/folderChooser';
 import Io from '../helpers/io';
 import Logger from '../helpers/logger';
+import Problems from '../helpers/problems';
 import {
     buildEmbeddedBlock,
     EMBEDDED_FOOTER,
     EMBEDDED_HEADER,
-    extractEmbedded,
 } from '../utils/embedded';
-import { migration, OldProblem } from '../utils/migration';
 import Result from '../utils/result';
 import { renderTemplate } from '../utils/strTemplate';
 import {
@@ -60,6 +58,7 @@ import Settings from './settings';
 type ProblemChangeCallback = (
     problem: Problem | undefined,
     canImport: boolean,
+    startTime: number | undefined,
 ) => void;
 
 export type CompileResult = Result<{
@@ -71,6 +70,7 @@ export type CompileResult = Result<{
 export default class CphNg {
     private static logger: Logger = new Logger('cphNg');
     private static _problem?: Problem;
+    private static _startTime?: number;
     private static _canImport: boolean = false;
     private static onProblemChange: ProblemChangeCallback[] = [];
     private static runAbortController?: AbortController;
@@ -79,9 +79,10 @@ export default class CphNg {
         return CphNg._problem;
     }
     static set problem(problem: Problem | undefined) {
-        CphNg._problem && CphNg.saveProblem(CphNg._problem);
+        CphNg._problem && CphNg.saveProblem();
         CphNg.runAbortController && CphNg.runAbortController.abort();
         CphNg._problem = problem;
+        CphNg._startTime = problem ? Date.now() : undefined;
         CphNg.emitProblemChange();
     }
 
@@ -97,23 +98,8 @@ export default class CphNg {
     }
     public static emitProblemChange() {
         for (const callback of CphNg.onProblemChange) {
-            callback(CphNg._problem, CphNg._canImport);
+            callback(CphNg._problem, CphNg._canImport, CphNg._startTime);
         }
-    }
-
-    public static async getBinByCpp(cppPath: string): Promise<string> {
-        const workspaceFolder = vscode.workspace.workspaceFolders
-            ? vscode.workspace.workspaceFolders[0].uri.fsPath
-            : dirname(cppPath);
-        const dir = renderTemplate(Settings.problem.problemFilePath, [
-            ['workspace', workspaceFolder],
-            ['dirname', dirname(cppPath)],
-            ['relativeDirname', relative(workspaceFolder, dirname(cppPath))],
-            ['basename', basename(cppPath)],
-            ['extname', extname(cppPath)],
-            ['basenameNoExt', basename(cppPath, extname(cppPath))],
-        ]);
-        return dir;
     }
 
     public static checkProblem() {
@@ -258,8 +244,9 @@ export default class CphNg {
                 tcs: [],
                 timeLimit: Settings.problem.defaultTimeLimit,
                 memoryLimit: Settings.problem.defaultMemoryLimit,
+                timeElapsed: 0,
             };
-            CphNg.saveProblem(CphNg.problem);
+            CphNg.saveProblem();
         } catch (e) {
             Io.error(
                 vscode.l10n.t('Failed to create problem: {msg}', {
@@ -294,7 +281,7 @@ export default class CphNg {
                 await access(probFile, constants.R_OK);
                 const problem = await CphCapable.loadProblem(probFile);
                 if (problem) {
-                    CphNg.saveProblem(problem);
+                    CphNg.saveProblem();
                 } else {
                     Io.warn(
                         vscode.l10n.t('Failed to import file.', {
@@ -321,118 +308,9 @@ export default class CphNg {
     public static async getProblem() {
         CphNg.emitProblemChange();
     }
-    private static async loadProblemFromBin(binFile: string): Promise<void> {
-        try {
-            const data = await readFile(binFile);
-            try {
-                CphNg.problem = migration(
-                    JSON.parse(
-                        gunzipSync(data).toString(),
-                    ) satisfies OldProblem,
-                );
-                CphNg.logger.info(
-                    'Problem loaded',
-                    { problem: CphNg._problem },
-                    'from',
-                    binFile,
-                );
-            } catch (e) {
-                Io.warn(
-                    vscode.l10n.t('Parse problem file {file} failed: {msg}.', {
-                        file: basename(binFile),
-                        msg: (e as Error).message,
-                    }),
-                );
-                CphNg.problem = undefined;
-            }
-        } catch {
-            CphNg.problem = undefined;
-        }
-    }
-    private static async loadProblemFromEmbedded(
-        cppFile: string,
-    ): Promise<void> {
-        try {
-            const cppData = await readFile(cppFile, 'utf-8');
-            const embeddedProblem = extractEmbedded(cppData);
-            if (!embeddedProblem) {
-                const startIdx = cppData.indexOf(EMBEDDED_HEADER);
-                const endIdx = cppData.indexOf(EMBEDDED_FOOTER);
-                if (startIdx !== -1 || endIdx !== -1) {
-                    Io.warn(
-                        vscode.l10n.t('Invalid embedded data in {file}.', {
-                            file: basename(cppFile),
-                        }),
-                    );
-                }
-                CphNg.problem = undefined;
-                return;
-            }
-            try {
-                CphNg.problem = {
-                    version,
-                    name: embeddedProblem.name,
-                    url: embeddedProblem.url,
-                    src: { path: cppFile },
-                    tcs: embeddedProblem.tcs.map((embeddedTc) => ({
-                        stdin: { useFile: false, data: embeddedTc.stdin },
-                        answer: { useFile: false, data: embeddedTc.answer },
-                        isExpand: false,
-                    })),
-                    timeLimit: embeddedProblem.timeLimit,
-                    memoryLimit: embeddedProblem.memoryLimit,
-                };
-                if (embeddedProblem.spjCode) {
-                    CphNg.problem.checker = {
-                        path: join(
-                            dirname(cppFile),
-                            basename(cppFile, extname(cppFile)) +
-                                '.spj' +
-                                extname(cppFile),
-                        ),
-                    };
-                    await writeFile(
-                        CphNg.problem.checker?.path,
-                        embeddedProblem.spjCode,
-                    );
-                }
-                if (embeddedProblem.interactorCode) {
-                    CphNg.problem.interactor = {
-                        path: join(
-                            dirname(cppFile),
-                            basename(cppFile, extname(cppFile)) +
-                                '.int' +
-                                extname(cppFile),
-                        ),
-                    };
-                    await writeFile(
-                        CphNg.problem.interactor?.path,
-                        embeddedProblem.interactorCode,
-                    );
-                }
-                CphNg.saveProblem(CphNg.problem);
-            } catch (e) {
-                Io.warn(
-                    vscode.l10n.t(
-                        'Parse embedded data in file {file} failed: {msg}.',
-                        {
-                            file: basename(cppFile),
-                            msg: (e as Error).message,
-                        },
-                    ),
-                );
-                CphNg.problem = undefined;
-            }
-        } catch {
-            CphNg.problem = undefined;
-        }
-    }
     public static async loadProblem(cppFile: string): Promise<void> {
         CphNg.logger.trace('loadProblem', { cppFile });
-        await CphNg.loadProblemFromBin(await CphNg.getBinByCpp(cppFile));
-        if (CphNg.problem === undefined) {
-            await CphNg.loadProblemFromEmbedded(cppFile);
-        }
+        CphNg.problem = await Problems.loadProblem(cppFile);
     }
     public static async editProblemDetails(
         title: string,
@@ -448,26 +326,18 @@ export default class CphNg {
         problem.url = url;
         problem.timeLimit = timeLimit;
         problem.memoryLimit = memoryLimit;
-        CphNg.saveProblem(problem);
+        CphNg.saveProblem();
     }
-    public static async saveProblem(problem: Problem): Promise<void> {
-        CphNg.logger.trace('saveProblem', { problem });
-        CphNg.emitProblemChange();
-        try {
-            const binPath = await CphNg.getBinByCpp(problem.src.path);
-            CphNg.logger.info('Saving problem', problem, 'to', binPath);
-            await mkdir(dirname(binPath), { recursive: true });
-            await writeFile(
-                binPath,
-                gzipSync(Buffer.from(JSON.stringify(problem))),
-            );
-        } catch (e) {
-            Io.error(
-                vscode.l10n.t('Failed to save problem: {msg}', {
-                    msg: (e as Error).message,
-                }),
-            );
+    public static async saveProblem(): Promise<void> {
+        CphNg.logger.trace('saveProblem');
+        if (!CphNg.checkProblem()) {
+            return;
         }
+        const problem = CphNg._problem!;
+        CphNg.emitProblemChange();
+        const currentTime = Date.now();
+        problem.timeElapsed += currentTime - CphNg._startTime!;
+        Problems.saveProblem(problem);
     }
     public static async exportToEmbedded(): Promise<void> {
         CphNg.logger.trace('exportToEmbedded');
@@ -526,7 +396,7 @@ export default class CphNg {
             return;
         }
         const problem = CphNg._problem!;
-        const binPath = await CphNg.getBinByCpp(problem.src.path);
+        const binPath = await Problems.getBinByCpp(problem.src.path);
         try {
             await access(binPath, constants.F_OK);
             await unlink(binPath);
@@ -551,7 +421,7 @@ export default class CphNg {
             answer: { useFile: false, data: '' },
             isExpand: false,
         });
-        CphNg.saveProblem(CphNg._problem);
+        CphNg.saveProblem();
     }
     public static async loadTcs(): Promise<void> {
         CphNg.logger.trace('loadTestCases');
@@ -765,7 +635,7 @@ export default class CphNg {
                     problem.tcs.push(tc);
                 });
             }
-            CphNg.saveProblem(problem);
+            CphNg.saveProblem();
         } catch (e) {
             Io.error(
                 vscode.l10n.t('Failed to load test cases: {msg}', {
@@ -781,7 +651,7 @@ export default class CphNg {
         }
         const problem = CphNg._problem!;
         problem.tcs[idx] = tc;
-        CphNg.saveProblem(problem);
+        CphNg.saveProblem();
     }
     public static async runTc(
         idx: number,
@@ -816,7 +686,7 @@ export default class CphNg {
         if (compileResult.verdict !== TCVerdicts.UKE) {
             result.verdict = TCVerdicts.CE;
             tc.isExpand = true;
-            CphNg.saveProblem(problem);
+            CphNg.saveProblem();
             CphNg.runAbortController = undefined;
             return;
         }
@@ -831,7 +701,7 @@ export default class CphNg {
             compileData,
         );
         tc.isExpand = isExpandVerdict(result.verdict);
-        CphNg.saveProblem(problem);
+        CphNg.saveProblem();
         CphNg.runAbortController = undefined;
     }
     public static async runTcs(compile: boolean | null): Promise<void> {
@@ -866,7 +736,7 @@ export default class CphNg {
             for (const tc of problem.tcs) {
                 tc.result!.verdict = TCVerdicts.CE;
             }
-            CphNg.saveProblem(problem);
+            CphNg.saveProblem();
             CphNg.runAbortController = undefined;
             return;
         }
@@ -900,7 +770,7 @@ export default class CphNg {
                 hasExpandStatus = tc.isExpand;
             }
         }
-        CphNg.saveProblem(problem);
+        CphNg.saveProblem();
         CphNg.runAbortController = undefined;
     }
     public static async stopTcs(onlyOne: boolean): Promise<void> {
@@ -916,7 +786,7 @@ export default class CphNg {
                     tc.result!.verdict = TCVerdicts.RJ;
                 }
             }
-            CphNg.saveProblem(problem);
+            CphNg.saveProblem();
         }
     }
     public static async chooseTcFile(
@@ -986,7 +856,7 @@ export default class CphNg {
                         }
                     }
                 }
-                CphNg.saveProblem(problem);
+                CphNg.saveProblem();
             }
         } catch (e) {
             Io.error(
@@ -1075,7 +945,7 @@ export default class CphNg {
                 tc.result![label] = { useFile: true, path: tempFilePath };
             }
         }
-        CphNg.saveProblem(problem);
+        CphNg.saveProblem();
     }
     public static async delTc(idx: number): Promise<void> {
         if (!CphNg.checkProblem() || !CphNg.checkIdx(idx)) {
@@ -1083,7 +953,7 @@ export default class CphNg {
         }
         const problem = CphNg._problem!;
         problem.tcs.splice(idx, 1);
-        CphNg.saveProblem(problem);
+        CphNg.saveProblem();
     }
     public static async chooseFile(fileType: FileTypes): Promise<void> {
         if (!CphNg.checkProblem()) {
@@ -1121,7 +991,7 @@ export default class CphNg {
             }
             problem.bfCompare.bruteForce = { path: checkerFileUri[0].fsPath };
         }
-        CphNg.saveProblem(problem);
+        CphNg.saveProblem();
     }
     public static async removeFile(fileType: FileTypes): Promise<void> {
         if (!CphNg.checkProblem()) {
@@ -1137,7 +1007,7 @@ export default class CphNg {
         } else {
             problem.bfCompare && (problem.bfCompare.bruteForce = undefined);
         }
-        CphNg.saveProblem(problem);
+        CphNg.saveProblem();
     }
     public static async startBfCompare(compile: boolean | null): Promise<void> {
         if (!CphNg.checkProblem()) {
@@ -1177,7 +1047,7 @@ export default class CphNg {
                 );
             }
             CphNg.runAbortController = undefined;
-            CphNg.saveProblem(problem);
+            CphNg.saveProblem();
         };
 
         problem.bfCompare.running = true;
@@ -1335,6 +1205,6 @@ export default class CphNg {
         }
         CphNg.runAbortController && CphNg.runAbortController.abort();
         problem.bfCompare.running = false;
-        CphNg.saveProblem(problem);
+        CphNg.saveProblem();
     }
 }

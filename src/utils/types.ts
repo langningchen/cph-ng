@@ -84,6 +84,7 @@ export interface Problem {
     checker?: FileWithHash;
     interactor?: FileWithHash;
     bfCompare?: BFCompare;
+    timeElapsed: number;
 }
 export interface EmbeddedProblem {
     name: string;

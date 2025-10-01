@@ -23,8 +23,8 @@ import { version } from '../../package.json';
 import FolderChooser from '../helpers/folderChooser';
 import Io from '../helpers/io';
 import Logger from '../helpers/logger';
+import Problems from '../helpers/problems';
 import { Problem } from '../utils/types';
-import CphNg from './cphNg';
 
 export interface CphProblem {
     name: string;
@@ -66,6 +66,7 @@ export default class CphCapable {
             timeLimit: cphProblem.timeLimit,
             memoryLimit: cphProblem.memoryLimit,
             src: { path: cphProblem.srcPath },
+            timeElapsed: 0,
         } satisfies Problem;
         this.logger.info('Converted CphProblem to Problem', { problem });
         return problem;
@@ -156,7 +157,7 @@ export default class CphCapable {
         this.logger.info('Selected problems for import', { chosenIdx });
         const selectedProblems = chosenIdx.map((idx) => problems[idx.value]);
         for (const problem of selectedProblems) {
-            await CphNg.saveProblem(problem);
+            await Problems.saveProblem(problem);
         }
     }
 }

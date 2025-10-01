@@ -25,9 +25,10 @@ import TcsView from './tcsView';
 
 interface ProblemViewProps {
     problem: Problem;
+    startTime: number;
 }
 
-const ProblemView = ({ problem }: ProblemViewProps) => {
+const ProblemView = ({ problem, startTime }: ProblemViewProps) => {
     return (
         <CphFlex
             column
@@ -38,7 +39,10 @@ const ProblemView = ({ problem }: ProblemViewProps) => {
                 boxSizing: 'border-box',
             }}
         >
-            <ProblemTitle problem={problem} />
+            <ProblemTitle
+                problem={problem}
+                startTime={startTime}
+            />
             <Box
                 flex={1}
                 width={'100%'}

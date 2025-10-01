@@ -32,15 +32,17 @@ export default class SidebarProvider implements vscode.WebviewViewProvider {
 
     constructor() {
         this.logger.trace('constructor');
-        CphNg.addProblemChangeListener((problem, canImport) => {
+        CphNg.addProblemChangeListener((problem, canImport, startTime) => {
             this.logger.debug('Problem change listener triggered', {
                 problem,
                 canImport,
+                startTime,
             });
             this._view?.webview.postMessage({
                 type: 'problem',
                 problem,
                 canImport,
+                startTime,
             });
         });
     }

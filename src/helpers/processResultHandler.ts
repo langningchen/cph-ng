@@ -139,7 +139,7 @@ export class ProcessResultHandler {
                     verdict: TCVerdicts.WA,
                     msg: vscode.l10n.t('Unexpected EOF'),
                 };
-            case 5:
+            case 7:
                 return { verdict: TCVerdicts.PC };
             default:
                 this.logger.warn('Testlib returned unknown exit code', code);

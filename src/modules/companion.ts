@@ -21,6 +21,7 @@ import * as vscode from 'vscode';
 import FolderChooser from '../helpers/folderChooser';
 import Io from '../helpers/io';
 import Logger from '../helpers/logger';
+import Problems from '../helpers/problems';
 import { renderTemplate } from '../utils/strTemplate';
 import { Problem } from '../utils/types';
 import CphCapable, { CphProblem } from './cphCapable';
@@ -165,7 +166,7 @@ class Companion {
                 document: document.fileName,
             });
             CphNg.problem = problem;
-            await CphNg.saveProblem(problem);
+            await Problems.saveProblem(problem);
             await vscode.window.showTextDocument(
                 document,
                 Settings.companion.showPanel,
