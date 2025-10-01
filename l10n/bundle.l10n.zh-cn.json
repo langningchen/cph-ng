@@ -135,6 +135,7 @@
     "Unexpected EOF": "意外的文件结束",
     "Unknown Error": "未知错误",
     "Unknown option: {option}.": "未知选项：{option}。",
+    "Use Runner option cannot be used with Use Wrapper option.": "Use Runner 选项不能与 Use Wrapper 选项一起使用。",
     "Verdict: {name} ({fullName})": "裁决：{name} ({fullName})",
     "Waiting": "等待中",
     "Waiting response from cph-submit...": "正在等待 cph-submit 的响应...",

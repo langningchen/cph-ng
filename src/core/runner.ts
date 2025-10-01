@@ -18,6 +18,7 @@
 import { SHA256 } from 'crypto-js';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
+import * as vscode from 'vscode';
 import Logger from '../helpers/logger';
 import ProcessExecutor from '../helpers/processExecutor';
 import { ProcessResultHandler } from '../helpers/processResultHandler';
@@ -90,6 +91,18 @@ export class Runner {
         stdin: TCIO,
         abortController: AbortController,
     ): Promise<RunnerResult> {
+        if (Settings.runner.useRunner && Settings.compilation.useWrapper) {
+            return {
+                verdict: TCVerdicts.RJ,
+                msg: vscode.l10n.t(
+                    'Use Runner option cannot be used with Use Wrapper option.',
+                ),
+                time: 0,
+                memory: undefined,
+                stdout: '',
+                stderr: '',
+            };
+        }
         return ProcessResultHandler.toRunner(
             Settings.runner.useRunner
                 ? await ProcessExecutor.executeWithRunner({
