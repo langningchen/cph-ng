@@ -53,7 +53,6 @@ export class Runner {
     public static async doRun(
         runCommand: string[],
         timeLimit: number,
-        memoryLimit: number,
         stdin: TCIO,
         abortController: AbortController,
         interactor?: string,
@@ -77,7 +76,6 @@ export class Runner {
             return this.runWithoutInteractor(
                 runCommand,
                 timeLimit,
-                memoryLimit,
                 stdin,
                 abortController,
             );
@@ -87,7 +85,6 @@ export class Runner {
     private static async runWithoutInteractor(
         cmd: string[],
         timeLimit: number,
-        memoryLimit: number,
         stdin: TCIO,
         abortController: AbortController,
     ): Promise<RunnerResult> {
@@ -108,7 +105,6 @@ export class Runner {
                 ? await ProcessExecutor.executeWithRunner({
                       cmd,
                       timeout: timeLimit + Settings.runner.timeAddition,
-                      memoryLimit,
                       stdin,
                       ac: abortController,
                   })
@@ -189,7 +185,6 @@ export class Runner {
             const runResult = await this.doRun(
                 await lang.runCommand(compileData.src.outputPath),
                 problem.timeLimit,
-                problem.memoryLimit,
                 tc.stdin,
                 abortController,
                 compileData.interactor?.outputPath,

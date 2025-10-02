@@ -42,7 +42,6 @@ interface ProcessExecutorOptions {
 interface ProcessRunnerExecutorOptions {
     cmd: string[];
     timeout: number;
-    memoryLimit: number;
     stdin: TCIO;
     ac: AbortController;
 }
