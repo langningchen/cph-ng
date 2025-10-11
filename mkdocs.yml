@@ -33,8 +33,6 @@ theme:
     - content.action.edit
     - content.code.copy
     - content.code.annotate
-    - navigation.instant
-    - navigation.instant.progress
     - navigation.sections
     - navigation.tabs
     - navigation.top

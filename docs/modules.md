@@ -1,7 +1,11 @@
 # Modules
 
-For the basic operations—creating a problem, adding test cases, and running
-tests, please see it in [Quick Start](/quickstart).
+This page covers additional modules and features. For the basic operations—creating a problem, adding test cases, and running tests, please see [Quick Start](quickStart.md).
+
+For a comprehensive guide with detailed explanations of how each feature works, see the [Feature Guide](features.md).
+
+!!! info "Configuration"
+    All features can be customized through [Configuration Settings](configuration.md).
 
 ## Compare with answer
 
@@ -16,6 +20,9 @@ can reset it by clicking on the current answer field.
 ![](images/beforeSetAsAnswer.png)
 
 ![](images/afterSetAsAnswer.png)
+
+!!! tip "Configuration"
+    You can customize comparison behavior in [Comparing Settings](configuration.md#comparing-settings), such as treating Presentation Error as Accepted or ignoring stderr output.
 
 ## Data Display Toggles: File & Inline
 
@@ -51,6 +58,11 @@ Finally, you must confirm which specific test cases from the source you wish to
 load.
 
 ![](images/loadFromFileConfirm.png)
+
+!!! note "Configuration"
+    See [Problem Settings](configuration.md#problem-settings) to customize the unzip folder location, auto-deletion behavior, and whether to clear existing test cases before loading.
+    
+    Learn more about this feature in the [Feature Guide](features.md#loading-test-cases-from-filesfolders).
 
 ## Edit problem metadata
 
@@ -102,7 +114,10 @@ It's feasible to import the test data from CPH to CPH-NG.
 If your program requires to judge specifically, please prepare a program for
 judging and add it when editing the problem.
 
-CPH-NG supports this as well as interactive problems.Add a interactive library
+CPH-NG supports this as well as interactive problems. Add a interactive library
 in a similar way if in need.
 
 ![](images/specialJudge.png)
+
+!!! info "Learn More"
+    For detailed information about Special Judge and Interactive Problems, including checker requirements and setup instructions, see the [Feature Guide - Special Judge](features.md#special-judge) and [Interactive Problems](features.md#interactive-problems) sections.

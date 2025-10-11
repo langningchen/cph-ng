@@ -1,5 +1,9 @@
 # Quick Start
 
+This guide will help you get started with CPH-NG in minutes. For detailed information about all features, see the [Feature Guide](features.md).
+
+## Installation
+
 First, the CPH-NG VS Code extension must be installed in your environment. You
 can install it directly by clicking this link:
 [Install CPH-NG](vscode:extension/langningchen.cph-ng). Please ensure you have
@@ -7,6 +11,9 @@ the latest version installed.
 
 After installation, you'll find the extension's sidebar icon on the left side of
 your VS Code window. Feel free to drag it to the right side if you prefer.
+
+!!! tip "First Time Setup"
+    Before creating your first problem, you may want to configure compiler settings in [Configuration](configuration.md#compilation-settings).
 
 ## Create a problem
 
@@ -50,3 +57,11 @@ files.Drag or click them to show them in detailed.
 
 **Now, you have already learned the basic usage of CPH-NG. Enjoy coding with
 CPH-NG!**
+
+## Next Steps
+
+- Explore all features in the [Feature Guide](features.md)
+- Learn about [Configuration Options](configuration.md)
+- Read about [Advanced Features](features.md#advanced-features) like Special Judge and Brute Force Comparison
+- Check [Modules](modules.md) for additional functionality
+- Visit [FAQ](faq.md) if you have questions
