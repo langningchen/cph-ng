@@ -6,9 +6,35 @@ copyright: ©2025 CPH NG
 nav:
   - Overview: index.md
   - Quick Start: quickStart.md
-  - Feature Guide: features.md
-  - Configuration: configuration.md
-  - Modules: modules.md
+  - Features:
+    - features/index.md
+    - Problem Management:
+      - features/create-problem.md
+      - features/import-problem.md
+      - features/edit-problem.md
+      - features/delete-problem.md
+    - Test Case Management:
+      - features/add-test-case.md
+      - features/load-test-cases.md
+      - features/edit-test-case.md
+      - features/delete-test-case.md
+      - features/toggle-file-inline.md
+      - features/compare-output.md
+    - Running and Testing:
+      - features/run-single-test.md
+      - features/run-all-tests.md
+      - features/stop-execution.md
+      - features/clear-results.md
+    - Advanced Features:
+      - features/brute-force-compare.md
+      - features/special-judge.md
+      - features/interactive-problems.md
+      - features/submit-codeforces.md
+    - Integration:
+      - features/competitive-companion.md
+      - features/cph-import.md
+  - Configuration:
+    - configuration/index.md
   - FAQ: faq.md
   - About: about.md
 theme:
