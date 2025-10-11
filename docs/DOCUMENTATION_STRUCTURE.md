@@ -33,59 +33,54 @@ The documentation is built using MkDocs with the Material theme, supporting both
 
 **Target Audience:** New users ready to start using CPH-NG
 
-### 3. Feature Guide (features.en.md / features.zh.md)
+### 3. Features (features/ folder with 21 pages)
 
-**Purpose:** Comprehensive guide to all features
-
-**Content:**
-- Getting started section
-- Problem management (create, import, edit, delete)
-- Test case management (manual, from files, embedded, CPH import)
-- Running and testing (single/all test cases, stopping execution)
-- Result analysis (judge statuses, comparison, execution details)
-- Advanced features (SPJ, interactive, brute force, caching, hooks)
-- Integration features (Codeforces submit, Git, AI tools)
-- Keyboard shortcuts
-- Tips and best practices
+**Purpose:** Individual detailed documentation for each feature
 
 **Structure:**
-- Organized by workflow
-- Each feature includes:
-  - How to trigger
-  - What CPH-NG does
-  - Configuration options
-  - Use cases where applicable
+Each feature has its own page following unified format:
 
-**Target Audience:** Users wanting detailed understanding of features
+- **Overview** - Purpose and functionality
+- **UI Interaction** - Triggering methods, prerequisites, UI components
+- **Internal Operation** - Code flow with source file:line references
+- **Configuration Options** - Related settings that affect behavior
+- **Error Handling** - Common errors and solutions
+- **Workflow Examples** - Practical usage scenarios
+- **Related Features** - Links to connected functionality
+- **Technical Details** - Dependencies, data structures, source references
 
-### 4. Configuration Reference (configuration.en.md / configuration.zh.md)
+**Organization:**
+- `features/index.md` - Navigation hub
+- **Problem Management/** - Create, Import, Edit, Delete
+- **Test Case Management/** - Add, Load, Edit, Delete, Toggle, Compare
+- **Running and Testing/** - Run Single, Run All, Stop, Clear
+- **Advanced Features/** - Brute Force, SPJ, Interactive, Submit
+- **Integration/** - Competitive Companion, CPH Import
 
-**Purpose:** Complete reference for all settings
+**Target Audience:** Users needing detailed feature understanding with code references
 
-**Content:**
-- Quick navigation to setting categories
-- 10 setting categories:
-  1. Basic Settings
-  2. Compilation Settings
-  3. Runner Settings
-  4. Comparing Settings
-  5. Brute Force Compare Settings
-  6. Problem Settings
-  7. Cache Settings
-  8. CPH Compatibility Settings
-  9. Competitive Companion Settings
-  10. Sidebar Settings
+### 4. Configuration (configuration/ folder)
 
-**Structure for each setting:**
-- Type and default value
-- Description
-- Example JSON configuration
-- When to change / use cases
+**Purpose:** Settings reference organized by category
 
-**Additional Content:**
-- Configuration examples (competitive, debugging, performance)
-- Path variables reference
-- Getting help section
+**Structure:**
+- `configuration/index.md` - Overview and navigation
+  - Lists all 10 setting categories
+  - Path variables reference table
+  - Configuration examples (competitive, debug, performance)
+  - Source code references
+
+**Planned Individual Pages** (to be created):
+- `basic.md` - Basic extension settings
+- `compilation.md` - Compiler configuration
+- `runner.md` - Execution settings
+- `comparing.md` - Output comparison
+- `brute-force.md` - BF compare settings
+- `problem.md` - Problem defaults and paths
+- `cache.md` - Cache management
+- `cph-compat.md` - CPH compatibility
+- `companion.md` - Browser extension integration
+- `sidebar.md` - UI customization
 
 **Target Audience:** Users customizing CPH-NG behavior
 

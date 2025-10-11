@@ -37,47 +37,64 @@ Switch languages using the language selector in the documentation site.
 
 ## 📖 What's Covered
 
-### Feature Guide (~659 lines)
+### Features (21 Individual Pages)
 
-Detailed explanations of all features organized by workflow:
+Each feature has a dedicated page with:
 
-- Getting started
-- Problem management (create, import, edit, delete)
-- Test case management (manual, files, embedded, CPH import)
-- Running and testing
-- Result analysis (21 judge statuses explained)
-- Advanced features (SPJ, interactive, brute force comparison)
-- Integration features (Codeforces submit, Git, AI tools)
-- Tips and best practices
+**Problem Management** (4 pages):
+- Create Problem - Initialize new competitive programming problem
+- Import Problem - Import from CPH format
+- Edit Problem - Modify metadata, limits, SPJ, interactor
+- Delete Problem - Remove problem from workspace
 
-### Configuration Reference (~1083 lines)
+**Test Case Management** (6 pages):
+- Add Test Case - Manual single case creation
+- Load Test Cases - Bulk import from files/folders
+- Edit Test Case - Modify input and answer data
+- Delete Test Case - Remove specific test case
+- Toggle File/Inline - Switch data storage mode
+- Compare Output - Visual diff of actual vs expected
 
-Complete reference for all 50+ settings across 10 categories:
+**Running and Testing** (4 pages):
+- Run Single Test - Execute one test case
+- Run All Tests - Execute all sequentially
+- Stop Execution - Terminate running tests
+- Clear Results - Reset execution results
 
-1. Basic Settings
-2. Compilation Settings (C, C++, Java)
-3. Runner Settings
-4. Comparing Settings
-5. Brute Force Compare Settings
-6. Problem Settings
-7. Cache Settings
-8. CPH Compatibility Settings
-9. Competitive Companion Settings
-10. Sidebar Settings
+**Advanced Features** (4 pages):
+- Brute Force Compare - Find edge cases automatically
+- Special Judge - Custom checker programs  
+- Interactive Problems - Support for interactive problems
+- Submit to Codeforces - Direct submission
 
-Each setting includes:
-- Type and default value
-- Detailed description
-- Example JSON configuration
-- When to change / use cases
+**Integration** (2 pages):
+- Competitive Companion - Browser extension integration
+- CPH Import - Import from original CPH
 
-### FAQ (~245 lines)
+Each page includes: UI interaction methods, internal operation with source code references, configuration options, error handling, workflow examples.
 
-Answers to 30+ common questions organized by:
+### Configuration Reference (10 Categories)
 
-- General questions
-- Installation & setup
-- Using CPH-NG
+Comprehensive settings documentation organized by category:
+
+1. **Basic Settings** - UI and folder selection
+2. **Compilation Settings** - Compilers for C/C++/Java
+3. **Runner Settings** - Execution and resource measurement
+4. **Comparing Settings** - Output comparison behavior
+5. **Brute Force Settings** - Generator and brute force timeouts
+6. **Problem Settings** - Defaults and file paths
+7. **Cache Settings** - Compilation cache management
+8. **CPH Compatibility** - Original CPH integration
+9. **Companion Settings** - Browser extension config
+10. **Sidebar Settings** - UI customization
+
+Includes: Path variable reference, configuration examples, source code references
+
+### FAQ
+
+Comprehensive Q&A covering:
+- General questions and installation
+- Feature usage and configuration
 - Advanced features
 - Troubleshooting
 - Getting help
