@@ -6,6 +6,8 @@ copyright: ©2025 CPH NG
 nav:
   - Overview: index.md
   - Quick Start: quickStart.md
+  - Feature Guide: features.md
+  - Configuration: configuration.md
   - Modules: modules.md
   - FAQ: faq.md
   - About: about.md
@@ -29,14 +31,20 @@ theme:
   logo: assets/cph-ng.svg
   features:
     - content.action.edit
+    - content.code.copy
+    - content.code.annotate
     - navigation.instant
     - navigation.instant.progress
     - navigation.sections
     - navigation.tabs
     - navigation.top
     - navigation.tracking
+    - navigation.indexes
+    - navigation.footer
     - search.suggest
-    - toc.integrate
+    - search.highlight
+    - search.share
+    - toc.follow
 extra:
   version:
     provider: mike
@@ -44,6 +52,7 @@ extra:
 repo_url: https://github.com/langningchen/cph-ng
 edit_uri: edit/main/docs/
 plugins:
+  - search
   - i18n:
       docs_structure: suffix
       languages:
@@ -54,3 +63,22 @@ plugins:
         - locale: zh
           name: 简体中文
           build: true
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - toc:
+      permalink: true
+      toc_depth: 3
