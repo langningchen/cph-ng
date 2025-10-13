@@ -82,48 +82,16 @@ The UI sends a `createProblem` message to the extension, which then processes th
 
 ## Configuration Options
 
-### Related Settings
+This feature is affected by several settings that control problem creation behavior:
 
-#### `cph-ng.problem.defaultTimeLimit`
-- **Type**: `number`
-- **Default**: `1000` (milliseconds)
-- **Description**: Default time limit for newly created problems
-- **Applied When**: Problem creation
+- **Time and Memory Limits**: Configure default limits for new problems  
+  → See [Problem Settings](../configuration/problem.md#default-limits)
 
-#### `cph-ng.problem.defaultMemoryLimit`
-- **Type**: `number`
-- **Default**: `512` (MB)
-- **Description**: Default memory limit for newly created problems  
-- **Applied When**: Problem creation
+- **File Storage**: Choose where problem data files are stored  
+  → See [Problem Settings](../configuration/problem.md#file-paths)
 
-#### `cph-ng.problem.problemFilePath`
-- **Type**: `string`
-- **Default**: `"${workspace}/.cph-ng/${relativeDirname}/${basename}.bin"`
-- **Description**: Template pattern for problem file storage location
-- **Variables**:
-  - `${workspace}`: Workspace root directory
-  - `${dirname}`: Source file directory
-  - `${relativeDirname}`: Directory relative to workspace
-  - `${basename}`: Filename with extension
-  - `${basenameNoExt}`: Filename without extension
-  - `${extname}`: File extension
-- **Applied When**: Problem file path calculation
-
-#### `cph-ng.problem.templateFile`
-- **Type**: `string`
-- **Default**: `""` (empty)
-- **Description**: Path to template file used when creating new problems
-- **Applied When**: Initial source file creation (if file doesn't exist)
-
-### Configuration Example
-
-```json
-{
-  "cph-ng.problem.defaultTimeLimit": 2000,
-  "cph-ng.problem.defaultMemoryLimit": 256,
-  "cph-ng.problem.problemFilePath": "${workspace}/.cph/${basenameNoExt}.bin"
-}
-```
+- **Templates**: Use a template file for initializing new problem source files  
+  → See [Problem Settings](../configuration/problem.md#template-file)
 
 ## Error Handling
 
@@ -178,31 +146,3 @@ Result: New problem created with 3000ms time limit and 1024MB memory limit.
 - [Edit Problem](edit-problem.md) - Modify problem metadata
 - [Import Problem](import-problem.md) - Alternative creation method from CPH
 - [Delete Problem](delete-problem.md) - Remove created problem
-
-## Technical Details
-
-### Data Structure
-
-The problem is stored as a data object containing:
-
-```
-Problem:
-  - version: CPH-NG version string
-  - name: Problem name (derived from filename)
-  - src.path: Full path to source file
-  - tcs: Array of test cases
-  - timeLimit: Time limit in milliseconds
-  - memoryLimit: Memory limit in MB
-  - timeElapsed: Time spent on problem (ms)
-  - url: Optional problem URL (for online judge problems)
-  - checker: Optional Special Judge program
-  - interactor: Optional interactor for interactive problems
-  - bfCompare: Optional brute force comparison configuration
-```
-
-### Implementation Notes
-
-- The extension validates the file path and checks for existing problems before creating
-- Problem data is compressed and stored in binary format for efficiency
-- The UI automatically refreshes to show the newly created problem
-- Template files can be used to initialize source code if configured

@@ -35,6 +35,16 @@ nav:
       - features/cph-import.md
   - Configuration:
     - configuration/index.md
+    - configuration/basic.md
+    - configuration/compilation.md
+    - configuration/runner.md
+    - configuration/comparing.md
+    - configuration/brute-force.md
+    - configuration/problem.md
+    - configuration/cache.md
+    - configuration/cph-compat.md
+    - configuration/companion.md
+    - configuration/sidebar.md
   - FAQ: faq.md
   - About: about.md
 theme:

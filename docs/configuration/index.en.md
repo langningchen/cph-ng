@@ -6,72 +6,122 @@ Complete reference for all CPH-NG configuration settings, organized by category.
 
 CPH-NG provides 10 categories of settings to customize behavior:
 
-### [Basic Settings](basic.md)
+### 1. [Basic Settings](basic.md)
 General extension behavior and UI preferences.
 
-- `cph-ng.basic.folderOpener` - Folder selection method
+**Key Settings**:
+- Folder selection method
 
-### [Compilation Settings](compilation.md)  
+**Related Features**: [Load Test Cases](../features/load-test-cases.md)
+
+---
+
+### 2. [Compilation Settings](compilation.md)  
 Compiler configuration for C, C++, and Java.
 
+**Key Settings**:
 - Compiler paths and arguments
 - Compilation timeout
 - Wrapper and hook support
 
-### [Runner Settings](runner.md)
+**Related Features**: [Run Single Test](../features/run-single-test.md), [Run All Tests](../features/run-all-tests.md)
+
+---
+
+### 3. [Runner Settings](runner.md)
 Program execution and resource measurement.
 
+**Key Settings**:
 - Time additions and thresholds
 - Output size limits
 - Advanced runner for memory tracking
 
-### [Comparing Settings](comparing.md)
+**Related Features**: [Run Single Test](../features/run-single-test.md), [Run All Tests](../features/run-all-tests.md)
+
+---
+
+### 4. [Comparing Settings](comparing.md)
 Output comparison and verdict determination.
 
+**Key Settings**:
 - Output limit exceeded threshold
 - Presentation error handling
 - Error output behavior
 
-### [Brute Force Compare Settings](brute-force.md)
+**Related Features**: [Compare Output](../features/compare-output.md), [Run Single Test](../features/run-single-test.md)
+
+---
+
+### 5. [Brute Force Compare Settings](brute-force.md)
 Settings for brute force comparison feature.
 
+**Key Settings**:
 - Generator time limit
 - Brute force solution timeout
 
-### [Problem Settings](problem.md)
+**Related Features**: [Brute Force Compare](../features/brute-force-compare.md)
+
+---
+
+### 6. [Problem Settings](problem.md)
 Problem file management and defaults.
 
+**Key Settings**:
 - Default time and memory limits
 - File path templates
 - Template file location
 - Test case loading behavior
 
-### [Cache Settings](cache.md)
+**Related Features**: [Create Problem](../features/create-problem.md), [Edit Problem](../features/edit-problem.md), [Load Test Cases](../features/load-test-cases.md)
+
+---
+
+### 7. [Cache Settings](cache.md)
 Compilation cache and temporary files.
 
+**Key Settings**:
 - Cache directory location
 - Cleanup behavior
 
-### [CPH Compatibility Settings](cph-compat.md)
+**Related Features**: [Run Single Test](../features/run-single-test.md), [Run All Tests](../features/run-all-tests.md)
+
+---
+
+### 8. [CPH Compatibility Settings](cph-compat.md)
 Integration with original CPH extension.
 
+**Key Settings**:
+- Automatic CPH detection
 - Import compatibility options
 
-### [Competitive Companion Settings](companion.md)
+**Related Features**: [CPH Import](../features/cph-import.md), [Import Problem](../features/import-problem.md)
+
+---
+
+### 9. [Competitive Companion Settings](companion.md)
 Browser extension integration settings.
 
+**Key Settings**:
 - Listen port configuration
 - File naming conventions
 - Auto-import behavior
 - Platform-specific options
+- Submission settings
 
-### [Sidebar Settings](sidebar.md)
+**Related Features**: [Competitive Companion](../features/competitive-companion.md), [Submit to Codeforces](../features/submit-codeforces.md)
+
+---
+
+### 10. [Sidebar Settings](sidebar.md)
 UI customization for the CPH-NG panel.
 
+**Key Settings**:
 - Theme and colors
 - Status display options
 - Font customization
 - Animation preferences
+
+**Related Features**: All features (affects UI display)
 
 ## Quick Reference
 
@@ -139,20 +189,18 @@ Many settings support template variables for flexible path configuration:
 }
 ```
 
-## Source Code References
+## Navigation
 
-Settings are defined in: `src/modules/settings.ts`
+Click any category above to view detailed settings documentation with:
 
-Each setting category has a corresponding class:
-- `BasicSection` (line 45)
-- `CompilationSection` (line 54)  
-- `RunnerSection` (line 158)
-- `ComparingSection` (line 176)
-- `BFCompareSection` (line 191)
-- `ProblemSection` (line 203)
-- `CacheSection` (line 96)
-- `CphCapableSection` (line 113)
-- `CompanionSection` (line 122)
-- `SidebarSection` (line 245)
+- Setting descriptions and types
+- Default values
+- User impact explanations
+- Configuration examples
+- Related features
 
-Package.json contributions: `package.json` lines 113-520
+## Need Help?
+
+- Check [FAQ](../faq.md) for common questions
+- See [Quick Start](../quickStart.md) for basic setup
+- Visit individual feature pages for feature-specific settings
