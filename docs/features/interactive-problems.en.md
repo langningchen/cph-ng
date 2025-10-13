@@ -1,49 +1,56 @@
 # Interactive Problems
 
-Support for interactive problems with custom interactor.
+Support for interactive problems with custom interactor programs.
 
 ## Overview
 
-[Detailed description based on source code analysis - IN PROGRESS]
+Interactive problems require two-way communication between your solution and a judge program. Your solution reads queries, processes them, and writes responses, with the interactor validating the interaction.
 
 ## UI Interaction
 
-### Triggering the Feature
+### Setup
 
-[Methods to trigger this feature]
+1. Click edit icon in problem title
+2. Find "Interactor" section in edit dialog
+3. Click "Choose Interactor"
+4. Select compiled interactor executable
+5. Save changes
 
-### Prerequisites
+### Requirements
 
-[Required conditions]
+- Interactor must be compiled executable
+- Communicates via stdin/stdout
+- Manages the interaction protocol
 
-### UI Components
+## How It Works
 
-**Location**: [Source file path]
+With interactor configured:
+1. Your solution starts
+2. Interactor starts simultaneously  
+3. Solution writes query → Interactor reads
+4. Interactor writes response → Solution reads
+5. Continues until solution outputs answer or error
+6. Interactor determines verdict
 
-[UI component details]
+## Example Interaction
 
-## Internal Operation
+Problem: Guess a number between 1-100
 
-### Code Flow
+**Your Solution**:
+```cpp
+while(true) {
+    cout << guess << endl;
+    cout.flush();
+    string response;
+    cin >> response;
+    if (response == "CORRECT") break;
+    // adjust guess based on response
+}
+```
 
-**Entry Point**: [Module and function with line numbers]
-
-[Detailed code flow analysis]
-
-## Configuration Options
-
-[Related settings from source code]
+**Interactor**: Provides "HIGHER"/"LOWER"/"CORRECT" responses
 
 ## Related Features
 
-[Links to related feature pages]
-
-## Technical Details
-
-### Source Code References
-
-[Specific file and line references]
-
----
-
-*This page is being expanded with detailed information from source code analysis.*
+- [Edit Problem](edit-problem.md) - Configure interactor
+- [Special Judge](special-judge.md) - Alternative validation

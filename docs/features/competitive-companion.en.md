@@ -1,49 +1,70 @@
 # Competitive Companion Integration
 
-Browser extension integration for automatic problem import.
+Browser extension integration for automatic problem import from online judges.
 
 ## Overview
 
-[Detailed description based on source code analysis - IN PROGRESS]
+Competitive Companion is a browser extension that sends problem data from online judges directly to CPH-NG. Click the extension icon on any problem page to automatically import all test cases and metadata.
 
 ## UI Interaction
 
-### Triggering the Feature
+### Setup
 
-[Methods to trigger this feature]
+1. Install Competitive Companion browser extension
+2. Configure listening port in CPH-NG settings (default: 27121)
+3. Open a source file in VS Code
+4. Navigate to problem on online judge
+5. Click Competitive Companion icon
+6. Problem auto-created in CPH-NG
 
-### Prerequisites
+### Supported Judges
 
-[Required conditions]
+- Codeforces
+- AtCoder
+- LeetCode
+- Codechef
+- CSES
+- And many more
 
-### UI Components
+## Configuration
 
-**Location**: [Source file path]
+### Port Setting
 
-[UI component details]
+#### `cph-ng.companion.listenPort`
+- **Default**: `27121`
+- Browser extension sends to this port
 
-## Internal Operation
+### Naming Conventions
 
-### Code Flow
+#### `cph-ng.companion.shortCodeforcesName`
+- **Default**: `true`
+- Uses short problem names (A, B, C) instead of full titles
 
-**Entry Point**: [Module and function with line numbers]
+#### `cph-ng.companion.shortLuoguName`
+- Shortens Luogu problem names
 
-[Detailed code flow analysis]
+#### `cph-ng.companion.shortAtCoderName`
+- Shortens AtCoder problem names
 
-## Configuration Options
+### File Handling
 
-[Related settings from source code]
+#### `cph-ng.companion.defaultExtension`
+- **Default**: `.cpp`
+- Extension for auto-created files
+
+#### `cph-ng.companion.chooseSaveFolder`
+- Whether to prompt for save location
+
+## How It Works
+
+1. User clicks extension icon on problem page
+2. Extension sends JSON data to CPH-NG
+3. CPH-NG receives problem metadata and test cases
+4. New file created (or existing opened)
+5. Problem imported with all test cases
+6. Ready to start coding
 
 ## Related Features
 
-[Links to related feature pages]
-
-## Technical Details
-
-### Source Code References
-
-[Specific file and line references]
-
----
-
-*This page is being expanded with detailed information from source code analysis.*
+- [Create Problem](create-problem.md) - Manual problem creation
+- [Import Problem](import-problem.md) - Import from CPH

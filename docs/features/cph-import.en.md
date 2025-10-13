@@ -1,49 +1,44 @@
 # CPH Import
 
-Import problems from original CPH extension format.
+Batch import problems from original CPH extension format.
 
 ## Overview
 
-[Detailed description based on source code analysis - IN PROGRESS]
+CPH Import command allows batch importing multiple problems from the original CPH extension. Useful when migrating from CPH to CPH-NG.
 
 ## UI Interaction
 
-### Triggering the Feature
+### Triggering
 
-[Methods to trigger this feature]
+**Command Palette**:
+1. Press Ctrl+Shift+P (Cmd+Shift+P on macOS)
+2. Type: "CPH-NG: Import from CPH"
+3. Select command
+4. Choose files to import
 
 ### Prerequisites
 
-[Required conditions]
+- CPH problem files (.prob) must exist
+- Corresponding source files should exist
 
-### UI Components
+## How It Works
 
-**Location**: [Source file path]
+1. Command invoked
+2. Scans workspace for CPH problem files
+3. Shows list of available problems
+4. User selects which to import
+5. Each selected problem is converted
+6. Imported problems saved in CPH-NG format
 
-[UI component details]
+## Batch Import
 
-## Internal Operation
-
-### Code Flow
-
-**Entry Point**: [Module and function with line numbers]
-
-[Detailed code flow analysis]
-
-## Configuration Options
-
-[Related settings from source code]
+Unlike single [Import Problem](import-problem.md), this command:
+- Imports multiple problems at once
+- Scans entire workspace
+- Shows selection dialog
+- Preserves all problem data
 
 ## Related Features
 
-[Links to related feature pages]
-
-## Technical Details
-
-### Source Code References
-
-[Specific file and line references]
-
----
-
-*This page is being expanded with detailed information from source code analysis.*
+- [Import Problem](import-problem.md) - Single problem import
+- [Create Problem](create-problem.md) - Create from scratch

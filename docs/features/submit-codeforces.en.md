@@ -4,46 +4,41 @@ Direct submission to Codeforces online judge.
 
 ## Overview
 
-[Detailed description based on source code analysis - IN PROGRESS]
+Submit to Codeforces feature allows you to submit your solution directly to Codeforces from within VS Code, without opening a browser.
 
 ## UI Interaction
 
-### Triggering the Feature
+### Triggering
 
-[Methods to trigger this feature]
+**Submit Button**:
+- Only appears when problem URL is from Codeforces
+- Icon: Upload/backup icon
+- Color: Green (success)
+- Click to start submission
 
 ### Prerequisites
 
-[Required conditions]
+- Problem must have valid Codeforces URL
+- Must be logged into Codeforces in browser
+- Source file must be saved
 
-### UI Components
+## How It Works
 
-**Location**: [Source file path]
+1. Click submit button
+2. Extension extracts contest/problem IDs from URL
+3. Opens browser for authentication
+4. Submits code to Codeforces
+5. Confirmation shown
 
-[UI component details]
+## Configuration
 
-## Internal Operation
+### Language Selection
 
-### Code Flow
-
-**Entry Point**: [Module and function with line numbers]
-
-[Detailed code flow analysis]
-
-## Configuration Options
-
-[Related settings from source code]
+#### `cph-ng.companion.submitLanguage`
+- Selects C++ compiler version for Codeforces
+- Options: GCC, Clang, MSVC versions
 
 ## Related Features
 
-[Links to related feature pages]
-
-## Technical Details
-
-### Source Code References
-
-[Specific file and line references]
-
----
-
-*This page is being expanded with detailed information from source code analysis.*
+- [Edit Problem](edit-problem.md) - Set problem URL
+- [Competitive Companion](competitive-companion.md) - Auto-import from Codeforces

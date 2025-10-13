@@ -4,46 +4,51 @@ Use custom checker programs for non-standard answer validation.
 
 ## Overview
 
-[Detailed description based on source code analysis - IN PROGRESS]
+Special Judge (SPJ) allows problems with multiple correct answers or custom validation logic. Instead of exact output matching, your checker program validates whether the output is correct according to problem requirements.
 
 ## UI Interaction
 
-### Triggering the Feature
+### Setup
 
-[Methods to trigger this feature]
+1. Click edit icon in problem title
+2. In edit dialog, find "Checker" section
+3. Click "Choose Checker"
+4. Select compiled checker executable
+5. Save changes
 
-### Prerequisites
+### Requirements
 
-[Required conditions]
+- Checker must be compiled executable
+- Should follow testlib.h conventions (recommended)
+- Receives test input, contestant output, and expected answer as arguments
 
-### UI Components
+## How It Works
 
-**Location**: [Source file path]
+When SPJ is configured:
+1. Your solution runs normally
+2. Instead of direct comparison, checker is invoked
+3. Checker receives: input file, output file, answer file
+4. Checker exits with code: 0 (AC), 1 (WA), or other
+5. Verdict determined by checker's exit code
 
-[UI component details]
+## Checker Program Structure
 
-## Internal Operation
-
-### Code Flow
-
-**Entry Point**: [Module and function with line numbers]
-
-[Detailed code flow analysis]
-
-## Configuration Options
-
-[Related settings from source code]
+Typical checker (C++ with testlib.h):
+```cpp
+#include "testlib.h"
+int main(int argc, char* argv[]) {
+    registerTestlibCmd(argc, argv);
+    int expected = ans.readInt();
+    int output = ouf.readInt();
+    if (output == expected)
+        quitf(_ok, "Correct");
+    else
+        quitf(_wa, "Wrong answer");
+}
+```
 
 ## Related Features
 
-[Links to related feature pages]
+- [Edit Problem](edit-problem.md) - Configure SPJ
+- [Interactive Problems](interactive-problems.md) - Alternative for two-way communication
 
-## Technical Details
-
-### Source Code References
-
-[Specific file and line references]
-
----
-
-*This page is being expanded with detailed information from source code analysis.*

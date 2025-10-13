@@ -1,49 +1,180 @@
 # Brute Force Compare
 
-Find edge cases using generator, brute force, and optimized solution comparison.
+Find edge cases automatically using generator, brute force, and optimized solution comparison.
 
 ## Overview
 
-[Detailed description based on source code analysis - IN PROGRESS]
+The Brute Force Compare feature helps discover edge cases and bugs by automatically generating test inputs, running both your optimized solution and a brute force reference solution, and comparing their outputs. When outputs differ, that test case is saved for debugging.
 
 ## UI Interaction
 
 ### Triggering the Feature
 
-[Methods to trigger this feature]
+**Method: Brute Force Button**
+- Click the brute force/compare arrows icon in the problem actions panel
+- Dialog opens for configuration
+- Start comparison process
 
 ### Prerequisites
 
-[Required conditions]
+- Problem must be loaded
+- Three programs needed:
+  - **Generator**: Creates random test inputs
+  - **Brute Force**: Slow but correct solution
+  - **Your Solution**: Fast solution to validate
 
 ### UI Components
 
-**Location**: [Source file path]
-
-[UI component details]
+**Brute Force Dialog**:
+- Generator program selection
+- Brute force solution selection
+- Configuration options (iterations, limits)
+- Start/Stop buttons
+- Progress display
+- Results summary
 
 ## Internal Operation
 
-### Code Flow
+### How It Works
 
-**Entry Point**: [Module and function with line numbers]
+1. **Setup**:
+   - User selects generator program
+   - User selects brute force solution
+   - Configures iteration limit
 
-[Detailed code flow analysis]
+2. **Comparison Loop**:
+   - Generator creates random input
+   - Both solutions run with same input
+   - Outputs are compared
+   - If different, mismatch found
+   - Loop continues until mismatch or limit reached
+
+3. **Result Handling**:
+   - If mismatch found:
+     - Input saved as new test case
+     - Both outputs saved
+     - User notified
+   - If all match:
+     - "No differences found" message
+
+4. **Test Case Creation**:
+   - Failing input added to test cases
+   - Expected answer from brute force
+   - Can be debugged like normal test
+
+### Generator Requirements
+
+Generator program should:
+- Output valid test input to stdout
+- Generate random/varied inputs
+- Run quickly (under time limit)
+- Not require input itself
+
+### Brute Force Requirements
+
+Brute force solution should:
+- Read input from stdin
+- Output correct answer to stdout
+- Be verified correct (even if slow)
+- Handle same input format as main solution
 
 ## Configuration Options
 
-[Related settings from source code]
+### Brute Force Settings
+
+#### `cph-ng.bfCompare.generatorTimeLimit`
+- **Type**: `number`
+- **Default**: `1000` (ms)
+- **Description**: Time limit for generator execution
+
+#### `cph-ng.bfCompare.bruteForceTimeLimit`
+- **Type**: `number`
+- **Default**: `2000` (ms)
+- **Description**: Time limit for brute force solution
+- **Note**: Can be higher than main solution limit
+
+## Workflow Example
+
+### Finding Edge Case
+
+1. Write optimized solution (may have bug)
+2. Write simple brute force solution (slow but correct)
+3. Write generator (creates random inputs)
+4. Open brute force dialog
+5. Select generator program
+6. Select brute force program
+7. Set iteration limit (e.g., 1000)
+8. Click "Start"
+9. System runs comparison
+10. After 347 iterations, finds mismatch
+11. Test case auto-created with failing input
+12. Debug using that test case
+
+### Typical Generator Example (Python)
+
+```python
+import random
+n = random.randint(1, 100)
+print(n)
+for i in range(n):
+    print(random.randint(1, 1000))
+```
+
+### Typical Brute Force (Python)
+
+```python
+n = int(input())
+arr = list(map(int, input().split()))
+# Simple O(n²) solution
+result = 0
+for i in range(n):
+    for j in range(i+1, n):
+        if arr[i] > arr[j]:
+            result += 1
+print(result)
+```
+
+### When No Mismatch Found
+
+1. Run 10000 iterations
+2. All outputs match
+3. High confidence solution is correct
+4. Or generator not covering edge cases well
 
 ## Related Features
 
-[Links to related feature pages]
+- [Run Single Test](run-single-test.md) - Test the found edge case
+- [Add Test Case](add-test-case.md) - Manually add cases if needed
+- [Special Judge](special-judge.md) - Alternative validation method
 
 ## Technical Details
 
-### Source Code References
+### Process Management
 
-[Specific file and line references]
+Each iteration:
+- 3 programs run: generator, brute force, your solution
+- All run with appropriate time limits
+- Outputs captured and compared
+- Clean up after each iteration
 
----
+### Performance
 
-*This page is being expanded with detailed information from source code analysis.*
+Comparison is CPU-intensive:
+- Runs many program executions
+- May take significant time
+- Progress indicator shows status
+- Can be stopped at any time
+
+### Comparison Method
+
+Outputs compared using same logic as normal test cases:
+- Exact match required by default
+- Whitespace handling per settings
+- First mismatch stops process
+
+### Limitations
+
+- Generator must produce valid inputs
+- Brute force must be correct
+- Time limits may need adjustment
+- Not suitable for interactive problems
