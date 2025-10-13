@@ -57,33 +57,13 @@ When the add test case button is clicked:
 
 ## Configuration Options
 
-### Related Settings
+This feature has no specific configuration settings. Test case data is stored according to:
 
-**No Direct Settings**
+- **Data Storage**: Control file vs inline storage modes  
+  → See [Toggle File/Inline](toggle-file-inline.md) feature
 
-This feature does not have specific configuration options. However, test case behavior is affected by:
-
-#### `cph-ng.problem.maxInlineDataLength`
-- **Type**: `number`
-- **Default**: `65536` (bytes)
-- **Description**: Maximum size for inline data before auto-converting to file
-- **Applied When**: Editing test case data
-
-## Data Structure
-
-```typescript
-interface TC {
-    stdin: TCIO;         // Input data
-    answer: TCIO;        // Expected answer
-    isExpand: boolean;   // UI expand state
-    result?: TCResult;   // Execution result (added after running)
-}
-
-interface TCIO {
-    useFile: boolean;    // true = file, false = inline
-    data: string;        // inline data or file path
-}
-```
+- **Problem Data**: Where problem files are stored  
+  → See [Problem Settings](../configuration/problem.md#file-paths)
 
 ## Workflow Example
 
@@ -110,24 +90,3 @@ interface TCIO {
 - [Load Test Cases](load-test-cases.md) - Bulk import from files
 - [Delete Test Case](delete-test-case.md) - Remove test case
 - [Run Single Test Case](run-single-test.md) - Execute the test
-
-## Technical Details
-
-### Implementation Notes
-
-- Test cases are stored in the problem's test cases array
-- The UI automatically displays newly added test cases
-- Test cases can be edited immediately after creation
-- No limit on the number of test cases that can be added
-
-## Error Handling
-
-### Silent Failures
-
-If no problem is loaded (`fullProblem === null`), the function returns early without user notification. This is intentional to avoid spamming error messages when no problem exists.
-
-### UI State
-
-- Button is always visible when a problem is loaded
-- Button click always succeeds if problem exists
-- New test case immediately appears in UI after creation

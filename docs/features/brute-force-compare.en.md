@@ -80,18 +80,16 @@ Brute force solution should:
 
 ## Configuration Options
 
-### Brute Force Settings
+This feature requires specific settings:
 
-#### `cph-ng.bfCompare.generatorTimeLimit`
-- **Type**: `number`
-- **Default**: `1000` (ms)
-- **Description**: Time limit for generator execution
+- **Time Limits**: Control how long generator and brute force can run  
+  → See [Brute Force Settings](../configuration/brute-force.md)
 
-#### `cph-ng.bfCompare.bruteForceTimeLimit`
-- **Type**: `number`
-- **Default**: `2000` (ms)
-- **Description**: Time limit for brute force solution
-- **Note**: Can be higher than main solution limit
+- **Compilation**: Affects compilation of all three programs  
+  → See [Compilation Settings](../configuration/compilation.md)
+
+- **Runner**: Your main solution uses standard runner settings  
+  → See [Runner Settings](../configuration/runner.md)
 
 ## Workflow Example
 
@@ -147,34 +145,3 @@ print(result)
 - [Add Test Case](add-test-case.md) - Manually add cases if needed
 - [Special Judge](special-judge.md) - Alternative validation method
 
-## Technical Details
-
-### Process Management
-
-Each iteration:
-- 3 programs run: generator, brute force, your solution
-- All run with appropriate time limits
-- Outputs captured and compared
-- Clean up after each iteration
-
-### Performance
-
-Comparison is CPU-intensive:
-- Runs many program executions
-- May take significant time
-- Progress indicator shows status
-- Can be stopped at any time
-
-### Comparison Method
-
-Outputs compared using same logic as normal test cases:
-- Exact match required by default
-- Whitespace handling per settings
-- First mismatch stops process
-
-### Limitations
-
-- Generator must produce valid inputs
-- Brute force must be correct
-- Time limits may need adjustment
-- Not suitable for interactive problems

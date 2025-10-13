@@ -81,37 +81,19 @@ The Run Single Test Case feature allows you to run your solution against a speci
 
 ## Configuration Options
 
-### Compilation Settings
+This feature is affected by multiple configuration settings:
 
-#### `cph-ng.compilation.timeout`
-- **Type**: `number`
-- **Default**: `5000` (ms)
-- **Description**: Compilation time limit
+- **Compilation**: Control compiler, arguments, and timeouts  
+  → See [Compilation Settings](../configuration/compilation.md)
 
-#### `cph-ng.compilation.cppArgs`
-- **Type**: `string`
-- **Default**: `"-std=c++17 -O2"`
-- **Description**: C++ compiler arguments
+- **Execution**: Control resource measurement and time additions  
+  → See [Runner Settings](../configuration/runner.md)
 
-### Execution Settings
+- **Comparison**: Control how output is compared and verdicts determined  
+  → See [Comparing Settings](../configuration/comparing.md)
 
-#### `cph-ng.runner.timeAddition`
-- **Type**: `number`
-- **Default**: `200` (ms)
-- **Description**: Extra time added to limit
-- **Purpose**: Account for system overhead
-
-#### `cph-ng.runner.useRunner`
-- **Type**: `boolean`
-- **Default**: `false`
-- **Description**: Use advanced runner for accurate memory measurement
-
-### Comparison Settings
-
-#### `cph-ng.comparing.regardPEAsAC`
-- **Type**: `boolean`
-- **Default**: `false`
-- **Description**: Treat Presentation Error as Accepted
+- **Caching**: Speed up repeated compilations  
+  → See [Cache Settings](../configuration/cache.md)
 
 ## Workflow Example
 
@@ -157,31 +139,3 @@ The Run Single Test Case feature allows you to run your solution against a speci
 - [Stop Execution](stop-execution.md) - Cancel running test
 - [Clear Results](clear-results.md) - Reset test results
 - [Compare Output](compare-output.md) - View differences for WA
-
-## Technical Details
-
-### Execution Environment
-
-- Tests run in isolated process
-- Input provided via stdin or file
-- Output captured from stdout
-- Errors captured from stderr
-- Time and memory tracked
-
-### Caching
-
-- Compilation results cached
-- Recompilation only when needed
-- Cache based on source file hash
-- Speeds up repeated runs
-
-### Resource Monitoring
-
-With standard execution:
-- Time measured accurately
-- Memory is approximate
-
-With advanced runner (if enabled):
-- More accurate memory tracking
-- May require system permissions
-- Slight performance overhead

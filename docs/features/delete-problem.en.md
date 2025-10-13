@@ -106,16 +106,3 @@ Only the problem metadata file is deleted. Your source code remains safe and unc
 - [Import Problem](import-problem.md) - Import CPH data if available
 - [Edit Problem](edit-problem.md) - Alternative to deletion for fixing problems
 
-## Technical Details
-
-### File Removal
-
-The problem binary file in `.cph-ng/` folder is permanently deleted using filesystem operations. This action cannot be undone through the extension.
-
-### Cleanup
-
-When a problem is deleted:
-- Problem removed from active problems list
-- UI immediately reflects the deletion
-- Cache files may remain (cleaned periodically)
-- Background problems (if any) are unaffected

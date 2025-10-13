@@ -118,18 +118,3 @@ After running a test and seeing WA:
 - [Compare Output](compare-output.md) - View differences when testing
 - [Delete Test Case](delete-test-case.md) - Remove unwanted cases
 
-## Technical Details
-
-### Auto-save Mechanism
-
-Changes trigger an update message to the extension, which:
-- Updates the test case in the problem data structure
-- Saves the problem file
-- Refreshes the UI if needed
-
-### Data Preservation
-
-- Whitespace and formatting are preserved
-- Line endings are normalized
-- Unicode characters supported
-- Binary data not supported (use file mode)

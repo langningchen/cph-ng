@@ -53,29 +53,16 @@ The load process follows these steps:
 
 ## Configuration Options
 
-### Related Settings
+This feature is affected by several settings:
 
-#### `cph-ng.problem.unzipFolder`
-- **Type**: `string`  
-- **Default**: `"${workspace}/.cph-ng/${zipBasenameNoExt}"`
-- **Description**: Template for zip extraction folder
-- **Variables**: `${workspace}`, `${dirname}`, `${zipBasenameNoExt}`
+- **Folder Selection**: Choose how folder picker works  
+  → See [Basic Settings](../configuration/basic.md#folder-selection)
 
-#### `cph-ng.problem.deleteAfterUnzip`
-- **Type**: `boolean`
-- **Default**: `false`
-- **Description**: Delete zip file after extraction
+- **Zip Handling**: Control where zips extract and if they're deleted  
+  → See [Problem Settings](../configuration/problem.md#test-case-loading)
 
-#### `cph-ng.problem.clearBeforeLoad`  
-- **Type**: `boolean`
-- **Default**: `true`
-- **Description**: Clear existing test cases before loading new ones
-
-#### `cph-ng.basic.folderOpener`
-- **Type**: `string`
-- **Default**: `"tree"`  
-- **Options**: `"tree"` | `"flat"`
-- **Description**: Method for folder selection dialog
+- **Test Case Clearing**: Choose whether to keep or replace existing test cases  
+  → See [Problem Settings](../configuration/problem.md#test-case-loading)
 
 ## Workflow Example
 
@@ -105,24 +92,12 @@ The load process follows these steps:
 - [Edit Test Case](edit-test-case.md) - Modify imported cases  
 - [Toggle File/Inline](toggle-file-inline.md) - Switch data storage mode
 
-## Technical Details
+## File Matching Rules
 
-### File Matching Logic
+CPH-NG matches input and answer files by their base names:
 
-**Input Files**: `.in` extension
-**Answer Files**: `.out` or `.ans` extension  
-**Matching**: By basename (e.g., `test1.in` + `test1.out`)
+**Input Files**: Must have `.in` extension (e.g., `test1.in`, `sample01.in`)
+**Answer Files**: Can have `.out` or `.ans` extension (e.g., `test1.out`, `sample01.ans`)
+**Matching**: `test1.in` matches with `test1.out` or `test1.ans`
 
-### File Naming Convention
-
-**Input Files**: Must have `.in` extension
-**Answer Files**: Can have `.out` or `.ans` extension
-**Matching**: Files are matched by base name (e.g., `test1.in` matches `test1.out` or `test1.ans`)
-
-### Implementation Notes
-
-- Recursive directory scanning ensures all test cases are found regardless of folder depth
-- Natural ordering provides intuitive test case numbering
-- Zip files are extracted to a temporary location that can be configured
-- After extraction, zip files can optionally be deleted automatically
-- The folder chooser method (tree view or flat list) is configurable
+Files without matches are still imported (input only, no expected answer).

@@ -78,12 +78,3 @@ After importing test cases from files:
 - [Load Test Cases](load-test-cases.md) - Import multiple cases
 - [Edit Test Case](edit-test-case.md) - Modify instead of deleting
 
-## Technical Details
-
-### Array Management
-
-Test cases are stored in an array. Deletion:
-- Removes element at specific index
-- Array automatically adjusts
-- UI re-renders with updated list
-- Indices recalculated starting from 1
