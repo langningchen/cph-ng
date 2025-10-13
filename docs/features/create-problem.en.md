@@ -29,31 +29,23 @@ The Create Problem feature initializes a new problem for the currently active so
 
 ### UI Components
 
-**Location**: `src/webview/components/createProblemView.tsx`
-
 The create problem view displays:
 - Warning alert explaining the action
-- `CREATE` button (Material-UI Button with SendIcon)
+- `CREATE` button with send icon
 - Optional `IMPORT` button if CPH data is detected
 
 ## Internal Operation
 
-### Code Flow
+### How It Works
 
-**Entry Point**: `src/modules/cphNg.ts` - `createProblem(filePath?: string)`
+1. **Validation**
+   - Checks if a source file path exists
+   - Verifies no problem already exists for this file
+   - Shows warning message if validation fails
 
-1. **Validation** (`src/modules/cphNg.ts:28-44`)
-   ```typescript
-   - Check if filePath exists
-   - Verify no problem already exists for this file
-   - Show warning if validation fails
-   ```
-
-2. **Problem Creation** (`src/helpers/problems.ts:54-64`)
-   ```typescript
-   const problem = Problems.createProblem(filePath);
-   ```
-   Creates problem object with:
+2. **Problem Creation**
+   - Creates a new problem object
+   - Initializes with:
    - `version`: Current CPH-NG version
    - `name`: Filename without extension
    - `src.path`: Full path to source file
@@ -62,21 +54,21 @@ The create problem view displays:
    - `memoryLimit`: From `cph-ng.problem.defaultMemoryLimit`
    - `timeElapsed`: 0 (tracking time spent on problem)
 
-3. **Storage** (`src/helpers/problems.ts` - `saveProblem`)
+3. **Storage**
    - Calculates binary file path using template pattern
-   - Serializes problem data to JSON
-   - Compresses with gzip
+   - Serializes problem data to JSON format
+   - Compresses data with gzip
    - Writes to `.cph-ng/` folder in workspace
 
-4. **UI Refresh** (`src/modules/problemsManager.ts` - `dataRefresh`)
+4. **UI Update**
    - Loads the new problem into active problems list
    - Updates sidebar with problem information
-   - Emits event to refresh webview
+   - Refreshes the webview panel
 
 ### File System
 
-**Problem Storage Location**:
-- Default: `${workspace}/.cph-ng/${relativeDirname}/${basename}.bin`
+**Problem Storage**:
+- Default location: `${workspace}/.cph-ng/${relativeDirname}/${basename}.bin`
 - Configurable via `cph-ng.problem.problemFilePath`
 
 **File Format**:
@@ -86,19 +78,7 @@ The create problem view displays:
 
 ### Message Flow
 
-**WebView → Extension**:
-```typescript
-// src/webview/components/createProblemView.tsx:69-72
-msg({ type: 'createProblem' })
-```
-
-**Extension Handler**:
-```typescript
-// src/modules/sidebarProvider.ts:102-103
-if (msg.type === 'createProblem') {
-    await CphNg.createProblem(msg.activePath);
-}
-```
+The UI sends a `createProblem` message to the extension, which then processes the request and creates the problem data structure.
 
 ## Configuration Options
 
@@ -166,7 +146,7 @@ if (msg.type === 'createProblem') {
 
 ### Implementation
 
-Error handling code: `src/modules/cphNg.ts:28-44`
+Error handling is implemented in the problem creation module with appropriate user feedback for each error condition.
 
 ## Workflow Example
 
@@ -201,35 +181,28 @@ Result: New problem created with 3000ms time limit and 1024MB memory limit.
 
 ## Technical Details
 
-### Dependencies
-
-- `src/helpers/problems.ts` - Problem data management
-- `src/modules/cphNg.ts` - Command implementation
-- `src/modules/problemsManager.ts` - Problem lifecycle management
-- `src/webview/components/createProblemView.tsx` - UI component
-
 ### Data Structure
 
-```typescript
-interface Problem {
-    version: string;           // CPH-NG version
-    name: string;              // Problem name (filename)
-    src: { path: string };     // Source file path
-    tcs: TC[];                 // Test cases array
-    timeLimit: number;         // Time limit in ms
-    memoryLimit: number;       // Memory limit in MB
-    timeElapsed: number;       // Time spent (ms)
-    url?: string;              // Optional problem URL
-    checker?: SrcFile;         // Optional SPJ checker
-    interactor?: SrcFile;      // Optional interactor
-    bfCompare?: BFCompare;     // Optional BF compare config
-}
+The problem is stored as a data object containing:
+
+```
+Problem:
+  - version: CPH-NG version string
+  - name: Problem name (derived from filename)
+  - src.path: Full path to source file
+  - tcs: Array of test cases
+  - timeLimit: Time limit in milliseconds
+  - memoryLimit: Memory limit in MB
+  - timeElapsed: Time spent on problem (ms)
+  - url: Optional problem URL (for online judge problems)
+  - checker: Optional Special Judge program
+  - interactor: Optional interactor for interactive problems
+  - bfCompare: Optional brute force comparison configuration
 ```
 
-### Source Code References
+### Implementation Notes
 
-- Command registration: `src/modules/extensionManager.ts:200-206`
-- WebView handler: `src/modules/sidebarProvider.ts:102-103`
-- Problem creation: `src/modules/cphNg.ts:28-44`
-- Data structure: `src/helpers/problems.ts:54-64`
-- UI component: `src/webview/components/createProblemView.tsx:65-74`
+- The extension validates the file path and checks for existing problems before creating
+- Problem data is compressed and stored in binary format for efficiency
+- The UI automatically refreshes to show the newly created problem
+- Template files can be used to initialize source code if configured

@@ -21,41 +21,22 @@ The Add Test Case feature creates a new empty test case that can be filled with 
 
 ### UI Components
 
-**Location**: `src/webview/components/problemActions.tsx:77-84`
-
 Button properties:
-- Icon: `AddIcon` (Material-UI)
-- Label: Translated via `problemActions.addTc`
-- Size: `larger={true}`
-- Position: First button in action panel
+- Icon: Plus (+) icon
+- Label: Localized "Add Test Case" text
+- Size: Large button
+- Position: First button in action panel (leftmost)
 
 ## Internal Operation
 
-### Code Flow
+### How It Works
 
-**Entry Point**: `src/modules/problemsManager.ts:161-172` - `addTc(msg: AddTcMsg)`
+The extension performs these steps when adding a test case:
 
-**Implementation**:
-```typescript
-public static async addTc(msg: msgs.AddTcMsg) {
-    const fullProblem = await this.getFullProblem(msg.activePath);
-    if (!fullProblem) {
-        return;
-    }
-    fullProblem.problem.tcs.push({
-        stdin: { useFile: false, data: '' },
-        answer: { useFile: false, data: '' },
-        isExpand: false,
-    });
-    await this.dataRefresh();
-}
-```
-
-**Process**:
-1. Retrieves the current problem from `fullProblems` list
-2. Creates new test case object with empty data
-3. Appends to problem's `tcs` array
-4. Triggers UI refresh via `dataRefresh()`
+1. **Retrieve Problem**: Gets the current active problem
+2. **Create Test Case**: Initializes a new empty test case object
+3. **Add to Problem**: Appends the test case to the problem's test cases array
+4. **Update UI**: Refreshes the interface to show the new test case
 
 ### Test Case Structure
 
@@ -68,19 +49,11 @@ New test case is initialized with:
 
 ### Message Flow
 
-**WebView → Extension**:
-```typescript
-// src/webview/components/problemActions.tsx:82
-msg({ type: 'addTc' })
-```
-
-**Extension Handler**:
-```typescript
-// src/modules/sidebarProvider.ts (message handler)
-if (msg.type === 'addTc') {
-    await ProblemsManager.addTc(msg);
-}
-```
+When the add test case button is clicked:
+1. The webview sends an `addTc` message to the extension
+2. The extension handler receives the message
+3. The problem manager adds the new test case
+4. The UI is updated to reflect the changes
 
 ## Configuration Options
 
@@ -140,19 +113,12 @@ interface TCIO {
 
 ## Technical Details
 
-### Dependencies
+### Implementation Notes
 
-- `src/modules/problemsManager.ts` - Test case management
-- `src/webview/components/problemActions.tsx` - UI button
-- `src/webview/components/tcView.tsx` - Test case display
-- `src/utils/types.ts` - `TC` interface definition
-
-### Source Code References
-
-- Button UI: `src/webview/components/problemActions.tsx:77-84`
-- Handler: `src/modules/problemsManager.ts:161-172`
-- Message type: `src/webview/msgs.ts:52-54`
-- Data structure: `src/utils/types.ts` (TC interface)
+- Test cases are stored in the problem's test cases array
+- The UI automatically displays newly added test cases
+- Test cases can be edited immediately after creation
+- No limit on the number of test cases that can be added
 
 ## Error Handling
 

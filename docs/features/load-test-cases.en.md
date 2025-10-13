@@ -16,29 +16,40 @@ The Load Test Cases feature allows you to import multiple test cases at once fro
 
 ### UI Components
 
-**Location**: `src/webview/components/problemActions.tsx:85-92`
-- Icon: `FileCopyIcon`
-- Label: `problemActions.loadTcs`
+Button properties:
+- Icon: File/folder icon
+- Label: Localized "Load Test Cases" text
+- Position: Second button from left in action panel
 
 ## Internal Operation
 
-### Code Flow
+### How It Works
 
-**Entry Point**: `src/modules/problemsManager.ts:173-187` - `loadTcs(msg: LoadTcsMsg)`
+The load process follows these steps:
 
-**Process**:
-1. Shows quick pick dialog: "Load from zip file" or "Load from folder"
-2. For zip: prompts for file, extracts to temporary folder
-3. For folder: prompts for folder selection
-4. Scans all files recursively
-5. Matches `.in` files with `.out`/`.ans` files by basename
-6. Shows selection dialog with found test cases
-7. Imports selected cases to problem
+1. **Source Selection**: Shows dialog with options:
+   - Load from a zip file
+   - Load from a folder
 
-**Implementation** (`src/utils/ui.ts:41-`):
-- Uses `getTcs()` function for file scanning
-- Supports recursive directory traversal
-- Natural ordering of test cases
+2. **File/Folder Selection**:
+   - For zip: Prompts user to choose a zip file
+   - For folder: Prompts user to choose a directory
+   - Zip files are extracted to a temporary folder
+
+3. **Test Case Discovery**:
+   - Scans all files recursively in the selected location
+   - Matches `.in` files with corresponding `.out` or `.ans` files by name
+   - Orders test cases naturally (test1, test2, test10, etc.)
+
+4. **Test Case Selection**:
+   - Displays all discovered test cases in a selection dialog
+   - Shows input and answer file paths for each case
+   - User can select which cases to import
+
+5. **Import**:
+   - Adds selected test cases to the problem
+   - Optionally clears existing test cases first (based on settings)
+   - Updates UI to show imported cases
 
 ## Configuration Options
 
@@ -102,16 +113,16 @@ The Load Test Cases feature allows you to import multiple test cases at once fro
 **Answer Files**: `.out` or `.ans` extension  
 **Matching**: By basename (e.g., `test1.in` + `test1.out`)
 
-### Dependencies
+### File Naming Convention
 
-- `src/utils/ui.ts` - `getTcs()` function
-- `src/modules/problemsManager.ts` - `loadTcs()` handler
-- `adm-zip` - Zip file extraction
-- `src/helpers/folderChooser.ts` - Folder selection
+**Input Files**: Must have `.in` extension
+**Answer Files**: Can have `.out` or `.ans` extension
+**Matching**: Files are matched by base name (e.g., `test1.in` matches `test1.out` or `test1.ans`)
 
-### Source Code References
+### Implementation Notes
 
-- Button UI: `src/webview/components/problemActions.tsx:85-92`
-- Handler: `src/modules/problemsManager.ts:173-187`  
-- File scanning: `src/utils/ui.ts:41-`
-- Message type: `src/webview/msgs.ts:55-57`
+- Recursive directory scanning ensures all test cases are found regardless of folder depth
+- Natural ordering provides intuitive test case numbering
+- Zip files are extracted to a temporary location that can be configured
+- After extraction, zip files can optionally be deleted automatically
+- The folder chooser method (tree view or flat list) is configurable
