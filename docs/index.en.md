@@ -75,7 +75,7 @@ CPH-NG fully supports:
 ## Quick Links
 
 - [Quick Start Guide](quickStart.md) - Get started in minutes
-- [Feature Guide](features.md) - Detailed feature documentation
+- [Feature Guide](features/) - Detailed feature documentation
 - [Configuration Reference](configuration.md) - All configuration options
 - [FAQ](faq.md) - Frequently asked questions
 - [About](about.md) - Project information and contributing
