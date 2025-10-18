@@ -73,7 +73,7 @@ CPH-NG 完全支持：
 ## 快速链接
 
 - [快速入门指南](quickStart.md) - 几分钟内开始使用
-- [功能指南](features.md) - 详细的功能文档
+- [功能指南](features/) - 详细的功能文档
 - [配置参考](configuration.md) - 所有配置选项
 - [常见问题](faq.md) - 常见问题解答
 - [关于](about.md) - 项目信息和贡献指南
