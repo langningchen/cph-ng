@@ -60,8 +60,7 @@ CPH-NG!**
 
 ## Next Steps
 
-- Explore all features in the [Feature Guide](features.md)
-- Learn about [Configuration Options](configuration.md)
-- Read about [Advanced Features](features.md#advanced-features) like Special Judge and Brute Force Comparison
+- Explore all features in the [Feature Guide](features/)
+- Learn about [Configuration Options](configuration/)
 - Check [Modules](modules.md) for additional functionality
 - Visit [FAQ](faq.md) if you have questions
