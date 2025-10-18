@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { readFile } from 'fs/promises';
 import * as vscode from 'vscode';
 import { Problem } from '../utils/types';
 import { write2TcIo } from '../utils/types.backend';
@@ -187,7 +188,7 @@ export class FileSystemProvider implements vscode.FileSystemProvider {
         if (Array.isArray(item)) {
             throw this.isDir;
         } else if (item.data instanceof vscode.Uri) {
-            return await vscode.workspace.fs.readFile(item.data);
+            return await readFile(item.data.fsPath);
         } else {
             return Buffer.from(item.data);
         }

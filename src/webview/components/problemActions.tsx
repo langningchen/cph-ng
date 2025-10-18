@@ -56,8 +56,9 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
         isRunningVerdict(tc.result?.verdict),
     );
     useEffect(() => {
-        if (clickTime.length == 10 && clickTime.at(-1)! - clickTime[0] < 5000) {
-            window.easterEgg = true;
+        if (clickTime.length == 10 && clickTime.at(-1)! - clickTime[0] < 2000) {
+            window.easterEgg = !window.easterEgg;
+            setClickTime([]);
         }
     }, [clickTime]);
     return (

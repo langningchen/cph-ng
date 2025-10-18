@@ -1,7 +1,7 @@
 {
     "acCongrats.firstLine": "恭喜你！",
     "acCongrats.secondLine": "你已通过所有测试用例！",
-    "bgProblemView.empty": "当前还没有后台题目。现在 CPH NG 允许你在后台运行测试样例或者对拍。",
+    "bgProblemView.empty": "当前还没有后台题目。现在 CPH-NG 允许你在后台运行测试样例或者对拍。",
     "bgProblemView.message": "后台题目数量: {{cnt}}",
     "bgProblemView.title": "后台题目",
     "createProblemView.createAlert": "此文档没有关联的题目。",

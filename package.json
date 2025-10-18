@@ -1,8 +1,8 @@
 {
     "name": "cph-ng",
-    "displayName": "CPH NG",
+    "displayName": "CPH-NG",
     "description": "The next generation of CPH.",
-    "version": "0.2.3",
+    "version": "0.3.2",
     "type": "module",
     "license": "AGPL-3.0-only",
     "publisher": "langningchen",

@@ -1,6 +1,12 @@
 name: Release
 on:
   workflow_dispatch:
+    inputs:
+      force_release:
+        description: 'Force a normal Release instead of a Prerelease'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -29,6 +35,8 @@ jobs:
 
       - name: Get Version
         id: version
+        env:
+          FORCE_RELEASE: ${{ github.event.inputs.force_release || false }}
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           LATEST_VERSION=$(grep -E '^## [0-9]+\.[0-9]+\.[0-9]+' CHANGELOG.md | head -1 | sed 's/^## //')
@@ -44,6 +52,12 @@ jobs:
             PRE_RELEASE=false
           else
             PRE_RELEASE=true
+          fi
+
+          # Allow manual override from workflow_dispatch input to force a Release
+          # When FORCE_RELEASE is 'true', always treat as a normal release
+          if [ "$FORCE_RELEASE" = "true" ]; then
+            PRE_RELEASE=false
           fi
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT

@@ -1,7 +1,7 @@
 {
     "acCongrats.firstLine": "Congratulations!",
     "acCongrats.secondLine": "You have passed all the test cases!",
-    "bgProblemView.empty": "There are currently no background problems now. Now CPH NG allows you to run test cases or a brute force compare in the background.",
+    "bgProblemView.empty": "There are currently no background problems now. Now CPH-NG allows you to run test cases or a brute force compare in the background.",
     "bgProblemView.message": "Background problems count: {{cnt}}",
     "bgProblemView.title": "Background problems",
     "createProblemView.createAlert": "This document does not have a CPH-NG problem associated with it.",

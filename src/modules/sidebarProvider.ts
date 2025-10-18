@@ -142,11 +142,7 @@ export default class SidebarProvider implements vscode.WebviewViewProvider {
                     } else if (msg.type === 'submitToCodeforces') {
                         await ProblemsManager.submitToCodeforces(msg);
                     } else if (msg.type === 'openFile') {
-                        await vscode.window.showTextDocument(
-                            await vscode.workspace.openTextDocument(msg.path),
-                        );
-                    } else if (msg.type === 'openRaw') {
-                        await ProblemsManager.openRaw(msg);
+                        await ProblemsManager.openFile(msg);
                     } else if (msg.type === 'startChat') {
                         await vscode.commands.executeCommand(
                             'workbench.action.chat.open',

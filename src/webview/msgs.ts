@@ -94,9 +94,7 @@ export interface DelTcMsg extends BaseMsg {
 export interface OpenFileMsg extends BaseMsg {
     type: 'openFile';
     path: string;
-}
-export interface OpenRawMsg extends BaseMsg {
-    type: 'openRaw';
+    isVirtual?: boolean;
 }
 export type WebviewSrcFileTypes =
     | 'checker'
@@ -147,7 +145,6 @@ export type WebviewMsg =
     | ToggleTcFileMsg
     | DelTcMsg
     | OpenFileMsg
-    | OpenRawMsg
     | ChooseSrcFileMsg
     | RemoveSrcFileMsg
     | StartBfCompareMsg

@@ -190,7 +190,9 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                         menu={{
                             [t('problemTitle.menu.editRaw')]: () => {
                                 msg({
-                                    type: 'openRaw',
+                                    type: 'openFile',
+                                    path: '/problem.cph-ng.json',
+                                    isVirtual: true,
                                 });
                             },
                         }}

@@ -205,6 +205,13 @@ const TcView = ({ tc, idx }: TcViewProp) => {
                                             idx,
                                         });
                                     }}
+                                    onDbClick={() => {
+                                        msg({
+                                            type: 'openFile',
+                                            path: `/tcs/${idx}/stdin`,
+                                            isVirtual: true,
+                                        });
+                                    }}
                                 />
                                 <TcDataView
                                     label={t('tcView.answer')}
@@ -228,6 +235,13 @@ const TcView = ({ tc, idx }: TcViewProp) => {
                                             type: 'toggleTcFile',
                                             label: 'answer',
                                             idx,
+                                        });
+                                    }}
+                                    onDbClick={() => {
+                                        msg({
+                                            type: 'openFile',
+                                            path: `/tcs/${idx}/answer`,
+                                            isVirtual: true,
                                         });
                                     }}
                                 />
@@ -257,11 +271,25 @@ const TcView = ({ tc, idx }: TcViewProp) => {
                                                     });
                                                 },
                                             }}
+                                            onDbClick={() => {
+                                                msg({
+                                                    type: 'openFile',
+                                                    path: `/tcs/${idx}/stdout`,
+                                                    isVirtual: true,
+                                                });
+                                            }}
                                         />
                                         <TcDataView
                                             label={t('tcView.stderr')}
                                             value={tc.result.stderr}
                                             readOnly={true}
+                                            onDbClick={() => {
+                                                msg({
+                                                    type: 'openFile',
+                                                    path: `/tcs/${idx}/stderr`,
+                                                    isVirtual: true,
+                                                });
+                                            }}
                                         />
                                         <TcDataView
                                             label={t('tcView.message')}

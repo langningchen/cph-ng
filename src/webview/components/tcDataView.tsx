@@ -46,6 +46,7 @@ interface CodeMirrorSectionProps {
     onBlur?: (value: string) => void;
     onChooseFile?: () => void;
     onToggleFile?: () => void;
+    onDbClick?: () => void;
     outputActions?: OutputActions;
     readOnly?: boolean;
 }
@@ -108,6 +109,7 @@ const TcDataView = ({
     onBlur,
     onChooseFile,
     onToggleFile,
+    onDbClick,
     outputActions,
     readOnly,
 }: CodeMirrorSectionProps) => {
@@ -153,7 +155,7 @@ const TcDataView = ({
                         flex={1}
                         flexWrap={'wrap'}
                     >
-                        <CphText>{label}</CphText>
+                        <CphText onDoubleClick={onDbClick}>{label}</CphText>
                         {internalValue.useFile && (
                             <CphLink
                                 name={internalValue.path}

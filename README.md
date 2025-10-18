@@ -1,4 +1,4 @@
-# CPH NG
+# CPH-NG
 
 [简体中文](https://github.com/langningchen/cph-ng/blob/main/README.zh-CN.md) | English
 

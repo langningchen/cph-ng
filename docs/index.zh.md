@@ -1,4 +1,4 @@
-# CPH NG
+# CPH-NG
 
 CPH NG（Competitive Programming Helper - Next Generation，竞争性编程助手 - 新一代）是一个专为竞争性编程开发的 **Visual Studio Code (VS Code) 扩展**。
 

@@ -737,19 +737,22 @@ export default class ProblemsManager {
         }
         Companion.submit(fullProblem.problem);
     }
-    public static async openRaw(msg: msgs.OpenRawMsg): Promise<void> {
-        const fullProblem = await this.getFullProblem(msg.activePath);
-        if (!fullProblem) {
-            return;
-        }
-        await vscode.window.showTextDocument(
-            await vscode.workspace.openTextDocument(
+    public static async openFile(msg: msgs.OpenFileMsg): Promise<void> {
+        if (!msg.isVirtual) {
+            var document = await vscode.workspace.openTextDocument(msg.path);
+        } else {
+            const fullProblem = await this.getFullProblem(msg.activePath);
+            if (!fullProblem) {
+                return;
+            }
+            var document = await vscode.workspace.openTextDocument(
                 vscode.Uri.from({
                     scheme: FileSystemProvider.scheme,
                     authority: fullProblem.problem.src.path,
-                    path: '/problem.cph-ng.json',
+                    path: msg.path,
                 }),
-            ),
-        );
+            );
+        }
+        await vscode.window.showTextDocument(document);
     }
 }

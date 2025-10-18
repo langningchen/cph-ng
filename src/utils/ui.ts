@@ -190,8 +190,8 @@ export const chooseTcFile = async (
     option: WebviewTcFileTypes,
 ): Promise<{ stdin?: string; answer?: string }> => {
     const isInput = option === 'stdin';
-    const mainExt = isInput ? ['.in'] : ['.ans', '.out'];
-    const pairExt = isInput ? ['.ans', '.out'] : ['.in'];
+    const mainExt = isInput ? ['in'] : ['ans', 'out'];
+    const pairExt = isInput ? ['ans', 'out'] : ['in'];
     const fileUri = await vscode.window.showOpenDialog({
         canSelectFiles: true,
         canSelectFolders: false,
@@ -217,7 +217,7 @@ export const chooseTcFile = async (
         return { stdin, answer };
     }
     for (const ext of pairExt) {
-        const pairPath = path.replace(extname(path), ext);
+        const pairPath = path.replace(extname(path), `.${ext}`);
         if (!(await exists(pairPath))) {
             continue;
         }
