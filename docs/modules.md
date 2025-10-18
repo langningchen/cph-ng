@@ -2,7 +2,7 @@
 
 This page covers additional modules and features. For the basic operations—creating a problem, adding test cases, and running tests, please see [Quick Start](quickStart.md).
 
-For a comprehensive guide with detailed explanations of how each feature works, see the [Feature Guide](features.md).
+For a comprehensive guide with detailed explanations of how each feature works, see the [Feature Guide](features/index.md).
 
 !!! info "Configuration"
     All features can be customized through [Configuration Settings](configuration.md).
