@@ -15,10 +15,6 @@
         <link rel="canonical" href="https://cph-ng.langningchen.com/dev/modules/">
       
       
-        <link rel="prev" href="../quickStart/">
-      
-      
-        <link rel="next" href="../faq/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -189,6 +185,53 @@
 </div>
     
     
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
     
       <div class="md-header__source">
         <a href="https://github.com/langningchen/cph-ng" title="Go to repository" class="md-source" data-md-component="source">
@@ -258,20 +301,43 @@
   
   
   
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../features/" class="md-tabs__link">
+          
+  
+  
     
   
+  Features
+
+        </a>
+      </li>
+    
   
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="./" class="md-tabs__link">
+
+      
         
   
   
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../configuration/" class="md-tabs__link">
+          
+  
+  
     
   
-  Modules
+  Configuration
 
-      </a>
-    </li>
+        </a>
+      </li>
+    
   
 
       
@@ -333,9 +399,7 @@
   
 
 
-  
-
-<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="CPH-NG" class="md-nav__button md-logo" aria-label="CPH-NG" data-md-component="logo">
       
@@ -407,44 +471,1213 @@
       
   
   
+  
+  
     
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
+    
       
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
       
       
         
       
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
           
+          <div class="md-nav__link md-nav__container">
+            <a href="../features/" class="md-nav__link ">
+              
   
   
   <span class="md-ellipsis">
-    Modules
+    Features
     
   </span>
   
 
-          <span class="md-nav__icon md-icon"></span>
-        </label>
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Features
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
       
-      <a href="./" class="md-nav__link md-nav__link--active">
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Problem Management
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Problem Management
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/create-problem/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Modules
+    Create Problem
     
   </span>
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/import-problem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Import Problem
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/edit-problem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Edit Problem
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/delete-problem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Delete Problem
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
       
         
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Test Case Management
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Test Case Management
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/add-test-case/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Add Test Case
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/load-test-cases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Load Test Cases
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/edit-test-case/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Edit Test Case
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/delete-test-case/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Delete Test Case
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/toggle-file-inline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Toggle File/Inline
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/compare-output/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compare Output
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Running and Testing
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Running and Testing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/run-single-test/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Run Single Test Case
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/run-all-tests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Run All Test Cases
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/stop-execution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Stop Execution
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/clear-results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Clear Results
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Advanced Features
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced Features
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/brute-force-compare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Brute Force Compare
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/special-judge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Special Judge
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/interactive-problems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Interactive Problems
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/submit-codeforces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Submit to Codeforces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Integration
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            Integration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/competitive-companion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Competitive Companion Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/cph-import/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CPH Import
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../configuration/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Configuration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/basic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Basic Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/compilation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compilation Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/runner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Runner Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/comparing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Comparing Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/brute-force/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Brute Force Compare Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/problem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Problem Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cache Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/cph-compat/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CPH Compatibility Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/companion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Competitive Companion Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/sidebar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sidebar Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    About
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
 
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
@@ -543,61 +1776,9 @@
     </ul>
   
 </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../faq/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    FAQ
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../about/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    About
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-  </ul>
-</nav>
                   </div>
                 </div>
               </div>
-            
             
           
           
@@ -616,10 +1797,14 @@
   
 
 
-<h1 id="modules">Modules</h1>
-<p>For the basic operations—creating a problem, adding test cases, and running
-tests, please see it in <a href="/quickstart">Quick Start</a>.</p>
-<h2 id="compare-with-answer">Compare with answer</h2>
+<h1 id="modules">Modules<a class="headerlink" href="#modules" title="Permanent link">&para;</a></h1>
+<p>This page covers additional modules and features. For the basic operations—creating a problem, adding test cases, and running tests, please see <a href="../quickStart/">Quick Start</a>.</p>
+<p>For a comprehensive guide with detailed explanations of how each feature works, see the <a href="../features/">Feature Guide</a>.</p>
+<div class="admonition info">
+<p class="admonition-title">Configuration</p>
+<p>All features can be customized through <a href="configuration.md">Configuration Settings</a>.</p>
+</div>
+<h2 id="compare-with-answer">Compare with answer<a class="headerlink" href="#compare-with-answer" title="Permanent link">&para;</a></h2>
 <p>If a test case returns a <strong>WA (Wrong Answer)</strong>, you can view the comparison
 against the correct answer by clicking the leftmost button in the output area.</p>
 <p><img alt="" src="../images/compareWithAnswer.png" /></p>
@@ -627,7 +1812,11 @@ against the correct answer by clicking the leftmost button in the output area.</
 can reset it by clicking on the current answer field.</p>
 <p><img alt="" src="../images/beforeSetAsAnswer.png" /></p>
 <p><img alt="" src="../images/afterSetAsAnswer.png" /></p>
-<h2 id="data-display-toggles-file-inline">Data Display Toggles: File &amp; Inline</h2>
+<div class="admonition tip">
+<p class="admonition-title">Configuration</p>
+<p>You can customize comparison behavior in <a href="configuration.md#comparing-settings">Comparing Settings</a>, such as treating Presentation Error as Accepted or ignoring stderr output.</p>
+</div>
+<h2 id="data-display-toggles-file-inline">Data Display Toggles: File &amp; Inline<a class="headerlink" href="#data-display-toggles-file-inline" title="Permanent link">&para;</a></h2>
 <p>Click the <code>Toggle to file</code> button to save the data to an external file.</p>
 <p><img alt="" src="../images/toggleToFile.png" /></p>
 <p>Conversely, if the data is currently displayed as a file, clicking this button
@@ -635,7 +1824,7 @@ will toggle it to inline view.</p>
 <p>If the file you are attempting to toggle to inline is too large, CPH-NG will
 display a warning reminder.</p>
 <p><img alt="" src="../images/toogleToInlineLarge.png" /></p>
-<h2 id="load-samples-from-filesfolder">Load samples from files&amp;folder</h2>
+<h2 id="load-samples-from-filesfolder">Load samples from files&amp;folder<a class="headerlink" href="#load-samples-from-filesfolder" title="Permanent link">&para;</a></h2>
 <p>The second button from the left allows you to <strong>load samples from zipped files
 or directories</strong>.</p>
 <p>You have the flexibility to choose the source location for your test cases.</p>
@@ -647,37 +1836,46 @@ specific file or folder.</p>
 <p>Finally, you must confirm which specific test cases from the source you wish to
 load.</p>
 <p><img alt="" src="../images/loadFromFileConfirm.png" /></p>
-<h2 id="edit-problem-metadata">Edit problem metadata</h2>
+<div class="admonition note">
+<p class="admonition-title">Configuration</p>
+<p>See <a href="configuration.md#problem-settings">Problem Settings</a> to customize the unzip folder location, auto-deletion behavior, and whether to clear existing test cases before loading.</p>
+<p>Learn more about this feature in the <a href="features.md#loading-test-cases-from-filesfolders">Feature Guide</a>.</p>
+</div>
+<h2 id="edit-problem-metadata">Edit problem metadata<a class="headerlink" href="#edit-problem-metadata" title="Permanent link">&para;</a></h2>
 <p>Click the <strong>pen-like button</strong> in the top-right corner of the problem panel to
 enter the edit mode.</p>
 <p><img alt="" src="../images/editProblem.png" /></p>
 <p>You can modify the <code>Title</code>,<code>URL</code>,<code>Time Limit</code> and <code>Memory Limit</code> by yourself.</p>
 <p>You can also add <strong>Special Judge (SPJ)</strong> programs or <strong>interactive libraries</strong>
 as required.</p>
-<h2 id="elapsed-time-tracking">Elapsed Time Tracking</h2>
+<h2 id="elapsed-time-tracking">Elapsed Time Tracking<a class="headerlink" href="#elapsed-time-tracking" title="Permanent link">&para;</a></h2>
 <p>CPH-NG can now record how long has it been since the problem was being created.</p>
 <p><img alt="" src="../images/timeElasped.png" /></p>
-<h2 id="delete-a-problem">Delete a problem</h2>
+<h2 id="delete-a-problem">Delete a problem<a class="headerlink" href="#delete-a-problem" title="Permanent link">&para;</a></h2>
 <p>When a problem is no longer needed, click the <strong>rightmost button</strong> in the
 control panel to delete it.</p>
 <p>A confirmation dialog will appear before the problem is permanently removed.</p>
 <p><img alt="" src="../images/deleteProblem.png" /></p>
-<h2 id="load-test-data-from-embedded">Load test data from embedded</h2>
+<h2 id="load-test-data-from-embedded">Load test data from embedded<a class="headerlink" href="#load-test-data-from-embedded" title="Permanent link">&para;</a></h2>
 <p>Similarly, if your file already contains embedded test data (exported
 previously), you can import them by using the command
 <code>CPH-NG: Load from Embedded</code> and load these with ease.</p>
 <p><img alt="" src="../images/loadFromEmbedded.png" /></p>
-<h2 id="import-from-cph-ng">Import from CPH-NG</h2>
+<h2 id="import-from-cph-ng">Import from CPH-NG<a class="headerlink" href="#import-from-cph-ng" title="Permanent link">&para;</a></h2>
 <p>CPH-NG is compatible with CPH.</p>
 <p>It's feasible to import the test data from CPH to CPH-NG.</p>
 <p><img alt="" src="../images/importFromCph.png" /></p>
 <p><img alt="" src="../images/importedFromCph.png" /></p>
-<h2 id="special-judge">Special Judge</h2>
+<h2 id="special-judge">Special Judge<a class="headerlink" href="#special-judge" title="Permanent link">&para;</a></h2>
 <p>If your program requires to judge specifically, please prepare a program for
 judging and add it when editing the problem.</p>
-<p>CPH-NG supports this as well as interactive problems.Add a interactive library
+<p>CPH-NG supports this as well as interactive problems. Add a interactive library
 in a similar way if in need.</p>
 <p><img alt="" src="../images/specialJudge.png" /></p>
+<div class="admonition info">
+<p class="admonition-title">Learn More</p>
+<p>For detailed information about Special Judge and Interactive Problems, including checker requirements and setup instructions, see the <a href="features.md#special-judge">Feature Guide - Special Judge</a> and <a href="features.md#interactive-problems">Interactive Problems</a> sections.</p>
+</div>
 
 
 
@@ -708,6 +1906,8 @@ in a similar way if in need.</p>
       
         <footer class="md-footer">
   
+    
+  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -733,12 +1933,10 @@ in a similar way if in need.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
-    
     
     
       
-      <script id="__config" type="application/json">{"base": "..", "features": ["content.action.edit", "navigation.instant", "navigation.instant.progress", "navigation.sections", "navigation.tabs", "navigation.top", "navigation.tracking", "search.suggest", "toc.integrate"], "search": "../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.action.edit", "content.code.copy", "content.code.annotate", "navigation.sections", "navigation.tabs", "navigation.top", "navigation.tracking", "navigation.indexes", "navigation.footer", "search.suggest", "search.highlight", "search.share", "toc.follow"], "search": "../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.f55a23d4.min.js"></script>
