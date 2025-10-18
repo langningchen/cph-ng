@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
-        <loc>https://cph-ng.langningchen.com/dev/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/"/>
-    </url>
-    <url>
-        <loc>https://cph-ng.langningchen.com/dev/DOCUMENTATION_STRUCTURE/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/DOCUMENTATION_STRUCTURE/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/DOCUMENTATION_STRUCTURE/"/>
-    </url>
-    <url>
         <loc>https://cph-ng.langningchen.com/dev/about/</loc>
         <lastmod>2025-10-18</lastmod>
         <changefreq>daily</changefreq>
@@ -27,20 +13,6 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/faq/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/faq/"/>
-    </url>
-    <url>
-        <loc>https://cph-ng.langningchen.com/dev/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/"/>
-    </url>
-    <url>
-        <loc>https://cph-ng.langningchen.com/dev/modules/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/modules/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/modules/"/>
     </url>
     <url>
         <loc>https://cph-ng.langningchen.com/dev/quickStart/</loc>
@@ -127,6 +99,55 @@
         <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/configuration/sidebar/"/>
     </url>
     <url>
+        <loc>https://cph-ng.langningchen.com/dev/contributing/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/contributing/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/contributing/"/>
+    </url>
+    <url>
+        <loc>https://cph-ng.langningchen.com/dev/contributing/feature-request/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/contributing/feature-request/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/contributing/feature-request/"/>
+    </url>
+    <url>
+        <loc>https://cph-ng.langningchen.com/dev/contributing/pull-request/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/contributing/pull-request/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/contributing/pull-request/"/>
+    </url>
+    <url>
+        <loc>https://cph-ng.langningchen.com/dev/contributing/reporting-a-bug/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/contributing/reporting-a-bug/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/contributing/reporting-a-bug/"/>
+    </url>
+    <url>
+        <loc>https://cph-ng.langningchen.com/dev/contributing/reporting-a-docs-issue/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/contributing/reporting-a-docs-issue/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/contributing/reporting-a-docs-issue/"/>
+    </url>
+    <url>
+        <loc>https://cph-ng.langningchen.com/dev/contributing/setting-up-dev-env/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/contributing/setting-up-dev-env/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/contributing/setting-up-dev-env/"/>
+    </url>
+    <url>
+        <loc>https://cph-ng.langningchen.com/dev/features/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/features/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/features/"/>
+    </url>
+    <url>
         <loc>https://cph-ng.langningchen.com/dev/features/add-test-case/</loc>
         <lastmod>2025-10-18</lastmod>
         <changefreq>daily</changefreq>
@@ -211,13 +232,6 @@
         <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/features/import-problem/"/>
     </url>
     <url>
-        <loc>https://cph-ng.langningchen.com/dev/features/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev/features/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/features/"/>
-    </url>
-    <url>
         <loc>https://cph-ng.langningchen.com/dev/features/interactive-problems/</loc>
         <lastmod>2025-10-18</lastmod>
         <changefreq>daily</changefreq>
@@ -274,20 +288,6 @@
         <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/devzh/features/toggle-file-inline/"/>
     </url>
     <url>
-        <loc>https://cph-ng.langningchen.com/dev/zh/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev"/>
-    </url>
-    <url>
-        <loc>https://cph-ng.langningchen.com/dev/zh/DOCUMENTATION_STRUCTURE/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/DOCUMENTATION_STRUCTURE/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/devDOCUMENTATION_STRUCTURE/"/>
-    </url>
-    <url>
         <loc>https://cph-ng.langningchen.com/dev/zh/about/</loc>
         <lastmod>2025-10-18</lastmod>
         <changefreq>daily</changefreq>
@@ -306,14 +306,6 @@
         <lastmod>2025-10-18</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/dev"/>
-    </url>
-    <url>
-        <loc>https://cph-ng.langningchen.com/dev/zh/modules/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/modules/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/devmodules/"/>
     </url>
     <url>
         <loc>https://cph-ng.langningchen.com/dev/zh/quickStart/</loc>
@@ -400,6 +392,55 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/devconfiguration/sidebar/"/>
     </url>
     <url>
+        <loc>https://cph-ng.langningchen.com/dev/zh/contributing/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/contributing/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/devcontributing/"/>
+    </url>
+    <url>
+        <loc>https://cph-ng.langningchen.com/dev/zh/contributing/feature-request/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/contributing/feature-request/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/devcontributing/feature-request/"/>
+    </url>
+    <url>
+        <loc>https://cph-ng.langningchen.com/dev/zh/contributing/pull-request/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/contributing/pull-request/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/devcontributing/pull-request/"/>
+    </url>
+    <url>
+        <loc>https://cph-ng.langningchen.com/dev/zh/contributing/reporting-a-bug/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/contributing/reporting-a-bug/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/devcontributing/reporting-a-bug/"/>
+    </url>
+    <url>
+        <loc>https://cph-ng.langningchen.com/dev/zh/contributing/reporting-a-docs-issue/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/contributing/reporting-a-docs-issue/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/devcontributing/reporting-a-docs-issue/"/>
+    </url>
+    <url>
+        <loc>https://cph-ng.langningchen.com/dev/zh/contributing/setting-up-dev-env/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/contributing/setting-up-dev-env/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/devcontributing/setting-up-dev-env/"/>
+    </url>
+    <url>
+        <loc>https://cph-ng.langningchen.com/dev/zh/features/</loc>
+        <lastmod>2025-10-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/features/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/devfeatures/"/>
+    </url>
+    <url>
         <loc>https://cph-ng.langningchen.com/dev/zh/features/add-test-case/</loc>
         <lastmod>2025-10-18</lastmod>
         <changefreq>daily</changefreq>
@@ -482,13 +523,6 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/features/import-problem/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/devfeatures/import-problem/"/>
-    </url>
-    <url>
-        <loc>https://cph-ng.langningchen.com/dev/zh/features/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/dev/zh/features/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/devfeatures/"/>
     </url>
     <url>
         <loc>https://cph-ng.langningchen.com/dev/zh/features/interactive-problems/</loc>
