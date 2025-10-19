@@ -9,7 +9,7 @@
         <meta name="description" content="A brief introduction for CPH-NG, the next generation of CPH">
       
       
-        <meta name="author" content="Hughpig">
+        <meta name="author" content="Langning Chen">
       
       
         <link rel="canonical" href="https://cph-ng.langningchen.com/dev/features/delete-problem/">
@@ -162,32 +162,6 @@
       <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
-      <div class="md-header__option">
-  <div class="md-select">
-    
-    <button class="md-header__button md-icon" aria-label="Select language">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
-    </button>
-    <div class="md-select__inner">
-      <ul class="md-select__list">
-        
-          <li class="md-select__item">
-            <a href="./" hreflang="en" class="md-select__link">
-              English
-            </a>
-          </li>
-        
-          <li class="md-select__item">
-            <a href="../../zh/features/delete-problem/" hreflang="zh" class="md-select__link">
-              简体中文
-            </a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</div>
-    
     
       
       
@@ -269,7 +243,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../index.md" class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -294,7 +268,7 @@
   
     
   
-  快速开始
+  快速入门
 
       </a>
     </li>
@@ -393,20 +367,17 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../about/about.md" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../../about/" class="md-tabs__link">
+        
   
   
     
   
-  About
+  关于
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -461,7 +432,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../index.md" class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -488,7 +459,7 @@
   
   
   <span class="md-ellipsis">
-    快速开始
+    快速入门
     
   </span>
   
@@ -614,7 +585,7 @@
   
   
   <span class="md-ellipsis">
-    Problem Management
+    题目管理
     
   </span>
   
@@ -625,7 +596,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
-            Problem Management
+            题目管理
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -755,26 +726,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#description" class="md-nav__link">
     <span class="md-ellipsis">
-      概述
+      描述
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#interaction" class="md-nav__link">
     <span class="md-ellipsis">
-      用户交互
+      交互
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="用户交互">
+    <nav class="md-nav" aria-label="交互">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#dispatch" class="md-nav__link">
     <span class="md-ellipsis">
       触发功能
     </span>
@@ -783,7 +754,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#requirements" class="md-nav__link">
     <span class="md-ellipsis">
       前置条件
     </span>
@@ -791,154 +762,31 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ui" class="md-nav__link">
-    <span class="md-ellipsis">
-      UI 组件
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#configurations" class="md-nav__link">
     <span class="md-ellipsis">
-      内部操作
+      相关配置
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="内部操作">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      工作原理
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
-    <span class="md-ellipsis">
-      被删除的内容
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
-    <span class="md-ellipsis">
-      被保留的内容
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
-    <span class="md-ellipsis">
-      安全功能
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="安全功能">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
-    <span class="md-ellipsis">
-      需要确认
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
-    <span class="md-ellipsis">
-      源代码受保护
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_13" class="md-nav__link">
+  <a href="#error-handling" class="md-nav__link">
     <span class="md-ellipsis">
       错误处理
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="错误处理">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_14" class="md-nav__link">
-    <span class="md-ellipsis">
-      删除失败
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
-  <a href="#_15" class="md-nav__link">
-    <span class="md-ellipsis">
-      工作流程示例
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="工作流程示例">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_16" class="md-nav__link">
-    <span class="md-ellipsis">
-      删除旧题目
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_17" class="md-nav__link">
-    <span class="md-ellipsis">
-      删除后
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_18" class="md-nav__link">
+  <a href="#relatives" class="md-nav__link">
     <span class="md-ellipsis">
       相关功能
     </span>
@@ -1008,7 +856,7 @@
   
   
   <span class="md-ellipsis">
-    Test Case Management
+    测试用例管理
     
   </span>
   
@@ -1019,7 +867,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
-            Test Case Management
+            测试用例管理
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1210,7 +1058,7 @@
   
   
   <span class="md-ellipsis">
-    Running and Testing
+    运行和测试
     
   </span>
   
@@ -1221,7 +1069,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
-            Running and Testing
+            运行和测试
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1366,7 +1214,7 @@
   
   
   <span class="md-ellipsis">
-    Advanced Features
+    高级功能
     
   </span>
   
@@ -1377,7 +1225,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_5">
             <span class="md-nav__icon md-icon"></span>
-            Advanced Features
+            高级功能
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1518,7 +1366,7 @@
   
   
   <span class="md-ellipsis">
-    Integration
+    集成
     
   </span>
   
@@ -1529,7 +1377,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_6">
             <span class="md-nav__icon md-icon"></span>
-            Integration
+            集成
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1684,7 +1532,7 @@
   
   
   <span class="md-ellipsis">
-    Basic Settings
+    基本设置
     
   </span>
   
@@ -1707,7 +1555,7 @@
   
   
   <span class="md-ellipsis">
-    Compilation Settings
+    编译设置
     
   </span>
   
@@ -1730,7 +1578,7 @@
   
   
   <span class="md-ellipsis">
-    Runner Settings
+    运行器设置
     
   </span>
   
@@ -1753,7 +1601,7 @@
   
   
   <span class="md-ellipsis">
-    Comparing Settings
+    比较设置
     
   </span>
   
@@ -1776,7 +1624,7 @@
   
   
   <span class="md-ellipsis">
-    Brute Force Compare Settings
+    暴力对拍设置
     
   </span>
   
@@ -1799,7 +1647,7 @@
   
   
   <span class="md-ellipsis">
-    Problem Settings
+    题目设置
     
   </span>
   
@@ -1822,7 +1670,7 @@
   
   
   <span class="md-ellipsis">
-    Cache Settings
+    缓存设置
     
   </span>
   
@@ -1845,7 +1693,7 @@
   
   
   <span class="md-ellipsis">
-    CPH Compatibility Settings
+    CPH 兼容性设置
     
   </span>
   
@@ -1868,7 +1716,7 @@
   
   
   <span class="md-ellipsis">
-    Competitive Companion Settings
+    Companion 设置
     
   </span>
   
@@ -1891,7 +1739,7 @@
   
   
   <span class="md-ellipsis">
-    Sidebar Settings
+    侧边栏设置
     
   </span>
   
@@ -2207,73 +2055,18 @@
   
   
   
-    
-    
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
-        
-          
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    About
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
-            <span class="md-nav__icon md-icon"></span>
-            About
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../../about/about.md" class="md-nav__link">
+      <a href="../../about/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    None
+    关于
     
   </span>
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -2305,26 +2098,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#description" class="md-nav__link">
     <span class="md-ellipsis">
-      概述
+      描述
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#interaction" class="md-nav__link">
     <span class="md-ellipsis">
-      用户交互
+      交互
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="用户交互">
+    <nav class="md-nav" aria-label="交互">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#dispatch" class="md-nav__link">
     <span class="md-ellipsis">
       触发功能
     </span>
@@ -2333,7 +2126,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#requirements" class="md-nav__link">
     <span class="md-ellipsis">
       前置条件
     </span>
@@ -2341,154 +2134,31 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ui" class="md-nav__link">
-    <span class="md-ellipsis">
-      UI 组件
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#configurations" class="md-nav__link">
     <span class="md-ellipsis">
-      内部操作
+      相关配置
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="内部操作">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      工作原理
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
-    <span class="md-ellipsis">
-      被删除的内容
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
-    <span class="md-ellipsis">
-      被保留的内容
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
-    <span class="md-ellipsis">
-      安全功能
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="安全功能">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
-    <span class="md-ellipsis">
-      需要确认
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
-    <span class="md-ellipsis">
-      源代码受保护
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_13" class="md-nav__link">
+  <a href="#error-handling" class="md-nav__link">
     <span class="md-ellipsis">
       错误处理
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="错误处理">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_14" class="md-nav__link">
-    <span class="md-ellipsis">
-      删除失败
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
-  <a href="#_15" class="md-nav__link">
-    <span class="md-ellipsis">
-      工作流程示例
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="工作流程示例">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_16" class="md-nav__link">
-    <span class="md-ellipsis">
-      删除旧题目
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_17" class="md-nav__link">
-    <span class="md-ellipsis">
-      删除后
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_18" class="md-nav__link">
+  <a href="#relatives" class="md-nav__link">
     <span class="md-ellipsis">
       相关功能
     </span>
@@ -2522,100 +2192,61 @@
 
 <h1 id="_1">删除题目<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <p>从工作区删除题目及其数据。</p>
-<h2 id="_2">概述<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<div class="admonition danger">
+<p class="admonition-title">请确认你知道你在做什么</p>
+<p>删除题目是永久的，不可恢复的。请在操作之前三思。</p>
+</div>
+<h2 id="description">描述<a class="headerlink" href="#description" title="Permanent link">&para;</a></h2>
 <p>删除题目功能会永久删除与当前源文件关联的题目。这会删除包含元数据和测试用例的题目文件，但不会影响您的源代码文件。</p>
-<h2 id="_3">用户交互<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<h3 id="_4">触发功能<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p><strong>方法：删除按钮</strong></p>
+<h2 id="interaction">交互<a class="headerlink" href="#interaction" title="Permanent link">&para;</a></h2>
+<h3 id="dispatch">触发功能<a class="headerlink" href="#dispatch" title="Permanent link">&para;</a></h3>
+<p>该功能可以通过多种方式触发：</p>
 <ul>
-<li>点击删除/垃圾桶图标按钮（题目操作面板中最右侧的按钮）</li>
-<li>删除前会出现确认对话框</li>
+<li>点击题目操作面板底部控制栏中的删除按钮</li>
+<li>按 <kbd>F1</kbd> 或者 <kbd>Ctrl/Cmd+Shift+P</kbd> 打开命令面板，并输入并选择：<code>CPH-NG: 删除题目</code></li>
 </ul>
-<h3 id="_5">前置条件<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p><img alt="" src="../../images/deleteProblem.png" /></p>
+<h3 id="requirements">前置条件<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h3>
 <ul>
 <li>当前文件必须已加载题目</li>
 <li>题目面板必须可见</li>
 </ul>
-<h3 id="ui">UI 组件<a class="headerlink" href="#ui" title="Permanent link">&para;</a></h3>
-<p><strong>删除按钮</strong>：</p>
+<h2 id="configurations">相关配置<a class="headerlink" href="#configurations" title="Permanent link">&para;</a></h2>
 <ul>
-<li>图标：垃圾桶/删除图标</li>
-<li>颜色：红色（错误颜色）以指示破坏性操作</li>
-<li>位置：操作面板中最右侧的按钮</li>
+<li><a href="../../configuration/problem/#problemFilePath">cph-ng.problem.problemFilePath</a></li>
 </ul>
-<p><strong>确认对话框</strong>：</p>
+<h2 id="error-handling">错误处理<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">错误</th>
+<th style="text-align: center;">原因</th>
+<th style="text-align: center;">解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><abbr title="未找到活动编辑器，请打开一个文件以创建题目。">没有活动编辑器</abbr></td>
+<td style="text-align: center;">当前没有打开文件</td>
+<td style="text-align: center;">打开源文件后重试</td>
+</tr>
+<tr>
+<td style="text-align: center;"><abbr title="未打开任何工作区文件夹。">未找到工作区</abbr></td>
+<td style="text-align: center;">文件不在工作区文件夹中</td>
+<td style="text-align: center;">在工作区文件夹中打开文件</td>
+</tr>
+<tr>
+<td style="text-align: center;"><abbr title="删除题目文件 {file} 失败。">删除失败</abbr></td>
+<td style="text-align: center;">题目文件可能已被删除或权限不足</td>
+<td style="text-align: center;">重试</td>
+</tr>
+</tbody>
+</table>
+<h2 id="relatives">相关功能<a class="headerlink" href="#relatives" title="Permanent link">&para;</a></h2>
 <ul>
-<li>标题：确认删除操作</li>
-<li>内容：警告操作无法撤消</li>
-<li>按钮：取消或确认</li>
-</ul>
-<h2 id="_6">内部操作<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<h3 id="_7">工作原理<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>用户点击删除</strong>：点击删除按钮</li>
-<li><strong>显示确认</strong>：模态对话框请求确认</li>
-<li><strong>用户确认</strong>：用户点击对话框中的确认按钮</li>
-<li><strong>删除文件</strong>：从文件系统删除题目二进制文件</li>
-<li><strong>从内存中删除</strong>：从活动题目列表中删除题目</li>
-<li><strong>更新 UI</strong>：侧边栏返回到"无题目"状态</li>
-<li><strong>保留源代码</strong>：源代码文件保持不变</li>
-</ol>
-<h3 id="_8">被删除的内容<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
-<ul>
-<li>题目元数据（名称、URL、限制）</li>
-<li>所有测试用例（输入和输出）</li>
-<li>题目配置（SPJ、交互器设置）</li>
-<li>执行历史和计时数据</li>
-<li><code>.cph-ng/*.bin</code> 题目文件</li>
-</ul>
-<h3 id="_9">被保留的内容<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
-<ul>
-<li>源代码文件</li>
-<li>编译的可执行文件（在缓存中）</li>
-<li>工作区中的其他题目</li>
-</ul>
-<h2 id="_10">安全功能<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
-<h3 id="_11">需要确认<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
-<p>删除需要明确确认以防止意外数据丢失。确认对话框明确说明操作无法撤消。</p>
-<h3 id="_12">源代码受保护<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
-<p>仅删除题目元数据文件。您的源代码保持安全且不变。</p>
-<h2 id="_13">错误处理<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h2>
-<h3 id="_14">删除失败<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h3>
-<p><strong>文件未找到</strong>：</p>
-<ul>
-<li>题目文件可能已被删除</li>
-<li>显示警告但操作继续</li>
-</ul>
-<p><strong>权限错误</strong>：</p>
-<ul>
-<li>删除文件的权限不足</li>
-<li>显示错误消息</li>
-<li>题目保留在系统中</li>
-</ul>
-<h2 id="_15">工作流程示例<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h2>
-<h3 id="_16">删除旧题目<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h3>
-<ol>
-<li>打开要删除题目的文件</li>
-<li>题目面板显示在侧边栏中</li>
-<li>点击红色删除/垃圾桶图标（最右侧按钮）</li>
-<li>出现确认对话框："您确定吗？"</li>
-<li>点击"确认"继续或"取消"中止</li>
-<li>题目被删除</li>
-<li>侧边栏显示"无题目"状态</li>
-<li>源代码文件未更改</li>
-</ol>
-<h3 id="_17">删除后<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h3>
-<ul>
-<li>可以为同一源文件创建新题目</li>
-<li>如果可用，可以导入 CPH 数据</li>
-<li>所有测试运行和结果都丢失</li>
-<li>如果重新创建需要再次设置测试用例</li>
-</ul>
-<h2 id="_18">相关功能<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="../create-problem/">创建题目</a> - 删除后创建新题目</li>
-<li><a href="../import-problem/">导入题目</a> - 如果可用，导入 CPH 数据</li>
-<li><a href="../edit-problem/">编辑题目</a> - 修复题目的替代方案，无需删除</li>
+<li><a href="../create-problem/">创建题目</a></li>
+<li><a href="../import-problem/">导入题目</a></li>
+<li><a href="../edit-problem/">编辑题目</a></li>
 </ul>
 
 

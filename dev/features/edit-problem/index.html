@@ -9,7 +9,7 @@
         <meta name="description" content="A brief introduction for CPH-NG, the next generation of CPH">
       
       
-        <meta name="author" content="Hughpig">
+        <meta name="author" content="Langning Chen">
       
       
         <link rel="canonical" href="https://cph-ng.langningchen.com/dev/features/edit-problem/">
@@ -162,32 +162,6 @@
       <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
-      <div class="md-header__option">
-  <div class="md-select">
-    
-    <button class="md-header__button md-icon" aria-label="Select language">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
-    </button>
-    <div class="md-select__inner">
-      <ul class="md-select__list">
-        
-          <li class="md-select__item">
-            <a href="./" hreflang="en" class="md-select__link">
-              English
-            </a>
-          </li>
-        
-          <li class="md-select__item">
-            <a href="../../zh/features/edit-problem/" hreflang="zh" class="md-select__link">
-              简体中文
-            </a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</div>
-    
     
       
       
@@ -269,7 +243,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../index.md" class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -294,7 +268,7 @@
   
     
   
-  快速开始
+  快速入门
 
       </a>
     </li>
@@ -393,20 +367,17 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../about/about.md" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../../about/" class="md-tabs__link">
+        
   
   
     
   
-  About
+  关于
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -461,7 +432,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../index.md" class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -488,7 +459,7 @@
   
   
   <span class="md-ellipsis">
-    快速开始
+    快速入门
     
   </span>
   
@@ -614,7 +585,7 @@
   
   
   <span class="md-ellipsis">
-    Problem Management
+    题目管理
     
   </span>
   
@@ -625,7 +596,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
-            Problem Management
+            题目管理
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -732,26 +703,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#description" class="md-nav__link">
     <span class="md-ellipsis">
-      概述
+      描述
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#interaction" class="md-nav__link">
     <span class="md-ellipsis">
-      用户交互
+      交互
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="用户交互">
+    <nav class="md-nav" aria-label="交互">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#dispatch" class="md-nav__link">
     <span class="md-ellipsis">
       触发功能
     </span>
@@ -760,7 +731,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#requirements" class="md-nav__link">
     <span class="md-ellipsis">
       前置条件
     </span>
@@ -768,178 +739,31 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ui" class="md-nav__link">
-    <span class="md-ellipsis">
-      UI 组件
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#configurations" class="md-nav__link">
     <span class="md-ellipsis">
-      内部操作
+      相关配置
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="内部操作">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      工作原理
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
-    <span class="md-ellipsis">
-      可编辑字段
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
-    <span class="md-ellipsis">
-      配置选项
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="配置选项">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
-    <span class="md-ellipsis">
-      默认限制
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
-    <span class="md-ellipsis">
-      特殊评测和交互器
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="特殊评测和交互器">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
-    <span class="md-ellipsis">
-      选择检查器
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_13" class="md-nav__link">
-    <span class="md-ellipsis">
-      选择交互器
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_14" class="md-nav__link">
+  <a href="#error-handling" class="md-nav__link">
     <span class="md-ellipsis">
       错误处理
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="错误处理">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_15" class="md-nav__link">
-    <span class="md-ellipsis">
-      验证错误
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
-  <a href="#_16" class="md-nav__link">
-    <span class="md-ellipsis">
-      工作流程示例
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="工作流程示例">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_17" class="md-nav__link">
-    <span class="md-ellipsis">
-      更改时间限制
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_18" class="md-nav__link">
-    <span class="md-ellipsis">
-      添加特殊评测
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_19" class="md-nav__link">
-    <span class="md-ellipsis">
-      设置交互式题目
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_20" class="md-nav__link">
+  <a href="#relatives" class="md-nav__link">
     <span class="md-ellipsis">
       相关功能
     </span>
@@ -1032,7 +856,7 @@
   
   
   <span class="md-ellipsis">
-    Test Case Management
+    测试用例管理
     
   </span>
   
@@ -1043,7 +867,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
-            Test Case Management
+            测试用例管理
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1234,7 +1058,7 @@
   
   
   <span class="md-ellipsis">
-    Running and Testing
+    运行和测试
     
   </span>
   
@@ -1245,7 +1069,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
-            Running and Testing
+            运行和测试
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1390,7 +1214,7 @@
   
   
   <span class="md-ellipsis">
-    Advanced Features
+    高级功能
     
   </span>
   
@@ -1401,7 +1225,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_5">
             <span class="md-nav__icon md-icon"></span>
-            Advanced Features
+            高级功能
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1542,7 +1366,7 @@
   
   
   <span class="md-ellipsis">
-    Integration
+    集成
     
   </span>
   
@@ -1553,7 +1377,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_6">
             <span class="md-nav__icon md-icon"></span>
-            Integration
+            集成
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1708,7 +1532,7 @@
   
   
   <span class="md-ellipsis">
-    Basic Settings
+    基本设置
     
   </span>
   
@@ -1731,7 +1555,7 @@
   
   
   <span class="md-ellipsis">
-    Compilation Settings
+    编译设置
     
   </span>
   
@@ -1754,7 +1578,7 @@
   
   
   <span class="md-ellipsis">
-    Runner Settings
+    运行器设置
     
   </span>
   
@@ -1777,7 +1601,7 @@
   
   
   <span class="md-ellipsis">
-    Comparing Settings
+    比较设置
     
   </span>
   
@@ -1800,7 +1624,7 @@
   
   
   <span class="md-ellipsis">
-    Brute Force Compare Settings
+    暴力对拍设置
     
   </span>
   
@@ -1823,7 +1647,7 @@
   
   
   <span class="md-ellipsis">
-    Problem Settings
+    题目设置
     
   </span>
   
@@ -1846,7 +1670,7 @@
   
   
   <span class="md-ellipsis">
-    Cache Settings
+    缓存设置
     
   </span>
   
@@ -1869,7 +1693,7 @@
   
   
   <span class="md-ellipsis">
-    CPH Compatibility Settings
+    CPH 兼容性设置
     
   </span>
   
@@ -1892,7 +1716,7 @@
   
   
   <span class="md-ellipsis">
-    Competitive Companion Settings
+    Companion 设置
     
   </span>
   
@@ -1915,7 +1739,7 @@
   
   
   <span class="md-ellipsis">
-    Sidebar Settings
+    侧边栏设置
     
   </span>
   
@@ -2231,73 +2055,18 @@
   
   
   
-    
-    
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
-        
-          
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    About
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
-            <span class="md-nav__icon md-icon"></span>
-            About
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../../about/about.md" class="md-nav__link">
+      <a href="../../about/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    None
+    关于
     
   </span>
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -2329,26 +2098,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#description" class="md-nav__link">
     <span class="md-ellipsis">
-      概述
+      描述
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#interaction" class="md-nav__link">
     <span class="md-ellipsis">
-      用户交互
+      交互
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="用户交互">
+    <nav class="md-nav" aria-label="交互">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#dispatch" class="md-nav__link">
     <span class="md-ellipsis">
       触发功能
     </span>
@@ -2357,7 +2126,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#requirements" class="md-nav__link">
     <span class="md-ellipsis">
       前置条件
     </span>
@@ -2365,178 +2134,31 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ui" class="md-nav__link">
-    <span class="md-ellipsis">
-      UI 组件
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#configurations" class="md-nav__link">
     <span class="md-ellipsis">
-      内部操作
+      相关配置
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="内部操作">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      工作原理
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
-    <span class="md-ellipsis">
-      可编辑字段
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
-    <span class="md-ellipsis">
-      配置选项
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="配置选项">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
-    <span class="md-ellipsis">
-      默认限制
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
-    <span class="md-ellipsis">
-      特殊评测和交互器
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="特殊评测和交互器">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
-    <span class="md-ellipsis">
-      选择检查器
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_13" class="md-nav__link">
-    <span class="md-ellipsis">
-      选择交互器
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_14" class="md-nav__link">
+  <a href="#error-handling" class="md-nav__link">
     <span class="md-ellipsis">
       错误处理
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="错误处理">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_15" class="md-nav__link">
-    <span class="md-ellipsis">
-      验证错误
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
-  <a href="#_16" class="md-nav__link">
-    <span class="md-ellipsis">
-      工作流程示例
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="工作流程示例">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_17" class="md-nav__link">
-    <span class="md-ellipsis">
-      更改时间限制
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_18" class="md-nav__link">
-    <span class="md-ellipsis">
-      添加特殊评测
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_19" class="md-nav__link">
-    <span class="md-ellipsis">
-      设置交互式题目
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_20" class="md-nav__link">
+  <a href="#relatives" class="md-nav__link">
     <span class="md-ellipsis">
       相关功能
     </span>
@@ -2570,147 +2192,30 @@
 
 <h1 id="_1">编辑题目<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <p>修改题目元数据，包括标题、URL、时间限制、内存限制和特殊评测设置。</p>
-<h2 id="_2">概述<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h2 id="description">描述<a class="headerlink" href="#description" title="Permanent link">&para;</a></h2>
 <p>编辑题目功能允许您在创建后修改题目的各个方面。您可以更改题目名称、URL、执行限制，以及配置高级功能，如特殊评测（SPJ）检查器和交互式题目的交互器。</p>
-<h2 id="_3">用户交互<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<h3 id="_4">触发功能<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p><strong>方法：编辑按钮</strong></p>
-<ul>
-<li>在题目标题区域（右上角）找到笔/编辑图标按钮</li>
-<li>点击编辑图标以打开编辑对话框</li>
-</ul>
-<h3 id="_5">前置条件<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<h2 id="interaction">交互<a class="headerlink" href="#interaction" title="Permanent link">&para;</a></h2>
+<h3 id="dispatch">触发功能<a class="headerlink" href="#dispatch" title="Permanent link">&para;</a></h3>
+<p>点击题目操作面板顶部，鼠标移动至标题栏上并点击编辑按钮</p>
+<p><img alt="" src="../../images/editProblem.png" /></p>
+<h3 id="requirements">前置条件<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h3>
 <ul>
 <li>当前文件必须已加载题目</li>
 <li>题目面板必须在侧边栏中可见</li>
 </ul>
-<h3 id="ui">UI 组件<a class="headerlink" href="#ui" title="Permanent link">&para;</a></h3>
-<p><strong>编辑对话框</strong>包含：</p>
+<h2 id="configurations">相关配置<a class="headerlink" href="#configurations" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>标题字段</strong>：题目名称的文本输入</li>
-<li><strong>URL 字段</strong>：题目 URL 的文本输入（可选）</li>
-<li><strong>时间限制</strong>：以毫秒为单位的数字输入</li>
-<li><strong>内存限制</strong>：以 MB 为单位的数字输入</li>
-<li><strong>检查器部分</strong>：选择或删除特殊评测程序</li>
-<li><strong>交互器部分</strong>：为交互式题目选择或删除交互器</li>
-<li><strong>保存/取消按钮</strong>：应用或放弃更改</li>
+<li><a href="../../configuration/problem/#defaultTimeLimit">cph-ng.problem.defaultTimeLimit</a></li>
+<li><a href="../../configuration/problem/#defaultMemoryLimit">cph-ng.problem.defaultMemoryLimit</a></li>
 </ul>
-<h2 id="_6">内部操作<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<h3 id="_7">工作原理<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>打开对话框</strong>：点击编辑按钮会打开带有当前值的模态对话框</li>
-<li><strong>编辑字段</strong>：用户修改所需字段</li>
-<li><strong>验证</strong>：保存时进行基本验证（例如，限制必须为正数）</li>
-<li><strong>更新</strong>：将更改应用到题目数据结构</li>
-<li><strong>保存</strong>：使用新元数据更新题目文件</li>
-<li><strong>刷新</strong>：UI 更新以显示新值</li>
-</ol>
-<h3 id="_8">可编辑字段<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
-<p><strong>题目元数据</strong>：</p>
+<h2 id="error-handling">错误处理<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
+<p>此功能不会引发错误。</p>
+<h2 id="relatives">相关功能<a class="headerlink" href="#relatives" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>名称</strong>：题目的显示名称</li>
-<li><strong>URL</strong>：在线评测网站的题目链接（如果适用）</li>
-<li><strong>时间限制</strong>：以毫秒为单位的最大执行时间（例如，1000 = 1 秒）</li>
-<li><strong>内存限制</strong>：以 MB 为单位的最大内存使用量（例如，256 MB）</li>
-</ul>
-<p><strong>高级选项</strong>：</p>
-<ul>
-<li><strong>检查器</strong>：用于自定义输出验证的特殊评测程序</li>
-<li><strong>交互器</strong>：用于交互式题目通信的程序</li>
-</ul>
-<h2 id="_9">配置选项<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
-<h3 id="_10">默认限制<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
-<p>创建题目时，使用设置中的默认值。编辑允许覆盖这些值：</p>
-<h4 id="cph-ngproblemdefaulttimelimit"><code>cph-ng.problem.defaultTimeLimit</code><a class="headerlink" href="#cph-ngproblemdefaulttimelimit" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>类型</strong>：<code>number</code></li>
-<li><strong>默认值</strong>：<code>1000</code>（毫秒）</li>
-<li><strong>注意</strong>：编辑对话框允许按题目更改</li>
-</ul>
-<h4 id="cph-ngproblemdefaultmemorylimit"><code>cph-ng.problem.defaultMemoryLimit</code><a class="headerlink" href="#cph-ngproblemdefaultmemorylimit" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>类型</strong>：<code>number</code></li>
-<li><strong>默认值</strong>：<code>512</code>（MB）</li>
-<li><strong>注意</strong>：编辑对话框允许按题目更改</li>
-</ul>
-<h2 id="_11">特殊评测和交互器<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
-<h3 id="_12">选择检查器<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
-<ol>
-<li>在编辑对话框中，点击"选择检查器"按钮</li>
-<li>浏览以选择您编译的检查器程序</li>
-<li>显示检查器路径</li>
-<li>点击"删除检查器"以取消设置</li>
-</ol>
-<p><strong>检查器要求</strong>：</p>
-<ul>
-<li>必须是编译的可执行文件</li>
-<li>应遵循 testlib.h 约定（推荐）</li>
-<li>接收输入、输出和答案文件作为参数</li>
-</ul>
-<h3 id="_13">选择交互器<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
-<ol>
-<li>在编辑对话框中，点击"选择交互器"按钮</li>
-<li>浏览以选择您编译的交互器程序</li>
-<li>显示交互器路径</li>
-<li>点击"删除交互器"以取消设置</li>
-</ol>
-<p><strong>交互器要求</strong>：</p>
-<ul>
-<li>必须是编译的可执行文件</li>
-<li>通过 stdin/stdout 与解决方案通信</li>
-<li>用于交互式题目</li>
-</ul>
-<h2 id="_14">错误处理<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h2>
-<h3 id="_15">验证错误<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
-<p><strong>无效的时间限制</strong>：</p>
-<ul>
-<li>时间限制必须为正数</li>
-<li>通常在 100ms 到 10000ms 之间</li>
-</ul>
-<p><strong>无效的内存限制</strong>：</p>
-<ul>
-<li>内存限制必须为正数</li>
-<li>通常在 16MB 到 2048MB 之间</li>
-</ul>
-<p><strong>无效的检查器/交互器路径</strong>：</p>
-<ul>
-<li>文件必须存在</li>
-<li>文件必须是可执行的</li>
-<li>必须具有平台的正确扩展名</li>
-</ul>
-<h2 id="_16">工作流程示例<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h2>
-<h3 id="_17">更改时间限制<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h3>
-<ol>
-<li>点击题目标题区域中的编辑图标</li>
-<li>编辑对话框以当前值打开</li>
-<li>修改时间限制字段（例如，从 1000 更改为 2000）</li>
-<li>点击"保存"按钮</li>
-<li>题目现在对所有测试运行使用 2000ms 时间限制</li>
-</ol>
-<h3 id="_18">添加特殊评测<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h3>
-<ol>
-<li>编译您的检查器程序（例如，<code>checker.cpp</code> → <code>checker</code>）</li>
-<li>点击编辑图标</li>
-<li>在编辑对话框中，点击"选择检查器"</li>
-<li>选择您编译的 <code>checker</code> 可执行文件</li>
-<li>保存更改</li>
-<li>测试用例现在使用您的检查器进行验证</li>
-</ol>
-<h3 id="_19">设置交互式题目<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h3>
-<ol>
-<li>编译您的交互器程序</li>
-<li>点击编辑图标</li>
-<li>点击"选择交互器"</li>
-<li>选择您编译的交互器</li>
-<li>保存更改</li>
-<li>题目现在以交互模式运行</li>
-</ol>
-<h2 id="_20">相关功能<a class="headerlink" href="#_20" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="../create-problem/">创建题目</a> - 使用默认限制的初始题目设置</li>
-<li><a href="../special-judge/">特殊评测</a> - 详细的检查器信息</li>
-<li><a href="../interactive-problems/">交互式题目</a> - 交互器设置指南</li>
-<li><a href="../delete-problem/">删除题目</a> - 如需要删除题目</li>
+<li><a href="../create-problem/">创建题目</a></li>
+<li><a href="../special-judge/">特殊评测</a></li>
+<li><a href="../interactive-problems/">交互式题目</a></li>
+<li><a href="../delete-problem/">删除题目</a></li>
 </ul>
 
 
