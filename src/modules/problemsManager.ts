@@ -185,7 +185,6 @@ export default class ProblemsManager {
                 });
             }
         }
-        
         await this.dataRefresh();
     }
     public static async updateTc(msg: msgs.UpdateTcMsg) {
