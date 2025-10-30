@@ -92,14 +92,14 @@ const TcView = ({
                         tc.isExpand = expanded;
                         emitUpdate();
                     }}
-                    draggable={true}
+                    draggable
                     onDragStart={onDragStart}
                     onDragOver={onDragOver}
                     onDragEnd={onDragEnd}
                     onDragLeave={onDragLeave}
                     sx={{
                         borderLeft: `4px solid`,
-                        cursor: 'grab',
+                        cursor: isDragging ? 'grabbing' : 'grab',
                         transition: 'all 0.2s',
                         opacity: isDragging ? 0.5 : 1,
                         ...(isDragOver && {
