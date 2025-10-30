@@ -632,6 +632,7 @@
         "publish": "pnpm vsce publish --allow-star-activation --no-dependencies",
         "publish:pre": "pnpm vsce publish --allow-star-activation --no-dependencies --pre-release",
         "lint": "eslint src",
+        "format": "prettier --write --cache .",
         "install-hooks": "node scripts/install-hooks.js",
         "check-translations": "node scripts/pre-commit"
     },
