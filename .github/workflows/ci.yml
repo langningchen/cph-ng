@@ -3,6 +3,7 @@ on:
   push:
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, closed]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -41,6 +42,10 @@ jobs:
       - name: Comment Issues
         if: success() && github.event_name == 'push'
         uses: ./.github/actions/comment-linked-issues
+
+      - name: Label PR Issues
+        if: success() && github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        uses: ./.github/actions/label-pr-issues
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

@@ -9,6 +9,7 @@
 export default async function run({ github, context, core }) {
     try {
         const version = process.env.VERSION;
+        const preRelease = process.env.PRE_RELEASE === 'true';
         if (!version) {
             core.setFailed('VERSION env is required.');
             return;
@@ -19,7 +20,7 @@ export default async function run({ github, context, core }) {
         const releasedLabelName = 'released';
 
         core.info(
-            `Fetching open issues labeled '${labelName}' to comment and close for release v${version}...`,
+            `Fetching open issues labeled '${labelName}' to update for release v${version} (pre-release: ${preRelease})...`,
         );
 
         /** @type {Array<import('@octokit/rest').RestEndpointMethodTypes['issues']['listForRepo']['response']['data'][number]>} */
@@ -55,13 +56,8 @@ export default async function run({ github, context, core }) {
                     issue_number: issue.number,
                     body,
                 });
-                await github.rest.issues.update({
-                    owner,
-                    repo,
-                    issue_number: issue.number,
-                    state: 'closed',
-                });
 
+                // Remove waiting-for-release label
                 try {
                     await github.rest.issues.removeLabel({
                         owner,
@@ -84,6 +80,7 @@ export default async function run({ github, context, core }) {
                     }
                 }
 
+                // Add released label
                 await github.rest.issues.addLabels({
                     owner,
                     repo,
@@ -93,7 +90,21 @@ export default async function run({ github, context, core }) {
                 core.info(
                     `Added label '${releasedLabelName}' to #${issue.number}.`,
                 );
-                core.info(`Commented and closed #${issue.number}.`);
+
+                // Close issue only if it's not a pre-release
+                if (!preRelease) {
+                    await github.rest.issues.update({
+                        owner,
+                        repo,
+                        issue_number: issue.number,
+                        state: 'closed',
+                    });
+                    core.info(`Closed issue #${issue.number}.`);
+                } else {
+                    core.info(
+                        `Pre-release: Issue #${issue.number} labeled but kept open.`,
+                    );
+                }
             } catch (err) {
                 core.warning(
                     `Failed to process #${issue.number}: ${err.message}`,

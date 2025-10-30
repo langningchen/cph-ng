@@ -1,7 +1,6 @@
-name: Close Waiting Issues
+name: Update Release Labels
 description:
-  Comment and close issues labeled 'waiting-for-release' after a successful
-  release
+  Update labels on issues labeled 'waiting-for-release' after a release. Changes label to 'released' and closes issues for regular releases.
 inputs: {}
 runs:
   using: composite
