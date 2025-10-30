@@ -176,7 +176,7 @@ export default class ProblemsManager {
             return;
         }
         const tcs = await getTcs(fullProblem.problem.src.path);
-        if(tcs.length>0){
+        if (tcs.length > 0) {
             if (Settings.problem.clearBeforeLoad) {
                 fullProblem.problem.tcs = tcs;
             } else {
