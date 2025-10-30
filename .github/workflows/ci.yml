@@ -32,9 +32,11 @@ jobs:
         uses: ./.github/actions/setup-node-pnpm
 
       - name: Lint
+        if: github.event_name == 'push' || github.event.action != 'closed'
         run: pnpm lint
 
       - name: Build
+        if: github.event_name == 'push' || github.event.action != 'closed'
         run: pnpm package
         env:
           BUILD_TYPE: 'Auto build'
@@ -44,10 +46,11 @@ jobs:
         uses: ./.github/actions/comment-linked-issues
 
       - name: Label PR Issues
-        if: success() && github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
         uses: ./.github/actions/label-pr-issues
 
       - name: Upload Artifact
+        if: github.event_name == 'push' || github.event.action != 'closed'
         uses: actions/upload-artifact@v4
         with:
           name: extension-${{ github.run_id }}
@@ -55,9 +58,10 @@ jobs:
           if-no-files-found: error
 
       - name: Generate Provenance
-        if:
-          github.event_name == 'push' ||
-          github.event.pull_request.head.repo.full_name == github.repository
+        if: |
+          (github.event_name == 'push' || github.event.action != 'closed') &&
+          (github.event_name == 'push' ||
+           github.event.pull_request.head.repo.full_name == github.repository)
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: ./*.vsix
