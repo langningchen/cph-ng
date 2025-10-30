@@ -18,6 +18,7 @@
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Problem } from '../../utils/types';
 import { msg } from '../utils';
 import AcCongrats from './acCongrats';
@@ -30,6 +31,7 @@ interface TcsViewProps {
 }
 
 const TcsView = ({ problem }: TcsViewProps) => {
+    const { t } = useTranslation();
     return (
         <Container>
             <CphFlex column>
@@ -70,7 +72,7 @@ const TcsView = ({ problem }: TcsViewProps) => {
                                     transition: 'all 0.2s',
                                 }}
                             >
-                                + Click here to add a new test case
+                                {t('tcsView.addTcHint')}
                             </Box>
                         </Box>
                     </>

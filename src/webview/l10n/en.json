@@ -88,6 +88,7 @@
     "tcView.stdin": "Input",
     "tcView.stdout": "Output",
     "tcView.time": "{{time}} ms",
+    "tcsView.addTcHint": "+ Click here to add a new test case",
     "tipMessage1": "Pressing Ctrl+Alt+B can quickly create, import a problem or run all test cases.",
     "tipMessage10": "You can debug your code with a specific test case input by right-clicking on any test case and selecting 'Debug with this test case'.",
     "tipMessage2": "Holding Ctrl when clicking a run button will force a recompile.",

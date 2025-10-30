@@ -24,7 +24,7 @@ import FileOpenIcon from '@mui/icons-material/FileOpen';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import { AnserJsonEntry, ansiToJson } from 'anser';
-import React, { CSSProperties, useEffect, useState } from 'react';
+import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
 import { TCIO } from '../../utils/types';
@@ -120,7 +120,7 @@ const TcDataView = ({
     const { t } = useTranslation();
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [internalValue, setInternalValue] = useState(value);
-    const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         setInternalValue(value);
