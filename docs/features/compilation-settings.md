@@ -6,21 +6,19 @@
 
 题目单独的编译选项功能允许您为每个题目设置专用的编译参数。这对于需要特殊编译标志或不同编译器版本的题目特别有用。这些设置会覆盖全局配置，并且只应用于该特定题目。
 
+系统会根据源文件的扩展名自动识别编程语言，因此您只需设置适用于当前题目语言的选项即可。
+
 ## 交互 { #interaction }
 
 ### 触发功能 { #dispatch }
 
 1. 将鼠标悬停在题目标题栏上，然后点击编辑按钮
 2. 在编辑题目对话框中，向下滚动到"编译选项"部分
-3. 填写您需要的编译选项字段：
-   - **C 编译器**: 用于编译 C 代码的编译器 (例如: `gcc`)
-   - **C 编译参数**: C 编译的额外参数 (例如: `-O2 -std=c11 -Wall -DCPH`)
-   - **C++ 编译器**: 用于编译 C++ 代码的编译器 (例如: `g++`)
-   - **C++ 编译参数**: C++ 编译的额外参数 (例如: `-O2 -std=c++17 -Wall -DCPH`)
-   - **Java 编译器**: 用于编译 Java 代码的编译器 (例如: `javac`)
-   - **Java 编译参数**: Java 编译的额外参数 (例如: `-cp .`)
-   - **Java 运行器**: 用于运行 Java 程序的命令 (例如: `java`)
-   - **Java 运行参数**: Java 运行时的额外参数
+3. 填写您需要的编译选项字段（根据题目的编程语言）：
+   - **编译器**: 编译器路径 (例如 C++: `g++`, C: `gcc`, Java: `javac`)
+   - **编译参数**: 编译的额外参数 (例如 C++: `-O2 -std=c++17 -Wall -DCPH`)
+   - **运行器**: 运行器路径（主要用于 Java，例如: `java`）
+   - **运行参数**: 运行时的额外参数
 
 4. 留空的字段将使用全局配置
 5. 点击"保存"按钮应用更改
@@ -37,7 +35,7 @@
 某些题目可能需要特定的 C++ 标准。例如，如果一个题目需要 C++17 特性：
 
 ```
-C++ 编译参数: -O2 -std=c++17 -Wall -DCPH
+编译参数: -O2 -std=c++17 -Wall -DCPH
 ```
 
 ### 额外的调试标志
@@ -45,7 +43,7 @@ C++ 编译参数: -O2 -std=c++17 -Wall -DCPH
 为特定题目添加调试标志：
 
 ```
-C++ 编译参数: -O2 -std=c++14 -Wall -DCPH -fsanitize=address
+编译参数: -O2 -std=c++14 -Wall -DCPH -fsanitize=address
 ```
 
 ### 不同的编译器
@@ -53,22 +51,17 @@ C++ 编译参数: -O2 -std=c++14 -Wall -DCPH -fsanitize=address
 使用 clang 而不是 g++：
 
 ```
-C++ 编译器: clang++
-C++ 编译参数: -O2 -std=c++14 -Wall -DCPH
+编译器: clang++
+编译参数: -O2 -std=c++14 -Wall -DCPH
 ```
 
 ## 相关配置 { #configurations }
 
-全局编译设置可在 VS Code 设置中配置：
+全局编译设置可在 VS Code 设置中配置。题目的编译选项会覆盖对应语言的全局设置：
 
-- [cph-ng.compilation.cCompiler](../configuration/compilation.md#cCompiler)
-- [cph-ng.compilation.cArgs](../configuration/compilation.md#cArgs)
-- [cph-ng.compilation.cppCompiler](../configuration/compilation.md#cppCompiler)
-- [cph-ng.compilation.cppArgs](../configuration/compilation.md#cppArgs)
-- [cph-ng.compilation.javaCompiler](../configuration/compilation.md#javaCompiler)
-- [cph-ng.compilation.javaArgs](../configuration/compilation.md#javaArgs)
-- [cph-ng.compilation.javaRunner](../configuration/compilation.md#javaRunner)
-- [cph-ng.compilation.javaRunArgs](../configuration/compilation.md#javaRunArgs)
+- C 语言: [cph-ng.compilation.cCompiler](../configuration/compilation.md#cCompiler), [cph-ng.compilation.cArgs](../configuration/compilation.md#cArgs)
+- C++ 语言: [cph-ng.compilation.cppCompiler](../configuration/compilation.md#cppCompiler), [cph-ng.compilation.cppArgs](../configuration/compilation.md#cppArgs)
+- Java 语言: [cph-ng.compilation.javaCompiler](../configuration/compilation.md#javaCompiler), [cph-ng.compilation.javaArgs](../configuration/compilation.md#javaArgs), [cph-ng.compilation.javaRunner](../configuration/compilation.md#javaRunner), [cph-ng.compilation.javaRunArgs](../configuration/compilation.md#javaRunArgs)
 
 ## 存储 { #storage }
 

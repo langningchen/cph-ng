@@ -50,8 +50,8 @@ export class LangC extends Lang {
                 (type() === 'Windows_NT' ? '.exe' : ''),
         );
         
-        const compiler = compilationSettings?.cCompiler ?? Settings.compilation.cCompiler;
-        const args = compilationSettings?.cArgs ?? Settings.compilation.cArgs;
+        const compiler = compilationSettings?.compiler ?? Settings.compilation.cCompiler;
+        const args = compilationSettings?.compilerArgs ?? Settings.compilation.cArgs;
         
         const { skip, hash } = await Lang.checkHash(
             src,

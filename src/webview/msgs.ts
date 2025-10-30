@@ -38,14 +38,10 @@ export interface EditProblemDetailsMsg extends BaseMsg {
     timeLimit: number;
     memoryLimit: number;
     compilationSettings?: {
-        cCompiler?: string;
-        cArgs?: string;
-        cppCompiler?: string;
-        cppArgs?: string;
-        javaCompiler?: string;
-        javaArgs?: string;
-        javaRunner?: string;
-        javaRunArgs?: string;
+        compiler?: string;
+        compilerArgs?: string;
+        runner?: string;
+        runnerArgs?: string;
     };
 }
 export interface DelProblemMsg extends BaseMsg {

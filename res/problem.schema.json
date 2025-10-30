@@ -137,28 +137,16 @@
             "title": "CompilationSettings",
             "type": "object",
             "properties": {
-                "cCompiler": {
+                "compiler": {
                     "type": "string"
                 },
-                "cArgs": {
+                "compilerArgs": {
                     "type": "string"
                 },
-                "cppCompiler": {
+                "runner": {
                     "type": "string"
                 },
-                "cppArgs": {
-                    "type": "string"
-                },
-                "javaCompiler": {
-                    "type": "string"
-                },
-                "javaArgs": {
-                    "type": "string"
-                },
-                "javaRunner": {
-                    "type": "string"
-                },
-                "javaRunArgs": {
+                "runnerArgs": {
                     "type": "string"
                 }
             },

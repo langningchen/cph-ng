@@ -61,14 +61,10 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
     const [editedUrl, setEditedUrl] = useState('');
     const [editedTimeLimit, setEditedTimeLimit] = useState(0);
     const [editedMemoryLimit, setEditedMemoryLimit] = useState(0);
-    const [editedCCompiler, setEditedCCompiler] = useState('');
-    const [editedCArgs, setEditedCArgs] = useState('');
-    const [editedCppCompiler, setEditedCppCompiler] = useState('');
-    const [editedCppArgs, setEditedCppArgs] = useState('');
-    const [editedJavaCompiler, setEditedJavaCompiler] = useState('');
-    const [editedJavaArgs, setEditedJavaArgs] = useState('');
-    const [editedJavaRunner, setEditedJavaRunner] = useState('');
-    const [editedJavaRunArgs, setEditedJavaRunArgs] = useState('');
+    const [editedCompiler, setEditedCompiler] = useState('');
+    const [editedCompilerArgs, setEditedCompilerArgs] = useState('');
+    const [editedRunner, setEditedRunner] = useState('');
+    const [editedRunnerArgs, setEditedRunnerArgs] = useState('');
     const [timeElapsed, setTimeElapsed] = useState(0);
 
     useEffect(() => {
@@ -76,14 +72,10 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
         setEditedUrl(problem.url || '');
         setEditedTimeLimit(problem.timeLimit);
         setEditedMemoryLimit(problem.memoryLimit);
-        setEditedCCompiler(problem.compilationSettings?.cCompiler || '');
-        setEditedCArgs(problem.compilationSettings?.cArgs || '');
-        setEditedCppCompiler(problem.compilationSettings?.cppCompiler || '');
-        setEditedCppArgs(problem.compilationSettings?.cppArgs || '');
-        setEditedJavaCompiler(problem.compilationSettings?.javaCompiler || '');
-        setEditedJavaArgs(problem.compilationSettings?.javaArgs || '');
-        setEditedJavaRunner(problem.compilationSettings?.javaRunner || '');
-        setEditedJavaRunArgs(problem.compilationSettings?.javaRunArgs || '');
+        setEditedCompiler(problem.compilationSettings?.compiler || '');
+        setEditedCompilerArgs(problem.compilationSettings?.compilerArgs || '');
+        setEditedRunner(problem.compilationSettings?.runner || '');
+        setEditedRunnerArgs(problem.compilationSettings?.runnerArgs || '');
     }, [problem.name, problem.url, problem.timeLimit, problem.memoryLimit, problem.compilationSettings]);
     useEffect(() => {
         setTimeElapsed(Date.now() - startTime);
@@ -99,16 +91,11 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
 
     const handleEditDialogClose = () => {
         setEditDialogOpen(false);
-        const compilationSettings = (editedCCompiler || editedCArgs || editedCppCompiler || editedCppArgs || 
-                                       editedJavaCompiler || editedJavaArgs || editedJavaRunner || editedJavaRunArgs) ? {
-            cCompiler: editedCCompiler || undefined,
-            cArgs: editedCArgs || undefined,
-            cppCompiler: editedCppCompiler || undefined,
-            cppArgs: editedCppArgs || undefined,
-            javaCompiler: editedJavaCompiler || undefined,
-            javaArgs: editedJavaArgs || undefined,
-            javaRunner: editedJavaRunner || undefined,
-            javaRunArgs: editedJavaRunArgs || undefined,
+        const compilationSettings = (editedCompiler || editedCompilerArgs || editedRunner || editedRunnerArgs) ? {
+            compiler: editedCompiler || undefined,
+            compilerArgs: editedCompilerArgs || undefined,
+            runner: editedRunner || undefined,
+            runnerArgs: editedRunnerArgs || undefined,
         } : undefined;
         msg({
             type: 'editProblemDetails',
@@ -292,74 +279,34 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                     <TextField
                         variant={'outlined'}
                         margin={'normal'}
-                        label={t('problemTitle.dialog.field.cCompiler')}
-                        value={editedCCompiler}
-                        onChange={(e) => setEditedCCompiler(e.target.value)}
+                        label={t('problemTitle.dialog.field.compiler')}
+                        value={editedCompiler}
+                        onChange={(e) => setEditedCompiler(e.target.value)}
                         fullWidth
-                        placeholder={'gcc'}
                     />
                     <TextField
                         variant={'outlined'}
                         margin={'normal'}
-                        label={t('problemTitle.dialog.field.cArgs')}
-                        value={editedCArgs}
-                        onChange={(e) => setEditedCArgs(e.target.value)}
+                        label={t('problemTitle.dialog.field.compilerArgs')}
+                        value={editedCompilerArgs}
+                        onChange={(e) => setEditedCompilerArgs(e.target.value)}
                         fullWidth
-                        placeholder={'-O2 -std=c11 -Wall -DCPH'}
                     />
                     <TextField
                         variant={'outlined'}
                         margin={'normal'}
-                        label={t('problemTitle.dialog.field.cppCompiler')}
-                        value={editedCppCompiler}
-                        onChange={(e) => setEditedCppCompiler(e.target.value)}
+                        label={t('problemTitle.dialog.field.runner')}
+                        value={editedRunner}
+                        onChange={(e) => setEditedRunner(e.target.value)}
                         fullWidth
-                        placeholder={'g++'}
                     />
                     <TextField
                         variant={'outlined'}
                         margin={'normal'}
-                        label={t('problemTitle.dialog.field.cppArgs')}
-                        value={editedCppArgs}
-                        onChange={(e) => setEditedCppArgs(e.target.value)}
+                        label={t('problemTitle.dialog.field.runnerArgs')}
+                        value={editedRunnerArgs}
+                        onChange={(e) => setEditedRunnerArgs(e.target.value)}
                         fullWidth
-                        placeholder={'-O2 -std=c++14 -Wall -DCPH'}
-                    />
-                    <TextField
-                        variant={'outlined'}
-                        margin={'normal'}
-                        label={t('problemTitle.dialog.field.javaCompiler')}
-                        value={editedJavaCompiler}
-                        onChange={(e) => setEditedJavaCompiler(e.target.value)}
-                        fullWidth
-                        placeholder={'javac'}
-                    />
-                    <TextField
-                        variant={'outlined'}
-                        margin={'normal'}
-                        label={t('problemTitle.dialog.field.javaArgs')}
-                        value={editedJavaArgs}
-                        onChange={(e) => setEditedJavaArgs(e.target.value)}
-                        fullWidth
-                        placeholder={'-cp .'}
-                    />
-                    <TextField
-                        variant={'outlined'}
-                        margin={'normal'}
-                        label={t('problemTitle.dialog.field.javaRunner')}
-                        value={editedJavaRunner}
-                        onChange={(e) => setEditedJavaRunner(e.target.value)}
-                        fullWidth
-                        placeholder={'java'}
-                    />
-                    <TextField
-                        variant={'outlined'}
-                        margin={'normal'}
-                        label={t('problemTitle.dialog.field.javaRunArgs')}
-                        value={editedJavaRunArgs}
-                        onChange={(e) => setEditedJavaRunArgs(e.target.value)}
-                        fullWidth
-                        placeholder={''}
                     />
                     <CphFlex>
                         <Typography>

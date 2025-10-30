@@ -31,14 +31,10 @@ const logger = new Logger('lang');
 export interface CompileAdditionalData {
     canUseWrapper: boolean;
     compilationSettings?: {
-        cCompiler?: string;
-        cArgs?: string;
-        cppCompiler?: string;
-        cppArgs?: string;
-        javaCompiler?: string;
-        javaArgs?: string;
-        javaRunner?: string;
-        javaRunArgs?: string;
+        compiler?: string;
+        compilerArgs?: string;
+        runner?: string;
+        runnerArgs?: string;
     };
 }
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
