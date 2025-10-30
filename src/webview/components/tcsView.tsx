@@ -19,6 +19,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import React from 'react';
 import { Problem } from '../../utils/types';
+import { msg } from '../utils';
 import AcCongrats from './acCongrats';
 import CphFlex from './base/cphFlex';
 import NoTcs from './noTcs';
@@ -53,6 +54,24 @@ const TcsView = ({ problem }: TcsViewProps) => {
                                     />
                                 ),
                             )}
+                            <Box
+                                onClick={() => msg({ type: 'addTc' })}
+                                sx={{
+                                    minHeight: '40px',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    opacity: 0.5,
+                                    '&:hover': {
+                                        opacity: 1,
+                                        backgroundColor: 'rgba(127, 127, 127, 0.1)',
+                                    },
+                                    transition: 'all 0.2s',
+                                }}
+                            >
+                                + Click here to add a new test case
+                            </Box>
                         </Box>
                     </>
                 ) : (

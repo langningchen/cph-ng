@@ -49,6 +49,8 @@ interface CodeMirrorSectionProps {
     onDbClick?: () => void;
     outputActions?: OutputActions;
     readOnly?: boolean;
+    autoFocus?: boolean;
+    onTabKey?: () => void;
 }
 
 const ansiToReact = (ansi: string) => {
@@ -112,14 +114,23 @@ const TcDataView = ({
     onDbClick,
     outputActions,
     readOnly,
+    autoFocus,
+    onTabKey,
 }: CodeMirrorSectionProps) => {
     const { t } = useTranslation();
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [internalValue, setInternalValue] = useState(value);
+    const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         setInternalValue(value);
     }, [value]);
+
+    useEffect(() => {
+        if (autoFocus && textareaRef.current) {
+            textareaRef.current.focus();
+        }
+    }, [autoFocus]);
 
     const handleCloseSnackbar = () => {
         setSnackbarOpen(false);
@@ -240,6 +251,7 @@ const TcDataView = ({
                         </div>
                     ) : (
                         <TextareaAutosize
+                            ref={textareaRef}
                             value={internalValue.data}
                             onChange={(e) =>
                                 setInternalValue({
@@ -248,6 +260,12 @@ const TcDataView = ({
                                 })
                             }
                             onBlur={(e) => onBlur && onBlur(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Tab' && onTabKey) {
+                                    e.preventDefault();
+                                    onTabKey();
+                                }
+                            }}
                             maxRows={10}
                             style={
                                 {
