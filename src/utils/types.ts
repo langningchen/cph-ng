@@ -73,6 +73,17 @@ export interface BFCompare {
     msg: string;
 }
 
+export interface CompilationSettings {
+    cCompiler?: string;
+    cArgs?: string;
+    cppCompiler?: string;
+    cppArgs?: string;
+    javaCompiler?: string;
+    javaArgs?: string;
+    javaRunner?: string;
+    javaRunArgs?: string;
+}
+
 export interface Problem {
     version: string;
     name: string;
@@ -85,4 +96,5 @@ export interface Problem {
     interactor?: FileWithHash;
     bfCompare?: BFCompare;
     timeElapsed: number;
+    compilationSettings?: CompilationSettings;
 }

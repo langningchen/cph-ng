@@ -39,7 +39,7 @@ export class LangC extends Lang {
         src: FileWithHash,
         ac: AbortController,
         forceCompile: boolean | null,
-        _: CompileAdditionalData = DefaultCompileAdditionalData,
+        { compilationSettings }: CompileAdditionalData = DefaultCompileAdditionalData,
     ): Promise<LangCompileResult> {
         this.logger.trace('compile', { src, forceCompile });
 
@@ -49,10 +49,14 @@ export class LangC extends Lang {
             basename(src.path, extname(src.path)) +
                 (type() === 'Windows_NT' ? '.exe' : ''),
         );
+        
+        const compiler = compilationSettings?.cCompiler ?? Settings.compilation.cCompiler;
+        const args = compilationSettings?.cArgs ?? Settings.compilation.cArgs;
+        
         const { skip, hash } = await Lang.checkHash(
             src,
             outputPath,
-            Settings.compilation.cCompiler + Settings.compilation.cArgs,
+            compiler + args,
             forceCompile,
         );
         if (skip) {
@@ -64,8 +68,6 @@ export class LangC extends Lang {
         }
 
         const {
-            cCompiler: compiler,
-            cArgs: args,
             timeout,
         } = Settings.compilation;
 

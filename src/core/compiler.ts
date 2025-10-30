@@ -64,6 +64,7 @@ export class Compiler {
     ): Promise<CompileResult> {
         const result = await lang.compile(problem.src, ac, compile, {
             canUseWrapper: true,
+            compilationSettings: problem.compilationSettings,
         });
         if (result.verdict !== TCVerdicts.UKE) {
             return { ...result, data: undefined };

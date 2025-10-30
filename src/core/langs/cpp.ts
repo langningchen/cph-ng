@@ -40,7 +40,7 @@ export class LangCpp extends Lang {
         src: FileWithHash,
         ac: AbortController,
         forceCompile: boolean | null,
-        { canUseWrapper }: CompileAdditionalData = DefaultCompileAdditionalData,
+        { canUseWrapper, compilationSettings }: CompileAdditionalData = DefaultCompileAdditionalData,
     ): Promise<LangCompileResult> {
         this.logger.trace('compile', { src, forceCompile });
 
@@ -50,11 +50,15 @@ export class LangCpp extends Lang {
             basename(src.path, extname(src.path)) +
                 (type() === 'Windows_NT' ? '.exe' : ''),
         );
+        
+        const compiler = compilationSettings?.cppCompiler ?? Settings.compilation.cppCompiler;
+        const args = compilationSettings?.cppArgs ?? Settings.compilation.cppArgs;
+        
         const { skip, hash } = await Lang.checkHash(
             src,
             outputPath,
-            Settings.compilation.cppCompiler +
-                Settings.compilation.cppArgs +
+            compiler +
+                args +
                 Settings.compilation.useWrapper +
                 Settings.compilation.useHook,
             forceCompile,
@@ -68,8 +72,6 @@ export class LangCpp extends Lang {
         }
 
         const {
-            cppCompiler: compiler,
-            cppArgs: args,
             objcopy,
             useWrapper,
             useHook,

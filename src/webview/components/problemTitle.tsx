@@ -61,6 +61,14 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
     const [editedUrl, setEditedUrl] = useState('');
     const [editedTimeLimit, setEditedTimeLimit] = useState(0);
     const [editedMemoryLimit, setEditedMemoryLimit] = useState(0);
+    const [editedCCompiler, setEditedCCompiler] = useState('');
+    const [editedCArgs, setEditedCArgs] = useState('');
+    const [editedCppCompiler, setEditedCppCompiler] = useState('');
+    const [editedCppArgs, setEditedCppArgs] = useState('');
+    const [editedJavaCompiler, setEditedJavaCompiler] = useState('');
+    const [editedJavaArgs, setEditedJavaArgs] = useState('');
+    const [editedJavaRunner, setEditedJavaRunner] = useState('');
+    const [editedJavaRunArgs, setEditedJavaRunArgs] = useState('');
     const [timeElapsed, setTimeElapsed] = useState(0);
 
     useEffect(() => {
@@ -68,7 +76,15 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
         setEditedUrl(problem.url || '');
         setEditedTimeLimit(problem.timeLimit);
         setEditedMemoryLimit(problem.memoryLimit);
-    }, [problem.name, problem.url, problem.timeLimit, problem.memoryLimit]);
+        setEditedCCompiler(problem.compilationSettings?.cCompiler || '');
+        setEditedCArgs(problem.compilationSettings?.cArgs || '');
+        setEditedCppCompiler(problem.compilationSettings?.cppCompiler || '');
+        setEditedCppArgs(problem.compilationSettings?.cppArgs || '');
+        setEditedJavaCompiler(problem.compilationSettings?.javaCompiler || '');
+        setEditedJavaArgs(problem.compilationSettings?.javaArgs || '');
+        setEditedJavaRunner(problem.compilationSettings?.javaRunner || '');
+        setEditedJavaRunArgs(problem.compilationSettings?.javaRunArgs || '');
+    }, [problem.name, problem.url, problem.timeLimit, problem.memoryLimit, problem.compilationSettings]);
     useEffect(() => {
         setTimeElapsed(Date.now() - startTime);
         const interval = setInterval(() => {
@@ -83,12 +99,24 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
 
     const handleEditDialogClose = () => {
         setEditDialogOpen(false);
+        const compilationSettings = (editedCCompiler || editedCArgs || editedCppCompiler || editedCppArgs || 
+                                       editedJavaCompiler || editedJavaArgs || editedJavaRunner || editedJavaRunArgs) ? {
+            cCompiler: editedCCompiler || undefined,
+            cArgs: editedCArgs || undefined,
+            cppCompiler: editedCppCompiler || undefined,
+            cppArgs: editedCppArgs || undefined,
+            javaCompiler: editedJavaCompiler || undefined,
+            javaArgs: editedJavaArgs || undefined,
+            javaRunner: editedJavaRunner || undefined,
+            javaRunArgs: editedJavaRunArgs || undefined,
+        } : undefined;
         msg({
             type: 'editProblemDetails',
             title: editedTitle,
             url: editedUrl,
             timeLimit: editedTimeLimit,
             memoryLimit: editedMemoryLimit,
+            compilationSettings,
         });
     };
 
@@ -257,6 +285,81 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                         }
                         fullWidth
                         type={'number'}
+                    />
+                    <Typography variant={'subtitle1'} marginTop={2}>
+                        {t('problemTitle.dialog.field.compilationSettings')}
+                    </Typography>
+                    <TextField
+                        variant={'outlined'}
+                        margin={'normal'}
+                        label={t('problemTitle.dialog.field.cCompiler')}
+                        value={editedCCompiler}
+                        onChange={(e) => setEditedCCompiler(e.target.value)}
+                        fullWidth
+                        placeholder={'gcc'}
+                    />
+                    <TextField
+                        variant={'outlined'}
+                        margin={'normal'}
+                        label={t('problemTitle.dialog.field.cArgs')}
+                        value={editedCArgs}
+                        onChange={(e) => setEditedCArgs(e.target.value)}
+                        fullWidth
+                        placeholder={'-O2 -std=c11 -Wall -DCPH'}
+                    />
+                    <TextField
+                        variant={'outlined'}
+                        margin={'normal'}
+                        label={t('problemTitle.dialog.field.cppCompiler')}
+                        value={editedCppCompiler}
+                        onChange={(e) => setEditedCppCompiler(e.target.value)}
+                        fullWidth
+                        placeholder={'g++'}
+                    />
+                    <TextField
+                        variant={'outlined'}
+                        margin={'normal'}
+                        label={t('problemTitle.dialog.field.cppArgs')}
+                        value={editedCppArgs}
+                        onChange={(e) => setEditedCppArgs(e.target.value)}
+                        fullWidth
+                        placeholder={'-O2 -std=c++14 -Wall -DCPH'}
+                    />
+                    <TextField
+                        variant={'outlined'}
+                        margin={'normal'}
+                        label={t('problemTitle.dialog.field.javaCompiler')}
+                        value={editedJavaCompiler}
+                        onChange={(e) => setEditedJavaCompiler(e.target.value)}
+                        fullWidth
+                        placeholder={'javac'}
+                    />
+                    <TextField
+                        variant={'outlined'}
+                        margin={'normal'}
+                        label={t('problemTitle.dialog.field.javaArgs')}
+                        value={editedJavaArgs}
+                        onChange={(e) => setEditedJavaArgs(e.target.value)}
+                        fullWidth
+                        placeholder={'-cp .'}
+                    />
+                    <TextField
+                        variant={'outlined'}
+                        margin={'normal'}
+                        label={t('problemTitle.dialog.field.javaRunner')}
+                        value={editedJavaRunner}
+                        onChange={(e) => setEditedJavaRunner(e.target.value)}
+                        fullWidth
+                        placeholder={'java'}
+                    />
+                    <TextField
+                        variant={'outlined'}
+                        margin={'normal'}
+                        label={t('problemTitle.dialog.field.javaRunArgs')}
+                        value={editedJavaRunArgs}
+                        onChange={(e) => setEditedJavaRunArgs(e.target.value)}
+                        fullWidth
+                        placeholder={''}
                     />
                     <CphFlex>
                         <Typography>

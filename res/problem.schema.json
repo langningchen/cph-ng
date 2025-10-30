@@ -132,6 +132,37 @@
             },
             "required": ["running", "msg"],
             "additionalProperties": false
+        },
+        "CompilationSettings": {
+            "title": "CompilationSettings",
+            "type": "object",
+            "properties": {
+                "cCompiler": {
+                    "type": "string"
+                },
+                "cArgs": {
+                    "type": "string"
+                },
+                "cppCompiler": {
+                    "type": "string"
+                },
+                "cppArgs": {
+                    "type": "string"
+                },
+                "javaCompiler": {
+                    "type": "string"
+                },
+                "javaArgs": {
+                    "type": "string"
+                },
+                "javaRunner": {
+                    "type": "string"
+                },
+                "javaRunArgs": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
         }
     },
     "properties": {
@@ -174,6 +205,9 @@
         "timeElapsed": {
             "type": "integer",
             "minimum": 0
+        },
+        "compilationSettings": {
+            "$ref": "#/definitions/CompilationSettings"
         }
     },
     "required": [

@@ -132,6 +132,7 @@ export default class ProblemsManager {
         fullProblem.problem.url = msg.url;
         fullProblem.problem.timeLimit = msg.timeLimit;
         fullProblem.problem.memoryLimit = msg.memoryLimit;
+        fullProblem.problem.compilationSettings = msg.compilationSettings;
         await this.dataRefresh();
     }
     public static async delProblem(msg: msgs.DelProblemMsg) {
