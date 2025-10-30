@@ -46,7 +46,7 @@ jobs:
         uses: ./.github/actions/comment-linked-issues
 
       - name: Label PR Issues
-        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged
         uses: ./.github/actions/label-pr-issues
 
       - name: Upload Artifact
@@ -60,8 +60,7 @@ jobs:
       - name: Generate Provenance
         if: |
           (github.event_name == 'push' || github.event.action != 'closed') &&
-          (github.event_name == 'push' ||
-           github.event.pull_request.head.repo.full_name == github.repository)
+          (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: ./*.vsix
