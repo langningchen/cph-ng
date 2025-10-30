@@ -129,7 +129,7 @@ export class LangCpp extends Lang {
                     outputPath,
                 ];
                 if (Settings.runner.unlimitedStack && type() === 'Windows_NT') {
-                    cmdArgs.push('-Wl,/STACK:268435456');
+                    cmdArgs.push('-Wl,--stack,268435456');
                 }
                 compileCommands.push(cmdArgs);
             }
