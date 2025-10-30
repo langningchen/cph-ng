@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import BugReportIcon from '@mui/icons-material/BugReport';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import Accordion from '@mui/material/Accordion';
@@ -164,6 +165,15 @@ const TcView = ({ tc, idx }: TcViewProp) => {
                                     }}
                                 />
                             </CphMenu>
+                            <CphButton
+                                name={t('tcView.debug')}
+                                icon={BugReportIcon}
+                                color={'info'}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    msg({ type: 'debugTc', idx });
+                                }}
+                            />
                             <CphButton
                                 name={t('tcView.delete')}
                                 icon={DeleteIcon}

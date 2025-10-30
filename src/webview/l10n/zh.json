@@ -67,6 +67,7 @@
     "tcDataView.snackbar.message": "已复制",
     "tcDataView.toggleFile": "切换是否保存文件",
     "tcView.answer": "答案",
+    "tcView.debug": "调试",
     "tcView.delete": "删除",
     "tcView.memory": "{{memory}} MB",
     "tcView.menu.clearTcStatus": "清除此测试用例状态",

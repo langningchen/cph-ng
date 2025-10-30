@@ -126,6 +126,10 @@ export interface OpenSettingsMsg extends BaseMsg {
     type: 'openSettings';
     item: string;
 }
+export interface DebugTcMsg extends BaseMsg {
+    type: 'debugTc';
+    idx: number;
+}
 export type WebviewMsg =
     | CreateProblemMsg
     | ImportProblemMsg
@@ -151,4 +155,5 @@ export type WebviewMsg =
     | StopBfCompareMsg
     | SubmitToCodeforcesMsg
     | StartChatMsg
-    | OpenSettingsMsg;
+    | OpenSettingsMsg
+    | DebugTcMsg;

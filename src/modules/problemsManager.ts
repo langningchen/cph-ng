@@ -757,4 +757,121 @@ export default class ProblemsManager {
         }
         await vscode.window.showTextDocument(document);
     }
+    public static async debugTc(msg: msgs.DebugTcMsg): Promise<void> {
+        const fullProblem = await this.getFullProblem(msg.activePath);
+        if (!fullProblem) {
+            return;
+        }
+        const srcLang = Langs.getLang(fullProblem.problem.src.path);
+        if (!srcLang) {
+            return;
+        }
+
+        const tc = fullProblem.problem.tcs[msg.idx];
+        if (!tc) {
+            Io.error(vscode.l10n.t('Test case not found.'));
+            return;
+        }
+
+        // Get the input data
+        const stdinData = await tcIo2Str(tc.stdin);
+
+        // Write input to a temporary file
+        const inputFilePath = join(
+            Settings.cache.directory,
+            'io',
+            `input_tc${msg.idx}.txt`,
+        );
+        await writeFile(inputFilePath, stdinData);
+
+        // Compile the program first
+        const compileResult = await Compiler.compileAll(
+            fullProblem.problem,
+            srcLang,
+            null,
+            new AbortController(),
+        );
+        if (compileResult.verdict !== TCVerdicts.UKE) {
+            Io.error(
+                vscode.l10n.t('Failed to compile the program: {msg}', {
+                    msg: compileResult.msg,
+                }),
+            );
+            return;
+        }
+
+        const compileData = compileResult.data;
+        if (!compileData) {
+            Io.error(vscode.l10n.t('Compile data is empty.'));
+            return;
+        }
+
+        // Get the executable path
+        const executablePath = compileData.outputPath;
+
+        // Determine debug configuration based on language
+        const ext = extname(fullProblem.problem.src.path)
+            .toLowerCase()
+            .slice(1);
+        let debugConfig: vscode.DebugConfiguration;
+
+        if (['cpp', 'cc', 'cxx', 'c++', 'c'].includes(ext)) {
+            // C/C++ debug configuration
+            debugConfig = {
+                name: `Debug Test Case #${msg.idx + 1}`,
+                type: 'cppdbg',
+                request: 'launch',
+                program: executablePath,
+                args: [],
+                stopAtEntry: false,
+                cwd: dirname(fullProblem.problem.src.path),
+                environment: [],
+                externalConsole: false,
+                MIMode: 'gdb',
+                setupCommands: [
+                    {
+                        description: 'Enable pretty-printing for gdb',
+                        text: '-enable-pretty-printing',
+                        ignoreFailures: true,
+                    },
+                ],
+                stdin: inputFilePath,
+            };
+        } else if (ext === 'java') {
+            // Java debug configuration
+            const className = basename(
+                fullProblem.problem.src.path,
+                extname(fullProblem.problem.src.path),
+            );
+            debugConfig = {
+                name: `Debug Test Case #${msg.idx + 1}`,
+                type: 'java',
+                request: 'launch',
+                mainClass: className,
+                console: 'integratedTerminal',
+                args: `< ${inputFilePath}`,
+            };
+        } else {
+            Io.error(
+                vscode.l10n.t(
+                    'Debugging is not supported for this language yet.',
+                ),
+            );
+            return;
+        }
+
+        // Show info message
+        Io.info(
+            vscode.l10n.t(
+                'Starting debugger for test case #{idx}. Input will be read from: {path}',
+                {
+                    idx: msg.idx + 1,
+                    path: inputFilePath,
+                },
+            ),
+        );
+
+        // Start debugging
+        await vscode.debug.startDebugging(undefined, debugConfig);
+    }
 }

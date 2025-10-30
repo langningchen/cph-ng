@@ -158,6 +158,8 @@ export default class SidebarProvider implements vscode.WebviewViewProvider {
                             'workbench.action.openSettings',
                             openSettingsMsg.item,
                         );
+                    } else if (msg.type === 'debugTc') {
+                        await ProblemsManager.debugTc(msg);
                     }
                 } catch (e) {
                     Io.error(

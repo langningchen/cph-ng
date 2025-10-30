@@ -67,6 +67,7 @@
     "tcDataView.snackbar.message": "Copied",
     "tcDataView.toggleFile": "Toggle Save to File",
     "tcView.answer": "Answer",
+    "tcView.debug": "Debug",
     "tcView.delete": "Delete",
     "tcView.memory": "{{memory}} MB",
     "tcView.menu.clearTcStatus": "Clear Current Test Case Status",
