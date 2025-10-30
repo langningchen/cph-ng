@@ -88,6 +88,7 @@
     "tipMessage7": "你可以在设置中隐藏某些类型的测试用例。",
     "tipMessage8": "按住 Ctrl 点击停止所有测试用例按钮将只停止当前运行的测试用例。",
     "tipMessage9": "通过在设置中勾选 Use Wrapper 选项来提高时间测量的准确性。",
+    "tipMessage10": "你可以通过点击任何测试用例上的调试按钮来使用特定的测试用例输入调试你的代码。",
     "tips.nextTip": "下一个提示",
     "tips.previousTip": "上一个提示",
     "tips.randomTip": "随机提示",

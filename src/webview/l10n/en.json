@@ -88,6 +88,7 @@
     "tipMessage7": "You can hide certain types of test cases in the settings.",
     "tipMessage8": "Holding Ctrl when clicking the stop all test cases button will only stop the currently running test case.",
     "tipMessage9": "Increase the accuracy of time measurement by checking the Use Wrapper option in the settings.",
+    "tipMessage10": "You can debug your code with a specific test case input by clicking the Debug button on any test case.",
     "tips.nextTip": "Next Tip",
     "tips.previousTip": "Previous Tip",
     "tips.randomTip": "Random Tip",
