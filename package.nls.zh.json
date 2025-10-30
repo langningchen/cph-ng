@@ -89,6 +89,7 @@
     "cph-ng.configuration.runner.properties.stderrThreshold.markdownDescription": "设置将标准错误输出（stderr）写入文件的**阈值**（单位为**字节**）。如果 stderr 输出大小超过此阈值，它将被重定向到文件以防止因大输出而导致的性能题目。设置为 `0` 则始终将 stderr 写入文件，设置为 `-1` 则完全禁用写入文件。",
     "cph-ng.configuration.runner.properties.stdoutThreshold.markdownDescription": "设置将标准输出（stdout）写入文件的**阈值**（单位为**字节**）。如果 stdout 输出大小超过此阈值，它将被重定向到文件以防止因大输出而导致的性能题目。设置为 `0` 则始终将 stdout 写入文件，设置为 `-1` 则完全禁用写入文件。",
     "cph-ng.configuration.runner.properties.timeAddition.markdownDescription": "在执行期间，为每个测试用例的时间限制添加额外的时间（单位为**毫秒**）。例如，如果一个测试用例的时间限制为 `1000ms`，此值为 `1000ms`，那么你的程序将被允许运行 `2000ms`，之后才会被终止。这对于应对轻微的开销或系统差异非常有用。",
+    "cph-ng.configuration.runner.properties.unlimitedStack.markdownDescription": "启用后，将为执行的程序设置无限栈大小。这对于需要深度递归的竞赛编程题目非常有用。在 Linux 上，使用 `setrlimit` 实现。在 Windows 上，使用 `/STACK` 链接器标志设置一个较大的值。**注意**：仅在启用 `#cphNg.runner.useRunner#` 时有效。",
     "cph-ng.configuration.runner.properties.useRunner.markdownDescription": "此选项仅适用于 Windows 或 Linux 系统与 C++ 程序。启用后，将使用一个运行器来执行程序，以提供更准确的时间测量与内存测量。（不要与 `#cphNg.compilation.useWrapper#` 选项同时使用）",
     "cph-ng.configuration.runner.title": "运行器",
     "cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.auto": "自动匹配 VSCode 颜色主题。",

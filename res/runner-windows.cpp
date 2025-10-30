@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <thread>
 #include <algorithm>
 #include <io.h>
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
     const char *in_file = argv[2];
     const char *out_file = argv[3];
     const char *err_file = argv[4];
+    // Note: Stack size for Windows is set via compilation flags, not at runtime
 
     std::thread listener_thread(stdin_listener);
     listener_thread.detach();

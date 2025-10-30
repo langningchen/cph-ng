@@ -171,6 +171,9 @@ class RunnerSection extends SettingsSection {
     get useRunner(): boolean {
         return this.get('useRunner') as boolean;
     }
+    get unlimitedStack(): boolean {
+        return this.get('unlimitedStack') as boolean;
+    }
 }
 
 class ComparingSection extends SettingsSection {

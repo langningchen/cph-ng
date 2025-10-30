@@ -6,6 +6,7 @@
 #include <csignal>
 #include <cerrno>
 #include <cstdlib>
+#include <cstring>
 #include <thread>
 
 #include "runner.h"
@@ -43,6 +44,9 @@ int main(int argc, char *argv[])
     const char *in_file = argv[2];
     const char *out_file = argv[3];
     const char *err_file = argv[4];
+    bool unlimited_stack = false;
+    if (argc >= 6 && strcmp(argv[5], "--unlimited-stack") == 0)
+        unlimited_stack = true;
 
     std::thread listener_thread(stdin_listener);
     listener_thread.detach();
@@ -60,6 +64,13 @@ int main(int argc, char *argv[])
         print_error(create_process_failed, errno);
     if (child_pid == 0)
     {
+        if (unlimited_stack)
+        {
+            struct rlimit rl;
+            rl.rlim_cur = RLIM_INFINITY;
+            rl.rlim_max = RLIM_INFINITY;
+            setrlimit(RLIMIT_STACK, &rl);
+        }
         dup2(hInputFile, STDIN_FILENO), safe_close(hInputFile);
         dup2(hOutputFile, STDOUT_FILENO), safe_close(hOutputFile);
         dup2(hErrorFile, STDERR_FILENO), safe_close(hErrorFile);
