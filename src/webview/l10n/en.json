@@ -77,6 +77,7 @@
     "tcDataView.toggleFile": "Toggle Save to File",
     "tcView.answer": "Answer",
     "tcView.delete": "Delete",
+    "tcView.dragHandle": "Drag to reorder",
     "tcView.memory": "{{memory}} MB",
     "tcView.menu.clearTcStatus": "Clear Current Test Case Status",
     "tcView.menu.debug": "Debug with this test case",

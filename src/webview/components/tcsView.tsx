@@ -17,7 +17,7 @@
 
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Problem } from '../../utils/types';
 import { msg } from '../utils';
@@ -32,6 +32,32 @@ interface TcsViewProps {
 
 const TcsView = ({ problem }: TcsViewProps) => {
     const { t } = useTranslation();
+    const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
+    const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+
+    const handleDragStart = (idx: number) => {
+        setDraggedIdx(idx);
+    };
+
+    const handleDragOver = (e: React.DragEvent, idx: number) => {
+        e.preventDefault();
+        if (draggedIdx !== null && draggedIdx !== idx) {
+            setDragOverIdx(idx);
+        }
+    };
+
+    const handleDragEnd = () => {
+        if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
+            msg({ type: 'reorderTc', fromIdx: draggedIdx, toIdx: dragOverIdx });
+        }
+        setDraggedIdx(null);
+        setDragOverIdx(null);
+    };
+
+    const handleDragLeave = () => {
+        setDragOverIdx(null);
+    };
+
     return (
         <Container>
             <CphFlex column>
@@ -53,6 +79,12 @@ const TcsView = ({ problem }: TcsViewProps) => {
                                         tc={tc}
                                         idx={idx}
                                         key={idx}
+                                        onDragStart={() => handleDragStart(idx)}
+                                        onDragOver={(e) => handleDragOver(e, idx)}
+                                        onDragEnd={handleDragEnd}
+                                        onDragLeave={handleDragLeave}
+                                        isDragging={draggedIdx === idx}
+                                        isDragOver={dragOverIdx === idx}
                                     />
                                 ),
                             )}

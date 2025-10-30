@@ -16,6 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import DeleteIcon from '@mui/icons-material/Delete';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -38,9 +39,24 @@ import TcDataView from './tcDataView';
 interface TcViewProp {
     tc: TC;
     idx: number;
+    onDragStart?: () => void;
+    onDragOver?: (e: React.DragEvent) => void;
+    onDragEnd?: () => void;
+    onDragLeave?: () => void;
+    isDragging?: boolean;
+    isDragOver?: boolean;
 }
 
-const TcView = ({ tc, idx }: TcViewProp) => {
+const TcView = ({ 
+    tc, 
+    idx, 
+    onDragStart, 
+    onDragOver, 
+    onDragEnd, 
+    onDragLeave,
+    isDragging = false,
+    isDragOver = false 
+}: TcViewProp) => {
     const { t } = useTranslation();
     const running = isRunningVerdict(tc.result?.verdict);
     const stdinRef = React.useRef<HTMLDivElement>(null);
@@ -76,8 +92,20 @@ const TcView = ({ tc, idx }: TcViewProp) => {
                         tc.isExpand = expanded;
                         emitUpdate();
                     }}
+                    draggable={true}
+                    onDragStart={onDragStart}
+                    onDragOver={onDragOver}
+                    onDragEnd={onDragEnd}
+                    onDragLeave={onDragLeave}
                     sx={{
                         borderLeft: `4px solid`,
+                        cursor: 'grab',
+                        transition: 'all 0.2s',
+                        opacity: isDragging ? 0.5 : 1,
+                        ...(isDragOver && {
+                            borderTop: '3px solid #2196f3',
+                            marginTop: '8px',
+                        }),
                         ...(window.easterEgg
                             ? (() => {
                                   const hash = MD5(JSON.stringify(tc)).words;
@@ -113,6 +141,17 @@ const TcView = ({ tc, idx }: TcViewProp) => {
                         }}
                     >
                         <CphFlex smallGap>
+                            <Tooltip title={t('tcView.dragHandle')}>
+                                <DragIndicatorIcon 
+                                    sx={{ 
+                                        cursor: 'grab',
+                                        color: 'rgba(127, 127, 127, 0.6)',
+                                        '&:hover': {
+                                            color: 'rgba(127, 127, 127, 1)',
+                                        }
+                                    }} 
+                                />
+                            </Tooltip>
                             <CphFlex flex={1}>
                                 <CphText fontWeight={'bold'}>
                                     #{idx + 1}

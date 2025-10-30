@@ -77,6 +77,7 @@
     "tcDataView.toggleFile": "切换是否保存文件",
     "tcView.answer": "答案",
     "tcView.delete": "删除",
+    "tcView.dragHandle": "拖动以重新排序",
     "tcView.memory": "{{memory}} MB",
     "tcView.menu.clearTcStatus": "清除此测试用例状态",
     "tcView.menu.debug": "使用此测试用例调试",

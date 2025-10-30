@@ -102,6 +102,11 @@ export interface SortTcsMsg extends BaseMsg {
     type: 'sortTcs';
     order: TcSortOrder;
 }
+export interface ReorderTcMsg extends BaseMsg {
+    type: 'reorderTc';
+    fromIdx: number;
+    toIdx: number;
+}
 export interface OpenFileMsg extends BaseMsg {
     type: 'openFile';
     path: string;
@@ -160,6 +165,7 @@ export type WebviewMsg =
     | ToggleTcFileMsg
     | DelTcMsg
     | SortTcsMsg
+    | ReorderTcMsg
     | OpenFileMsg
     | ChooseSrcFileMsg
     | RemoveSrcFileMsg
