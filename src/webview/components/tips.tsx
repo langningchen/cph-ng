@@ -66,6 +66,7 @@ const Tips = () => {
                     item: 'cph-ng.compilation.useWrapper',
                 }),
         },
+        { msg: t('tipMessage10') },
     ];
     const [idx, setIdx] = useState(
         Math.floor(Math.random() * tipMessages.length),

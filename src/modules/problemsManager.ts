@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { SHA256 } from 'crypto-js';
 import { unlink, writeFile } from 'fs/promises';
 import { basename, dirname, extname, join } from 'path';
 import * as vscode from 'vscode';
@@ -773,18 +774,21 @@ export default class ProblemsManager {
             return;
         }
 
-        // Get the input data
         const stdinData = await tcIo2Str(tc.stdin);
 
-        // Write input to a temporary file
+        const hash = SHA256(
+            `${fullProblem.problem.src.path}-tc${msg.idx}-${stdinData}`,
+        )
+            .toString()
+            .substring(0, 16);
+        const srcExt = extname(fullProblem.problem.src.path);
         const inputFilePath = join(
             Settings.cache.directory,
             'io',
-            `input_tc${msg.idx}.txt`,
+            `${hash}.in${srcExt}`,
         );
         await writeFile(inputFilePath, stdinData);
 
-        // Compile the program first
         const compileResult = await Compiler.compileAll(
             fullProblem.problem,
             srcLang,
@@ -816,9 +820,8 @@ export default class ProblemsManager {
         let debugConfig: vscode.DebugConfiguration;
 
         if (['cpp', 'cc', 'cxx', 'c++', 'c'].includes(ext)) {
-            // C/C++ debug configuration
             debugConfig = {
-                name: `Debug Test Case #${msg.idx + 1}`,
+                name: `CPH-NG Debug TC#${msg.idx + 1}`,
                 type: 'cppdbg',
                 request: 'launch',
                 program: executablePath,
@@ -838,13 +841,12 @@ export default class ProblemsManager {
                 stdin: inputFilePath,
             };
         } else if (ext === 'java') {
-            // Java debug configuration
             const className = basename(
                 fullProblem.problem.src.path,
                 extname(fullProblem.problem.src.path),
             );
             debugConfig = {
-                name: `Debug Test Case #${msg.idx + 1}`,
+                name: `CPH-NG Debug TC#${msg.idx + 1}`,
                 type: 'java',
                 request: 'launch',
                 mainClass: className,
@@ -860,18 +862,6 @@ export default class ProblemsManager {
             return;
         }
 
-        // Show info message
-        Io.info(
-            vscode.l10n.t(
-                'Starting debugger for test case #{idx}. Input will be read from: {path}',
-                {
-                    idx: msg.idx + 1,
-                    path: inputFilePath,
-                },
-            ),
-        );
-
-        // Start debugging
         await vscode.debug.startDebugging(undefined, debugConfig);
     }
 }
