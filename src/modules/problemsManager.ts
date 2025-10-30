@@ -780,7 +780,7 @@ export default class ProblemsManager {
             `${fullProblem.problem.src.path}-tc${msg.idx}-${stdinData}`,
         )
             .toString()
-            .substring(0, 16);
+            .substring(0, 32);
         const srcExt = extname(fullProblem.problem.src.path);
         const inputFilePath = join(
             Settings.cache.directory,
@@ -845,13 +845,26 @@ export default class ProblemsManager {
                 fullProblem.problem.src.path,
                 extname(fullProblem.problem.src.path),
             );
+            await vscode.workspace
+                .openTextDocument(inputFilePath)
+                .then((doc) => {
+                    vscode.window.showTextDocument(doc, {
+                        viewColumn: vscode.ViewColumn.Beside,
+                        preview: false,
+                    });
+                });
+            Io.info(
+                vscode.l10n.t(
+                    'Java debugging does not support automatic stdin redirection. The input file has been opened. Please copy the input manually.',
+                ),
+            );
             debugConfig = {
                 name: `CPH-NG Debug TC#${msg.idx + 1}`,
                 type: 'java',
                 request: 'launch',
                 mainClass: className,
                 console: 'integratedTerminal',
-                args: `< ${inputFilePath}`,
+                args: [],
             };
         } else {
             Io.error(
