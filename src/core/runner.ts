@@ -184,7 +184,10 @@ export class Runner {
             await ProblemsManager.dataRefresh();
 
             const runResult = await this.doRun(
-                await lang.runCommand(compileData.src.outputPath, problem.compilationSettings),
+                await lang.runCommand(
+                    compileData.src.outputPath,
+                    problem.compilationSettings,
+                ),
                 problem.timeLimit,
                 tc.stdin,
                 abortController,
