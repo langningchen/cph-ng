@@ -20,20 +20,20 @@ export default async function run({ github, context, core }) {
         const releasedLabelName = 'released';
 
         core.info(
-            `Fetching open issues labeled '${labelName}' to update for release v${version} (pre-release: ${preRelease})...`,
+            `Fetching closed issues labeled '${labelName}' to update for release v${version} (pre-release: ${preRelease})...`,
         );
 
         /** @type {Array<import('@octokit/rest').RestEndpointMethodTypes['issues']['listForRepo']['response']['data'][number]>} */
         const issues = await github.paginate(github.rest.issues.listForRepo, {
             owner,
             repo,
-            state: 'open',
+            state: 'closed',
             labels: labelName,
             per_page: 100,
         });
 
         if (!issues.length) {
-            core.info('No open issues with the label found.');
+            core.info('No closed issues with the label found.');
             return;
         }
 
@@ -90,21 +90,9 @@ export default async function run({ github, context, core }) {
                 core.info(
                     `Added label '${releasedLabelName}' to #${issue.number}.`,
                 );
-
-                // Close issue only if it's not a pre-release
-                if (!preRelease) {
-                    await github.rest.issues.update({
-                        owner,
-                        repo,
-                        issue_number: issue.number,
-                        state: 'closed',
-                    });
-                    core.info(`Closed issue #${issue.number}.`);
-                } else {
-                    core.info(
-                        `Pre-release: Issue #${issue.number} labeled but kept open.`,
-                    );
-                }
+                core.info(
+                    `Updated labels for issue #${issue.number} (issue is already closed).`,
+                );
             } catch (err) {
                 core.warning(
                     `Failed to process #${issue.number}: ${err.message}`,
