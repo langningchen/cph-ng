@@ -49,7 +49,7 @@
     "problemTitle.dialog.field.time": "Time limit (ms)",
     "problemTitle.dialog.field.title": "Title",
     "problemTitle.dialog.field.url": "URL (optional)",
-    "problemTitle.dialog.field.compilationSettings": "Compilation Settings (Optional)",
+    "problemTitle.dialog.field.compilationSettings": "Compilation Settings (optional)",
     "problemTitle.dialog.field.compiler": "Compiler",
     "problemTitle.dialog.field.compilerArgs": "Compiler Arguments",
     "problemTitle.dialog.field.runner": "Runner",

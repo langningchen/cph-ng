@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import Logger from '../helpers/logger';
-import { Problem, Problem as Problem_0_2_3 } from './types';
+import { Problem, Problem as Problem_0_2_4 } from './types';
 import { Problem as Problem_0_0_1 } from './types/0.0.1';
 import { Problem as Problem_0_0_3 } from './types/0.0.3';
 import { Problem as Problem_0_0_4 } from './types/0.0.4';
@@ -24,10 +24,12 @@ import { Problem as Problem_0_0_5 } from './types/0.0.5';
 import { Problem as Problem_0_1_0 } from './types/0.1.0';
 import { Problem as Problem_0_1_1 } from './types/0.1.1';
 import { Problem as Problem_0_2_1 } from './types/0.2.1';
+import { Problem as Problem_0_2_3 } from './types/0.2.3';
 
 const logger = new Logger('migration');
 
 export type OldProblem =
+    | Problem_0_2_3
     | Problem_0_2_1
     | Problem_0_1_1
     | Problem_0_1_0
@@ -37,6 +39,11 @@ export type OldProblem =
     | Problem_0_0_1;
 
 const migrateFunctions: Record<string, (oldProblem: any) => any> = {
+    '0.2.3': (problem: Problem_0_2_3): Problem_0_2_4 =>
+        ({
+            ...problem,
+            version: '0.2.4',
+        }) satisfies Problem_0_2_4,
     '0.2.1': (problem: Problem_0_2_1): Problem_0_2_3 =>
         ({
             ...problem,
