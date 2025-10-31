@@ -42,7 +42,7 @@ jobs:
           BUILD_TYPE: 'Auto build'
 
       - name: Comment Issues
-        if: success() && github.event_name == 'push'
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: ./.github/actions/comment-linked-issues
 
       - name: Label PR Issues
