@@ -80,7 +80,7 @@
     "tcView.stdout": "Output",
     "tcView.time": "{{time}} ms",
     "tipMessage1": "Pressing Ctrl+Alt+B can quickly create, import a problem or run all test cases.",
-    "tipMessage10": "You can debug your code with a specific test case input by clicking the Debug button on any test case.",
+    "tipMessage10": "You can debug your code with a specific test case input by right-clicking on any test case and selecting 'Debug with this test case'.",
     "tipMessage2": "Holding Ctrl when clicking a run button will force a recompile.",
     "tipMessage3": "Holding Alt when clicking a run button will skip compiling.",
     "tipMessage4": "You can ask an AI agent to call the #cphNgRunTestCases tool to help you.",
