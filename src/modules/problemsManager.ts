@@ -781,7 +781,7 @@ export default class ProblemsManager {
                 `${fullProblem.problem.src.path}-tc${msg.idx}-${stdinData}`,
             )
                 .toString()
-                .substring(0, 32);
+                .substring(0, 8);
             const srcExt = extname(fullProblem.problem.src.path);
             const inputFilePath = join(
                 Settings.cache.directory,
