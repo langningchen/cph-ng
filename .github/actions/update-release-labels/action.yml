@@ -1,7 +1,7 @@
 name: Update Release Labels
 description:
   Update labels on issues labeled 'waiting-for-release' after a release. Changes
-  label to 'released' and closes issues for regular releases.
+  label to 'released' on issues that are already closed.
 inputs: {}
 runs:
   using: composite
@@ -11,5 +11,5 @@ runs:
       with:
         script: |
           const { join } = await import('path');
-          const { default: run } = await import(join(process.env.GITHUB_WORKSPACE, '.github', 'actions', 'close-waiting-issues', 'index.js'));
+          const { default: run } = await import(join(process.env.GITHUB_WORKSPACE, '.github', 'actions', 'update-release-labels', 'index.js'));
           await run({ github, context, core });

@@ -99,6 +99,6 @@ export default async function run({ github, context, core }) {
             }
         }
     } catch (outerErr) {
-        core.setFailed(`close-waiting-issues failed: ${outerErr.message}`);
+        core.setFailed(`update-release-labels failed: ${outerErr.message}`);
     }
 }

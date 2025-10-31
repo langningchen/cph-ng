@@ -101,7 +101,7 @@ export default async function run({ github, context, core }) {
                 );
 
                 // Close the issue immediately after adding the label
-                if (issueState === 'OPEN') {
+                if (issueState && issueState.toLowerCase() === 'open') {
                     await github.rest.issues.update({
                         owner,
                         repo,
