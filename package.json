@@ -216,6 +216,11 @@
                         "type": "boolean",
                         "default": false,
                         "markdownDescription": "%cph-ng.configuration.runner.properties.useRunner.markdownDescription%"
+                    },
+                    "cph-ng.runner.unlimitedStack": {
+                        "type": "boolean",
+                        "default": false,
+                        "markdownDescription": "%cph-ng.configuration.runner.properties.unlimitedStack.markdownDescription%"
                     }
                 }
             },

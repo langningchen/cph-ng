@@ -19,20 +19,20 @@ export default async function run({ github, context, core }) {
         const releasedLabelName = 'released';
 
         core.info(
-            `Fetching open issues labeled '${labelName}' to comment and close for release v${version}...`,
+            `Fetching closed issues labeled '${labelName}' to update for release v${version}...`,
         );
 
         /** @type {Array<import('@octokit/rest').RestEndpointMethodTypes['issues']['listForRepo']['response']['data'][number]>} */
         const issues = await github.paginate(github.rest.issues.listForRepo, {
             owner,
             repo,
-            state: 'open',
+            state: 'closed',
             labels: labelName,
             per_page: 100,
         });
 
         if (!issues.length) {
-            core.info('No open issues with the label found.');
+            core.info('No closed issues with the label found.');
             return;
         }
 
@@ -55,13 +55,8 @@ export default async function run({ github, context, core }) {
                     issue_number: issue.number,
                     body,
                 });
-                await github.rest.issues.update({
-                    owner,
-                    repo,
-                    issue_number: issue.number,
-                    state: 'closed',
-                });
 
+                // Remove waiting-for-release label
                 try {
                     await github.rest.issues.removeLabel({
                         owner,
@@ -84,6 +79,7 @@ export default async function run({ github, context, core }) {
                     }
                 }
 
+                // Add released label
                 await github.rest.issues.addLabels({
                     owner,
                     repo,
@@ -93,7 +89,9 @@ export default async function run({ github, context, core }) {
                 core.info(
                     `Added label '${releasedLabelName}' to #${issue.number}.`,
                 );
-                core.info(`Commented and closed #${issue.number}.`);
+                core.info(
+                    `Updated labels for issue #${issue.number} (issue is already closed).`,
+                );
             } catch (err) {
                 core.warning(
                     `Failed to process #${issue.number}: ${err.message}`,
@@ -101,6 +99,6 @@ export default async function run({ github, context, core }) {
             }
         }
     } catch (outerErr) {
-        core.setFailed(`close-waiting-issues failed: ${outerErr.message}`);
+        core.setFailed(`update-release-labels failed: ${outerErr.message}`);
     }
 }

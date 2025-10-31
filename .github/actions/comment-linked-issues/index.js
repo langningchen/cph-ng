@@ -121,6 +121,17 @@ export default async function run({ github, context, core }) {
                     labels: [labelName],
                 });
                 core.info(`Added label '${labelName}' to issue #${number}.`);
+
+                // Close the issue immediately after adding the label
+                if (issue.state === 'open') {
+                    await github.rest.issues.update({
+                        owner,
+                        repo,
+                        issue_number: number,
+                        state: 'closed',
+                    });
+                    core.info(`Closed issue #${number}.`);
+                }
             }
 
             const exists = comments.some(

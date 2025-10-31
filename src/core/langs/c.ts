@@ -81,8 +81,19 @@ export class LangC extends Lang {
 
             const compilerArgs = args.split(/\s+/).filter(Boolean);
 
+            const cmdArgs = [
+                compiler,
+                src.path,
+                ...compilerArgs,
+                '-o',
+                outputPath,
+            ];
+            if (Settings.runner.unlimitedStack && type() === 'Windows_NT') {
+                cmdArgs.push('-Wl,--stack,268435456');
+            }
+
             const result = await ProcessExecutor.execute({
-                cmd: [compiler, src.path, ...compilerArgs, '-o', outputPath],
+                cmd: cmdArgs,
                 ac,
                 timeout,
             });

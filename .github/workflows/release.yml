@@ -163,11 +163,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Close Issues
-        if: success() && steps.version.outputs.pre_release != 'true'
-        uses: ./.github/actions/close-waiting-issues
+      - name: Update Release Labels
+        if: success()
+        uses: ./.github/actions/update-release-labels
         env:
           VERSION: ${{ steps.version.outputs.version }}
+          PRE_RELEASE: ${{ steps.version.outputs.pre_release }}
 
   deploy-docs:
     runs-on: ubuntu-latest

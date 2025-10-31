@@ -79,7 +79,7 @@ export class FileSystemProvider implements vscode.FileSystemProvider {
                             'stdin',
                             {
                                 data: tc.stdin.useFile
-                                    ? vscode.Uri.parse(tc.stdin.path)
+                                    ? vscode.Uri.file(tc.stdin.path)
                                     : tc.stdin.data,
                                 set: async (data: string) => {
                                     tc.stdin = await write2TcIo(tc.stdin, data);
@@ -90,7 +90,7 @@ export class FileSystemProvider implements vscode.FileSystemProvider {
                             'answer',
                             {
                                 data: tc.answer.useFile
-                                    ? vscode.Uri.parse(tc.answer.path)
+                                    ? vscode.Uri.file(tc.answer.path)
                                     : tc.answer.data,
                                 set: async (data: string) => {
                                     tc.answer = await write2TcIo(
@@ -106,7 +106,7 @@ export class FileSystemProvider implements vscode.FileSystemProvider {
                             'stdout',
                             {
                                 data: tc.result.stdout.useFile
-                                    ? vscode.Uri.parse(tc.result.stdout.path)
+                                    ? vscode.Uri.file(tc.result.stdout.path)
                                     : tc.result.stdout.data,
                                 set: async (data: string) => {
                                     if (!tc.result) {
@@ -123,7 +123,7 @@ export class FileSystemProvider implements vscode.FileSystemProvider {
                             'stderr',
                             {
                                 data: tc.result.stderr.useFile
-                                    ? vscode.Uri.parse(tc.result.stderr.path)
+                                    ? vscode.Uri.file(tc.result.stderr.path)
                                     : tc.result.stderr.data,
                                 set: async (data: string) => {
                                     if (!tc.result) {

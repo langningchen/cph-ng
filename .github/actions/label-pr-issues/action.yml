@@ -1,0 +1,13 @@
+name: Label PR Issues
+description: Label issues referenced by merged pull requests
+inputs: {}
+runs:
+  using: composite
+  steps:
+    - name: Label issues from merged PR
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { join } = await import('path');
+          const { default: run } = await import(join(process.env.GITHUB_WORKSPACE, '.github', 'actions', 'label-pr-issues', 'index.js'));
+          await run({ github, context, core });

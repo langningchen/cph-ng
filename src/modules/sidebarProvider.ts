@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import EventEmitter from 'events';
+import { EventEmitter } from 'events';
 import * as vscode from 'vscode';
 import Io from '../helpers/io';
 import Logger from '../helpers/logger';

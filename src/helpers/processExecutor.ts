@@ -141,8 +141,18 @@ export default class ProcessExecutor {
         await writeFile(outputFile, '');
         await writeFile(errorFile, '');
 
+        const runnerCmd = [
+            runnerPath,
+            cmd.join(' '),
+            inputFile,
+            outputFile,
+            errorFile,
+        ];
+        if (Settings.runner.unlimitedStack) {
+            runnerCmd.push('--unlimited-stack');
+        }
         const process = await this.createProcess({
-            cmd: [runnerPath, cmd.join(' '), inputFile, outputFile, errorFile],
+            cmd: runnerCmd,
         });
         const timeoutId = setTimeout(() => {
             this.logger.warn(

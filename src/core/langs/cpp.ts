@@ -123,13 +123,17 @@ export class LangCpp extends Lang {
                 );
             } else {
                 const compilerArgs = args.split(/\s+/).filter(Boolean);
-                compileCommands.push([
+                const cmdArgs = [
                     compiler,
                     src.path,
                     ...compilerArgs,
                     '-o',
                     outputPath,
-                ]);
+                ];
+                if (Settings.runner.unlimitedStack && type() === 'Windows_NT') {
+                    cmdArgs.push('-Wl,--stack,268435456');
+                }
+                compileCommands.push(cmdArgs);
             }
             this.logger.info('Starting compilation', {
                 compileCommands,
