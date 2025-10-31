@@ -29,61 +29,59 @@ export default async function run({ github, context, core }) {
     const owner = context.repo.owner;
     const repo = context.repo.repo;
     const prNumber = pr.number;
-    const prBody = pr.body || '';
-    const prTitle = pr.title || '';
 
-    const issueSet = new Set();
-
-    function collectIssuesFromText(text) {
-        if (!text) {
-            return;
-        }
-        // Match #123, fixes #123, closes #123, resolves #123, etc.
-        const patterns = [
-            /#(\d+)/g,
-            /\b(?:fix|fixes|fixed|close|closes|closed|resolve|resolves|resolved)\s+#(\d+)/gi,
-        ];
-        for (const pattern of patterns) {
-            for (const m of text.matchAll(pattern)) {
-                const num = Number(m[1]);
-                if (num) {
-                    issueSet.add(num);
+    // Use GitHub's GraphQL API to get closing issues references
+    core.info(`Fetching linked issues for PR #${prNumber} via GraphQL API...`);
+    
+    const query = `
+        query($owner: String!, $repo: String!, $prNumber: Int!) {
+            repository(owner: $owner, name: $repo) {
+                pullRequest(number: $prNumber) {
+                    closingIssuesReferences(first: 100) {
+                        nodes {
+                            number
+                            state
+                            labels(first: 10) {
+                                nodes {
+                                    name
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
+    `;
 
-    collectIssuesFromText(prTitle);
-    collectIssuesFromText(prBody);
-
-    if (issueSet.size === 0) {
-        core.info('No linked issues found in PR title or body.');
+    let linkedIssues = [];
+    try {
+        const result = await github.graphql(query, {
+            owner,
+            repo,
+            prNumber,
+        });
+        
+        linkedIssues = result?.repository?.pullRequest?.closingIssuesReferences?.nodes || [];
+        core.info(`Found ${linkedIssues.length} linked issue(s) via GraphQL.`);
+    } catch (err) {
+        core.warning(`Failed to fetch linked issues via GraphQL: ${err.message}`);
         return;
     }
 
-    const issues = Array.from(issueSet);
+    if (linkedIssues.length === 0) {
+        core.info('No linked issues found for this PR.');
+        return;
+    }
+
     const labelName = 'waiting-for-release';
 
-    for (const number of issues) {
+    for (const issue of linkedIssues) {
         try {
-            const { data: issue } = await github.rest.issues.get({
-                owner,
-                repo,
-                issue_number: number,
-            });
+            const number = issue.number;
+            const issueState = issue.state;
+            const issueLabels = issue.labels?.nodes || [];
 
-            if (issue.pull_request) {
-                core.info(`#${number} is a pull request; skipping.`);
-                continue;
-            }
-
-            const hasLabel =
-                Array.isArray(issue.labels) &&
-                issue.labels.some((l) =>
-                    typeof l === 'string'
-                        ? l === labelName
-                        : l?.name === labelName,
-                );
+            const hasLabel = issueLabels.some((l) => l.name === labelName);
 
             if (hasLabel) {
                 core.info(`Issue #${number} already has label '${labelName}'.`);
@@ -99,7 +97,7 @@ export default async function run({ github, context, core }) {
                 );
                 
                 // Close the issue immediately after adding the label
-                if (issue.state === 'open') {
+                if (issueState === 'OPEN') {
                     await github.rest.issues.update({
                         owner,
                         repo,
@@ -111,7 +109,7 @@ export default async function run({ github, context, core }) {
             }
         } catch (err) {
             core.warning(
-                `Failed to process issue #${number}: ${err.message}`,
+                `Failed to process issue #${issue.number}: ${err.message}`,
             );
         }
     }
