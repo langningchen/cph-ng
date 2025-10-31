@@ -9,7 +9,6 @@
 export default async function run({ github, context, core }) {
     try {
         const version = process.env.VERSION;
-        const preRelease = process.env.PRE_RELEASE === 'true';
         if (!version) {
             core.setFailed('VERSION env is required.');
             return;
@@ -20,7 +19,7 @@ export default async function run({ github, context, core }) {
         const releasedLabelName = 'released';
 
         core.info(
-            `Fetching closed issues labeled '${labelName}' to update for release v${version} (pre-release: ${preRelease})...`,
+            `Fetching closed issues labeled '${labelName}' to update for release v${version}...`,
         );
 
         /** @type {Array<import('@octokit/rest').RestEndpointMethodTypes['issues']['listForRepo']['response']['data'][number]>} */
