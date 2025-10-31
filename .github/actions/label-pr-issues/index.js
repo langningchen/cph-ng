@@ -97,7 +97,7 @@ export default async function run({ github, context, core }) {
                 core.info(
                     `Added label '${labelName}' to issue #${number} (referenced by PR #${prNumber}).`,
                 );
-                
+
                 // Close the issue immediately after adding the label
                 if (issue.state === 'open') {
                     await github.rest.issues.update({
@@ -110,9 +110,7 @@ export default async function run({ github, context, core }) {
                 }
             }
         } catch (err) {
-            core.warning(
-                `Failed to process issue #${number}: ${err.message}`,
-            );
+            core.warning(`Failed to process issue #${number}: ${err.message}`);
         }
     }
 }

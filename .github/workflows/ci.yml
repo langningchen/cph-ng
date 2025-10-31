@@ -46,7 +46,9 @@ jobs:
         uses: ./.github/actions/comment-linked-issues
 
       - name: Label PR Issues
-        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged
+        if:
+          github.event_name == 'pull_request' && github.event.action == 'closed'
+          && github.event.pull_request.merged
         uses: ./.github/actions/label-pr-issues
 
       - name: Upload Artifact

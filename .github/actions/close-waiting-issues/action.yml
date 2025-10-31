@@ -1,6 +1,7 @@
 name: Update Release Labels
 description:
-  Update labels on issues labeled 'waiting-for-release' after a release. Changes label to 'released' and closes issues for regular releases.
+  Update labels on issues labeled 'waiting-for-release' after a release. Changes
+  label to 'released' and closes issues for regular releases.
 inputs: {}
 runs:
   using: composite
