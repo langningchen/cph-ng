@@ -51,6 +51,7 @@ const TcsView = ({ problem }: TcsViewProps) => {
 
     const handleDragOver = (e: React.DragEvent, idx: number) => {
         e.preventDefault();
+        e.stopPropagation();
         if (draggedIdx !== null && draggedIdx !== idx) {
             setDragOverIdx(idx);
         }
@@ -75,8 +76,15 @@ const TcsView = ({ problem }: TcsViewProps) => {
         setExpandedStates([]);
     };
 
-    const handleDragLeave = () => {
-        setDragOverIdx(null);
+    const handleDragLeave = (e: React.DragEvent, idx: number) => {
+        // Only clear dragOverIdx if we're actually leaving this specific element
+        // and not just moving to a child element
+        if (e.currentTarget.contains(e.relatedTarget as Node)) {
+            return;
+        }
+        if (dragOverIdx === idx) {
+            setDragOverIdx(null);
+        }
     };
 
     return (
@@ -103,7 +111,7 @@ const TcsView = ({ problem }: TcsViewProps) => {
                                         onDragStart={() => handleDragStart(idx)}
                                         onDragOver={(e) => handleDragOver(e, idx)}
                                         onDragEnd={handleDragEnd}
-                                        onDragLeave={handleDragLeave}
+                                        onDragLeave={(e) => handleDragLeave(e, idx)}
                                         isDragging={draggedIdx === idx}
                                         isDragOver={dragOverIdx === idx}
                                     />

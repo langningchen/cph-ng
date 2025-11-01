@@ -133,7 +133,7 @@ const TcView = ({
                         }}
                         onDragLeave={(e) => {
                             e.stopPropagation();
-                            if (onDragLeave) onDragLeave();
+                            if (onDragLeave) onDragLeave(e);
                         }}
                         sx={{
                             '& > span': { margin: '0 !important' },
