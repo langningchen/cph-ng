@@ -58,19 +58,8 @@ const TcView = ({
 }: TcViewProp) => {
     const { t } = useTranslation();
     const running = isRunningVerdict(tc.result?.verdict);
-    const stdinRef = React.useRef<HTMLDivElement>(null);
-    const answerRef = React.useRef<HTMLDivElement>(null);
 
     const emitUpdate = () => msg({ type: 'updateTc', idx, tc });
-
-    const focusAnswer = () => {
-        if (answerRef.current) {
-            const textarea = answerRef.current.querySelector('textarea');
-            if (textarea) {
-                textarea.focus();
-            }
-        }
-    };
 
     return (
         <ErrorBoundary>
@@ -238,76 +227,73 @@ const TcView = ({
                                 smallGap
                                 column
                             >
-                                <div ref={stdinRef}>
-                                    <TcDataView
-                                        label={t('tcView.stdin')}
-                                        value={tc.stdin}
-                                        onBlur={(value) => {
-                                            tc.stdin = {
-                                                useFile: false,
-                                                data: value,
-                                            };
-                                            emitUpdate();
-                                        }}
-                                        onChooseFile={() =>
-                                            msg({
-                                                type: 'chooseTcFile',
-                                                label: 'stdin',
-                                                idx,
-                                            })
-                                        }
-                                        onToggleFile={() => {
-                                            msg({
-                                                type: 'toggleTcFile',
-                                                label: 'stdin',
-                                                idx,
-                                            });
-                                        }}
-                                        onDbClick={() => {
-                                            msg({
-                                                type: 'openFile',
-                                                path: `/tcs/${idx}/stdin`,
-                                                isVirtual: true,
-                                            });
-                                        }}
-                                        autoFocus={tc.isExpand && !tc.stdin.data && !tc.answer.data}
-                                        onTabKey={focusAnswer}
-                                    />
-                                </div>
-                                <div ref={answerRef}>
-                                    <TcDataView
-                                        label={t('tcView.answer')}
-                                        value={tc.answer}
-                                        onBlur={(value) => {
-                                            tc.answer = {
-                                                useFile: false,
-                                                data: value,
-                                            };
-                                            emitUpdate();
-                                        }}
-                                        onChooseFile={() => {
-                                            msg({
-                                                type: 'chooseTcFile',
-                                                label: 'answer',
-                                                idx,
-                                            });
-                                        }}
-                                        onToggleFile={() => {
-                                            msg({
-                                                type: 'toggleTcFile',
-                                                label: 'answer',
-                                                idx,
-                                            });
-                                        }}
-                                        onDbClick={() => {
-                                            msg({
-                                                type: 'openFile',
-                                                path: `/tcs/${idx}/answer`,
-                                                isVirtual: true,
-                                            });
-                                        }}
-                                    />
-                                </div>
+                                <TcDataView
+                                    label={t('tcView.stdin')}
+                                    value={tc.stdin}
+                                    onBlur={(value) => {
+                                        tc.stdin = {
+                                            useFile: false,
+                                            data: value,
+                                        };
+                                        emitUpdate();
+                                    }}
+                                    onChooseFile={() =>
+                                        msg({
+                                            type: 'chooseTcFile',
+                                            label: 'stdin',
+                                            idx,
+                                        })
+                                    }
+                                    onToggleFile={() => {
+                                        msg({
+                                            type: 'toggleTcFile',
+                                            label: 'stdin',
+                                            idx,
+                                        });
+                                    }}
+                                    onDbClick={() => {
+                                        msg({
+                                            type: 'openFile',
+                                            path: `/tcs/${idx}/stdin`,
+                                            isVirtual: true,
+                                        });
+                                    }}
+                                    autoFocus={tc.isExpand && !tc.stdin.data && !tc.answer.data}
+                                    tabIndex={idx * 2 + 1}
+                                />
+                                <TcDataView
+                                    label={t('tcView.answer')}
+                                    value={tc.answer}
+                                    onBlur={(value) => {
+                                        tc.answer = {
+                                            useFile: false,
+                                            data: value,
+                                        };
+                                        emitUpdate();
+                                    }}
+                                    onChooseFile={() => {
+                                        msg({
+                                            type: 'chooseTcFile',
+                                            label: 'answer',
+                                            idx,
+                                        });
+                                    }}
+                                    onToggleFile={() => {
+                                        msg({
+                                            type: 'toggleTcFile',
+                                            label: 'answer',
+                                            idx,
+                                        });
+                                    }}
+                                    onDbClick={() => {
+                                        msg({
+                                            type: 'openFile',
+                                            path: `/tcs/${idx}/answer`,
+                                            isVirtual: true,
+                                        });
+                                    }}
+                                    tabIndex={idx * 2 + 2}
+                                />
                             </CphFlex>
                             {tc.result && (
                                 <>

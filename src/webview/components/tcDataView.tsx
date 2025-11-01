@@ -50,7 +50,7 @@ interface CodeMirrorSectionProps {
     outputActions?: OutputActions;
     readOnly?: boolean;
     autoFocus?: boolean;
-    onTabKey?: () => void;
+    tabIndex?: number;
 }
 
 const ansiToReact = (ansi: string) => {
@@ -115,7 +115,7 @@ const TcDataView = ({
     outputActions,
     readOnly,
     autoFocus,
-    onTabKey,
+    tabIndex,
 }: CodeMirrorSectionProps) => {
     const { t } = useTranslation();
     const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -260,12 +260,7 @@ const TcDataView = ({
                                 })
                             }
                             onBlur={(e) => onBlur && onBlur(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Tab' && onTabKey) {
-                                    e.preventDefault();
-                                    onTabKey();
-                                }
-                            }}
+                            tabIndex={tabIndex}
                             maxRows={10}
                             style={
                                 {
