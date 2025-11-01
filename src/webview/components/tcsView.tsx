@@ -34,8 +34,18 @@ const TcsView = ({ problem }: TcsViewProps) => {
     const { t } = useTranslation();
     const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
     const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+    const [expandedStates, setExpandedStates] = useState<boolean[]>([]);
 
     const handleDragStart = (idx: number) => {
+        // Save current expansion states
+        const states = problem.tcs.map(tc => tc.isExpand);
+        setExpandedStates(states);
+        
+        // Collapse all test cases
+        problem.tcs.forEach(tc => {
+            tc.isExpand = false;
+        });
+        
         setDraggedIdx(idx);
     };
 
@@ -50,8 +60,19 @@ const TcsView = ({ problem }: TcsViewProps) => {
         if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
             msg({ type: 'reorderTc', fromIdx: draggedIdx, toIdx: dragOverIdx });
         }
+        
+        // Restore expansion states
+        if (expandedStates.length > 0) {
+            problem.tcs.forEach((tc, idx) => {
+                if (idx < expandedStates.length) {
+                    tc.isExpand = expandedStates[idx];
+                }
+            });
+        }
+        
         setDraggedIdx(null);
         setDragOverIdx(null);
+        setExpandedStates([]);
     };
 
     const handleDragLeave = () => {

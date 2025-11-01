@@ -16,7 +16,6 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import DeleteIcon from '@mui/icons-material/Delete';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -92,14 +91,8 @@ const TcView = ({
                         tc.isExpand = expanded;
                         emitUpdate();
                     }}
-                    draggable
-                    onDragStart={onDragStart}
-                    onDragOver={onDragOver}
-                    onDragEnd={onDragEnd}
-                    onDragLeave={onDragLeave}
                     sx={{
                         borderLeft: `4px solid`,
-                        cursor: isDragging ? 'grabbing' : 'grab',
                         transition: 'all 0.2s',
                         opacity: isDragging ? 0.5 : 1,
                         ...(isDragOver && {
@@ -136,22 +129,29 @@ const TcView = ({
                     }}
                 >
                     <AccordionSummary
+                        draggable
+                        onDragStart={(e) => {
+                            e.stopPropagation();
+                            if (onDragStart) onDragStart();
+                        }}
+                        onDragOver={(e) => {
+                            e.stopPropagation();
+                            if (onDragOver) onDragOver(e);
+                        }}
+                        onDragEnd={(e) => {
+                            e.stopPropagation();
+                            if (onDragEnd) onDragEnd();
+                        }}
+                        onDragLeave={(e) => {
+                            e.stopPropagation();
+                            if (onDragLeave) onDragLeave();
+                        }}
                         sx={{
                             '& > span': { margin: '0 !important' },
+                            cursor: isDragging ? 'grabbing' : 'grab',
                         }}
                     >
                         <CphFlex smallGap>
-                            <Tooltip title={t('tcView.dragHandle')}>
-                                <DragIndicatorIcon 
-                                    sx={{ 
-                                        cursor: 'grab',
-                                        color: 'rgba(127, 127, 127, 0.6)',
-                                        '&:hover': {
-                                            color: 'rgba(127, 127, 127, 1)',
-                                        }
-                                    }} 
-                                />
-                            </Tooltip>
                             <CphFlex flex={1}>
                                 <CphText fontWeight={'bold'}>
                                     #{idx + 1}
