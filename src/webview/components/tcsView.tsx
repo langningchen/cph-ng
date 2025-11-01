@@ -39,7 +39,7 @@ const TcsView = ({ problem }: TcsViewProps) => {
     const handleDragStart = (idx: number, e: React.DragEvent) => {
         // Save current expansion states mapped to test case objects
         const states = problem.tcs.map((tc) => ({ tc, isExpand: tc.isExpand }));
-        setExpandedStates(states.map(s => s.isExpand));
+        setExpandedStates(states.map((s) => s.isExpand));
 
         // Collapse all test cases
         problem.tcs.forEach((tc) => {
@@ -82,7 +82,11 @@ const TcsView = ({ problem }: TcsViewProps) => {
         if (expandedStates.length > 0) {
             // Calculate the reordered positions to restore correct states
             const reorderedStates = [...expandedStates];
-            if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
+            if (
+                draggedIdx !== null &&
+                dragOverIdx !== null &&
+                draggedIdx !== dragOverIdx
+            ) {
                 const [movedState] = reorderedStates.splice(draggedIdx, 1);
                 reorderedStates.splice(dragOverIdx, 0, movedState);
             }
@@ -139,7 +143,7 @@ const TcsView = ({ problem }: TcsViewProps) => {
                                     <Box
                                         key={originalIdx}
                                         onDragOver={(e) =>
-                                            handleDragOver(e, originalIdx)
+                                            handleDragOver(e, displayIdx)
                                         }
                                     >
                                         <TcView
