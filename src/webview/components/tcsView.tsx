@@ -36,7 +36,7 @@ const TcsView = ({ problem }: TcsViewProps) => {
     const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
     const [expandedStates, setExpandedStates] = useState<boolean[]>([]);
 
-    const handleDragStart = (idx: number) => {
+    const handleDragStart = (idx: number, e: React.DragEvent) => {
         // Save current expansion states
         const states = problem.tcs.map(tc => tc.isExpand);
         setExpandedStates(states);
@@ -46,31 +46,27 @@ const TcsView = ({ problem }: TcsViewProps) => {
             tc.isExpand = false;
         });
         
+        // Create a transparent drag image to hide default ghost
+        const dragImage = document.createElement('div');
+        dragImage.style.opacity = '0';
+        document.body.appendChild(dragImage);
+        e.dataTransfer.setDragImage(dragImage, 0, 0);
+        setTimeout(() => document.body.removeChild(dragImage), 0);
+        
         setDraggedIdx(idx);
+        setDragOverIdx(idx);
     };
 
     const handleDragOver = (e: React.DragEvent, idx: number) => {
         e.preventDefault();
-        e.stopPropagation();
-        if (draggedIdx !== null && draggedIdx !== idx) {
+        if (draggedIdx !== null) {
             setDragOverIdx(idx);
         }
     };
 
     const handleDragEnd = () => {
-        if (draggedIdx !== null && dragOverIdx !== null) {
-            // Calculate the actual target index
-            let targetIdx = dragOverIdx;
-            
-            // If dragging down, and the target is after the dragged item,
-            // we need to adjust because removing the item shifts indices
-            if (draggedIdx < dragOverIdx) {
-                targetIdx = dragOverIdx - 1;
-            }
-            
-            if (draggedIdx !== targetIdx) {
-                msg({ type: 'reorderTc', fromIdx: draggedIdx, toIdx: targetIdx });
-            }
+        if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
+            msg({ type: 'reorderTc', fromIdx: draggedIdx, toIdx: dragOverIdx });
         }
         
         // Restore expansion states
@@ -87,6 +83,20 @@ const TcsView = ({ problem }: TcsViewProps) => {
         setExpandedStates([]);
     };
 
+    // Calculate display order for preview
+    const getDisplayOrder = () => {
+        if (draggedIdx === null || dragOverIdx === null) {
+            return problem.tcs.map((_, idx) => idx);
+        }
+        
+        const order = problem.tcs.map((_, idx) => idx);
+        const [removed] = order.splice(draggedIdx, 1);
+        order.splice(dragOverIdx, 0, removed);
+        return order;
+    };
+
+    const displayOrder = getDisplayOrder();
+
     return (
         <Container>
             <CphFlex column>
@@ -99,58 +109,28 @@ const TcsView = ({ problem }: TcsViewProps) => {
                             <AcCongrats />
                         ) : null}
                         <Box width={'100%'}>
-                            {problem.tcs.map((tc, idx) =>
-                                tc.result?.verdict &&
-                                hiddenStatuses.includes(
-                                    tc.result?.verdict.name,
-                                ) ? null : (
-                                    <React.Fragment key={idx}>
-                                        {/* Drop zone before each test case */}
-                                        <Box
-                                            onDragOver={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                if (draggedIdx !== null && draggedIdx !== idx) {
-                                                    setDragOverIdx(idx);
-                                                }
-                                            }}
-                                            sx={{
-                                                height: '4px',
-                                                ...(dragOverIdx === idx && {
-                                                    backgroundColor: '#2196f3',
-                                                    height: '4px',
-                                                }),
-                                            }}
-                                        />
+                            {displayOrder.map((originalIdx, displayIdx) => {
+                                const tc = problem.tcs[originalIdx];
+                                if (tc.result?.verdict &&
+                                    hiddenStatuses.includes(tc.result?.verdict.name)) {
+                                    return null;
+                                }
+                                
+                                return (
+                                    <Box
+                                        key={originalIdx}
+                                        onDragOver={(e) => handleDragOver(e, displayIdx)}
+                                    >
                                         <TcView
                                             tc={tc}
-                                            idx={idx}
-                                            onDragStart={() => handleDragStart(idx)}
+                                            idx={originalIdx}
+                                            onDragStart={(e) => handleDragStart(originalIdx, e)}
                                             onDragEnd={handleDragEnd}
-                                            isDragging={draggedIdx === idx}
+                                            isDragging={draggedIdx === originalIdx}
                                         />
-                                    </React.Fragment>
-                                ),
-                            )}
-                            {/* Drop zone after the last test case */}
-                            {problem.tcs.length > 0 && (
-                                <Box
-                                    onDragOver={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        if (draggedIdx !== null) {
-                                            setDragOverIdx(problem.tcs.length);
-                                        }
-                                    }}
-                                    sx={{
-                                        height: '4px',
-                                        ...(dragOverIdx === problem.tcs.length && {
-                                            backgroundColor: '#2196f3',
-                                            height: '4px',
-                                        }),
-                                    }}
-                                />
-                            )}
+                                    </Box>
+                                );
+                            })}
                             <Box
                                 onClick={() => msg({ type: 'addTc' })}
                                 sx={{

@@ -38,7 +38,7 @@ import TcDataView from './tcDataView';
 interface TcViewProp {
     tc: TC;
     idx: number;
-    onDragStart?: () => void;
+    onDragStart?: (e: React.DragEvent) => void;
     onDragEnd?: () => void;
     isDragging?: boolean;
 }
@@ -111,7 +111,7 @@ const TcView = ({
                         draggable
                         onDragStart={(e) => {
                             e.stopPropagation();
-                            if (onDragStart) onDragStart();
+                            if (onDragStart) onDragStart(e);
                         }}
                         onDragEnd={(e) => {
                             e.stopPropagation();
