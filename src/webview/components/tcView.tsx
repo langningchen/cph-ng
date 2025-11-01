@@ -39,22 +39,16 @@ interface TcViewProp {
     tc: TC;
     idx: number;
     onDragStart?: () => void;
-    onDragOver?: (e: React.DragEvent) => void;
     onDragEnd?: () => void;
-    onDragLeave?: () => void;
     isDragging?: boolean;
-    isDragOver?: boolean;
 }
 
 const TcView = ({ 
     tc, 
     idx, 
     onDragStart, 
-    onDragOver, 
     onDragEnd, 
-    onDragLeave,
-    isDragging = false,
-    isDragOver = false 
+    isDragging = false 
 }: TcViewProp) => {
     const { t } = useTranslation();
     const running = isRunningVerdict(tc.result?.verdict);
@@ -84,9 +78,6 @@ const TcView = ({
                         borderLeft: `4px solid`,
                         transition: 'all 0.2s',
                         opacity: isDragging ? 0.5 : 1,
-                        ...(isDragOver && {
-                            boxShadow: '0 -3px 0 0 #2196f3 inset',
-                        }),
                         ...(window.easterEgg
                             ? (() => {
                                   const hash = MD5(JSON.stringify(tc)).words;
@@ -122,17 +113,9 @@ const TcView = ({
                             e.stopPropagation();
                             if (onDragStart) onDragStart();
                         }}
-                        onDragOver={(e) => {
-                            e.stopPropagation();
-                            if (onDragOver) onDragOver(e);
-                        }}
                         onDragEnd={(e) => {
                             e.stopPropagation();
                             if (onDragEnd) onDragEnd();
-                        }}
-                        onDragLeave={(e) => {
-                            e.stopPropagation();
-                            if (onDragLeave) onDragLeave(e);
                         }}
                         sx={{
                             '& > span': { margin: '0 !important' },
