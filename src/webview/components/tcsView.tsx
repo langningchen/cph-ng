@@ -66,6 +66,11 @@ const TcsView = ({ problem }: TcsViewProps) => {
 
     const handleDragEnd = () => {
         if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
+            // Perform the actual reorder in the local array immediately
+            const [movedTc] = problem.tcs.splice(draggedIdx, 1);
+            problem.tcs.splice(dragOverIdx, 0, movedTc);
+            
+            // Send message to persist the change
             msg({ type: 'reorderTc', fromIdx: draggedIdx, toIdx: dragOverIdx });
         }
         
