@@ -477,7 +477,7 @@ export default class ProblemsManager {
             return;
         }
         const tcs = fullProblem.problem.tcs;
-        
+
         if (msg.order === 'default') {
             // No sorting needed for default order
             return;
@@ -508,7 +508,7 @@ export default class ProblemsManager {
                 return 0;
             });
         }
-        
+
         await this.dataRefresh();
     }
     public static async reorderTc(msg: msgs.ReorderTcMsg): Promise<void> {
@@ -517,17 +517,21 @@ export default class ProblemsManager {
             return;
         }
         const tcs = fullProblem.problem.tcs;
-        
-        if (msg.fromIdx < 0 || msg.fromIdx >= tcs.length || 
-            msg.toIdx < 0 || msg.toIdx >= tcs.length) {
+
+        if (
+            msg.fromIdx < 0 ||
+            msg.fromIdx >= tcs.length ||
+            msg.toIdx < 0 ||
+            msg.toIdx >= tcs.length
+        ) {
             return;
         }
-        
+
         // Remove the test case from the original position
         const [movedTc] = tcs.splice(msg.fromIdx, 1);
         // Insert it at the new position
         tcs.splice(msg.toIdx, 0, movedTc);
-        
+
         await this.dataRefresh();
     }
 

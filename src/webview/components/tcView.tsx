@@ -43,12 +43,12 @@ interface TcViewProp {
     isDragging?: boolean;
 }
 
-const TcView = ({ 
-    tc, 
-    idx, 
-    onDragStart, 
-    onDragEnd, 
-    isDragging = false 
+const TcView = ({
+    tc,
+    idx,
+    onDragStart,
+    onDragEnd,
+    isDragging = false,
 }: TcViewProp) => {
     const { t } = useTranslation();
     const running = isRunningVerdict(tc.result?.verdict);
@@ -119,7 +119,7 @@ const TcView = ({
                         }}
                         sx={{
                             '& > span': { margin: '0 !important' },
-                            cursor: isDragging ? 'grabbing' : 'grab',
+                            'cursor': isDragging ? 'grabbing' : 'grab',
                         }}
                     >
                         <CphFlex smallGap>
@@ -240,7 +240,11 @@ const TcView = ({
                                             isVirtual: true,
                                         });
                                     }}
-                                    autoFocus={tc.isExpand && !tc.stdin.data && !tc.answer.data}
+                                    autoFocus={
+                                        tc.isExpand &&
+                                        !tc.stdin.data &&
+                                        !tc.answer.data
+                                    }
                                     tabIndex={idx * 2 + 1}
                                 />
                                 <TcDataView

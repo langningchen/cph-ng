@@ -38,21 +38,21 @@ const TcsView = ({ problem }: TcsViewProps) => {
 
     const handleDragStart = (idx: number, e: React.DragEvent) => {
         // Save current expansion states
-        const states = problem.tcs.map(tc => tc.isExpand);
+        const states = problem.tcs.map((tc) => tc.isExpand);
         setExpandedStates(states);
-        
+
         // Collapse all test cases
-        problem.tcs.forEach(tc => {
+        problem.tcs.forEach((tc) => {
             tc.isExpand = false;
         });
-        
+
         // Create a transparent drag image to hide default ghost
         const dragImage = document.createElement('div');
         dragImage.style.opacity = '0';
         document.body.appendChild(dragImage);
         e.dataTransfer.setDragImage(dragImage, 0, 0);
         setTimeout(() => document.body.removeChild(dragImage), 0);
-        
+
         setDraggedIdx(idx);
         setDragOverIdx(idx);
     };
@@ -65,15 +65,19 @@ const TcsView = ({ problem }: TcsViewProps) => {
     };
 
     const handleDragEnd = () => {
-        if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
+        if (
+            draggedIdx !== null &&
+            dragOverIdx !== null &&
+            draggedIdx !== dragOverIdx
+        ) {
             // Perform the actual reorder in the local array immediately
             const [movedTc] = problem.tcs.splice(draggedIdx, 1);
             problem.tcs.splice(dragOverIdx, 0, movedTc);
-            
+
             // Send message to persist the change
             msg({ type: 'reorderTc', fromIdx: draggedIdx, toIdx: dragOverIdx });
         }
-        
+
         // Restore expansion states
         if (expandedStates.length > 0) {
             problem.tcs.forEach((tc, idx) => {
@@ -82,7 +86,7 @@ const TcsView = ({ problem }: TcsViewProps) => {
                 }
             });
         }
-        
+
         setDraggedIdx(null);
         setDragOverIdx(null);
         setExpandedStates([]);
@@ -93,7 +97,7 @@ const TcsView = ({ problem }: TcsViewProps) => {
         if (draggedIdx === null || dragOverIdx === null) {
             return problem.tcs.map((_, idx) => idx);
         }
-        
+
         const order = problem.tcs.map((_, idx) => idx);
         const [removed] = order.splice(draggedIdx, 1);
         order.splice(dragOverIdx, 0, removed);
@@ -116,22 +120,32 @@ const TcsView = ({ problem }: TcsViewProps) => {
                         <Box width={'100%'}>
                             {displayOrder.map((originalIdx, displayIdx) => {
                                 const tc = problem.tcs[originalIdx];
-                                if (tc.result?.verdict &&
-                                    hiddenStatuses.includes(tc.result?.verdict.name)) {
+                                if (
+                                    tc.result?.verdict &&
+                                    hiddenStatuses.includes(
+                                        tc.result?.verdict.name,
+                                    )
+                                ) {
                                     return null;
                                 }
-                                
+
                                 return (
                                     <Box
                                         key={originalIdx}
-                                        onDragOver={(e) => handleDragOver(e, displayIdx)}
+                                        onDragOver={(e) =>
+                                            handleDragOver(e, displayIdx)
+                                        }
                                     >
                                         <TcView
                                             tc={tc}
                                             idx={originalIdx}
-                                            onDragStart={(e) => handleDragStart(originalIdx, e)}
+                                            onDragStart={(e) =>
+                                                handleDragStart(originalIdx, e)
+                                            }
                                             onDragEnd={handleDragEnd}
-                                            isDragging={draggedIdx === originalIdx}
+                                            isDragging={
+                                                draggedIdx === originalIdx
+                                            }
                                         />
                                     </Box>
                                 );
@@ -139,17 +153,18 @@ const TcsView = ({ problem }: TcsViewProps) => {
                             <Box
                                 onClick={() => msg({ type: 'addTc' })}
                                 sx={{
-                                    minHeight: '40px',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    opacity: 0.5,
+                                    'minHeight': '40px',
+                                    'cursor': 'pointer',
+                                    'display': 'flex',
+                                    'alignItems': 'center',
+                                    'justifyContent': 'center',
+                                    'opacity': 0.5,
                                     '&:hover': {
                                         opacity: 1,
-                                        backgroundColor: 'rgba(127, 127, 127, 0.1)',
+                                        backgroundColor:
+                                            'rgba(127, 127, 127, 0.1)',
                                     },
-                                    transition: 'all 0.2s',
+                                    'transition': 'all 0.2s',
                                 }}
                             >
                                 {t('tcsView.addTcHint')}
