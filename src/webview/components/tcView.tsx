@@ -228,7 +228,11 @@ const TcView = ({
                             />
                         </CphFlex>
                     </AccordionSummary>
-                    <AccordionDetails>
+                    <AccordionDetails
+                        sx={{
+                            padding: '8px 16px',
+                        }}
+                    >
                         <CphFlex column>
                             <CphFlex
                                 smallGap
