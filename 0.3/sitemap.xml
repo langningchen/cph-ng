@@ -1,73 +1,175 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://cph-ng.langningchen.com/0.3/about/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/0.3/about/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/0.3zh/about/"/>
+         <loc>https://cph-ng.langningchen.com/0.3/</loc>
+         <lastmod>2025-11-01</lastmod>
     </url>
     <url>
-        <loc>https://cph-ng.langningchen.com/0.3/faq/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/0.3/faq/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/0.3zh/faq/"/>
+         <loc>https://cph-ng.langningchen.com/0.3/about/</loc>
+         <lastmod>2025-11-01</lastmod>
     </url>
     <url>
-        <loc>https://cph-ng.langningchen.com/0.3/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/0.3/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/0.3zh/"/>
+         <loc>https://cph-ng.langningchen.com/0.3/faq/</loc>
+         <lastmod>2025-11-01</lastmod>
     </url>
     <url>
-        <loc>https://cph-ng.langningchen.com/0.3/modules/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/0.3/modules/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/0.3zh/modules/"/>
+         <loc>https://cph-ng.langningchen.com/0.3/quickStart/</loc>
+         <lastmod>2025-11-01</lastmod>
     </url>
     <url>
-        <loc>https://cph-ng.langningchen.com/0.3/quickStart/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/0.3/quickStart/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/0.3zh/quickStart/"/>
+         <loc>https://cph-ng.langningchen.com/0.3/configuration/</loc>
+         <lastmod>2025-11-01</lastmod>
     </url>
     <url>
-        <loc>https://cph-ng.langningchen.com/0.3/zh/about/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/0.3/zh/about/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/0.3about/"/>
+         <loc>https://cph-ng.langningchen.com/0.3/configuration/basic/</loc>
+         <lastmod>2025-11-01</lastmod>
     </url>
     <url>
-        <loc>https://cph-ng.langningchen.com/0.3/zh/faq/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/0.3/zh/faq/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/0.3faq/"/>
+         <loc>https://cph-ng.langningchen.com/0.3/configuration/brute-force/</loc>
+         <lastmod>2025-11-01</lastmod>
     </url>
     <url>
-        <loc>https://cph-ng.langningchen.com/0.3/zh/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/0.3/zh/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/0.3"/>
+         <loc>https://cph-ng.langningchen.com/0.3/configuration/cache/</loc>
+         <lastmod>2025-11-01</lastmod>
     </url>
     <url>
-        <loc>https://cph-ng.langningchen.com/0.3/zh/modules/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/0.3/zh/modules/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/0.3modules/"/>
+         <loc>https://cph-ng.langningchen.com/0.3/configuration/companion/</loc>
+         <lastmod>2025-11-01</lastmod>
     </url>
     <url>
-        <loc>https://cph-ng.langningchen.com/0.3/zh/quickStart/</loc>
-        <lastmod>2025-10-18</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://cph-ng.langningchen.com/0.3/zh/quickStart/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://cph-ng.langningchen.com/0.3quickStart/"/>
+         <loc>https://cph-ng.langningchen.com/0.3/configuration/comparing/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/configuration/compilation/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/configuration/cph-compat/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/configuration/problem/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/configuration/runner/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/configuration/sidebar/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/contributing/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/contributing/feature-request/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/contributing/pull-request/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/contributing/reporting-a-bug/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/contributing/reporting-a-docs-issue/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/contributing/setting-up-dev-env/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/add-test-case/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/brute-force-compare/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/clear-results/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/compare-output/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/competitive-companion/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/compilation-settings/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/cph-import/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/create-problem/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/delete-problem/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/delete-test-case/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/edit-problem/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/edit-test-case/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/import-problem/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/interactive-problems/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/load-test-cases/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/run-all-tests/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/run-single-test/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/special-judge/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/stop-execution/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/submit-codeforces/</loc>
+         <lastmod>2025-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://cph-ng.langningchen.com/0.3/features/toggle-file-inline/</loc>
+         <lastmod>2025-11-01</lastmod>
     </url>
 </urlset>
