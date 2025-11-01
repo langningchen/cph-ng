@@ -85,8 +85,7 @@ const TcView = ({
                         transition: 'all 0.2s',
                         opacity: isDragging ? 0.5 : 1,
                         ...(isDragOver && {
-                            borderTop: '3px solid #2196f3',
-                            marginTop: '8px',
+                            boxShadow: '0 -3px 0 0 #2196f3 inset',
                         }),
                         ...(window.easterEgg
                             ? (() => {
