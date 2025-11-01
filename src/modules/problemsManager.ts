@@ -471,46 +471,6 @@ export default class ProblemsManager {
         fullProblem.problem.tcs.splice(msg.idx, 1);
         await this.dataRefresh();
     }
-    public static async sortTcs(msg: msgs.SortTcsMsg): Promise<void> {
-        const fullProblem = await this.getFullProblem(msg.activePath);
-        if (!fullProblem) {
-            return;
-        }
-        const tcs = fullProblem.problem.tcs;
-
-        if (msg.order === 'default') {
-            // No sorting needed for default order
-            return;
-        } else if (msg.order === 'pass') {
-            // Sort passing test cases first
-            tcs.sort((a, b) => {
-                const aPass = a.result?.verdict.name === 'AC';
-                const bPass = b.result?.verdict.name === 'AC';
-                if (aPass && !bPass) {
-                    return -1;
-                }
-                if (!aPass && bPass) {
-                    return 1;
-                }
-                return 0;
-            });
-        } else if (msg.order === 'fail') {
-            // Sort failing test cases first
-            tcs.sort((a, b) => {
-                const aPass = a.result?.verdict.name === 'AC';
-                const bPass = b.result?.verdict.name === 'AC';
-                if (!aPass && bPass) {
-                    return -1;
-                }
-                if (aPass && !bPass) {
-                    return 1;
-                }
-                return 0;
-            });
-        }
-
-        await this.dataRefresh();
-    }
     public static async reorderTc(msg: msgs.ReorderTcMsg): Promise<void> {
         const fullProblem = await this.getFullProblem(msg.activePath);
         if (!fullProblem) {

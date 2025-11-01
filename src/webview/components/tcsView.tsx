@@ -37,9 +37,9 @@ const TcsView = ({ problem }: TcsViewProps) => {
     const [expandedStates, setExpandedStates] = useState<boolean[]>([]);
 
     const handleDragStart = (idx: number, e: React.DragEvent) => {
-        // Save current expansion states
-        const states = problem.tcs.map((tc) => tc.isExpand);
-        setExpandedStates(states);
+        // Save current expansion states mapped to test case objects
+        const states = problem.tcs.map((tc) => ({ tc, isExpand: tc.isExpand }));
+        setExpandedStates(states.map(s => s.isExpand));
 
         // Collapse all test cases
         problem.tcs.forEach((tc) => {
@@ -78,11 +78,17 @@ const TcsView = ({ problem }: TcsViewProps) => {
             msg({ type: 'reorderTc', fromIdx: draggedIdx, toIdx: dragOverIdx });
         }
 
-        // Restore expansion states
+        // Restore expansion states by finding original indices before reorder
         if (expandedStates.length > 0) {
+            // Calculate the reordered positions to restore correct states
+            const reorderedStates = [...expandedStates];
+            if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
+                const [movedState] = reorderedStates.splice(draggedIdx, 1);
+                reorderedStates.splice(dragOverIdx, 0, movedState);
+            }
             problem.tcs.forEach((tc, idx) => {
-                if (idx < expandedStates.length) {
-                    tc.isExpand = expandedStates[idx];
+                if (idx < reorderedStates.length) {
+                    tc.isExpand = reorderedStates[idx];
                 }
             });
         }
@@ -133,7 +139,7 @@ const TcsView = ({ problem }: TcsViewProps) => {
                                     <Box
                                         key={originalIdx}
                                         onDragOver={(e) =>
-                                            handleDragOver(e, displayIdx)
+                                            handleDragOver(e, originalIdx)
                                         }
                                     >
                                         <TcView

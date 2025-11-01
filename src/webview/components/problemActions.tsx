@@ -25,7 +25,7 @@ import FileOpenIcon from '@mui/icons-material/FileOpen';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
-import SortIcon from '@mui/icons-material/Sort';
+
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
@@ -92,25 +92,7 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
                             msg({ type: 'loadTcs' });
                         }}
                     />
-                    <CphMenu
-                        menu={{
-                            [t('problemActions.sortTcs.menu.default')]: () => {
-                                msg({ type: 'sortTcs', order: 'default' });
-                            },
-                            [t('problemActions.sortTcs.menu.pass')]: () => {
-                                msg({ type: 'sortTcs', order: 'pass' });
-                            },
-                            [t('problemActions.sortTcs.menu.fail')]: () => {
-                                msg({ type: 'sortTcs', order: 'fail' });
-                            },
-                        }}
-                    >
-                        <CphButton
-                            larger={true}
-                            name={t('problemActions.sortTcs')}
-                            icon={SortIcon}
-                        />
-                    </CphMenu>
+
                     {hasRunning ? (
                         <CphButton
                             larger={true}
