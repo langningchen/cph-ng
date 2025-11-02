@@ -38,7 +38,7 @@ import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isRunningVerdict, Problem } from '../../utils/types';
-import { basename, getCompile, msg } from '../utils';
+import { basename, blurActiveElement, getCompile, msg } from '../utils';
 import CphFlex from './base/cphFlex';
 import CphLink from './base/cphLink';
 import CphMenu from './base/cphMenu';
@@ -111,6 +111,7 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
                             menu={{
                                 [t('problemActions.runTcs.menu.forceCompile')]:
                                     () => {
+                                        blurActiveElement();
                                         msg({
                                             type: 'runTcs',
                                             compile: true,
@@ -118,6 +119,7 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
                                     },
                                 [t('problemActions.runTcs.menu.skipCompile')]:
                                     () => {
+                                        blurActiveElement();
                                         msg({
                                             type: 'runTcs',
                                             compile: false,
@@ -130,6 +132,7 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
                                 name={t('problemActions.runTcs')}
                                 icon={PlaylistPlayIcon}
                                 color={'success'}
+                                onMouseDown={blurActiveElement}
                                 onClick={(e) => {
                                     msg({
                                         type: 'runTcs',

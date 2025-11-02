@@ -27,7 +27,7 @@ import { MD5 } from 'crypto-js';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { isRunningVerdict, TC } from '../../utils/types';
-import { getCompile, msg } from '../utils';
+import { blurActiveElement, getCompile, msg } from '../utils';
 import CphFlex from './base/cphFlex';
 import CphMenu from './base/cphMenu';
 import CphText from './base/cphText';
@@ -158,6 +158,7 @@ const TcView = ({
                             <CphMenu
                                 menu={{
                                     [t('tcView.run.menu.forceCompile')]: () => {
+                                        blurActiveElement();
                                         msg({
                                             type: 'runTc',
                                             idx,
@@ -165,6 +166,7 @@ const TcView = ({
                                         });
                                     },
                                     [t('tcView.run.menu.skipCompile')]: () => {
+                                        blurActiveElement();
                                         msg({
                                             type: 'runTc',
                                             idx,
@@ -178,6 +180,7 @@ const TcView = ({
                                     icon={PlayArrowIcon}
                                     color={'success'}
                                     loading={running}
+                                    onMouseDown={blurActiveElement}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         msg({
