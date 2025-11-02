@@ -52,6 +52,7 @@ class MessageQueue {
     private queue: QueuedMessage[] = [];
     private processing = false;
     private pendingUpdateTc: Map<number, UpdateTcMsg> = new Map();
+    private flushTimer: number | null = null;
 
     async enqueue(msg: WebviewMsg): Promise<void> {
         return new Promise((resolve) => {
@@ -80,11 +81,19 @@ class MessageQueue {
         // For updateTc messages, store them to debounce multiple updates
         if (msg.type === 'updateTc') {
             this.pendingUpdateTc.set(msg.idx, msg);
+            // Schedule a flush if not already scheduled
+            this.scheduleFlush();
             return;
         }
 
         // For run commands, flush all pending updateTc messages first
         if (msg.type === 'runTcs' || msg.type === 'runTc') {
+            // Cancel any pending flush timer
+            if (this.flushTimer !== null) {
+                clearTimeout(this.flushTimer);
+                this.flushTimer = null;
+            }
+
             // Force blur on active element to capture any pending changes
             const activeElement = document.activeElement;
             if (
@@ -95,10 +104,17 @@ class MessageQueue {
                 (activeElement as HTMLElement).blur();
             }
 
-            // Wait for any blur events to be processed
-            await new Promise((resolve) => setTimeout(resolve, 0));
+            // Use a microtask to allow blur event to enqueue updateTc
+            await new Promise((resolve) => queueMicrotask(resolve));
 
-            // Flush all pending updateTc messages
+            // Process any updateTc messages that were queued by the blur event
+            while (this.queue.length > 0 && this.queue[0].msg.type === 'updateTc') {
+                const updateItem = this.queue.shift()!;
+                await this.processMessage(updateItem.msg);
+                updateItem.resolve();
+            }
+
+            // Flush all accumulated pending updateTc messages
             for (const updateMsg of this.pendingUpdateTc.values()) {
                 vscode.postMessage({
                     ...updateMsg,
@@ -112,9 +128,12 @@ class MessageQueue {
         vscode.postMessage({ ...msg, activePath: window.activePath });
     }
 
-    // Periodically flush pending updateTc messages
-    startPeriodicFlush() {
-        setInterval(() => {
+    private scheduleFlush() {
+        if (this.flushTimer !== null) {
+            clearTimeout(this.flushTimer);
+        }
+        this.flushTimer = window.setTimeout(() => {
+            this.flushTimer = null;
             if (this.pendingUpdateTc.size > 0 && !this.processing) {
                 for (const updateMsg of this.pendingUpdateTc.values()) {
                     vscode.postMessage({
@@ -129,7 +148,6 @@ class MessageQueue {
 }
 
 const messageQueue = new MessageQueue();
-messageQueue.startPeriodicFlush();
 
 export const msg = (msg: WebviewMsg) => {
     messageQueue.enqueue(msg);
