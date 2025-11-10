@@ -2269,7 +2269,7 @@
 </div>
 <p>"重要提示" 此选项仅在启用 <code>cph-ng.runner.useRunner</code> 时有效。在不同操作系统上的实现方式不同：</p>
 <div class="highlight"><pre><span></span><code>- **Linux**：在运行时使用 `setrlimit` 将栈大小设置为无限
-- **Windows**：在编译时使用 `/STACK` 链接器标志设置 256MB 栈大小
+- **Windows**：在编译时使用 `-Wl,--stack,268435456` 链接器标志设置 256MB 栈大小
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
