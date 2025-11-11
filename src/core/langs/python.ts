@@ -84,14 +84,19 @@ export class LangPython extends Lang {
 
             const compilerArgs = args.split(/\s+/).filter(Boolean);
 
-            // Compile Python to bytecode using py_compile
+            // Compile Python to bytecode using py_compile to the cache directory
             const result = await ProcessExecutor.execute({
-                cmd: [compiler, '-m', 'py_compile', ...compilerArgs, src.path],
+                cmd: [
+                    compiler,
+                    '-c',
+                    `import py_compile; py_compile.compile('${src.path}', cfile='${outputPath}', doraise=True)`,
+                    ...compilerArgs,
+                ],
                 ac,
                 timeout,
             });
 
-            this.logger.debug('Compilation completed', {
+            this.logger.debug('Compilation completed successfully', {
                 path: src.path,
                 outputPath,
             });
@@ -113,13 +118,13 @@ export class LangPython extends Lang {
                 return { verdict: TCVerdicts.CE, msg: '' };
             }
 
-            // Check if the source file exists (we'll run the source directly)
+            // Check if the compiled .pyc file exists
             return {
-                verdict: await access(src.path, constants.R_OK)
+                verdict: await access(outputPath, constants.R_OK)
                     .then(() => TCVerdicts.UKE)
                     .catch(() => TCVerdicts.CE),
                 msg: '',
-                data: { outputPath: src.path, hash },
+                data: { outputPath, hash },
             };
         } catch (e) {
             this.logger.error('Compilation failed', e);
