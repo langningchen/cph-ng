@@ -23,10 +23,16 @@ import { LangC } from './c';
 import { LangCpp } from './cpp';
 import { LangJava } from './java';
 import { Lang } from './lang';
+import { LangPython } from './python';
 
 export default class Langs {
     private static logger = new Logger('langs');
-    public static langs: Lang[] = [new LangCpp(), new LangC(), new LangJava()];
+    public static langs: Lang[] = [
+        new LangCpp(),
+        new LangC(),
+        new LangJava(),
+        new LangPython(),
+    ];
     public static getLang(
         filePath: string,
         ignoreError: boolean = false,

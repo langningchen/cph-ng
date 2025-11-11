@@ -172,6 +172,26 @@
                         "default": "",
                         "markdownDescription": "%cph-ng.configuration.compilation.properties.javaRunArgs.markdownDescription%"
                     },
+                    "cph-ng.compilation.pythonCompiler": {
+                        "type": "string",
+                        "default": "pypy3",
+                        "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonCompiler.markdownDescription%"
+                    },
+                    "cph-ng.compilation.pythonArgs": {
+                        "type": "string",
+                        "default": "",
+                        "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonArgs.markdownDescription%"
+                    },
+                    "cph-ng.compilation.pythonRunner": {
+                        "type": "string",
+                        "default": "pypy3",
+                        "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonRunner.markdownDescription%"
+                    },
+                    "cph-ng.compilation.pythonRunArgs": {
+                        "type": "string",
+                        "default": "",
+                        "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonRunArgs.markdownDescription%"
+                    },
                     "cph-ng.compilation.objcopy": {
                         "type": "string",
                         "default": "objcopy",

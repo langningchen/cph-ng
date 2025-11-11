@@ -75,6 +75,18 @@ class CompilationSection extends SettingsSection {
     get javaRunArgs(): string {
         return this.get('javaRunArgs') as string;
     }
+    get pythonCompiler(): string {
+        return this.get('pythonCompiler') as string;
+    }
+    get pythonArgs(): string {
+        return this.get('pythonArgs') as string;
+    }
+    get pythonRunner(): string {
+        return this.get('pythonRunner') as string;
+    }
+    get pythonRunArgs(): string {
+        return this.get('pythonRunArgs') as string;
+    }
     get objcopy(): string {
         return this.get('objcopy') as string;
     }
