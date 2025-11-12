@@ -33,8 +33,10 @@ import {
     workspace,
 } from 'vscode';
 import { version } from '../../package.json';
-import LlmFileReader from '../ai/llmFileReader';
+import LlmDataInspector from '../ai/llmDataInspector';
 import LlmTcRunner from '../ai/llmTcRunner';
+import LlmTestCaseEditor from '../ai/llmTestCaseEditor';
+import LlmTestCaseLister from '../ai/llmTestCaseLister';
 import Io from '../helpers/io';
 import Logger from '../helpers/logger';
 import Companion from '../modules/companion';
@@ -128,7 +130,13 @@ export default class ExtensionManager {
                 lm.registerTool('run_test_cases', new LlmTcRunner()),
             );
             context.subscriptions.push(
-                lm.registerTool('read_problem_file', new LlmFileReader()),
+                lm.registerTool('inspect_problem_data', new LlmDataInspector()),
+            );
+            context.subscriptions.push(
+                lm.registerTool('list_test_cases', new LlmTestCaseLister()),
+            );
+            context.subscriptions.push(
+                lm.registerTool('upsert_test_case', new LlmTestCaseEditor()),
             );
             context.subscriptions.push(
                 window.onDidChangeActiveTextEditor(

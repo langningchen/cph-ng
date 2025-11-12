@@ -23,6 +23,7 @@ import { Problem } from '../../utils/types';
 import { msg } from '../utils';
 import AcCongrats from './acCongrats';
 import CphFlex from './base/cphFlex';
+import ErrorBoundary from './base/errorBoundary';
 import NoTcs from './noTcs';
 import TcView from './tcView';
 
@@ -141,18 +142,23 @@ const TcsView = ({ problem }: TcsViewProps) => {
                                             handleDragOver(e, displayIdx)
                                         }
                                     >
-                                        <TcView
-                                            tc={tc}
-                                            idx={originalIdx}
-                                            id={id}
-                                            onDragStart={(e) =>
-                                                handleDragStart(originalIdx, e)
-                                            }
-                                            onDragEnd={handleDragEnd}
-                                            isDragging={
-                                                draggedIdx === originalIdx
-                                            }
-                                        />
+                                        <ErrorBoundary>
+                                            <TcView
+                                                tc={tc}
+                                                idx={originalIdx}
+                                                id={id}
+                                                onDragStart={(e) =>
+                                                    handleDragStart(
+                                                        originalIdx,
+                                                        e,
+                                                    )
+                                                }
+                                                onDragEnd={handleDragEnd}
+                                                isDragging={
+                                                    draggedIdx === originalIdx
+                                                }
+                                            />
+                                        </ErrorBoundary>
                                     </Box>
                                 );
                             })}

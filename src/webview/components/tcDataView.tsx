@@ -32,7 +32,6 @@ import { basename, msg } from '../utils';
 import CphFlex from './base/cphFlex';
 import CphLink from './base/cphLink';
 import CphText from './base/cphText';
-import ErrorBoundary from './base/errorBoundary';
 import CphButton from './cphButton';
 
 interface OutputActions {
@@ -156,137 +155,135 @@ const TcDataView = ({
         return null;
     }
     return (
-        <ErrorBoundary>
-            <CphFlex
-                column
-                smallGap
-            >
-                <CphFlex justifyContent={'space-between'}>
-                    <CphFlex
-                        flex={1}
-                        flexWrap={'wrap'}
-                    >
-                        <CphText onDoubleClick={onDbClick}>{label}</CphText>
-                        {internalValue.useFile && (
-                            <CphLink
-                                name={internalValue.path}
-                                onClick={() => {
-                                    msg({
-                                        type: 'openFile',
-                                        path: internalValue.path,
-                                    });
-                                }}
-                            >
-                                {basename(internalValue.path)}
-                            </CphLink>
-                        )}
-                    </CphFlex>
-                    {outputActions && (
-                        <CphButton
-                            name={t('tcDataView.compare')}
-                            icon={DifferenceIcon}
-                            onClick={outputActions.onCompare}
-                        />
-                    )}
-                    {onToggleFile && (
-                        <CphButton
-                            name={t('tcDataView.toggleFile')}
-                            icon={ChangeCircleIcon}
-                            onClick={onToggleFile}
-                        />
-                    )}
-                    {internalValue.useFile ? (
-                        readOnly || (
-                            <CphButton
-                                name={t('tcDataView.clearFile')}
-                                icon={ClearIcon}
-                                onClick={() => onChange && onChange('')}
-                            />
-                        )
-                    ) : (
-                        <>
-                            {readOnly || (
-                                <CphButton
-                                    name={t('tcDataView.loadFile')}
-                                    icon={FileOpenIcon}
-                                    onClick={onChooseFile}
-                                />
-                            )}
-                            {outputActions && (
-                                <CphButton
-                                    name={t('tcDataView.setAnswer')}
-                                    icon={ArrowUpwardIcon}
-                                    onClick={outputActions.onSetAnswer}
-                                />
-                            )}
-                            <CphButton
-                                name={t('tcDataView.copy')}
-                                icon={ContentCopyIcon}
-                                onClick={() => {
-                                    navigator.clipboard
-                                        .writeText(internalValue.data)
-                                        .then(() => {
-                                            setSnackbarOpen(true);
-                                        })
-                                        .catch((e) => {
-                                            console.error(
-                                                'Failed to copy code: ',
-                                                e,
-                                            );
-                                        });
-                                }}
-                            />
-                        </>
-                    )}
-                </CphFlex>
-                {internalValue.useFile ||
-                    (readOnly ? (
-                        <div
-                            style={{
-                                ...commonStyle,
-                                maxHeight: '20em',
-                            }}
-                        >
-                            {ansiToReact(internalValue.data)}
-                        </div>
-                    ) : (
-                        <TextareaAutosize
-                            ref={textareaRef}
-                            value={internalValue.data}
-                            onChange={(e) => {
-                                onChange && onChange(e.target.value);
-                                setInternalValue({
-                                    useFile: false,
-                                    data: e.target.value,
+        <CphFlex
+            column
+            smallGap
+        >
+            <CphFlex justifyContent={'space-between'}>
+                <CphFlex
+                    flex={1}
+                    flexWrap={'wrap'}
+                >
+                    <CphText onDoubleClick={onDbClick}>{label}</CphText>
+                    {internalValue.useFile && (
+                        <CphLink
+                            name={internalValue.path}
+                            onClick={() => {
+                                msg({
+                                    type: 'openFile',
+                                    path: internalValue.path,
                                 });
                             }}
-                            tabIndex={tabIndex}
-                            maxRows={10}
-                            style={
-                                {
-                                    ...commonStyle,
-                                    resize: 'none',
-                                } as any
-                            }
+                        >
+                            {basename(internalValue.path)}
+                        </CphLink>
+                    )}
+                </CphFlex>
+                {outputActions && (
+                    <CphButton
+                        name={t('tcDataView.compare')}
+                        icon={DifferenceIcon}
+                        onClick={outputActions.onCompare}
+                    />
+                )}
+                {onToggleFile && (
+                    <CphButton
+                        name={t('tcDataView.toggleFile')}
+                        icon={ChangeCircleIcon}
+                        onClick={onToggleFile}
+                    />
+                )}
+                {internalValue.useFile ? (
+                    readOnly || (
+                        <CphButton
+                            name={t('tcDataView.clearFile')}
+                            icon={ClearIcon}
+                            onClick={() => onChange && onChange('')}
                         />
-                    ))}
-                <Snackbar
-                    open={snackbarOpen}
-                    autoHideDuration={3000}
-                    onClose={handleCloseSnackbar}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                >
-                    <Alert
-                        onClose={handleCloseSnackbar}
-                        severity={'success'}
-                        variant={'filled'}
-                        sx={{ width: '100%' }}
-                    >
-                        {t('tcDataView.snackbar.message')}
-                    </Alert>
-                </Snackbar>
+                    )
+                ) : (
+                    <>
+                        {readOnly || (
+                            <CphButton
+                                name={t('tcDataView.loadFile')}
+                                icon={FileOpenIcon}
+                                onClick={onChooseFile}
+                            />
+                        )}
+                        {outputActions && (
+                            <CphButton
+                                name={t('tcDataView.setAnswer')}
+                                icon={ArrowUpwardIcon}
+                                onClick={outputActions.onSetAnswer}
+                            />
+                        )}
+                        <CphButton
+                            name={t('tcDataView.copy')}
+                            icon={ContentCopyIcon}
+                            onClick={() => {
+                                navigator.clipboard
+                                    .writeText(internalValue.data)
+                                    .then(() => {
+                                        setSnackbarOpen(true);
+                                    })
+                                    .catch((e) => {
+                                        console.error(
+                                            'Failed to copy code: ',
+                                            e,
+                                        );
+                                    });
+                            }}
+                        />
+                    </>
+                )}
             </CphFlex>
-        </ErrorBoundary>
+            {internalValue.useFile ||
+                (readOnly ? (
+                    <div
+                        style={{
+                            ...commonStyle,
+                            maxHeight: '20em',
+                        }}
+                    >
+                        {ansiToReact(internalValue.data)}
+                    </div>
+                ) : (
+                    <TextareaAutosize
+                        ref={textareaRef}
+                        value={internalValue.data}
+                        onChange={(e) => {
+                            onChange && onChange(e.target.value);
+                            setInternalValue({
+                                useFile: false,
+                                data: e.target.value,
+                            });
+                        }}
+                        tabIndex={tabIndex}
+                        maxRows={10}
+                        style={
+                            {
+                                ...commonStyle,
+                                resize: 'none',
+                            } as any
+                        }
+                    />
+                ))}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={handleCloseSnackbar}
+                    severity={'success'}
+                    variant={'filled'}
+                    sx={{ width: '100%' }}
+                >
+                    {t('tcDataView.snackbar.message')}
+                </Alert>
+            </Snackbar>
+        </CphFlex>
     );
 };
 

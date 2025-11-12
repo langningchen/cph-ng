@@ -33,7 +33,7 @@ const CphButton = (props: CphButtonProps) => {
             <IconButton
                 color={'primary'}
                 size={props.larger ? 'medium' : 'small'}
-                {...delProps(props, ['icon', 'name'])}
+                {...delProps(props, ['icon', 'name', 'larger'])}
             >
                 <props.icon fontSize={'small'} />
             </IconButton>

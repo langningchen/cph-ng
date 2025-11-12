@@ -45,50 +45,120 @@
                 "name": "run_test_cases",
                 "toolReferenceName": "cphNgRunTestCases",
                 "displayName": "Run CPH-NG Test Cases",
-                "modelDescription": "A tool to execute one or all test cases for the active competitive programming problem using CPH-NG. Useful for verifying code correctness against provided examples or custom inputs. This tool is especially useful after the AI has generated or modified code for a competitive programming problem, allowing it to automatically validate the solution against existing test cases.",
-                "userDescription": "Runs test cases for the current competitive programming problem (CPH-NG).",
+                "modelDescription": "Executes one test case (identified by its stable UUID) or the entire suite for the active competitive programming problem managed by CPH-NG. Use this to validate solutions after edits or to confirm fixes against previously failing cases.",
+                "userDescription": "Runs one or all test cases for the current CPH-NG problem.",
                 "canBeReferencedInPrompt": true,
                 "icon": "$(play)",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "idx": {
-                            "type": "number",
-                            "description": "The 1-based index of the specific test case to run (e.g., 1 for the first test case). If omitted, all test cases will be run."
+                        "id": {
+                            "type": "string",
+                            "description": "Optional test case ID (UUID) to run. Omit to execute the full test suite."
                         }
                     }
                 }
             },
             {
-                "name": "read_problem_file",
-                "toolReferenceName": "cphNgReadProblemFile",
-                "displayName": "Read CPH-NG Problem File",
-                "modelDescription": "A tool to read the content of a specific file associated with a competitive programming problem's test case. This includes input (stdin), actual output (stdout), expected output (answer), and error output (stderr) files. Useful for analyzing test case data or debugging. This tool can only read files explicitly linked to CPH-NG test cases, not arbitrary files.",
-                "userDescription": "Reads the content of a specific input, output, answer, or error file for a competitive programming problem (CPH-NG).",
+                "name": "inspect_problem_data",
+                "toolReferenceName": "cphNgInspectProblemData",
+                "displayName": "Inspect CPH-NG Test Data",
+                "modelDescription": "Retrieves a specific data slice for a CPH-NG test case - stdin, expected answer, stdout, stderr, verdict, runtime, memory usage, or diagnostic message. Use this to examine precise artifacts after executing tests.",
+                "userDescription": "Reads a chosen data field (stdin/answer/stdout/stderr/verdict/message/time/memory) for a test case by ID.",
                 "canBeReferencedInPrompt": true,
                 "icon": "$(file)",
                 "inputSchema": {
                     "type": "object",
                     "required": [
-                        "fileType"
+                        "dataType",
+                        "id"
                     ],
                     "properties": {
-                        "fileType": {
+                        "dataType": {
                             "type": "string",
                             "enum": [
-                                "input",
-                                "output",
+                                "stdin",
                                 "answer",
-                                "error"
+                                "stdout",
+                                "stderr",
+                                "verdict",
+                                "message",
+                                "time",
+                                "memory"
                             ],
-                            "description": "The type of file to read: 'input' (standard input), 'output' (standard output from execution), 'answer' (expected output), or 'error' (standard error from execution)."
+                            "description": "Which data field to inspect for the specified test case."
                         },
-                        "idx": {
-                            "type": "number",
-                            "description": "The 1-based index of the test case to which the file belongs. For example, 1 for the first test case. If omitted, the tool will assume the request is for a general problem file (if applicable, though usually test case specific). It's highly recommended to provide this for test case related files."
+                        "id": {
+                            "type": "string",
+                            "description": "The test case ID (UUID) whose data should be fetched."
                         }
                     }
                 }
+            },
+            {
+                "name": "list_test_cases",
+                "toolReferenceName": "cphNgListTestCases",
+                "displayName": "List CPH-NG Test IDs",
+                "modelDescription": "Returns all test case identifiers for the active problem, along with their latest verdict/time summary. Call this before running or editing tests to work with stable IDs instead of indices.",
+                "userDescription": "Lists every test case ID for the current CPH-NG problem.",
+                "canBeReferencedInPrompt": true,
+                "icon": "$(list-unordered)",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {}
+                }
+            },
+            {
+                "name": "upsert_test_case",
+                "toolReferenceName": "cphNgUpsertTestCase",
+                "displayName": "Add or Update CPH-NG Test Case",
+                "modelDescription": "Creates a new test case or updates an existing one for the active competitive programming problem. Accepts inline stdin/answer content and clears previous verdicts so the test can be re-run. Use this to capture newly discovered counterexamples or tweak expected answers.",
+                "userDescription": "Adds a new test case or updates an existing one (stdin/answer) for the current CPH-NG problem.",
+                "canBeReferencedInPrompt": true,
+                "icon": "$(edit)",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "description": "Optional test case ID to update. Omit to append a new test case."
+                        },
+                        "stdin": {
+                            "type": "string",
+                            "description": "Standard input content to store inline for the test case."
+                        },
+                        "answer": {
+                            "type": "string",
+                            "description": "Expected output content to store inline for the test case."
+                        }
+                    },
+                    "anyOf": [
+                        {
+                            "required": [
+                                "stdin"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "answer"
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "languageModelPrompts": [
+            {
+                "id": "cph-ng.analyzeFailure",
+                "name": "CPH-NG: Analyze failing test",
+                "description": "Diagnose a failing competitive programming attempt by running the managed test cases, inspecting the failing data, and outlining next steps.",
+                "prompt": "You are assisting with a competitive programming workspace managed by CPH-NG.\n- Call `list_test_cases` to discover available test IDs.\n- Run either the failing test (`run_test_cases` with the specific ID) or the entire suite as needed.\n- Inspect stdin/answer/stdout/stderr or other result fields via `inspect_problem_data`.\n- Summarize findings, root causes, and recommended code fixes.\n- If you discover a new regression input, persist it with `upsert_test_case` before concluding.\n\nUser request:\n{{input}}"
+            },
+            {
+                "id": "cph-ng.designEdgeCases",
+                "name": "CPH-NG: Generate edge tests",
+                "description": "Brainstorm tricky inputs for the active problem and persist them as executable CPH-NG test cases.",
+                "prompt": "You are helping design stress tests for a competitive programming solution managed by CPH-NG.\n- Call `list_test_cases` to understand existing coverage.\n- For each new scenario, decide on stdin and expected answer values.\n- Save them with `upsert_test_case` (omit `id` to append a fresh case).\n- Suggest re-running with `run_test_cases` to validate the new coverage.\n\nUser request:\n{{input}}"
             }
         ],
         "views": {

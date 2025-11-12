@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { Problem } from '../../utils/types';
 import { msg } from '../utils';
 import CphMenu from './base/cphMenu';
+import ErrorBoundary from './base/errorBoundary';
 import ProblemActions from './problemActions';
 import ProblemTitle from './problemTitle';
 import TcsView from './tcsView';
@@ -34,10 +35,12 @@ const ProblemView = ({ problem, startTime }: ProblemViewProps) => {
     const { t } = useTranslation();
     return (
         <>
-            <ProblemTitle
-                problem={problem}
-                startTime={startTime}
-            />
+            <ErrorBoundary>
+                <ProblemTitle
+                    problem={problem}
+                    startTime={startTime}
+                />
+            </ErrorBoundary>
             <Box
                 flex={1}
                 width={'100%'}
@@ -49,17 +52,21 @@ const ProblemView = ({ problem, startTime }: ProblemViewProps) => {
                 bgcolor={'rgba(127, 127, 127, 0.05)'}
                 paddingY={2}
             >
-                <CphMenu
-                    menu={{
-                        [t('problemView.menu.clearStatus')]: () => {
-                            msg({ type: 'clearStatus' });
-                        },
-                    }}
-                >
-                    <TcsView problem={problem} />
-                </CphMenu>
+                <ErrorBoundary>
+                    <CphMenu
+                        menu={{
+                            [t('problemView.menu.clearStatus')]: () => {
+                                msg({ type: 'clearStatus' });
+                            },
+                        }}
+                    >
+                        <TcsView problem={problem} />
+                    </CphMenu>
+                </ErrorBoundary>
             </Box>
-            <ProblemActions problem={problem} />
+            <ErrorBoundary>
+                <ProblemActions problem={problem} />
+            </ErrorBoundary>
         </>
     );
 };

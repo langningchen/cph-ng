@@ -5,6 +5,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 ## [Unreleased]
 
 - **fix**: update URL host checks to use endsWith for better accuracy
+- **refactor**: llm tools and enhance test case management
 
 ## 0.3.7
 

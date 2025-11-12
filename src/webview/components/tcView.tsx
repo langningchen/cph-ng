@@ -59,159 +59,157 @@ const TcView = ({
     const emitUpdate = () => msg({ type: 'updateTc', id, tc });
 
     return (
-        <ErrorBoundary>
-            <CphMenu
-                menu={{
-                    [t('tcView.menu.clearTcStatus')]: () => {
-                        msg({ type: 'clearTcStatus', id });
-                    },
-                    [t('tcView.menu.debug')]: () => {
-                        msg({ type: 'debugTc', id });
-                    },
+        <CphMenu
+            menu={{
+                [t('tcView.menu.clearTcStatus')]: () => {
+                    msg({ type: 'clearTcStatus', id });
+                },
+                [t('tcView.menu.debug')]: () => {
+                    msg({ type: 'debugTc', id });
+                },
+            }}
+        >
+            <Accordion
+                expanded={tc.isExpand}
+                disableGutters={true}
+                onChange={(_, expanded) => {
+                    tc.isExpand = expanded;
+                    emitUpdate();
+                }}
+                sx={{
+                    borderLeft: `4px solid`,
+                    transition: 'all 0.2s',
+                    opacity: isDragging ? 0.5 : 1,
+                    ...(window.easterEgg
+                        ? (() => {
+                              const hash = MD5(JSON.stringify(tc)).words;
+                              let color = 0;
+                              for (let i = 0; i < hash.length; i++) {
+                                  color = (color << 4) + hash[i];
+                              }
+                              color =
+                                  (((color >> 16) & 0xff) << 16) |
+                                  (((color >> 8) & 0xff) << 8) |
+                                  (color & 0xff);
+                              const colorStr = color
+                                  .toString(16)
+                                  .padStart(6, '0');
+                              return {
+                                  borderLeftColor: `#${colorStr}`,
+                                  backgroundColor: `#${colorStr}20`,
+                              };
+                          })()
+                        : tc.result?.verdict
+                          ? {
+                                borderLeftColor: tc.result.verdict.color,
+                                backgroundColor: `${tc.result.verdict.color}20`,
+                            }
+                          : {
+                                borderLeftColor: 'transparent',
+                            }),
                 }}
             >
-                <Accordion
-                    expanded={tc.isExpand}
-                    disableGutters={true}
-                    onChange={(_, expanded) => {
-                        tc.isExpand = expanded;
-                        emitUpdate();
+                <AccordionSummary
+                    draggable
+                    onDragStart={(e) => {
+                        e.stopPropagation();
+                        if (onDragStart) onDragStart(e);
+                    }}
+                    onDragEnd={(e) => {
+                        e.stopPropagation();
+                        if (onDragEnd) onDragEnd();
                     }}
                     sx={{
-                        borderLeft: `4px solid`,
-                        transition: 'all 0.2s',
-                        opacity: isDragging ? 0.5 : 1,
-                        ...(window.easterEgg
-                            ? (() => {
-                                  const hash = MD5(JSON.stringify(tc)).words;
-                                  let color = 0;
-                                  for (let i = 0; i < hash.length; i++) {
-                                      color = (color << 4) + hash[i];
-                                  }
-                                  color =
-                                      (((color >> 16) & 0xff) << 16) |
-                                      (((color >> 8) & 0xff) << 8) |
-                                      (color & 0xff);
-                                  const colorStr = color
-                                      .toString(16)
-                                      .padStart(6, '0');
-                                  return {
-                                      borderLeftColor: `#${colorStr}`,
-                                      backgroundColor: `#${colorStr}20`,
-                                  };
-                              })()
-                            : tc.result?.verdict
-                              ? {
-                                    borderLeftColor: tc.result.verdict.color,
-                                    backgroundColor: `${tc.result.verdict.color}20`,
-                                }
-                              : {
-                                    borderLeftColor: 'transparent',
-                                }),
+                        '& > span': { margin: '0 !important' },
+                        'cursor': isDragging ? 'grabbing' : 'grab',
                     }}
                 >
-                    <AccordionSummary
-                        draggable
-                        onDragStart={(e) => {
-                            e.stopPropagation();
-                            if (onDragStart) onDragStart(e);
-                        }}
-                        onDragEnd={(e) => {
-                            e.stopPropagation();
-                            if (onDragEnd) onDragEnd();
-                        }}
-                        sx={{
-                            '& > span': { margin: '0 !important' },
-                            'cursor': isDragging ? 'grabbing' : 'grab',
-                        }}
-                    >
-                        <CphFlex smallGap>
-                            <CphFlex flex={1}>
-                                <CphText fontWeight={'bold'}>
-                                    #{idx + 1}
-                                </CphText>
-                                <Tooltip title={tc.result?.verdict.fullName}>
-                                    <CphText>{tc.result?.verdict.name}</CphText>
-                                </Tooltip>
-                            </CphFlex>
-                            {!!tc.result?.memory && (
-                                <Chip
-                                    label={t('tcView.memory', {
-                                        memory: tc.result.memory.toFixed(1),
-                                    })}
-                                    size={'small'}
-                                    sx={{
-                                        marginLeft: 'auto',
-                                        fontSize: '0.8rem',
-                                    }}
-                                />
-                            )}
-                            {!!tc.result?.time && (
-                                <Chip
-                                    label={t('tcView.time', {
-                                        time: tc.result.time.toFixed(1),
-                                    })}
-                                    size={'small'}
-                                    sx={{
-                                        marginLeft: 'auto',
-                                        fontSize: '0.8rem',
-                                    }}
-                                />
-                            )}
-                            <CphMenu
-                                menu={{
-                                    [t('tcView.run.menu.forceCompile')]: () => {
-                                        msg({
-                                            type: 'runTc',
-                                            id,
-                                            compile: true,
-                                        });
-                                    },
-                                    [t('tcView.run.menu.skipCompile')]: () => {
-                                        msg({
-                                            type: 'runTc',
-                                            id,
-                                            compile: false,
-                                        });
-                                    },
-                                }}
-                            >
-                                <CphButton
-                                    name={t('tcView.run')}
-                                    icon={PlayArrowIcon}
-                                    color={'success'}
-                                    loading={running}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        msg({
-                                            type: 'runTc',
-                                            id,
-                                            compile: getCompile(e),
-                                        });
-                                    }}
-                                />
-                            </CphMenu>
-                            <CphButton
-                                name={t('tcView.delete')}
-                                icon={DeleteIcon}
-                                color={'error'}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    msg({ type: 'delTc', id });
+                    <CphFlex smallGap>
+                        <CphFlex flex={1}>
+                            <CphText fontWeight={'bold'}>#{idx + 1}</CphText>
+                            <Tooltip title={tc.result?.verdict.fullName}>
+                                <CphText>{tc.result?.verdict.name}</CphText>
+                            </Tooltip>
+                        </CphFlex>
+                        {!!tc.result?.memory && (
+                            <Chip
+                                label={t('tcView.memory', {
+                                    memory: tc.result.memory.toFixed(1),
+                                })}
+                                size={'small'}
+                                sx={{
+                                    marginLeft: 'auto',
+                                    fontSize: '0.8rem',
                                 }}
                             />
-                        </CphFlex>
-                    </AccordionSummary>
-                    <AccordionDetails
-                        sx={{
-                            padding: '8px 16px',
-                        }}
-                    >
-                        <CphFlex column>
-                            <CphFlex
-                                smallGap
-                                column
-                            >
+                        )}
+                        {!!tc.result?.time && (
+                            <Chip
+                                label={t('tcView.time', {
+                                    time: tc.result.time.toFixed(1),
+                                })}
+                                size={'small'}
+                                sx={{
+                                    marginLeft: 'auto',
+                                    fontSize: '0.8rem',
+                                }}
+                            />
+                        )}
+                        <CphMenu
+                            menu={{
+                                [t('tcView.run.menu.forceCompile')]: () => {
+                                    msg({
+                                        type: 'runTc',
+                                        id,
+                                        compile: true,
+                                    });
+                                },
+                                [t('tcView.run.menu.skipCompile')]: () => {
+                                    msg({
+                                        type: 'runTc',
+                                        id,
+                                        compile: false,
+                                    });
+                                },
+                            }}
+                        >
+                            <CphButton
+                                name={t('tcView.run')}
+                                icon={PlayArrowIcon}
+                                color={'success'}
+                                loading={running}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    msg({
+                                        type: 'runTc',
+                                        id,
+                                        compile: getCompile(e),
+                                    });
+                                }}
+                            />
+                        </CphMenu>
+                        <CphButton
+                            name={t('tcView.delete')}
+                            icon={DeleteIcon}
+                            color={'error'}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                msg({ type: 'delTc', id });
+                            }}
+                        />
+                    </CphFlex>
+                </AccordionSummary>
+                <AccordionDetails
+                    sx={{
+                        padding: '8px 16px',
+                    }}
+                >
+                    <CphFlex column>
+                        <CphFlex
+                            smallGap
+                            column
+                        >
+                            <ErrorBoundary>
                                 <TcDataView
                                     label={t('tcView.stdin')}
                                     value={tc.stdin}
@@ -246,6 +244,8 @@ const TcView = ({
                                     autoFocus={tc.isExpand}
                                     tabIndex={idx * 2 + 1}
                                 />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
                                 <TcDataView
                                     label={t('tcView.answer')}
                                     value={tc.answer}
@@ -279,14 +279,16 @@ const TcView = ({
                                     }}
                                     tabIndex={idx * 2 + 2}
                                 />
-                            </CphFlex>
-                            {tc.result && (
-                                <>
-                                    <Divider />
-                                    <CphFlex
-                                        smallGap
-                                        column
-                                    >
+                            </ErrorBoundary>
+                        </CphFlex>
+                        {tc.result && (
+                            <>
+                                <Divider />
+                                <CphFlex
+                                    smallGap
+                                    column
+                                >
+                                    <ErrorBoundary>
                                         <TcDataView
                                             label={t('tcView.stdout')}
                                             value={tc.result.stdout}
@@ -313,6 +315,8 @@ const TcView = ({
                                                 });
                                             }}
                                         />
+                                    </ErrorBoundary>
+                                    <ErrorBoundary>
                                         <TcDataView
                                             label={t('tcView.stderr')}
                                             value={tc.result.stderr}
@@ -325,6 +329,8 @@ const TcView = ({
                                                 });
                                             }}
                                         />
+                                    </ErrorBoundary>
+                                    <ErrorBoundary>
                                         <TcDataView
                                             label={t('tcView.message')}
                                             value={{
@@ -333,14 +339,14 @@ const TcView = ({
                                             }}
                                             readOnly={true}
                                         />
-                                    </CphFlex>
-                                </>
-                            )}
-                        </CphFlex>
-                    </AccordionDetails>
-                </Accordion>
-            </CphMenu>
-        </ErrorBoundary>
+                                    </ErrorBoundary>
+                                </CphFlex>
+                            </>
+                        )}
+                    </CphFlex>
+                </AccordionDetails>
+            </Accordion>
+        </CphMenu>
     );
 };
 
