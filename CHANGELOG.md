@@ -6,6 +6,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 
 - **fix**: update URL host checks to use endsWith for better accuracy
 - **refactor**: llm tools and enhance test case management
+- **feat**: add python support with pypy
 
 ## 0.3.7
 
