@@ -87,6 +87,7 @@ export class Lang {
     }
     public readonly name: string = 'generic';
     public readonly extensions: string[] = [];
+    public readonly enableRunner: boolean = false;
     public async compile(
         src: FileWithHash,
         ac: AbortController,

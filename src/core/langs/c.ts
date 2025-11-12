@@ -36,6 +36,7 @@ export class LangC extends Lang {
     private logger: Logger = new Logger('langC');
     public readonly name = 'C';
     public readonly extensions = ['c'];
+    public readonly enableRunner = true;
     protected async _compile(
         src: FileWithHash,
         ac: AbortController,

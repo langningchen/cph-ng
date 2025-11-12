@@ -56,7 +56,8 @@ export class Runner {
         timeLimit: number,
         stdin: TCIO,
         abortController: AbortController,
-        interactor?: string,
+        interactor: string | undefined,
+        enableRunner: boolean,
     ): Promise<RunnerResult> {
         this.logger.trace('runExecutable', {
             runCommand,
@@ -79,6 +80,7 @@ export class Runner {
                 timeLimit,
                 stdin,
                 abortController,
+                enableRunner,
             );
         }
     }
@@ -88,6 +90,7 @@ export class Runner {
         timeLimit: number,
         stdin: TCIO,
         abortController: AbortController,
+        enableRunner: boolean,
     ): Promise<RunnerResult> {
         if (Settings.runner.useRunner && Settings.compilation.useWrapper) {
             return {
@@ -102,7 +105,7 @@ export class Runner {
             };
         }
         return ProcessResultHandler.toRunner(
-            Settings.runner.useRunner
+            Settings.runner.useRunner && enableRunner
                 ? await ProcessExecutor.executeWithRunner({
                       cmd,
                       timeout: timeLimit + Settings.runner.timeAddition,
@@ -192,6 +195,7 @@ export class Runner {
                 tc.stdin,
                 abortController,
                 compileData.interactor?.outputPath,
+                lang.enableRunner,
             );
             result.time = runResult.time;
             result.memory = runResult.memory;

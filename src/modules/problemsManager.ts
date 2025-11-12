@@ -640,6 +640,7 @@ export default class ProblemsManager {
                 { useFile: false, data: '' },
                 fullProblem.ac,
                 undefined,
+                false,
             );
             if (generatorRunResult.verdict !== TCVerdicts.UKE) {
                 if (generatorRunResult.verdict !== TCVerdicts.RJ) {
@@ -660,6 +661,7 @@ export default class ProblemsManager {
                 { useFile: false, data: generatorRunResult.stdout },
                 fullProblem.ac,
                 undefined,
+                false,
             );
             if (bruteForceRunResult.verdict !== TCVerdicts.UKE) {
                 if (generatorRunResult.verdict !== TCVerdicts.RJ) {

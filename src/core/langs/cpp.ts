@@ -37,6 +37,7 @@ export class LangCpp extends Lang {
     private logger: Logger = new Logger('langCpp');
     public readonly name = 'C++';
     public readonly extensions = ['cpp', 'cc', 'cxx', 'c++'];
+    public readonly enableRunner = true;
     protected async _compile(
         src: FileWithHash,
         ac: AbortController,
