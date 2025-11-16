@@ -12,13 +12,13 @@
         <meta name="author" content="Langning Chen">
       
       
-        <link rel="canonical" href="https://cph-ng.langningchen.com/dev/features/toggle-file-inline/">
+        <link rel="canonical" href="https://cph-ng.langningchen.com/dev/features/wrapper-runner/">
       
       
-        <link rel="prev" href="../delete-test-case/">
+        <link rel="prev" href="../clear-results/">
       
       
-        <link rel="next" href="../compare-output/">
+        <link rel="next" href="../brute-force-compare/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>Toggle file inline - CPH-NG</title>
+        <title>包装脚本 / 运行器 - CPH-NG</title>
       
     
     
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Toggle file inline
+              包装脚本 / 运行器
             
           </span>
         </div>
@@ -702,8 +702,6 @@
                 
   
   
-    
-  
   
   
     
@@ -733,11 +731,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
         
           
           <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
@@ -753,7 +751,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
             测试用例管理
@@ -856,32 +854,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Toggle file inline
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../toggle-file-inline/" class="md-nav__link">
         
   
   
@@ -892,218 +868,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      概述
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      用户交互
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="用户交互">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      触发功能
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      前置条件
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ui" class="md-nav__link">
-    <span class="md-ellipsis">
-      UI 组件
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      内部操作
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="内部操作">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      工作原理
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
-    <span class="md-ellipsis">
-      文件命名
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
-    <span class="md-ellipsis">
-      配置选项
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="配置选项">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
-    <span class="md-ellipsis">
-      大小限制
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
-    <span class="md-ellipsis">
-      何时使用每种模式
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="何时使用每种模式">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
-    <span class="md-ellipsis">
-      使用内联模式：
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_13" class="md-nav__link">
-    <span class="md-ellipsis">
-      使用文件模式：
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_14" class="md-nav__link">
-    <span class="md-ellipsis">
-      工作流程示例
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="工作流程示例">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_15" class="md-nav__link">
-    <span class="md-ellipsis">
-      将大数据转换为文件
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_16" class="md-nav__link">
-    <span class="md-ellipsis">
-      加载文件数据以快速编辑
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_17" class="md-nav__link">
-    <span class="md-ellipsis">
-      处理大文件警告
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_18" class="md-nav__link">
-    <span class="md-ellipsis">
-      相关功能
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1144,6 +908,8 @@
                 
   
   
+    
+  
   
   
     
@@ -1171,11 +937,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
         
           
           <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
@@ -1191,7 +957,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
             运行和测试
@@ -1294,10 +1060,32 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../wrapper-runner/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    包装脚本 / 运行器
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1308,6 +1096,86 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#description" class="md-nav__link">
+    <span class="md-ellipsis">
+      描述
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="描述">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#precise-time-measurement" class="md-nav__link">
+    <span class="md-ellipsis">
+      精确的时间测量
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory-measurement" class="md-nav__link">
+    <span class="md-ellipsis">
+      内存测量
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-hook" class="md-nav__link">
+    <span class="md-ellipsis">
+      文件钩子
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unlimited-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      无限栈空间
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      编译流程
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -2246,192 +2114,60 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#description" class="md-nav__link">
+    <span class="md-ellipsis">
+      描述
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="描述">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#precise-time-measurement" class="md-nav__link">
+    <span class="md-ellipsis">
+      精确的时间测量
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory-measurement" class="md-nav__link">
+    <span class="md-ellipsis">
+      内存测量
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-hook" class="md-nav__link">
+    <span class="md-ellipsis">
+      文件钩子
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unlimited-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      无限栈空间
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      概述
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      用户交互
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="用户交互">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      触发功能
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      前置条件
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ui" class="md-nav__link">
-    <span class="md-ellipsis">
-      UI 组件
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      内部操作
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="内部操作">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      工作原理
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
-    <span class="md-ellipsis">
-      文件命名
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
-    <span class="md-ellipsis">
-      配置选项
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="配置选项">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
-    <span class="md-ellipsis">
-      大小限制
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
-    <span class="md-ellipsis">
-      何时使用每种模式
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="何时使用每种模式">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
-    <span class="md-ellipsis">
-      使用内联模式：
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_13" class="md-nav__link">
-    <span class="md-ellipsis">
-      使用文件模式：
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_14" class="md-nav__link">
-    <span class="md-ellipsis">
-      工作流程示例
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="工作流程示例">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_15" class="md-nav__link">
-    <span class="md-ellipsis">
-      将大数据转换为文件
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_16" class="md-nav__link">
-    <span class="md-ellipsis">
-      加载文件数据以快速编辑
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_17" class="md-nav__link">
-    <span class="md-ellipsis">
-      处理大文件警告
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_18" class="md-nav__link">
-    <span class="md-ellipsis">
-      相关功能
+      编译流程
     </span>
   </a>
   
@@ -2453,7 +2189,7 @@
 
 
   
-    <a href="https://github.com/langningchen/cph-ng/edit/main/docs/features/toggle-file-inline.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/langningchen/cph-ng/edit/main/docs/features/wrapper-runner.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2461,132 +2197,95 @@
   
 
 
-<p><strong>此页面由 AI 生成且未经人工审核，可能包含错误。因人工过于繁忙，暂时无法进行校对。</strong></p>
-<h1 id="_1">切换文件/内联<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>在文件存储和内联显示模式之间切换测试用例数据。</p>
-<h2 id="_2">概述<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>切换文件/内联功能允许您更改测试用例数据的存储和显示方式。小数据可以内联显示以便于查看和编辑，而大数据可以存储在外部文件中以获得更好的性能。</p>
-<h2 id="_3">用户交互<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<h3 id="_4">触发功能<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p><strong>方法：切换按钮</strong></p>
+<h1 id="_1">包装脚本 / 运行器<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">实验性功能</p>
+<p>此功能为实验性功能，目前仅适用于 C/C++ 程序，不支持 MacOS 操作系统，而且没有经过稳定测试，请谨慎使用。</p>
+</div>
+<p>使用包装脚本或运行器来运行代码。</p>
+<h2 id="description">描述<a class="headerlink" href="#description" title="Permanent link">&para;</a></h2>
+<p>包装脚本与运行器的设计初衷都是能够给程序运行时提供更多的能力。</p>
+<p>两个因为技术原因，不可同时开启。开启 <a href="../../configuration/compilation/#useWrapper">cph-ng.compilation.useWrapper</a> 选项以启用包装脚本。开启 <a href="../../configuration/runner/#useRunner">cph-ng.runner.useRunner</a> 选项以启用运行器。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">功能</th>
+<th style="text-align: center;">不开启</th>
+<th style="text-align: center;">开启包装脚本</th>
+<th style="text-align: center;">开启运行器</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">精确的时间测量</td>
+<td style="text-align: center;"><span class="twemoji" style="color: #EF5350"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span></td>
+<td style="text-align: center;"><span class="twemoji" style="color: #4DB6AC"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+<td style="text-align: center;"><span class="twemoji" style="color: #4DB6AC"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">内存测量</td>
+<td style="text-align: center;"><span class="twemoji" style="color: #EF5350"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span></td>
+<td style="text-align: center;"><span class="twemoji" style="color: #EF5350"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span></td>
+<td style="text-align: center;"><span class="twemoji" style="color: #4DB6AC"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">交互题</td>
+<td style="text-align: center;"><span class="twemoji" style="color: #4DB6AC"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+<td style="text-align: center;"><span class="twemoji" style="color: #4DB6AC"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+<td style="text-align: center;"><span class="twemoji" style="color: #EF5350"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">文件钩子</td>
+<td style="text-align: center;"><span class="twemoji" style="color: #EF5350"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span></td>
+<td style="text-align: center;"><span class="twemoji" style="color: #4DB6AC"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+<td style="text-align: center;"><span class="twemoji" style="color: #EF5350"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">无限栈空间</td>
+<td style="text-align: center;"><span class="twemoji" style="color: #EF5350"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span></td>
+<td style="text-align: center;"><span class="twemoji" style="color: #4DB6AC"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+<td style="text-align: center;"><span class="twemoji" style="color: #4DB6AC"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">性能影响</p>
 <ul>
-<li>展开测试用例</li>
-<li>找到文件/内联切换图标（通常靠近输入或答案字段）</li>
-<li>点击以在模式之间切换：<ul>
-<li><strong>内联 → 文件</strong>：将数据保存到外部文件</li>
-<li><strong>文件 → 内联</strong>：从文件加载数据到内联编辑器</li>
+<li>包装脚本会在编译时稍微降低编译速度</li>
+<li>运行器会在第一次运行时预编译，运行时增大系统处理器、内存与磁盘操作的开销。</li>
 </ul>
+</div>
+<h3 id="precise-time-measurement">精确的时间测量<a class="headerlink" href="#precise-time-measurement" title="Permanent link">&para;</a></h3>
+<p>默认的时间测量是使用墙钟时间，测量精度受限于操作系统。
+使用包装脚本后，会更改 C/C++ 文件的编译流程。在原本的 <code>main</code> 函数外包裹一层使用 <code>std::chrono::high_resolution_clock</code> 的时间测量函数。这个时间最接近于主函数的运行时间。
+使用运行器后，会通过一个额外的运行器程序调用编译后的选手源代码。这个时间最接近于一般 OJ 检测的时间。
+包装脚本测量出的时间最短，运行器其次，这两者都远小于墙钟时间。</p>
+<h3 id="memory-measurement">内存测量<a class="headerlink" href="#memory-measurement" title="Permanent link">&para;</a></h3>
+<p>运行器能够在选手程序退出后进行内存测量。</p>
+<h3 id="file-hook">文件钩子<a class="headerlink" href="#file-hook" title="Permanent link">&para;</a></h3>
+<p>使用特殊的编译流程将 <code>fopen</code> <code>freopen</code> <code>open</code> 函数替换为没有任何操作<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>。这样选手调用文件操作是会被阻拦，从而能够正常从样例加载测试数据运行。开启 <a href="../../configuration/compilation/#useHook">cph-ng.compilation.useHook</a> 选项以启用此功能。</p>
+<h3 id="unlimited-stack">无限栈空间<a class="headerlink" href="#unlimited-stack" title="Permanent link">&para;</a></h3>
+<p>在 <code>DFS</code> 等需要多次递归调用等情况下，系统栈空间可能会不够。开启 <a href="../../configuration/runner/#unlimitedStack">cph-ng.runner.unlimitedStack</a> 选项以启用此功能。</p>
+<h2 id="_2">编译流程<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>包装器会更改 C/C++ 程序的默认编译流程。例如，对于一个开启文件钩子的 <code>source.cpp</code>，编译流程如下：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>graph TD
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>source.cpp --&gt; source.o
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>wrapper.cpp --&gt; source.wrapper.o
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>hook.cpp --&gt; source.hook.o
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>source.o --&gt; source.o
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>source.o --&gt; source
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>source.wrapper.o --&gt; source
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>source.hook.o --&gt; source
+</code></pre></div>
+<p>其中，<code>objcopy</code> 程序路径可以通过 <a href="../../configuration/compilation/#objcopy">cph-ng.compilation.objcopy</a> 指定。</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p><code>ifstream</code> <code>ofstream</code> 等 <code>std</code> 函数的内部实现也是调用 <code>fopen</code> 等 C 风格函数，因此也能够处理。&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-</ul>
-<h3 id="_5">前置条件<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
-<ul>
-<li>必须已加载题目</li>
-<li>测试用例必须存在</li>
-<li>对于内联模式：数据大小应在限制内</li>
-</ul>
-<h3 id="ui">UI 组件<a class="headerlink" href="#ui" title="Permanent link">&para;</a></h3>
-<p><strong>切换图标</strong>：</p>
-<ul>
-<li>文件图标：指示数据处于文件模式</li>
-<li>内联图标：指示数据处于内联模式</li>
-<li>点击以在模式之间切换</li>
-</ul>
-<p><strong>大数据警告</strong>：</p>
-<ul>
-<li>如果文件数据非常大，转换为内联前会显示警告</li>
-<li>用户可以继续或取消</li>
-</ul>
-<h2 id="_6">内部操作<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<h3 id="_7">工作原理<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
-<p><strong>切换到文件模式</strong>：</p>
-<ol>
-<li>用户点击内联数据的切换按钮</li>
-<li>从内联字段提取数据</li>
-<li>生成唯一文件名</li>
-<li>将数据写入文件</li>
-<li>更新测试用例以引用文件</li>
-<li>UI 显示文件图标和文件名</li>
 </ol>
-<p><strong>切换到内联模式</strong>：</p>
-<ol>
-<li>用户点击文件数据的切换按钮</li>
-<li>根据限制检查文件大小</li>
-<li>如果太大，显示警告</li>
-<li>如果用户继续或大小正常，读取文件</li>
-<li>将数据加载到内联字段</li>
-<li>更新测试用例为内联模式</li>
-<li>UI 显示可编辑文本字段</li>
-</ol>
-<h3 id="_8">文件命名<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
-<p>文件系统命名：</p>
-<ul>
-<li>输入文件：<code>input_{index}.txt</code> 或类似</li>
-<li>答案文件：<code>answer_{index}.txt</code> 或类似</li>
-<li>存储在缓存或题目特定文件夹中</li>
-</ul>
-<h2 id="_9">配置选项<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
-<h3 id="_10">大小限制<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
-<h4 id="cph-ngproblemmaxinlinedatalength"><code>cph-ng.problem.maxInlineDataLength</code><a class="headerlink" href="#cph-ngproblemmaxinlinedatalength" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>类型</strong>：<code>number</code></li>
-<li><strong>默认值</strong>：<code>65536</code>（字节）</li>
-<li><strong>说明</strong>：内联数据的最大大小</li>
-<li><strong>警告</strong>：尝试内联更大的数据会显示警告</li>
-</ul>
-<h4 id="cph-ngrunnerstdoutthreshold"><code>cph-ng.runner.stdoutThreshold</code><a class="headerlink" href="#cph-ngrunnerstdoutthreshold" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>类型</strong>：<code>number</code></li>
-<li><strong>默认值</strong>：<code>65536</code>（字节）</li>
-<li><strong>说明</strong>：输出大小阈值（类似概念）</li>
-</ul>
-<h2 id="_11">何时使用每种模式<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
-<h3 id="_12">使用内联模式：<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
-<ul>
-<li>小测试输入/输出</li>
-<li>经常编辑的数据</li>
-<li>快速查看和修改</li>
-<li>您想一目了然看到的测试用例</li>
-</ul>
-<h3 id="_13">使用文件模式：<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
-<ul>
-<li>大测试数据（&gt; 64KB）</li>
-<li>二进制或特殊字符数据</li>
-<li>性能优化</li>
-<li>很少更改的数据</li>
-</ul>
-<h2 id="_14">工作流程示例<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h2>
-<h3 id="_15">将大数据转换为文件<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
-<ol>
-<li>测试用例的输入内联很长</li>
-<li>UI 很慢或混乱</li>
-<li>点击切换按钮</li>
-<li>数据自动保存到文件</li>
-<li>UI 现在只显示文件名</li>
-<li>仍然可以正常运行测试</li>
-</ol>
-<h3 id="_16">加载文件数据以快速编辑<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h3>
-<ol>
-<li>测试用例输入处于文件模式</li>
-<li>需要快速编辑一个值</li>
-<li>点击切换按钮</li>
-<li>如果数据不太大，加载内联</li>
-<li>直接在 UI 中编辑</li>
-<li>更改保存到题目</li>
-</ol>
-<h3 id="_17">处理大文件警告<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h3>
-<ol>
-<li>点击大文件的切换</li>
-<li>出现警告："文件非常大（800KB）"</li>
-<li>选项："是"继续或"取消"</li>
-<li>如果是：数据加载内联（可能很慢）</li>
-<li>如果取消：保持文件模式</li>
-</ol>
-<h2 id="_18">相关功能<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="../edit-test-case/">编辑测试用例</a> - 在任一模式下编辑数据</li>
-<li><a href="../load-test-cases/">加载测试用例</a> - 导入的数据模式取决于大小</li>
-<li><a href="../add-test-case/">添加测试用例</a> - 新用例以内联模式开始</li>
-</ul>
+</div>
 
 
 
@@ -2622,7 +2321,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../delete-test-case/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Delete test case">
+          <a href="../clear-results/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Clear results">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2632,20 +2331,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Delete test case
+                Clear results
               </div>
             </div>
           </a>
         
         
           
-          <a href="../compare-output/" class="md-footer__link md-footer__link--next" aria-label="Next: Compare output">
+          <a href="../brute-force-compare/" class="md-footer__link md-footer__link--next" aria-label="Next: Brute force compare">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Compare output
+                Brute force compare
               </div>
             </div>
             <div class="md-footer__button md-icon">
