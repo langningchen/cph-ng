@@ -910,6 +910,8 @@
       
         
       
+        
+      
     
     
     
@@ -1028,6 +1030,29 @@
   
   <span class="md-ellipsis">
     Clear results
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/wrapper-runner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    包装脚本 / 运行器
     
   </span>
   
@@ -2290,13 +2315,17 @@
 </table>
 <h3 id="version-info">插件与 VSCode 版本<a class="headerlink" href="#version-info" title="Permanent link">&para;</a></h3>
 <p>在报告错误时，请确保包含您使用的插件版本和 VSCode 版本。这有助于我们了解问题的上下文，并确保我们能够在相同的环境中重现问题。</p>
-<p>你可以在 VSCode 中通过以下方式找到插件版本：
-1. 按 <kbd>F1</kbd> 或者 <kbd>Ctrl/Cmd+Shift+P</kbd> 打开命令面板。
-2. 输入并选择 <code>CPH-NG: Version Info</code> 命令。
-3. 在弹出的对话框中，您将看到插件版本和 VSCode 版本的信息，你可以点击复制按钮将其复制到剪贴板。</p>
-<p>你可以在 VSCode 中通过以下方式找到 VSCode 版本：
-1. 在菜单栏中点击 <code>帮助</code>，然后选择 <code>关于</code>。
-2. 在弹出的对话框中，您将看到 VSCode 版本的信息，你可以点击复制按钮将其复制到剪贴板。</p>
+<p>你可以在 VSCode 中通过以下方式找到插件版本：</p>
+<ol>
+<li>按 <span class="keys"><kbd class="key-f1">F1</kbd></span> 或者 <span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-shift">Shift</kbd><span>+</span><kbd class="key-p">P</kbd></span> 打开命令面板。</li>
+<li>输入并选择 <code>CPH-NG: Version Info</code> 命令。</li>
+<li>在弹出的对话框中，您将看到插件版本和 VSCode 版本的信息，你可以点击复制按钮将其复制到剪贴板。</li>
+</ol>
+<p>你可以在 VSCode 中通过以下方式找到 VSCode 版本：</p>
+<ol>
+<li>在菜单栏中点击 <code>帮助</code>，然后选择 <code>关于</code>。</li>
+<li>在弹出的对话框中，您将看到 VSCode 版本的信息，你可以点击复制按钮将其复制到剪贴板。</li>
+</ol>
 <h3 id="description">描述<a class="headerlink" href="#description" title="Permanent link">&para;</a></h3>
 <p>在描述部分，您需要详细说明您遇到的问题，其中包括以下内容：
 - 这个错误是如何发生的？
@@ -2310,18 +2339,17 @@
 请确保这些步骤是简洁明了的，并且不遗漏任何内容。
 请使用简单的语言，就像您向五岁儿童解释一样，并注重连贯性。</p>
 <h3 id="log-output">日志 <small>可选</small><a class="headerlink" href="#log-output" title="Permanent link">&para;</a></h3>
-<p class="annotate">最后，您需要提供一些日志信息，以帮助我们更好地理解问题的根源。你可以在 VSCode 中通过以下方式找到日志信息：
-1. 找到 VSCode 的输出面板，通常位于底部的面板中。
-2. 在输出面板中，选择 <code>CPH-NG</code> 作为输出源。 (1)</p>
+<p>最后，您需要提供一些日志信息，以帮助我们更好地理解问题的根源。你可以在 VSCode 中通过以下方式找到日志信息：</p>
 <ol>
-<li>
-<p>注意不是 <code>CPH-NG 编译</code>，而是 <code>CPH-NG</code>。如果您在输出源中找不到 <code>CPH-NG</code>，请尝试重新加载 VSCode 或检查插件是否正确安装。</p>
-</li>
-<li>
-<p>尽量提供 Trace 级别的日志信息，以便我们能够更好地理解问题的根源，你可以通过输出面板右上角的设置按钮来调整日志级别。</p>
-</li>
+<li>找到 VSCode 的输出面板，通常位于底部的面板中。</li>
+<li>在输出面板中，选择 <code>CPH-NG</code> 作为输出源。</li>
+<li>尽量提供 Trace 级别的日志信息，以便我们能够更好地理解问题的根源，你可以通过输出面板右上角的设置按钮来调整日志级别。</li>
 <li>将日志信息复制到问题描述中，确保使用代码块格式化，以便我们能够更容易地阅读和分析。若果日志信息过长，可以作为附件上传。</li>
 </ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>输出源注意不是 <code>CPH-NG 编译</code>，而是 <code>CPH-NG</code>。如果您在输出源中找不到 <code>CPH-NG</code>，请尝试重新加载 VSCode 或检查插件是否正确安装。</p>
+</div>
 <h3 id="checklist">核对清单<a class="headerlink" href="#checklist" title="Permanent link">&para;</a></h3>
 <p>感谢您遵循本指南并创建高质量且完整的错误报告。核对清单确保您已阅读本指南，并已尽最大努力向我们提供所有需要的信息，以便我们为您提供帮助。</p>
 

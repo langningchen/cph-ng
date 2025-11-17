@@ -708,7 +708,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#preconditions" class="md-nav__link">
     <span class="md-ellipsis">
       前置条件
     </span>
@@ -1034,6 +1034,8 @@
       
         
       
+        
+      
     
     
     
@@ -1155,6 +1157,29 @@
   
   <span class="md-ellipsis">
     Clear results
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wrapper-runner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    包装脚本 / 运行器
     
   </span>
   
@@ -2126,7 +2151,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#preconditions" class="md-nav__link">
     <span class="md-ellipsis">
       前置条件
     </span>
@@ -2197,22 +2222,19 @@
 <p>题目导入是单向的，编辑 CPH-NG 的题目不会使得 CPH 原本题目数据改变。</p>
 </div>
 <h2 id="description">描述<a class="headerlink" href="#description" title="Permanent link">&para;</a></h2>
-<p class="annotate">导入题目功能允许您将题目从原始 CPH (1) 扩展迁移到 CPH-NG。它读取与源代码关联的 CPH 题目文件，并将其转换为 CPH-NG 格式，包括所有测试用例和元数据。</p>
-<ol>
-<li>Competitive Programming Helper</li>
-</ol>
+<p>导入题目功能允许您将题目从原始 CPH 扩展迁移到 CPH-NG。它读取与源代码关联的 CPH 题目文件，并将其转换为 CPH-NG 格式，包括所有测试用例和元数据。</p>
 <h2 id="interaction">交互<a class="headerlink" href="#interaction" title="Permanent link">&para;</a></h2>
 <h3 id="dispatch">触发功能<a class="headerlink" href="#dispatch" title="Permanent link">&para;</a></h3>
 <p>该功能可以通过多种方式触发：</p>
 <ul>
 <li>打开一个没有题目的源文件并点击 CPH-NG 侧边栏面板中的 <code>导入</code> 按钮。</li>
-<li>按 <kbd>F1</kbd> 或者 <kbd>Ctrl/Cmd+Shift+P</kbd> 打开命令面板，并输入并选择：<code>CPH-NG: 导入题目</code></li>
-<li>打开一个没有题目的源文件并按 <kbd>Ctrl/Cmd+Alt+B</kbd> 快捷键</li>
+<li>按 <span class="keys"><kbd class="key-f1">F1</kbd></span> 或者 <span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-shift">Shift</kbd><span>+</span><kbd class="key-p">P</kbd></span> 打开命令面板，并输入并选择：<code>CPH-NG: 导入题目</code></li>
+<li>打开一个没有题目的源文件并按 <span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-alt">Alt</kbd><span>+</span><kbd class="key-b">B</kbd></span> 快捷键</li>
 <li>打开一个没有题目的源文件中点击右上角的火箭图标</li>
 </ul>
 <p><img alt="" src="../../images/importFromCph.png" /></p>
 <p><img alt="" src="../../images/importedFromCph.png" /></p>
-<h3 id="_2">前置条件<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<h3 id="preconditions">前置条件<a class="headerlink" href="#preconditions" title="Permanent link">&para;</a></h3>
 <ul>
 <li>必须有一个打开源文件的编辑器处于活动状态</li>
 <li>此文件不应已存在题目</li>
