@@ -44,6 +44,12 @@ export interface EditProblemDetailsMsg extends BaseMsg {
         runner?: string;
         runnerArgs?: string;
     };
+    enhancedCompare: {
+        enabled: boolean;
+        enableFloatComparison: boolean;
+        floatPrecision?: number;
+        caseInsensitive: boolean;
+    };
 }
 export interface DelProblemMsg extends BaseMsg {
     type: 'delProblem';

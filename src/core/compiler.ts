@@ -17,6 +17,7 @@
 
 import { l10n } from 'vscode';
 import Logger from '../helpers/logger';
+import EnhancedChecker from '../helpers/enhancedChecker';
 import Result from '../utils/result';
 import { FileWithHash, Problem } from '../utils/types';
 import { TCVerdicts } from '../utils/types.backend';
@@ -73,16 +74,28 @@ export class Compiler {
         const data: CompileResult['data'] = {
             src: result.data!,
         };
-        if (problem.checker) {
+        let checkerFile = problem.checker;
+        if (!checkerFile && problem.enhancedCompare?.enabled) {
+            const { path, hash } = await EnhancedChecker.getCheckerSource(
+                problem.enhancedCompare,
+            );
+            checkerFile = { path, hash: problem.enhancedCompare.hash };
+        }
+        if (checkerFile) {
             const checkerResult = await this.optionalCompile(
-                problem.checker,
+                checkerFile,
                 ac,
                 compile,
             );
             if (checkerResult.verdict !== TCVerdicts.UKE) {
                 return { ...checkerResult, data };
             }
-            problem.checker.hash = checkerResult.data!.hash;
+            if (problem.checker) {
+                problem.checker.hash = checkerResult.data!.hash;
+            }
+            if (problem.enhancedCompare?.enabled) {
+                problem.enhancedCompare.hash = checkerResult.data!.hash;
+            }
             data.checker = checkerResult.data!;
         }
         if (problem.interactor) {

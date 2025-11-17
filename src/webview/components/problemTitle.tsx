@@ -24,8 +24,10 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import Switch from '@mui/material/Switch';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Problem } from '../../utils/types';
@@ -65,6 +67,10 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
     const [editedCompilerArgs, setEditedCompilerArgs] = useState('');
     const [editedRunner, setEditedRunner] = useState('');
     const [editedRunnerArgs, setEditedRunnerArgs] = useState('');
+    const [useEnhancedCompare, setUseEnhancedCompare] = useState(false);
+    const [useEnhancedFloat, setUseEnhancedFloat] = useState(false);
+    const [enhancedPrecision, setEnhancedPrecision] = useState(1e-6);
+    const [caseInsensitiveCompare, setCaseInsensitiveCompare] = useState(false);
     const [timeElapsed, setTimeElapsed] = useState(0);
 
     useEffect(() => {
@@ -76,12 +82,23 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
         setEditedCompilerArgs(problem.compilationSettings?.compilerArgs || '');
         setEditedRunner(problem.compilationSettings?.runner || '');
         setEditedRunnerArgs(problem.compilationSettings?.runnerArgs || '');
+        setUseEnhancedCompare(problem.enhancedCompare?.enabled ?? false);
+        setUseEnhancedFloat(
+            problem.enhancedCompare?.enableFloatComparison ?? false,
+        );
+        setEnhancedPrecision(
+            problem.enhancedCompare?.floatPrecision ?? 1e-6,
+        );
+        setCaseInsensitiveCompare(
+            problem.enhancedCompare?.caseInsensitive ?? false,
+        );
     }, [
         problem.name,
         problem.url,
         problem.timeLimit,
         problem.memoryLimit,
         problem.compilationSettings,
+        problem.enhancedCompare,
     ]);
     useEffect(() => {
         setTimeElapsed(Date.now() - startTime);
@@ -116,6 +133,12 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
             timeLimit: editedTimeLimit,
             memoryLimit: editedMemoryLimit,
             compilationSettings,
+            enhancedCompare: {
+                enabled: useEnhancedCompare,
+                enableFloatComparison: useEnhancedFloat,
+                floatPrecision: enhancedPrecision,
+                caseInsensitive: caseInsensitiveCompare,
+            },
         });
     };
 
@@ -323,6 +346,74 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                         onChange={(e) => setEditedRunnerArgs(e.target.value)}
                         fullWidth
                     />
+                    <Typography
+                        variant={'subtitle1'}
+                        marginTop={2}
+                    >
+                        {t('problemTitle.dialog.field.enhancedCompare')}
+                    </Typography>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={useEnhancedCompare}
+                                onChange={(e) =>
+                                    setUseEnhancedCompare(e.target.checked)
+                                }
+                            />
+                        }
+                        label={t(
+                            'problemTitle.dialog.field.enhancedCompareToggle',
+                        )}
+                    />
+                    <CphFlex column>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={useEnhancedFloat}
+                                    disabled={!useEnhancedCompare}
+                                    onChange={(e) =>
+                                        setUseEnhancedFloat(e.target.checked)
+                                    }
+                                />
+                            }
+                            label={t(
+                                'problemTitle.dialog.field.enhancedCompareFloat',
+                            )}
+                        />
+                        <TextField
+                            variant={'outlined'}
+                            margin={'dense'}
+                            label={t(
+                                'problemTitle.dialog.field.enhancedComparePrecision',
+                            )}
+                            value={enhancedPrecision}
+                            onChange={(e) =>
+                                setEnhancedPrecision(
+                                    parseFloat(e.target.value) || 0,
+                                )
+                            }
+                            fullWidth
+                            type={'number'}
+                            inputProps={{ step: 'any' }}
+                            disabled={!useEnhancedCompare || !useEnhancedFloat}
+                        />
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={caseInsensitiveCompare}
+                                    disabled={!useEnhancedCompare}
+                                    onChange={(e) =>
+                                        setCaseInsensitiveCompare(
+                                            e.target.checked,
+                                        )
+                                    }
+                                />
+                            }
+                            label={t(
+                                'problemTitle.dialog.field.enhancedCompareCaseInsensitive',
+                            )}
+                        />
+                    </CphFlex>
                     <CphFlex>
                         <Typography>
                             {t('problemTitle.dialog.field.specialJudge')}

@@ -140,6 +140,10 @@ export default class ProblemsManager {
         fullProblem.problem.timeLimit = msg.timeLimit;
         fullProblem.problem.memoryLimit = msg.memoryLimit;
         fullProblem.problem.compilationSettings = msg.compilationSettings;
+        fullProblem.problem.enhancedCompare = {
+            ...fullProblem.problem.enhancedCompare,
+            ...msg.enhancedCompare,
+        };
         await this.dataRefresh();
     }
     public static async delProblem(msg: msgs.DelProblemMsg) {
