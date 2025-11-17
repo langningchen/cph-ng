@@ -136,6 +136,31 @@
             "required": ["running", "msg"],
             "additionalProperties": false
         },
+        "EnhancedCompare": {
+            "title": "EnhancedCompare",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "enableFloatComparison": {
+                    "type": "boolean"
+                },
+                "floatPrecision": {
+                    "type": "number"
+                },
+                "caseInsensitive": {
+                    "type": "boolean"
+                },
+                "hash": {
+                    "type": "string",
+                    "minLength": 64,
+                    "maxLength": 64
+                }
+            },
+            "required": ["enabled"],
+            "additionalProperties": false
+        },
         "CompilationSettings": {
             "title": "CompilationSettings",
             "type": "object",
@@ -202,6 +227,9 @@
         },
         "bfCompare": {
             "$ref": "#/definitions/BFCompare"
+        },
+        "enhancedCompare": {
+            "$ref": "#/definitions/EnhancedCompare"
         },
         "timeElapsed": {
             "type": "integer",

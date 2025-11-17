@@ -60,6 +60,7 @@ export default class Problems {
             tcOrder: [],
             timeLimit: Settings.problem.defaultTimeLimit,
             memoryLimit: Settings.problem.defaultMemoryLimit,
+            enhancedCompare: { enabled: false },
             timeElapsed: 0,
         } satisfies Problem;
     }

@@ -76,6 +76,14 @@ export interface BFCompare {
     msg: string;
 }
 
+export interface EnhancedCompare {
+    enabled: boolean;
+    enableFloatComparison?: boolean;
+    floatPrecision?: number;
+    caseInsensitive?: boolean;
+    hash?: string;
+}
+
 export interface CompilationSettings {
     compiler?: string;
     compilerArgs?: string;
@@ -95,6 +103,7 @@ export interface Problem {
     checker?: FileWithHash;
     interactor?: FileWithHash;
     bfCompare?: BFCompare;
+    enhancedCompare?: EnhancedCompare;
     timeElapsed: number;
     compilationSettings?: CompilationSettings;
 }
