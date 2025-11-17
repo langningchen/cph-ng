@@ -191,4 +191,45 @@ export class ProcessResultHandler {
         }
         return { verdict: TCVerdicts.AC, msg: '' };
     }
+
+    public static async compareOutputsAsync(
+        stdout: string,
+        answer: string,
+        stderr: string,
+        outputFilePath?: string,
+        answerFilePath?: string,
+    ): Promise<Result<undefined>> {
+        if (!Settings.comparing.ignoreError && stderr) {
+            return { verdict: TCVerdicts.RE, msg: '' };
+        }
+
+        // Check if we should use fast comparator
+        const useFastComparator =
+            Settings.comparing.useFastComparator &&
+            outputFilePath &&
+            answerFilePath &&
+            (stdout.length >= Settings.comparing.fastComparatorThreshold ||
+                answer.length >= Settings.comparing.fastComparatorThreshold);
+
+        if (useFastComparator) {
+            // Try to use fast comparator
+            const { FastComparator } = await import('../core/fastComparator');
+            const result = await FastComparator.compare(outputFilePath!, answerFilePath!);
+            
+            if (result !== null) {
+                // Fast comparator succeeded
+                if (result) {
+                    return { verdict: TCVerdicts.AC, msg: '' };
+                } else {
+                    // Check if it's PE or WA using the standard method
+                    return this.compareOutputs(stdout, answer, stderr);
+                }
+            }
+            // If fast comparator failed, fall back to standard comparison
+            this.logger.info('Fast comparator failed, falling back to standard comparison');
+        }
+
+        // Use standard comparison
+        return this.compareOutputs(stdout, answer, stderr);
+    }
 }

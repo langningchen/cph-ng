@@ -197,6 +197,12 @@ class ComparingSection extends SettingsSection {
     get ignoreError(): boolean {
         return this.get('ignoreError') as boolean;
     }
+    get useFastComparator(): boolean {
+        return this.get('useFastComparator') as boolean;
+    }
+    get fastComparatorThreshold(): number {
+        return this.get('fastComparatorThreshold') as number;
+    }
 }
 
 class BFCompareSection extends SettingsSection {

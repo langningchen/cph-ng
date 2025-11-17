@@ -331,6 +331,16 @@
                         "type": "boolean",
                         "default": true,
                         "markdownDescription": "%cph-ng.configuration.comparing.properties.ignoreError.markdownDescription%"
+                    },
+                    "cph-ng.comparing.useFastComparator": {
+                        "type": "boolean",
+                        "default": false,
+                        "markdownDescription": "%cph-ng.configuration.comparing.properties.useFastComparator.markdownDescription%"
+                    },
+                    "cph-ng.comparing.fastComparatorThreshold": {
+                        "type": "number",
+                        "default": 1048576,
+                        "markdownDescription": "%cph-ng.configuration.comparing.properties.fastComparatorThreshold.markdownDescription%"
                     }
                 }
             },
