@@ -252,14 +252,10 @@ export class Runner {
                               tc,
                               abortController,
                           )
-                        : await ProcessResultHandler.compareOutputsAsync(
+                        : ProcessResultHandler.compareOutputs(
                               runResult.stdout,
                               await tcIo2Str(tc.answer),
                               runResult.stderr,
-                              result.stdout.useFile
-                                  ? result.stdout.path
-                                  : undefined,
-                              tc.answer.useFile ? tc.answer.path : undefined,
                           ),
                 );
             }

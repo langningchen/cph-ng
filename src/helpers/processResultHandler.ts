@@ -155,6 +155,75 @@ export class ProcessResultHandler {
         }
     }
 
+    /**
+     * Fast token-based comparison without creating intermediate strings.
+     * This is significantly faster for large files than using replace().
+     */
+    private static fastTokenCompare(str1: string, str2: string): boolean {
+        const len1 = str1.length;
+        const len2 = str2.length;
+        let pos1 = 0;
+        let pos2 = 0;
+
+        // Helper to check if character is whitespace
+        const isWhitespace = (c: string): boolean => {
+            const code = c.charCodeAt(0);
+            return (
+                code === 32 || // space
+                code === 9 || // tab
+                code === 10 || // newline
+                code === 13 || // carriage return
+                code === 11 || // vertical tab
+                code === 12
+            ); // form feed
+        };
+
+        while (true) {
+            // Skip whitespace in both strings
+            while (pos1 < len1 && isWhitespace(str1[pos1])) {
+                pos1++;
+            }
+            while (pos2 < len2 && isWhitespace(str2[pos2])) {
+                pos2++;
+            }
+
+            // Check if one string ended but not the other
+            if ((pos1 >= len1) !== (pos2 >= len2)) {
+                return false;
+            }
+
+            // Both strings ended at the same time
+            if (pos1 >= len1) {
+                return true;
+            }
+
+            // Compare tokens character by character
+            const tokenStart1 = pos1;
+            const tokenStart2 = pos2;
+
+            while (
+                pos1 < len1 &&
+                !isWhitespace(str1[pos1]) &&
+                pos2 < len2 &&
+                !isWhitespace(str2[pos2])
+            ) {
+                if (str1[pos1] !== str2[pos2]) {
+                    return false;
+                }
+                pos1++;
+                pos2++;
+            }
+
+            // Check if tokens have different lengths
+            const token1Continues = pos1 < len1 && !isWhitespace(str1[pos1]);
+            const token2Continues = pos2 < len2 && !isWhitespace(str2[pos2]);
+
+            if (token1Continues || token2Continues) {
+                return false;
+            }
+        }
+    }
+
     public static compareOutputs(
         stdout: string,
         answer: string,
@@ -181,9 +250,18 @@ export class ProcessResultHandler {
             return { verdict: TCVerdicts.OLE, msg: '' };
         }
 
-        const compressOutput = stdout.replace(/\r|\n|\t|\s/g, '');
-        const compressAnswer = answer.replace(/\r|\n|\t|\s/g, '');
-        if (compressOutput !== compressAnswer) {
+        // Use fast token-based comparison for large files
+        const useFastCompare =
+            Settings.comparing.useFastComparator &&
+            (stdout.length >= Settings.comparing.fastComparatorThreshold ||
+                answer.length >= Settings.comparing.fastComparatorThreshold);
+
+        const tokensMatch = useFastCompare
+            ? this.fastTokenCompare(stdout, answer)
+            : stdout.replace(/\r|\n|\t|\s/g, '') ===
+              answer.replace(/\r|\n|\t|\s/g, '');
+
+        if (!tokensMatch) {
             return { verdict: TCVerdicts.WA, msg: '' };
         }
         if (fixedOutput !== fixedAnswer && !Settings.comparing.regardPEAsAC) {
@@ -192,49 +270,5 @@ export class ProcessResultHandler {
         return { verdict: TCVerdicts.AC, msg: '' };
     }
 
-    public static async compareOutputsAsync(
-        stdout: string,
-        answer: string,
-        stderr: string,
-        outputFilePath?: string,
-        answerFilePath?: string,
-    ): Promise<Result<undefined>> {
-        if (!Settings.comparing.ignoreError && stderr) {
-            return { verdict: TCVerdicts.RE, msg: '' };
-        }
 
-        // Check if we should use fast comparator
-        const useFastComparator =
-            Settings.comparing.useFastComparator &&
-            outputFilePath &&
-            answerFilePath &&
-            (stdout.length >= Settings.comparing.fastComparatorThreshold ||
-                answer.length >= Settings.comparing.fastComparatorThreshold);
-
-        if (useFastComparator) {
-            // Try to use fast comparator
-            const { FastComparator } = await import('../core/fastComparator');
-            const result = await FastComparator.compare(
-                outputFilePath!,
-                answerFilePath!,
-            );
-
-            if (result !== null) {
-                // Fast comparator succeeded
-                if (result) {
-                    return { verdict: TCVerdicts.AC, msg: '' };
-                } else {
-                    // Check if it's PE or WA using the standard method
-                    return this.compareOutputs(stdout, answer, stderr);
-                }
-            }
-            // If fast comparator failed, fall back to standard comparison
-            this.logger.info(
-                'Fast comparator failed, falling back to standard comparison',
-            );
-        }
-
-        // Use standard comparison
-        return this.compareOutputs(stdout, answer, stderr);
-    }
 }
