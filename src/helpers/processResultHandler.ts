@@ -214,8 +214,11 @@ export class ProcessResultHandler {
         if (useFastComparator) {
             // Try to use fast comparator
             const { FastComparator } = await import('../core/fastComparator');
-            const result = await FastComparator.compare(outputFilePath!, answerFilePath!);
-            
+            const result = await FastComparator.compare(
+                outputFilePath!,
+                answerFilePath!,
+            );
+
             if (result !== null) {
                 // Fast comparator succeeded
                 if (result) {
@@ -226,7 +229,9 @@ export class ProcessResultHandler {
                 }
             }
             // If fast comparator failed, fall back to standard comparison
-            this.logger.info('Fast comparator failed, falling back to standard comparison');
+            this.logger.info(
+                'Fast comparator failed, falling back to standard comparison',
+            );
         }
 
         // Use standard comparison

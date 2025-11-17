@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { access, constants, readFile, writeFile } from 'fs/promises';
 import { SHA256 } from 'crypto-js';
-import { basename, extname, join } from 'path';
+import { access, constants, readFile, writeFile } from 'fs/promises';
 import { type } from 'os';
+import { join } from 'path';
 import Logger from '../helpers/logger';
 import ProcessExecutor from '../helpers/processExecutor';
 import Settings from '../modules/settings';
@@ -70,7 +70,9 @@ export class FastComparator {
 
             // Read source to check if we need to recompile
             const sourceContent = await readFile(sourcePath, 'utf-8');
-            const sourceHash = SHA256(sourceContent).toString().substring(0, 16);
+            const sourceHash = SHA256(sourceContent)
+                .toString()
+                .substring(0, 16);
             const hashFilePath = `${outputPath}.hash`;
 
             // Check if already compiled with the same source
@@ -78,7 +80,9 @@ export class FastComparator {
                 const existingHash = await readFile(hashFilePath, 'utf-8');
                 if (existingHash === sourceHash) {
                     await access(outputPath, constants.X_OK);
-                    this.logger.info('Fast comparator already compiled, using cached version');
+                    this.logger.info(
+                        'Fast comparator already compiled, using cached version',
+                    );
                     this.compiledPath = outputPath;
                     return outputPath;
                 }
@@ -107,7 +111,10 @@ export class FastComparator {
             });
 
             if (result.exitCode !== 0 || result.killed) {
-                this.logger.error('Fast comparator compilation failed:', result.stderr);
+                this.logger.error(
+                    'Fast comparator compilation failed:',
+                    result.stderr,
+                );
                 return null;
             }
 
@@ -138,7 +145,9 @@ export class FastComparator {
     ): Promise<boolean | null> {
         const comparatorPath = await this.ensureCompiled();
         if (!comparatorPath) {
-            this.logger.warn('Fast comparator not available, falling back to standard comparison');
+            this.logger.warn(
+                'Fast comparator not available, falling back to standard comparison',
+            );
             return null;
         }
 
@@ -157,7 +166,10 @@ export class FastComparator {
             } else if (result.exitCode === 1) {
                 return false;
             } else {
-                this.logger.warn('Fast comparator returned unexpected exit code:', result.exitCode);
+                this.logger.warn(
+                    'Fast comparator returned unexpected exit code:',
+                    result.exitCode,
+                );
                 return null;
             }
         } catch (e) {
