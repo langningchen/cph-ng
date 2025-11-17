@@ -188,7 +188,7 @@ export class ProcessResultHandler {
             }
 
             // Check if one string ended but not the other
-            if ((pos1 >= len1) !== (pos2 >= len2)) {
+            if (pos1 >= len1 !== pos2 >= len2) {
                 return false;
             }
 
@@ -269,6 +269,4 @@ export class ProcessResultHandler {
         }
         return { verdict: TCVerdicts.AC, msg: '' };
     }
-
-
 }
