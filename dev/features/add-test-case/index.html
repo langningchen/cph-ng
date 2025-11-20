@@ -745,7 +745,7 @@
   
   
   <span class="md-ellipsis">
-    测试用例管理
+    测试样例管理
     
   </span>
   
@@ -756,7 +756,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
-            测试用例管理
+            测试样例管理
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -889,7 +889,7 @@
           <li class="md-nav__item">
   <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
-      测试用例结构
+      测试样例结构
     </span>
   </a>
   
@@ -940,7 +940,7 @@
           <li class="md-nav__item">
   <a href="#_13" class="md-nav__link">
     <span class="md-ellipsis">
-      多个测试用例
+      多个测试样例
     </span>
   </a>
   
@@ -2270,7 +2270,7 @@
           <li class="md-nav__item">
   <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
-      测试用例结构
+      测试样例结构
     </span>
   </a>
   
@@ -2321,7 +2321,7 @@
           <li class="md-nav__item">
   <a href="#_13" class="md-nav__link">
     <span class="md-ellipsis">
-      多个测试用例
+      多个测试样例
     </span>
   </a>
   
@@ -2366,10 +2366,10 @@
 
 
 <p><strong>此页面由 AI 生成且未经人工审核，可能包含错误。因人工过于繁忙，暂时无法进行校对。</strong></p>
-<h1 id="_1">添加测试用例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>手动为当前题目添加单个测试用例。</p>
+<h1 id="_1">添加测试样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>手动为当前题目添加单个测试样例。</p>
 <h2 id="_2">概述<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>添加测试用例功能会创建一个新的空测试用例，可以填入输入数据和预期答案。这对于手动创建自定义测试用例很有用。</p>
+<p>添加测试样例功能会创建一个新的空测试样例，可以填入输入数据和预期答案。这对于手动创建自定义测试样例很有用。</p>
 <h2 id="_3">用户交互<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <h3 id="_4">触发功能<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <p><strong>方法：侧边栏按钮</strong></p>
@@ -2386,21 +2386,21 @@
 <p>按钮属性：</p>
 <ul>
 <li>图标：加号（+）图标</li>
-<li>标签：本地化的"添加测试用例"文本</li>
+<li>标签：本地化的"添加测试样例"文本</li>
 <li>大小：大按钮</li>
 <li>位置：操作面板第一个按钮（最左侧）</li>
 </ul>
 <h2 id="_6">内部操作<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <h3 id="_7">工作原理<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
-<p>扩展在添加测试用例时执行以下步骤：</p>
+<p>扩展在添加测试样例时执行以下步骤：</p>
 <ol>
 <li><strong>获取题目</strong>：获取当前活动的题目</li>
-<li><strong>创建测试用例</strong>：初始化一个新的空测试用例对象</li>
-<li><strong>添加到题目</strong>：将测试用例追加到题目的测试用例数组中</li>
-<li><strong>更新 UI</strong>：刷新界面以显示新测试用例</li>
+<li><strong>创建测试样例</strong>：初始化一个新的空测试样例对象</li>
+<li><strong>添加到题目</strong>：将测试样例追加到题目的测试样例数组中</li>
+<li><strong>更新 UI</strong>：刷新界面以显示新测试样例</li>
 </ol>
-<h3 id="_8">测试用例结构<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
-<p>新测试用例初始化为：</p>
+<h3 id="_8">测试样例结构<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<p>新测试样例初始化为：</p>
 <ul>
 <li><code>stdin.useFile</code>：<code>false</code>（内联数据模式）</li>
 <li><code>stdin.data</code>：<code>''</code>（空字符串）</li>
@@ -2409,15 +2409,15 @@
 <li><code>isExpand</code>：<code>false</code>（折叠视图）</li>
 </ul>
 <h3 id="_9">消息流程<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
-<p>当点击添加测试用例按钮时：</p>
+<p>当点击添加测试样例按钮时：</p>
 <ol>
 <li>Webview 向扩展发送 <code>addTc</code> 消息</li>
 <li>扩展处理程序接收消息</li>
-<li>题目管理器添加新测试用例</li>
+<li>题目管理器添加新测试样例</li>
 <li>UI 更新以反映更改</li>
 </ol>
 <h2 id="_10">配置选项<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
-<p>此功能没有特定的配置设置。测试用例数据根据以下规则存储：</p>
+<p>此功能没有特定的配置设置。测试样例数据根据以下规则存储：</p>
 <ul>
 <li>
 <p><strong>数据存储</strong>：控制文件与内联存储模式<br />
@@ -2433,25 +2433,25 @@
 <ol>
 <li>打开带有现有题目的题目面板</li>
 <li>点击操作面板中的 <code>+</code> 图标</li>
-<li>新测试用例以折叠状态出现在测试用例列表底部</li>
-<li>点击展开测试用例</li>
+<li>新测试样例以折叠状态出现在测试样例列表底部</li>
+<li>点击展开测试样例</li>
 <li>在"输入"字段中输入输入数据</li>
 <li>在"答案"字段中输入预期答案</li>
 <li>数据在失去焦点/更改时自动保存</li>
 </ol>
-<h3 id="_13">多个测试用例<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
+<h3 id="_13">多个测试样例<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
 <ul>
-<li>测试用例数量没有限制</li>
+<li>测试样例数量没有限制</li>
 <li>每个都有顺序索引（#1、#2、#3 等）</li>
 <li>可以在 UI 中手动重新排序</li>
 <li>可以单独删除</li>
 </ul>
 <h2 id="_14">相关功能<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../edit-test-case/">编辑测试用例</a> - 创建后修改测试用例</li>
-<li><a href="../load-test-cases/">加载测试用例</a> - 从文件批量导入</li>
-<li><a href="../delete-test-case/">删除测试用例</a> - 删除测试用例</li>
-<li><a href="../run-single-test/">运行单个测试用例</a> - 执行测试</li>
+<li><a href="../edit-test-case/">编辑测试样例</a> - 创建后修改测试样例</li>
+<li><a href="../load-test-cases/">加载测试样例</a> - 从文件批量导入</li>
+<li><a href="../delete-test-case/">删除测试样例</a> - 删除测试样例</li>
+<li><a href="../run-single-test/">运行单个测试样例</a> - 执行测试</li>
 </ul>
 
 
