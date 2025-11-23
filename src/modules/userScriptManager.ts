@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import {
     basename,
@@ -75,6 +76,9 @@ export default class UserScriptManager {
                 isAbsolute,
                 parse,
                 format,
+            },
+            fs: {
+                existsSync,
             },
             utils: {
                 sanitize: (name: string) => name.replace(/[\\/:*?"<>|]/g, '_'),

@@ -45,6 +45,7 @@ export const renderPath = (original: string) => {
         renderString(original, [
             ['tmp', tmpdir()],
             ['home', homedir()],
+            ['workspace', workspace.workspaceFolders?.[0].uri.fsPath || ''],
             ['extensionPath', extensionPath],
         ]),
     );
