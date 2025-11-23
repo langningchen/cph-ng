@@ -745,7 +745,7 @@
   
   
   <span class="md-ellipsis">
-    测试用例管理
+    测试样例管理
     
   </span>
   
@@ -756,7 +756,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
-            测试用例管理
+            测试样例管理
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -2330,10 +2330,10 @@
 
 
 <p><strong>此页面由 AI 生成且未经人工审核，可能包含错误。因人工过于繁忙，暂时无法进行校对。</strong></p>
-<h1 id="_1">加载测试用例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>从 zip 文件或文件夹导入测试用例。</p>
+<h1 id="_1">加载测试样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>从 zip 文件或文件夹导入测试样例。</p>
 <h2 id="_2">概述<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>加载测试用例功能允许您一次从外部源导入多个测试用例。它支持从 zip 压缩包或目录文件夹加载，自动匹配输入（.in）文件与答案（.out、.ans）文件。</p>
+<p>加载测试样例功能允许您一次从外部源导入多个测试样例。它支持从 zip 压缩包或目录文件夹加载，自动匹配输入（.in）文件与答案（.out、.ans）文件。</p>
 <h2 id="_3">用户交互<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <h3 id="_4">触发功能<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <p><strong>方法：侧边栏按钮</strong></p>
@@ -2345,7 +2345,7 @@
 <p>按钮属性：</p>
 <ul>
 <li>图标：文件/文件夹图标</li>
-<li>标签：本地化的"加载测试用例"文本</li>
+<li>标签：本地化的"加载测试样例"文本</li>
 <li>位置：操作面板从左数第二个按钮</li>
 </ul>
 <h2 id="_5">内部操作<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
@@ -2368,17 +2368,17 @@
 </ul>
 </li>
 <li>
-<p><strong>测试用例发现</strong>：</p>
+<p><strong>测试样例发现</strong>：</p>
 <ul>
 <li>递归扫描所选位置中的所有文件</li>
 <li>按名称匹配 <code>.in</code> 文件与相应的 <code>.out</code> 或 <code>.ans</code> 文件</li>
-<li>自然排序测试用例（test1、test2、test10 等）</li>
+<li>自然排序测试样例（test1、test2、test10 等）</li>
 </ul>
 </li>
 <li>
-<p><strong>测试用例选择</strong>：</p>
+<p><strong>测试样例选择</strong>：</p>
 <ul>
-<li>在选择对话框中显示所有发现的测试用例</li>
+<li>在选择对话框中显示所有发现的测试样例</li>
 <li>为每个用例显示输入和答案文件路径</li>
 <li>用户可以选择要导入的用例</li>
 </ul>
@@ -2386,8 +2386,8 @@
 <li>
 <p><strong>导入</strong>：</p>
 <ul>
-<li>将选定的测试用例添加到题目</li>
-<li>可选地先清除现有测试用例（基于设置）</li>
+<li>将选定的测试样例添加到题目</li>
+<li>可选地先清除现有测试样例（基于设置）</li>
 <li>更新 UI 以显示导入的用例</li>
 </ul>
 </li>
@@ -2404,35 +2404,35 @@
   → 查看<a href="../../configuration/problem/#test-case-loading">题目设置</a></p>
 </li>
 <li>
-<p><strong>测试用例清除</strong>：选择是保留还是替换现有测试用例<br />
+<p><strong>测试样例清除</strong>：选择是保留还是替换现有测试样例<br />
   → 查看<a href="../../configuration/problem/#test-case-loading">题目设置</a></p>
 </li>
 </ul>
 <h2 id="_8">工作流程示例<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <h3 id="zip">从 Zip 加载<a class="headerlink" href="#zip" title="Permanent link">&para;</a></h3>
 <ol>
-<li>点击加载测试用例按钮</li>
+<li>点击加载测试样例按钮</li>
 <li>选择"从 zip 文件加载"</li>
 <li>从文件系统选择 zip 文件</li>
 <li>Zip 解压到 <code>.cph-ng/{zipname}/</code></li>
-<li>显示找到的测试用例</li>
+<li>显示找到的测试样例</li>
 <li>选择要导入的用例</li>
-<li>测试用例添加到题目</li>
+<li>测试样例添加到题目</li>
 </ol>
 <h3 id="_9">从文件夹加载<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
 <ol>
-<li>点击加载测试用例按钮</li>
+<li>点击加载测试样例按钮</li>
 <li>选择"从文件夹加载"</li>
 <li>选择包含测试文件的文件夹</li>
 <li>扫描文件以查找 <code>.in</code>/<code>.out</code> 对</li>
 <li>在选择对话框中显示匹配的对</li>
-<li>选择要导入的测试用例</li>
-<li>测试用例添加到题目</li>
+<li>选择要导入的测试样例</li>
+<li>测试样例添加到题目</li>
 </ol>
 <h2 id="_10">相关功能<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../add-test-case/">添加测试用例</a> - 手动添加单个用例</li>
-<li><a href="../edit-test-case/">编辑测试用例</a> - 修改导入的用例</li>
+<li><a href="../add-test-case/">添加测试样例</a> - 手动添加单个用例</li>
+<li><a href="../edit-test-case/">编辑测试样例</a> - 修改导入的用例</li>
 <li><a href="../toggle-file-inline/">切换文件/内联</a> - 切换数据存储模式</li>
 </ul>
 <h2 id="_11">文件匹配规则<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
