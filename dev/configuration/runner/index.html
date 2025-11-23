@@ -1571,24 +1571,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#cph-ngrunnerstderrthreshold" class="md-nav__link">
-    <span class="md-ellipsis">
-      cph-ng.runner.stderrThreshold
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cph-ngrunnerstdoutthreshold" class="md-nav__link">
-    <span class="md-ellipsis">
-      cph-ng.runner.stdoutThreshold
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2181,24 +2163,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#cph-ngrunnerstderrthreshold" class="md-nav__link">
-    <span class="md-ellipsis">
-      cph-ng.runner.stderrThreshold
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cph-ngrunnerstdoutthreshold" class="md-nav__link">
-    <span class="md-ellipsis">
-      cph-ng.runner.stdoutThreshold
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2315,32 +2279,6 @@
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">}</span>
 </code></pre></div>
 <p><em>允许 500ms 的额外启动开销时间。</em></p>
-<h3 id="cph-ngrunnerstderrthreshold"><code>cph-ng.runner.stderrThreshold</code><a class="headerlink" href="#cph-ngrunnerstderrthreshold" title="Permanent link">&para;</a></h3>
-<p>显示警告前的最大标准错误输出大小（以字节为单位）。</p>
-<ul>
-<li><strong>类型</strong>：数字</li>
-<li><strong>默认值</strong>：<code>100000</code>（100KB）</li>
-<li><strong>用户影响</strong>：如果您的程序向 stderr 写入超过此大小，将显示警告。帮助捕获输出过多调试信息的程序。</li>
-</ul>
-<p><strong>示例</strong>：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="nt">&quot;cph-ng.runner.stderrThreshold&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">}</span>
-</code></pre></div>
-<p><em>警告前允许最多 1MB 的 stderr。</em></p>
-<h3 id="cph-ngrunnerstdoutthreshold"><code>cph-ng.runner.stdoutThreshold</code><a class="headerlink" href="#cph-ngrunnerstdoutthreshold" title="Permanent link">&para;</a></h3>
-<p>截断前的最大标准输出大小（以字节为单位）。</p>
-<ul>
-<li><strong>类型</strong>：数字</li>
-<li><strong>默认值</strong>：<code>100000</code>（100KB）</li>
-<li><strong>用户影响</strong>：大于此大小的输出会被截断。防止打印过多输出的程序导致内存问题。</li>
-</ul>
-<p><strong>示例</strong>：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="nt">&quot;cph-ng.runner.stdoutThreshold&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">500000</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">}</span>
-</code></pre></div>
-<p><em>允许最多 500KB 的输出。</em></p>
 <h2 id="_4">何时更改这些设置<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p><strong>何时启用运行器</strong>：</p>
 <ul>
