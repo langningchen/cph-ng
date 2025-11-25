@@ -65,7 +65,7 @@ Java (`java.ts`). Each implements the `Lang` interface with `compile()` method.
 
 - Built with Material-UI components
 - Uses `react-i18next` for translations (`src/webview/l10n/en.json`, `zh.json`)
-- Message passing via `window.postMessage` (see `src/webview/msgs.ts` for
+- Message passing via `window.postMessage` (see `src/webview/src/msgs.ts` for
   protocol)
 
 **Backend→Frontend**: Events sent via `sidebarProvider.event.emit()` → webview

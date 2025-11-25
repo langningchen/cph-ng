@@ -15,6 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import pkg from '../../package.json';
+import pkg from '@/../package.json';
 
 export const version = pkg.version;

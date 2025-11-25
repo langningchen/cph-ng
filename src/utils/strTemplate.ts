@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import Io from '@/helpers/io';
+import Settings from '@/helpers/settings';
 import { readFile } from 'fs/promises';
 import { homedir, tmpdir } from 'os';
 import { basename, dirname, extname, normalize, relative } from 'path';
 import { l10n, Uri, workspace } from 'vscode';
-import Io from '../helpers/io';
-import Settings from '../modules/settings';
+import { Problem } from '../types/types.backend';
 import { extensionPath } from './global';
-import { Problem } from './types.backend';
 
 const renderString = (original: string, replacements: [string, string][]) => {
     for (const replacement of replacements) {

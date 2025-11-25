@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import Logger from '@/helpers/logger';
+import Settings from '@/helpers/settings';
+import { FileWithHash } from '@/types';
+import { extensionPath } from '@/utils/global';
+import { KnownResult, UnknownResult } from '@/utils/result';
 import { type } from 'os';
 import { basename, extname, join } from 'path';
-import Logger from '../../helpers/logger';
-import Settings from '../../modules/settings';
-import { extensionPath } from '../../utils/global';
-import { KnownResult, UnknownResult } from '../../utils/result';
-import { FileWithHash } from '../../utils/types.backend';
 import {
     CompileAdditionalData,
     DefaultCompileAdditionalData,
@@ -48,7 +48,6 @@ export class LangCpp extends Lang {
 
         const outputPath = join(
             Settings.cache.directory,
-            'bin',
             basename(src.path, extname(src.path)) +
                 (type() === 'Windows_NT' ? '.exe' : ''),
         );

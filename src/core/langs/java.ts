@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import Logger from '@/helpers/logger';
+import Settings from '@/helpers/settings';
+import { FileWithHash } from '@/types';
+import { KnownResult, UnknownResult } from '@/utils/result';
 import { basename, dirname, extname, join } from 'path';
-import Logger from '../../helpers/logger';
-import Settings from '../../modules/settings';
-import { KnownResult, UnknownResult } from '../../utils/result';
-import { FileWithHash } from '../../utils/types.backend';
 import {
     CompileAdditionalData,
     DefaultCompileAdditionalData,
@@ -41,9 +41,8 @@ export class LangJava extends Lang {
     ): Promise<LangCompileResult> {
         this.logger.trace('compile', { src, forceCompile });
 
-        const classDir = join(Settings.cache.directory, 'bin');
         const outputPath = join(
-            classDir,
+            Settings.cache.directory,
             basename(src.path, extname(src.path)) + '.class',
         );
 
@@ -65,7 +64,13 @@ export class LangJava extends Lang {
         const compilerArgs = args.split(/\s+/).filter(Boolean);
 
         const result = await this._executeCompiler(
-            [compiler, ...compilerArgs, '-d', classDir, src.path],
+            [
+                compiler,
+                ...compilerArgs,
+                '-d',
+                Settings.cache.directory,
+                src.path,
+            ],
             ac,
         );
         return result instanceof KnownResult

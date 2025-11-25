@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { CompilationIo } from '@/helpers/io';
 import { UUID } from 'crypto';
 import {
     CancellationToken,
@@ -26,8 +27,7 @@ import {
     LanguageModelToolResult,
     PreparedToolInvocation,
 } from 'vscode';
-import { CompilationIo } from '../helpers/io';
-import ProblemsManager from '../modules/problemsManager';
+import ProblemsManager from '../modules/problems/manager';
 
 interface CphTestRunnerParams {
     activePath: string;

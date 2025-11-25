@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import Logger from '@/helpers/logger';
+import { TcVerdicts } from '@/types';
+import { KnownResult, Result, UnknownResult } from '@/utils/result';
 import assert from 'assert';
 import { readFile, writeFile } from 'fs/promises';
 import { l10n } from 'vscode';
-import Logger from '../helpers/logger';
-import Settings from '../modules/settings';
-import { KnownResult, Result, UnknownResult } from '../utils/result';
-import { TcVerdicts } from '../utils/types.backend';
 import { AbortReason, ExecuteResult } from './processExecutor';
+import Settings from './settings';
 
 export interface WrapperData {
     time: number; // in nanoseconds
@@ -72,10 +72,7 @@ export class ProcessResultHandler {
         this.logger.trace('parse', { result, ignoreExitCode });
         this.logger.info('Parsing process result', { result, ignoreExitCode });
         if (result instanceof Error) {
-            return {
-                verdict: TcVerdicts.SE,
-                msg: result.message,
-            };
+            return new KnownResult(TcVerdicts.SE, result.message);
         }
         const wrapperData = await this.extractWrapperData(result.stderrPath);
 
@@ -116,12 +113,7 @@ export class ProcessResultHandler {
                 processData,
             );
         }
-        return new UnknownResult({
-            time,
-            memory: result.memory,
-            stdoutPath: result.stdoutPath,
-            stderrPath: result.stderrPath,
-        });
+        return new UnknownResult(processData);
     }
 
     public static async parseChecker(

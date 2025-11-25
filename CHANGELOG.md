@@ -4,6 +4,11 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 
 ## [Unreleased]
 
+- **feat**: enhance path handling for moved workspace in problem data
+- **feat**: add javascript language support
+
+## 0.4.8
+
 - **feat**: drag and drop to webview
 - **refactor**: change core process logic
 - **feat**: add support for unlimited stack size in runner
@@ -14,6 +19,8 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 - **fix**: use file to enhance robustness
 - **feat**: unify file limit threshold
 - **refactor**: types and imports for backend compatibility
+- **fix**: stop running may not work
+- **fix**: subprocess may exist before we start listening
 
 ## 0.4.7
 

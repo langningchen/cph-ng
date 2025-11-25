@@ -16,8 +16,8 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TextEditor, Uri } from 'vscode';
-import ProblemFs from '../modules/problemFs';
-import SidebarProvider from '../modules/sidebarProvider';
+import ProblemFs from '../modules/problems/problemFs';
+import SidebarProvider from '../modules/sidebar';
 
 export let extensionUri: Uri;
 export let extensionPath: string;

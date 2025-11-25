@@ -15,18 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SHA256 } from 'crypto-js';
-import { readFile, unlink } from 'fs/promises';
+import { checkHash } from '@/core/compiler/cache';
+import Cache from '@/helpers/cache';
+import { CompilationIo } from '@/helpers/io';
+import Logger from '@/helpers/logger';
+import ProcessExecutor, { AbortReason } from '@/helpers/processExecutor';
+import Settings from '@/helpers/settings';
+import { FileWithHash, ICompilationSettings, TcVerdicts } from '@/types';
+import { waitUntil } from '@/utils/global';
+import { exists } from '@/utils/process';
+import { KnownResult, Result, UnknownResult } from '@/utils/result';
+import { readFile } from 'fs/promises';
 import { l10n, window } from 'vscode';
-import { CompilationIo } from '../../helpers/io';
-import Logger from '../../helpers/logger';
-import ProcessExecutor, { AbortReason } from '../../helpers/processExecutor';
-import Settings from '../../modules/settings';
-import { waitUntil } from '../../utils/global';
-import { exists } from '../../utils/process';
-import { KnownResult, Result, UnknownResult } from '../../utils/result';
-import { ICompilationSettings } from '../../utils/types';
-import { FileWithHash, TcVerdicts } from '../../utils/types.backend';
 
 export interface LangCompileData {
     outputPath: string;
@@ -56,40 +56,7 @@ export class Lang {
         skip: boolean;
         hash: string;
     }> {
-        logger.trace('Checking hash for file', src, {
-            src,
-            outputPath,
-            additionalHash,
-            forceCompile,
-        });
-        const hash = SHA256(
-            (await readFile(src.path, 'utf-8')) + additionalHash,
-        ).toString();
-        if (
-            forceCompile === false ||
-            (forceCompile !== true &&
-                src.hash === hash &&
-                (await exists(outputPath)))
-        ) {
-            logger.debug('Skipping compilation', {
-                srcHash: src.hash,
-                currentHash: hash,
-                outputPath,
-            });
-            return { skip: true, hash };
-        }
-        try {
-            await unlink(outputPath);
-            logger.debug('Removed existing output file', { outputPath });
-        } catch {
-            logger.debug('No existing output file to remove', { outputPath });
-        }
-        logger.debug('Proceeding with compilation', {
-            srcHash: src.hash,
-            currentHash: hash,
-            outputPath,
-        });
-        return { skip: false, hash };
+        return checkHash(src, outputPath, additionalHash, forceCompile);
     }
 
     public readonly name: string = 'generic';
@@ -185,6 +152,7 @@ export class Lang {
                 }),
             );
         }
+        Cache.dispose([result.stdoutPath, result.stderrPath]);
         return new UnknownResult(undefined);
     }
 

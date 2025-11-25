@@ -38,34 +38,17 @@
         },
         "TCIO": {
             "title": "TCIO",
-            "oneOf": [
-                {
-                    "properties": {
-                        "useFile": {
-                            "type": "boolean",
-                            "const": true
-                        },
-                        "path": {
-                            "type": "string"
-                        }
-                    },
-                    "required": ["useFile", "path"],
-                    "additionalProperties": false
+            "type": "object",
+            "properties": {
+                "useFile": {
+                    "type": "boolean"
                 },
-                {
-                    "properties": {
-                        "useFile": {
-                            "type": "boolean",
-                            "const": false
-                        },
-                        "data": {
-                            "type": "string"
-                        }
-                    },
-                    "required": ["useFile", "data"],
-                    "additionalProperties": false
+                "data": {
+                    "type": "string"
                 }
-            ]
+            },
+            "required": ["useFile", "data"],
+            "additionalProperties": false
         },
         "TcResult": {
             "title": "TcResult",
@@ -87,10 +70,13 @@
                     "$ref": "#/definitions/TCIO"
                 },
                 "msg": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             },
-            "required": ["verdict", "time", "stdout", "stderr", "msg"],
+            "required": ["verdict", "stdout", "stderr", "msg"],
             "additionalProperties": false
         },
         "Tc": {

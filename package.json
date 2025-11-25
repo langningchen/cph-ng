@@ -2,7 +2,7 @@
     "name": "cph-ng",
     "displayName": "CPH-NG",
     "description": "The next generation of CPH.",
-    "version": "0.4.7",
+    "version": "0.4.8",
     "type": "module",
     "license": "AGPL-3.0-only",
     "publisher": "langningchen",
@@ -292,6 +292,16 @@
                         "type": "string",
                         "default": "",
                         "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonRunArgs.markdownDescription%"
+                    },
+                    "cph-ng.compilation.javascriptRunner": {
+                        "type": "string",
+                        "default": "node",
+                        "markdownDescription": "%cph-ng.configuration.compilation.properties.javascriptRunner.markdownDescription%"
+                    },
+                    "cph-ng.compilation.javascriptRunArgs": {
+                        "type": "string",
+                        "default": "",
+                        "markdownDescription": "%cph-ng.configuration.compilation.properties.javascriptRunArgs.markdownDescription%"
                     },
                     "cph-ng.compilation.objcopy": {
                         "type": "string",
@@ -772,6 +782,7 @@
         "@octokit/rest": "^22.0.1",
         "@octokit/webhooks-types": "^7.6.1",
         "@pmmmwh/react-refresh-webpack-plugin": "^0.6.1",
+        "@swc/core": "^1.15.3",
         "@types/adm-zip": "^0.5.7",
         "@types/crypto-js": "^4.2.2",
         "@types/mocha": "^10.0.10",
@@ -791,12 +802,15 @@
         "prettier": "^3.6.2",
         "prettier-plugin-organize-imports": "^4.3.0",
         "react-refresh": "^0.18.0",
+        "speed-measure-webpack-plugin": "^1.5.0",
+        "swc-loader": "^0.2.6",
         "terser-webpack-plugin": "^5.3.14",
         "thread-loader": "^4.0.4",
         "ts-loader": "^9.5.4",
         "typescript": "5.9.3",
         "webpack": "^5.103.0",
-        "webpack-cli": "^6.0.1"
+        "webpack-cli": "^6.0.1",
+        "webpack-merge": "^6.0.1"
     },
     "dependencies": {
         "@base-ui-components/react": "1.0.0-beta.6",

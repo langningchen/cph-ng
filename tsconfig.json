@@ -5,6 +5,10 @@
         "target": "ES2022",
         "jsx": "react",
         "lib": ["ES2022", "dom"],
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["src/*"]
+        },
         "sourceMap": true,
         "rootDir": "src",
         "strict": true /* enable all strict type-checking options */,
