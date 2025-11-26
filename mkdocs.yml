@@ -34,6 +34,7 @@ nav:
       - 集成:
           - features/competitive-companion.md
           - features/cph-import.md
+          - features/user-script.md
   - 配置:
       - configuration/index.md
       - configuration/basic.md
