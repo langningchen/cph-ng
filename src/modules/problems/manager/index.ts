@@ -1,4 +1,4 @@
-import * as msgs from '@/webview/src/msgs';
+import * as msgs from '@w/msgs';
 import { BfCompare } from './bfCompare';
 import { ProblemActions } from './problemActions';
 import Store, { FullProblem } from './store';
@@ -45,6 +45,9 @@ export default class ProblemsManager {
     }
     public static async openFile(msg: msgs.OpenFileMsg) {
         return ProblemActions.openFile(msg);
+    }
+    public static async openTestlib(msg: msgs.OpenTestlibMsg) {
+        return ProblemActions.openTestlib(msg);
     }
     public static async debugTc(msg: msgs.DebugTcMsg) {
         return ProblemActions.debugTc(msg);

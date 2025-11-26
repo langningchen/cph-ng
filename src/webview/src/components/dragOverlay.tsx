@@ -16,7 +16,6 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import DownloadIcon from '@mui/icons-material/Download';
-import FolderIcon from '@mui/icons-material/Folder';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -28,13 +27,9 @@ import { useTranslation } from 'react-i18next';
 import { basename, msg } from '../utils';
 import CphFlex from './base/cphFlex';
 
-type DragItems = Map<string, 'folder' | 'file'>;
-
 const DragOverlay = () => {
     const { t } = useTranslation();
-    const [dragData, setDragData] = useState<DragItems | null | undefined>(
-        null,
-    );
+    const [dragData, setDragData] = useState<string[] | null | undefined>(null);
 
     const onDragOver = (e: DragEvent) =>
         e.dataTransfer?.types.includes('text/uri-list') &&
@@ -43,25 +38,18 @@ const DragOverlay = () => {
         if (!e.dataTransfer?.types.includes('text/uri-list')) {
             return;
         }
-        const dragItems: DragItems = new Map();
+        const items: string[] = [];
         for (const item of e.dataTransfer
             .getData('text/plain')
             .replaceAll('\r', '')
             .split('\n') || []) {
-            dragItems.set(item, 'folder');
+            items.push(item);
         }
-        if (e.dataTransfer.types.includes('codeeditors')) {
-            for (const item of JSON.parse(
-                e.dataTransfer.getData('codeeditors'),
-            )) {
-                dragItems.set(item.resource.path, 'file');
-            }
-        }
-        if (!dragItems.size) {
+        if (!items.length) {
             setDragData(null);
         } else {
-            setDragData(dragItems);
-            msg({ type: 'dragDrop', items: Object.fromEntries(dragItems) });
+            setDragData(items);
+            msg({ type: 'dragDrop', items });
             setTimeout(() => {
                 setDragData(null);
             }, 1000);
@@ -108,14 +96,10 @@ const DragOverlay = () => {
         >
             {dragData ? (
                 <List style={{ width: '100%' }}>
-                    {[...dragData.entries()].map(([path, item]) => (
+                    {dragData.map((path) => (
                         <ListItem key={path}>
                             <ListItemIcon>
-                                {item === 'folder' ? (
-                                    <FolderIcon />
-                                ) : (
-                                    <InsertDriveFileIcon />
-                                )}
+                                <InsertDriveFileIcon />
                             </ListItemIcon>
                             <ListItemText
                                 primary={basename(path)}

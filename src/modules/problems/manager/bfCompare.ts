@@ -8,7 +8,7 @@ import Settings from '@/helpers/settings';
 import { Tc, TcIo, TcResult, TcVerdicts, TcWithResult } from '@/types';
 import { waitUntil } from '@/utils/global';
 import { KnownResult } from '@/utils/result';
-import * as msgs from '@/webview/src/msgs';
+import * as msgs from '@w/msgs';
 import { l10n } from 'vscode';
 import Store from './store';
 

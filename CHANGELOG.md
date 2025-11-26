@@ -2,10 +2,19 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
-## [Unreleased]
+## 0.4.10
+
+- **fix**: no editor
+- **fix**: robust the drag and drop
+
+## 0.4.9
 
 - **feat**: enhance path handling for moved workspace in problem data
 - **feat**: add javascript language support
+- **feat**: special judge templates
+- **refactor**: add cache dispose and migration logic for problem management
+- **fix**: cache runner program
+- **fix**: show panel not working in new opening mode
 
 ## 0.4.8
 

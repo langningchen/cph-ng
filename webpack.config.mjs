@@ -66,7 +66,10 @@ export default (env, argv) => {
         devtool: isProd ? 'source-map' : 'eval-cheap-module-source-map',
         resolve: {
             extensions: ['.tsx', '.ts', '.js', '.jsx', '.json'],
-            alias: { '@': resolve(__dirname, 'src') },
+            alias: {
+                '@': resolve(__dirname, 'src'),
+                '@w': resolve(__dirname, 'src/webview/src'),
+            },
         },
         module: {
             rules: [

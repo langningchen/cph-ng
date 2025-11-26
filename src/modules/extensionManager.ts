@@ -28,7 +28,6 @@ import Companion from '@/modules/companion';
 import { CphProblem } from '@/modules/problems/cphProblem';
 import ProblemsManager from '@/modules/problems/manager';
 import ProblemFs from '@/modules/problems/problemFs';
-import { debounce } from '@/utils/debounce';
 import {
     extensionPath,
     getActivePath,
@@ -50,7 +49,6 @@ import {
     l10n,
     lm,
     MessageItem,
-    TextEditor,
     window,
     workspace,
 } from 'vscode';
@@ -127,15 +125,16 @@ export default class ExtensionManager {
                 lm.registerTool('upsert_test_case', new LlmTestCaseEditor()),
             );
             context.subscriptions.push(
-                window.onDidChangeActiveTextEditor(
-                    debounce<(editor?: TextEditor) => void>(async (editor) => {
-                        setActivePath(editor);
-                        sidebarProvider.event.emit('activePath', {
-                            activePath: getActivePath(),
-                        });
-                        await ProblemsManager.dataRefresh();
-                    }, 1000),
-                ),
+                window.onDidChangeActiveTextEditor(async (editor) => {
+                    if (!editor) {
+                        return;
+                    }
+                    setActivePath(editor);
+                    sidebarProvider.event.emit('activePath', {
+                        activePath: getActivePath(),
+                    });
+                    await ProblemsManager.dataRefresh();
+                }),
             );
 
             let lastAlertTime = 0;
@@ -313,7 +312,7 @@ OS: ${release()}`;
                 ),
             );
 
-            setActivePath(window.activeTextEditor);
+            window.activeTextEditor && setActivePath(window.activeTextEditor);
             await ProblemsManager.dataRefresh();
             ExtensionManager.logger.info(
                 'CPH-NG extension activated successfully',

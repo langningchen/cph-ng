@@ -98,7 +98,11 @@ export class Handler {
         }
 
         if (createdDocuments.length > 0) {
-            await commands.executeCommand('vscode.open', createdDocuments[0]);
+            await commands.executeCommand(
+                'vscode.open',
+                createdDocuments[0],
+                Settings.companion.showPanel,
+            );
 
             if (createdDocuments.length > 1) {
                 Io.info(

@@ -7,7 +7,8 @@
         "lib": ["ES2022", "dom"],
         "baseUrl": ".",
         "paths": {
-            "@/*": ["src/*"]
+            "@/*": ["src/*"],
+            "@w/*": ["src/webview/src/*"]
         },
         "sourceMap": true,
         "rootDir": "src",

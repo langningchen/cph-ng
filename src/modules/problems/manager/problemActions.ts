@@ -1,12 +1,15 @@
 import Langs from '@/core/langs/langs';
 import Io from '@/helpers/io';
 import ProcessExecutor from '@/helpers/processExecutor';
+import Settings from '@/helpers/settings';
 import Companion from '@/modules/companion';
 import { Problem } from '@/types';
+import { extensionPath } from '@/utils/global';
 import { exists } from '@/utils/process';
 import { KnownResult } from '@/utils/result';
-import * as msgs from '@/webview/src/msgs';
-import { basename, dirname, extname } from 'path';
+import * as msgs from '@w/msgs';
+import { readdir } from 'fs/promises';
+import { basename, dirname, extname, join } from 'path';
 import { commands, debug, l10n, Uri, window } from 'vscode';
 import { CphProblem } from '../cphProblem';
 import ProblemFs from '../problemFs';
@@ -160,7 +163,11 @@ export class ProblemActions {
     }
     public static async openFile(msg: msgs.OpenFileMsg): Promise<void> {
         if (!msg.isVirtual) {
-            await commands.executeCommand('vscode.open', Uri.file(msg.path));
+            await commands.executeCommand(
+                'vscode.open',
+                Uri.file(msg.path),
+                Settings.companion.showPanel,
+            );
             return;
         }
         const fullProblem = await Store.getFullProblem(msg.activePath);
@@ -174,6 +181,23 @@ export class ProblemActions {
                 authority: fullProblem.problem.src.path,
                 path: msg.path,
             }),
+            Settings.companion.showPanel,
+        );
+    }
+    public static async openTestlib(_msg: msgs.OpenTestlibMsg): Promise<void> {
+        const item = await window.showQuickPick(
+            await readdir(join(extensionPath, 'dist', 'testlib')),
+            {
+                placeHolder: l10n.t('Select a file to open'),
+            },
+        );
+        if (!item) {
+            return;
+        }
+        await commands.executeCommand(
+            'vscode.open',
+            Uri.file(join(extensionPath, 'dist', 'testlib', item)),
+            Settings.companion.showPanel,
         );
     }
     public static async debugTc(msg: msgs.DebugTcMsg): Promise<void> {

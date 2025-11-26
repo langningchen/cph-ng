@@ -147,6 +147,7 @@
     "Running test case {id} using CPH-NG...": "正在使用 CPH-NG 运行测试样例 {id}...",
     "Runtime Error": "运行时错误",
     "Runtime error occurred: {error}": "发生运行时错误：{error}",
+    "Select a file to open": "选择要打开的文件",
     "Select location to save": "选择保存位置",
     "Select problems to import": "选择要导入的题目",
     "Select test cases to add": "选择要添加的测试样例",

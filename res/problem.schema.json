@@ -151,7 +151,14 @@
         },
         "url": {
             "type": "string",
-            "format": "uri"
+            "anyOf": [
+                {
+                    "format": "uri"
+                },
+                {
+                    "maxLength": 0
+                }
+            ]
         },
         "tcs": {
             "type": "object",

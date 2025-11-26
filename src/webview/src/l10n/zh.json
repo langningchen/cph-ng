@@ -54,6 +54,7 @@
     "problemTitle.dialog.tab.advanced": "高级",
     "problemTitle.dialog.tab.basic": "基础",
     "problemTitle.dialog.tab.environment": "环境",
+    "problemTitle.dialog.testlib": "Testlib 模板",
     "problemTitle.dialog.title": "编辑题目",
     "problemTitle.editTitle": "编辑题目",
     "problemTitle.interact": "交互",

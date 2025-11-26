@@ -54,6 +54,7 @@
     "problemTitle.dialog.tab.advanced": "Advanced",
     "problemTitle.dialog.tab.basic": "Basic",
     "problemTitle.dialog.tab.environment": "Env",
+    "problemTitle.dialog.testlib": "Testlib Templates",
     "problemTitle.dialog.title": "Edit Problem",
     "problemTitle.editTitle": "Edit Problem",
     "problemTitle.interact": "Interact",

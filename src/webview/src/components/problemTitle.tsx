@@ -441,6 +441,16 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                                         }}
                                     />
                                 )}
+                                <CphLink
+                                    name={t('problemTitle.dialog.testlib')}
+                                    onClick={() => {
+                                        msg({
+                                            type: 'openTestlib',
+                                        });
+                                    }}
+                                >
+                                    {t('problemTitle.dialog.testlib')}
+                                </CphLink>
                             </CphFlex>
                         </TabPanel>
                     </TabContext>
