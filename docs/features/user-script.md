@@ -9,6 +9,7 @@ const process = async () => {
     /* -- your code -- */
     return results;
 };
+```
 
 其中返回值的意义见下文。
 
@@ -19,10 +20,10 @@ const process = async () => {
 - **problems** ：类型 `CompanionProblem[]` ，每一项代表一个题目，`CompanionProblem` 一些可能有用的字段定义如下：
   - **name**：类型 `string`，题目的全名，这可能包含人类可读的名称。
   - **group**：类型 `string`，题目所属的分类，格式为 `<OJ名称> - <分类>`，如果分类不存在，连字符会被省略。一些常见 OJ 的字段值如下：
-      - `luogu`：值恒为 `Luogu`，即使是 `Remote Judge` 题库。
-      - `atcoder`：值为 `Atcoder - <比赛名称>`，如 `AtCoder - AtCoder Beginner Contest 433`。
-      - `codeforces`：值为 `Codeforces - <比赛名称>`，如 `Codeforces - Educational Codeforces Round 184 (Rated for Div. 2)`。
-      - `vjudge`：值为 `Virtual Judge - <比赛名称>` 或 `Virtual Judge - <题库>`，如 `Virtual Judge - 数论杂题（div1）`或 `Virtual Judge - %E6%B4%9B%E8%B0%B7`（`%E6%B4%9B%E8%B0%B7`解码后为 `洛谷`）
+    - `luogu`：值恒为 `Luogu`，即使是 `Remote Judge` 题库。
+    - `atcoder`：值为 `Atcoder - <比赛名称>`，如 `AtCoder - AtCoder Beginner Contest 433`。
+    - `codeforces`：值为 `Codeforces - <比赛名称>`，如 `Codeforces - Educational Codeforces Round 184 (Rated for Div. 2)`。
+    - `vjudge`：值为 `Virtual Judge - <比赛名称>` 或 `Virtual Judge - <题库>`，如 `Virtual Judge - 数论杂题（div1）`或 `Virtual Judge - %E6%B4%9B%E8%B0%B7`（`%E6%B4%9B%E8%B0%B7`解码后为 `洛谷`）
   - **url**：类型 `string`，题目在 OJ 上的完整链接。
   - **interactive**：类型 `boolean`，是否为交互题。
 
