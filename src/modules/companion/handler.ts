@@ -121,6 +121,7 @@ export class Handler {
             problem,
         });
         try {
+            await writeFile(problem.src.path, '');
             if (Settings.problem.templateFile) {
                 Handler.logger.debug('Using template file', {
                     templateFile: Settings.problem.templateFile,
@@ -141,16 +142,11 @@ export class Handler {
                             { msg: (e as Error).message },
                         ),
                     );
-                    await writeFile(problem.src.path, '');
-                    Handler.logger.debug('Created empty source file', {
-                        srcPath: problem.src.path,
-                    });
                 }
             } else {
                 Handler.logger.debug(
                     'No template file configured, creating empty file',
                 );
-                await writeFile(problem.src.path, '');
             }
         } catch (e) {
             Handler.logger.error('Failed to create source file', e);

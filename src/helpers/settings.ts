@@ -210,7 +210,7 @@ class ProblemSection extends SettingsSection {
             | 'never';
     }
     get templateFile(): string {
-        return renderPath(this.get('templateFile') as string);
+        return this.get('templateFile') as string;
     }
     get problemFilePath(): string {
         return this.get('problemFilePath') as string;
