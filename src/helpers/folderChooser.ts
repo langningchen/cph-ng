@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import Logger from '@/helpers/logger';
 import { join, relative } from 'path';
 import { FileType, l10n, Uri, window, workspace } from 'vscode';
-import Logger from '../helpers/logger';
-import Settings from '../modules/settings';
 import Io from './io';
+import Settings from './settings';
 
 export default class FolderChooser {
     private static logger: Logger = new Logger('folderChooser');

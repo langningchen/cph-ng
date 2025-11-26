@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import Logger from '@/helpers/logger';
 import { l10n, window } from 'vscode';
-import Logger from '../helpers/logger';
 
 const compilationChannel = window.createOutputChannel(
     l10n.t('CPH-NG Compilation'),
@@ -24,7 +24,6 @@ const compilationChannel = window.createOutputChannel(
 
 export default class Io {
     private static logger: Logger = new Logger('io');
-    private static _compilationMsg = '';
 
     public static info(msg: string, ...args: any) {
         this.logger.info(msg);
@@ -38,14 +37,15 @@ export default class Io {
         this.logger.error(msg);
         return window.showErrorMessage(msg, ...args);
     }
-    public static async confirm(
-        msg: string,
-        modal: boolean = false,
-    ): Promise<boolean> {
+    public static async confirm(msg: string): Promise<boolean> {
         this.logger.info(msg);
+        const yesOption = l10n.t('Yes');
         return (
-            (await window.showInformationMessage(msg, { modal }, 'Yes')) ===
-            'Yes'
+            (await window.showInformationMessage(
+                msg,
+                { modal: true },
+                yesOption,
+            )) === yesOption
         );
     }
 }

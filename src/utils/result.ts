@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TcVerdict } from './types.backend';
+import { TcVerdict } from '../types/types.backend';
 
 export class UnknownResult<T> {
     constructor(public data: T) {}
@@ -27,4 +27,4 @@ export class KnownResult<T = never> {
         public data?: T,
     ) {}
 }
-export type Result<T> = UnknownResult<T> | KnownResult;
+export type Result<T> = UnknownResult<T> | KnownResult<T>;

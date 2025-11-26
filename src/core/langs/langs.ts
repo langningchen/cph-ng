@@ -15,11 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import Logger from '@/helpers/logger';
 import { extname } from 'path';
-import Logger from '../../helpers/logger';
 import { LangC } from './c';
 import { LangCpp } from './cpp';
 import { LangJava } from './java';
+import { LangJavascript } from './javascript';
 import { Lang } from './lang';
 import { LangPython } from './python';
 
@@ -30,6 +31,7 @@ export default class Langs {
         new LangC(),
         new LangJava(),
         new LangPython(),
+        new LangJavascript(),
     ];
 
     public static getLang(filePath: string): Lang | undefined {

@@ -15,6 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import LlmDataInspector from '@/ai/llmDataInspector';
+import LlmTcRunner from '@/ai/llmTcRunner';
+import LlmTestCaseEditor from '@/ai/llmTestCaseEditor';
+import LlmTestCaseLister from '@/ai/llmTestCaseLister';
+import Cache from '@/helpers/cache';
+import FolderChooser from '@/helpers/folderChooser';
+import Io from '@/helpers/io';
+import Logger from '@/helpers/logger';
+import Settings from '@/helpers/settings';
+import Companion from '@/modules/companion';
+import { CphProblem } from '@/modules/problems/cphProblem';
+import ProblemsManager from '@/modules/problems/manager';
+import ProblemFs from '@/modules/problems/problemFs';
+import {
+    extensionPath,
+    getActivePath,
+    problemFs,
+    setActivePath,
+    setExtensionUri,
+    sidebarProvider,
+} from '@/utils/global';
+import { version } from '@/utils/packageInfo';
 import { readFile, rm } from 'fs/promises';
 import { release } from 'os';
 import { join } from 'path';
@@ -27,36 +49,10 @@ import {
     l10n,
     lm,
     MessageItem,
-    TextEditor,
     window,
     workspace,
 } from 'vscode';
-import LlmDataInspector from '../ai/llmDataInspector';
-import LlmTcRunner from '../ai/llmTcRunner';
-import LlmTestCaseEditor from '../ai/llmTestCaseEditor';
-import LlmTestCaseLister from '../ai/llmTestCaseLister';
-import FolderChooser from '../helpers/folderChooser';
-import Io from '../helpers/io';
-import Logger from '../helpers/logger';
-import Problems from '../helpers/problems';
-import Companion from '../modules/companion';
-import SidebarProvider from '../modules/sidebarProvider';
-import { debounce } from '../utils/debounce';
-import {
-    extensionPath,
-    getActivePath,
-    problemFs,
-    setActivePath,
-    setExtensionUri,
-    sidebarProvider,
-} from '../utils/global';
-import { version } from '../utils/packageInfo';
-import Cache from './cache';
-import { CphProblem } from './cphCapable';
-import CphNg from './cphNg';
-import ProblemFs from './problemFs';
-import ProblemsManager from './problemsManager';
-import Settings from './settings';
+import SidebarProvider from './sidebar';
 
 interface ContextEvent {
     hasProblem: boolean;
@@ -94,10 +90,7 @@ export default class ExtensionManager {
             }
 
             await Cache.ensureDir();
-            ExtensionManager.logger.info(
-                'Cache directories created successfully',
-            );
-
+            await Cache.startMonitor();
             Companion.init();
 
             context.subscriptions.push(
@@ -132,15 +125,16 @@ export default class ExtensionManager {
                 lm.registerTool('upsert_test_case', new LlmTestCaseEditor()),
             );
             context.subscriptions.push(
-                window.onDidChangeActiveTextEditor(
-                    debounce<(editor?: TextEditor) => void>(async (editor) => {
-                        setActivePath(editor);
-                        sidebarProvider.event.emit('activePath', {
-                            activePath: getActivePath(),
-                        });
-                        await ProblemsManager.dataRefresh();
-                    }, 1000),
-                ),
+                window.onDidChangeActiveTextEditor(async (editor) => {
+                    if (!editor) {
+                        return;
+                    }
+                    setActivePath(editor);
+                    sidebarProvider.event.emit('activePath', {
+                        activePath: getActivePath(),
+                    });
+                    await ProblemsManager.dataRefresh();
+                }),
             );
 
             let lastAlertTime = 0;
@@ -239,9 +233,7 @@ OS: ${release()}`;
                         return;
                     }
                     await Promise.all(
-                        chosenIdx.map((idx) =>
-                            Problems.saveProblem(problems[idx.value]),
-                        ),
+                        chosenIdx.map((idx) => problems[idx.value].save()),
                     );
                     await ProblemsManager.dataRefresh();
                 }),
@@ -249,13 +241,19 @@ OS: ${release()}`;
             context.subscriptions.push(
                 commands.registerCommand('cph-ng.createProblem', async () => {
                     sidebarProvider.focus();
-                    await CphNg.createProblem(getActivePath());
+                    await ProblemsManager.createProblem({
+                        type: 'createProblem',
+                        activePath: getActivePath(),
+                    });
                 }),
             );
             context.subscriptions.push(
                 commands.registerCommand('cph-ng.importProblem', async () => {
                     sidebarProvider.focus();
-                    await CphNg.importProblem(getActivePath());
+                    await ProblemsManager.importProblem({
+                        type: 'importProblem',
+                        activePath: getActivePath(),
+                    });
                 }),
             );
             context.subscriptions.push(
@@ -314,7 +312,7 @@ OS: ${release()}`;
                 ),
             );
 
-            setActivePath(window.activeTextEditor);
+            window.activeTextEditor && setActivePath(window.activeTextEditor);
             await ProblemsManager.dataRefresh();
             ExtensionManager.logger.info(
                 'CPH-NG extension activated successfully',

@@ -16,8 +16,8 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TextEditor, Uri } from 'vscode';
-import ProblemFs from '../modules/problemFs';
-import SidebarProvider from '../modules/sidebarProvider';
+import ProblemFs from '../modules/problems/problemFs';
+import SidebarProvider from '../modules/sidebar';
 
 export let extensionUri: Uri;
 export let extensionPath: string;
@@ -29,16 +29,12 @@ export const problemFs = new ProblemFs();
 export const sidebarProvider = new SidebarProvider();
 
 let _activePath: string | undefined;
-export const setActivePath = (textEditor?: TextEditor) => {
-    if (!textEditor) {
-        _activePath = undefined;
-    } else {
-        const activeUri = textEditor.document.uri;
-        if (activeUri.scheme !== 'file') {
-            return;
-        }
-        _activePath = activeUri.fsPath;
+export const setActivePath = (textEditor: TextEditor) => {
+    const activeUri = textEditor.document.uri;
+    if (activeUri.scheme !== 'file') {
+        return;
     }
+    _activePath = activeUri.fsPath;
 };
 export const getActivePath = () => _activePath;
 

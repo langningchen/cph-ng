@@ -25,7 +25,7 @@ import {
     LanguageModelToolResult,
     PreparedToolInvocation,
 } from 'vscode';
-import ProblemsManager from '../modules/problemsManager';
+import ProblemsManager from '../modules/problems/manager';
 
 interface LlmTestCaseListerParams {
     activePath: string;
