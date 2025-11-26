@@ -112,9 +112,9 @@ pe:
     size_t to = 0, ta = 0, tc = 0;
     while (true)
     {
-        while (to < o.s && isspace(o.d[to]))
+        while (to < o.s && ig(o.d[to]))
             to++;
-        while (ta < a.s && isspace(a.d[ta]))
+        while (ta < a.s && ig(a.d[ta]))
             ta++;
         bool eo = to >= o.s, ea = ta >= a.s;
         if (eo && ea)
@@ -123,12 +123,12 @@ pe:
             quitf(_wa, "Token count differs");
         tc++;
         unsigned char *so = o.d + to, *sa = a.d + ta;
-        while (to < o.s && !isspace(o.d[to]))
+        while (to < o.s && !ig(o.d[to]))
             to++;
-        while (ta < a.s && !isspace(a.d[ta]))
+        while (ta < a.s && !ig(a.d[ta]))
             ta++;
         size_t lo = to - (so - o.d), la = ta - (sa - a.d);
         if (lo != la || memcmp(so, sa, lo) != 0)
-            quitf(_wa, "Token #%u expected '%s' found '%s'", tc, ts(sa, la).c_str(), ts(so, lo).c_str());
+            quitf(_wa, "Token #%lu expected '%s' found '%s'", tc, ts(sa, la).c_str(), ts(so, lo).c_str());
     }
 }
