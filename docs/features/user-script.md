@@ -4,12 +4,11 @@
 
 你的脚本应该有如下结构：
 
-``````javascript
+```javascript
 const process = async () => {
     /* -- your code -- */
     return results;
 };
-``````
 
 其中返回值的意义见下文。
 
@@ -23,7 +22,7 @@ const process = async () => {
       - `luogu`：值恒为 `Luogu`，即使是 `Remote Judge` 题库。
       - `atcoder`：值为 `Atcoder - <比赛名称>`，如 `AtCoder - AtCoder Beginner Contest 433`。
       - `codeforces`：值为 `Codeforces - <比赛名称>`，如 `Codeforces - Educational Codeforces Round 184 (Rated for Div. 2)`。
-      - `vjudge`：值为 `Codeforces - <比赛名称>` 或 `Codeforces - <题库>`，如 `Virtual Judge - 数论杂题（div1）`或 `Virtual Judge - %E6%B4%9B%E8%B0%B7`（`%E6%B4%9B%E8%B0%B7`解码后为 `洛谷`）
+      - `vjudge`：值为 `Virtual Judge - <比赛名称>` 或 `Virtual Judge - <题库>`，如 `Virtual Judge - 数论杂题（div1）`或 `Virtual Judge - %E6%B4%9B%E8%B0%B7`（`%E6%B4%9B%E8%B0%B7`解码后为 `洛谷`）
   - **url**：类型 `string`，题目在 OJ 上的完整链接。
   - **interactive**：类型 `boolean`，是否为交互题。
 
@@ -41,7 +40,7 @@ const process = async () => {
 - **path**：精简版的 `path` 库，包含 `join`、`basename`、`dirname`、`extname`、`sep`、`normalize`、`isAbsolute`、`parse`、`format`。
 - **fs**：精简版的 `fs` 库，包含 `existsSync`。
 - **utils**：包含 `sanitize: (name: string) => string` 函数，将文件名中不允许的字符替换为下划线。
-- **logger**：包含 `trace`、`debug`、`info`、`warn`、`error` 的日志类，你可以在下方面板 `输出`选项卡并选择`CPH-NG 脚本`来查看日志。
+- **logger**：包含 `trace`、`debug`、`info`、`warn`、`error` 的日志类，你可以在下方面板 `输出`选项卡并选择`CPH-NG 用户脚本`来查看日志。
 - **ui**：包含简单的 ui 交互功能，具体如下：
   - `chooseFolder: (title?: string) => Promise<string | undefined>`：让用户选择一个目录。
   - `chooseItem: (items: string[], placeholder?: string) => Promise<string | undefined>`：让用户在多个选项中选择一个。
