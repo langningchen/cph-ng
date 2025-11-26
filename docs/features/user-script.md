@@ -25,7 +25,7 @@ const process = async () => {
       - `codeforces`：值为 `Codeforces - <比赛名称>`，如 `Codeforces - Educational Codeforces Round 184 (Rated for Div. 2)`。
       - `vjudge`：值为 `Codeforces - <比赛名称>` 或 `Codeforces - <题库>`，如 `Virtual Judge - 数论杂题（div1）`或 `Virtual Judge - %E6%B4%9B%E8%B0%B7`（`%E6%B4%9B%E8%B0%B7`解码后为 `洛谷`）
   - **url**：类型 `string`，题目在 OJ 上的完整链接。
-  - **interactive**：类型 `bool`，是否为交互题。
+  - **interactive**：类型 `boolean`，是否为交互题。
 
 - **workspaceFolders** ：类型 `WorkspaceFolderCtx[] | undefined`，使用时注意判断 `undefined` 和列表为空的情况，判断后可使用 `workspaceFolders[0].path` 获取工作区根目录的绝对路径。
 
