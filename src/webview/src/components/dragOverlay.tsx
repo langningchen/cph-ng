@@ -17,6 +17,7 @@
 
 import DownloadIcon from '@mui/icons-material/Download';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import Backdrop from '@mui/material/Backdrop';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -50,9 +51,7 @@ const DragOverlay = () => {
         } else {
             setDragData(items);
             msg({ type: 'dragDrop', items });
-            setTimeout(() => {
-                setDragData(null);
-            }, 1000);
+            setTimeout(() => setDragData(null), 1000);
         }
     };
     const onDragLeave = (e: DragEvent) =>
@@ -74,49 +73,52 @@ const DragOverlay = () => {
     }, []);
 
     return (
-        <CphFlex
-            zIndex={10}
-            position={'fixed'}
-            top={0}
-            left={0}
-            width={'100%'}
-            height={'100%'}
-            column
-            gap={5}
-            paddingY={2}
-            justifyContent={'center'}
-            style={{
-                opacity:
-                    dragData === null ? 0 : dragData === undefined ? 0.8 : 1,
-                pointerEvents: dragData === null ? 'none' : 'auto',
-                transition: '500ms',
-                background: '#000000',
-                backdropFilter: 'blur(2px)',
-            }}
+        <Backdrop
+            sx={(theme) => ({
+                zIndex: theme.zIndex.drawer + 1,
+            })}
+            open={dragData !== null}
         >
             {dragData ? (
-                <List style={{ width: '100%' }}>
-                    {dragData.map((path) => (
-                        <ListItem key={path}>
-                            <ListItemIcon>
-                                <InsertDriveFileIcon />
-                            </ListItemIcon>
-                            <ListItemText
-                                primary={basename(path)}
-                                secondary={path}
-                            />
-                        </ListItem>
-                    ))}
-                </List>
+                <CphFlex
+                    width={'100%'}
+                    height={'100%'}
+                    column
+                    paddingX={2}
+                    justifyContent={'center'}
+                >
+                    <List
+                        sx={{
+                            width: '100%',
+                            bgcolor: 'background.paper',
+                        }}
+                    >
+                        {dragData.map((path) => (
+                            <ListItem key={path}>
+                                <ListItemIcon>
+                                    <InsertDriveFileIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={basename(path)} />
+                            </ListItem>
+                        ))}
+                    </List>
+                </CphFlex>
             ) : (
-                <>
+                <CphFlex
+                    width={'100%'}
+                    height={'100%'}
+                    column
+                    gap={2}
+                    color='#ffffff'
+                    justifyContent={'center'}
+                >
                     <DownloadIcon sx={{ fontSize: 80 }} />
                     <Typography variant='h5'>
                         {t('dragOverlay.description')}
                     </Typography>
-                </>
+                </CphFlex>
             )}
-        </CphFlex>
+        </Backdrop>
     );
 };
 

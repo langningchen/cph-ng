@@ -56,8 +56,6 @@ jobs:
             PRE_RELEASE=true
           fi
 
-          # Allow manual override from workflow_dispatch input to force a Release
-          # When FORCE_RELEASE is 'true', always treat as a normal release
           if [ "$FORCE_RELEASE" = "true" ]; then
             PRE_RELEASE=false
           fi
@@ -69,14 +67,9 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/setup-node-pnpm
 
-      - name: Create Branch and Tag
+      - name: Create Tag
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          BRANCH_NAME="release/v${VERSION}"
-
-          git checkout -b "$BRANCH_NAME"
-          git push origin "$BRANCH_NAME"
-
           git tag "v${VERSION}"
           git push origin "v${VERSION}"
 

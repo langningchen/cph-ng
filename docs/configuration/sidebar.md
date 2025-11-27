@@ -4,24 +4,6 @@
 
 CPH-NG 侧边栏面板的 UI 自定义设置。
 
-## 字体自定义
-
-### `cph-ng.sidebar.fontFamily`
-
-- **类型**：字符串
-- **默认值**：`""`（使用 VSCode 默认值）
-- **用户影响**：侧边栏中使用的字体系列。空字符串使用 VSCode 的编辑器字体。
-
-**示例**：
-
-```json
-{
-    "cph-ng.sidebar.fontFamily": "Consolas, monospace"
-}
-```
-
-_使用 Consolas 作为侧边栏字体。_
-
 ## UI 样式
 
 侧边栏显示：

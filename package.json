@@ -2,7 +2,7 @@
     "name": "cph-ng",
     "displayName": "CPH-NG",
     "description": "The next generation of CPH.",
-    "version": "0.4.10",
+    "version": "0.4.11",
     "type": "module",
     "license": "AGPL-3.0-only",
     "publisher": "langningchen",
@@ -664,11 +664,6 @@
                         "type": "boolean",
                         "default": true,
                         "markdownDescription": "%cph-ng.configuration.sidebar.properties.showTips.markdownDescription%"
-                    },
-                    "cph-ng.sidebar.fontFamily": {
-                        "type": "string",
-                        "default": "Monaspace, 'Cascadia Code', 'Source Code Pro', Consolas, 'Ubuntu Mono', monospace",
-                        "markdownDescription": "%cph-ng.configuration.sidebar.properties.fontFamily.markdownDescription%"
                     }
                 }
             }
@@ -781,7 +776,7 @@
         "@commitlint/config-conventional": "^20.0.0",
         "@octokit/rest": "^22.0.1",
         "@octokit/webhooks-types": "^7.6.1",
-        "@pmmmwh/react-refresh-webpack-plugin": "^0.6.1",
+        "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
         "@swc/core": "^1.15.3",
         "@types/adm-zip": "^0.5.7",
         "@types/crypto-js": "^4.2.2",
@@ -830,7 +825,6 @@
         "codemirror": "^6.0.2",
         "copy-webpack-plugin": "^13.0.1",
         "crypto-js": "^4.2.0",
-        "elements": "link:../.local/share/pnpm/global/5/node_modules/@vscode-elements/elements",
         "i18next": "^25.6.3",
         "natural-orderby": "^5.0.0",
         "p-queue": "^9.0.1",

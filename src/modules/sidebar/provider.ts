@@ -1,7 +1,15 @@
+import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import { extensionUri } from '@/utils/global';
 import { EventEmitter } from 'events';
-import { commands, WebviewView, WebviewViewProvider, window } from 'vscode';
+import {
+    commands,
+    l10n,
+    WebviewView,
+    WebviewViewProvider,
+    window,
+    workspace,
+} from 'vscode';
 import { getHtmlForWebview } from './htmlGenerator';
 import { handleMessage } from './messageHandler';
 import {
@@ -32,6 +40,23 @@ export class SidebarProvider implements WebviewViewProvider {
                 type: 'activePath',
                 ...problem,
             } satisfies ActivePathEvent);
+        });
+        workspace.onDidChangeConfiguration(async (e) => {
+            if (
+                e.affectsConfiguration('cph-ng.sidebar.retainWhenHidden') ||
+                e.affectsConfiguration('cph-ng.sidebar.showAcGif') ||
+                e.affectsConfiguration('cph-ng.sidebar.colorTheme') ||
+                e.affectsConfiguration('cph-ng.sidebar.hiddenStatuses') ||
+                e.affectsConfiguration('cph-ng.sidebar.showTips')
+            ) {
+                const choice = await Io.info(
+                    l10n.t(
+                        'Sidebar configuration changed, please refresh to apply the new settings.',
+                    ),
+                    l10n.t('Refresh'),
+                );
+                choice && this.refresh();
+            }
         });
     }
 

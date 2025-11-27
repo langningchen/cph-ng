@@ -2,6 +2,13 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.4.11
+
+- **fix**: improve testlib compare
+- **fix**: improve drag drop style
+- **feat**: use vscode builtin font selection
+- **feat**: add sidebar reload message
+
 ## 0.4.10
 
 - **fix**: no editor

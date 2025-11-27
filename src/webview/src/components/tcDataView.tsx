@@ -130,7 +130,8 @@ const TcDataView = ({
     }, [autoFocus]);
 
     const commonStyle: CSSProperties = {
-        fontFamily,
+        fontFamily: 'var(--vscode-editor-font-family)',
+        fontWeight: 'var(--vscode-editor-font-weight)',
         width: '100%',
         overflow: 'auto',
         scrollbarWidth: 'thin',
