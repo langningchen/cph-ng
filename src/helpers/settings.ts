@@ -135,7 +135,7 @@ class CompanionSection extends SettingsSection {
         return this.get('listenPort') as number;
     }
     get customPathScript(): string {
-        return renderPath(this.get('customPathScript') as string);
+        return this.get('customPathScript') as string;
     }
     get submitLanguage(): number {
         return this.get('submitLanguage') as number;

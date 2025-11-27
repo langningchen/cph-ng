@@ -17,10 +17,11 @@
 
 import Io from '@/helpers/io';
 import Settings from '@/helpers/settings';
+import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { homedir, tmpdir } from 'os';
 import { basename, dirname, extname, normalize, relative } from 'path';
-import { l10n, Uri, workspace } from 'vscode';
+import { l10n, Uri, window, workspace } from 'vscode';
 import { Problem } from '../types/types.backend';
 import { extensionPath } from './global';
 
@@ -55,6 +56,61 @@ export const renderPath = (original: string) => {
             ['extensionPath', extensionPath],
         ]),
     );
+};
+export const renderPathWithoutFile = async (
+    original: string,
+    ignoreError: boolean = false,
+) => {
+    if (original.includes('${workspace}')) {
+        const folders = [];
+        if (!workspace.workspaceFolders) {
+            ignoreError ||
+                Io.error(
+                    l10n.t(
+                        'Path uses ${workspace} or ${relativeDirname}, but file is not in a workspace folder.',
+                    ),
+                );
+            return null;
+        }
+        for (const folder of workspace.workspaceFolders) {
+            if (
+                existsSync(
+                    renderPath(
+                        renderString(original, [
+                            ['workspace', folder.uri.fsPath],
+                        ]),
+                    ),
+                )
+            ) {
+                folders.push(folder.uri.fsPath);
+            }
+        }
+        if (!folders.length) {
+            ignoreError ||
+                Io.error(
+                    l10n.t(
+                        'Path uses ${workspace} or ${relativeDirname}, but no workspace folder contains the file.',
+                    ),
+                );
+            return null;
+        }
+        if (folders.length === 1) {
+            original = renderString(original, [
+                ['workspace', workspace.workspaceFolders[0].uri.fsPath],
+            ]);
+        } else {
+            const folder = await window.showQuickPick(folders, {
+                canPickMany: false,
+                title: l10n.t('Select workspace folder'),
+            });
+            if (!folder) {
+                Io.info(l10n.t('No workspace folder selected.'));
+                return null;
+            }
+            original = renderString(original, [['workspace', folder]]);
+        }
+    }
+    return renderPath(original);
 };
 export const renderPathWithFile = (
     original: string,

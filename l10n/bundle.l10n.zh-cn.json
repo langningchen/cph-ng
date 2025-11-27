@@ -152,6 +152,7 @@
     "Select location to save": "选择保存位置",
     "Select problems to import": "选择要导入的题目",
     "Select test cases to add": "选择要添加的测试样例",
+    "Select {workspace} folder": "选择 {workspace} 目录",
     "Select {fileType} File": "选择{fileType}文件",
     "Sidebar configuration changed, please refresh to apply the new settings.": "侧边栏配置已更改，请刷新以应用新设置。",
     "Skipped": "已跳过",

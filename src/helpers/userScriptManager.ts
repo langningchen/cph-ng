@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { renderPathWithoutFile } from '@/utils/strTemplate';
 import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import {
@@ -55,7 +56,13 @@ export default class UserScriptManager {
     ): Promise<(string | null)[]> {
         let code: string;
         try {
-            code = await readFile(Settings.companion.customPathScript, 'utf-8');
+            const scriptFile = await renderPathWithoutFile(
+                Settings.companion.customPathScript,
+            );
+            if (!scriptFile) {
+                return problems.map(() => null);
+            }
+            code = await readFile(scriptFile, 'utf-8');
         } catch (e) {
             this.logger.error('Could not read user script', e);
             Io.error(l10n.t('Could not read user script'));

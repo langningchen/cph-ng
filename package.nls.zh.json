@@ -19,7 +19,7 @@
     "cph-ng.configuration.cache.properties.directory.markdownDescription": "指定用于存储已编译文件和扩展生成的其他临时数据的**缓存目录**。你可以使用以下占位符：\n- `${tmp}`：表示系统的默认临时文件夹。\n- `${home}`：表示用户的主目录。\n\n请确保此目录具有适当的写入权限。",
     "cph-ng.configuration.cache.title": "缓存",
     "cph-ng.configuration.companion.properties.addTimestamp.markdownDescription": "启用后，提交时将在源代码末尾附加一个**时间戳注释**。该注释指示提交的确切日期和时间，这对于跟踪和记录目的非常有用。",
-    "cph-ng.configuration.companion.properties.customPathScript.markdownDescription": "指定一个**自定义脚本的路径**，该脚本将在通过 Competitive Companion 导入题目后执行。此脚本用于根据题目数据来自定义文件保存路径。你可以使用以下占位符：\n- `${tmp}`：表示系统的默认临时文件夹。\n- `${home}`：表示用户的主目录。\n- `${extensionPath}`：表示扩展的安装路径。",
+    "cph-ng.configuration.companion.properties.customPathScript.markdownDescription": "指定一个**自定义脚本的路径**，该脚本将在通过 Competitive Companion 导入题目后执行。此脚本用于根据题目数据来自定义文件保存路径。你可以使用以下占位符：\n- `${tmp}`：表示系统的默认临时文件夹。\n- `${home}`：表示用户的主目录。\n- `${extensionPath}`：表示扩展的安装路径。\n- `${workspace}`：表示打开的文件夹路径（如果你的工作区中有多个文件夹并都包含这一文件，每次导入题目会出现选择的提示）",
     "cph-ng.configuration.companion.properties.listenPort.markdownDescription": "设置 Competitive Companion 服务器的**监听端口**。此端口用于扩展与浏览器扩展等外部工具之间的通信，这些工具会自动获取题目数据。请确保此端口未被防火墙阻止。",
     "cph-ng.configuration.companion.properties.showPanel.enumItemLabels.-1": "活动",
     "cph-ng.configuration.companion.properties.showPanel.enumItemLabels.-2": "旁边",
