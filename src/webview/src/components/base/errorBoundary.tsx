@@ -32,103 +32,99 @@ import CphButton from '../cphButton';
 import CphFlex from './cphFlex';
 
 interface ErrorFallbackProps {
-    error: Error;
-    resetErrorBoundary: () => void;
+  error: Error;
+  resetErrorBoundary: () => void;
 }
 
 const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
-    const { t } = useTranslation();
-    const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
 
-    return (
-        <>
-            <CphFlex>
-                <CphButton
-                    icon={ErrorIcon}
-                    name={'Error'}
-                    color={'error'}
-                    onClick={() => {
-                        setOpen(true);
-                    }}
-                />
-                <CphButton
-                    icon={ReplayIcon}
-                    name={'Retry'}
-                    color={'warning'}
-                    onClick={resetErrorBoundary}
-                />
-            </CphFlex>
-            <Dialog
-                fullWidth
-                maxWidth={false}
-                open={open}
-                onClose={() => {
-                    setOpen(false);
-                }}
-            >
-                <DialogTitle>{t('errorBoundary.title')}</DialogTitle>
-                <DialogContent>
-                    <CphFlex column>
-                        <Typography>
-                            {t('errorBoundary.description')}
-                        </Typography>
-                        <Accordion sx={{ width: '100%' }}>
-                            <AccordionSummary>
-                                {t('errorBoundary.details')}
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Box
-                                    component='pre'
-                                    overflow={'scroll'}
-                                >
-                                    {error.stack}
-                                </Box>
-                            </AccordionDetails>
-                        </Accordion>
-                    </CphFlex>
-                </DialogContent>
-            </Dialog>
-        </>
-    );
+  return (
+    <>
+      <CphFlex>
+        <CphButton
+          icon={ErrorIcon}
+          name={'Error'}
+          color={'error'}
+          onClick={() => {
+            setOpen(true);
+          }}
+        />
+        <CphButton
+          icon={ReplayIcon}
+          name={'Retry'}
+          color={'warning'}
+          onClick={resetErrorBoundary}
+        />
+      </CphFlex>
+      <Dialog
+        fullWidth
+        maxWidth={false}
+        open={open}
+        onClose={() => {
+          setOpen(false);
+        }}
+      >
+        <DialogTitle>{t('errorBoundary.title')}</DialogTitle>
+        <DialogContent>
+          <CphFlex column>
+            <Typography>{t('errorBoundary.description')}</Typography>
+            <Accordion sx={{ width: '100%' }}>
+              <AccordionSummary>{t('errorBoundary.details')}</AccordionSummary>
+              <AccordionDetails>
+                <Box
+                  component='pre'
+                  overflow={'scroll'}
+                >
+                  {error.stack}
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+          </CphFlex>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 };
 
 interface Props {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 interface State {
-    hasError: boolean;
-    error: Error | null;
-    showDialog: boolean;
+  hasError: boolean;
+  error: Error | null;
+  showDialog: boolean;
 }
 
 class ErrorBoundary extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-        this.state = { hasError: false, error: null, showDialog: false };
-    }
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false, error: null, showDialog: false };
+  }
 
-    static getDerivedStateFromError(error: Error): Partial<State> {
-        return { hasError: true, error };
-    }
+  static getDerivedStateFromError(error: Error): Partial<State> {
+    return { hasError: true, error };
+  }
 
-    resetBoundary = () => {
-        this.setState({ hasError: false, error: null }, () => {
-            this.forceUpdate();
-        });
-    };
+  resetBoundary = () => {
+    this.setState({ hasError: false, error: null }, () => {
+      this.forceUpdate();
+    });
+  };
 
-    render() {
-        if (this.state.hasError && this.state.error) {
-            return (
-                <ErrorFallback
-                    error={this.state.error}
-                    resetErrorBoundary={this.resetBoundary}
-                />
-            );
-        }
-        return this.props.children;
+  render() {
+    if (this.state.hasError && this.state.error) {
+      return (
+        <ErrorFallback
+          error={this.state.error}
+          resetErrorBoundary={this.resetBoundary}
+        />
+      );
     }
+    return this.props.children;
+  }
 }
 
 export default ErrorBoundary;

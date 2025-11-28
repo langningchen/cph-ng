@@ -18,13 +18,13 @@
 import { TcVerdict } from '../types/types.backend';
 
 export class UnknownResult<T> {
-    constructor(public data: T) {}
+  constructor(public data: T) {}
 }
 export class KnownResult<T = never> {
-    constructor(
-        public verdict: TcVerdict,
-        public msg?: string,
-        public data?: T,
-    ) {}
+  constructor(
+    public verdict: TcVerdict,
+    public msg?: string,
+    public data?: T,
+  ) {}
 }
 export type Result<T> = UnknownResult<T> | KnownResult<T>;

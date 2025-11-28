@@ -21,20 +21,20 @@ import React from 'react';
 interface CphTextProps extends TypographyProps {}
 
 const CphText = (props: CphTextProps) => {
-    return (
-        <Typography
-            overflow={'hidden'}
-            textOverflow={'ellipsis'}
-            component={'span'}
-            sx={{
-                cursor: 'default',
-                userSelect: 'none',
-            }}
-            {...props}
-        >
-            {props.children}
-        </Typography>
-    );
+  return (
+    <Typography
+      overflow={'hidden'}
+      textOverflow={'ellipsis'}
+      component={'span'}
+      sx={{
+        cursor: 'default',
+        userSelect: 'none',
+      }}
+      {...props}
+    >
+      {props.children}
+    </Typography>
+  );
 };
 
 export default CphText;

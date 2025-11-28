@@ -16,38 +16,38 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 export interface TCVerdict {
-    name: string;
-    fullName: string;
-    color: string;
+  name: string;
+  fullName: string;
+  color: string;
 }
 
 export type TCIO =
-    | { useFile: true; path: string }
-    | { useFile: false; data: string };
+  | { useFile: true; path: string }
+  | { useFile: false; data: string };
 
 export interface TCResult {
-    verdict: TCVerdict;
-    time: number;
-    stdout: TCIO;
-    stderr: TCIO;
-    msg: string;
+  verdict: TCVerdict;
+  time: number;
+  stdout: TCIO;
+  stderr: TCIO;
+  msg: string;
 }
 
 export interface TC {
-    stdin: TCIO;
-    answer: TCIO;
-    isExpand: boolean;
-    result?: TCResult;
+  stdin: TCIO;
+  answer: TCIO;
+  isExpand: boolean;
+  result?: TCResult;
 }
 
 export interface Problem {
-    name: string;
-    url?: string;
-    tcs: TC[];
-    timeLimit: number;
-    srcPath: string;
-    srcHash?: string;
-    isSpecialJudge?: boolean;
-    checkerPath?: string;
-    checkerHash?: string;
+  name: string;
+  url?: string;
+  tcs: TC[];
+  timeLimit: number;
+  srcPath: string;
+  srcHash?: string;
+  isSpecialJudge?: boolean;
+  checkerPath?: string;
+  checkerHash?: string;
 }

@@ -29,97 +29,92 @@ import CphText from './base/cphText';
 import CphButton from './cphButton';
 
 type TipMessage = {
-    msg: string;
-    action?: () => void;
+  msg: string;
+  action?: () => void;
 };
 
 const Tips = () => {
-    const { t } = useTranslation();
-    const tipMessages: TipMessage[] = [
-        { msg: t('tipMessage1') },
-        { msg: t('tipMessage2') },
-        { msg: t('tipMessage3') },
-        {
-            msg: t('tipMessage4'),
-            action: () => msg({ type: 'startChat' }),
-        },
-        { msg: t('tipMessage5') },
-        {
-            msg: t('tipMessage6'),
-            action: () =>
-                msg({ type: 'openSettings', item: 'cph-ng.sidebar.showAcGif' }),
-        },
-        {
-            msg: t('tipMessage7'),
-            action: () =>
-                msg({
-                    type: 'openSettings',
-                    item: 'cph-ng.sidebar.hiddenStatuses',
-                }),
-        },
-        { msg: t('tipMessage8') },
-        {
-            msg: t('tipMessage9'),
-            action: () =>
-                msg({
-                    type: 'openSettings',
-                    item: 'cph-ng.compilation.useWrapper',
-                }),
-        },
-        { msg: t('tipMessage10') },
-    ];
-    const [idx, setIdx] = useState(
-        Math.floor(Math.random() * tipMessages.length),
-    );
-    return (
-        <Alert
-            sx={{
-                'width': '100%',
-                'boxSizing': 'border-box',
-                '& > .MuiAlert-message': { flex: '1' },
-            }}
-            severity='info'
-        >
-            <AlertTitle>
-                <CphFlex>
-                    <CphText flex={1}>{t('tips.title')}</CphText>
-                    <CphButton
-                        icon={TryIcon}
-                        name={t('tips.tryNow')}
-                        disabled={!tipMessages[idx].action}
-                        onClick={tipMessages[idx].action}
-                    />
-                    <CphButton
-                        icon={NavigateBeforeIcon}
-                        name={t('tips.previousTip')}
-                        onClick={() =>
-                            setIdx(
-                                (idx - 1 + tipMessages.length) %
-                                    tipMessages.length,
-                            )
-                        }
-                    />
-                    <CphButton
-                        icon={ShuffleIcon}
-                        name={t('tips.randomTip')}
-                        onClick={() =>
-                            setIdx(
-                                Math.floor(Math.random() * tipMessages.length),
-                            )
-                        }
-                    />
-                    <CphButton
-                        icon={NavigateNextIcon}
-                        name={t('tips.nextTip')}
-                        onClick={() => setIdx((idx + 1) % tipMessages.length)}
-                    />
-                </CphFlex>
-            </AlertTitle>
-            <CphText>
-                #{idx + 1}. {tipMessages[idx].msg}
-            </CphText>
-        </Alert>
-    );
+  const { t } = useTranslation();
+  const tipMessages: TipMessage[] = [
+    { msg: t('tipMessage1') },
+    { msg: t('tipMessage2') },
+    { msg: t('tipMessage3') },
+    {
+      msg: t('tipMessage4'),
+      action: () => msg({ type: 'startChat' }),
+    },
+    { msg: t('tipMessage5') },
+    {
+      msg: t('tipMessage6'),
+      action: () =>
+        msg({ type: 'openSettings', item: 'cph-ng.sidebar.showAcGif' }),
+    },
+    {
+      msg: t('tipMessage7'),
+      action: () =>
+        msg({
+          type: 'openSettings',
+          item: 'cph-ng.sidebar.hiddenStatuses',
+        }),
+    },
+    { msg: t('tipMessage8') },
+    {
+      msg: t('tipMessage9'),
+      action: () =>
+        msg({
+          type: 'openSettings',
+          item: 'cph-ng.compilation.useWrapper',
+        }),
+    },
+    { msg: t('tipMessage10') },
+  ];
+  const [idx, setIdx] = useState(
+    Math.floor(Math.random() * tipMessages.length),
+  );
+  return (
+    <Alert
+      sx={{
+        'width': '100%',
+        'boxSizing': 'border-box',
+        '& > .MuiAlert-message': { flex: '1' },
+      }}
+      severity='info'
+    >
+      <AlertTitle>
+        <CphFlex>
+          <CphText flex={1}>{t('tips.title')}</CphText>
+          <CphButton
+            icon={TryIcon}
+            name={t('tips.tryNow')}
+            disabled={!tipMessages[idx].action}
+            onClick={tipMessages[idx].action}
+          />
+          <CphButton
+            icon={NavigateBeforeIcon}
+            name={t('tips.previousTip')}
+            onClick={() =>
+              setIdx((idx - 1 + tipMessages.length) % tipMessages.length)
+            }
+          />
+          <CphButton
+            icon={ShuffleIcon}
+            name={t('tips.randomTip')}
+            onClick={() =>
+              setIdx(Math.floor(Math.random() * tipMessages.length))
+            }
+          />
+          <CphButton
+            icon={NavigateNextIcon}
+            name={t('tips.nextTip')}
+            onClick={() => setIdx((idx + 1) % tipMessages.length)}
+          />
+        </CphFlex>
+      </AlertTitle>
+      <CphText>
+        #{idx + 1}. {tipMessages[idx].msg}
+      </CphText>
+    </Alert>
+  );
 };
 
 export default Tips;

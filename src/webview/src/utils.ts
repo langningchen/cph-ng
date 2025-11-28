@@ -18,28 +18,28 @@
 import { WebviewMsg } from './msgs';
 
 export const basename = (path: string) => {
-    if (path.includes('/')) {
-        return path.split('/').pop();
-    }
-    return path.split('\\').pop();
+  if (path.includes('/')) {
+    return path.split('/').pop();
+  }
+  return path.split('\\').pop();
 };
 
 export const delProps = (obj: Object, props: string[]) => {
-    return Object.fromEntries(
-        Object.entries(obj).filter(([key]) => !props.includes(key)),
-    );
+  return Object.fromEntries(
+    Object.entries(obj).filter(([key]) => !props.includes(key)),
+  );
 };
 
 export const getCompile = (e: React.MouseEvent) => {
-    if (e.ctrlKey) {
-        return true;
-    }
-    if (e.altKey) {
-        return false;
-    }
-    return null;
+  if (e.ctrlKey) {
+    return true;
+  }
+  if (e.altKey) {
+    return false;
+  }
+  return null;
 };
 
 export const msg = (msg: WebviewMsg) => {
-    vscode.postMessage({ ...msg, activePath: window.activePath });
+  vscode.postMessage({ ...msg, activePath: window.activePath });
 };

@@ -6,18 +6,18 @@ import { ColorThemeKind, env, Uri, Webview, window } from 'vscode';
 const logger = new Logger('sidebar-html');
 
 export const getHtmlForWebview = (webview: Webview): string => {
-    logger.debug('Generating HTML for webview');
-    const getUri = (filename: string) =>
-        webview.asWebviewUri(Uri.joinPath(extensionUri, filename));
-    let isDarkMode =
-        window.activeColorTheme.kind === ColorThemeKind.Dark ? true : false;
-    if (Settings.sidebar.colorTheme === 'light') {
-        isDarkMode = false;
-    }
-    if (Settings.sidebar.colorTheme === 'dark') {
-        isDarkMode = true;
-    }
-    return `<!DOCTYPE html><html>
+  logger.debug('Generating HTML for webview');
+  const getUri = (filename: string) =>
+    webview.asWebviewUri(Uri.joinPath(extensionUri, filename));
+  let isDarkMode =
+    window.activeColorTheme.kind === ColorThemeKind.Dark ? true : false;
+  if (Settings.sidebar.colorTheme === 'light') {
+    isDarkMode = false;
+  }
+  if (Settings.sidebar.colorTheme === 'dark') {
+    isDarkMode = true;
+  }
+  return `<!DOCTYPE html><html>
 <head>
 <link rel="stylesheet" href="${getUri('dist/styles.css')}">
 </head>

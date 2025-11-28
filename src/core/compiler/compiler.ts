@@ -23,120 +23,120 @@ import { KnownResult, Result, UnknownResult } from '@/utils/result';
 import { l10n } from 'vscode';
 
 export interface CompileData {
-    src: LangCompileData;
-    srcLang: Lang;
-    checker?: LangCompileData;
-    interactor?: LangCompileData;
-    bfCompare?: {
-        generator: LangCompileData;
-        bruteForce: LangCompileData;
-    };
+  src: LangCompileData;
+  srcLang: Lang;
+  checker?: LangCompileData;
+  interactor?: LangCompileData;
+  bfCompare?: {
+    generator: LangCompileData;
+    bruteForce: LangCompileData;
+  };
 }
 type CompileResult = Result<CompileData>;
 
 export class Compiler {
-    private static logger: Logger = new Logger('compiler');
+  private static logger: Logger = new Logger('compiler');
 
-    /**
-     * Compile if the file given is a compilable language
-     * @returns UKE if compiled or not compilable; otherwise returns the compile error
-     */
-    private static async optionalCompile(
-        file: FileWithHash,
-        ac: AbortController,
-        forceCompile: boolean | null,
-    ): Promise<LangCompileResult> {
-        const checkerLang = Langs.getLang(file.path);
-        if (checkerLang) {
-            return await checkerLang.compile(file, ac, forceCompile);
-        }
-        return new UnknownResult({ outputPath: file.path });
+  /**
+   * Compile if the file given is a compilable language
+   * @returns UKE if compiled or not compilable; otherwise returns the compile error
+   */
+  private static async optionalCompile(
+    file: FileWithHash,
+    ac: AbortController,
+    forceCompile: boolean | null,
+  ): Promise<LangCompileResult> {
+    const checkerLang = Langs.getLang(file.path);
+    if (checkerLang) {
+      return await checkerLang.compile(file, ac, forceCompile);
+    }
+    return new UnknownResult({ outputPath: file.path });
+  }
+
+  public static async compileAll(
+    problem: Problem,
+    compile: boolean | null,
+    ac: AbortController,
+  ): Promise<CompileResult> {
+    // Compile source code
+    const srcLang = Langs.getLang(problem.src.path);
+    if (!srcLang) {
+      return new KnownResult(
+        TcVerdicts.SE,
+        l10n.t(
+          'Cannot determine the programming language of the source file: {file}.',
+          { file: problem.src.path },
+        ),
+      );
+    }
+    const result = await srcLang.compile(problem.src, ac, compile, {
+      canUseWrapper: true,
+      compilationSettings: problem.compilationSettings,
+    });
+    if (result instanceof KnownResult) {
+      return new KnownResult(result.verdict, result.msg);
+    }
+    problem.src.hash = result.data.hash;
+    const data: CompileData = {
+      src: result.data,
+      srcLang,
+    };
+
+    // Compile checker
+    if (problem.checker) {
+      const checkerResult = await this.optionalCompile(
+        problem.checker,
+        ac,
+        compile,
+      );
+      if (checkerResult instanceof KnownResult) {
+        return { ...checkerResult, data };
+      }
+      problem.checker.hash = checkerResult.data.hash;
+      data.checker = checkerResult.data;
     }
 
-    public static async compileAll(
-        problem: Problem,
-        compile: boolean | null,
-        ac: AbortController,
-    ): Promise<CompileResult> {
-        // Compile source code
-        const srcLang = Langs.getLang(problem.src.path);
-        if (!srcLang) {
-            return new KnownResult(
-                TcVerdicts.SE,
-                l10n.t(
-                    'Cannot determine the programming language of the source file: {file}.',
-                    { file: problem.src.path },
-                ),
-            );
-        }
-        const result = await srcLang.compile(problem.src, ac, compile, {
-            canUseWrapper: true,
-            compilationSettings: problem.compilationSettings,
-        });
-        if (result instanceof KnownResult) {
-            return result;
-        }
-        problem.src.hash = result.data.hash;
-        const data: CompileData = {
-            src: result.data,
-            srcLang,
-        };
-
-        // Compile checker
-        if (problem.checker) {
-            const checkerResult = await this.optionalCompile(
-                problem.checker,
-                ac,
-                compile,
-            );
-            if (checkerResult instanceof KnownResult) {
-                return { ...checkerResult, data };
-            }
-            problem.checker.hash = checkerResult.data.hash;
-            data.checker = checkerResult.data;
-        }
-
-        // Compile interactor
-        if (problem.interactor) {
-            const interactorResult = await this.optionalCompile(
-                problem.interactor,
-                ac,
-                compile,
-            );
-            if (interactorResult instanceof KnownResult) {
-                return { ...interactorResult, data };
-            }
-            problem.interactor.hash = interactorResult.data.hash;
-            data.interactor = interactorResult.data;
-        }
-
-        // Compile brute force comparison programs
-        if (problem.bfCompare?.generator && problem.bfCompare?.bruteForce) {
-            const generatorResult = await this.optionalCompile(
-                problem.bfCompare.generator,
-                ac,
-                compile,
-            );
-            if (generatorResult instanceof KnownResult) {
-                return { ...generatorResult, data };
-            }
-            problem.bfCompare.generator.hash = generatorResult.data.hash;
-
-            const bruteForceResult = await this.optionalCompile(
-                problem.bfCompare.bruteForce,
-                ac,
-                compile,
-            );
-            if (bruteForceResult instanceof KnownResult) {
-                return { ...bruteForceResult, data };
-            }
-            problem.bfCompare.bruteForce.hash = bruteForceResult.data.hash;
-            data.bfCompare = {
-                generator: generatorResult.data,
-                bruteForce: bruteForceResult.data,
-            };
-        }
-        this.logger.trace('Compilation succeeded', data);
-        return new UnknownResult(data);
+    // Compile interactor
+    if (problem.interactor) {
+      const interactorResult = await this.optionalCompile(
+        problem.interactor,
+        ac,
+        compile,
+      );
+      if (interactorResult instanceof KnownResult) {
+        return { ...interactorResult, data };
+      }
+      problem.interactor.hash = interactorResult.data.hash;
+      data.interactor = interactorResult.data;
     }
+
+    // Compile brute force comparison programs
+    if (problem.bfCompare?.generator && problem.bfCompare?.bruteForce) {
+      const generatorResult = await this.optionalCompile(
+        problem.bfCompare.generator,
+        ac,
+        compile,
+      );
+      if (generatorResult instanceof KnownResult) {
+        return { ...generatorResult, data };
+      }
+      problem.bfCompare.generator.hash = generatorResult.data.hash;
+
+      const bruteForceResult = await this.optionalCompile(
+        problem.bfCompare.bruteForce,
+        ac,
+        compile,
+      );
+      if (bruteForceResult instanceof KnownResult) {
+        return { ...bruteForceResult, data };
+      }
+      problem.bfCompare.bruteForce.hash = bruteForceResult.data.hash;
+      data.bfCompare = {
+        generator: generatorResult.data,
+        bruteForce: bruteForceResult.data,
+      };
+    }
+    this.logger.trace('Compilation succeeded', data);
+    return new UnknownResult(data);
+  }
 }

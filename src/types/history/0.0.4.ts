@@ -16,38 +16,38 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 export interface TestCaseVerdict {
-    name: string;
-    fullName: string;
-    color: string;
+  name: string;
+  fullName: string;
+  color: string;
 }
 
 export type TestCaseIO =
-    | { useFile: true; path: string }
-    | { useFile: false; data: string };
+  | { useFile: true; path: string }
+  | { useFile: false; data: string };
 
 export interface TestCaseResult {
-    verdict: TestCaseVerdict;
-    time: number;
-    stdout: TestCaseIO;
-    stderr: TestCaseIO;
-    message: string;
+  verdict: TestCaseVerdict;
+  time: number;
+  stdout: TestCaseIO;
+  stderr: TestCaseIO;
+  message: string;
 }
 
 export interface TestCase {
-    stdin: TestCaseIO;
-    answer: TestCaseIO;
-    isExpand: boolean;
-    result?: TestCaseResult;
+  stdin: TestCaseIO;
+  answer: TestCaseIO;
+  isExpand: boolean;
+  result?: TestCaseResult;
 }
 
 export interface Problem {
-    name: string;
-    url?: string;
-    testCases: TestCase[];
-    timeLimit: number;
-    srcPath: string;
-    srcHash?: string;
-    isSpecialJudge?: boolean;
-    checkerPath?: string;
-    checkerHash?: string;
+  name: string;
+  url?: string;
+  testCases: TestCase[];
+  timeLimit: number;
+  srcPath: string;
+  srcHash?: string;
+  isSpecialJudge?: boolean;
+  checkerPath?: string;
+  checkerHash?: string;
 }

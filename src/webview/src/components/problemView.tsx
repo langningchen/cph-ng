@@ -27,51 +27,51 @@ import ProblemTitle from './problemTitle';
 import TcsView from './tcsView';
 
 interface ProblemViewProps {
-    problem: IProblem;
-    startTime: number;
+  problem: IProblem;
+  startTime: number;
 }
 
 const ProblemView = ({ problem, startTime }: ProblemViewProps) => {
-    const { t } = useTranslation();
-    return (
-        <>
-            <ErrorBoundary>
-                <ProblemTitle
-                    problem={problem}
-                    startTime={startTime}
-                />
-            </ErrorBoundary>
-            <CphFlex
-                column
-                flex={1}
-                width={'100%'}
-                sx={{
-                    overflowY: 'scroll',
-                    scrollbarWidth: 'thin',
-                    scrollbarGutter: 'stable',
-                }}
-                bgcolor={'rgba(127, 127, 127, 0.05)'}
-                paddingY={2}
-            >
-                <ErrorBoundary>
-                    <CphMenu
-                        menu={{
-                            [t('problemView.menu.clearStatus')]: () => {
-                                msg({ type: 'clearStatus' });
-                            },
-                        }}
-                        flex={1}
-                        width={'100%'}
-                    >
-                        <TcsView problem={problem} />
-                    </CphMenu>
-                </ErrorBoundary>
-            </CphFlex>
-            <ErrorBoundary>
-                <ProblemActions problem={problem} />
-            </ErrorBoundary>
-        </>
-    );
+  const { t } = useTranslation();
+  return (
+    <>
+      <ErrorBoundary>
+        <ProblemTitle
+          problem={problem}
+          startTime={startTime}
+        />
+      </ErrorBoundary>
+      <CphFlex
+        column
+        flex={1}
+        width={'100%'}
+        sx={{
+          overflowY: 'scroll',
+          scrollbarWidth: 'thin',
+          scrollbarGutter: 'stable',
+        }}
+        bgcolor={'rgba(127, 127, 127, 0.05)'}
+        paddingY={2}
+      >
+        <ErrorBoundary>
+          <CphMenu
+            menu={{
+              [t('problemView.menu.clearStatus')]: () => {
+                msg({ type: 'clearStatus' });
+              },
+            }}
+            flex={1}
+            width={'100%'}
+          >
+            <TcsView problem={problem} />
+          </CphMenu>
+        </ErrorBoundary>
+      </CphFlex>
+      <ErrorBoundary>
+        <ProblemActions problem={problem} />
+      </ErrorBoundary>
+    </>
+  );
 };
 
 export default ProblemView;

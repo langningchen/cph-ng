@@ -20,29 +20,29 @@
 html,
 body,
 #root {
-    padding: 0 !important;
-    height: 100% !important;
-    overflow: hidden;
+  padding: 0 !important;
+  height: 100% !important;
+  overflow: hidden;
 }
 
 @keyframes blink {
-    0%,
-    50% {
-        opacity: 1;
-    }
+  0%,
+  50% {
+    opacity: 1;
+  }
 
-    51%,
-    100% {
-        opacity: 0;
-    }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .defaultBlur {
-    filter: blur(4px);
-    transition: filter 0.2s;
-    cursor: pointer;
-    display: inline-block;
+  filter: blur(4px);
+  transition: filter 0.2s;
+  cursor: pointer;
+  display: inline-block;
 }
 .defaultBlur:hover {
-    filter: none;
+  filter: none;
 }

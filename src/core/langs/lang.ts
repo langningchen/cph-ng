@@ -22,144 +22,143 @@ import Logger from '@/helpers/logger';
 import ProcessExecutor, { AbortReason } from '@/helpers/processExecutor';
 import Settings from '@/helpers/settings';
 import { FileWithHash, ICompilationSettings, TcVerdicts } from '@/types';
-import { waitUntil } from '@/utils/global';
+import { telemetry, waitUntil } from '@/utils/global';
 import { exists } from '@/utils/process';
 import { KnownResult, Result, UnknownResult } from '@/utils/result';
 import { readFile } from 'fs/promises';
 import { l10n, window } from 'vscode';
 
 export interface LangCompileData {
-    outputPath: string;
-    hash?: string;
+  outputPath: string;
+  hash?: string;
 }
 export type LangCompileResult = Result<LangCompileData>;
 const logger = new Logger('lang');
 
 export interface CompileAdditionalData {
-    canUseWrapper: boolean;
-    compilationSettings?: ICompilationSettings;
-    debug?: boolean;
+  canUseWrapper: boolean;
+  compilationSettings?: ICompilationSettings;
+  debug?: boolean;
 }
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
-    canUseWrapper: false,
+  canUseWrapper: false,
 };
 
 export class Lang {
-    protected static executor: ProcessExecutor = new ProcessExecutor();
+  protected static executor: ProcessExecutor = new ProcessExecutor();
 
-    protected static async checkHash(
-        src: FileWithHash,
-        outputPath: string,
-        additionalHash: string,
-        forceCompile: boolean | null,
-    ): Promise<{
-        skip: boolean;
-        hash: string;
-    }> {
-        return checkHash(src, outputPath, additionalHash, forceCompile);
+  protected static async checkHash(
+    src: FileWithHash,
+    outputPath: string,
+    additionalHash: string,
+    forceCompile: boolean | null,
+  ): Promise<{
+    skip: boolean;
+    hash: string;
+  }> {
+    return checkHash(src, outputPath, additionalHash, forceCompile);
+  }
+
+  public readonly name: string = 'generic';
+  public readonly extensions: string[] = [];
+  public readonly enableRunner: boolean = false;
+
+  public async compile(
+    src: FileWithHash,
+    ac: AbortController,
+    forceCompile: boolean | null,
+    additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
+  ): Promise<LangCompileResult> {
+    // Save the file if it's opened in an editor
+    const editor = window.visibleTextEditors.find(
+      (editor) => editor.document.fileName === src.path,
+    );
+    if (editor) {
+      await editor.document.save();
+      // We have to wait until the document is actually saved to disk.
+      // Although `editor.document.save()` returns a promise, it seems that
+      // the promise resolves before the file is fully written.
+      // See https://github.com/langningchen/cph-ng/issues/60
+      await waitUntil(() => !editor.document.isDirty);
     }
 
-    public readonly name: string = 'generic';
-    public readonly extensions: string[] = [];
-    public readonly enableRunner: boolean = false;
+    // Clear previous compilation IO
+    CompilationIo.clear();
 
-    public async compile(
-        src: FileWithHash,
-        ac: AbortController,
-        forceCompile: boolean | null,
-        additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
-    ): Promise<LangCompileResult> {
-        // Save the file if it's opened in an editor
-        const editor = window.visibleTextEditors.find(
-            (editor) => editor.document.fileName === src.path,
-        );
-        if (editor) {
-            await editor.document.save();
-            // We have to wait until the document is actually saved to disk.
-            // Although `editor.document.save()` returns a promise, it seems that
-            // the promise resolves before the file is fully written.
-            // See https://github.com/langningchen/cph-ng/issues/60
-            await waitUntil(() => !editor.document.isDirty);
-        }
+    try {
+      const compileEnd = telemetry.start('compile', {
+        lang: this.name,
+        forceCompile: forceCompile ? 'auto' : String(forceCompile),
+      });
+      const langCompileResult = await this._compile(
+        src,
+        ac,
+        forceCompile,
+        additionalData,
+      );
+      compileEnd();
 
-        // Clear previous compilation IO
-        CompilationIo.clear();
-
-        try {
-            const langCompileResult = await this._compile(
-                src,
-                ac,
-                forceCompile,
-                additionalData,
-            );
-
-            // Check if the output file exists
-            if (
-                langCompileResult instanceof UnknownResult &&
-                !(await exists(langCompileResult.data.outputPath))
-            ) {
-                return new KnownResult(
-                    TcVerdicts.CE,
-                    l10n.t('Compilation failed'),
-                );
-            }
-            return langCompileResult;
-        } catch (e) {
-            logger.error('Compilation failed', e);
-            CompilationIo.append((e as Error).message);
-            return new KnownResult(TcVerdicts.CE, l10n.t('Compilation failed'));
-        }
+      // Check if the output file exists
+      if (
+        langCompileResult instanceof UnknownResult &&
+        !(await exists(langCompileResult.data.outputPath))
+      ) {
+        return new KnownResult(TcVerdicts.CE, l10n.t('Compilation failed'));
+      }
+      return langCompileResult;
+    } catch (e) {
+      logger.error('Compilation failed', e);
+      CompilationIo.append((e as Error).message);
+      return new KnownResult(TcVerdicts.CE, l10n.t('Compilation failed'));
     }
-    protected async _compile(
-        _src: FileWithHash,
-        _ac: AbortController,
-        _forceCompile: boolean | null,
-        _additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
-    ): Promise<LangCompileResult> {
-        throw new Error('Compile method not implemented.');
+  }
+  protected async _compile(
+    _src: FileWithHash,
+    _ac: AbortController,
+    _forceCompile: boolean | null,
+    _additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
+  ): Promise<LangCompileResult> {
+    throw new Error('Compile method not implemented.');
+  }
+  protected async _executeCompiler(
+    cmd: string[],
+    ac: AbortController,
+  ): Promise<Result<undefined>> {
+    const result = await ProcessExecutor.execute({
+      cmd,
+      ac,
+      timeout: Settings.compilation.timeout,
+    });
+    if (result instanceof Error) {
+      return new KnownResult(TcVerdicts.SE, result.message);
     }
-    protected async _executeCompiler(
-        cmd: string[],
-        ac: AbortController,
-    ): Promise<Result<undefined>> {
-        const result = await ProcessExecutor.execute({
-            cmd,
-            ac,
-            timeout: Settings.compilation.timeout,
-        });
-        if (result instanceof Error) {
-            return new KnownResult(TcVerdicts.SE, result.message);
-        }
-        if (result.abortReason === AbortReason.UserAbort) {
-            return new KnownResult(
-                TcVerdicts.RJ,
-                l10n.t('Compilation aborted by user'),
-            );
-        }
-        if (result.abortReason === AbortReason.Timeout) {
-            return new KnownResult(
-                TcVerdicts.CE,
-                l10n.t('Compilation timed out'),
-            );
-        }
-        CompilationIo.append(await readFile(result.stdoutPath, 'utf-8'));
-        CompilationIo.append(await readFile(result.stderrPath, 'utf-8'));
-        if (result.codeOrSignal) {
-            return new KnownResult(
-                TcVerdicts.CE,
-                l10n.t('Compiler exited with code {code}', {
-                    code: result.codeOrSignal,
-                }),
-            );
-        }
-        Cache.dispose([result.stdoutPath, result.stderrPath]);
-        return new UnknownResult(undefined);
+    if (result.abortReason === AbortReason.UserAbort) {
+      return new KnownResult(
+        TcVerdicts.RJ,
+        l10n.t('Compilation aborted by user'),
+      );
     }
+    if (result.abortReason === AbortReason.Timeout) {
+      return new KnownResult(TcVerdicts.CE, l10n.t('Compilation timed out'));
+    }
+    CompilationIo.append(await readFile(result.stdoutPath, 'utf-8'));
+    CompilationIo.append(await readFile(result.stderrPath, 'utf-8'));
+    if (result.codeOrSignal) {
+      return new KnownResult(
+        TcVerdicts.CE,
+        l10n.t('Compiler exited with code {code}', {
+          code: result.codeOrSignal,
+        }),
+      );
+    }
+    Cache.dispose([result.stdoutPath, result.stderrPath]);
+    return new UnknownResult(undefined);
+  }
 
-    public async getRunCommand(
-        _target: string,
-        _compilationSettings?: ICompilationSettings,
-    ): Promise<string[]> {
-        throw new Error('Run method not implemented.');
-    }
+  public async getRunCommand(
+    _target: string,
+    _compilationSettings?: ICompilationSettings,
+  ): Promise<string[]> {
+    throw new Error('Run method not implemented.');
+  }
 }

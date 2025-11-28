@@ -21,24 +21,24 @@ import React from 'react';
 import { delProps } from '../../utils';
 
 interface CphFlexProps extends BoxProps {
-    smallGap?: boolean;
-    column?: boolean;
-    alignStart?: boolean;
+  smallGap?: boolean;
+  column?: boolean;
+  alignStart?: boolean;
 }
 
 const CphFlex = (props: CphFlexProps) => {
-    return (
-        <Stack
-            alignItems={props.alignStart ? 'flex-start' : 'center'}
-            flexDirection={props.column ? 'column' : 'row'}
-            gap={props.smallGap ? 0.5 : 1}
-            width={'100%'}
-            minWidth={0}
-            {...delProps(props, ['smallGap', 'column', 'alignStart'])}
-        >
-            {props.children}
-        </Stack>
-    );
+  return (
+    <Stack
+      alignItems={props.alignStart ? 'flex-start' : 'center'}
+      flexDirection={props.column ? 'column' : 'row'}
+      gap={props.smallGap ? 0.5 : 1}
+      width={'100%'}
+      minWidth={0}
+      {...delProps(props, ['smallGap', 'column', 'alignStart'])}
+    >
+      {props.children}
+    </Stack>
+  );
 };
 
 export default CphFlex;

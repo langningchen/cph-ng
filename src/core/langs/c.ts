@@ -22,64 +22,64 @@ import { KnownResult, UnknownResult } from '@/utils/result';
 import { type } from 'os';
 import { basename, extname, join } from 'path';
 import {
-    CompileAdditionalData,
-    DefaultCompileAdditionalData,
-    Lang,
-    LangCompileResult,
+  CompileAdditionalData,
+  DefaultCompileAdditionalData,
+  Lang,
+  LangCompileResult,
 } from './lang';
 
 export class LangC extends Lang {
-    private logger: Logger = new Logger('langC');
-    public readonly name = 'C';
-    public readonly extensions = ['c'];
-    public readonly enableRunner = true;
-    protected async _compile(
-        src: FileWithHash,
-        ac: AbortController,
-        forceCompile: boolean | null,
-        {
-            compilationSettings,
-            debug,
-        }: CompileAdditionalData = DefaultCompileAdditionalData,
-    ): Promise<LangCompileResult> {
-        this.logger.trace('compile', { src, forceCompile });
+  private logger: Logger = new Logger('langC');
+  public readonly name = 'C';
+  public readonly extensions = ['c'];
+  public readonly enableRunner = true;
+  protected async _compile(
+    src: FileWithHash,
+    ac: AbortController,
+    forceCompile: boolean | null,
+    {
+      compilationSettings,
+      debug,
+    }: CompileAdditionalData = DefaultCompileAdditionalData,
+  ): Promise<LangCompileResult> {
+    this.logger.trace('compile', { src, forceCompile });
 
-        const outputPath = join(
-            Settings.cache.directory,
-            basename(src.path, extname(src.path)) +
-                (type() === 'Windows_NT' ? '.exe' : ''),
-        );
+    const outputPath = join(
+      Settings.cache.directory,
+      basename(src.path, extname(src.path)) +
+        (type() === 'Windows_NT' ? '.exe' : ''),
+    );
 
-        const compiler =
-            compilationSettings?.compiler ?? Settings.compilation.cCompiler;
-        const args =
-            compilationSettings?.compilerArgs ?? Settings.compilation.cArgs;
+    const compiler =
+      compilationSettings?.compiler ?? Settings.compilation.cCompiler;
+    const args =
+      compilationSettings?.compilerArgs ?? Settings.compilation.cArgs;
 
-        const { skip, hash } = await Lang.checkHash(
-            src,
-            outputPath,
-            compiler + args,
-            forceCompile,
-        );
-        if (skip) {
-            return new UnknownResult({ outputPath, hash });
-        }
-
-        const compilerArgs = args.split(/\s+/).filter(Boolean);
-
-        const cmd = [compiler, src.path, ...compilerArgs, '-o', outputPath];
-        if (Settings.runner.unlimitedStack && type() === 'Windows_NT') {
-            cmd.push('-Wl,--stack,268435456');
-        }
-        debug && cmd.push('-g', '-O0');
-
-        const result = await this._executeCompiler(cmd, ac);
-        return result instanceof KnownResult
-            ? result
-            : new UnknownResult({ outputPath, hash });
+    const { skip, hash } = await Lang.checkHash(
+      src,
+      outputPath,
+      compiler + args,
+      forceCompile,
+    );
+    if (skip) {
+      return new UnknownResult({ outputPath, hash });
     }
-    public async getRunCommand(target: string): Promise<string[]> {
-        this.logger.trace('runCommand', { target });
-        return [target];
+
+    const compilerArgs = args.split(/\s+/).filter(Boolean);
+
+    const cmd = [compiler, src.path, ...compilerArgs, '-o', outputPath];
+    if (Settings.runner.unlimitedStack && type() === 'Windows_NT') {
+      cmd.push('-Wl,--stack,268435456');
     }
+    debug && cmd.push('-g', '-O0');
+
+    const result = await this._executeCompiler(cmd, ac);
+    return result instanceof KnownResult
+      ? result
+      : new UnknownResult({ outputPath, hash });
+  }
+  public async getRunCommand(target: string): Promise<string[]> {
+    this.logger.trace('runCommand', { target });
+    return [target];
+  }
 }

@@ -19,168 +19,168 @@ import { ITc } from '@/types/types';
 import { UUID } from 'crypto';
 
 export interface BaseMsg {
-    type: string;
-    activePath?: string;
+  type: string;
+  activePath?: string;
 }
 
 export interface CreateProblemMsg extends BaseMsg {
-    type: 'createProblem';
+  type: 'createProblem';
 }
 export interface ImportProblemMsg extends BaseMsg {
-    type: 'importProblem';
+  type: 'importProblem';
 }
 export interface InitMsg extends BaseMsg {
-    type: 'init';
+  type: 'init';
 }
 export interface EditProblemDetailsMsg extends BaseMsg {
-    type: 'editProblemDetails';
-    title: string;
-    url: string;
-    timeLimit: number;
-    memoryLimit: number;
-    compilationSettings?: {
-        compiler?: string;
-        compilerArgs?: string;
-        runner?: string;
-        runnerArgs?: string;
-    };
+  type: 'editProblemDetails';
+  title: string;
+  url: string;
+  timeLimit: number;
+  memoryLimit: number;
+  compilationSettings?: {
+    compiler?: string;
+    compilerArgs?: string;
+    runner?: string;
+    runnerArgs?: string;
+  };
 }
 export interface DelProblemMsg extends BaseMsg {
-    type: 'delProblem';
+  type: 'delProblem';
 }
 export interface RunTcsMsg extends BaseMsg {
-    type: 'runTcs';
-    compile: boolean | null;
+  type: 'runTcs';
+  compile: boolean | null;
 }
 export interface StopTcsMsg extends BaseMsg {
-    type: 'stopTcs';
-    onlyOne: boolean;
+  type: 'stopTcs';
+  onlyOne: boolean;
 }
 export interface AddTcMsg extends BaseMsg {
-    type: 'addTc';
+  type: 'addTc';
 }
 export interface LoadTcsMsg extends BaseMsg {
-    type: 'loadTcs';
+  type: 'loadTcs';
 }
 export interface RunTcMsg extends BaseMsg {
-    type: 'runTc';
-    id: UUID;
-    compile: boolean | null;
+  type: 'runTc';
+  id: UUID;
+  compile: boolean | null;
 }
 export interface ToggleDisableMsg extends BaseMsg {
-    type: 'toggleDisable';
-    id: UUID;
+  type: 'toggleDisable';
+  id: UUID;
 }
 export interface ClearTcStatusMsg extends BaseMsg {
-    type: 'clearTcStatus';
-    id: UUID;
+  type: 'clearTcStatus';
+  id: UUID;
 }
 export interface ClearStatusMsg extends BaseMsg {
-    type: 'clearStatus';
+  type: 'clearStatus';
 }
 export type WebviewTcFileTypes = 'stdin' | 'answer';
 export interface ChooseTcFileMsg extends BaseMsg {
-    type: 'chooseTcFile';
-    id: UUID;
-    label: WebviewTcFileTypes;
+  type: 'chooseTcFile';
+  id: UUID;
+  label: WebviewTcFileTypes;
 }
 export interface UpdateTcMsg extends BaseMsg {
-    type: 'updateTc';
-    id: UUID;
-    tc: ITc;
+  type: 'updateTc';
+  id: UUID;
+  tc: ITc;
 }
 export interface CompareTcMsg extends BaseMsg {
-    type: 'compareTc';
-    id: UUID;
+  type: 'compareTc';
+  id: UUID;
 }
 export interface ToggleTcFileMsg extends BaseMsg {
-    type: 'toggleTcFile';
-    id: UUID;
-    label: WebviewTcFileTypes;
+  type: 'toggleTcFile';
+  id: UUID;
+  label: WebviewTcFileTypes;
 }
 export interface DelTcMsg extends BaseMsg {
-    type: 'delTc';
-    id: UUID;
+  type: 'delTc';
+  id: UUID;
 }
 export interface ReorderTcMsg extends BaseMsg {
-    type: 'reorderTc';
-    fromIdx: number;
-    toIdx: number;
+  type: 'reorderTc';
+  fromIdx: number;
+  toIdx: number;
 }
 export interface OpenFileMsg extends BaseMsg {
-    type: 'openFile';
-    path: string;
-    isVirtual?: boolean;
+  type: 'openFile';
+  path: string;
+  isVirtual?: boolean;
 }
 export interface OpenTestlibMsg extends BaseMsg {
-    type: 'openTestlib';
+  type: 'openTestlib';
 }
 export type WebviewSrcFileTypes =
-    | 'checker'
-    | 'interactor'
-    | 'generator'
-    | 'bruteForce';
+  | 'checker'
+  | 'interactor'
+  | 'generator'
+  | 'bruteForce';
 export interface ChooseSrcFileMsg extends BaseMsg {
-    type: 'chooseSrcFile';
-    fileType: WebviewSrcFileTypes;
+  type: 'chooseSrcFile';
+  fileType: WebviewSrcFileTypes;
 }
 export interface RemoveSrcFileMsg extends BaseMsg {
-    type: 'removeSrcFile';
-    fileType: WebviewSrcFileTypes;
+  type: 'removeSrcFile';
+  fileType: WebviewSrcFileTypes;
 }
 export interface StartBfCompareMsg extends BaseMsg {
-    type: 'startBfCompare';
-    compile: boolean | null;
+  type: 'startBfCompare';
+  compile: boolean | null;
 }
 export interface StopBfCompareMsg extends BaseMsg {
-    type: 'stopBfCompare';
+  type: 'stopBfCompare';
 }
 export interface SubmitToCodeforcesMsg extends BaseMsg {
-    type: 'submitToCodeforces';
+  type: 'submitToCodeforces';
 }
 export interface StartChatMsg extends BaseMsg {
-    type: 'startChat';
+  type: 'startChat';
 }
 export interface OpenSettingsMsg extends BaseMsg {
-    type: 'openSettings';
-    item: string;
+  type: 'openSettings';
+  item: string;
 }
 export interface DebugTcMsg extends BaseMsg {
-    type: 'debugTc';
-    id: UUID;
+  type: 'debugTc';
+  id: UUID;
 }
 export interface DragDropMsg extends BaseMsg {
-    type: 'dragDrop';
-    items: string[];
+  type: 'dragDrop';
+  items: string[];
 }
 export type WebviewMsg =
-    | CreateProblemMsg
-    | ImportProblemMsg
-    | InitMsg
-    | EditProblemDetailsMsg
-    | DelProblemMsg
-    | RunTcsMsg
-    | StopTcsMsg
-    | AddTcMsg
-    | LoadTcsMsg
-    | RunTcMsg
-    | ToggleDisableMsg
-    | ClearTcStatusMsg
-    | ClearStatusMsg
-    | ChooseTcFileMsg
-    | UpdateTcMsg
-    | CompareTcMsg
-    | ToggleTcFileMsg
-    | DelTcMsg
-    | ReorderTcMsg
-    | OpenFileMsg
-    | OpenTestlibMsg
-    | ChooseSrcFileMsg
-    | RemoveSrcFileMsg
-    | StartBfCompareMsg
-    | StopBfCompareMsg
-    | SubmitToCodeforcesMsg
-    | StartChatMsg
-    | OpenSettingsMsg
-    | DebugTcMsg
-    | DragDropMsg;
+  | CreateProblemMsg
+  | ImportProblemMsg
+  | InitMsg
+  | EditProblemDetailsMsg
+  | DelProblemMsg
+  | RunTcsMsg
+  | StopTcsMsg
+  | AddTcMsg
+  | LoadTcsMsg
+  | RunTcMsg
+  | ToggleDisableMsg
+  | ClearTcStatusMsg
+  | ClearStatusMsg
+  | ChooseTcFileMsg
+  | UpdateTcMsg
+  | CompareTcMsg
+  | ToggleTcFileMsg
+  | DelTcMsg
+  | ReorderTcMsg
+  | OpenFileMsg
+  | OpenTestlibMsg
+  | ChooseSrcFileMsg
+  | RemoveSrcFileMsg
+  | StartBfCompareMsg
+  | StopBfCompareMsg
+  | SubmitToCodeforcesMsg
+  | StartChatMsg
+  | OpenSettingsMsg
+  | DebugTcMsg
+  | DragDropMsg;

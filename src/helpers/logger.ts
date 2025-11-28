@@ -18,33 +18,33 @@
 import { window } from 'vscode';
 
 const outputChannel = window.createOutputChannel('CPH-NG', {
-    log: true,
+  log: true,
 });
 
 export default class Logger {
-    private module: string;
-    constructor(module: string) {
-        this.module = module;
-    }
-    private message(...args: any[]) {
-        const messageData = args
-            .map((arg) => (typeof arg === 'string' ? arg : JSON.stringify(arg)))
-            .join(' ');
-        return `[${this.module}] ${messageData}`;
-    }
-    public trace(...args: any[]) {
-        outputChannel.trace(this.message(...args));
-    }
-    public debug(...args: any[]) {
-        outputChannel.debug(this.message(...args));
-    }
-    public info(...args: any[]) {
-        outputChannel.info(this.message(...args));
-    }
-    public warn(...args: any[]) {
-        outputChannel.warn(this.message(...args));
-    }
-    public error(...args: any[]) {
-        outputChannel.error(this.message(...args));
-    }
+  private module: string;
+  constructor(module: string) {
+    this.module = module;
+  }
+  private message(...args: any[]) {
+    const messageData = args
+      .map((arg) => (typeof arg === 'string' ? arg : JSON.stringify(arg)))
+      .join(' ');
+    return `[${this.module}] ${messageData}`;
+  }
+  public trace(...args: any[]) {
+    outputChannel.trace(this.message(...args));
+  }
+  public debug(...args: any[]) {
+    outputChannel.debug(this.message(...args));
+  }
+  public info(...args: any[]) {
+    outputChannel.info(this.message(...args));
+  }
+  public warn(...args: any[]) {
+    outputChannel.warn(this.message(...args));
+  }
+  public error(...args: any[]) {
+    outputChannel.error(this.message(...args));
+  }
 }

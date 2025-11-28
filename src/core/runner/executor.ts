@@ -20,8 +20,8 @@ import Cache from '@/helpers/cache';
 import Logger from '@/helpers/logger';
 import ProcessExecutor from '@/helpers/processExecutor';
 import {
-    ProcessData,
-    ProcessResultHandler,
+  ProcessData,
+  ProcessResultHandler,
 } from '@/helpers/processResultHandler';
 import Settings from '@/helpers/settings';
 import { TcIo, TcVerdicts } from '@/types';
@@ -34,180 +34,172 @@ import { join } from 'path';
 import { l10n } from 'vscode';
 
 export interface RunOptions {
-    cmd: string[];
-    timeLimit: number;
-    stdin: TcIo;
-    ac: AbortController;
-    enableRunner: boolean;
+  cmd: string[];
+  timeLimit: number;
+  stdin: TcIo;
+  ac: AbortController;
+  enableRunner: boolean;
 }
 
 export class Executor {
-    private static logger: Logger = new Logger('executor');
+  private static logger: Logger = new Logger('executor');
 
-    // The KnownResult<ProcessData>.data must be not-null when verdict is UKE
-    public static async doRun(
-        options: RunOptions,
-        interactor?: string,
-    ): Promise<Result<ProcessData>> {
-        this.logger.trace('runExecutable', { options, interactor });
-        return interactor
-            ? this.runWithInteractor(interactor, options)
-            : this.runWithoutInteractor(options);
+  // The KnownResult<ProcessData>.data must be not-null when verdict is UKE
+  public static async doRun(
+    options: RunOptions,
+    interactor?: string,
+  ): Promise<Result<ProcessData>> {
+    this.logger.trace('runExecutable', { options, interactor });
+    return interactor
+      ? this.runWithInteractor(interactor, options)
+      : this.runWithoutInteractor(options);
+  }
+
+  private static async getRunnerPath(): Promise<string | null> {
+    const srcPath =
+      type() === 'Windows_NT'
+        ? join(extensionPath, 'res', 'runner-windows.cpp')
+        : join(extensionPath, 'res', 'runner-linux.cpp');
+    const outputPath = join(
+      Settings.cache.directory,
+      type() === 'Windows_NT' ? 'runner-windows.exe' : 'runner-linux',
+    );
+    if (await exists(outputPath)) {
+      this.logger.debug('Using cached runner program', { outputPath });
+      return outputPath;
+    }
+    const runnerLang = new LangCpp();
+    const langCompileResult = await runnerLang.compile(
+      { path: srcPath },
+      new AbortController(),
+      null,
+      {
+        canUseWrapper: false,
+        compilationSettings: {
+          compiler: Settings.compilation.cppCompiler,
+          compilerArgs:
+            type() === 'Windows_NT' ? '-lpsapi -ladvapi32 -static' : '-pthread',
+        },
+      },
+    );
+    if (langCompileResult instanceof KnownResult) {
+      this.logger.error('Failed to compile runner program', langCompileResult);
+      return null;
+    }
+    if (langCompileResult.data.outputPath !== outputPath) {
+      this.logger.error('Runner program output path mismatch');
+      return null;
+    }
+    return outputPath;
+  }
+
+  private static async runWithoutInteractor(
+    options: RunOptions,
+  ): Promise<Result<ProcessData>> {
+    if (Settings.runner.useRunner && Settings.compilation.useWrapper) {
+      return new KnownResult(
+        TcVerdicts.RJ,
+        l10n.t('Cannot use both runner and wrapper at the same time'),
+      );
     }
 
-    private static async getRunnerPath(): Promise<string | null> {
-        const srcPath =
-            type() === 'Windows_NT'
-                ? join(extensionPath, 'res', 'runner-windows.cpp')
-                : join(extensionPath, 'res', 'runner-linux.cpp');
-        const outputPath = join(
-            Settings.cache.directory,
-            type() === 'Windows_NT' ? 'runner-windows.exe' : 'runner-linux',
+    let runnerPath: string | null = null;
+    if (Settings.runner.useRunner && options.enableRunner) {
+      runnerPath = await this.getRunnerPath();
+      if (!runnerPath) {
+        return new KnownResult(
+          TcVerdicts.SE,
+          l10n.t('Failed to compile runner program'),
         );
-        if (await exists(outputPath)) {
-            this.logger.debug('Using cached runner program', { outputPath });
-            return outputPath;
-        }
-        const runnerLang = new LangCpp();
-        const langCompileResult = await runnerLang.compile(
-            { path: srcPath },
-            new AbortController(),
-            null,
+      }
+    }
+
+    // Adjust time limit for runner overhead
+    return await ProcessResultHandler.parse(
+      await (runnerPath
+        ? ProcessExecutor.executeWithRunner(
             {
-                canUseWrapper: false,
-                compilationSettings: {
-                    compiler: Settings.compilation.cppCompiler,
-                    compilerArgs:
-                        type() === 'Windows_NT'
-                            ? '-lpsapi -ladvapi32 -static'
-                            : '-pthread',
-                },
+              ...options,
+              timeout: options.timeLimit + Settings.runner.timeAddition,
             },
-        );
-        if (langCompileResult instanceof KnownResult) {
-            this.logger.error(
-                'Failed to compile runner program',
-                langCompileResult,
-            );
-            return null;
-        }
-        if (langCompileResult.data.outputPath !== outputPath) {
-            this.logger.error('Runner program output path mismatch');
-            return null;
-        }
-        return outputPath;
+            runnerPath,
+          )
+        : ProcessExecutor.execute({
+            ...options,
+            cmd: Settings.runner.unlimitedStack
+              ? [...options.cmd, '--unlimited-stack']
+              : options.cmd,
+            timeout: options.timeLimit + Settings.runner.timeAddition,
+          })),
+    );
+  }
+
+  private static async runWithInteractor(
+    interactor: string,
+    options: RunOptions,
+  ): Promise<KnownResult<ProcessData>> {
+    // Prepare input and output files
+    const inputPath = options.stdin.useFile
+      ? options.stdin.data
+      : Cache.createIo();
+    const stdoutPath = Cache.createIo();
+    options.stdin.useFile || (await writeFile(inputPath, options.stdin.data));
+
+    // Launch both processes with pipe
+    const { process1: solResult, process2: intResult } =
+      await ProcessExecutor.launchWithPipe(
+        {
+          cmd: options.cmd,
+          timeout: options.timeLimit + Settings.runner.timeAddition,
+          ac: options.ac,
+        },
+        {
+          cmd: [interactor, inputPath, stdoutPath],
+          timeout: options.timeLimit + Settings.runner.timeAddition,
+          ac: options.ac,
+        },
+      );
+    this.logger.debug('Interactor execution completed', {
+      solResult,
+      intResult,
+    });
+
+    // Dispose of input file if it was created by Cache
+    options.stdin.useFile || Cache.dispose(inputPath);
+
+    // Process results
+    const solProcessResult = await ProcessResultHandler.parse(solResult);
+    const intProcessResult = await ProcessResultHandler.parseChecker(intResult);
+    if (solProcessResult instanceof KnownResult) {
+      intProcessResult.data &&
+        Cache.dispose([
+          intProcessResult.data.stdoutPath,
+          intProcessResult.data.stderrPath,
+        ]);
+      return solProcessResult;
     }
-
-    private static async runWithoutInteractor(
-        options: RunOptions,
-    ): Promise<Result<ProcessData>> {
-        if (Settings.runner.useRunner && Settings.compilation.useWrapper) {
-            return new KnownResult(
-                TcVerdicts.RJ,
-                l10n.t('Cannot use both runner and wrapper at the same time'),
-            );
-        }
-
-        let runnerPath: string | null = null;
-        if (Settings.runner.useRunner && options.enableRunner) {
-            runnerPath = await this.getRunnerPath();
-            if (!runnerPath) {
-                return new KnownResult(
-                    TcVerdicts.SE,
-                    l10n.t('Failed to compile runner program'),
-                );
-            }
-        }
-
-        // Adjust time limit for runner overhead
-        return await ProcessResultHandler.parse(
-            await (runnerPath
-                ? ProcessExecutor.executeWithRunner(
-                      {
-                          ...options,
-                          timeout:
-                              options.timeLimit + Settings.runner.timeAddition,
-                      },
-                      runnerPath,
-                  )
-                : ProcessExecutor.execute({
-                      ...options,
-                      cmd: Settings.runner.unlimitedStack
-                          ? [...options.cmd, '--unlimited-stack']
-                          : options.cmd,
-                      timeout: options.timeLimit + Settings.runner.timeAddition,
-                  })),
-        );
+    if (intProcessResult.data) {
+      const msg = [
+        intProcessResult.msg,
+        await readFile(intProcessResult.data.stdoutPath, 'utf-8'),
+        await readFile(intProcessResult.data.stderrPath, 'utf-8'),
+      ]
+        .filter((m) => !!m)
+        .join('\n\n');
+      Cache.dispose([
+        intProcessResult.data.stdoutPath,
+        intProcessResult.data.stderrPath,
+      ]);
+      return {
+        verdict: intProcessResult.verdict,
+        msg,
+        data: solProcessResult.data,
+      };
     }
-
-    private static async runWithInteractor(
-        interactor: string,
-        options: RunOptions,
-    ): Promise<KnownResult<ProcessData>> {
-        // Prepare input and output files
-        const inputPath = options.stdin.useFile
-            ? options.stdin.data
-            : Cache.createIo();
-        const stdoutPath = Cache.createIo();
-        options.stdin.useFile ||
-            (await writeFile(inputPath, options.stdin.data));
-
-        // Launch both processes with pipe
-        const { process1: solResult, process2: intResult } =
-            await ProcessExecutor.launchWithPipe(
-                {
-                    cmd: options.cmd,
-                    timeout: options.timeLimit + Settings.runner.timeAddition,
-                    ac: options.ac,
-                },
-                {
-                    cmd: [interactor, inputPath, stdoutPath],
-                    timeout: options.timeLimit + Settings.runner.timeAddition,
-                    ac: options.ac,
-                },
-            );
-        this.logger.debug('Interactor execution completed', {
-            solResult,
-            intResult,
-        });
-
-        // Dispose of input file if it was created by Cache
-        options.stdin.useFile || Cache.dispose(inputPath);
-
-        // Process results
-        const solProcessResult = await ProcessResultHandler.parse(solResult);
-        const intProcessResult =
-            await ProcessResultHandler.parseChecker(intResult);
-        if (solProcessResult instanceof KnownResult) {
-            intProcessResult.data &&
-                Cache.dispose([
-                    intProcessResult.data.stdoutPath,
-                    intProcessResult.data.stderrPath,
-                ]);
-            return solProcessResult;
-        }
-        if (intProcessResult.data) {
-            const msg = [
-                intProcessResult.msg,
-                await readFile(intProcessResult.data.stdoutPath, 'utf-8'),
-                await readFile(intProcessResult.data.stderrPath, 'utf-8'),
-            ]
-                .filter((m) => !!m)
-                .join('\n\n');
-            Cache.dispose([
-                intProcessResult.data.stdoutPath,
-                intProcessResult.data.stderrPath,
-            ]);
-            return {
-                verdict: intProcessResult.verdict,
-                msg,
-                data: solProcessResult.data,
-            };
-        }
-        return {
-            verdict: intProcessResult.verdict,
-            msg: intProcessResult.msg,
-            data: solProcessResult.data,
-        };
-    }
+    return {
+      verdict: intProcessResult.verdict,
+      msg: intProcessResult.msg,
+      data: solProcessResult.data,
+    };
+  }
 }

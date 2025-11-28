@@ -21,21 +21,21 @@ import CphFlex from './base/cphFlex';
 import CphText from './base/cphText';
 
 const AcCongrats = () => {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
-    return (
-        <CphFlex column>
-            <img
-                width={'30%'}
-                src={partyUri}
-            />
-            <CphText textAlign={'center'}>
-                {t('acCongrats.firstLine')}
-                <br />
-                {t('acCongrats.secondLine')}
-            </CphText>
-        </CphFlex>
-    );
+  return (
+    <CphFlex column>
+      <img
+        width={'30%'}
+        src={partyUri}
+      />
+      <CphText textAlign={'center'}>
+        {t('acCongrats.firstLine')}
+        <br />
+        {t('acCongrats.secondLine')}
+      </CphText>
+    </CphFlex>
+  );
 };
 
 export default AcCongrats;

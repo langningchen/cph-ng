@@ -18,76 +18,76 @@
 import { UUID } from 'crypto';
 
 export const isRunningVerdict = (verdict?: ITcVerdict): boolean => {
-    return (
-        verdict !== undefined &&
-        ['WT', 'CP', 'CPD', 'JG', 'JGD', 'CMP'].includes(verdict?.name)
-    );
+  return (
+    verdict !== undefined &&
+    ['WT', 'CP', 'CPD', 'JG', 'JGD', 'CMP'].includes(verdict?.name)
+  );
 };
 export const isExpandVerdict = (verdict?: ITcVerdict): boolean => {
-    return !(
-        (verdict !== undefined && ['AC', 'SK', 'RJ'].includes(verdict.name)) ||
-        isRunningVerdict(verdict)
-    );
+  return !(
+    (verdict !== undefined && ['AC', 'SK', 'RJ'].includes(verdict.name)) ||
+    isRunningVerdict(verdict)
+  );
 };
 
 export interface ITcVerdict {
-    name: string;
-    fullName: string;
-    color: string;
+  name: string;
+  fullName: string;
+  color: string;
 }
 
 export interface ITcIo {
-    useFile: boolean;
-    data: string;
+  useFile: boolean;
+  data: string;
 }
 
 export interface ITcResult {
-    verdict: ITcVerdict;
-    time?: number;
-    memory?: number;
-    stdout: ITcIo;
-    stderr: ITcIo;
-    msg: string[];
+  verdict: ITcVerdict;
+  time?: number;
+  memory?: number;
+  stdout: ITcIo;
+  stderr: ITcIo;
+  msg: string[];
 }
 export interface ITc {
-    stdin: ITcIo;
-    answer: ITcIo;
-    isExpand: boolean;
-    isDisabled: boolean;
-    result?: ITcResult;
+  stdin: ITcIo;
+  answer: ITcIo;
+  isExpand: boolean;
+  isDisabled: boolean;
+  result?: ITcResult;
 }
 
 export interface IFileWithHash {
-    path: string;
-    hash?: string;
+  path: string;
+  hash?: string;
 }
 
 export interface IBfCompare {
-    generator?: IFileWithHash;
-    bruteForce?: IFileWithHash;
-    running: boolean;
-    msg: string;
+  generator?: IFileWithHash;
+  bruteForce?: IFileWithHash;
+  running: boolean;
+  msg: string;
 }
 
 export interface ICompilationSettings {
-    compiler?: string;
-    compilerArgs?: string;
-    runner?: string;
-    runnerArgs?: string;
+  compiler?: string;
+  compilerArgs?: string;
+  runner?: string;
+  runnerArgs?: string;
 }
 
 export interface IProblem {
-    version: string;
-    name: string;
-    url?: string;
-    tcs: Record<UUID, ITc>;
-    tcOrder: UUID[];
-    timeLimit: number;
-    memoryLimit: number;
-    src: IFileWithHash;
-    checker?: IFileWithHash;
-    interactor?: IFileWithHash;
-    bfCompare?: IBfCompare;
-    timeElapsed: number;
-    compilationSettings?: ICompilationSettings;
+  version: string;
+  name: string;
+  url?: string;
+  tcs: Record<UUID, ITc>;
+  tcOrder: UUID[];
+  timeLimit: number;
+  memoryLimit: number;
+  src: IFileWithHash;
+  checker?: IFileWithHash;
+  interactor?: IFileWithHash;
+  bfCompare?: IBfCompare;
+  timeElapsed: number;
+  compilationSettings?: ICompilationSettings;
 }

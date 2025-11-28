@@ -23,47 +23,47 @@ import React, { useState } from 'react';
 import { delProps } from '../../utils';
 
 interface CphMenuProps extends BoxProps {
-    children: React.ReactNode;
-    menu: Record<string, () => void>;
+  children: React.ReactNode;
+  menu: Record<string, () => void>;
 }
 
 const CphMenu = (props: CphMenuProps) => {
-    const [contextMenu, setContextMenu] = useState<PopoverPosition>();
-    return (
-        <Box
-            onContextMenu={(e: React.MouseEvent) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setContextMenu({
-                    left: e.clientX + 2,
-                    top: e.clientY - 6,
-                });
+  const [contextMenu, setContextMenu] = useState<PopoverPosition>();
+  return (
+    <Box
+      onContextMenu={(e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setContextMenu({
+          left: e.clientX + 2,
+          top: e.clientY - 6,
+        });
+      }}
+      style={{ cursor: 'context-menu' }}
+      {...delProps(props, ['children', 'menu'])}
+    >
+      {props.children}
+      <Menu
+        open={!!contextMenu}
+        onClose={() => setContextMenu(undefined)}
+        anchorReference='anchorPosition'
+        anchorPosition={contextMenu}
+      >
+        {Object.entries(props.menu).map(([key, value]) => (
+          <MenuItem
+            dense
+            key={key}
+            onClick={() => {
+              value();
+              setContextMenu(undefined);
             }}
-            style={{ cursor: 'context-menu' }}
-            {...delProps(props, ['children', 'menu'])}
-        >
-            {props.children}
-            <Menu
-                open={!!contextMenu}
-                onClose={() => setContextMenu(undefined)}
-                anchorReference='anchorPosition'
-                anchorPosition={contextMenu}
-            >
-                {Object.entries(props.menu).map(([key, value]) => (
-                    <MenuItem
-                        dense
-                        key={key}
-                        onClick={() => {
-                            value();
-                            setContextMenu(undefined);
-                        }}
-                    >
-                        {key}
-                    </MenuItem>
-                ))}
-            </Menu>
-        </Box>
-    );
+          >
+            {key}
+          </MenuItem>
+        ))}
+      </Menu>
+    </Box>
+  );
 };
 
 export default CphMenu;

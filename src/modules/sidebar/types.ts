@@ -1,22 +1,22 @@
 import { Problem } from '@/types';
 
 export interface ProblemEventData {
-    canImport: boolean;
-    problem: {
-        problem: Problem;
-        startTime: number;
-    } | null;
-    bgProblems: {
-        name: string;
-        srcPath: string;
-    }[];
+  canImport: boolean;
+  problem: {
+    problem: Problem;
+    startTime: number;
+  } | null;
+  bgProblems: {
+    name: string;
+    srcPath: string;
+  }[];
 }
 export interface ProblemEvent extends ProblemEventData {
-    type: 'problem';
+  type: 'problem';
 }
 export interface ActivePathEventData {
-    activePath?: string;
+  activePath?: string;
 }
 export interface ActivePathEvent extends ActivePathEventData {
-    type: 'activePath';
+  type: 'activePath';
 }

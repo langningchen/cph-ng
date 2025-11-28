@@ -22,26 +22,26 @@ import React from 'react';
 import { delProps } from '../utils';
 
 interface CphButtonProps extends IconButtonProps {
-    icon: typeof SvgIcon;
-    name: string;
-    larger?: boolean;
+  icon: typeof SvgIcon;
+  name: string;
+  larger?: boolean;
 }
 
 const CphButton = (props: CphButtonProps) => {
-    return (
-        <Tooltip
-            disableInteractive
-            title={props.name}
-        >
-            <IconButton
-                color={'primary'}
-                size={props.larger ? 'medium' : 'small'}
-                {...delProps(props, ['icon', 'name', 'larger'])}
-            >
-                <props.icon fontSize={'small'} />
-            </IconButton>
-        </Tooltip>
-    );
+  return (
+    <Tooltip
+      disableInteractive
+      title={props.name}
+    >
+      <IconButton
+        color={'primary'}
+        size={props.larger ? 'medium' : 'small'}
+        {...delProps(props, ['icon', 'name', 'larger'])}
+      >
+        <props.icon fontSize={'small'} />
+      </IconButton>
+    </Tooltip>
+  );
 };
 
 export default CphButton;

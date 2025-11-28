@@ -21,17 +21,17 @@ import CphFlex from './base/cphFlex';
 import CphText from './base/cphText';
 
 const NoTcs = () => {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
-    return (
-        <CphFlex column>
-            <CphText textAlign={'center'}>
-                {t('noTcs.firstLine')}
-                <br />
-                {t('noTcs.secondLine')}
-            </CphText>
-        </CphFlex>
-    );
+  return (
+    <CphFlex column>
+      <CphText textAlign={'center'}>
+        {t('noTcs.firstLine')}
+        <br />
+        {t('noTcs.secondLine')}
+      </CphText>
+    </CphFlex>
+  );
 };
 
 export default NoTcs;

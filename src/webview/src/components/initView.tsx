@@ -23,28 +23,28 @@ import CphFlex from './base/cphFlex';
 import CphText from './base/cphText';
 
 const InitView = () => {
-    const { t } = useTranslation();
-    return (
-        <Box
-            flex={1}
-            width={'100%'}
+  const { t } = useTranslation();
+  return (
+    <Box
+      flex={1}
+      width={'100%'}
+    >
+      <CphFlex
+        column
+        height={'100%'}
+        justifyContent={'center'}
+        gap={2}
+      >
+        <CircularProgress />
+        <CphText
+          fontWeight={'bold'}
+          fontSize={'bigger'}
         >
-            <CphFlex
-                column
-                height={'100%'}
-                justifyContent={'center'}
-                gap={2}
-            >
-                <CircularProgress />
-                <CphText
-                    fontWeight={'bold'}
-                    fontSize={'bigger'}
-                >
-                    {t('initView.message')}
-                </CphText>
-            </CphFlex>
-        </Box>
-    );
+          {t('initView.message')}
+        </CphText>
+      </CphFlex>
+    </Box>
+  );
 };
 
 export default InitView;

@@ -26,63 +26,63 @@ import CphLink from './base/cphLink';
 import CphText from './base/cphText';
 
 interface BgProblemViewProps {
-    bgProblems: {
-        name: string;
-        srcPath: string;
-    }[];
+  bgProblems: {
+    name: string;
+    srcPath: string;
+  }[];
 }
 
 const BgProblemView = ({ bgProblems }: BgProblemViewProps) => {
-    const { t } = useTranslation();
-    const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
 
-    return (
-        <>
-            <CphText
-                sx={{ cursor: 'pointer' }}
-                fontSize={'smaller'}
-                onClick={() => {
-                    setOpen(true);
-                }}
-            >
-                {t('bgProblemView.message', {
-                    cnt: bgProblems.length,
-                })}
-            </CphText>
-            <Dialog
-                fullWidth
-                maxWidth={false}
-                open={open}
-                onClose={() => {
+  return (
+    <>
+      <CphText
+        sx={{ cursor: 'pointer' }}
+        fontSize={'smaller'}
+        onClick={() => {
+          setOpen(true);
+        }}
+      >
+        {t('bgProblemView.message', {
+          cnt: bgProblems.length,
+        })}
+      </CphText>
+      <Dialog
+        fullWidth
+        maxWidth={false}
+        open={open}
+        onClose={() => {
+          setOpen(false);
+        }}
+      >
+        <DialogTitle>{t('bgProblemView.title')}</DialogTitle>
+        <DialogContent>
+          {bgProblems.length ? (
+            <CphFlex>
+              {bgProblems.map((bgProblem) => (
+                <CphLink
+                  name={bgProblem.srcPath}
+                  onClick={() => {
+                    msg({
+                      type: 'openFile',
+                      path: bgProblem.srcPath,
+                    });
                     setOpen(false);
-                }}
-            >
-                <DialogTitle>{t('bgProblemView.title')}</DialogTitle>
-                <DialogContent>
-                    {bgProblems.length ? (
-                        <CphFlex>
-                            {bgProblems.map((bgProblem) => (
-                                <CphLink
-                                    name={bgProblem.srcPath}
-                                    onClick={() => {
-                                        msg({
-                                            type: 'openFile',
-                                            path: bgProblem.srcPath,
-                                        });
-                                        setOpen(false);
-                                    }}
-                                >
-                                    {bgProblem.name}
-                                </CphLink>
-                            ))}
-                        </CphFlex>
-                    ) : (
-                        <CphText>{t('bgProblemView.empty')}</CphText>
-                    )}
-                </DialogContent>
-            </Dialog>
-        </>
-    );
+                  }}
+                >
+                  {bgProblem.name}
+                </CphLink>
+              ))}
+            </CphFlex>
+          ) : (
+            <CphText>{t('bgProblemView.empty')}</CphText>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 };
 
 export default BgProblemView;

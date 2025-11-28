@@ -1,218 +1,218 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Problem",
-    "type": "object",
-    "definitions": {
-        "TcVerdict": {
-            "title": "TcVerdict",
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "fullName": {
-                    "type": "string"
-                },
-                "color": {
-                    "type": "string"
-                }
-            },
-            "required": ["name", "fullName", "color"],
-            "additionalProperties": false
-        },
-        "FileWithHash": {
-            "title": "FileWithHash",
-            "type": "object",
-            "properties": {
-                "path": {
-                    "type": "string"
-                },
-                "hash": {
-                    "type": "string",
-                    "minLength": 64,
-                    "maxLength": 64
-                }
-            },
-            "required": ["path"],
-            "additionalProperties": false
-        },
-        "TCIO": {
-            "title": "TCIO",
-            "type": "object",
-            "properties": {
-                "useFile": {
-                    "type": "boolean"
-                },
-                "data": {
-                    "type": "string"
-                }
-            },
-            "required": ["useFile", "data"],
-            "additionalProperties": false
-        },
-        "TcResult": {
-            "title": "TcResult",
-            "type": "object",
-            "properties": {
-                "verdict": {
-                    "$ref": "#/definitions/TcVerdict"
-                },
-                "memory": {
-                    "type": "number"
-                },
-                "time": {
-                    "type": "number"
-                },
-                "stdout": {
-                    "$ref": "#/definitions/TCIO"
-                },
-                "stderr": {
-                    "$ref": "#/definitions/TCIO"
-                },
-                "msg": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            },
-            "required": ["verdict", "stdout", "stderr", "msg"],
-            "additionalProperties": false
-        },
-        "Tc": {
-            "title": "Tc",
-            "type": "object",
-            "properties": {
-                "stdin": {
-                    "$ref": "#/definitions/TCIO"
-                },
-                "answer": {
-                    "$ref": "#/definitions/TCIO"
-                },
-                "isExpand": {
-                    "type": "boolean"
-                },
-                "isDisabled": {
-                    "type": "boolean"
-                },
-                "result": {
-                    "$ref": "#/definitions/TcResult"
-                }
-            },
-            "required": ["stdin", "answer", "isExpand", "isDisabled"],
-            "additionalProperties": false
-        },
-        "BfCompare": {
-            "title": "BfCompare",
-            "type": "object",
-            "properties": {
-                "generator": {
-                    "$ref": "#/definitions/FileWithHash"
-                },
-                "bruteForce": {
-                    "$ref": "#/definitions/FileWithHash"
-                },
-                "running": {
-                    "type": "boolean"
-                },
-                "msg": {
-                    "type": "string"
-                }
-            },
-            "required": ["running", "msg"],
-            "additionalProperties": false
-        },
-        "CompilationSettings": {
-            "title": "CompilationSettings",
-            "type": "object",
-            "properties": {
-                "compiler": {
-                    "type": "string"
-                },
-                "compilerArgs": {
-                    "type": "string"
-                },
-                "runner": {
-                    "type": "string"
-                },
-                "runnerArgs": {
-                    "type": "string"
-                }
-            },
-            "additionalProperties": false
-        }
-    },
-    "properties": {
-        "version": {
-            "type": "string"
-        },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Problem",
+  "type": "object",
+  "definitions": {
+    "TcVerdict": {
+      "title": "TcVerdict",
+      "type": "object",
+      "properties": {
         "name": {
-            "type": "string"
+          "type": "string"
         },
-        "url": {
-            "type": "string",
-            "anyOf": [
-                {
-                    "format": "uri"
-                },
-                {
-                    "maxLength": 0
-                }
-            ]
+        "fullName": {
+          "type": "string"
         },
-        "tcs": {
-            "type": "object",
-            "propertyNames": {
-                "format": "uuid"
-            },
-            "additionalProperties": {
-                "$ref": "#/definitions/Tc"
-            }
-        },
-        "tcOrder": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "format": "uuid"
-            }
-        },
-        "timeLimit": {
-            "type": "integer",
-            "minimum": 1
-        },
-        "memoryLimit": {
-            "type": "integer",
-            "minimum": 1
-        },
-        "src": {
-            "$ref": "#/definitions/FileWithHash"
-        },
-        "checker": {
-            "$ref": "#/definitions/FileWithHash"
-        },
-        "interactor": {
-            "$ref": "#/definitions/FileWithHash"
-        },
-        "bfCompare": {
-            "$ref": "#/definitions/BfCompare"
-        },
-        "timeElapsed": {
-            "type": "integer",
-            "minimum": 0
-        },
-        "compilationSettings": {
-            "$ref": "#/definitions/CompilationSettings"
+        "color": {
+          "type": "string"
         }
+      },
+      "required": ["name", "fullName", "color"],
+      "additionalProperties": false
     },
-    "required": [
-        "version",
-        "name",
-        "tcs",
-        "tcOrder",
-        "timeLimit",
-        "memoryLimit",
-        "src",
-        "timeElapsed"
-    ],
-    "additionalProperties": false
+    "FileWithHash": {
+      "title": "FileWithHash",
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "hash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        }
+      },
+      "required": ["path"],
+      "additionalProperties": false
+    },
+    "TCIO": {
+      "title": "TCIO",
+      "type": "object",
+      "properties": {
+        "useFile": {
+          "type": "boolean"
+        },
+        "data": {
+          "type": "string"
+        }
+      },
+      "required": ["useFile", "data"],
+      "additionalProperties": false
+    },
+    "TcResult": {
+      "title": "TcResult",
+      "type": "object",
+      "properties": {
+        "verdict": {
+          "$ref": "#/definitions/TcVerdict"
+        },
+        "memory": {
+          "type": "number"
+        },
+        "time": {
+          "type": "number"
+        },
+        "stdout": {
+          "$ref": "#/definitions/TCIO"
+        },
+        "stderr": {
+          "$ref": "#/definitions/TCIO"
+        },
+        "msg": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["verdict", "stdout", "stderr", "msg"],
+      "additionalProperties": false
+    },
+    "Tc": {
+      "title": "Tc",
+      "type": "object",
+      "properties": {
+        "stdin": {
+          "$ref": "#/definitions/TCIO"
+        },
+        "answer": {
+          "$ref": "#/definitions/TCIO"
+        },
+        "isExpand": {
+          "type": "boolean"
+        },
+        "isDisabled": {
+          "type": "boolean"
+        },
+        "result": {
+          "$ref": "#/definitions/TcResult"
+        }
+      },
+      "required": ["stdin", "answer", "isExpand", "isDisabled"],
+      "additionalProperties": false
+    },
+    "BfCompare": {
+      "title": "BfCompare",
+      "type": "object",
+      "properties": {
+        "generator": {
+          "$ref": "#/definitions/FileWithHash"
+        },
+        "bruteForce": {
+          "$ref": "#/definitions/FileWithHash"
+        },
+        "running": {
+          "type": "boolean"
+        },
+        "msg": {
+          "type": "string"
+        }
+      },
+      "required": ["running", "msg"],
+      "additionalProperties": false
+    },
+    "CompilationSettings": {
+      "title": "CompilationSettings",
+      "type": "object",
+      "properties": {
+        "compiler": {
+          "type": "string"
+        },
+        "compilerArgs": {
+          "type": "string"
+        },
+        "runner": {
+          "type": "string"
+        },
+        "runnerArgs": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string",
+      "anyOf": [
+        {
+          "format": "uri"
+        },
+        {
+          "maxLength": 0
+        }
+      ]
+    },
+    "tcs": {
+      "type": "object",
+      "propertyNames": {
+        "format": "uuid"
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/Tc"
+      }
+    },
+    "tcOrder": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "timeLimit": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "memoryLimit": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "src": {
+      "$ref": "#/definitions/FileWithHash"
+    },
+    "checker": {
+      "$ref": "#/definitions/FileWithHash"
+    },
+    "interactor": {
+      "$ref": "#/definitions/FileWithHash"
+    },
+    "bfCompare": {
+      "$ref": "#/definitions/BfCompare"
+    },
+    "timeElapsed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "compilationSettings": {
+      "$ref": "#/definitions/CompilationSettings"
+    }
+  },
+  "required": [
+    "version",
+    "name",
+    "tcs",
+    "tcOrder",
+    "timeLimit",
+    "memoryLimit",
+    "src",
+    "timeElapsed"
+  ],
+  "additionalProperties": false
 }

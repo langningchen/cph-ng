@@ -22,32 +22,30 @@ import { UnknownResult } from '@/utils/result';
 import { CompileAdditionalData, Lang, LangCompileResult } from './lang';
 
 export class LangJavascript extends Lang {
-    private logger: Logger = new Logger('langJavascript');
-    public readonly name = 'JavaScript';
-    public readonly extensions = ['js'];
-    protected async _compile(
-        src: FileWithHash,
-        _ac: AbortController,
-        _forceCompile: boolean | null,
-        _compileAdditionalData: CompileAdditionalData,
-    ): Promise<LangCompileResult> {
-        return new UnknownResult({
-            outputPath: src.path,
-        });
-    }
+  private logger: Logger = new Logger('langJavascript');
+  public readonly name = 'JavaScript';
+  public readonly extensions = ['js'];
+  protected async _compile(
+    src: FileWithHash,
+    _ac: AbortController,
+    _forceCompile: boolean | null,
+    _compileAdditionalData: CompileAdditionalData,
+  ): Promise<LangCompileResult> {
+    return new UnknownResult({
+      outputPath: src.path,
+    });
+  }
 
-    public async getRunCommand(
-        target: string,
-        compilationSettings?: CompileAdditionalData['compilationSettings'],
-    ): Promise<string[]> {
-        this.logger.trace('runCommand', { target });
-        const runner =
-            compilationSettings?.runner ??
-            Settings.compilation.javascriptRunner;
-        const runArgs =
-            compilationSettings?.runnerArgs ??
-            Settings.compilation.javascriptRunArgs;
-        const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
-        return [runner, ...runArgsArray, target];
-    }
+  public async getRunCommand(
+    target: string,
+    compilationSettings?: CompileAdditionalData['compilationSettings'],
+  ): Promise<string[]> {
+    this.logger.trace('runCommand', { target });
+    const runner =
+      compilationSettings?.runner ?? Settings.compilation.javascriptRunner;
+    const runArgs =
+      compilationSettings?.runnerArgs ?? Settings.compilation.javascriptRunArgs;
+    const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
+    return [runner, ...runArgsArray, target];
+  }
 }

@@ -25,21 +25,21 @@ import { Lang } from './lang';
 import { LangPython } from './python';
 
 export default class Langs {
-    private static logger = new Logger('langs');
-    public static langs: Lang[] = [
-        new LangCpp(),
-        new LangC(),
-        new LangJava(),
-        new LangPython(),
-        new LangJavascript(),
-    ];
+  private static logger = new Logger('langs');
+  public static langs: Lang[] = [
+    new LangCpp(),
+    new LangC(),
+    new LangJava(),
+    new LangPython(),
+    new LangJavascript(),
+  ];
 
-    public static getLang(filePath: string): Lang | undefined {
-        const ext = extname(filePath).toLowerCase().slice(1);
-        const lang = this.langs.find((lang) => lang.extensions.includes(ext));
-        lang
-            ? this.logger.debug('Detected language for', filePath, lang.name)
-            : this.logger.debug('No language detected for', filePath);
-        return lang;
-    }
+  public static getLang(filePath: string): Lang | undefined {
+    const ext = extname(filePath).toLowerCase().slice(1);
+    const lang = this.langs.find((lang) => lang.extensions.includes(ext));
+    lang
+      ? this.logger.debug('Detected language for', filePath, lang.name)
+      : this.logger.debug('No language detected for', filePath);
+    return lang;
+  }
 }

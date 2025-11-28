@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 declare const vscode: {
-    postMessage<T>(msg: T): Thenable<void>;
+  postMessage<T>(msg: T): Thenable<void>;
 };
 
 declare const isDarkMode: boolean;
@@ -25,6 +25,6 @@ declare const hiddenStatuses: string[];
 declare const language: string;
 declare const showTips: boolean;
 interface Window {
-    easterEgg?: boolean;
-    activePath?: string;
+  easterEgg?: boolean;
+  activePath?: string;
 }

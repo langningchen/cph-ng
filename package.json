@@ -1,837 +1,838 @@
 {
-    "name": "cph-ng",
-    "displayName": "CPH-NG",
-    "description": "The next generation of CPH.",
-    "version": "0.4.11",
-    "type": "module",
-    "license": "AGPL-3.0-only",
-    "publisher": "langningchen",
-    "icon": "res/cph-ng.png",
-    "galleryBanner": {
-        "color": "#8adbae",
-        "theme": "dark"
-    },
-    "bugs": {
-        "url": "https://github.com/langningchen/cph-ng/issues",
-        "email": "i@langningchen.com"
-    },
-    "qna": "https://github.com/langningchen/cph-ng/discussions/categories/q-a",
-    "pricing": "Free",
-    "l10n": "./l10n",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/langningchen/cph-ng"
-    },
-    "engines": {
-        "vscode": "^1.95.0"
-    },
-    "categories": [
-        "Other"
+  "name": "cph-ng",
+  "displayName": "CPH-NG",
+  "description": "The next generation of CPH.",
+  "version": "0.4.12",
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "publisher": "langningchen",
+  "icon": "res/cph-ng.png",
+  "galleryBanner": {
+    "color": "#8adbae",
+    "theme": "dark"
+  },
+  "bugs": {
+    "url": "https://github.com/langningchen/cph-ng/issues",
+    "email": "i@langningchen.com"
+  },
+  "qna": "https://github.com/langningchen/cph-ng/discussions/categories/q-a",
+  "pricing": "Free",
+  "l10n": "./l10n",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/langningchen/cph-ng"
+  },
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./dist/extension.js",
+  "exports": "./dist/extension.js",
+  "contributes": {
+    "jsonValidation": [
+      {
+        "fileMatch": "problem.cph-ng.json",
+        "url": "./res/problem.schema.json"
+      }
     ],
-    "activationEvents": [
-        "*"
-    ],
-    "main": "./dist/extension.js",
-    "exports": "./dist/extension.js",
-    "contributes": {
-        "jsonValidation": [
-            {
-                "fileMatch": "problem.cph-ng.json",
-                "url": "./res/problem.schema.json"
+    "languageModelTools": [
+      {
+        "name": "run_test_cases",
+        "toolReferenceName": "cphNgRunTestCases",
+        "displayName": "Run CPH-NG Test Cases",
+        "modelDescription": "Executes one test case (identified by its stable UUID) or the entire suite for the active competitive programming problem managed by CPH-NG. Use this to validate solutions after edits or to confirm fixes against previously failing cases.",
+        "userDescription": "Runs one or all test cases for the current CPH-NG problem.",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(play)",
+        "inputSchema": {
+          "type": "object",
+          "required": [
+            "activePath"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Optional test case ID (UUID) to run. Omit to execute the full test suite."
+            },
+            "activePath": {
+              "type": "string",
+              "description": "File path for the target problem source code. Must be provided by LLM invocations."
             }
-        ],
-        "languageModelTools": [
-            {
-                "name": "run_test_cases",
-                "toolReferenceName": "cphNgRunTestCases",
-                "displayName": "Run CPH-NG Test Cases",
-                "modelDescription": "Executes one test case (identified by its stable UUID) or the entire suite for the active competitive programming problem managed by CPH-NG. Use this to validate solutions after edits or to confirm fixes against previously failing cases.",
-                "userDescription": "Runs one or all test cases for the current CPH-NG problem.",
-                "canBeReferencedInPrompt": true,
-                "icon": "$(play)",
-                "inputSchema": {
-                    "type": "object",
-                    "required": [
-                        "activePath"
-                    ],
-                    "properties": {
-                        "id": {
-                            "type": "string",
-                            "description": "Optional test case ID (UUID) to run. Omit to execute the full test suite."
-                        },
-                        "activePath": {
-                            "type": "string",
-                            "description": "File path for the target problem source code. Must be provided by LLM invocations."
-                        }
-                    }
-                }
-            },
-            {
-                "name": "inspect_problem_data",
-                "toolReferenceName": "cphNgInspectProblemData",
-                "displayName": "Inspect CPH-NG Test Data",
-                "modelDescription": "Retrieves a specific data slice for a CPH-NG test case - stdin, expected answer, stdout, stderr, verdict, runtime, memory usage, or diagnostic message. Use this to examine precise artifacts after executing tests.",
-                "userDescription": "Reads a chosen data field (stdin/answer/stdout/stderr/verdict/message/time/memory) for a test case by ID.",
-                "canBeReferencedInPrompt": true,
-                "icon": "$(file)",
-                "inputSchema": {
-                    "type": "object",
-                    "required": [
-                        "dataType",
-                        "id",
-                        "activePath"
-                    ],
-                    "properties": {
-                        "dataType": {
-                            "type": "string",
-                            "enum": [
-                                "stdin",
-                                "answer",
-                                "stdout",
-                                "stderr",
-                                "verdict",
-                                "message",
-                                "time",
-                                "memory"
-                            ],
-                            "description": "Which data field to inspect for the specified test case."
-                        },
-                        "id": {
-                            "type": "string",
-                            "description": "The test case ID (UUID) whose data should be fetched."
-                        },
-                        "activePath": {
-                            "type": "string",
-                            "description": "File path for the target problem source code. Must be provided by LLM invocations."
-                        }
-                    }
-                }
-            },
-            {
-                "name": "list_test_cases",
-                "toolReferenceName": "cphNgListTestCases",
-                "displayName": "List CPH-NG Test IDs",
-                "modelDescription": "Returns all test case identifiers for the active problem, along with their latest verdict/time summary. Call this before running or editing tests to work with stable IDs instead of indices.",
-                "userDescription": "Lists every test case ID for the current CPH-NG problem.",
-                "canBeReferencedInPrompt": true,
-                "icon": "$(list-unordered)",
-                "inputSchema": {
-                    "type": "object",
-                    "required": [
-                        "activePath"
-                    ],
-                    "properties": {
-                        "activePath": {
-                            "type": "string",
-                            "description": "File path for the target problem source code. Must be provided by LLM invocations."
-                        }
-                    }
-                }
-            },
-            {
-                "name": "upsert_test_case",
-                "toolReferenceName": "cphNgUpsertTestCase",
-                "displayName": "Add or Update CPH-NG Test Case",
-                "modelDescription": "Creates a new test case or updates an existing one for the active competitive programming problem. Accepts inline stdin/answer content and clears previous verdicts so the test can be re-run. Use this to capture newly discovered counterexamples or tweak expected answers.",
-                "userDescription": "Adds a new test case or updates an existing one (stdin/answer) for the current CPH-NG problem.",
-                "canBeReferencedInPrompt": true,
-                "icon": "$(edit)",
-                "inputSchema": {
-                    "type": "object",
-                    "required": [
-                        "activePath"
-                    ],
-                    "properties": {
-                        "id": {
-                            "type": "string",
-                            "description": "Optional test case ID to update. Omit to append a new test case."
-                        },
-                        "stdin": {
-                            "type": "string",
-                            "description": "Standard input content to store inline for the test case."
-                        },
-                        "answer": {
-                            "type": "string",
-                            "description": "Expected output content to store inline for the test case."
-                        },
-                        "activePath": {
-                            "type": "string",
-                            "description": "File path for the target problem source code. Must be provided by LLM invocations."
-                        }
-                    },
-                    "anyOf": [
-                        {
-                            "required": [
-                                "stdin"
-                            ]
-                        },
-                        {
-                            "required": [
-                                "answer"
-                            ]
-                        }
-                    ]
-                }
-            }
-        ],
-        "languageModelPrompts": [
-            {
-                "id": "cph-ng.analyzeFailure",
-                "name": "CPH-NG: Analyze failing test",
-                "description": "Diagnose a failing competitive programming attempt by running the managed test cases, inspecting the failing data, and outlining next steps.",
-                "prompt": "You are assisting with a competitive programming workspace managed by CPH-NG.\n- Call `list_test_cases` to discover available test IDs.\n- Run either the failing test (`run_test_cases` with the specific ID) or the entire suite as needed.\n- Inspect stdin/answer/stdout/stderr or other result fields via `inspect_problem_data`.\n- Summarize findings, root causes, and recommended code fixes.\n- If you discover a new regression input, persist it with `upsert_test_case` before concluding.\n\nUser request:\n{{input}}"
-            },
-            {
-                "id": "cph-ng.designEdgeCases",
-                "name": "CPH-NG: Generate edge tests",
-                "description": "Brainstorm tricky inputs for the active problem and persist them as executable CPH-NG test cases.",
-                "prompt": "You are helping design stress tests for a competitive programming solution managed by CPH-NG.\n- Call `list_test_cases` to understand existing coverage.\n- For each new scenario, decide on stdin and expected answer values.\n- Save them with `upsert_test_case` (omit `id` to append a fresh case).\n- Suggest re-running with `run_test_cases` to validate the new coverage.\n\nUser request:\n{{input}}"
-            }
-        ],
-        "views": {
-            "cphNgContainer": [
-                {
-                    "id": "cphNgSidebar",
-                    "name": "%cph-ng.views.cphNgContainer.name%",
-                    "type": "webview",
-                    "icon": "./res/panel-view-icon.svg"
-                }
-            ]
-        },
-        "viewsContainers": {
-            "activitybar": [
-                {
-                    "id": "cphNgContainer",
-                    "title": "%cph-ng.viewsContainers.activitybar.title%",
-                    "icon": "./res/panel-view-icon.svg"
-                }
-            ]
-        },
-        "configuration": [
-            {
-                "id": "basic",
-                "order": 0,
-                "title": "%cph-ng.configuration.basic.title%",
-                "properties": {
-                    "cph-ng.basic.folderOpener": {
-                        "type": "string",
-                        "default": "tree",
-                        "enum": [
-                            "tree",
-                            "flat"
-                        ],
-                        "markdownDescription": "%cph-ng.configuration.basic.properties.folderOpener.markdownDescription%",
-                        "markdownEnumDescriptions": [
-                            "%cph-ng.configuration.basic.properties.folderOpener.enumDescriptions.tree%",
-                            "%cph-ng.configuration.basic.properties.folderOpener.enumDescriptions.flat%"
-                        ]
-                    }
-                }
-            },
-            {
-                "id": "compilation",
-                "order": 1,
-                "title": "%cph-ng.configuration.compilation.title%",
-                "properties": {
-                    "cph-ng.compilation.cCompiler": {
-                        "type": "string",
-                        "default": "gcc",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.cCompiler.markdownDescription%"
-                    },
-                    "cph-ng.compilation.cArgs": {
-                        "type": "string",
-                        "default": "-O2 -std=c11 -Wall -DCPH",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.cArgs.markdownDescription%"
-                    },
-                    "cph-ng.compilation.cppCompiler": {
-                        "type": "string",
-                        "default": "g++",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.cppCompiler.markdownDescription%"
-                    },
-                    "cph-ng.compilation.cppArgs": {
-                        "type": "string",
-                        "default": "-O2 -std=c++14 -Wall -DCPH",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.cppArgs.markdownDescription%"
-                    },
-                    "cph-ng.compilation.javaCompiler": {
-                        "type": "string",
-                        "default": "javac",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.javaCompiler.markdownDescription%"
-                    },
-                    "cph-ng.compilation.javaArgs": {
-                        "type": "string",
-                        "default": "-cp .",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.javaArgs.markdownDescription%"
-                    },
-                    "cph-ng.compilation.javaRunner": {
-                        "type": "string",
-                        "default": "java",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.javaRunner.markdownDescription%"
-                    },
-                    "cph-ng.compilation.javaRunArgs": {
-                        "type": "string",
-                        "default": "",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.javaRunArgs.markdownDescription%"
-                    },
-                    "cph-ng.compilation.pythonCompiler": {
-                        "type": "string",
-                        "default": "pypy3",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonCompiler.markdownDescription%"
-                    },
-                    "cph-ng.compilation.pythonArgs": {
-                        "type": "string",
-                        "default": "",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonArgs.markdownDescription%"
-                    },
-                    "cph-ng.compilation.pythonRunner": {
-                        "type": "string",
-                        "default": "pypy3",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonRunner.markdownDescription%"
-                    },
-                    "cph-ng.compilation.pythonRunArgs": {
-                        "type": "string",
-                        "default": "",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonRunArgs.markdownDescription%"
-                    },
-                    "cph-ng.compilation.javascriptRunner": {
-                        "type": "string",
-                        "default": "node",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.javascriptRunner.markdownDescription%"
-                    },
-                    "cph-ng.compilation.javascriptRunArgs": {
-                        "type": "string",
-                        "default": "",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.javascriptRunArgs.markdownDescription%"
-                    },
-                    "cph-ng.compilation.objcopy": {
-                        "type": "string",
-                        "default": "objcopy",
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.objcopy.markdownDescription%"
-                    },
-                    "cph-ng.compilation.timeout": {
-                        "type": "number",
-                        "default": 10000,
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.timeout.markdownDescription%"
-                    },
-                    "cph-ng.compilation.useWrapper": {
-                        "type": "boolean",
-                        "default": false,
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.useWrapper.markdownDescription%"
-                    },
-                    "cph-ng.compilation.useHook": {
-                        "type": "boolean",
-                        "default": false,
-                        "markdownDescription": "%cph-ng.configuration.compilation.properties.useHook.markdownDescription%"
-                    }
-                }
-            },
-            {
-                "id": "runner",
-                "order": 2,
-                "title": "%cph-ng.configuration.runner.title%",
-                "properties": {
-                    "cph-ng.runner.timeAddition": {
-                        "type": "number",
-                        "default": 1000,
-                        "markdownDescription": "%cph-ng.configuration.runner.properties.timeAddition.markdownDescription%"
-                    },
-                    "cph-ng.runner.useRunner": {
-                        "type": "boolean",
-                        "default": false,
-                        "markdownDescription": "%cph-ng.configuration.runner.properties.useRunner.markdownDescription%"
-                    },
-                    "cph-ng.runner.unlimitedStack": {
-                        "type": "boolean",
-                        "default": false,
-                        "markdownDescription": "%cph-ng.configuration.runner.properties.unlimitedStack.markdownDescription%"
-                    }
-                }
-            },
-            {
-                "id": "comparing",
-                "order": 3,
-                "title": "%cph-ng.configuration.comparing.title%",
-                "properties": {
-                    "cph-ng.comparing.oleSize": {
-                        "type": "number",
-                        "default": 8,
-                        "markdownDescription": "%cph-ng.configuration.comparing.properties.oleSize.markdownDescription%"
-                    },
-                    "cph-ng.comparing.regardPEAsAC": {
-                        "type": "boolean",
-                        "default": false,
-                        "markdownDescription": "%cph-ng.configuration.comparing.properties.regardPEAsAC.markdownDescription%"
-                    },
-                    "cph-ng.comparing.ignoreError": {
-                        "type": "boolean",
-                        "default": true,
-                        "markdownDescription": "%cph-ng.configuration.comparing.properties.ignoreError.markdownDescription%"
-                    }
-                }
-            },
-            {
-                "id": "bfCompare",
-                "order": 4,
-                "title": "%cph-ng.configuration.bfCompare.title%",
-                "properties": {
-                    "cph-ng.bfCompare.generatorTimeLimit": {
-                        "type": "number",
-                        "default": 10000,
-                        "markdownDescription": "%cph-ng.configuration.bfCompare.properties.generatorTimeLimit.markdownDescription%"
-                    },
-                    "cph-ng.bfCompare.bruteForceTimeLimit": {
-                        "type": "number",
-                        "default": 60000,
-                        "markdownDescription": "%cph-ng.configuration.bfCompare.properties.bruteForceTimeLimit.markdownDescription%"
-                    }
-                }
-            },
-            {
-                "id": "problem",
-                "order": 5,
-                "title": "%cph-ng.configuration.problem.title%",
-                "properties": {
-                    "cph-ng.problem.defaultTimeLimit": {
-                        "type": "number",
-                        "default": 1000,
-                        "markdownDescription": "%cph-ng.configuration.problem.properties.defaultTimeLimit.markdownDescription%"
-                    },
-                    "cph-ng.problem.defaultMemoryLimit": {
-                        "type": "number",
-                        "default": 512,
-                        "markdownDescription": "%cph-ng.configuration.problem.properties.defaultMemoryLimit.markdownDescription%"
-                    },
-                    "cph-ng.problem.foundMatchTestCaseBehavior": {
-                        "type": "string",
-                        "default": "always",
-                        "enum": [
-                            "ask",
-                            "always",
-                            "never"
-                        ],
-                        "markdownDescription": "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.markdownDescription%",
-                        "markdownEnumDescriptions": [
-                            "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.ask%",
-                            "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.always%",
-                            "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.never%"
-                        ]
-                    },
-                    "cph-ng.problem.templateFile": {
-                        "type": "string",
-                        "default": "",
-                        "markdownDescription": "%cph-ng.configuration.problem.properties.templateFile.markdownDescription%"
-                    },
-                    "cph-ng.problem.problemFilePath": {
-                        "type": "string",
-                        "default": "${workspace}/.cph-ng/${relativeDirname}/${basename}.bin",
-                        "markdownDescription": "%cph-ng.configuration.problem.properties.problemFilePath.markdownDescription%"
-                    },
-                    "cph-ng.problem.unzipFolder": {
-                        "type": "string",
-                        "default": "${workspace}/.cph-ng/${zipBasenameNoExt}",
-                        "markdownDescription": "%cph-ng.configuration.problem.properties.unzipFolder.markdownDescription%"
-                    },
-                    "cph-ng.problem.deleteAfterUnzip": {
-                        "type": "boolean",
-                        "default": false,
-                        "markdownDescription": "%cph-ng.configuration.problem.properties.deleteAfterUnzip.markdownDescription%"
-                    },
-                    "cph-ng.problem.clearBeforeLoad": {
-                        "type": "boolean",
-                        "default": false,
-                        "markdownDescription": "%cph-ng.configuration.problem.properties.clearBeforeLoad.markdownDescription%"
-                    },
-                    "cph-ng.problem.maxInlineDataLength": {
-                        "type": "number",
-                        "default": 65536,
-                        "markdownDescription": "%cph-ng.configuration.problem.properties.maxInlineDataLength.markdownDescription%"
-                    },
-                    "cph-ng.problem.inputFileExtensionList": {
-                        "type": "array",
-                        "default": [
-                            ".in"
-                        ],
-                        "markdownDescription": "%cph-ng.configuration.problem.properties.inputFileExtensionList.markdownDescription%"
-                    },
-                    "cph-ng.problem.outputFileExtensionList": {
-                        "type": "array",
-                        "default": [
-                            ".ans",
-                            ".out"
-                        ],
-                        "markdownDescription": "%cph-ng.configuration.problem.properties.outputFileExtensionList.markdownDescription%"
-                    }
-                }
-            },
-            {
-                "id": "cache",
-                "order": 6,
-                "title": "%cph-ng.configuration.cache.title%",
-                "properties": {
-                    "cph-ng.cache.directory": {
-                        "type": "string",
-                        "default": "${tmp}/cph-ng",
-                        "markdownDescription": "%cph-ng.configuration.cache.properties.directory.markdownDescription%"
-                    },
-                    "cph-ng.cache.cleanOnStartup": {
-                        "type": "boolean",
-                        "default": true,
-                        "markdownDescription": "%cph-ng.configuration.cache.properties.cleanOnStartup.markdownDescription%"
-                    }
-                }
-            },
-            {
-                "id": "cphCapable",
-                "order": 7,
-                "title": "%cph-ng.configuration.cphCapable.title%",
-                "properties": {
-                    "cph-ng.cphCapable.enabled": {
-                        "type": "boolean",
-                        "default": true,
-                        "markdownDescription": "%cph-ng.configuration.cphCapable.properties.enabled.markdownDescription%"
-                    }
-                }
-            },
-            {
-                "id": "companion",
-                "order": 8,
-                "title": "%cph-ng.configuration.companion.title%",
-                "properties": {
-                    "cph-ng.companion.listenPort": {
-                        "type": "number",
-                        "default": 27121,
-                        "markdownDescription": "%cph-ng.configuration.companion.properties.listenPort.markdownDescription%"
-                    },
-                    "cph-ng.companion.customPathScript": {
-                        "type": "string",
-                        "default": "${extensionPath}/res/defaultScript.js",
-                        "markdownDescription": "%cph-ng.configuration.companion.properties.customPathScript.markdownDescription%"
-                    },
-                    "cph-ng.companion.submitLanguage": {
-                        "type": "number",
-                        "default": -1,
-                        "markdownDescription": "%cph-ng.configuration.companion.properties.submitLanguage.markdownDescription%",
-                        "enum": [
-                            -1,
-                            54,
-                            89,
-                            91
-                        ],
-                        "enumItemLabels": [
-                            "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.-1%",
-                            "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.54%",
-                            "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.89%",
-                            "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.91%"
-                        ]
-                    },
-                    "cph-ng.companion.addTimestamp": {
-                        "type": "boolean",
-                        "default": true,
-                        "markdownDescription": "%cph-ng.configuration.companion.properties.addTimestamp.markdownDescription%"
-                    },
-                    "cph-ng.companion.showPanel": {
-                        "type": "number",
-                        "default": -1,
-                        "markdownDescription": "%cph-ng.configuration.companion.properties.showPanel.markdownDescription%",
-                        "enum": [
-                            -1,
-                            -2,
-                            1,
-                            2,
-                            3,
-                            4,
-                            5,
-                            6,
-                            7,
-                            8,
-                            9
-                        ],
-                        "enumItemLabels": [
-                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.-1%",
-                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.-2%",
-                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.1%",
-                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.2%",
-                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.3%",
-                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.4%",
-                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.5%",
-                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.6%",
-                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.7%",
-                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.8%",
-                            "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.9%"
-                        ],
-                        "markdownEnumDescriptions": [
-                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.-1%",
-                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.-2%",
-                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.1%",
-                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.2%",
-                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.3%",
-                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.4%",
-                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.5%",
-                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.6%",
-                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.7%",
-                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.8%",
-                            "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.9%"
-                        ]
-                    }
-                }
-            },
-            {
-                "id": "sidebar",
-                "order": 9,
-                "title": "%cph-ng.configuration.sidebar.title%",
-                "properties": {
-                    "cph-ng.sidebar.retainWhenHidden": {
-                        "type": "boolean",
-                        "default": true,
-                        "markdownDescription": "%cph-ng.configuration.sidebar.properties.retainWhenHidden.markdownDescription%"
-                    },
-                    "cph-ng.sidebar.showAcGif": {
-                        "type": "boolean",
-                        "default": true,
-                        "markdownDescription": "%cph-ng.configuration.sidebar.properties.showAcGif.markdownDescription%"
-                    },
-                    "cph-ng.sidebar.colorTheme": {
-                        "type": "string",
-                        "default": "auto",
-                        "markdownDescription": "%cph-ng.configuration.sidebar.properties.colorTheme.markdownDescription%",
-                        "enum": [
-                            "auto",
-                            "light",
-                            "dark"
-                        ],
-                        "markdownEnumDescriptions": [
-                            "%cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.auto%",
-                            "%cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.light%",
-                            "%cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.dark%"
-                        ]
-                    },
-                    "cph-ng.sidebar.hiddenStatuses": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "UKE",
-                                "AC",
-                                "PC",
-                                "PE",
-                                "WA",
-                                "TLE",
-                                "MLE",
-                                "OLE",
-                                "RE",
-                                "RF",
-                                "CE",
-                                "SE",
-                                "WT",
-                                "FC",
-                                "CP",
-                                "CPD",
-                                "JG",
-                                "JGD",
-                                "CMP",
-                                "SK",
-                                "RJ"
-                            ],
-                            "enumDescriptions": [
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.UKE%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.AC%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.PC%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.PE%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.WA%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.TLE%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.MLE%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.OLE%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.RE%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.RF%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.CE%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.SE%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.WT%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.FC%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.CP%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.CPD%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.JG%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.JGD%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.CMP%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.SK%",
-                                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.RJ%"
-                            ]
-                        },
-                        "uniqueItems": true,
-                        "default": [],
-                        "markdownDescription": "%cph-ng.configuration.sidebar.properties.hiddenStatuses.markdownDescription%"
-                    },
-                    "cph-ng.sidebar.showTips": {
-                        "type": "boolean",
-                        "default": true,
-                        "markdownDescription": "%cph-ng.configuration.sidebar.properties.showTips.markdownDescription%"
-                    }
-                }
-            }
-        ],
-        "commands": [
-            {
-                "command": "cph-ng.versionInfo",
-                "title": "CPH-NG: Version Info"
-            },
-            {
-                "command": "cph-ng.importFromCph",
-                "title": "%cph-ng.commands.importFromCph%"
-            },
-            {
-                "command": "cph-ng.createProblem",
-                "title": "%cph-ng.commands.createProblem%",
-                "icon": "$(rocket)"
-            },
-            {
-                "command": "cph-ng.importProblem",
-                "title": "%cph-ng.commands.importProblem%",
-                "icon": "$(desktop-download)"
-            },
-            {
-                "command": "cph-ng.runTestCases",
-                "title": "%cph-ng.commands.runTestCases%",
-                "icon": "$(run-all)"
-            },
-            {
-                "command": "cph-ng.stopTestCases",
-                "title": "%cph-ng.commands.stopTestCases%",
-                "icon": "$(stop-circle)"
-            },
-            {
-                "command": "cph-ng.addTestCase",
-                "title": "%cph-ng.commands.addTestCase%"
-            },
-            {
-                "command": "cph-ng.loadTestCases",
-                "title": "%cph-ng.commands.loadTestCases%"
-            },
-            {
-                "command": "cph-ng.deleteProblem",
-                "title": "%cph-ng.commands.deleteProblem%"
-            },
-            {
-                "command": "cph-ng.submitToCodeforces",
-                "title": "%cph-ng.commands.submitToCodeforces%"
-            }
-        ],
-        "keybindings": [
-            {
-                "command": "cph-ng.createProblem",
-                "key": "ctrl+alt+b",
-                "when": "!cph-ng.hasProblem && !cph-ng.canImport"
-            },
-            {
-                "command": "cph-ng.importProblem",
-                "key": "ctrl+alt+b",
-                "when": "!cph-ng.hasProblem && cph-ng.canImport"
-            },
-            {
-                "command": "cph-ng.runTestCases",
-                "key": "ctrl+alt+b",
-                "when": "cph-ng.hasProblem && !cph-ng.isRunning"
-            },
-            {
-                "command": "cph-ng.stopTestCases",
-                "key": "ctrl+alt+b",
-                "when": "cph-ng.hasProblem && cph-ng.isRunning"
-            }
-        ],
-        "menus": {
-            "editor/title": [
-                {
-                    "command": "cph-ng.createProblem",
-                    "when": "!cph-ng.hasProblem",
-                    "group": "navigation"
-                },
-                {
-                    "command": "cph-ng.runTestCases",
-                    "when": "cph-ng.hasProblem && !cph-ng.isRunning",
-                    "group": "navigation"
-                },
-                {
-                    "command": "cph-ng.stopTestCases",
-                    "when": "cph-ng.hasProblem && cph-ng.isRunning",
-                    "group": "navigation"
-                }
-            ]
+          }
         }
+      },
+      {
+        "name": "inspect_problem_data",
+        "toolReferenceName": "cphNgInspectProblemData",
+        "displayName": "Inspect CPH-NG Test Data",
+        "modelDescription": "Retrieves a specific data slice for a CPH-NG test case - stdin, expected answer, stdout, stderr, verdict, runtime, memory usage, or diagnostic message. Use this to examine precise artifacts after executing tests.",
+        "userDescription": "Reads a chosen data field (stdin/answer/stdout/stderr/verdict/message/time/memory) for a test case by ID.",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(file)",
+        "inputSchema": {
+          "type": "object",
+          "required": [
+            "dataType",
+            "id",
+            "activePath"
+          ],
+          "properties": {
+            "dataType": {
+              "type": "string",
+              "enum": [
+                "stdin",
+                "answer",
+                "stdout",
+                "stderr",
+                "verdict",
+                "message",
+                "time",
+                "memory"
+              ],
+              "description": "Which data field to inspect for the specified test case."
+            },
+            "id": {
+              "type": "string",
+              "description": "The test case ID (UUID) whose data should be fetched."
+            },
+            "activePath": {
+              "type": "string",
+              "description": "File path for the target problem source code. Must be provided by LLM invocations."
+            }
+          }
+        }
+      },
+      {
+        "name": "list_test_cases",
+        "toolReferenceName": "cphNgListTestCases",
+        "displayName": "List CPH-NG Test IDs",
+        "modelDescription": "Returns all test case identifiers for the active problem, along with their latest verdict/time summary. Call this before running or editing tests to work with stable IDs instead of indices.",
+        "userDescription": "Lists every test case ID for the current CPH-NG problem.",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(list-unordered)",
+        "inputSchema": {
+          "type": "object",
+          "required": [
+            "activePath"
+          ],
+          "properties": {
+            "activePath": {
+              "type": "string",
+              "description": "File path for the target problem source code. Must be provided by LLM invocations."
+            }
+          }
+        }
+      },
+      {
+        "name": "upsert_test_case",
+        "toolReferenceName": "cphNgUpsertTestCase",
+        "displayName": "Add or Update CPH-NG Test Case",
+        "modelDescription": "Creates a new test case or updates an existing one for the active competitive programming problem. Accepts inline stdin/answer content and clears previous verdicts so the test can be re-run. Use this to capture newly discovered counterexamples or tweak expected answers.",
+        "userDescription": "Adds a new test case or updates an existing one (stdin/answer) for the current CPH-NG problem.",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(edit)",
+        "inputSchema": {
+          "type": "object",
+          "required": [
+            "activePath"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Optional test case ID to update. Omit to append a new test case."
+            },
+            "stdin": {
+              "type": "string",
+              "description": "Standard input content to store inline for the test case."
+            },
+            "answer": {
+              "type": "string",
+              "description": "Expected output content to store inline for the test case."
+            },
+            "activePath": {
+              "type": "string",
+              "description": "File path for the target problem source code. Must be provided by LLM invocations."
+            }
+          },
+          "anyOf": [
+            {
+              "required": [
+                "stdin"
+              ]
+            },
+            {
+              "required": [
+                "answer"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "languageModelPrompts": [
+      {
+        "id": "cph-ng.analyzeFailure",
+        "name": "CPH-NG: Analyze failing test",
+        "description": "Diagnose a failing competitive programming attempt by running the managed test cases, inspecting the failing data, and outlining next steps.",
+        "prompt": "You are assisting with a competitive programming workspace managed by CPH-NG.\n- Call `list_test_cases` to discover available test IDs.\n- Run either the failing test (`run_test_cases` with the specific ID) or the entire suite as needed.\n- Inspect stdin/answer/stdout/stderr or other result fields via `inspect_problem_data`.\n- Summarize findings, root causes, and recommended code fixes.\n- If you discover a new regression input, persist it with `upsert_test_case` before concluding.\n\nUser request:\n{{input}}"
+      },
+      {
+        "id": "cph-ng.designEdgeCases",
+        "name": "CPH-NG: Generate edge tests",
+        "description": "Brainstorm tricky inputs for the active problem and persist them as executable CPH-NG test cases.",
+        "prompt": "You are helping design stress tests for a competitive programming solution managed by CPH-NG.\n- Call `list_test_cases` to understand existing coverage.\n- For each new scenario, decide on stdin and expected answer values.\n- Save them with `upsert_test_case` (omit `id` to append a fresh case).\n- Suggest re-running with `run_test_cases` to validate the new coverage.\n\nUser request:\n{{input}}"
+      }
+    ],
+    "views": {
+      "cphNgContainer": [
+        {
+          "id": "cphNgSidebar",
+          "name": "%cph-ng.views.cphNgContainer.name%",
+          "type": "webview",
+          "icon": "./res/panel-view-icon.svg"
+        }
+      ]
     },
-    "scripts": {
-        "vscode:prepublish": "webpack --mode production",
-        "compile": "webpack --mode production",
-        "watch": "webpack --watch --mode development",
-        "package": "pnpm vsce package --allow-star-activation --no-dependencies",
-        "publish": "pnpm vsce publish --allow-star-activation --no-dependencies",
-        "publish:pre": "pnpm vsce publish --allow-star-activation --no-dependencies --pre-release",
-        "lint": "eslint src",
-        "format": "prettier --write --cache .",
-        "install-hooks": "node scripts/install-hooks.js",
-        "check-translations": "node scripts/pre-commit"
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "cphNgContainer",
+          "title": "%cph-ng.viewsContainers.activitybar.title%",
+          "icon": "./res/panel-view-icon.svg"
+        }
+      ]
     },
-    "devDependencies": {
-        "@actions/core": "^1.11.1",
-        "@actions/github": "^6.0.1",
-        "@babel/preset-react": "^7.28.5",
-        "@commitlint/cli": "^20.1.0",
-        "@commitlint/config-conventional": "^20.0.0",
-        "@octokit/rest": "^22.0.1",
-        "@octokit/webhooks-types": "^7.6.1",
-        "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
-        "@swc/core": "^1.15.3",
-        "@types/adm-zip": "^0.5.7",
-        "@types/crypto-js": "^4.2.2",
-        "@types/mocha": "^10.0.10",
-        "@types/node": "~24.10.1",
-        "@types/react": "^19.2.7",
-        "@types/react-dom": "^19.2.3",
-        "@types/semver": "^7.7.1",
-        "@types/speed-measure-webpack-plugin": "^1.3.6",
-        "@types/vscode": "1.95.0",
-        "@types/webpack": "^5.28.5",
-        "@typescript-eslint/eslint-plugin": "^8.48.0",
-        "@typescript-eslint/parser": "^8.48.0",
-        "@vscode/test-cli": "^0.0.12",
-        "@vscode/test-electron": "^2.5.2",
-        "@vscode/vsce": "^3.7.1",
-        "eslint": "^9.39.1",
-        "prettier": "^3.6.2",
-        "prettier-plugin-organize-imports": "^4.3.0",
-        "react-refresh": "^0.18.0",
-        "speed-measure-webpack-plugin": "^1.5.0",
-        "swc-loader": "^0.2.6",
-        "terser-webpack-plugin": "^5.3.14",
-        "thread-loader": "^4.0.4",
-        "ts-loader": "^9.5.4",
-        "typescript": "5.9.3",
-        "webpack": "^5.103.0",
-        "webpack-cli": "^6.0.1",
-        "webpack-merge": "^6.0.1"
-    },
-    "dependencies": {
-        "@base-ui-components/react": "1.0.0-beta.6",
-        "@codemirror/language": "^6.11.3",
-        "@codemirror/state": "^6.5.2",
-        "@codemirror/view": "^6.38.8",
-        "@emotion/react": "^11.14.0",
-        "@emotion/styled": "^11.14.1",
-        "@lezer/highlight": "^1.2.3",
-        "@mui/icons-material": "^7.3.5",
-        "@mui/lab": "7.0.1-beta.19",
-        "@mui/material": "^7.3.5",
-        "@uiw/react-codemirror": "^4.25.3",
-        "adm-zip": "^0.5.16",
-        "anser": "^2.3.3",
-        "ansi_up": "^6.0.6",
-        "codemirror": "^6.0.2",
-        "copy-webpack-plugin": "^13.0.1",
-        "crypto-js": "^4.2.0",
-        "i18next": "^25.6.3",
-        "natural-orderby": "^5.0.0",
-        "p-queue": "^9.0.1",
-        "react": "^19.2.0",
-        "react-dom": "^19.2.0",
-        "react-i18next": "^16.3.5",
-        "react-textarea-autosize": "^8.5.9",
-        "semver": "^7.7.3"
+    "configuration": [
+      {
+        "id": "basic",
+        "order": 0,
+        "title": "%cph-ng.configuration.basic.title%",
+        "properties": {
+          "cph-ng.basic.folderOpener": {
+            "type": "string",
+            "default": "tree",
+            "enum": [
+              "tree",
+              "flat"
+            ],
+            "markdownDescription": "%cph-ng.configuration.basic.properties.folderOpener.markdownDescription%",
+            "markdownEnumDescriptions": [
+              "%cph-ng.configuration.basic.properties.folderOpener.enumDescriptions.tree%",
+              "%cph-ng.configuration.basic.properties.folderOpener.enumDescriptions.flat%"
+            ]
+          }
+        }
+      },
+      {
+        "id": "compilation",
+        "order": 1,
+        "title": "%cph-ng.configuration.compilation.title%",
+        "properties": {
+          "cph-ng.compilation.cCompiler": {
+            "type": "string",
+            "default": "gcc",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.cCompiler.markdownDescription%"
+          },
+          "cph-ng.compilation.cArgs": {
+            "type": "string",
+            "default": "-O2 -std=c11 -Wall -DCPH",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.cArgs.markdownDescription%"
+          },
+          "cph-ng.compilation.cppCompiler": {
+            "type": "string",
+            "default": "g++",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.cppCompiler.markdownDescription%"
+          },
+          "cph-ng.compilation.cppArgs": {
+            "type": "string",
+            "default": "-O2 -std=c++14 -Wall -DCPH",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.cppArgs.markdownDescription%"
+          },
+          "cph-ng.compilation.javaCompiler": {
+            "type": "string",
+            "default": "javac",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.javaCompiler.markdownDescription%"
+          },
+          "cph-ng.compilation.javaArgs": {
+            "type": "string",
+            "default": "-cp .",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.javaArgs.markdownDescription%"
+          },
+          "cph-ng.compilation.javaRunner": {
+            "type": "string",
+            "default": "java",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.javaRunner.markdownDescription%"
+          },
+          "cph-ng.compilation.javaRunArgs": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.javaRunArgs.markdownDescription%"
+          },
+          "cph-ng.compilation.pythonCompiler": {
+            "type": "string",
+            "default": "pypy3",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonCompiler.markdownDescription%"
+          },
+          "cph-ng.compilation.pythonArgs": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonArgs.markdownDescription%"
+          },
+          "cph-ng.compilation.pythonRunner": {
+            "type": "string",
+            "default": "pypy3",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonRunner.markdownDescription%"
+          },
+          "cph-ng.compilation.pythonRunArgs": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonRunArgs.markdownDescription%"
+          },
+          "cph-ng.compilation.javascriptRunner": {
+            "type": "string",
+            "default": "node",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.javascriptRunner.markdownDescription%"
+          },
+          "cph-ng.compilation.javascriptRunArgs": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.javascriptRunArgs.markdownDescription%"
+          },
+          "cph-ng.compilation.objcopy": {
+            "type": "string",
+            "default": "objcopy",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.objcopy.markdownDescription%"
+          },
+          "cph-ng.compilation.timeout": {
+            "type": "number",
+            "default": 10000,
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.timeout.markdownDescription%"
+          },
+          "cph-ng.compilation.useWrapper": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.useWrapper.markdownDescription%"
+          },
+          "cph-ng.compilation.useHook": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.useHook.markdownDescription%"
+          }
+        }
+      },
+      {
+        "id": "runner",
+        "order": 2,
+        "title": "%cph-ng.configuration.runner.title%",
+        "properties": {
+          "cph-ng.runner.timeAddition": {
+            "type": "number",
+            "default": 1000,
+            "markdownDescription": "%cph-ng.configuration.runner.properties.timeAddition.markdownDescription%"
+          },
+          "cph-ng.runner.useRunner": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%cph-ng.configuration.runner.properties.useRunner.markdownDescription%"
+          },
+          "cph-ng.runner.unlimitedStack": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%cph-ng.configuration.runner.properties.unlimitedStack.markdownDescription%"
+          }
+        }
+      },
+      {
+        "id": "comparing",
+        "order": 3,
+        "title": "%cph-ng.configuration.comparing.title%",
+        "properties": {
+          "cph-ng.comparing.oleSize": {
+            "type": "number",
+            "default": 8,
+            "markdownDescription": "%cph-ng.configuration.comparing.properties.oleSize.markdownDescription%"
+          },
+          "cph-ng.comparing.regardPEAsAC": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%cph-ng.configuration.comparing.properties.regardPEAsAC.markdownDescription%"
+          },
+          "cph-ng.comparing.ignoreError": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%cph-ng.configuration.comparing.properties.ignoreError.markdownDescription%"
+          }
+        }
+      },
+      {
+        "id": "bfCompare",
+        "order": 4,
+        "title": "%cph-ng.configuration.bfCompare.title%",
+        "properties": {
+          "cph-ng.bfCompare.generatorTimeLimit": {
+            "type": "number",
+            "default": 10000,
+            "markdownDescription": "%cph-ng.configuration.bfCompare.properties.generatorTimeLimit.markdownDescription%"
+          },
+          "cph-ng.bfCompare.bruteForceTimeLimit": {
+            "type": "number",
+            "default": 60000,
+            "markdownDescription": "%cph-ng.configuration.bfCompare.properties.bruteForceTimeLimit.markdownDescription%"
+          }
+        }
+      },
+      {
+        "id": "problem",
+        "order": 5,
+        "title": "%cph-ng.configuration.problem.title%",
+        "properties": {
+          "cph-ng.problem.defaultTimeLimit": {
+            "type": "number",
+            "default": 1000,
+            "markdownDescription": "%cph-ng.configuration.problem.properties.defaultTimeLimit.markdownDescription%"
+          },
+          "cph-ng.problem.defaultMemoryLimit": {
+            "type": "number",
+            "default": 512,
+            "markdownDescription": "%cph-ng.configuration.problem.properties.defaultMemoryLimit.markdownDescription%"
+          },
+          "cph-ng.problem.foundMatchTestCaseBehavior": {
+            "type": "string",
+            "default": "always",
+            "enum": [
+              "ask",
+              "always",
+              "never"
+            ],
+            "markdownDescription": "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.markdownDescription%",
+            "markdownEnumDescriptions": [
+              "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.ask%",
+              "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.always%",
+              "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.never%"
+            ]
+          },
+          "cph-ng.problem.templateFile": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "%cph-ng.configuration.problem.properties.templateFile.markdownDescription%"
+          },
+          "cph-ng.problem.problemFilePath": {
+            "type": "string",
+            "default": "${workspace}/.cph-ng/${relativeDirname}/${basename}.bin",
+            "markdownDescription": "%cph-ng.configuration.problem.properties.problemFilePath.markdownDescription%"
+          },
+          "cph-ng.problem.unzipFolder": {
+            "type": "string",
+            "default": "${workspace}/.cph-ng/${zipBasenameNoExt}",
+            "markdownDescription": "%cph-ng.configuration.problem.properties.unzipFolder.markdownDescription%"
+          },
+          "cph-ng.problem.deleteAfterUnzip": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%cph-ng.configuration.problem.properties.deleteAfterUnzip.markdownDescription%"
+          },
+          "cph-ng.problem.clearBeforeLoad": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%cph-ng.configuration.problem.properties.clearBeforeLoad.markdownDescription%"
+          },
+          "cph-ng.problem.maxInlineDataLength": {
+            "type": "number",
+            "default": 65536,
+            "markdownDescription": "%cph-ng.configuration.problem.properties.maxInlineDataLength.markdownDescription%"
+          },
+          "cph-ng.problem.inputFileExtensionList": {
+            "type": "array",
+            "default": [
+              ".in"
+            ],
+            "markdownDescription": "%cph-ng.configuration.problem.properties.inputFileExtensionList.markdownDescription%"
+          },
+          "cph-ng.problem.outputFileExtensionList": {
+            "type": "array",
+            "default": [
+              ".ans",
+              ".out"
+            ],
+            "markdownDescription": "%cph-ng.configuration.problem.properties.outputFileExtensionList.markdownDescription%"
+          }
+        }
+      },
+      {
+        "id": "cache",
+        "order": 6,
+        "title": "%cph-ng.configuration.cache.title%",
+        "properties": {
+          "cph-ng.cache.directory": {
+            "type": "string",
+            "default": "${tmp}/cph-ng",
+            "markdownDescription": "%cph-ng.configuration.cache.properties.directory.markdownDescription%"
+          },
+          "cph-ng.cache.cleanOnStartup": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%cph-ng.configuration.cache.properties.cleanOnStartup.markdownDescription%"
+          }
+        }
+      },
+      {
+        "id": "cphCapable",
+        "order": 7,
+        "title": "%cph-ng.configuration.cphCapable.title%",
+        "properties": {
+          "cph-ng.cphCapable.enabled": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%cph-ng.configuration.cphCapable.properties.enabled.markdownDescription%"
+          }
+        }
+      },
+      {
+        "id": "companion",
+        "order": 8,
+        "title": "%cph-ng.configuration.companion.title%",
+        "properties": {
+          "cph-ng.companion.listenPort": {
+            "type": "number",
+            "default": 27121,
+            "markdownDescription": "%cph-ng.configuration.companion.properties.listenPort.markdownDescription%"
+          },
+          "cph-ng.companion.customPathScript": {
+            "type": "string",
+            "default": "${extensionPath}/res/defaultScript.js",
+            "markdownDescription": "%cph-ng.configuration.companion.properties.customPathScript.markdownDescription%"
+          },
+          "cph-ng.companion.submitLanguage": {
+            "type": "number",
+            "default": -1,
+            "markdownDescription": "%cph-ng.configuration.companion.properties.submitLanguage.markdownDescription%",
+            "enum": [
+              -1,
+              54,
+              89,
+              91
+            ],
+            "enumItemLabels": [
+              "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.-1%",
+              "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.54%",
+              "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.89%",
+              "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.91%"
+            ]
+          },
+          "cph-ng.companion.addTimestamp": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%cph-ng.configuration.companion.properties.addTimestamp.markdownDescription%"
+          },
+          "cph-ng.companion.showPanel": {
+            "type": "number",
+            "default": -1,
+            "markdownDescription": "%cph-ng.configuration.companion.properties.showPanel.markdownDescription%",
+            "enum": [
+              -1,
+              -2,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "enumItemLabels": [
+              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.-1%",
+              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.-2%",
+              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.1%",
+              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.2%",
+              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.3%",
+              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.4%",
+              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.5%",
+              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.6%",
+              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.7%",
+              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.8%",
+              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.9%"
+            ],
+            "markdownEnumDescriptions": [
+              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.-1%",
+              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.-2%",
+              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.1%",
+              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.2%",
+              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.3%",
+              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.4%",
+              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.5%",
+              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.6%",
+              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.7%",
+              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.8%",
+              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.9%"
+            ]
+          }
+        }
+      },
+      {
+        "id": "sidebar",
+        "order": 9,
+        "title": "%cph-ng.configuration.sidebar.title%",
+        "properties": {
+          "cph-ng.sidebar.retainWhenHidden": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%cph-ng.configuration.sidebar.properties.retainWhenHidden.markdownDescription%"
+          },
+          "cph-ng.sidebar.showAcGif": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%cph-ng.configuration.sidebar.properties.showAcGif.markdownDescription%"
+          },
+          "cph-ng.sidebar.colorTheme": {
+            "type": "string",
+            "default": "auto",
+            "markdownDescription": "%cph-ng.configuration.sidebar.properties.colorTheme.markdownDescription%",
+            "enum": [
+              "auto",
+              "light",
+              "dark"
+            ],
+            "markdownEnumDescriptions": [
+              "%cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.auto%",
+              "%cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.light%",
+              "%cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.dark%"
+            ]
+          },
+          "cph-ng.sidebar.hiddenStatuses": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "UKE",
+                "AC",
+                "PC",
+                "PE",
+                "WA",
+                "TLE",
+                "MLE",
+                "OLE",
+                "RE",
+                "RF",
+                "CE",
+                "SE",
+                "WT",
+                "FC",
+                "CP",
+                "CPD",
+                "JG",
+                "JGD",
+                "CMP",
+                "SK",
+                "RJ"
+              ],
+              "enumDescriptions": [
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.UKE%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.AC%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.PC%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.PE%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.WA%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.TLE%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.MLE%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.OLE%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.RE%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.RF%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.CE%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.SE%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.WT%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.FC%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.CP%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.CPD%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.JG%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.JGD%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.CMP%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.SK%",
+                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.RJ%"
+              ]
+            },
+            "uniqueItems": true,
+            "default": [],
+            "markdownDescription": "%cph-ng.configuration.sidebar.properties.hiddenStatuses.markdownDescription%"
+          },
+          "cph-ng.sidebar.showTips": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%cph-ng.configuration.sidebar.properties.showTips.markdownDescription%"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "cph-ng.versionInfo",
+        "title": "CPH-NG: Version Info"
+      },
+      {
+        "command": "cph-ng.importFromCph",
+        "title": "%cph-ng.commands.importFromCph%"
+      },
+      {
+        "command": "cph-ng.createProblem",
+        "title": "%cph-ng.commands.createProblem%",
+        "icon": "$(rocket)"
+      },
+      {
+        "command": "cph-ng.importProblem",
+        "title": "%cph-ng.commands.importProblem%",
+        "icon": "$(desktop-download)"
+      },
+      {
+        "command": "cph-ng.runTestCases",
+        "title": "%cph-ng.commands.runTestCases%",
+        "icon": "$(run-all)"
+      },
+      {
+        "command": "cph-ng.stopTestCases",
+        "title": "%cph-ng.commands.stopTestCases%",
+        "icon": "$(stop-circle)"
+      },
+      {
+        "command": "cph-ng.addTestCase",
+        "title": "%cph-ng.commands.addTestCase%"
+      },
+      {
+        "command": "cph-ng.loadTestCases",
+        "title": "%cph-ng.commands.loadTestCases%"
+      },
+      {
+        "command": "cph-ng.deleteProblem",
+        "title": "%cph-ng.commands.deleteProblem%"
+      },
+      {
+        "command": "cph-ng.submitToCodeforces",
+        "title": "%cph-ng.commands.submitToCodeforces%"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "cph-ng.createProblem",
+        "key": "ctrl+alt+b",
+        "when": "!cph-ng.hasProblem && !cph-ng.canImport"
+      },
+      {
+        "command": "cph-ng.importProblem",
+        "key": "ctrl+alt+b",
+        "when": "!cph-ng.hasProblem && cph-ng.canImport"
+      },
+      {
+        "command": "cph-ng.runTestCases",
+        "key": "ctrl+alt+b",
+        "when": "cph-ng.hasProblem && !cph-ng.isRunning"
+      },
+      {
+        "command": "cph-ng.stopTestCases",
+        "key": "ctrl+alt+b",
+        "when": "cph-ng.hasProblem && cph-ng.isRunning"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "cph-ng.createProblem",
+          "when": "!cph-ng.hasProblem",
+          "group": "navigation"
+        },
+        {
+          "command": "cph-ng.runTestCases",
+          "when": "cph-ng.hasProblem && !cph-ng.isRunning",
+          "group": "navigation"
+        },
+        {
+          "command": "cph-ng.stopTestCases",
+          "when": "cph-ng.hasProblem && cph-ng.isRunning",
+          "group": "navigation"
+        }
+      ]
     }
+  },
+  "scripts": {
+    "vscode:prepublish": "webpack --mode production",
+    "compile": "webpack --mode production",
+    "watch": "webpack --watch --mode development",
+    "package": "pnpm vsce package --allow-star-activation --no-dependencies",
+    "publish": "pnpm vsce publish --allow-star-activation --no-dependencies",
+    "publish:pre": "pnpm vsce publish --allow-star-activation --no-dependencies --pre-release",
+    "lint": "eslint src",
+    "format": "prettier --write --cache .",
+    "install-hooks": "node scripts/install-hooks.js",
+    "check-translations": "node scripts/pre-commit"
+  },
+  "devDependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.1",
+    "@babel/preset-react": "^7.28.5",
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "@octokit/rest": "^22.0.1",
+    "@octokit/webhooks-types": "^7.6.1",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
+    "@swc/core": "^1.15.3",
+    "@types/adm-zip": "^0.5.7",
+    "@types/crypto-js": "^4.2.2",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "~24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@types/semver": "^7.7.1",
+    "@types/speed-measure-webpack-plugin": "^1.3.6",
+    "@types/vscode": "1.95.0",
+    "@types/webpack": "^5.28.5",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.7.1",
+    "eslint": "^9.39.1",
+    "prettier": "^3.6.2",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "react-refresh": "^0.18.0",
+    "speed-measure-webpack-plugin": "^1.5.0",
+    "swc-loader": "^0.2.6",
+    "terser-webpack-plugin": "^5.3.14",
+    "thread-loader": "^4.0.4",
+    "ts-loader": "^9.5.4",
+    "typescript": "5.9.3",
+    "webpack": "^5.103.0",
+    "webpack-cli": "^6.0.1",
+    "webpack-merge": "^6.0.1"
+  },
+  "dependencies": {
+    "@base-ui-components/react": "1.0.0-beta.6",
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.38.8",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@lezer/highlight": "^1.2.3",
+    "@mui/icons-material": "^7.3.5",
+    "@mui/lab": "7.0.1-beta.19",
+    "@mui/material": "^7.3.5",
+    "@uiw/react-codemirror": "^4.25.3",
+    "@vscode/extension-telemetry": "^1.2.0",
+    "adm-zip": "^0.5.16",
+    "anser": "^2.3.3",
+    "ansi_up": "^6.0.6",
+    "codemirror": "^6.0.2",
+    "copy-webpack-plugin": "^13.0.1",
+    "crypto-js": "^4.2.0",
+    "i18next": "^25.6.3",
+    "natural-orderby": "^5.0.0",
+    "p-queue": "^9.0.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-i18next": "^16.3.5",
+    "react-textarea-autosize": "^8.5.9",
+    "semver": "^7.7.3"
+  }
 }

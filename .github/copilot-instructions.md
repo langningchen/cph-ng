@@ -90,19 +90,19 @@ extension → `ProblemsManager` handles messages
 **Three translation layers** (all must be synchronized):
 
 1. **VSCode Extension Configuration** (`package.json`):
-    - References: `%key%` syntax
-    - English: `package.nls.json`
-    - Chinese: `package.nls.zh.json`
+   - References: `%key%` syntax
+   - English: `package.nls.json`
+   - Chinese: `package.nls.zh.json`
 
 2. **Extension Runtime** (TypeScript code):
-    - Usage: `l10n.t('key')` or `l10n.t('template {var}', {var: value})`
-    - Chinese: `l10n/bundle.l10n.zh-cn.json`
-    - English: embedded in code as default
+   - Usage: `l10n.t('key')` or `l10n.t('template {var}', {var: value})`
+   - Chinese: `l10n/bundle.l10n.zh-cn.json`
+   - English: embedded in code as default
 
 3. **Webview UI** (React):
-    - Usage: `t('key')` hook from `react-i18next`
-    - English: `src/webview/l10n/en.json`
-    - Chinese: `src/webview/l10n/zh.json`
+   - Usage: `t('key')` hook from `react-i18next`
+   - English: `src/webview/l10n/en.json`
+   - Chinese: `src/webview/l10n/zh.json`
 
 **Translation enforcement**: Git pre-commit hook (`scripts/pre-commit`)
 validates all translation keys are complete. Run manually:

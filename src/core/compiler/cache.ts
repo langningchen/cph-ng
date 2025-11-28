@@ -24,46 +24,44 @@ import { readFile, unlink } from 'fs/promises';
 const logger = new Logger('compiler-cache');
 
 export const checkHash = async (
-    src: FileWithHash,
-    outputPath: string,
-    additionalHash: string,
-    forceCompile: boolean | null,
+  src: FileWithHash,
+  outputPath: string,
+  additionalHash: string,
+  forceCompile: boolean | null,
 ): Promise<{
-    skip: boolean;
-    hash: string;
+  skip: boolean;
+  hash: string;
 }> => {
-    logger.trace('Checking hash for file', src, {
-        src,
-        outputPath,
-        additionalHash,
-        forceCompile,
+  logger.trace('Checking hash for file', src, {
+    src,
+    outputPath,
+    additionalHash,
+    forceCompile,
+  });
+  const hash = SHA256(
+    (await readFile(src.path, 'utf-8')) + additionalHash,
+  ).toString();
+  if (
+    forceCompile === false ||
+    (forceCompile !== true && src.hash === hash && (await exists(outputPath)))
+  ) {
+    logger.debug('Skipping compilation', {
+      srcHash: src.hash,
+      currentHash: hash,
+      outputPath,
     });
-    const hash = SHA256(
-        (await readFile(src.path, 'utf-8')) + additionalHash,
-    ).toString();
-    if (
-        forceCompile === false ||
-        (forceCompile !== true &&
-            src.hash === hash &&
-            (await exists(outputPath)))
-    ) {
-        logger.debug('Skipping compilation', {
-            srcHash: src.hash,
-            currentHash: hash,
-            outputPath,
-        });
-        return { skip: true, hash };
-    }
-    try {
-        await unlink(outputPath);
-        logger.debug('Removed existing output file', { outputPath });
-    } catch {
-        logger.debug('No existing output file to remove', { outputPath });
-    }
-    logger.debug('Proceeding with compilation', {
-        srcHash: src.hash,
-        currentHash: hash,
-        outputPath,
-    });
-    return { skip: false, hash };
+    return { skip: true, hash };
+  }
+  try {
+    await unlink(outputPath);
+    logger.debug('Removed existing output file', { outputPath });
+  } catch {
+    logger.debug('No existing output file to remove', { outputPath });
+  }
+  logger.debug('Proceeding with compilation', {
+    srcHash: src.hash,
+    currentHash: hash,
+    outputPath,
+  });
+  return { skip: false, hash };
 };

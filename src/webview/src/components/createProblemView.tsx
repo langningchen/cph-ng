@@ -26,55 +26,55 @@ import CphFlex from './base/cphFlex';
 import Tips from './tips';
 
 interface CreateProblemProps {
-    canImport: boolean;
+  canImport: boolean;
 }
 
 const CreateProblemView = ({ canImport }: CreateProblemProps) => {
-    const { t } = useTranslation();
-    return (
-        <CphFlex
-            column
-            gap={5}
-            paddingY={2}
+  const { t } = useTranslation();
+  return (
+    <CphFlex
+      column
+      gap={5}
+      paddingY={2}
+    >
+      <CphFlex column>
+        <Alert
+          sx={{ width: '100%', boxSizing: 'border-box' }}
+          variant={'outlined'}
+          severity={'warning'}
         >
-            <CphFlex column>
-                <Alert
-                    sx={{ width: '100%', boxSizing: 'border-box' }}
-                    variant={'outlined'}
-                    severity={'warning'}
-                >
-                    {canImport
-                        ? t('createProblemView.importAlert')
-                        : t('createProblemView.createAlert')}
-                </Alert>
-                <CphFlex>
-                    {canImport && (
-                        <Button
-                            fullWidth
-                            variant={'contained'}
-                            endIcon={<InputIcon />}
-                            onClick={() => {
-                                msg({ type: 'importProblem' });
-                            }}
-                        >
-                            {t('createProblemView.importButton')}
-                        </Button>
-                    )}
-                    <Button
-                        fullWidth
-                        variant={canImport ? 'outlined' : 'contained'}
-                        endIcon={<SendIcon />}
-                        onClick={() => {
-                            msg({ type: 'createProblem' });
-                        }}
-                    >
-                        {t('createProblemView.createButton')}
-                    </Button>
-                </CphFlex>
-            </CphFlex>
-            {showTips && <Tips />}
+          {canImport
+            ? t('createProblemView.importAlert')
+            : t('createProblemView.createAlert')}
+        </Alert>
+        <CphFlex>
+          {canImport && (
+            <Button
+              fullWidth
+              variant={'contained'}
+              endIcon={<InputIcon />}
+              onClick={() => {
+                msg({ type: 'importProblem' });
+              }}
+            >
+              {t('createProblemView.importButton')}
+            </Button>
+          )}
+          <Button
+            fullWidth
+            variant={canImport ? 'outlined' : 'contained'}
+            endIcon={<SendIcon />}
+            onClick={() => {
+              msg({ type: 'createProblem' });
+            }}
+          >
+            {t('createProblemView.createButton')}
+          </Button>
         </CphFlex>
-    );
+      </CphFlex>
+      {showTips && <Tips />}
+    </CphFlex>
+  );
 };
 
 export default CreateProblemView;

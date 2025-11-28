@@ -21,26 +21,26 @@ import React from 'react';
 import { delProps } from '../../utils';
 
 interface CphLinkProps extends LinkProps {
-    name: string;
+  name: string;
 }
 
 const CphLink = (props: CphLinkProps) => {
-    return (
-        <Tooltip
-            disableInteractive
-            title={props.name}
-        >
-            <Link
-                href={'#'}
-                overflow={'hidden'}
-                textOverflow={'ellipsis'}
-                underline={'hover'}
-                {...delProps(props, ['name'])}
-            >
-                {props.children}
-            </Link>
-        </Tooltip>
-    );
+  return (
+    <Tooltip
+      disableInteractive
+      title={props.name}
+    >
+      <Link
+        href={'#'}
+        overflow={'hidden'}
+        textOverflow={'ellipsis'}
+        underline={'hover'}
+        {...delProps(props, ['name'])}
+      >
+        {props.children}
+      </Link>
+    </Tooltip>
+  );
 };
 
 export default CphLink;

@@ -21,10 +21,10 @@ import { promisify } from 'util';
 
 export const execAsync = promisify(exec);
 export const exists = async (path: string): Promise<boolean> => {
-    try {
-        await access(path);
-        return true;
-    } catch {
-        return false;
-    }
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
 };

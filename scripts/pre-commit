@@ -7,476 +7,460 @@
 
 import { execSync } from 'child_process';
 import {
-    existsSync,
-    readdirSync,
-    readFileSync,
-    statSync,
-    writeFileSync,
+  existsSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
 } from 'fs';
 import { extname, join } from 'path';
 
 // Colors for console output
 const colors = {
-    red: '\x1b[31m',
-    green: '\x1b[32m',
-    yellow: '\x1b[33m',
-    blue: '\x1b[34m',
-    reset: '\x1b[0m',
-    bold: '\x1b[1m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  reset: '\x1b[0m',
+  bold: '\x1b[1m',
 };
 
 // Configuration constants
 
 // Translation checker configurations
 const TRANSLATION_CONFIGS = {
-    packageJson: {
-        title: 'VSCode Extension Configuration Translations',
-        requiredKeysExtractor: extractPackageJsonTranslationKeys,
-        files: [
-            {
-                path: 'package.nls.json',
-                name: 'English',
-                keyExtractor: getAllKeys,
-            },
-            {
-                path: 'package.nls.zh.json',
-                name: 'Chinese',
-                keyExtractor: getAllKeys,
-            },
-        ],
-        referenceFile: 'package.json',
-    },
-    bundle: {
-        title: 'VSCode Extension Runtime Bundle Translations',
-        requiredKeysExtractor: extractVSCodeL10nCalls,
-        files: [
-            {
-                path: 'l10n/bundle.l10n.zh-cn.json',
-                name: 'Bundle',
-                keyExtractor: (data) => new Set(Object.keys(data)),
-            },
-        ],
-        referenceFile: 'l10n.t calls',
-        checkDynamic: true,
-    },
-    webview: {
-        title: 'React Webview Translations',
-        requiredKeysExtractor: extractWebviewTranslationCalls,
-        files: [
-            {
-                path: 'src/webview/src/l10n/en.json',
-                name: 'English',
-                keyExtractor: (data) => new Set(Object.keys(data)),
-            },
-            {
-                path: 'src/webview/src/l10n/zh.json',
-                name: 'Chinese',
-                keyExtractor: (data) => new Set(Object.keys(data)),
-            },
-        ],
-        referenceFile: 't() calls',
-        checkDynamic: true,
-    },
+  packageJson: {
+    title: 'VSCode Extension Configuration Translations',
+    requiredKeysExtractor: extractPackageJsonTranslationKeys,
+    files: [
+      {
+        path: 'package.nls.json',
+        name: 'English',
+        keyExtractor: getAllKeys,
+      },
+      {
+        path: 'package.nls.zh.json',
+        name: 'Chinese',
+        keyExtractor: getAllKeys,
+      },
+    ],
+    referenceFile: 'package.json',
+  },
+  bundle: {
+    title: 'VSCode Extension Runtime Bundle Translations',
+    requiredKeysExtractor: extractVSCodeL10nCalls,
+    files: [
+      {
+        path: 'l10n/bundle.l10n.zh-cn.json',
+        name: 'Bundle',
+        keyExtractor: (data) => new Set(Object.keys(data)),
+      },
+    ],
+    referenceFile: 'l10n.t calls',
+    checkDynamic: true,
+  },
+  webview: {
+    title: 'React Webview Translations',
+    requiredKeysExtractor: extractWebviewTranslationCalls,
+    files: [
+      {
+        path: 'src/webview/src/l10n/en.json',
+        name: 'English',
+        keyExtractor: (data) => new Set(Object.keys(data)),
+      },
+      {
+        path: 'src/webview/src/l10n/zh.json',
+        name: 'Chinese',
+        keyExtractor: (data) => new Set(Object.keys(data)),
+      },
+    ],
+    referenceFile: 't() calls',
+    checkDynamic: true,
+  },
 };
 
 function log(message, color = 'reset') {
-    console.log(`${colors[color]}${message}${colors.reset}`);
+  console.log(`${colors[color]}${message}${colors.reset}`);
 }
 
 function loadJsonFile(filePath) {
-    try {
-        const content = readFileSync(filePath, 'utf8');
-        return JSON.parse(content);
-    } catch (error) {
-        throw new Error(`Failed to load ${filePath}: ${error.message}`);
-    }
+  try {
+    const content = readFileSync(filePath, 'utf8');
+    return JSON.parse(content);
+  } catch (error) {
+    throw new Error(`Failed to load ${filePath}: ${error.message}`);
+  }
 }
 
 function getAllKeys(obj, prefix = '') {
-    const keys = new Set();
+  const keys = new Set();
 
-    for (const [key, value] of Object.entries(obj)) {
-        const fullKey = prefix ? `${prefix}.${key}` : key;
-        keys.add(fullKey);
+  for (const [key, value] of Object.entries(obj)) {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    keys.add(fullKey);
 
-        if (
-            typeof value === 'object' &&
-            value !== null &&
-            !Array.isArray(value)
-        ) {
-            const nestedKeys = getAllKeys(value, fullKey);
-            nestedKeys.forEach((k) => keys.add(k));
-        }
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      const nestedKeys = getAllKeys(value, fullKey);
+      nestedKeys.forEach((k) => keys.add(k));
     }
+  }
 
-    return keys;
+  return keys;
 }
 
 function checkKeysOrder(obj, filePath) {
-    let hasChanges = false;
+  let hasChanges = false;
 
-    function sortObjectKeys(currentObj) {
-        const sortedObj = {};
-        const keys = Object.keys(currentObj);
+  function sortObjectKeys(currentObj) {
+    const sortedObj = {};
+    const keys = Object.keys(currentObj);
 
-        // Sort keys alphabetically
-        const sortedKeys = keys.sort();
+    // Sort keys alphabetically
+    const sortedKeys = keys.sort();
 
-        // Add sorted keys
-        for (const key of sortedKeys) {
-            if (
-                typeof currentObj[key] === 'object' &&
-                currentObj[key] !== null &&
-                !Array.isArray(currentObj[key])
-            ) {
-                const [sortedValue, childHasChanges] = sortObjectKeys(
-                    currentObj[key],
-                );
-                sortedObj[key] = sortedValue;
-                hasChanges = hasChanges || childHasChanges;
-            } else {
-                sortedObj[key] = currentObj[key];
-            }
-        }
-
-        // Check if order changed
-        const originalKeys = Object.keys(currentObj);
-        const newKeys = Object.keys(sortedObj);
-        const orderChanged = originalKeys.some(
-            (key, index) => key !== newKeys[index],
-        );
-
-        return [sortedObj, orderChanged];
+    // Add sorted keys
+    for (const key of sortedKeys) {
+      if (
+        typeof currentObj[key] === 'object' &&
+        currentObj[key] !== null &&
+        !Array.isArray(currentObj[key])
+      ) {
+        const [sortedValue, childHasChanges] = sortObjectKeys(currentObj[key]);
+        sortedObj[key] = sortedValue;
+        hasChanges = hasChanges || childHasChanges;
+      } else {
+        sortedObj[key] = currentObj[key];
+      }
     }
 
-    const [sortedObj, orderChanged] = sortObjectKeys(obj);
-    hasChanges = hasChanges || orderChanged;
+    // Check if order changed
+    const originalKeys = Object.keys(currentObj);
+    const newKeys = Object.keys(sortedObj);
+    const orderChanged = originalKeys.some(
+      (key, index) => key !== newKeys[index],
+    );
 
-    if (hasChanges) {
-        try {
-            writeFileSync(
-                filePath,
-                JSON.stringify(sortedObj, null, 4) + '\n',
-                'utf8',
-            );
-            log(`  🔧 Auto-sorted keys in ${filePath}`, 'blue');
-        } catch (error) {
-            log(
-                `  ❌ Failed to auto-sort ${filePath}: ${error.message}`,
-                'red',
-            );
-            return false;
-        }
+    return [sortedObj, orderChanged];
+  }
+
+  const [sortedObj, orderChanged] = sortObjectKeys(obj);
+  hasChanges = hasChanges || orderChanged;
+
+  if (hasChanges) {
+    try {
+      writeFileSync(
+        filePath,
+        JSON.stringify(sortedObj, null, 4) + '\n',
+        'utf8',
+      );
+      log(`  🔧 Auto-sorted keys in ${filePath}`, 'blue');
+    } catch (error) {
+      log(`  ❌ Failed to auto-sort ${filePath}: ${error.message}`, 'red');
+      return false;
     }
+  }
 
-    return hasChanges;
+  return hasChanges;
 }
 
 function extractPackageJsonTranslationKeys() {
-    const packageJson = loadJsonFile('package.json');
-    const requiredKeys = new Set();
+  const packageJson = loadJsonFile('package.json');
+  const requiredKeys = new Set();
 
-    // Extract translation keys from package.json
-    function extractFromObject(obj) {
-        for (const [key, value] of Object.entries(obj)) {
-            if (
-                typeof value === 'string' &&
-                value.startsWith('%') &&
-                value.endsWith('%')
-            ) {
-                // Extract key from %key% format
-                const translationKey = value.slice(1, -1);
-                requiredKeys.add(translationKey);
-            } else if (Array.isArray(value)) {
-                value.forEach((item) => {
-                    if (
-                        typeof item === 'string' &&
-                        item.startsWith('%') &&
-                        item.endsWith('%')
-                    ) {
-                        const translationKey = item.slice(1, -1);
-                        requiredKeys.add(translationKey);
-                    } else if (typeof item === 'object' && item !== null) {
-                        extractFromObject(item);
-                    }
-                });
-            } else if (typeof value === 'object' && value !== null) {
-                extractFromObject(value);
-            }
-        }
+  // Extract translation keys from package.json
+  function extractFromObject(obj) {
+    for (const [key, value] of Object.entries(obj)) {
+      if (
+        typeof value === 'string' &&
+        value.startsWith('%') &&
+        value.endsWith('%')
+      ) {
+        // Extract key from %key% format
+        const translationKey = value.slice(1, -1);
+        requiredKeys.add(translationKey);
+      } else if (Array.isArray(value)) {
+        value.forEach((item) => {
+          if (
+            typeof item === 'string' &&
+            item.startsWith('%') &&
+            item.endsWith('%')
+          ) {
+            const translationKey = item.slice(1, -1);
+            requiredKeys.add(translationKey);
+          } else if (typeof item === 'object' && item !== null) {
+            extractFromObject(item);
+          }
+        });
+      } else if (typeof value === 'object' && value !== null) {
+        extractFromObject(value);
+      }
     }
+  }
 
-    extractFromObject(packageJson);
-    return requiredKeys;
+  extractFromObject(packageJson);
+  return requiredKeys;
 }
 
 function findFilesRecursively(dir, extensions = []) {
-    const files = [];
+  const files = [];
 
-    function walkDir(currentDir) {
-        try {
-            const items = readdirSync(currentDir);
+  function walkDir(currentDir) {
+    try {
+      const items = readdirSync(currentDir);
 
-            for (const item of items) {
-                const fullPath = join(currentDir, item);
-                const stat = statSync(fullPath);
+      for (const item of items) {
+        const fullPath = join(currentDir, item);
+        const stat = statSync(fullPath);
 
-                if (stat.isDirectory()) {
-                    // Skip node_modules and other common directories
-                    if (
-                        !['node_modules', '.git', 'dist', 'out'].includes(item)
-                    ) {
-                        walkDir(fullPath);
-                    }
-                } else if (stat.isFile()) {
-                    const ext = extname(fullPath).slice(1);
-                    if (extensions.length === 0 || extensions.includes(ext)) {
-                        files.push(fullPath);
-                    }
-                }
-            }
-        } catch (error) {
-            // Ignore directories we can't read
+        if (stat.isDirectory()) {
+          // Skip node_modules and other common directories
+          if (!['node_modules', '.git', 'dist', 'out'].includes(item)) {
+            walkDir(fullPath);
+          }
+        } else if (stat.isFile()) {
+          const ext = extname(fullPath).slice(1);
+          if (extensions.length === 0 || extensions.includes(ext)) {
+            files.push(fullPath);
+          }
         }
+      }
+    } catch (error) {
+      // Ignore directories we can't read
     }
+  }
 
-    if (existsSync(dir)) {
-        walkDir(dir);
-    }
+  if (existsSync(dir)) {
+    walkDir(dir);
+  }
 
-    return files;
+  return files;
 }
 
 function extractTranslationCalls(patterns) {
-    const requiredKeys = new Set();
-    const dynamicKeys = [];
+  const requiredKeys = new Set();
+  const dynamicKeys = [];
 
-    try {
-        for (const { dir, exts, staticRegex, dynamicRegex } of patterns) {
-            const files = findFilesRecursively(dir, exts);
+  try {
+    for (const { dir, exts, staticRegex, dynamicRegex } of patterns) {
+      const files = findFilesRecursively(dir, exts);
 
-            for (const file of files) {
-                try {
-                    const content = readFileSync(file, 'utf8');
+      for (const file of files) {
+        try {
+          const content = readFileSync(file, 'utf8');
 
-                    // Extract static keys
-                    const matches = content.match(staticRegex);
-                    if (matches) {
-                        matches.forEach((match) => {
-                            const keyMatch = match.match(/(['"])(.*?)\1/);
-                            if (keyMatch) {
-                                requiredKeys.add(keyMatch[2]);
-                            }
-                        });
-                    }
+          // Extract static keys
+          const matches = content.match(staticRegex);
+          if (matches) {
+            matches.forEach((match) => {
+              const keyMatch = match.match(/(['"])(.*?)\1/);
+              if (keyMatch) {
+                requiredKeys.add(keyMatch[2]);
+              }
+            });
+          }
 
-                    // Check for dynamic keys
-                    const dynamicMatches = content.match(dynamicRegex);
-                    if (dynamicMatches) {
-                        dynamicMatches.forEach((match) => {
-                            const lines = content
-                                .substring(0, content.indexOf(match))
-                                .split('\n');
-                            const lineNum = lines.length;
-                            dynamicKeys.push({
-                                file: file,
-                                line: lineNum,
-                                match: match.trim(),
-                            });
-                        });
-                    }
-                } catch (error) {
-                    // Ignore errors for individual files
-                }
-            }
+          // Check for dynamic keys
+          const dynamicMatches = content.match(dynamicRegex);
+          if (dynamicMatches) {
+            dynamicMatches.forEach((match) => {
+              const lines = content
+                .substring(0, content.indexOf(match))
+                .split('\n');
+              const lineNum = lines.length;
+              dynamicKeys.push({
+                file: file,
+                line: lineNum,
+                match: match.trim(),
+              });
+            });
+          }
+        } catch (error) {
+          // Ignore errors for individual files
         }
-    } catch (error) {
-        log(
-            `Warning: Failed to extract translation calls: ${error.message}`,
-            'yellow',
-        );
+      }
     }
+  } catch (error) {
+    log(
+      `Warning: Failed to extract translation calls: ${error.message}`,
+      'yellow',
+    );
+  }
 
-    return { requiredKeys, dynamicKeys };
+  return { requiredKeys, dynamicKeys };
 }
 
 function extractVSCodeL10nCalls() {
-    return extractTranslationCalls([
-        {
-            dir: 'src',
-            exts: ['ts', 'js'],
-            staticRegex: /l10n\.t\s*\(\s*(['"])(.*?)\1/g,
-            dynamicRegex: /l10n\.t\s*\(\s*(?!['"]).+?\)/g,
-        },
-    ]);
+  return extractTranslationCalls([
+    {
+      dir: 'src',
+      exts: ['ts', 'js'],
+      staticRegex: /l10n\.t\s*\(\s*(['"])(.*?)\1/g,
+      dynamicRegex: /l10n\.t\s*\(\s*(?!['"]).+?\)/g,
+    },
+  ]);
 }
 
 function extractWebviewTranslationCalls() {
-    return extractTranslationCalls([
-        {
-            dir: join('src', 'webview', 'src'),
-            exts: ['tsx', 'ts'],
-            staticRegex: /\bt\s*\(\s*['"](.*?)['"]/g,
-            dynamicRegex: /\bt\s*\(\s*(?!['"]).+?\)/g,
-        },
-    ]);
+  return extractTranslationCalls([
+    {
+      dir: join('src', 'webview', 'src'),
+      exts: ['tsx', 'ts'],
+      staticRegex: /\bt\s*\(\s*['"](.*?)['"]/g,
+      dynamicRegex: /\bt\s*\(\s*(?!['"]).+?\)/g,
+    },
+  ]);
 }
 
 function checkTranslations(config) {
-    log(`\n${colors.bold}Checking ${config.title}...${colors.reset}`);
+  log(`\n${colors.bold}Checking ${config.title}...${colors.reset}`);
 
-    let hasErrors = false;
+  let hasErrors = false;
 
-    try {
-        // Get required keys
-        const extractResult = config.requiredKeysExtractor();
-        const requiredKeys = extractResult.requiredKeys || extractResult;
-        const dynamicKeys = extractResult.dynamicKeys || [];
+  try {
+    // Get required keys
+    const extractResult = config.requiredKeysExtractor();
+    const requiredKeys = extractResult.requiredKeys || extractResult;
+    const dynamicKeys = extractResult.dynamicKeys || [];
 
+    log(
+      `Required translation keys from ${config.referenceFile}: ${requiredKeys.size}`,
+    );
+
+    // Check for dynamic translation keys (if enabled)
+    if (config.checkDynamic && dynamicKeys.length > 0) {
+      hasErrors = true;
+      log(`  ❌ Dynamic translation keys are not allowed:`, 'red');
+      dynamicKeys.forEach((dynamicKey) => {
         log(
-            `Required translation keys from ${config.referenceFile}: ${requiredKeys.size}`,
+          `    - ${dynamicKey.file}:${dynamicKey.line} - ${dynamicKey.match}`,
+          'red',
         );
-
-        // Check for dynamic translation keys (if enabled)
-        if (config.checkDynamic && dynamicKeys.length > 0) {
-            hasErrors = true;
-            log(`  ❌ Dynamic translation keys are not allowed:`, 'red');
-            dynamicKeys.forEach((dynamicKey) => {
-                log(
-                    `    - ${dynamicKey.file}:${dynamicKey.line} - ${dynamicKey.match}`,
-                    'red',
-                );
-            });
-            log(
-                `  ℹ️  All translation keys must be static strings wrapped in quotes`,
-                'yellow',
-            );
-        }
-
-        // Check each translation file
-        const sortedFiles = [];
-        for (const fileConfig of config.files) {
-            const data = loadJsonFile(fileConfig.path);
-            const keys = fileConfig.keyExtractor(data);
-            log(
-                `${fileConfig.name} translations (${fileConfig.path}): ${keys.size} keys`,
-            );
-
-            // Auto-sort keys
-            if (checkKeysOrder(data, fileConfig.path)) {
-                sortedFiles.push(fileConfig.path);
-            }
-
-            // Check missing keys
-            const missingKeys = [...requiredKeys].filter(
-                (key) => !keys.has(key),
-            );
-            if (missingKeys.length > 0) {
-                hasErrors = true;
-                log(`  ❌ Missing keys in ${fileConfig.path}:`, 'red');
-                missingKeys.forEach((key) => log(`    - ${key}`, 'red'));
-            }
-
-            // Check extra keys
-            const extraKeys = [...keys].filter((key) => !requiredKeys.has(key));
-            if (extraKeys.length > 0) {
-                hasErrors = true;
-                log(
-                    `  ❌ Extra keys in ${fileConfig.path} (not used in ${config.referenceFile}):`,
-                    'red',
-                );
-                extraKeys.forEach((key) => log(`    - ${key}`, 'red'));
-            }
-        }
-
-        // Report auto-sorting
-        if (sortedFiles.length > 0) {
-            log(
-                `  ℹ️  Files were automatically sorted and will be included in commit`,
-                'blue',
-            );
-        }
-
-        if (!hasErrors) {
-            log(`  ✅ ${config.title} are complete`, 'green');
-        }
-    } catch (error) {
-        hasErrors = true;
-        log(
-            `❌ Error checking ${config.title.toLowerCase()}: ${error.message}`,
-            'red',
-        );
+      });
+      log(
+        `  ℹ️  All translation keys must be static strings wrapped in quotes`,
+        'yellow',
+      );
     }
 
-    return hasErrors;
+    // Check each translation file
+    const sortedFiles = [];
+    for (const fileConfig of config.files) {
+      const data = loadJsonFile(fileConfig.path);
+      const keys = fileConfig.keyExtractor(data);
+      log(
+        `${fileConfig.name} translations (${fileConfig.path}): ${keys.size} keys`,
+      );
+
+      // Auto-sort keys
+      if (checkKeysOrder(data, fileConfig.path)) {
+        sortedFiles.push(fileConfig.path);
+      }
+
+      // Check missing keys
+      const missingKeys = [...requiredKeys].filter((key) => !keys.has(key));
+      if (missingKeys.length > 0) {
+        hasErrors = true;
+        log(`  ❌ Missing keys in ${fileConfig.path}:`, 'red');
+        missingKeys.forEach((key) => log(`    - ${key}`, 'red'));
+      }
+
+      // Check extra keys
+      const extraKeys = [...keys].filter((key) => !requiredKeys.has(key));
+      if (extraKeys.length > 0) {
+        hasErrors = true;
+        log(
+          `  ❌ Extra keys in ${fileConfig.path} (not used in ${config.referenceFile}):`,
+          'red',
+        );
+        extraKeys.forEach((key) => log(`    - ${key}`, 'red'));
+      }
+    }
+
+    // Report auto-sorting
+    if (sortedFiles.length > 0) {
+      log(
+        `  ℹ️  Files were automatically sorted and will be included in commit`,
+        'blue',
+      );
+    }
+
+    if (!hasErrors) {
+      log(`  ✅ ${config.title} are complete`, 'green');
+    }
+  } catch (error) {
+    hasErrors = true;
+    log(
+      `❌ Error checking ${config.title.toLowerCase()}: ${error.message}`,
+      'red',
+    );
+  }
+
+  return hasErrors;
 }
 
 function main() {
-    log(
-        `${colors.bold}${colors.blue}🔍 Checking translation completeness and auto-sorting...${colors.reset}`,
-    );
+  log(
+    `${colors.bold}${colors.blue}🔍 Checking translation completeness and auto-sorting...${colors.reset}`,
+  );
 
-    let hasAnyErrors = false;
+  let hasAnyErrors = false;
 
-    // Check all translation configurations
-    for (const [key, config] of Object.entries(TRANSLATION_CONFIGS)) {
-        const hasErrors = checkTranslations(config);
-        hasAnyErrors = hasAnyErrors || hasErrors;
+  // Check all translation configurations
+  for (const [key, config] of Object.entries(TRANSLATION_CONFIGS)) {
+    const hasErrors = checkTranslations(config);
+    hasAnyErrors = hasAnyErrors || hasErrors;
+  }
+
+  // Auto-add sorted files to git staging
+  const filesToCheck = [
+    'package.nls.json',
+    'package.nls.zh.json',
+    'l10n/bundle.l10n.zh-cn.json',
+    'src/webview/src/l10n/en.json',
+    'src/webview/src/l10n/zh.json',
+  ];
+
+  let hasAutoSorted = false;
+  for (const file of filesToCheck) {
+    try {
+      const status = execSync(`git status --porcelain "${file}"`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      }).trim();
+      if (status && status.includes('M ')) {
+        execSync(`git add "${file}"`, { stdio: 'pipe' });
+        hasAutoSorted = true;
+      }
+    } catch (error) {
+      // Ignore git errors - file might not be tracked yet
     }
+  }
 
-    // Auto-add sorted files to git staging
-    const filesToCheck = [
-        'package.nls.json',
-        'package.nls.zh.json',
-        'l10n/bundle.l10n.zh-cn.json',
-        'src/webview/src/l10n/en.json',
-        'src/webview/src/l10n/zh.json',
-    ];
+  if (hasAutoSorted) {
+    log('\n🔧 Auto-sorted files have been added to the commit', 'blue');
+  }
 
-    let hasAutoSorted = false;
-    for (const file of filesToCheck) {
-        try {
-            const status = execSync(`git status --porcelain "${file}"`, {
-                encoding: 'utf8',
-                stdio: 'pipe',
-            }).trim();
-            if (status && status.includes('M ')) {
-                execSync(`git add "${file}"`, { stdio: 'pipe' });
-                hasAutoSorted = true;
-            }
-        } catch (error) {
-            // Ignore git errors - file might not be tracked yet
-        }
-    }
-
+  // Summary
+  log('\n' + '='.repeat(50));
+  if (hasAnyErrors) {
+    log('❌ Translation check failed! Please fix the issues above.', 'red');
+    log('Commit aborted.', 'red');
+    process.exit(1);
+  } else {
+    log('✅ All translations are complete!', 'green');
     if (hasAutoSorted) {
-        log('\n🔧 Auto-sorted files have been added to the commit', 'blue');
+      log('🔧 Files were automatically sorted and included in commit', 'blue');
     }
+    log('Proceeding with commit...', 'green');
+  }
 
-    // Summary
-    log('\n' + '='.repeat(50));
-    if (hasAnyErrors) {
-        log('❌ Translation check failed! Please fix the issues above.', 'red');
-        log('Commit aborted.', 'red');
-        process.exit(1);
-    } else {
-        log('✅ All translations are complete!', 'green');
-        if (hasAutoSorted) {
-            log(
-                '🔧 Files were automatically sorted and included in commit',
-                'blue',
-            );
-        }
-        log('Proceeding with commit...', 'green');
-    }
-
-    log(
-        `${colors.bold}${colors.blue}🔧 Formatting code using prettier...${colors.reset}`,
-    );
-    execSync(`pnpm prettier --write .`);
-    execSync(`git add .`, { stdio: 'pipe' });
-    log('✅ Code formatted!', 'green');
-    process.exit(0);
+  log(
+    `${colors.bold}${colors.blue}🔧 Formatting code using prettier...${colors.reset}`,
+  );
+  execSync(`pnpm prettier --write .`);
+  execSync(`git add .`, { stdio: 'pipe' });
+  log('✅ Code formatted!', 'green');
+  process.exit(0);
 }
 
 main();

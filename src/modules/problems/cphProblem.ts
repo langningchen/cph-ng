@@ -25,101 +25,98 @@ import { basename, dirname, join } from 'path';
 import { l10n } from 'vscode';
 
 export interface ICphProblem {
-    name: string;
-    url: string;
-    tests: { id: number; input: string; output: string }[];
-    interactive: boolean;
-    memoryLimit: number;
-    timeLimit: number;
-    srcPath: string;
-    group: string;
-    local: boolean;
+  name: string;
+  url: string;
+  tests: { id: number; input: string; output: string }[];
+  interactive: boolean;
+  memoryLimit: number;
+  timeLimit: number;
+  srcPath: string;
+  group: string;
+  local: boolean;
 }
 
 export class CphProblem implements ICphProblem {
-    private static logger: Logger = new Logger('CphProblem');
+  private static logger: Logger = new Logger('CphProblem');
 
-    public name: string;
-    public url: string;
-    public tests: { id: number; input: string; output: string }[];
-    public interactive: boolean;
-    public memoryLimit: number;
-    public timeLimit: number;
-    public srcPath: string;
-    public group: string;
-    public local: boolean;
+  public name: string;
+  public url: string;
+  public tests: { id: number; input: string; output: string }[];
+  public interactive: boolean;
+  public memoryLimit: number;
+  public timeLimit: number;
+  public srcPath: string;
+  public group: string;
+  public local: boolean;
 
-    constructor(data: ICphProblem) {
-        this.name = data.name;
-        this.url = data.url;
-        this.tests = data.tests;
-        this.interactive = data.interactive;
-        this.memoryLimit = data.memoryLimit;
-        this.timeLimit = data.timeLimit;
-        this.srcPath = data.srcPath;
-        this.group = data.group;
-        this.local = data.local;
+  constructor(data: ICphProblem) {
+    this.name = data.name;
+    this.url = data.url;
+    this.tests = data.tests;
+    this.interactive = data.interactive;
+    this.memoryLimit = data.memoryLimit;
+    this.timeLimit = data.timeLimit;
+    this.srcPath = data.srcPath;
+    this.group = data.group;
+    this.local = data.local;
+  }
+
+  public static getProbBySrc(srcFile: string): string {
+    return join(
+      dirname(srcFile),
+      '.cph',
+      `.${basename(srcFile)}_${MD5(srcFile).toString(enc.Hex)}.prob`,
+    );
+  }
+  public static async fromFile(
+    probFile: string,
+  ): Promise<CphProblem | undefined> {
+    try {
+      const data = await readFile(probFile, 'utf-8');
+      return new CphProblem(JSON.parse(data) as ICphProblem);
+    } catch (e) {
+      CphProblem.logger.error('Failed to read CPH problem file', e);
+      Io.error(
+        l10n.t('Failed to read CPH problem file {file}: {error}', {
+          file: probFile,
+          error: (e as Error).message,
+        }),
+      );
+      return undefined;
     }
-
-    public static getProbBySrc(srcFile: string): string {
-        return join(
-            dirname(srcFile),
-            '.cph',
-            `.${basename(srcFile)}_${MD5(srcFile).toString(enc.Hex)}.prob`,
-        );
-    }
-    public static async fromFile(
-        probFile: string,
-    ): Promise<CphProblem | undefined> {
-        try {
-            const data = await readFile(probFile, 'utf-8');
-            return new CphProblem(JSON.parse(data) as ICphProblem);
-        } catch (e) {
-            CphProblem.logger.error('Failed to read CPH problem file', e);
-            Io.error(
-                l10n.t('Failed to read CPH problem file {file}: {error}', {
-                    file: probFile,
-                    error: (e as Error).message,
-                }),
-            );
-            return undefined;
+  }
+  public static async fromFolder(folderUri: string): Promise<CphProblem[]> {
+    const problems: CphProblem[] = [];
+    const dirEntries = await readdir(folderUri, { withFileTypes: true });
+    for (const entry of dirEntries) {
+      if (entry.isFile() && entry.name.endsWith('.prob')) {
+        const probFilePath = join(folderUri, entry.name);
+        const cphProblem = await CphProblem.fromFile(probFilePath);
+        if (cphProblem) {
+          problems.push(cphProblem);
         }
+      }
     }
-    public static async fromFolder(folderUri: string): Promise<CphProblem[]> {
-        const problems: CphProblem[] = [];
-        const dirEntries = await readdir(folderUri, { withFileTypes: true });
-        for (const entry of dirEntries) {
-            if (entry.isFile() && entry.name.endsWith('.prob')) {
-                const probFilePath = join(folderUri, entry.name);
-                const cphProblem = await CphProblem.fromFile(probFilePath);
-                if (cphProblem) {
-                    problems.push(cphProblem);
-                }
-            }
-        }
-        return problems;
-    }
+    return problems;
+  }
 
-    public toProblem(): Problem {
-        const problem = Problem.fromI({
-            version,
-            name: this.name,
-            url: this.url,
-            tcs: {},
-            tcOrder: [],
-            timeLimit: this.timeLimit,
-            memoryLimit: this.memoryLimit,
-            src: { path: this.srcPath },
-            timeElapsed: 0,
-        });
-        for (const test of this.tests) {
-            problem.addTc(
-                new Tc(
-                    new TcIo(false, test.input),
-                    new TcIo(false, test.output),
-                ),
-            );
-        }
-        return problem;
+  public toProblem(): Problem {
+    const problem = Problem.fromI({
+      version,
+      name: this.name,
+      url: this.url,
+      tcs: {},
+      tcOrder: [],
+      timeLimit: this.timeLimit,
+      memoryLimit: this.memoryLimit,
+      src: { path: this.srcPath },
+      timeElapsed: 0,
+    });
+    for (const test of this.tests) {
+      problem.addTc(
+        new Tc(new TcIo(false, test.input), new TcIo(false, test.output)),
+      );
     }
+    return problem;
+  }
 }
