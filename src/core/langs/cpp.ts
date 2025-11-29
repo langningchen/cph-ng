@@ -127,13 +127,19 @@ export class LangCpp extends Lang {
       compileCommands.map((cmd) => this._executeCompiler(cmd, ac)),
     )) {
       if (result instanceof KnownResult) {
-        return result;
+        return new KnownResult(result.verdict, result.msg, {
+          outputPath,
+          hash,
+        });
       }
     }
     for (const cmd of postCommands) {
       const result = await this._executeCompiler(cmd, ac);
       if (result instanceof KnownResult) {
-        return result;
+        return new KnownResult(result.verdict, result.msg, {
+          outputPath,
+          hash,
+        });
       }
     }
     return new UnknownResult({ outputPath, hash });

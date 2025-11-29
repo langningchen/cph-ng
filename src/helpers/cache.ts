@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { telemetry } from '@/utils/global';
 import { randomUUID } from 'crypto';
 import { mkdir } from 'fs/promises';
 import { join } from 'path';
@@ -43,14 +42,6 @@ export default class Cache {
       );
       this.logger.trace('Used paths', Array.from(this.usedPool));
       this.logger.trace('Free paths', Array.from(this.freePool));
-      telemetry.log(
-        'cache',
-        {},
-        {
-          used: this.usedPool.size,
-          free: this.freePool.size,
-        },
-      );
     }, 10000);
     this.logger.info('Cache monitor started');
   }

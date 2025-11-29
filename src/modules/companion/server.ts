@@ -1,6 +1,7 @@
 import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
+import { telemetry } from '@/utils/global';
 import { createServer, Server as HttpServer } from 'http';
 import { l10n } from 'vscode';
 import { Handler } from './handler';
@@ -35,6 +36,10 @@ export class Server {
                   l10n.t('Error occurred while processing companion data'),
                 );
               }
+              telemetry.error('serverRequestError', {
+                requestData,
+                error: (e as Error).message,
+              });
             }
           }
           response.statusCode = 200;

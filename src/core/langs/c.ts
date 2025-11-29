@@ -75,7 +75,7 @@ export class LangC extends Lang {
 
     const result = await this._executeCompiler(cmd, ac);
     return result instanceof KnownResult
-      ? result
+      ? new KnownResult(result.verdict, result.msg, { outputPath, hash })
       : new UnknownResult({ outputPath, hash });
   }
   public async getRunCommand(target: string): Promise<string[]> {

@@ -2,7 +2,7 @@
   "name": "cph-ng",
   "displayName": "CPH-NG",
   "description": "The next generation of CPH.",
-  "version": "0.4.12",
+  "version": "0.4.13",
   "type": "module",
   "license": "AGPL-3.0-only",
   "publisher": "langningchen",
@@ -794,7 +794,7 @@
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.7.1",
     "eslint": "^9.39.1",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.1",
     "prettier-plugin-organize-imports": "^4.3.0",
     "react-refresh": "^0.18.0",
     "speed-measure-webpack-plugin": "^1.5.0",
@@ -808,7 +808,7 @@
     "webpack-merge": "^6.0.1"
   },
   "dependencies": {
-    "@base-ui-components/react": "1.0.0-beta.6",
+    "@base-ui-components/react": "1.0.0-beta.7",
     "@codemirror/language": "^6.11.3",
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.38.8",

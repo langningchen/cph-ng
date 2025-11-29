@@ -96,7 +96,7 @@ export class Lang {
         forceCompile,
         additionalData,
       );
-      compileEnd();
+      compileEnd(langCompileResult.flatten());
 
       // Check if the output file exists
       if (
@@ -109,6 +109,9 @@ export class Lang {
     } catch (e) {
       logger.error('Compilation failed', e);
       CompilationIo.append((e as Error).message);
+      telemetry.error('compileError', {
+        error: (e as Error).message,
+      });
       return new KnownResult(TcVerdicts.CE, l10n.t('Compilation failed'));
     }
   }

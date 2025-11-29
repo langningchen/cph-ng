@@ -19,6 +19,7 @@ import Cache from '@/helpers/cache';
 import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
+import { telemetry } from '@/utils/global';
 import { randomUUID, UUID } from 'crypto';
 import { readFileSync, writeFileSync } from 'fs';
 import { mkdir, readFile, stat, unlink, writeFile } from 'fs/promises';
@@ -260,6 +261,9 @@ export class Problem implements IProblem {
           msg: (e as Error).message,
         }),
       );
+      telemetry.error('loadProblemError', {
+        error: (e as Error).message,
+      });
       return null;
     }
 
@@ -273,6 +277,10 @@ export class Problem implements IProblem {
           msg: (e as Error).message,
         }),
       );
+      telemetry.error('migrateError', {
+        oldProblem: JSON.stringify(oldProblem),
+        error: (e as Error).message,
+      });
       return null;
     }
 
@@ -403,6 +411,10 @@ export class Problem implements IProblem {
           msg: (e as Error).message,
         }),
       );
+      telemetry.error('saveError', {
+        problem: JSON.stringify(this),
+        error: (e as Error).message,
+      });
       return false;
     }
   }
@@ -421,6 +433,9 @@ export class Problem implements IProblem {
           msg: (e as Error).message,
         }),
       );
+      telemetry.error('deleteError', {
+        error: (e as Error).message,
+      });
     }
   }
 }

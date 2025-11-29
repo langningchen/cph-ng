@@ -17,6 +17,7 @@
 
 import Logger from '@/helpers/logger';
 import { TcIo } from '@/types';
+import { telemetry } from '@/utils/global';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
@@ -93,6 +94,10 @@ export default class ProcessExecutor {
         );
       } else {
         this.logger.warn('Set up process', pid, name, 'failed', e);
+        telemetry.error('pipeFailed', {
+          name,
+          error: (e as Error).message,
+        });
       }
     };
   }
@@ -157,9 +162,10 @@ export default class ProcessExecutor {
     return new Promise(async (resolve) => {
       launch.child.on('close', async (code, signal) => {
         stdin.useFile || Cache.dispose(inputFile);
-        Cache.dispose([launch.stdoutPath, launch.stderrPath]);
         clearTimeout(timeoutId);
         await Promise.all(launch.ioPromises);
+        const stdout = await readFile(launch.stdoutPath, 'utf-8');
+        Cache.dispose([launch.stdoutPath, launch.stderrPath]);
         if (code || signal) {
           Cache.dispose([stdoutPath, stderrPath]);
           resolve(
@@ -173,9 +179,7 @@ export default class ProcessExecutor {
         }
         try {
           this.logger.debug('Reading runner output', launch);
-          const runInfo = JSON.parse(
-            await readFile(launch.stdoutPath, 'utf-8'),
-          ) as RunnerOutput;
+          const runInfo = JSON.parse(stdout) as RunnerOutput;
           this.logger.info('Runner output', runInfo);
           if (runInfo.error) {
             Cache.dispose([stdoutPath, stderrPath]);
@@ -219,6 +223,10 @@ export default class ProcessExecutor {
               ),
             );
           }
+          telemetry.error('parseRunnerError', {
+            output: stdout,
+            error: (e as Error).message,
+          });
         }
       });
       launch.child.on('error', (error) => {

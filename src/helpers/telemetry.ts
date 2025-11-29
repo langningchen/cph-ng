@@ -30,7 +30,7 @@ export default class Telemetry {
   private reporter!: TelemetryReporter;
   public async init() {
     this.reporter = new TelemetryReporter(
-      'InstrumentationKey=2fecce85-ad3b-4ccd-9773-70b02eb2fe43;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=56e8033b-ca41-427f-a839-825645ecb44e',
+      'InstrumentationKey=ee659d58-b2b5-48b3-b05b-48865365c0d1;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=6ff8b3ee-dc15-4a9b-bab8-ffaa956f1773',
       [],
       {
         additionalCommonProperties: {
@@ -70,11 +70,13 @@ export default class Telemetry {
   }
   public start(eventName: string, properties?: TelemetryEventProperties) {
     const startTime = Date.now();
-    return () => {
+    return (endProperties?: TelemetryEventProperties) => {
       const duration = Date.now() - startTime;
-      this.reporter.sendTelemetryEvent(eventName, properties, {
-        duration,
-      });
+      this.reporter.sendTelemetryEvent(
+        eventName,
+        { ...properties, ...endProperties },
+        { duration },
+      );
     };
   }
   dispose(): Promise<any> {

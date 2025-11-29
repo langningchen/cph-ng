@@ -19,6 +19,7 @@ import { Checker } from '@/core/checker';
 import { CompileData } from '@/core/compiler';
 import { Lang } from '@/core/langs/lang';
 import { ProcessResultHandler } from '@/helpers/processResultHandler';
+import Settings from '@/helpers/settings';
 import ProblemsManager from '@/modules/problems/manager';
 import { Problem, TcIo, TcVerdicts, TcWithResult } from '@/types';
 import { telemetry } from '@/utils/global';
@@ -35,7 +36,15 @@ export class Runner {
     ac: AbortController,
     compileData: CompileData,
   ) {
-    const runTimerEnd = telemetry.start('runner.run', { lang: lang.name });
+    const runTimerEnd = telemetry.start('run', {
+      lang: lang.name,
+      timeLimit: problem.timeLimit.toString(),
+      memoryLimit: problem.memoryLimit.toString(),
+      checker: String(!!problem.checker),
+      interactor: String(!!problem.interactor),
+      useRunner: String(Settings.runner.useRunner),
+      unlimitedStack: String(Settings.runner.unlimitedStack),
+    });
     try {
       tc.result.verdict = TcVerdicts.JG;
       await ProblemsManager.dataRefresh();
@@ -100,6 +109,7 @@ export class Runner {
           );
         }
       }
+      runTimerEnd({ verdict: tc.result.verdict.name });
     } catch (e) {
       tc.result.verdict = TcVerdicts.SE;
       tc.result.msg.push(
@@ -107,16 +117,13 @@ export class Runner {
           error: (e as Error).message,
         }),
       );
+      telemetry.error('runError', {
+        error: (e as Error).message,
+      });
     } finally {
       await tc.result.stdout.inlineSmall();
       await tc.result.stderr.inlineSmall();
       await ProblemsManager.dataRefresh();
-      runTimerEnd();
-      telemetry.log(
-        'tc.result',
-        { verdict: tc.result.verdict.name },
-        { time: tc.result.time, memory: tc.result.memory },
-      );
     }
   }
 }

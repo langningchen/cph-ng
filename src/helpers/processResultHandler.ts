@@ -17,6 +17,7 @@
 
 import Logger from '@/helpers/logger';
 import { TcVerdicts } from '@/types';
+import { telemetry } from '@/utils/global';
 import { KnownResult, Result, UnknownResult } from '@/utils/result';
 import assert from 'assert';
 import { readFile, writeFile } from 'fs/promises';
@@ -51,6 +52,10 @@ export class ProcessResultHandler {
         wrapperData = JSON.parse(wrapperDataStr) as WrapperData;
       } catch (e) {
         this.logger.error('Failed to parse wrapper data JSON', e as Error);
+        telemetry.error('wrapperError', {
+          output: wrapperDataStr,
+          error: (e as Error).message,
+        });
       }
       await writeFile(
         stderrPath,
@@ -125,15 +130,13 @@ export class ProcessResultHandler {
     assert(!(result instanceof Error));
     assert(typeof result.codeOrSignal === 'number');
 
-    return {
-      ...this.getTestlibVerdict(result.codeOrSignal),
-      data: {
-        time: result.time,
-        memory: result.memory,
-        stdoutPath: result.stdoutPath,
-        stderrPath: result.stderrPath,
-      },
-    };
+    const testlibVerdict = this.getTestlibVerdict(result.codeOrSignal);
+    return new KnownResult(testlibVerdict.verdict, testlibVerdict.msg, {
+      time: result.time,
+      memory: result.memory,
+      stdoutPath: result.stdoutPath,
+      stderrPath: result.stderrPath,
+    });
   }
 
   private static getTestlibVerdict(code: number): KnownResult {

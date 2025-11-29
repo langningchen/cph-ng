@@ -11,7 +11,7 @@ export const handleMessage = async (msg: WebviewMsg) => {
   logger.info('Received', msg.type, 'message');
   logger.debug('Received message data from webview', msg);
   try {
-    const handleEnd = telemetry.start('sidebar.handleMessage', {
+    const handleEnd = telemetry.start('sidebarMessage', {
       type: msg.type,
     });
     if (msg.type === 'init') {
@@ -91,7 +91,7 @@ export const handleMessage = async (msg: WebviewMsg) => {
         msg: (e as Error).message,
       }),
     );
-    telemetry.error('sidebar-handleMessage-error', {
+    telemetry.error('sidebarError', {
       type: msg.type,
       error: (e as Error).message,
     });

@@ -190,16 +190,16 @@ export class Executor {
         intProcessResult.data.stdoutPath,
         intProcessResult.data.stderrPath,
       ]);
-      return {
-        verdict: intProcessResult.verdict,
+      return new KnownResult(
+        intProcessResult.verdict,
         msg,
-        data: solProcessResult.data,
-      };
+        solProcessResult.data,
+      );
     }
-    return {
-      verdict: intProcessResult.verdict,
-      msg: intProcessResult.msg,
-      data: solProcessResult.data,
-    };
+    return new KnownResult(
+      intProcessResult.verdict,
+      intProcessResult.msg,
+      solProcessResult.data,
+    );
   }
 }

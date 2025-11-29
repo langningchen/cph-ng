@@ -169,7 +169,7 @@ export class TcActions {
     const tc = fullProblem.problem.tcs[msg.id];
     const fileIo = tc[msg.label];
     if (fileIo.useFile) {
-      const data = await fileIo.toString();
+      const data = fileIo.toString();
       if (
         data.length <= Settings.problem.maxInlineDataLength ||
         (await Io.confirm(

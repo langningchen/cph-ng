@@ -68,7 +68,7 @@ export class LangJava extends Lang {
       ac,
     );
     return result instanceof KnownResult
-      ? result
+      ? new KnownResult(result.verdict, result.msg, { outputPath, hash })
       : new UnknownResult({ outputPath, hash });
   }
 

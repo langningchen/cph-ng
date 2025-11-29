@@ -90,7 +90,7 @@ export class Compiler {
         compile,
       );
       if (checkerResult instanceof KnownResult) {
-        return { ...checkerResult, data };
+        return new KnownResult(checkerResult.verdict, checkerResult.msg, data);
       }
       problem.checker.hash = checkerResult.data.hash;
       data.checker = checkerResult.data;
@@ -104,7 +104,11 @@ export class Compiler {
         compile,
       );
       if (interactorResult instanceof KnownResult) {
-        return { ...interactorResult, data };
+        return new KnownResult(
+          interactorResult.verdict,
+          interactorResult.msg,
+          data,
+        );
       }
       problem.interactor.hash = interactorResult.data.hash;
       data.interactor = interactorResult.data;
@@ -118,7 +122,11 @@ export class Compiler {
         compile,
       );
       if (generatorResult instanceof KnownResult) {
-        return { ...generatorResult, data };
+        return new KnownResult(
+          generatorResult.verdict,
+          generatorResult.msg,
+          data,
+        );
       }
       problem.bfCompare.generator.hash = generatorResult.data.hash;
 
@@ -128,7 +136,11 @@ export class Compiler {
         compile,
       );
       if (bruteForceResult instanceof KnownResult) {
-        return { ...bruteForceResult, data };
+        return new KnownResult(
+          bruteForceResult.verdict,
+          bruteForceResult.msg,
+          data,
+        );
       }
       problem.bfCompare.bruteForce.hash = bruteForceResult.data.hash;
       data.bfCompare = {

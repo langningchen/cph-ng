@@ -15,10 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TcVerdict } from '../types/types.backend';
+import { TcVerdict, TcVerdicts } from '../types/types.backend';
 
 export class UnknownResult<T> {
   constructor(public data: T) {}
+  public flatten() {
+    return { verdict: TcVerdicts.UKE.name };
+  }
 }
 export class KnownResult<T = never> {
   constructor(
@@ -26,5 +29,8 @@ export class KnownResult<T = never> {
     public msg?: string,
     public data?: T,
   ) {}
+  public flatten() {
+    return { verdict: this.verdict.name, msg: this.msg };
+  }
 }
 export type Result<T> = UnknownResult<T> | KnownResult<T>;
