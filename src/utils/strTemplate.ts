@@ -83,7 +83,7 @@ export const renderWorkspacePath = async (original: string) => {
     }
     if (folders.length === 1) {
       original = renderString(original, [
-        ['workspace', workspace.workspaceFolders[0].uri.fsPath],
+        ['workspace', folders[0]],
       ]);
     } else {
       const folder = await window.showQuickPick(folders, {
