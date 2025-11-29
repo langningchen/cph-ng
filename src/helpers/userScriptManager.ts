@@ -123,7 +123,7 @@ export default class UserScriptManager {
                         return await process();
                     } catch (e) {
                         logger.error("Error in script", e);
-                        return ;
+                        return null;
                     }
                 })()
             `);

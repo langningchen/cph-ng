@@ -97,7 +97,7 @@ export const renderWorkspacePath = async (original: string) => {
       original = renderString(original, [['workspace', folder]]);
     }
   }
-  return renderPath(original);
+  return original;
 };
 export const renderPathWithFile = (
   original: string,
