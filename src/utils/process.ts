@@ -16,15 +16,6 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { exec } from 'child_process';
-import { access } from 'fs/promises';
 import { promisify } from 'util';
 
 export const execAsync = promisify(exec);
-export const exists = async (path: string): Promise<boolean> => {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
-};

@@ -23,8 +23,8 @@ import ProcessExecutor, { AbortReason } from '@/helpers/processExecutor';
 import Settings from '@/helpers/settings';
 import { FileWithHash, ICompilationSettings, TcVerdicts } from '@/types';
 import { telemetry, waitUntil } from '@/utils/global';
-import { exists } from '@/utils/process';
 import { KnownResult, Result, UnknownResult } from '@/utils/result';
+import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { l10n, window } from 'vscode';
 
@@ -101,7 +101,7 @@ export class Lang {
       // Check if the output file exists
       if (
         langCompileResult instanceof UnknownResult &&
-        !(await exists(langCompileResult.data.outputPath))
+        !existsSync(langCompileResult.data.outputPath)
       ) {
         return new KnownResult(TcVerdicts.CE, l10n.t('Compilation failed'));
       }

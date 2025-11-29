@@ -26,8 +26,8 @@ import {
 import Settings from '@/helpers/settings';
 import { TcIo, TcVerdicts } from '@/types';
 import { extensionPath } from '@/utils/global';
-import { exists } from '@/utils/process';
 import { KnownResult, Result } from '@/utils/result';
+import { existsSync } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
 import { type } from 'os';
 import { join } from 'path';
@@ -64,7 +64,7 @@ export class Executor {
       Settings.cache.directory,
       type() === 'Windows_NT' ? 'runner-windows.exe' : 'runner-linux',
     );
-    if (await exists(outputPath)) {
+    if (existsSync(outputPath)) {
       this.logger.debug('Using cached runner program', { outputPath });
       return outputPath;
     }

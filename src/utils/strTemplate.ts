@@ -57,39 +57,28 @@ export const renderPath = (original: string) => {
     ]),
   );
 };
-export const renderPathWithoutFile = async (
-  original: string,
-  ignoreError: boolean = false,
-) => {
+export const renderWorkspacePath = async (original: string) => {
+  original = renderPath(original);
   if (original.includes('${workspace}')) {
-    const folders = [];
     if (!workspace.workspaceFolders) {
-      ignoreError ||
-        Io.error(
-          l10n.t(
-            'Path uses ${workspace} or ${relativeDirname}, but file is not in a workspace folder.',
-          ),
-        );
+      Io.error(
+        l10n.t(
+          'Path uses ${workspace} or ${relativeDirname}, but file is not in a workspace folder.',
+        ),
+      );
       return null;
     }
-    for (const folder of workspace.workspaceFolders) {
-      if (
-        existsSync(
-          renderPath(
-            renderString(original, [['workspace', folder.uri.fsPath]]),
-          ),
-        )
-      ) {
-        folders.push(folder.uri.fsPath);
-      }
-    }
+    const folders = workspace.workspaceFolders
+      .map((folder) => folder.uri.fsPath)
+      .filter((path) =>
+        existsSync(renderString(original, [['workspace', path]])),
+      );
     if (!folders.length) {
-      ignoreError ||
-        Io.error(
-          l10n.t(
-            'Path uses ${workspace} or ${relativeDirname}, but no workspace folder contains the file.',
-          ),
-        );
+      Io.error(
+        l10n.t(
+          'Path uses ${workspace} or ${relativeDirname}, but no workspace folder contains the file.',
+        ),
+      );
       return null;
     }
     if (folders.length === 1) {

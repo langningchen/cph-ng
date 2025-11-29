@@ -18,9 +18,9 @@
 import Io from '@/helpers/io';
 import Settings from '@/helpers/settings';
 import { ITc, Tc, TcIo } from '@/types';
-import { exists } from '@/utils/process';
 import { renderUnzipFolder } from '@/utils/strTemplate';
 import AdmZip from 'adm-zip';
+import { existsSync } from 'fs';
 import { mkdir, readdir, unlink } from 'fs/promises';
 import { orderBy } from 'natural-orderby';
 import { basename, dirname, extname, join } from 'path';
@@ -61,7 +61,7 @@ export default class TcFactory {
     if (behavior !== 'never') {
       for (const ext of pairExt) {
         const pairPath = path.replace(extname(path), ext);
-        if (!(await exists(pairPath))) {
+        if (!existsSync(pairPath)) {
           continue;
         }
         if (behavior === 'ask') {

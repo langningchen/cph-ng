@@ -7,7 +7,7 @@ import {
   sidebarProvider,
   waitUntil,
 } from '@/utils/global';
-import { exists } from '@/utils/process';
+import { existsSync } from 'fs';
 import { CphProblem } from '../cphProblem';
 
 export interface FullProblem {
@@ -72,7 +72,7 @@ class Store {
 
     const fullProblem = await this.getFullProblem(activePath);
     const canImport =
-      !!activePath && (await exists(CphProblem.getProbBySrc(activePath)));
+      !!activePath && existsSync(CphProblem.getProbBySrc(activePath));
     sidebarProvider.event.emit('problem', {
       problem: fullProblem && {
         problem: fullProblem.problem,

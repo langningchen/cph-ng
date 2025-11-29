@@ -5,9 +5,9 @@ import Settings from '@/helpers/settings';
 import Companion from '@/modules/companion';
 import { Problem } from '@/types';
 import { extensionPath } from '@/utils/global';
-import { exists } from '@/utils/process';
 import { KnownResult } from '@/utils/result';
 import * as msgs from '@w/msgs';
+import { existsSync } from 'fs';
 import { readdir } from 'fs/promises';
 import { basename, dirname, extname, join } from 'path';
 import { commands, debug, l10n, Uri, window } from 'vscode';
@@ -27,7 +27,7 @@ export class ProblemActions {
       return;
     }
     const binPath = await Problem.getBinBySrc(src);
-    if (binPath && (await exists(binPath))) {
+    if (binPath && existsSync(binPath)) {
       Io.warn(l10n.t('Problem already exists for this file.'));
       return;
     }
@@ -46,7 +46,7 @@ export class ProblemActions {
       return;
     }
     const binPath = await Problem.getBinBySrc(src);
-    if (binPath && (await exists(binPath))) {
+    if (binPath && existsSync(binPath)) {
       Io.warn(l10n.t('Problem already exists for this file.'));
       return;
     }

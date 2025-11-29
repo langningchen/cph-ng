@@ -17,8 +17,8 @@
 
 import Logger from '@/helpers/logger';
 import { FileWithHash } from '@/types';
-import { exists } from '@/utils/process';
 import { SHA256 } from 'crypto-js';
+import { existsSync } from 'fs';
 import { readFile, unlink } from 'fs/promises';
 
 const logger = new Logger('compiler-cache');
@@ -43,7 +43,7 @@ export const checkHash = async (
   ).toString();
   if (
     forceCompile === false ||
-    (forceCompile !== true && src.hash === hash && (await exists(outputPath)))
+    (forceCompile !== true && src.hash === hash && existsSync(outputPath))
   ) {
     logger.debug('Skipping compilation', {
       srcHash: src.hash,
