@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <mask id="xor-mask">
+            <rect x="0" y="0" width="24" height="24" fill="#fff" />
+            <rect x="7" y="13" width="18" height="9" />
+        </mask>
+    </defs>
+
+    <g x="0" y="0" width="24" height="24" fill="currentColor" mask="url(#xor-mask)">
+        <rect x="0" y="7.5" width="6" height="13.5" rx="1.5" ry="1.5" />
+        <rect x="9" y="3" width="6" height="18" rx="1.5" ry="1.5" />
+        <rect x="18" y="10.5" width="6" height="10.5" rx="1.5" ry="1.5" />
+    </g>
+    <text x="10" y="21" font-family="Consolas" font-size="10">
+        NG
+    </text>
+</svg>
