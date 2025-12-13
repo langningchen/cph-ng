@@ -7,6 +7,7 @@ import { mkdirSync, writeFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
 import { fileURLToPath } from 'url';
+import webpack from 'webpack';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -98,6 +99,8 @@ export default (_env, argv) => {
       alias: {
         '@': resolve(__dirname, 'src'),
         '@w': resolve(__dirname, 'src/webview/src'),
+        bufferutil: false,
+        'utf-8-validate': false,
       },
     },
     module: {
@@ -154,12 +157,18 @@ export default (_env, argv) => {
         type: 'module',
       },
       chunkFormat: 'module',
-      clean: { keep: /generated\.json/ },
+      clean: {
+        keep: /generated\.json|router\.js|frontend\.js|styles\.css/,
+      },
     },
     externals: { vscode: 'vscode' },
     plugins: [
       generateSettings(),
       generateBuildInfo(),
+      new webpack.DefinePlugin({
+        'process.env.WS_NO_BUFFER_UTIL': JSON.stringify(true),
+        'process.env.WS_NO_UTF_8_VALIDATE': JSON.stringify(true),
+      }),
       new CopyPlugin({
         patterns: [
           { from: 'testlib/testlib.h', to: 'testlib/testlib.h' },
@@ -204,5 +213,33 @@ export default (_env, argv) => {
     },
   };
 
-  return [extensionConfig, webviewConfig];
+  /** @type WebpackConfig */
+  const routerConfig = {
+    ...baseConfig,
+    target: 'node',
+    entry: './src/router/index.ts',
+    output: {
+      path: resolve(__dirname, 'dist'),
+      filename: 'router.js',
+      clean: false,
+      library: {
+        type: 'module',
+      },
+      chunkFormat: 'module',
+    },
+    experiments: { outputModule: true },
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env.WS_NO_BUFFER_UTIL': JSON.stringify(true),
+        'process.env.WS_NO_UTF_8_VALIDATE': JSON.stringify(true),
+      }),
+    ],
+    cache: {
+      type: 'filesystem',
+      buildDependencies: { config: [__filename] },
+      name: isProd ? 'prod-router' : 'dev-router',
+    },
+  };
+
+  return [extensionConfig, webviewConfig, routerConfig];
 };
