@@ -35,7 +35,7 @@ const CONFIGS = [
         {
           dir: 'src',
           exts: ['ts', 'js'],
-          regex: /l10n\.t\s*\(\s*(['"])(.*?)\1/g,
+          regex: /l10n\.t\s*\(\s*(['"])([\s\S]*?)\1/g,
         },
       ]),
     files: ['l10n/bundle.l10n.zh-cn.json'],
@@ -47,7 +47,7 @@ const CONFIGS = [
         {
           dir: join('src', 'webview', 'src'),
           exts: ['tsx', 'ts'],
-          regex: /\bt\s*\(\s*['"](.*?)['"]/g,
+          regex: /\bt\s*\(\s*(['"])([\s\S]*?)\1/g,
         },
       ]),
     files: ['src/webview/src/l10n/en.json', 'src/webview/src/l10n/zh.json'],
@@ -107,7 +107,7 @@ function extractTranslationCalls(patterns) {
       const matches = content.match(regex);
       if (matches) {
         matches.forEach((match) => {
-          const keyMatch = match.match(/(['"])(.*?)\1/);
+          const keyMatch = match.match(/(['"])([\s\S]*?)\1/);
           if (keyMatch) {
             keys.add(keyMatch[2]);
           }
