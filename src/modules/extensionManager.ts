@@ -34,6 +34,7 @@ import LlmDataInspector from '@/ai/llmDataInspector';
 import LlmTcRunner from '@/ai/llmTcRunner';
 import LlmTestCaseEditor from '@/ai/llmTestCaseEditor';
 import LlmTestCaseLister from '@/ai/llmTestCaseLister';
+import { setupContainer } from '@/composition/container';
 import Cache from '@/helpers/cache';
 import FolderChooser from '@/helpers/folderChooser';
 import Io from '@/helpers/io';
@@ -71,6 +72,8 @@ export default class ExtensionManager {
   public static async activate(context: ExtensionContext) {
     ExtensionManager.logger.info('Activating CPH-NG extension');
     try {
+      // Initialize DI container (no behavior changes yet)
+      setupContainer(context);
       setExtensionUri(context.extensionUri);
       context.subscriptions.push(telemetry);
       await telemetry.init();

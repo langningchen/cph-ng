@@ -1,4 +1,7 @@
 import * as msgs from '@w/msgs';
+import { container } from 'tsyringe';
+import RunSingleTc from '@/application/usecases/RunSingleTc';
+import { TOKENS } from '@/composition/tokens';
 import { BfCompare } from './bfCompare';
 import { ProblemActions } from './problemActions';
 import Store, { FullProblem } from './store';
@@ -93,7 +96,15 @@ export default class ProblemsManager {
 
   // Runner
   public static async runTc(msg: msgs.RunTcMsg) {
-    return TcRunner.runTc(msg);
+    // Prefer DI use case; fall back to legacy static if resolution fails.
+    try {
+      const usecase = container.resolve<RunSingleTc>(
+        TOKENS.RunSingleTc as unknown as string,
+      );
+      return await usecase.exec(msg);
+    } catch {
+      return TcRunner.runTc(msg);
+    }
   }
   public static async runTcs(msg: msgs.RunTcsMsg) {
     return TcRunner.runTcs(msg);

@@ -17,6 +17,19 @@
 
 import { UUID } from 'crypto';
 
+export const isRunningVerdict = (verdict?: ITcVerdict): boolean => {
+  return (
+    verdict !== undefined &&
+    ['WT', 'CP', 'CPD', 'JG', 'JGD', 'CMP'].includes(verdict.name)
+  );
+};
+export const isExpandVerdict = (verdict?: ITcVerdict): boolean => {
+  return !(
+    (verdict !== undefined && ['AC', 'SK', 'RJ'].includes(verdict.name)) ||
+    isRunningVerdict(verdict)
+  );
+};
+
 export interface ITcVerdict {
   name: string;
   fullName: string;

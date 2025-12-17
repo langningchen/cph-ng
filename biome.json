@@ -24,14 +24,14 @@
     "rules": {
       "recommended": false,
       "style": {
-        "useBlockStatements": "warn",
+        "useBlockStatements": "on",
         "noCommonJs": "on",
         "noUselessElse": "on",
         "useConst": "on"
       },
       "suspicious": {
         "noDoubleEquals": "on",
-        "noImplicitAnyLet": "error"
+        "noImplicitAnyLet": "on"
       },
       "correctness": {
         "noUnusedImports": "on"
@@ -39,6 +39,9 @@
     }
   },
   "javascript": {
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    },
     "formatter": {
       "jsxQuoteStyle": "single",
       "quoteProperties": "asNeeded",

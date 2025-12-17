@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import 'reflect-metadata';
 import { install } from 'source-map-support';
 import ExtensionManager from './modules/extensionManager';
 

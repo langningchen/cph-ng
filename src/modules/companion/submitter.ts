@@ -24,14 +24,19 @@ export class Submitter {
       'GNU G++17 7.3.0': 54,
       'GNU G++20 13.2 (64 bit, winlibs)': 89,
       'GNU G++23 14.2 (64 bit, msys2)': 91,
-    };
+    } as const;
+    const languageIds = Object.values(languageList) as Array<
+      (typeof languageList)[keyof typeof languageList]
+    >;
     if (Submitter.isSubmitting) {
       Io.warn(l10n.t('A submission is already in progress.'));
       return Promise.reject(new Error('Submission already in progress'));
     }
 
     let submitLanguageId = Settings.companion.submitLanguage;
-    if (!Object.values(languageList).includes(submitLanguageId)) {
+    if (
+      !languageIds.includes(submitLanguageId as (typeof languageIds)[number])
+    ) {
       const choice = await window.showQuickPick(Object.keys(languageList), {
         placeHolder: l10n.t('Choose submission language'),
       });
@@ -43,6 +48,12 @@ export class Submitter {
       Settings.companion.submitLanguage = submitLanguageId;
     }
 
+    const normalizedLanguageId = languageIds.includes(
+      submitLanguageId as (typeof languageIds)[number],
+    )
+      ? (submitLanguageId as (typeof languageIds)[number])
+      : languageIds[0];
+
     const sourceCode = await readFile(problem.src.path, 'utf-8');
     Submitter.logger.debug('Read source code for submission', {
       srcPath: problem.src.path,
@@ -53,7 +64,7 @@ export class Submitter {
       return;
     }
     Submitter.logger.info(
-      `Submitting problem ${problem.name} using language ${submitLanguageId} and file ${problem.src.path}`,
+      `Submitting problem ${problem.name} using language ${normalizedLanguageId} and file ${problem.src.path}`,
     );
     const requestData: Exclude<CphSubmitResponse, CphSubmitEmpty> = {
       empty: false,
@@ -64,7 +75,7 @@ export class Submitter {
         (Settings.companion.addTimestamp
           ? `\n// Submitted via cph-ng at ${new Date().toISOString()}`
           : ''),
-      languageId: submitLanguageId,
+      languageId: normalizedLanguageId,
     };
     Submitter.logger.debug('Submission data', requestData);
 
