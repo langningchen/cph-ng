@@ -1,4 +1,4 @@
-import { createServer, Server as HttpServer } from 'http';
+import { createServer, type Server as HttpServer } from 'http';
 import { l10n } from 'vscode';
 import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
@@ -28,7 +28,7 @@ export class Server {
             try {
               await Handler.handleIncomingProblem(JSON.parse(requestData));
             } catch (e) {
-              this.logger.error('Error parsing request data', e);
+              Server.logger.error('Error parsing request data', e);
               if (e instanceof SyntaxError) {
                 Io.warn(l10n.t('Companion data is invalid JSON'));
               } else {

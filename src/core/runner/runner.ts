@@ -18,12 +18,12 @@
 import { readFile } from 'fs/promises';
 import { l10n } from 'vscode';
 import { Checker } from '@/core/checker';
-import { CompileData } from '@/core/compiler';
-import { Lang } from '@/core/langs/lang';
+import type { CompileData } from '@/core/compiler';
+import type { Lang } from '@/core/langs/lang';
 import { ProcessResultHandler } from '@/helpers/processResultHandler';
 import Settings from '@/helpers/settings';
 import ProblemsManager from '@/modules/problems/manager';
-import { Problem, TcIo, TcVerdicts, TcWithResult } from '@/types';
+import { type Problem, TcIo, TcVerdicts, type TcWithResult } from '@/types';
 import { telemetry } from '@/utils/global';
 import { KnownResult } from '@/utils/result';
 import { Executor } from './executor';

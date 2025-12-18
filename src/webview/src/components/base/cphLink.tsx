@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import Link, { LinkProps } from '@mui/material/Link';
+import Link, { type LinkProps } from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
 import { delProps } from '../../utils';

@@ -1,10 +1,10 @@
-import * as msgs from '@w/msgs';
+import type * as msgs from '@w/msgs';
 import { container } from 'tsyringe';
-import RunSingleTc from '@/application/usecases/RunSingleTc';
+import type RunSingleTc from '@/application/usecases/RunSingleTc';
 import { TOKENS } from '@/composition/tokens';
 import { BfCompare } from './bfCompare';
 import { ProblemActions } from './problemActions';
-import Store, { FullProblem } from './store';
+import Store, { type FullProblem } from './store';
 import { TcActions } from './tcActions';
 import { TcRunner } from './tcRunner';
 

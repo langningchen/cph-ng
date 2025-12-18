@@ -17,9 +17,13 @@
 
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
-import { FileWithHash } from '@/types';
+import type { FileWithHash } from '@/types';
 import { UnknownResult } from '@/utils/result';
-import { CompileAdditionalData, Lang, LangCompileResult } from './lang';
+import {
+  type CompileAdditionalData,
+  Lang,
+  type LangCompileResult,
+} from './lang';
 
 export class LangJavascript extends Lang {
   private logger: Logger = new Logger('langsJavascript');

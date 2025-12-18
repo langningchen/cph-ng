@@ -22,7 +22,7 @@ import { basename, dirname, extname, normalize, relative } from 'path';
 import { l10n, Uri, window, workspace } from 'vscode';
 import Io from '@/helpers/io';
 import Settings from '@/helpers/settings';
-import { Problem } from '../types/types.backend';
+import type { Problem } from '../types/types.backend';
 import { extensionPath } from './global';
 
 const renderString = (original: string, replacements: [string, string][]) => {

@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import Box, { BoxProps } from '@mui/material/Box';
+import Box, { type BoxProps } from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { PopoverPosition } from '@mui/material/Popover';
+import type { PopoverPosition } from '@mui/material/Popover';
 import React, { useState } from 'react';
 import { delProps } from '../../utils';
 

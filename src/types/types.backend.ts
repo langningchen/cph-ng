@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { randomUUID, UUID } from 'crypto';
+import { randomUUID, type UUID } from 'crypto';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { readFile, stat, unlink, writeFile } from 'fs/promises';
 import { basename, dirname, extname, join, relative } from 'path';
@@ -28,10 +28,10 @@ import Settings from '@/helpers/settings';
 import { telemetry } from '@/utils/global';
 import { mkdirIfNotExists } from '@/utils/process';
 import { version } from '../utils/packageInfo';
-import { KnownResult } from '../utils/result';
+import type { KnownResult } from '../utils/result';
 import { renderPathWithFile } from '../utils/strTemplate';
-import { migration, OldProblem } from './migration';
-import {
+import { migration, type OldProblem } from './migration';
+import type {
   IBfCompare,
   ICompilationSettings,
   IFileWithHash,
@@ -292,7 +292,7 @@ export class Problem implements IProblem {
         relative(dirname(problem.src.path), oldPath),
       );
       if (existsSync(newPath)) {
-        this.logger.debug('Fixed path', oldPath, 'to', newPath);
+        Problem.logger.debug('Fixed path', oldPath, 'to', newPath);
         return newPath;
       }
       return oldPath;
@@ -313,8 +313,8 @@ export class Problem implements IProblem {
     fixFileWithHash(problem.bfCompare?.bruteForce);
     problem.src.path = srcPath;
 
-    this.logger.info('Problem', problem.src.path, 'loaded');
-    this.logger.trace('Loaded problem data', { problem });
+    Problem.logger.info('Problem', problem.src.path, 'loaded');
+    Problem.logger.trace('Loaded problem data', { problem });
     return problem;
   }
 

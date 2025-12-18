@@ -19,7 +19,7 @@ import { SHA256 } from 'crypto-js';
 import { existsSync } from 'fs';
 import { readFile, unlink } from 'fs/promises';
 import Logger from '@/helpers/logger';
-import { FileWithHash } from '@/types';
+import type { FileWithHash } from '@/types';
 
 const logger = new Logger('compilerCache');
 

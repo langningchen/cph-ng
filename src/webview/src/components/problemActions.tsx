@@ -35,7 +35,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IProblem, isRunningVerdict } from '@/types/types';
+import { type IProblem, isRunningVerdict } from '@/types/types';
 import { useProblemContext } from '../context/ProblemContext';
 import { basename, getCompile } from '../utils';
 import CphFlex from './base/cphFlex';

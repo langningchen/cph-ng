@@ -21,12 +21,12 @@ import { join } from 'path';
 import { EventEmitter } from 'stream';
 import {
   commands,
-  ExtensionContext,
+  type ExtensionContext,
   env,
   extensions,
   l10n,
   lm,
-  MessageItem,
+  type MessageItem,
   window,
   workspace,
 } from 'vscode';

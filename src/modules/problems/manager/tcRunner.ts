@@ -1,4 +1,4 @@
-import * as msgs from '@w/msgs';
+import type * as msgs from '@w/msgs';
 import { Compiler } from '@/core/compiler';
 import { Runner } from '@/core/runner';
 import Settings from '@/helpers/settings';
@@ -7,7 +7,7 @@ import {
   isRunningVerdict,
   TcResult,
   TcVerdicts,
-  TcWithResult,
+  type TcWithResult,
 } from '@/types';
 import { waitUntil } from '@/utils/global';
 import { KnownResult } from '@/utils/result';

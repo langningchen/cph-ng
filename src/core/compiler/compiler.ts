@@ -16,11 +16,15 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { l10n } from 'vscode';
-import { Lang, LangCompileData, LangCompileResult } from '@/core/langs/lang';
+import type {
+  Lang,
+  LangCompileData,
+  LangCompileResult,
+} from '@/core/langs/lang';
 import Langs from '@/core/langs/langs';
 import Logger from '@/helpers/logger';
-import { FileWithHash, Problem, TcVerdicts } from '@/types';
-import { KnownResult, Result, UnknownResult } from '@/utils/result';
+import { type FileWithHash, type Problem, TcVerdicts } from '@/types';
+import { KnownResult, type Result, UnknownResult } from '@/utils/result';
 
 export interface CompileData {
   src: LangCompileData;
@@ -84,7 +88,7 @@ export class Compiler {
 
     // Compile checker
     if (problem.checker) {
-      const checkerResult = await this.optionalCompile(
+      const checkerResult = await Compiler.optionalCompile(
         problem.checker,
         ac,
         compile,
@@ -98,7 +102,7 @@ export class Compiler {
 
     // Compile interactor
     if (problem.interactor) {
-      const interactorResult = await this.optionalCompile(
+      const interactorResult = await Compiler.optionalCompile(
         problem.interactor,
         ac,
         compile,
@@ -116,7 +120,7 @@ export class Compiler {
 
     // Compile brute force comparison programs
     if (problem.bfCompare?.generator && problem.bfCompare?.bruteForce) {
-      const generatorResult = await this.optionalCompile(
+      const generatorResult = await Compiler.optionalCompile(
         problem.bfCompare.generator,
         ac,
         compile,
@@ -130,7 +134,7 @@ export class Compiler {
       }
       problem.bfCompare.generator.hash = generatorResult.data.hash;
 
-      const bruteForceResult = await this.optionalCompile(
+      const bruteForceResult = await Compiler.optionalCompile(
         problem.bfCompare.bruteForce,
         ac,
         compile,
@@ -148,7 +152,7 @@ export class Compiler {
         bruteForce: bruteForceResult.data,
       };
     }
-    this.logger.trace('Compilation succeeded', data);
+    Compiler.logger.trace('Compilation succeeded', data);
     return new UnknownResult(data);
   }
 }

@@ -23,7 +23,7 @@ import { basename, dirname, extname, join } from 'path';
 import { l10n, window } from 'vscode';
 import Io from '@/helpers/io';
 import Settings from '@/helpers/settings';
-import { ITc, Tc, TcIo } from '@/types';
+import { type ITc, Tc, TcIo } from '@/types';
 import { mkdirIfNotExists } from '@/utils/process';
 import { renderUnzipFolder } from '@/utils/strTemplate';
 
@@ -99,7 +99,7 @@ export default class TcFactory {
     if (Settings.problem.deleteAfterUnzip) {
       await unlink(zipPath);
     }
-    return await this.fromFolder(folderPath);
+    return await TcFactory.fromFolder(folderPath);
   }
   public static async fromFolder(folderPath: string): Promise<Tc[]> {
     const allFiles = await TcFactory.getAllFiles(folderPath);

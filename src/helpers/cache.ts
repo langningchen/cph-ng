@@ -31,23 +31,23 @@ export default class Cache {
     return await mkdirIfNotExists(Settings.cache.directory);
   }
   public static async startMonitor() {
-    if (this.monitorInterval) {
+    if (Cache.monitorInterval) {
       return;
     }
-    this.monitorInterval = setInterval(() => {
-      this.logger.debug(
-        `Cache Monitor: ${this.usedPool.size} used, ${this.freePool.size} free.`,
+    Cache.monitorInterval = setInterval(() => {
+      Cache.logger.debug(
+        `Cache Monitor: ${Cache.usedPool.size} used, ${Cache.freePool.size} free.`,
       );
-      this.logger.trace('Used paths', Array.from(this.usedPool));
-      this.logger.trace('Free paths', Array.from(this.freePool));
+      Cache.logger.trace('Used paths', Array.from(Cache.usedPool));
+      Cache.logger.trace('Free paths', Array.from(Cache.freePool));
     }, 10000);
-    this.logger.info('Cache monitor started');
+    Cache.logger.info('Cache monitor started');
   }
   public static stopMonitor() {
-    if (this.monitorInterval) {
-      clearInterval(this.monitorInterval);
-      this.monitorInterval = undefined;
-      this.logger.info('Cache monitor stopped');
+    if (Cache.monitorInterval) {
+      clearInterval(Cache.monitorInterval);
+      Cache.monitorInterval = undefined;
+      Cache.logger.info('Cache monitor stopped');
     }
   }
 
@@ -55,10 +55,10 @@ export default class Cache {
     let path = Cache.freePool.values().next().value;
     if (path) {
       Cache.freePool.delete(path);
-      this.logger.trace('Reusing cached path', path);
+      Cache.logger.trace('Reusing cached path', path);
     } else {
       path = join(Settings.cache.directory, randomUUID());
-      this.logger.trace('Creating new cached path', path);
+      Cache.logger.trace('Creating new cached path', path);
     }
     Cache.usedPool.add(path);
     // We do not actually create or empty the file here
@@ -71,13 +71,13 @@ export default class Cache {
     }
     for (const path of paths) {
       if (Cache.freePool.has(path)) {
-        this.logger.warn('Duplicate dispose path', path);
+        Cache.logger.warn('Duplicate dispose path', path);
       } else if (Cache.usedPool.has(path)) {
         Cache.usedPool.delete(path);
         Cache.freePool.add(path);
-        this.logger.trace('Disposing cached path', path);
+        Cache.logger.trace('Disposing cached path', path);
       } else {
-        this.logger.debug('Path', path, 'is not disposable');
+        Cache.logger.debug('Path', path, 'is not disposable');
       }
     }
   }

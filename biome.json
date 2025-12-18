@@ -22,19 +22,10 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false,
+      "recommended": true,
       "style": {
-        "useBlockStatements": "on",
         "noCommonJs": "on",
-        "noUselessElse": "on",
-        "useConst": "on"
-      },
-      "suspicious": {
-        "noDoubleEquals": "on",
-        "noImplicitAnyLet": "on"
-      },
-      "correctness": {
-        "noUnusedImports": "on"
+        "noUselessElse": "on"
       }
     }
   },

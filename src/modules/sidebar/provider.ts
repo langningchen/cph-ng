@@ -2,8 +2,8 @@ import { EventEmitter } from 'events';
 import {
   commands,
   l10n,
-  WebviewView,
-  WebviewViewProvider,
+  type WebviewView,
+  type WebviewViewProvider,
   window,
   workspace,
 } from 'vscode';
@@ -12,7 +12,7 @@ import Logger from '@/helpers/logger';
 import { extensionUri } from '@/utils/global';
 import { getHtmlForWebview } from './htmlGenerator';
 import { handleMessage } from './messageHandler';
-import {
+import type {
   ActivePathEvent,
   ActivePathEventData,
   ProblemEvent,

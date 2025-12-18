@@ -1,4 +1,4 @@
-import * as msgs from '@w/msgs';
+import type * as msgs from '@w/msgs';
 import { l10n } from 'vscode';
 import { Compiler } from '@/core/compiler';
 import Langs from '@/core/langs/langs';
@@ -7,7 +7,7 @@ import Cache from '@/helpers/cache';
 import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
-import { Tc, TcIo, TcResult, TcVerdicts, TcWithResult } from '@/types';
+import { Tc, TcIo, TcResult, TcVerdicts, type TcWithResult } from '@/types';
 import { waitUntil } from '@/utils/global';
 import { KnownResult } from '@/utils/result';
 import Store from './store';
@@ -195,7 +195,7 @@ export class BfCompare {
     }
     fullProblem.ac?.abort();
     await waitUntil(() => !fullProblem.ac);
-    this.logger.info('Brute Force comparison stopped');
+    BfCompare.logger.info('Brute Force comparison stopped');
     await Store.dataRefresh();
   }
 }

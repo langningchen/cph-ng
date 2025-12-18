@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { type ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
 import { constants } from 'os';
@@ -24,7 +24,7 @@ import { cwd } from 'process';
 import { pipeline } from 'stream/promises';
 import { l10n } from 'vscode';
 import Logger from '@/helpers/logger';
-import { TcIo } from '@/types';
+import type { TcIo } from '@/types';
 import { telemetry } from '@/utils/global';
 import Cache from './cache';
 import Settings from './settings';
@@ -92,9 +92,11 @@ export default class ProcessExecutor {
         'EOF',
       ];
       if (e && e.code && expectedErrors.includes(e.code)) {
-        this.logger.trace(`Pipe ${name} of process ${pid} closed prematurely`);
+        ProcessExecutor.logger.trace(
+          `Pipe ${name} of process ${pid} closed prematurely`,
+        );
       } else {
-        this.logger.warn('Set up process', pid, name, 'failed', e);
+        ProcessExecutor.logger.warn('Set up process', pid, name, 'failed', e);
         telemetry.error('pipeFailed', e, { name });
       }
     };
@@ -104,12 +106,14 @@ export default class ProcessExecutor {
     options: LaunchOptions,
     runnerPath: string,
   ): Promise<ExecuteResult> {
-    this.logger.trace('executeWithRunner', options);
+    ProcessExecutor.logger.trace('executeWithRunner', options);
     if (options.debug) {
-      return this.toErrorResult(l10n.t('Debug mode not supported with runner'));
+      return ProcessExecutor.toErrorResult(
+        l10n.t('Debug mode not supported with runner'),
+      );
     }
     if (!options.stdin) {
-      return this.toErrorResult(
+      return ProcessExecutor.toErrorResult(
         l10n.t('stdin is required for runner execution'),
       );
     }
@@ -139,12 +143,12 @@ export default class ProcessExecutor {
     }
 
     // We use our own timeout handling to allow graceful exit
-    const launch = this.launch({
+    const launch = ProcessExecutor.launch({
       cmd: runnerCmd,
     });
 
     const timeoutId = setTimeout(() => {
-      this.logger.warn(
+      ProcessExecutor.logger.warn(
         'Soft killing runner',
         launch.child.pid,
         'due to timeout',
@@ -167,7 +171,7 @@ export default class ProcessExecutor {
         if (code || signal) {
           Cache.dispose([stdoutPath, stderrPath]);
           resolve(
-            this.toErrorResult(
+            ProcessExecutor.toErrorResult(
               l10n.t('Runner does not exit properly with code {code}', {
                 code: code ?? signal!,
               }),
@@ -176,13 +180,13 @@ export default class ProcessExecutor {
           return;
         }
         try {
-          this.logger.debug('Reading runner output', launch);
+          ProcessExecutor.logger.debug('Reading runner output', launch);
           const runInfo = JSON.parse(stdout) as RunnerOutput;
-          this.logger.info('Runner output', runInfo);
+          ProcessExecutor.logger.info('Runner output', runInfo);
           if (runInfo.error) {
             Cache.dispose([stdoutPath, stderrPath]);
             resolve(
-              this.toErrorResult(
+              ProcessExecutor.toErrorResult(
                 l10n.t('Runner error {type} with code {code}', {
                   type: runInfo.error_type,
                   code: runInfo.error_code,
@@ -191,7 +195,7 @@ export default class ProcessExecutor {
             );
           } else {
             resolve(
-              await this.toResult(
+              await ProcessExecutor.toResult(
                 {
                   ...launch,
                   acSignal: unifiedAc.signal,
@@ -210,13 +214,15 @@ export default class ProcessExecutor {
             );
           }
         } catch (e) {
-          this.logger.error('Error parsing runner output', e);
+          ProcessExecutor.logger.error('Error parsing runner output', e);
           Cache.dispose([stdoutPath, stderrPath]);
           if (e instanceof SyntaxError) {
-            return this.toErrorResult(l10n.t('Runner output is invalid JSON'));
+            return ProcessExecutor.toErrorResult(
+              l10n.t('Runner output is invalid JSON'),
+            );
           }
           resolve(
-            this.toErrorResult(
+            ProcessExecutor.toErrorResult(
               l10n.t('Error occurred while processing runner output'),
             ),
           );
@@ -234,21 +240,22 @@ export default class ProcessExecutor {
           stderrPath,
         ]);
         clearTimeout(timeoutId);
-        resolve(this.toErrorResult(error));
+        resolve(ProcessExecutor.toErrorResult(error));
       });
     });
   }
 
   public static async execute(options: LaunchOptions): Promise<ExecuteResult> {
-    this.logger.trace('execute', options);
-    const launch = this.launch(options);
+    ProcessExecutor.logger.trace('execute', options);
+    const launch = ProcessExecutor.launch(options);
     return new Promise(async (resolve) => {
       launch.child.on('close', async (code, signal) => {
-        resolve(await this.toResult(launch, code ?? signal!));
+        resolve(await ProcessExecutor.toResult(launch, code ?? signal!));
       });
       launch.child.on('error', (error) => {
         Cache.dispose([launch.stderrPath, launch.stderrPath]);
-        error.name === 'AbortError' || resolve(this.toErrorResult(error));
+        error.name === 'AbortError' ||
+          resolve(ProcessExecutor.toErrorResult(error));
       });
     });
   }
@@ -257,8 +264,8 @@ export default class ProcessExecutor {
     process1Options: LaunchOptions,
     process2Options: LaunchOptions,
   ): Promise<{ process1: ExecuteResult; process2: ExecuteResult }> {
-    const process1 = this.launch(process1Options);
-    const process2 = this.launch(process2Options);
+    const process1 = ProcessExecutor.launch(process1Options);
+    const process2 = ProcessExecutor.launch(process2Options);
 
     // Pipe the processes
     // Use pipe() instead of pipeline() to avoid destroying the source streams
@@ -276,7 +283,7 @@ export default class ProcessExecutor {
       } = {};
 
       const checkCompletion = () => {
-        this.logger.trace('checkCompletion', {
+        ProcessExecutor.logger.trace('checkCompletion', {
           results,
         });
         if (results.process1 && results.process2) {
@@ -291,18 +298,24 @@ export default class ProcessExecutor {
       // https://nodejs.org/docs/latest/api/child_process.html#event-close
       // "One of the two will always be non-null."
       process1.child.on('close', async (code, signal) => {
-        results.process1 ||= await this.toResult(process1, code ?? signal!);
+        results.process1 ||= await ProcessExecutor.toResult(
+          process1,
+          code ?? signal!,
+        );
         checkCompletion();
       });
       process2.child.on('close', async (code, signal) => {
-        results.process2 ||= await this.toResult(process2, code ?? signal!);
+        results.process2 ||= await ProcessExecutor.toResult(
+          process2,
+          code ?? signal!,
+        );
         checkCompletion();
       });
       process1.child.on('error', (error) => {
         if (error.name === 'AbortError') {
           return;
         }
-        results.process1 ||= this.toErrorResult(error);
+        results.process1 ||= ProcessExecutor.toErrorResult(error);
         results.process2 || process2.child.kill();
         checkCompletion();
       });
@@ -310,7 +323,7 @@ export default class ProcessExecutor {
         if (error.name === 'AbortError') {
           return;
         }
-        results.process2 ||= this.toErrorResult(error);
+        results.process2 ||= ProcessExecutor.toErrorResult(error);
         results.process1 || process1.child.kill();
         checkCompletion();
       });
@@ -318,13 +331,13 @@ export default class ProcessExecutor {
       const process1CodeOrSignal =
         process1.child.exitCode ?? process1.child.signalCode;
       if (process1CodeOrSignal !== null) {
-        this.logger.debug(
+        ProcessExecutor.logger.debug(
           'Child',
           process1.child.pid,
           'already exited',
           process1CodeOrSignal,
         );
-        results.process1 ||= await this.toResult(
+        results.process1 ||= await ProcessExecutor.toResult(
           process1,
           process1CodeOrSignal,
         );
@@ -332,13 +345,13 @@ export default class ProcessExecutor {
       const process2CodeOrSignal =
         process2.child.exitCode ?? process2.child.signalCode;
       if (process2CodeOrSignal !== null) {
-        this.logger.debug(
+        ProcessExecutor.logger.debug(
           'Child',
           process2.child.pid,
           'already exited',
           process2CodeOrSignal,
         );
-        results.process2 ||= await this.toResult(
+        results.process2 ||= await ProcessExecutor.toResult(
           process2,
           process2CodeOrSignal,
         );
@@ -347,7 +360,7 @@ export default class ProcessExecutor {
   }
 
   public static launch(options: LaunchOptions): LaunchResult {
-    this.logger.trace('createProcess', options);
+    ProcessExecutor.logger.trace('createProcess', options);
     const { cmd, ac, timeout, debug, stdin } = options;
 
     // Use a unified AbortController to handle both external and internal aborts
@@ -362,7 +375,7 @@ export default class ProcessExecutor {
       cwd: cmd[0] ? dirname(cmd[0]) : cwd(),
       signal: unifiedAc.signal,
     });
-    this.logger.info('Running executable', options, child.pid);
+    ProcessExecutor.logger.info('Running executable', options, child.pid);
     const result: LaunchResult = {
       child,
       acSignal: unifiedAc.signal,
@@ -375,14 +388,19 @@ export default class ProcessExecutor {
     // Send SIGSTOP for debugging
     if (debug) {
       if (!child.kill('SIGSTOP')) {
-        this.logger.error('Failed to stop process for debugging', child.pid);
+        ProcessExecutor.logger.error(
+          'Failed to stop process for debugging',
+          child.pid,
+        );
       }
     }
 
     // Process timeout
     if (timeout) {
       const timeoutId = setTimeout(() => {
-        this.logger.warn(`Process ${child.pid} reached timeout ${timeout}ms`);
+        ProcessExecutor.logger.warn(
+          `Process ${child.pid} reached timeout ${timeout}ms`,
+        );
         unifiedAc.abort(AbortReason.Timeout);
       }, timeout);
       child.on('close', () => clearTimeout(timeoutId));
@@ -418,9 +436,9 @@ export default class ProcessExecutor {
     launch: LaunchResult,
     data: number | NodeJS.Signals,
   ): Promise<ExecuteResult> {
-    this.logger.trace('toResult', { launch, data });
+    ProcessExecutor.logger.trace('toResult', { launch, data });
     await Promise.all(launch.ioPromises);
-    this.logger.debug(`Process ${launch.child.pid} close`, data);
+    ProcessExecutor.logger.debug(`Process ${launch.child.pid} close`, data);
     return {
       codeOrSignal: data,
       stdoutPath: launch.stdoutPath,
@@ -432,7 +450,7 @@ export default class ProcessExecutor {
     };
   }
   private static toErrorResult(data: Error | string): ExecuteResult {
-    this.logger.trace('toErrorResult', { data });
+    ProcessExecutor.logger.trace('toErrorResult', { data });
     if (data instanceof Error) {
       return data;
     }

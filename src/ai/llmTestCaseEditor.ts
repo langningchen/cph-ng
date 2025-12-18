@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UUID } from 'crypto';
+import type { UUID } from 'crypto';
 import {
-  CancellationToken,
+  type CancellationToken,
   LanguageModelTextPart,
-  LanguageModelTool,
-  LanguageModelToolInvocationOptions,
-  LanguageModelToolInvocationPrepareOptions,
+  type LanguageModelTool,
+  type LanguageModelToolInvocationOptions,
+  type LanguageModelToolInvocationPrepareOptions,
   LanguageModelToolResult,
   l10n,
-  PreparedToolInvocation,
+  type PreparedToolInvocation,
 } from 'vscode';
 import { Tc, TcIo } from '@/types';
 import ProblemsManager from '../modules/problems/manager';

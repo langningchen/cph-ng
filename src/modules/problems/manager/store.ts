@@ -21,7 +21,7 @@ class Store {
   private static fullProblems: FullProblem[] = [];
 
   public static async listFullProblems(): Promise<FullProblem[]> {
-    return this.fullProblems;
+    return Store.fullProblems;
   }
 
   public static async getFullProblem(
@@ -30,9 +30,9 @@ class Store {
     if (!path) {
       return null;
     }
-    for (const fullProblem of this.fullProblems) {
+    for (const fullProblem of Store.fullProblems) {
       if (fullProblem.problem.isRelated(path)) {
-        this.logger.trace(
+        Store.logger.trace(
           'Found loaded problem',
           fullProblem.problem.src.path,
           'for path',
@@ -43,34 +43,34 @@ class Store {
     }
     const problem = await Problem.fromSrc(path);
     if (!problem) {
-      this.logger.debug('Failed to load problem for path', path);
+      Store.logger.debug('Failed to load problem for path', path);
       return null;
     }
-    this.logger.debug('Loaded problem', problem.src.path, 'for path', path);
+    Store.logger.debug('Loaded problem', problem.src.path, 'for path', path);
     const fullProblem = {
       problem,
       ac: null,
       startTime: Date.now(),
     } satisfies FullProblem;
-    this.fullProblems.push(fullProblem);
+    Store.fullProblems.push(fullProblem);
     return fullProblem;
   }
 
   public static async dataRefresh(noMsg = false) {
-    this.logger.trace('Starting data refresh');
+    Store.logger.trace('Starting data refresh');
     const activePath = getActivePath();
-    const idles: FullProblem[] = this.fullProblems.filter(
+    const idles: FullProblem[] = Store.fullProblems.filter(
       (fullProblem) =>
         !fullProblem.ac && !fullProblem.problem.isRelated(activePath),
     );
     for (const idle of idles) {
       idle.problem.timeElapsed += Date.now() - idle.startTime;
       await idle.problem.save();
-      this.logger.debug('Closed idle problem', idle.problem.src.path);
+      Store.logger.debug('Closed idle problem', idle.problem.src.path);
     }
-    this.fullProblems = this.fullProblems.filter((p) => !idles.includes(p));
+    Store.fullProblems = Store.fullProblems.filter((p) => !idles.includes(p));
 
-    const fullProblem = await this.getFullProblem(activePath);
+    const fullProblem = await Store.getFullProblem(activePath);
     const canImport =
       !!activePath && existsSync(CphProblem.getProbBySrc(activePath));
     noMsg ||
@@ -79,7 +79,7 @@ class Store {
           problem: fullProblem.problem,
           startTime: fullProblem.startTime,
         },
-        bgProblems: this.fullProblems
+        bgProblems: Store.fullProblems
           .map((bgProblem) => ({
             name: bgProblem.problem.name,
             srcPath: bgProblem.problem.src.path,
@@ -99,18 +99,18 @@ class Store {
   }
 
   public static async closeAll() {
-    for (const fullProblem of this.fullProblems) {
+    for (const fullProblem of Store.fullProblems) {
       fullProblem.ac?.abort();
       await waitUntil(() => !fullProblem.ac);
       fullProblem.problem.timeElapsed += Date.now() - fullProblem.startTime;
       await fullProblem.problem.save();
     }
-    this.fullProblems = [];
+    Store.fullProblems = [];
   }
 
   // Helper to remove a problem from the list (used by delProblem)
   public static removeProblem(fullProblem: FullProblem) {
-    this.fullProblems = this.fullProblems.filter((p) => p !== fullProblem);
+    Store.fullProblems = Store.fullProblems.filter((p) => p !== fullProblem);
   }
 }
 

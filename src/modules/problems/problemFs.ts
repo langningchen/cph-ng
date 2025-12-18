@@ -15,22 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UUID } from 'crypto';
+import type { UUID } from 'crypto';
 import { readFile } from 'fs/promises';
 import {
   Disposable,
-  Event,
+  type Event,
   EventEmitter,
-  FileChangeEvent,
+  type FileChangeEvent,
   FileChangeType,
   FilePermission,
-  FileStat,
+  type FileStat,
   FileSystemError,
-  FileSystemProvider,
+  type FileSystemProvider,
   FileType,
   Uri,
 } from 'vscode';
-import { Problem } from '@/types';
+import type { Problem } from '@/types';
 import ProblemsManager from './manager';
 
 export type UriTypes = 'stdin' | 'answer' | 'stdout' | 'stderr';

@@ -16,8 +16,8 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-  TelemetryEventMeasurements,
-  TelemetryEventProperties,
+  type TelemetryEventMeasurements,
+  type TelemetryEventProperties,
   TelemetryReporter,
 } from '@vscode/extension-telemetry';
 import { readFile } from 'fs/promises';

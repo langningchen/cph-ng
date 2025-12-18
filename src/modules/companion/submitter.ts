@@ -3,8 +3,8 @@ import { l10n, ProgressLocation, window } from 'vscode';
 import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
-import { Problem } from '@/types';
-import { CphSubmitEmpty, CphSubmitResponse } from './types';
+import type { Problem } from '@/types';
+import type { CphSubmitEmpty, CphSubmitResponse } from './types';
 
 export class Submitter {
   private static logger: Logger = new Logger('companionSubmitter');

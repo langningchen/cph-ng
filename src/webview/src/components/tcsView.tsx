@@ -16,10 +16,10 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import Box from '@mui/material/Box';
-import { UUID } from 'crypto';
+import type { UUID } from 'crypto';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IProblem } from '@/types/types';
+import type { IProblem } from '@/types/types';
 import { useProblemContext } from '../context/ProblemContext';
 import AcCongrats from './acCongrats';
 import CphFlex from './base/cphFlex';

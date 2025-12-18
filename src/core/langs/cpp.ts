@@ -19,14 +19,14 @@ import { type } from 'os';
 import { basename, extname, join } from 'path';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
-import { FileWithHash } from '@/types';
+import type { FileWithHash } from '@/types';
 import { extensionPath } from '@/utils/global';
 import { KnownResult, UnknownResult } from '@/utils/result';
 import {
-  CompileAdditionalData,
+  type CompileAdditionalData,
   DefaultCompileAdditionalData,
   Lang,
-  LangCompileResult,
+  type LangCompileResult,
 } from './lang';
 
 export class LangCpp extends Lang {

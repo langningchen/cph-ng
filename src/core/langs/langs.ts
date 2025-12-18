@@ -21,7 +21,7 @@ import { LangC } from './c';
 import { LangCpp } from './cpp';
 import { LangJava } from './java';
 import { LangJavascript } from './javascript';
-import { Lang } from './lang';
+import type { Lang } from './lang';
 import { LangPython } from './python';
 
 export default class Langs {
@@ -36,10 +36,10 @@ export default class Langs {
 
   public static getLang(filePath: string): Lang | undefined {
     const ext = extname(filePath).toLowerCase().slice(1);
-    const lang = this.langs.find((lang) => lang.extensions.includes(ext));
+    const lang = Langs.langs.find((lang) => lang.extensions.includes(ext));
     lang
-      ? this.logger.debug('Detected language for', filePath, lang.name)
-      : this.logger.debug('No language detected for', filePath);
+      ? Langs.logger.debug('Detected language for', filePath, lang.name)
+      : Langs.logger.debug('No language detected for', filePath);
     return lang;
   }
 }

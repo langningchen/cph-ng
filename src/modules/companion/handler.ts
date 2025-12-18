@@ -6,19 +6,19 @@ import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
 import UserScriptManager from '@/helpers/userScriptManager';
-import { Problem } from '@/types';
+import type { Problem } from '@/types';
 import { mkdirIfNotExists } from '@/utils/process';
 import { renderTemplate } from '@/utils/strTemplate';
 import { CphProblem } from '../problems/cphProblem';
 import ProblemsManager from '../problems/manager';
-import { CompanionProblem } from './types';
+import type { CompanionProblem } from './types';
 
 export class Handler {
   private static logger: Logger = new Logger('companionHandler');
   private static batches: Map<string, CompanionProblem[]> = new Map();
 
   public static async handleIncomingProblem(data: CompanionProblem) {
-    this.logger.debug('Handling incoming problem', data);
+    Handler.logger.debug('Handling incoming problem', data);
 
     const batchId = data.batch.id;
     const batchSize = data.batch.size;

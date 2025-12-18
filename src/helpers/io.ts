@@ -26,19 +26,19 @@ export default class Io {
   private static logger: Logger = new Logger('io');
 
   public static info(msg: string, ...args: any) {
-    this.logger.info(msg);
+    Io.logger.info(msg);
     return window.showInformationMessage(msg, ...args);
   }
   public static warn(msg: string, ...args: any) {
-    this.logger.warn(msg);
+    Io.logger.warn(msg);
     return window.showWarningMessage(msg, ...args);
   }
   public static error(msg: string, ...args: any) {
-    this.logger.error(msg);
+    Io.logger.error(msg);
     return window.showErrorMessage(msg, ...args);
   }
   public static async confirm(msg: string): Promise<boolean> {
-    this.logger.info(msg);
+    Io.logger.info(msg);
     const yesOption = l10n.t('Yes');
     return (
       (await window.showInformationMessage(msg, { modal: true }, yesOption)) ===
@@ -51,7 +51,7 @@ export class CompilationIo {
   private static _compilationMsg: string = '';
   public static clear() {
     compilationChannel.clear();
-    this._compilationMsg = '';
+    CompilationIo._compilationMsg = '';
     compilationChannel.hide();
   }
   public static append(msg: string) {
@@ -60,11 +60,11 @@ export class CompilationIo {
       return;
     }
     msg += '\n';
-    this._compilationMsg += msg + '\n';
+    CompilationIo._compilationMsg += msg + '\n';
     compilationChannel.appendLine(msg);
     compilationChannel.show();
   }
   public static toString(): string {
-    return this._compilationMsg;
+    return CompilationIo._compilationMsg;
   }
 }
