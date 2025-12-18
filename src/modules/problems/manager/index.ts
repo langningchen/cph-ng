@@ -98,9 +98,7 @@ export default class ProblemsManager {
   public static async runTc(msg: msgs.RunTcMsg) {
     // Prefer DI use case; fall back to legacy static if resolution fails.
     try {
-      const usecase = container.resolve<RunSingleTc>(
-        TOKENS.RunSingleTc as unknown as string,
-      );
+      const usecase = container.resolve<RunSingleTc>(TOKENS.RunSingleTc);
       return await usecase.exec(msg);
     } catch {
       return TcRunner.runTc(msg);
