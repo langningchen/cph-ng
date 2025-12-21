@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TcIo } from '@/types';
+import type { ITcIo } from '@/types';
 
 export enum AbortReason {
   UserAbort = 'user_abort',
@@ -27,7 +27,7 @@ export interface ProcessOptions {
   cwd?: string;
   timeoutMs?: number;
   ac?: AbortController;
-  stdin?: TcIo;
+  stdin?: ITcIo;
 }
 
 export interface PipeProcessOptions {

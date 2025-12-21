@@ -4,22 +4,36 @@
     "moduleResolution": "bundler",
     "target": "ES2022",
     "jsx": "react",
-    "lib": ["ES2022", "dom"],
+    "lib": [
+      "ES2022",
+      "dom"
+    ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@w/*": ["src/webview/src/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@w/*": [
+        "src/webview/src/*"
+      ]
     },
     "sourceMap": true,
-    "rootDir": "src",
+    "rootDir": ".",
     "strict": true /* enable all strict type-checking options */,
     /* Additional Checks */
     // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
     // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
     // "noUnusedParameters": true,  /* Report errors on unused parameters. */
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": [
+      "node",
+      "vitest/globals"
+    ]
   },
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*",
+    "tests/**/*"
+  ]
 }
