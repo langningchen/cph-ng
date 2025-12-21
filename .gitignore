@@ -10,3 +10,4 @@ src/helpers/settings.ts
 venv/
 src/application/ports/vscode/ISettings.ts
 src/infrastructure/vscode/settingsAdapter.ts
+coverage/

@@ -1,3 +1,20 @@
+// Copyright (C) 2025 Langning Chen
+//
+// This file is part of cph-ng.
+//
+// cph-ng is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// cph-ng is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
+
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -97,6 +114,23 @@ describe('ProcessExecutorAdapter', () => {
     }
   });
 
+  it('should correctly handle stdin input (file mode)', async () => {
+    const inputFile = tmpMock.create();
+    writeFileSync(inputFile, 'hello_file');
+    const result = await adapter.execute({
+      cmd: [
+        'node',
+        '-e',
+        `process.stdin.on('data', (d) => process.stdout.write('rec:' + d));`,
+      ],
+      stdin: { useFile: true, data: inputFile },
+    });
+    expect(result).not.toBeInstanceOf(Error);
+    if (!(result instanceof Error)) {
+      expect(readFileSync(result.stdoutPath, 'utf-8')).toBe('rec:hello_file');
+    }
+  });
+
   it('should support executeWithPipe (interaction simulation)', async () => {
     const { res1, res2 } = await adapter.executeWithPipe(
       {
@@ -176,5 +210,31 @@ process.stdin.on('data', (d) => {
         'got:manual_input',
       );
     }
+  });
+
+  it('should allow manual process control via handle in spawn mode', async () => {
+    const handle = await adapter.spawn({
+      cmd: [
+        'node',
+        '-e',
+        `process.stdin.on('data', (d) => console.log('got:' + d));`,
+      ],
+    });
+    expect(handle.pid).toBeGreaterThan(0);
+
+    handle.kill();
+
+    const result = await handle.wait();
+    expect(result).not.toBeInstanceOf(Error);
+    if (!(result instanceof Error)) {
+      expect(result.codeOrSignal).toBe('SIGTERM');
+    }
+  });
+
+  it('should return error if the program does not exists', async () => {
+    const result = await adapter.execute({
+      cmd: ['non_exists'],
+    });
+    expect(result).toBeInstanceOf(Error);
   });
 });

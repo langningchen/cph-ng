@@ -116,11 +116,7 @@ export class ExternalRunnerStrategy implements IRunStrategy {
     const onUnifiedAbort = () => {
       this.performSoftKill(handle);
     };
-    unifiedAc.signal.addEventListener('abort', () => {
-      this.performSoftKill(handle);
-    });
-
-    ac.signal.addEventListener('abort', onUserAbort, { once: true });
+    ac.signal.addEventListener('abort', onUserAbort);
     unifiedAc.signal.addEventListener('abort', onUnifiedAbort);
 
     const timeoutVal = ctx.timeLimitMs + this.settings.runner.timeAddition;

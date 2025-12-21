@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TcIo } from '@/types';
+import type { ITcIo } from '@/types';
 
 export interface ExecutionContext {
   cmd: string[];
-  stdin: TcIo;
+  stdin: ITcIo;
   timeLimitMs: number;
   memoryLimitMb?: number;
 }

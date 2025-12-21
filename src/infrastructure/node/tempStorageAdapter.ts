@@ -27,6 +27,7 @@ import { TOKENS } from '@/composition/tokens';
 export class TempStorageAdapter implements ITempStorage {
   private usedPool: Set<string> = new Set();
   private freePool: Set<string> = new Set();
+  private monitorInterval: NodeJS.Timeout | undefined;
 
   constructor(
     @inject(TOKENS.Logger) private readonly logger: ILogger,
@@ -37,7 +38,19 @@ export class TempStorageAdapter implements ITempStorage {
     this.logger = this.logger.withScope('cache');
   }
 
-  async startMonitor(): Promise<void> {}
+  async startMonitor(): Promise<void> {
+    if (this.monitorInterval) {
+      return;
+    }
+    this.monitorInterval = setInterval(() => {
+      this.logger.debug(
+        `this Monitor: ${this.usedPool.size} used, ${this.freePool.size} free.`,
+      );
+      this.logger.trace('Used paths', Array.from(this.usedPool));
+      this.logger.trace('Free paths', Array.from(this.freePool));
+    }, 10000);
+    this.logger.info('Cache monitor started');
+  }
 
   create(): string {
     let path = this.freePool.values().next().value;
