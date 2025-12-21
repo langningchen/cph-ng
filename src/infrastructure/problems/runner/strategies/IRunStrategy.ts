@@ -15,14 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type {
-  AppEvent,
-  IWebviewEventBus,
-} from '@/application/ports/vscode/IWebviewEventBus';
-import { sidebarProvider } from '@/utils/global';
+import type { ExecutionContext, ExecutionResult } from '@/domain/execution';
 
-export class WebviewEventBusAdapter implements IWebviewEventBus {
-  publish<T = unknown>(event: AppEvent<T>): void {
-    sidebarProvider.event.emit(event.type, event.payload);
-  }
+export interface IRunStrategy {
+  execute(ctx: ExecutionContext, ac: AbortController): Promise<ExecutionResult>;
 }

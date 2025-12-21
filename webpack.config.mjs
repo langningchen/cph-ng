@@ -1,12 +1,12 @@
 // @ts-check
 /** @typedef {import('webpack').Configuration} WebpackConfig **/
 
-import { execSync } from 'child_process';
+import { execSync } from 'node:child_process';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import CopyPlugin from 'copy-webpack-plugin';
-import { mkdirSync, writeFileSync } from 'fs';
-import { dirname, join, resolve } from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
-import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -59,7 +59,7 @@ const generateBuildInfo = () => {
           try {
             commitHash = execSync('git rev-parse HEAD').toString().trim();
             userName = execSync('git config user.name').toString().trim();
-          } catch (e) {}
+          } catch (_e) {}
           writeFileSync(
             jsonPath,
             JSON.stringify(

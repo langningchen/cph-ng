@@ -16,7 +16,7 @@
 ### 分层定义
 1.  **Domain (`src/domain`):** 纯业务实体与规则（如 `VerdictRules`）。**严禁**引用 VS Code 或 Node.js API。
 2.  **Application (`src/application`):** 用例编排层。仅依赖 **Ports**（接口）。**严禁**引用具体实现。
-3.  **Ports (`src/application/ports`):** 定义外部能力的接口（如 `ICompiler`, `IProcessRunner`）。
+3.  **Ports (`src/application/ports`):** 定义外部能力的接口（如 `ICompiler`, `IProcessExecutor`）。
 4.  **Infrastructure (`src/infrastructure`):** 端口的具体实现（Adapters）。这里可以引用 VS Code / Node.js API。
 5.  **Composition (`src/composition`):** 依赖注入（DI）的装配根。
 
@@ -37,8 +37,8 @@
 ```text
 src/
 ├── application/           # [Layer: Application]
-│   ├── ports/             # 接口定义 (ICompiler, IProcessRunner, IProblemRepository...)
-│   └── usecases/          # 业务用例 (RunSingleTc.ts...)
+│   ├── ports/             # 接口定义 (ICompiler, IProcessExecutor, IProblemRepository...)
+│   └── useCases/          # 业务用例 (RunSingleTc.ts...)
 ├── composition/           # [Layer: Composition Root]
 │   ├── container.ts       # DI 容器装配、注册单例
 │   └── tokens.ts          # DI Token 常量定义
@@ -69,7 +69,7 @@ src/
 
 ### 4.2 核心链路迁移 (RunSingleTc)
 *   [x] **Use Case:** 创建 `RunSingleTc`，实现了编译 -> 运行 -> 判定 -> 持久化的编排逻辑。
-*   [x] **Ports Defined:** `ICompiler`, `IRunner`, `IProblemRepository`, `ISettingsProvider`, `ITelemetry` (及其他基础接口).
+*   [x] **Ports Defined:** `ICompiler`, `IRunner`, `IProblemRepository`, `ISettings`, `ITelemetry` (及其他基础接口).
 *   [x] **Adapters Implemented:**
     *   `CompilerAdapter`: 封装 `core/compiler.ts`。
     *   `RunnerAdapter`: 封装 `core/runner.ts`。

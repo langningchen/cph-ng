@@ -15,14 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type {
-  AppEvent,
-  IWebviewEventBus,
-} from '@/application/ports/vscode/IWebviewEventBus';
-import { sidebarProvider } from '@/utils/global';
+export interface AppEvent<T = unknown> {
+  type: string;
+  payload?: T;
+}
 
-export class WebviewEventBusAdapter implements IWebviewEventBus {
-  publish<T = unknown>(event: AppEvent<T>): void {
-    sidebarProvider.event.emit(event.type, event.payload);
-  }
+export interface IWebviewEventBus {
+  publish<T = unknown>(event: AppEvent<T>): void;
 }

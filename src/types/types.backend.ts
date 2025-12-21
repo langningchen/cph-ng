@@ -66,7 +66,7 @@ export class TcResult implements ITcResult {
     this.stderr.fromI(result.stderr);
     this.msg = result.msg || [];
   }
-  public fromResult<T>(result: KnownResult<T>) {
+  public fromResult(result: KnownResult<unknown>) {
     this.verdict = result.verdict;
     result.msg && this.msg.push(result.msg);
   }

@@ -16,13 +16,16 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type {
-  AppEvent,
-  IWebviewEventBus,
-} from '@/application/ports/vscode/IWebviewEventBus';
-import { sidebarProvider } from '@/utils/global';
+  ExecutionContext,
+  ExecutionResult,
+  InteractiveExecutionResult,
+} from '@/domain/execution';
 
-export class WebviewEventBusAdapter implements IWebviewEventBus {
-  publish<T = unknown>(event: AppEvent<T>): void {
-    sidebarProvider.event.emit(event.type, event.payload);
-  }
+export interface ISolutionRunner {
+  run(ctx: ExecutionContext, ac: AbortController): Promise<ExecutionResult>;
+  runInteractive(
+    ctx: ExecutionContext,
+    ac: AbortController,
+    interactorPath: string,
+  ): Promise<InteractiveExecutionResult>;
 }

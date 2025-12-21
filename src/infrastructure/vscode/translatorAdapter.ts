@@ -15,14 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type {
-  AppEvent,
-  IWebviewEventBus,
-} from '@/application/ports/vscode/IWebviewEventBus';
-import { sidebarProvider } from '@/utils/global';
+import { l10n } from 'vscode';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 
-export class WebviewEventBusAdapter implements IWebviewEventBus {
-  publish<T = unknown>(event: AppEvent<T>): void {
-    sidebarProvider.event.emit(event.type, event.payload);
+export class TranslatorAdapter implements ITranslator {
+  t(msg: string, ...args: Array<string | number | boolean>): string {
+    return l10n.t(msg, ...args);
   }
 }

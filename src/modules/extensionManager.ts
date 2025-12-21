@@ -73,7 +73,7 @@ export default class ExtensionManager {
     ExtensionManager.logger.info('Activating CPH-NG extension');
     try {
       // Initialize DI container (no behavior changes yet)
-      setupContainer(context);
+      await setupContainer(context);
       setExtensionUri(context.extensionUri);
       context.subscriptions.push(telemetry);
       await telemetry.init();

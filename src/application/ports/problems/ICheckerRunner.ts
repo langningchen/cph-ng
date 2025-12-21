@@ -15,14 +15,20 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type {
-  AppEvent,
-  IWebviewEventBus,
-} from '@/application/ports/vscode/IWebviewEventBus';
-import { sidebarProvider } from '@/utils/global';
+export interface CheckerOptions {
+  checkerPath: string;
+  inputPath: string;
+  outputPath: string;
+  answerPath: string;
+}
 
-export class WebviewEventBusAdapter implements IWebviewEventBus {
-  publish<T = unknown>(event: AppEvent<T>): void {
-    sidebarProvider.event.emit(event.type, event.payload);
-  }
+export interface CheckerData {
+  exitCode: number;
+  message: string;
+}
+
+export type CheckerResult = CheckerData | Error;
+
+export interface ICheckerRunner {
+  run(options: CheckerOptions, ac: AbortController): Promise<CheckerResult>;
 }

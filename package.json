@@ -445,11 +445,13 @@
           "cph-ng.problem.inputFileExtensionList": {
             "type": "array",
             "default": [".in"],
+            "items": { "type": "string" },
             "markdownDescription": "%cph-ng.configuration.problem.properties.inputFileExtensionList.markdownDescription%"
           },
           "cph-ng.problem.outputFileExtensionList": {
             "type": "array",
             "default": [".ans", ".out"],
+            "items": { "type": "string" },
             "markdownDescription": "%cph-ng.configuration.problem.properties.outputFileExtensionList.markdownDescription%"
           }
         }
@@ -733,8 +735,8 @@
     "package": "vsce package --allow-star-activation --no-dependencies",
     "publish": "vsce publish --allow-star-activation --no-dependencies",
     "publish:pre": "vsce publish --allow-star-activation --no-dependencies --pre-release",
-    "lint": "biome check .",
-    "format": "biome check --write .",
+    "lint": "biome check",
+    "format": "biome check --write",
     "check-translations": "node scripts/check-translations.js",
     "generate-settings": "node scripts/generate-settings.js",
     "install-hooks": "node scripts/install-hooks.js",

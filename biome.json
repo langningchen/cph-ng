@@ -5,6 +5,14 @@
     "clientKind": "git",
     "useIgnoreFile": true
   },
+  "files": {
+    "includes": [
+      "src/application/**",
+      "src/composition/**",
+      "src/domain/**",
+      "src/infrastructure/**"
+    ]
+  },
   "formatter": {
     "enabled": true,
     "formatWithErrors": false,
@@ -16,8 +24,7 @@
     "bracketSameLine": false,
     "bracketSpacing": true,
     "expand": "auto",
-    "useEditorconfig": true,
-    "includes": ["**", "!**/testlib/"]
+    "useEditorconfig": true
   },
   "linter": {
     "enabled": true,
@@ -25,7 +32,8 @@
       "recommended": true,
       "style": {
         "noCommonJs": "on",
-        "noUselessElse": "on"
+        "noUselessElse": "on",
+        "noDefaultExport": "on"
       }
     }
   },

@@ -15,14 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type {
-  AppEvent,
-  IWebviewEventBus,
-} from '@/application/ports/vscode/IWebviewEventBus';
-import { sidebarProvider } from '@/utils/global';
+import type { CompileData } from '@/core/compiler';
+import type { Problem } from '@/types';
+import type { KnownResult } from '@/utils/result';
 
-export class WebviewEventBusAdapter implements IWebviewEventBus {
-  publish<T = unknown>(event: AppEvent<T>): void {
-    sidebarProvider.event.emit(event.type, event.payload);
-  }
+export type CompileSuccess = { ok: true; data: CompileData };
+export type CompileKnownFailure = {
+  ok: false;
+  known: KnownResult<CompileData>;
+};
+export type CompileException = { ok: false; error: Error };
+export type CompileOutcome =
+  | CompileSuccess
+  | CompileKnownFailure
+  | CompileException;
+
+export interface ICompiler {
+  compile(
+    problem: Problem,
+    compileFlag: boolean | null,
+    ac: AbortController,
+  ): Promise<CompileOutcome>;
 }
