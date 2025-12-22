@@ -81,7 +81,7 @@ ${sections.map(s => `  readonly ${s.name}: I${s.className};`).join('\n')}
 
 for (const section of sections) {
   interfaceContent += `export interface I${section.className} {
-${section.props.map(p => `  readonly ${p.shortKey}: ${p.type};`).join('\n')}
+${section.props.map(p => `  ${p.shortKey}: ${p.type};`).join('\n')}
 }\n\n`;
 }
 fs.writeFileSync(interfacePath, interfaceContent);
@@ -147,11 +147,9 @@ class ${section.className} extends SettingsSectionBase implements I${section.cla
     }
 
     // Setter 处理
-    if (prop.fullKey === 'cph-ng.companion.submitLanguage') {
-      adapterContent += `  set ${prop.shortKey}(value: ${prop.type}) {
+    adapterContent += `  set ${prop.shortKey}(value: ${prop.type}) {
     this.set('${prop.shortKey}', value);
   }\n`;
-    }
   }
   adapterContent += `}\n`;
 }
