@@ -28,6 +28,7 @@ import {
   Lang,
   type LangCompileResult,
 } from './lang';
+import { renderPath } from '@/utils/strTemplate';
 
 export class LangCpp extends Lang {
   private logger: Logger = new Logger('langsCpp');
@@ -47,7 +48,7 @@ export class LangCpp extends Lang {
     this.logger.trace('compile', { src, forceCompile });
 
     const outputPath = join(
-      Settings.cache.directory,
+      renderPath(Settings.cache.directory),
       basename(src.path, extname(src.path)) +
         (type() === 'Windows_NT' ? '.exe' : ''),
     );

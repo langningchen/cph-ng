@@ -30,6 +30,7 @@ import type { ICompiler } from '@/application/ports/problems/ICompiler';
 import type { IRunnerProvider } from '@/application/ports/problems/IRunnerProvider';
 import type { IRunStrategyFactory } from '@/application/ports/problems/IRunStrategyFactory';
 import type { ISolutionRunner } from '@/application/ports/problems/ISolutionRunner';
+import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
@@ -63,6 +64,7 @@ export const TOKENS = {
   Translator: 'ports.Translator' as InjectionToken<ITranslator>,
   RunnerProvider: 'ports.RunnerProvider' as InjectionToken<IRunnerProvider>,
   Telemetry: 'ports.Telemetry' as InjectionToken<ITelemetry>,
+  PathRenderer: 'ports.PathRenderer' as InjectionToken<IPathRenderer>,
   TempStorage: 'ports.TempStorage' as InjectionToken<ITempStorage>,
   Clock: 'ports.Clock' as InjectionToken<IClock>,
   Crypto: 'ports.Crypto' as InjectionToken<ICrypto>,

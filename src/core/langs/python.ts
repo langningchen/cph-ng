@@ -26,6 +26,7 @@ import {
   Lang,
   type LangCompileResult,
 } from './lang';
+import { renderPath } from '@/utils/strTemplate';
 
 export class LangPython extends Lang {
   private logger: Logger = new Logger('langsPython');
@@ -42,7 +43,7 @@ export class LangPython extends Lang {
     this.logger.trace('compile', { src, forceCompile });
 
     const outputPath = join(
-      Settings.cache.directory,
+      renderPath(Settings.cache.directory),
       basename(src.path, extname(src.path)) + '.pyc',
     );
 

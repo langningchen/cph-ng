@@ -29,7 +29,7 @@ import { telemetry } from '@/utils/global';
 import { mkdirIfNotExists } from '@/utils/process';
 import { version } from '../utils/packageInfo';
 import type { KnownResult } from '../utils/result';
-import { renderPathWithFile } from '../utils/strTemplate';
+import { renderPath, renderPathWithFile } from '../utils/strTemplate';
 import { migration, type OldProblem } from './migration';
 import type {
   IBfCompare,
@@ -352,7 +352,7 @@ export class Problem implements IProblem {
     }
 
     if (
-      path.startsWith(Settings.cache.directory.toLowerCase()) ||
+      path.startsWith(renderPath(Settings.cache.directory).toLowerCase()) ||
       this.src.path.toLowerCase() === path ||
       this.checker?.path.toLowerCase() === path ||
       this.interactor?.path.toLowerCase() === path ||

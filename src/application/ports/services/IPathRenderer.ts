@@ -15,18 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface IFileSystem {
-  cwd(): string;
-  tmpdir(): string;
-  homedir(): string;
-  normalize(path: string): string;
-  join(...paths: string[]): string;
-  dirname(path: string): string;
-  readFile(path: string, encoding?: BufferEncoding): Promise<string>;
-  safeWriteFile(path: string, data: string | Uint8Array): Promise<void>;
-  exists(path: string): Promise<boolean>;
-  rm(
-    path: string,
-    options?: { recursive?: boolean; force?: boolean },
-  ): Promise<void>;
+import type { Problem } from '@/types/types.backend';
+
+export interface IPathRenderer {
+  renderTemplate(problem: Problem): Promise<string>;
+  renderPath(original: string): string;
+  renderWorkspacePath(original: string): Promise<string | null>;
+  renderPathWithFile(
+    original: string,
+    filePath: string,
+    ignoreError?: boolean,
+  ): string | null;
+  renderUnzipFolder(srcPath: string, zipPath: string): string | null;
 }

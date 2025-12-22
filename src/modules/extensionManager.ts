@@ -55,6 +55,7 @@ import {
 } from '@/utils/global';
 import { version } from '@/utils/packageInfo';
 import SidebarProvider from './sidebar';
+import { renderPath } from '@/utils/strTemplate';
 
 interface ContextEvent {
   hasProblem: boolean;
@@ -87,7 +88,7 @@ export default class ExtensionManager {
 
       if (Settings.cache.cleanOnStartup) {
         ExtensionManager.logger.info('Cleaning cache on startup');
-        await rm(Settings.cache.directory, {
+        await rm(renderPath(Settings.cache.directory), {
           force: true,
           recursive: true,
         });

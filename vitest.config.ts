@@ -8,6 +8,7 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     alias: {
         '@': resolve(__dirname, 'src'),
+        '@t': resolve(__dirname, 'tests'),
         '@w': resolve(__dirname, 'src/webview/src'),
     },
   },

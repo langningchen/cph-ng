@@ -32,6 +32,7 @@ import Settings from '@/helpers/settings';
 import { type TcIo, TcVerdicts } from '@/types';
 import { extensionPath } from '@/utils/global';
 import { KnownResult, type Result } from '@/utils/result';
+import { renderPath } from '@/utils/strTemplate';
 
 export interface RunOptions {
   cmd: string[];
@@ -61,7 +62,7 @@ export class Executor {
         ? join(extensionPath, 'res', 'runner-windows.cpp')
         : join(extensionPath, 'res', 'runner-linux.cpp');
     const outputPath = join(
-      Settings.cache.directory,
+      renderPath(Settings.cache.directory),
       type() === 'Windows_NT' ? 'runner-windows.exe' : 'runner-linux',
     );
     if (existsSync(outputPath)) {

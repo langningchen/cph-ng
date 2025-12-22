@@ -24,6 +24,7 @@ import type { IRunnerProvider } from '@/application/ports/problems/IRunnerProvid
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
+import { renderPath } from '@/utils/strTemplate';
 
 @injectable()
 export class RunnerProviderAdapter implements IRunnerProvider {
@@ -62,7 +63,10 @@ export class RunnerProviderAdapter implements IRunnerProvider {
       isWin ? 'runner-windows.cpp' : 'runner-linux.cpp',
     );
     const binaryName = isWin ? 'runner-windows.exe' : 'runner-linux';
-    const outputPath = this.fs.join(this.settings.cache.directory, binaryName);
+    const outputPath = this.fs.join(
+      renderPath(this.settings.cache.directory),
+      binaryName,
+    );
 
     if (await this.fs.exists(outputPath)) {
       this.logger.debug('Using existing runner binary', { outputPath });

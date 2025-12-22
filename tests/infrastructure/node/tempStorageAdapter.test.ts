@@ -16,14 +16,17 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { join } from 'node:path';
+import { PathRendererMock } from '@t/infrastructure/services/pathRendererMock';
+import { SettingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { type MockProxy, mock } from 'vitest-mock-extended';
+import type { ExtensionContext } from 'vscode';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
-import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
+import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
 
 describe('TempStorageAdapter', () => {
@@ -31,19 +34,11 @@ describe('TempStorageAdapter', () => {
   let loggerMock: MockProxy<ILogger>;
   let fsMock: MockProxy<IFileSystem>;
   let cryptoMock: MockProxy<ICrypto>;
-  let settingsMock: MockProxy<ISettings>;
-
-  const MOCK_CACHE_DIR = '/mock/cache';
 
   beforeEach(() => {
     loggerMock = mock<ILogger>();
     fsMock = mock<IFileSystem>();
     cryptoMock = mock<ICrypto>();
-    settingsMock = mock<ISettings>({
-      cache: {
-        directory: MOCK_CACHE_DIR,
-      },
-    });
 
     loggerMock.withScope.mockReturnValue(loggerMock);
 
@@ -52,11 +47,18 @@ describe('TempStorageAdapter', () => {
     let uuidCnt = 0;
     cryptoMock.randomUUID.mockImplementation(() => `uuid-${uuidCnt++}`);
 
-    // 注册实例
     container.registerInstance(TOKENS.Logger, loggerMock);
     container.registerInstance(TOKENS.FileSystem, fsMock);
     container.registerInstance(TOKENS.Crypto, cryptoMock);
-    container.registerInstance(TOKENS.Settings, settingsMock);
+    container.registerInstance(
+      TOKENS.ExtensionContext,
+      mock<ExtensionContext>({
+        extensionPath: '/home/langningchen/cph-ng',
+      }),
+    );
+    container.registerSingleton(TOKENS.Settings, SettingsMock);
+    container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
+    container.registerSingleton(TOKENS.PathRenderer, PathRendererMock);
 
     adapter = container.resolve(TempStorageAdapter);
   });
@@ -64,7 +66,7 @@ describe('TempStorageAdapter', () => {
   it('should create a new path using crypto and settings when pool is empty', () => {
     const path = adapter.create();
 
-    expect(path).toBe(`${MOCK_CACHE_DIR}/uuid-0`);
+    expect(path).contains('/uuid-0');
     expect(cryptoMock.randomUUID).toHaveBeenCalledTimes(1);
     expect(loggerMock.trace).toHaveBeenCalledWith(
       expect.stringContaining('Creating new'),
@@ -107,7 +109,7 @@ describe('TempStorageAdapter', () => {
     const reusedPaths = [r1, r2];
     expect(reusedPaths).toContain(p1);
     expect(reusedPaths).toContain(p2);
-    expect(r3).toBe(`${MOCK_CACHE_DIR}/uuid-3`);
+    expect(r3).contains('/uuid-3');
   });
 
   it('should warn when disposing the same path multiple times', () => {

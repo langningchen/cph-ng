@@ -1,6 +1,12 @@
+import { mkdirSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { PathRendererMock } from '@t/infrastructure/services/pathRendererMock';
+import { SettingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { type MockProxy, mock } from 'vitest-mock-extended';
+import type { ExtensionContext } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type {
   IProcessExecutor,
@@ -16,13 +22,19 @@ import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext } from '@/domain/execution';
+import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
+import { CryptoAdapter } from '@/infrastructure/node/cryptoAdapter';
+import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
+import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
+import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
+import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
+import { RunnerProviderAdapter } from '@/infrastructure/problems/runner/runnerProviderAdapter';
 import { ExternalRunnerStrategy } from '@/infrastructure/problems/runner/strategies/ExternalRunnerStrategy';
 
 describe('ExternalRunnerStrategy', () => {
   let strategy: ExternalRunnerStrategy;
   let loggerMock: MockProxy<ILogger>;
   let telemetryMock: MockProxy<ITelemetry>;
-  let settingsMock: MockProxy<ISettings>;
   let fsMock: MockProxy<IFileSystem>;
   let executorMock: MockProxy<IProcessExecutor>;
   let tmpMock: MockProxy<ITempStorage>;
@@ -37,9 +49,6 @@ describe('ExternalRunnerStrategy', () => {
 
     loggerMock = mock<ILogger>();
     telemetryMock = mock<ITelemetry>();
-    settingsMock = mock<ISettings>({
-      runner: { timeAddition: 200, unlimitedStack: false },
-    });
     fsMock = mock<IFileSystem>();
     executorMock = mock<IProcessExecutor>();
     tmpMock = mock<ITempStorage>();
@@ -58,12 +67,13 @@ describe('ExternalRunnerStrategy', () => {
 
     container.registerInstance(TOKENS.Logger, loggerMock);
     container.registerInstance(TOKENS.Telemetry, telemetryMock);
-    container.registerInstance(TOKENS.Settings, settingsMock);
     container.registerInstance(TOKENS.FileSystem, fsMock);
     container.registerInstance(TOKENS.ProcessExecutor, executorMock);
     container.registerInstance(TOKENS.TempStorage, tmpMock);
     container.registerInstance(TOKENS.Translator, translatorMock);
     container.registerInstance(TOKENS.RunnerProvider, runnerProviderMock);
+    container.registerSingleton(TOKENS.Settings, SettingsMock);
+    container.registerSingleton(TOKENS.PathRenderer, PathRendererMock);
 
     strategy = container.resolve(ExternalRunnerStrategy);
   });
@@ -116,10 +126,12 @@ describe('ExternalRunnerStrategy', () => {
 
     let resolveWait: (value: ProcessExecuteResult) => void;
     const waitPromise = new Promise<ProcessExecuteResult>((resolve) => {
+      console.log('called wait');
       resolveWait = resolve;
     });
     processHandleMock.wait.mockReturnValue(waitPromise);
     processHandleMock.writeStdin.mockImplementation((data) => {
+      console.log(`stdin: ${data}`);
       if (data === 'k') {
         resolveWait({
           codeOrSignal: 0,
@@ -142,7 +154,9 @@ describe('ExternalRunnerStrategy', () => {
     );
 
     const resultPromise = strategy.execute(mockCtx, new AbortController());
-    await vi.advanceTimersByTimeAsync(1300);
+    await vi.advanceTimersByTimeAsync(
+      mockCtx.timeLimitMs + new SettingsMock().runner.timeAddition + 100,
+    );
     const result = await resultPromise;
 
     expect(processHandleMock.writeStdin).toHaveBeenCalledWith('k');
@@ -224,8 +238,6 @@ describe('ExternalRunnerStrategy', () => {
   });
 
   it('should handle User Abort correctly', async () => {
-    vi.useRealTimers();
-
     executorMock.spawn.mockResolvedValue(processHandleMock);
 
     let resolveWait: (value: ProcessExecuteResult) => void;
@@ -260,6 +272,7 @@ describe('ExternalRunnerStrategy', () => {
     setImmediate(() => {
       ac.abort();
     });
+    await vi.advanceTimersToNextTimerAsync();
     const result = await resultPromise;
 
     expect(processHandleMock.writeStdin).toHaveBeenCalledWith('k');
@@ -285,5 +298,122 @@ describe('ExternalRunnerStrategy', () => {
     await strategy.execute(mockCtx, new AbortController());
 
     expect(tmpMock.dispose).toHaveBeenCalledWith('/tmp/file-0');
+  });
+});
+
+describe('ExternalRunnerStrategy Real Integration', () => {
+  let strategy: ExternalRunnerStrategy;
+  let testWorkspace: string;
+
+  // Mocks for UI/Telemetry (Keep these mocked to avoid VS Code dependency)
+  const loggerMock = mock<ILogger>();
+  const telemetryMock = mock<ITelemetry>();
+  const translatorMock = mock<ITranslator>();
+  const ctxMock = mock<ExtensionContext>({
+    extensionPath: '/home/langningchen/cph-ng',
+  });
+  const settingsMock = mock<ISettings>({
+    runner: { timeAddition: 200, unlimitedStack: false },
+  });
+
+  beforeEach(async () => {
+    // 2. Setup real test workspace
+    testWorkspace = join(tmpdir(), `cph-real-test-${Date.now()}`);
+    mkdirSync(testWorkspace, { recursive: true });
+    const cacheDir = join(testWorkspace, 'cache');
+    mkdirSync(cacheDir);
+    settingsMock.cache.directory = cacheDir;
+
+    // 3. Configure Mocks
+    loggerMock.withScope.mockReturnValue(loggerMock);
+    translatorMock.t.mockImplementation(
+      (key, ...args) => `${key}:${args.join(',')}`,
+    );
+
+    // 4. Register REAL implementations in the container
+    container.registerInstance(TOKENS.Logger, loggerMock);
+    container.registerInstance(TOKENS.Telemetry, telemetryMock);
+    container.registerInstance(TOKENS.Translator, translatorMock);
+    container.registerInstance(TOKENS.ExtensionContext, ctxMock);
+
+    container.registerSingleton(TOKENS.Settings, SettingsMock);
+    container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);
+    container.registerSingleton(TOKENS.System, SystemAdapter);
+    container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
+    container.registerSingleton(TOKENS.TempStorage, TempStorageAdapter);
+    container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
+    container.registerSingleton(TOKENS.Clock, ClockAdapter);
+    container.registerSingleton(TOKENS.PathRenderer, PathRendererMock);
+    container.registerSingleton(TOKENS.Crypto, CryptoAdapter);
+
+    strategy = container.resolve(ExternalRunnerStrategy);
+  });
+
+  afterEach(() => {
+    container.clearInstances();
+    if (testWorkspace) {
+      rmSync(testWorkspace, { recursive: true, force: true });
+    }
+  });
+
+  it('should execute a real program through the real runner binary', async () => {
+    // Context: run a simple node command that prints "hello"
+    const ctx: ExecutionContext = {
+      cmd: ['node', '-e', 'console.log("hello_from_node")'],
+      stdin: { useFile: false, data: '' },
+      timeLimitMs: 2000,
+    };
+
+    const result = await strategy.execute(ctx, new AbortController());
+    console.log(result);
+    expect(result).not.toBeInstanceOf(Error);
+    if (!(result instanceof Error)) {
+      expect(result.codeOrSignal).toBe(0);
+      expect(result.timeMs).toBeGreaterThan(0);
+
+      // Verify actual output from the file created by the runner
+      const output = readFileSync(result.stdoutPath, 'utf-8');
+      expect(output.trim()).toBe('hello_from_node');
+    }
+  });
+
+  it('should successfully perform a "Soft Kill" on the real runner binary', async () => {
+    // Context: a command that runs forever
+    const ctx: ExecutionContext = {
+      cmd: ['node', '-e', 'setInterval(()=>{}, 1000)'],
+      stdin: { useFile: false, data: '' },
+      timeLimitMs: 500, // Short time limit to trigger timeout
+    };
+
+    const result = await strategy.execute(ctx, new AbortController());
+
+    // In a real TLE scenario, the runner should respond to 'k' and exit
+    expect(result).not.toBeInstanceOf(Error);
+    if (!(result instanceof Error)) {
+      // The exact field depends on your Runner's JSON output
+      expect(result.isAborted).toBe(false); // Because it was a Timeout, not User Abort
+      expect(result.timeMs).toBeGreaterThanOrEqual(500);
+    }
+  });
+
+  it('should handle User Abort by sending "k" to the real runner', async () => {
+    const ctx: ExecutionContext = {
+      cmd: ['node', '-e', 'setInterval(()=>{}, 1000)'],
+      stdin: { useFile: false, data: '' },
+      timeLimitMs: 10000,
+    };
+
+    const ac = new AbortController();
+    const promise = strategy.execute(ctx, ac);
+
+    // Manually abort after 200ms
+    setTimeout(() => ac.abort(), 200);
+
+    const result = await promise;
+
+    if (!(result instanceof Error)) {
+      expect(result.isAborted).toBe(true);
+      expect(result.timeMs).toBeLessThan(1000);
+    }
   });
 });

@@ -22,6 +22,7 @@ import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
+import { renderPath } from '@/utils/strTemplate';
 
 @injectable()
 export class TempStorageAdapter implements ITempStorage {
@@ -59,7 +60,7 @@ export class TempStorageAdapter implements ITempStorage {
       this.logger.trace('Reusing cached path', path);
     } else {
       path = this.fs.join(
-        this.settings.cache.directory,
+        renderPath(this.settings.cache.directory),
         this.crypto.randomUUID(),
       );
       this.logger.trace('Creating new cached path', path);

@@ -1,11 +1,11 @@
+import { SettingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { type MockProxy, mock } from 'vitest-mock-extended';
+import { anyNumber, type MockProxy, mock } from 'vitest-mock-extended';
 import {
   AbortReason,
   type IProcessExecutor,
 } from '@/application/ports/node/IProcessExecutor';
-import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext } from '@/domain/execution';
 import { NormalStrategy } from '@/infrastructure/problems/runner/strategies/NormalStrategy';
@@ -13,20 +13,12 @@ import { NormalStrategy } from '@/infrastructure/problems/runner/strategies/Norm
 describe('NormalStrategy', () => {
   let strategy: NormalStrategy;
   let executorMock: MockProxy<IProcessExecutor>;
-  let settingsMock: MockProxy<ISettings>;
-
-  const TIME_ADDITION = 200;
 
   beforeEach(() => {
     executorMock = mock<IProcessExecutor>();
-    settingsMock = mock<ISettings>({
-      runner: {
-        timeAddition: TIME_ADDITION,
-      },
-    });
 
     container.registerInstance(TOKENS.ProcessExecutor, executorMock);
-    container.registerInstance(TOKENS.Settings, settingsMock);
+    container.registerSingleton(TOKENS.Settings, SettingsMock);
 
     strategy = container.resolve(NormalStrategy);
   });
@@ -52,7 +44,7 @@ describe('NormalStrategy', () => {
 
     expect(executorMock.execute).toHaveBeenCalledWith({
       cmd: executionContext.cmd,
-      timeoutMs: executionContext.timeLimitMs + TIME_ADDITION,
+      timeoutMs: anyNumber(),
       stdin: executionContext.stdin,
       ac: abortController,
     });

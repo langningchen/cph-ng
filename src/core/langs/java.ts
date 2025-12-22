@@ -26,6 +26,7 @@ import {
   Lang,
   type LangCompileResult,
 } from './lang';
+import { renderPath } from '@/utils/strTemplate';
 
 export class LangJava extends Lang {
   private logger: Logger = new Logger('langsJava');
@@ -42,7 +43,7 @@ export class LangJava extends Lang {
     this.logger.trace('compile', { src, forceCompile });
 
     const outputPath = join(
-      Settings.cache.directory,
+      renderPath(Settings.cache.directory),
       basename(src.path, extname(src.path)) + '.class',
     );
 
@@ -64,7 +65,7 @@ export class LangJava extends Lang {
     const compilerArgs = args.split(/\s+/).filter(Boolean);
 
     const result = await this._executeCompiler(
-      [compiler, ...compilerArgs, '-d', Settings.cache.directory, src.path],
+      [compiler, ...compilerArgs, '-d', renderPath(Settings.cache.directory), src.path],
       ac,
     );
     return result instanceof KnownResult

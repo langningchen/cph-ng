@@ -16,13 +16,26 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { access, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { homedir, tmpdir } from 'node:os';
+import { dirname, join, normalize } from 'node:path';
 import { cwd } from 'node:process';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 
 export class FileSystemAdapter implements IFileSystem {
   cwd(): string {
     return cwd();
+  }
+
+  tmpdir(): string {
+    return tmpdir();
+  }
+
+  homedir(): string {
+    return homedir();
+  }
+
+  normalize(path: string): string {
+    return normalize(path);
   }
 
   join(...paths: string[]): string {

@@ -20,6 +20,7 @@ import { join } from 'path';
 import { mkdirIfNotExists } from '@/utils/process';
 import Logger from './logger';
 import Settings from './settings';
+import { renderPath } from '@/utils/strTemplate';
 
 export default class Cache {
   private static logger: Logger = new Logger('cache');
@@ -28,7 +29,7 @@ export default class Cache {
   private static monitorInterval?: NodeJS.Timeout;
 
   public static async ensureDir() {
-    return await mkdirIfNotExists(Settings.cache.directory);
+    return await mkdirIfNotExists(renderPath(Settings.cache.directory));
   }
   public static async startMonitor() {
     if (Cache.monitorInterval) {
@@ -57,7 +58,7 @@ export default class Cache {
       Cache.freePool.delete(path);
       Cache.logger.trace('Reusing cached path', path);
     } else {
-      path = join(Settings.cache.directory, randomUUID());
+      path = join(renderPath(Settings.cache.directory), randomUUID());
       Cache.logger.trace('Creating new cached path', path);
     }
     Cache.usedPool.add(path);

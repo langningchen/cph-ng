@@ -32,6 +32,7 @@ import { CheckerRunnerAdapter } from '@/infrastructure/problems/runner/checkerRu
 import { RunStrategyFactoryAdapter } from '@/infrastructure/problems/runner/RunStrategyFactoryAdapter';
 import { RunnerProviderAdapter } from '@/infrastructure/problems/runner/runnerProviderAdapter';
 import { SolutionRunnerAdapter } from '@/infrastructure/problems/runner/solutionRunnerAdapter';
+import { PathRendererAdapter } from '@/infrastructure/services/pathRendererAdapter';
 import { LoggerAdapter } from '@/infrastructure/vscode/loggerAdapter';
 import { SettingsAdapter } from '@/infrastructure/vscode/settingsAdapter';
 import { TelemetryAdapter } from '@/infrastructure/vscode/telemetryAdapter';
@@ -47,6 +48,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.Crypto, CryptoAdapter);
   container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
   container.registerSingleton(TOKENS.Logger, LoggerAdapter);
+  container.registerSingleton(TOKENS.PathRenderer, PathRendererAdapter);
   container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
   container.registerSingleton(TOKENS.Runner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);

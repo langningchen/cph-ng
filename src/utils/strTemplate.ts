@@ -1,150 +1,47 @@
-// Copyright (C) 2025 Langning Chen
-//
-// This file is part of cph-ng.
-//
-// cph-ng is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// cph-ng is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
-
-import { existsSync } from 'fs';
-import { readFile } from 'fs/promises';
-import { homedir, tmpdir } from 'os';
-import { basename, dirname, extname, normalize, relative } from 'path';
-import { l10n, Uri, window, workspace } from 'vscode';
-import Io from '@/helpers/io';
-import Settings from '@/helpers/settings';
+import { container } from 'tsyringe';
+import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '../types/types.backend';
-import { extensionPath } from './global';
+import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 
-const renderString = (original: string, replacements: [string, string][]) => {
-  for (const replacement of replacements) {
-    original = original.replaceAll(`\${${replacement[0]}}`, replacement[1]);
-  }
-  return original;
+const getRenderer = (): IPathRenderer => {
+  return container.resolve<IPathRenderer>(TOKENS.PathRenderer);
 };
 
-export const renderTemplate = async (problem: Problem) => {
-  const templatePath = renderPathWithFile(
-    Settings.problem.templateFile,
-    problem.src.path,
-  );
-  if (!templatePath) {
-    return '';
-  }
-  const template = await readFile(templatePath, 'utf-8');
-  return renderString(template, [
-    ['title', problem.name],
-    ['timeLimit', problem.timeLimit.toString()],
-    ['memoryLimit', problem.memoryLimit.toString()],
-    ['url', problem.url || ''],
-  ]);
+/**
+ * @deprecated Use new DI IPathRenderer
+ */
+export const renderTemplate = async (problem: Problem): Promise<string> => {
+  return getRenderer().renderTemplate(problem);
 };
-export const renderPath = (original: string) => {
-  return normalize(
-    renderString(original, [
-      ['tmp', tmpdir()],
-      ['home', homedir()],
-      ['extensionPath', extensionPath],
-    ]),
-  );
+
+/**
+ * @deprecated Use new DI IPathRenderer
+ */
+export const renderPath = (original: string): string => {
+  return getRenderer().renderPath(original);
 };
-export const renderWorkspacePath = async (original: string) => {
-  original = renderPath(original);
-  if (original.includes('${workspace}')) {
-    if (!workspace.workspaceFolders) {
-      Io.error(
-        l10n.t(
-          'Path uses ${workspace} or ${relativeDirname}, but file is not in a workspace folder.',
-        ),
-      );
-      return null;
-    }
-    const folders = workspace.workspaceFolders
-      .map((folder) => folder.uri.fsPath)
-      .filter((path) =>
-        existsSync(renderString(original, [['workspace', path]])),
-      );
-    if (!folders.length) {
-      Io.error(
-        l10n.t(
-          'Path uses ${workspace} or ${relativeDirname}, but no workspace folder contains the file.',
-        ),
-      );
-      return null;
-    }
-    if (folders.length === 1) {
-      original = renderString(original, [['workspace', folders[0]]]);
-    } else {
-      const folder = await window.showQuickPick(folders, {
-        canPickMany: false,
-        title: l10n.t('Select workspace folder'),
-      });
-      if (!folder) {
-        Io.info(l10n.t('No workspace folder selected.'));
-        return null;
-      }
-      original = renderString(original, [['workspace', folder]]);
-    }
-  }
-  return original;
+
+/**
+ * @deprecated Use new DI IPathRenderer
+ */
+export const renderWorkspacePath = async (original: string): Promise<string | null> => {
+  return getRenderer().renderWorkspacePath(original);
 };
+
+/**
+ * @deprecated Use new DI IPathRenderer
+ */
 export const renderPathWithFile = (
   original: string,
   path: string,
   ignoreError: boolean = false,
-) => {
-  const workspaceFolder = workspace.getWorkspaceFolder(Uri.file(path));
-  const dirnameV = dirname(path);
-  const extnameV = extname(path);
-  const basenameV = basename(path);
-  const basenameNoExt = basename(path, extnameV);
-  if (
-    original.includes('${workspace}') ||
-    original.includes('${relativeDirname}')
-  ) {
-    if (!workspaceFolder) {
-      ignoreError ||
-        Io.error(
-          l10n.t(
-            'Path uses ${workspace} or ${relativeDirname}, but file is not in a workspace folder.',
-          ),
-        );
-      return null;
-    }
-    const workspace = workspaceFolder.uri.fsPath;
-    original = renderString(original, [
-      ['workspace', workspace],
-      ['relativeDirname', relative(workspace, dirnameV) || '.'],
-    ]);
-  }
-  return normalize(
-    renderString(renderPath(original), [
-      ['dirname', dirnameV],
-      ['extname', extnameV],
-      ['basename', basenameV],
-      ['basenameNoExt', basenameNoExt],
-    ]),
-  );
+): string | null => {
+  return getRenderer().renderPathWithFile(original, path, ignoreError);
 };
-export const renderUnzipFolder = (srcPath: string, zipPath: string) => {
-  const original = renderPathWithFile(Settings.problem.unzipFolder, srcPath);
-  return (
-    original &&
-    normalize(
-      renderString(original, [
-        ['zipDirname', dirname(zipPath)],
-        ['zipBasename', basename(zipPath)],
-        ['zipBasenameNoExt', basename(zipPath, extname(zipPath))],
-      ]),
-    )
-  );
+
+/**
+ * @deprecated Use new DI IPathRenderer
+ */
+export const renderUnzipFolder = (srcPath: string, zipPath: string): string | null => {
+  return getRenderer().renderUnzipFolder(srcPath, zipPath);
 };

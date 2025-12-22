@@ -59,7 +59,7 @@ const generateBuildInfo = () => {
           try {
             commitHash = execSync('git rev-parse HEAD').toString().trim();
             userName = execSync('git config user.name').toString().trim();
-          } catch (_e) {}
+          } catch (_e) { }
           writeFileSync(
             jsonPath,
             JSON.stringify(
@@ -97,6 +97,7 @@ export default (_env, argv) => {
       extensions: ['.tsx', '.ts', '.js', '.jsx', '.json'],
       alias: {
         '@': resolve(__dirname, 'src'),
+        '@t': resolve(__dirname, 'tests'),
         '@w': resolve(__dirname, 'src/webview/src'),
       },
     },
