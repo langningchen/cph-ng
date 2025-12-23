@@ -1,3 +1,20 @@
+// Copyright (C) 2025 Langning Chen
+//
+// This file is part of cph-ng.
+//
+// cph-ng is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// cph-ng is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
+
 import {
   chmodSync,
   mkdirSync,
@@ -7,6 +24,7 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { hasCppCompiler } from '@t/check';
 import { tempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import { PathRendererMock } from '@t/infrastructure/services/pathRendererMock';
 import { extensionPathMock } from '@t/infrastructure/vscode/extensionPathMock';
@@ -292,101 +310,109 @@ describe('ExternalRunnerStrategy', () => {
   });
 });
 
-describe('ExternalRunnerStrategy Real Integration', () => {
-  let strategy: ExternalRunnerStrategy;
-  let testWorkspace: string;
+describe.runIf(hasCppCompiler)(
+  'ExternalRunnerStrategy Real Integration',
+  () => {
+    let strategy: ExternalRunnerStrategy;
+    let testWorkspace: string;
 
-  beforeEach(async () => {
-    testWorkspace = join(tmpdir(), `cph-real-test-${Date.now()}`);
-    mkdirSync(testWorkspace, { recursive: true });
-    settingsMock.cache.directory = testWorkspace;
+    beforeEach(async () => {
+      testWorkspace = join(tmpdir(), `cph-real-test-${Date.now()}`);
+      mkdirSync(testWorkspace, { recursive: true });
+      settingsMock.cache.directory = testWorkspace;
 
-    container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
-    container.registerInstance(TOKENS.Logger, loggerMock);
-    container.registerInstance(TOKENS.Settings, settingsMock);
-    container.registerInstance(TOKENS.Telemetry, telemetryMock);
-    container.registerInstance(TOKENS.Translator, translatorMock);
+      container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
+      container.registerInstance(TOKENS.Logger, loggerMock);
+      container.registerInstance(TOKENS.Settings, settingsMock);
+      container.registerInstance(TOKENS.Telemetry, telemetryMock);
+      container.registerInstance(TOKENS.Translator, translatorMock);
 
-    container.registerSingleton(TOKENS.Clock, ClockAdapter);
-    container.registerSingleton(TOKENS.Crypto, CryptoAdapter);
-    container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
-    container.registerSingleton(TOKENS.PathRenderer, PathRendererMock);
-    container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
-    container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);
-    container.registerSingleton(TOKENS.System, SystemAdapter);
-    container.registerSingleton(TOKENS.TempStorage, TempStorageAdapter);
+      container.registerSingleton(TOKENS.Clock, ClockAdapter);
+      container.registerSingleton(TOKENS.Crypto, CryptoAdapter);
+      container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
+      container.registerSingleton(TOKENS.PathRenderer, PathRendererMock);
+      container.registerSingleton(
+        TOKENS.ProcessExecutor,
+        ProcessExecutorAdapter,
+      );
+      container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);
+      container.registerSingleton(TOKENS.System, SystemAdapter);
+      container.registerSingleton(TOKENS.TempStorage, TempStorageAdapter);
 
-    strategy = container.resolve(ExternalRunnerStrategy);
-  });
+      strategy = container.resolve(ExternalRunnerStrategy);
+    });
 
-  afterEach(() => {
-    container.clearInstances();
-    if (testWorkspace) {
-      rmSync(testWorkspace, { recursive: true, force: true });
-    }
-  });
+    afterEach(() => {
+      container.clearInstances();
+      if (testWorkspace) {
+        rmSync(testWorkspace, { recursive: true, force: true });
+      }
+    });
 
-  const createExecutableScript = (content: string): string => {
-    const scriptPath = join(testWorkspace, 'script.js');
-    writeFileSync(scriptPath, `#!/usr/bin/env node\n${content}`);
-    chmodSync(scriptPath, 0o755);
-    return scriptPath;
-  };
-
-  it('should execute a real program through the real runner binary', async () => {
-    const scriptPath = createExecutableScript('console.log("hello_from_node")');
-    const ctx: ExecutionContext = {
-      cmd: [scriptPath],
-      stdin: { useFile: false, data: '' },
-      timeLimitMs: 2000,
-    };
-    const result = await strategy.execute(ctx, new AbortController());
-
-    expect(result).not.toBeInstanceOf(Error);
-    if (!(result instanceof Error)) {
-      expect(result.codeOrSignal).toBe(0);
-      expect(result.timeMs).toBeGreaterThan(0);
-
-      const output = readFileSync(result.stdoutPath, 'utf-8');
-      expect(output.trim()).toBe('hello_from_node');
-    }
-  });
-
-  it('should successfully perform a "Soft Kill" on the real runner binary', async () => {
-    const scriptPath = createExecutableScript('while (true) {}');
-    const ctx: ExecutionContext = {
-      cmd: [scriptPath],
-      stdin: { useFile: false, data: '' },
-      timeLimitMs: 500,
+    const createExecutableScript = (content: string): string => {
+      const scriptPath = join(testWorkspace, 'script.js');
+      writeFileSync(scriptPath, `#!/usr/bin/env node\n${content}`);
+      chmodSync(scriptPath, 0o755);
+      return scriptPath;
     };
 
-    const result = await strategy.execute(ctx, new AbortController());
+    it('should execute a real program through the real runner binary', async () => {
+      const scriptPath = createExecutableScript(
+        'console.log("hello_from_node")',
+      );
+      const ctx: ExecutionContext = {
+        cmd: [scriptPath],
+        stdin: { useFile: false, data: '' },
+        timeLimitMs: 2000,
+      };
+      const result = await strategy.execute(ctx, new AbortController());
 
-    console.log(result);
-    expect(result).not.toBeInstanceOf(Error);
-    if (!(result instanceof Error)) {
-      expect(result.isAborted).toBe(false);
-      expect(result.timeMs).toBeGreaterThanOrEqual(500);
-    }
-  });
+      expect(result).not.toBeInstanceOf(Error);
+      if (!(result instanceof Error)) {
+        expect(result.codeOrSignal).toBe(0);
+        expect(result.timeMs).toBeGreaterThan(0);
 
-  it('should handle User Abort by sending "k" to the real runner', async () => {
-    const scriptPath = createExecutableScript('while (true) {}');
-    const ctx: ExecutionContext = {
-      cmd: [scriptPath],
-      stdin: { useFile: false, data: '' },
-      timeLimitMs: 10000,
-    };
+        const output = readFileSync(result.stdoutPath, 'utf-8');
+        expect(output.trim()).toBe('hello_from_node');
+      }
+    });
 
-    const ac = new AbortController();
-    const promise = strategy.execute(ctx, ac);
-    setTimeout(() => ac.abort(), 200);
+    it('should successfully perform a "Soft Kill" on the real runner binary', async () => {
+      const scriptPath = createExecutableScript('while (true) {}');
+      const ctx: ExecutionContext = {
+        cmd: [scriptPath],
+        stdin: { useFile: false, data: '' },
+        timeLimitMs: 500,
+      };
 
-    const result = await promise;
+      const result = await strategy.execute(ctx, new AbortController());
 
-    if (!(result instanceof Error)) {
-      expect(result.isAborted).toBe(true);
-      expect(result.timeMs).toBeLessThan(1000);
-    }
-  });
-});
+      console.log(result);
+      expect(result).not.toBeInstanceOf(Error);
+      if (!(result instanceof Error)) {
+        expect(result.isAborted).toBe(false);
+        expect(result.timeMs).toBeGreaterThanOrEqual(500);
+      }
+    });
+
+    it('should handle User Abort by sending "k" to the real runner', async () => {
+      const scriptPath = createExecutableScript('while (true) {}');
+      const ctx: ExecutionContext = {
+        cmd: [scriptPath],
+        stdin: { useFile: false, data: '' },
+        timeLimitMs: 10000,
+      };
+
+      const ac = new AbortController();
+      const promise = strategy.execute(ctx, ac);
+      setTimeout(() => ac.abort(), 200);
+
+      const result = await promise;
+
+      if (!(result instanceof Error)) {
+        expect(result.isAborted).toBe(true);
+        expect(result.timeMs).toBeLessThan(1000);
+      }
+    });
+  },
+);

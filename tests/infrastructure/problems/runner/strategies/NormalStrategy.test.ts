@@ -1,26 +1,41 @@
+// Copyright (C) 2025 Langning Chen
+//
+// This file is part of cph-ng.
+//
+// cph-ng is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// cph-ng is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
+
+import { executorMock } from '@t/infrastructure/node/processExecutorMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { anyNumber, type MockProxy, mock } from 'vitest-mock-extended';
-import {
-  AbortReason,
-  type IProcessExecutor,
-} from '@/application/ports/node/IProcessExecutor';
+import { anyNumber } from 'vitest-mock-extended';
+import { AbortReason } from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext } from '@/domain/execution';
 import { NormalStrategy } from '@/infrastructure/problems/runner/strategies/NormalStrategy';
 
 describe('NormalStrategy', () => {
   let strategy: NormalStrategy;
-  let executorMock: MockProxy<IProcessExecutor>;
 
   beforeEach(() => {
-    executorMock = mock<IProcessExecutor>();
-
     container.registerInstance(TOKENS.ProcessExecutor, executorMock);
     container.registerInstance(TOKENS.Settings, settingsMock);
-
     strategy = container.resolve(NormalStrategy);
+  });
+
+  afterEach(() => {
+    container.clearInstances();
   });
 
   const executionContext: ExecutionContext = {

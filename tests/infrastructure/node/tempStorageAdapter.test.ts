@@ -34,8 +34,6 @@ describe('TempStorageAdapter', () => {
   let fsMock: MockProxy<IFileSystem>;
 
   beforeEach(() => {
-    vi.clearAllMocks();
-
     fsMock = mock<IFileSystem>();
     fsMock.join.mockImplementation(join);
 

@@ -18,27 +18,35 @@
 import { type MockProxy, mock } from 'vitest-mock-extended';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 
-const createLoggerMock = (scope?: string): MockProxy<ILogger> => {
+const createLoggerMock = (
+  scope?: string,
+  rootInstance?: MockProxy<ILogger>,
+): MockProxy<ILogger> => {
   const logger = mock<ILogger>();
 
+  const root = rootInstance || logger;
   const prefix = scope ? `[${scope}]` : '';
-  logger.withScope.mockImplementation((name: string) => createLoggerMock(name));
 
-  logger.info.mockImplementation((...args) =>
-    console.info('[INFO]', prefix, ...args),
+  logger.withScope.mockImplementation((name: string) =>
+    createLoggerMock(name, root),
   );
-  logger.warn.mockImplementation((...args) =>
-    console.warn('[WARN]', prefix, ...args),
-  );
-  logger.error.mockImplementation((...args) =>
-    console.error('[ERROR]', prefix, ...args),
-  );
-  logger.debug.mockImplementation((...args) =>
-    console.debug('[DEBUG]', prefix, ...args),
-  );
-  logger.trace.mockImplementation((...args) =>
-    console.debug('[TRACE]', prefix, ...args),
-  );
+
+  const implementLog = (
+    level: Exclude<keyof ILogger, 'withScope'>,
+    consoleMethod: (...args: unknown[]) => void,
+    tag: string,
+  ) => {
+    logger[level].mockImplementation((...args) => {
+      consoleMethod(tag, prefix, ...args);
+      logger !== root && root[level](...args);
+    });
+  };
+
+  implementLog('info', console.info, '[INFO]');
+  implementLog('warn', console.warn, '[WARN]');
+  implementLog('error', console.error, '[ERROR]');
+  implementLog('debug', console.debug, '[DEBUG]');
+  implementLog('trace', console.debug, '[TRACE]');
 
   return logger;
 };
