@@ -1,55 +1,67 @@
-import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
-import { extname, join } from 'path';
+// Copyright (C) 2025 Langning Chen
+//
+// This file is part of cph-ng.
+//
+// cph-ng is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// cph-ng is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-// Translation checker configurations
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { extname, join } from 'node:path';
+import ignore from 'ignore';
+import {
+  createSourceFile,
+  forEachChild,
+  isCallExpression,
+  isIdentifier,
+  isNoSubstitutionTemplateLiteral,
+  isPropertyAccessExpression,
+  isStringLiteral,
+  ScriptTarget,
+} from 'typescript';
+
 const CONFIGS = [
   {
     title: 'Extension Configuration',
-    requiredKeysExtractor: () => {
-      const requiredKeys = new Set();
-
-      function extract(obj) {
+    getKeys: () => {
+      const keys = new Set();
+      const visit = (obj) => {
         if (typeof obj === 'string') {
           if (obj.startsWith('%') && obj.endsWith('%')) {
-            const translationKey = obj.slice(1, -1);
-            requiredKeys.add(translationKey);
+            keys.add(obj.slice(1, -1));
           }
         } else if (Array.isArray(obj)) {
-          obj.forEach((item) => extract(item));
+          obj.forEach((item) => {
+            visit(item);
+          });
         } else if (typeof obj === 'object' && obj !== null) {
           for (const value of Object.values(obj)) {
-            extract(value);
+            visit(value);
           }
         }
-      }
-
-      extract(loadJsonFile('package.json'));
-      return requiredKeys;
+      };
+      visit(loadJsonFile('package.json'));
+      return keys;
     },
     files: ['package.nls.json', 'package.nls.zh.json'],
   },
   {
     title: 'Extension Runtime',
-    requiredKeysExtractor: () =>
-      extractTranslationCalls([
-        {
-          dir: 'src',
-          exts: ['ts', 'js'],
-          regex: /l10n\.t\s*\(\s*(['"])(.*?)\1/g,
-        },
-      ]),
+    getKeys: () => extractKeys('src', ['ts', 'js', 'tsx', 'jsx'], ['webview']),
     files: ['l10n/bundle.l10n.zh-cn.json'],
   },
   {
     title: 'Webview',
-    requiredKeysExtractor: () =>
-      extractTranslationCalls([
-        {
-          dir: join('src', 'webview', 'src'),
-          exts: ['tsx', 'ts'],
-          regex: /\bt\s*\(\s*['"](.*?)['"]/g,
-        },
-      ]),
+    getKeys: () => extractKeys(join('src', 'webview', 'src'), ['tsx', 'ts']),
     files: ['src/webview/src/l10n/en.json', 'src/webview/src/l10n/zh.json'],
   },
 ];
@@ -63,64 +75,60 @@ function loadJsonFile(filePath) {
   }
 }
 
-function findFilesRecursively(dir, extensions = []) {
+function findFilesRecursively(dir, exts, excludes) {
   const files = [];
-
-  function walkDir(currentDir) {
-    try {
-      const items = readdirSync(currentDir);
-
-      for (const item of items) {
-        const fullPath = join(currentDir, item);
-        const stat = statSync(fullPath);
-
-        if (stat.isDirectory()) {
-          // Skip node_modules and other common directories
-          if (!['node_modules', '.git', 'dist', 'out'].includes(item)) {
-            walkDir(fullPath);
-          }
-        } else if (stat.isFile()) {
-          const ext = extname(fullPath).slice(1);
-          if (extensions.length === 0 || extensions.includes(ext)) {
-            files.push(fullPath);
-          }
-        }
-      }
-    } catch (error) {
-      // Ignore directories we can't read
+  const ig = ignore();
+  ig.add(excludes);
+  ig.add(readFileSync('.gitignore', 'utf8'));
+  const visit = (dir) => {
+    for (const name of readdirSync(dir)) {
+      const path = join(dir, name);
+      if (ig.ignores(path)) continue;
+      const stat = statSync(path);
+      if (stat.isDirectory()) visit(path);
+      if (stat.isFile())
+        exts.includes(extname(path).slice(1)) && files.push(path);
     }
-  }
-
-  if (existsSync(dir)) {
-    walkDir(dir);
-  }
-
+  };
+  existsSync(dir) && visit(dir);
   return files;
 }
 
-function extractTranslationCalls(patterns) {
+function extractKeys(dir, exts, excludes = []) {
   const keys = new Set();
-  for (const { dir, exts, regex } of patterns) {
-    const files = findFilesRecursively(dir, exts);
-    for (const file of files) {
-      const content = readFileSync(file, 'utf8');
-      const matches = content.match(regex);
-      if (matches) {
-        matches.forEach((match) => {
-          const keyMatch = match.match(/(['"])(.*?)\1/);
-          if (keyMatch) {
-            keys.add(keyMatch[2]);
-          }
-        });
+  const files = findFilesRecursively(dir, exts, excludes);
+  for (const file of files) {
+    const content = readFileSync(file, 'utf8');
+    const src = createSourceFile(file, content, ScriptTarget.Latest, true);
+    const visit = (node) => {
+      if (isCallExpression(node) && isTranslationCall(node.expression)) {
+        const args = node.arguments;
+        if (args.length > 0) {
+          const firstArg = args[0];
+          if (
+            isStringLiteral(firstArg) ||
+            isNoSubstitutionTemplateLiteral(firstArg)
+          )
+            keys.add(firstArg.text);
+        }
       }
-    }
+      forEachChild(node, visit);
+    };
+    visit(src);
   }
   return keys;
 }
 
+function isTranslationCall(expression) {
+  if (isPropertyAccessExpression(expression))
+    return expression.name.text === 't';
+  if (isIdentifier(expression)) return expression.text === 't';
+  return false;
+}
+
 function checkTranslations(config) {
   let hasErrors = false;
-  const requiredKeys = config.requiredKeysExtractor();
+  const requiredKeys = config.getKeys();
   for (const file of config.files) {
     const data = loadJsonFile(file);
     const keys = new Set(Object.keys(data));
@@ -129,14 +137,18 @@ function checkTranslations(config) {
     if (missingKeys.length > 0) {
       hasErrors = true;
       console.log(`Missing keys in ${file}:`);
-      missingKeys.forEach((key) => console.log(`    ${key}`));
+      missingKeys.forEach((key) => {
+        console.log(`    ${key}`);
+      });
     }
 
     const extraKeys = [...keys].filter((key) => !requiredKeys.has(key));
     if (extraKeys.length > 0) {
       hasErrors = true;
       console.log(`Extra keys in ${file}: `);
-      extraKeys.forEach((key) => console.log(`    ${key}`));
+      extraKeys.forEach((key) => {
+        console.log(`    ${key}`);
+      });
     }
   }
   return hasErrors;

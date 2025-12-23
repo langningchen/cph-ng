@@ -177,6 +177,9 @@ importers:
       '@vscode/vsce':
         specifier: ^3.7.1
         version: 3.7.1
+      ignore:
+        specifier: ^7.0.5
+        version: 7.0.5
       react-refresh:
         specifier: ^0.18.0
         version: 0.18.0

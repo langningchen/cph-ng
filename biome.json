@@ -11,7 +11,8 @@
       "src/composition/**",
       "src/domain/**",
       "src/infrastructure/**",
-      "tests/**"
+      "tests/**",
+      "scripts/**"
     ]
   },
   "formatter": {
