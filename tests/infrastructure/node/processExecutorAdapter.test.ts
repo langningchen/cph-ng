@@ -21,52 +21,34 @@ import { dirname, join } from 'node:path';
 import { container } from 'tsyringe';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { type MockProxy, mock } from 'vitest-mock-extended';
-import type { IClock } from '@/application/ports/node/IClock';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { AbortReason } from '@/application/ports/node/IProcessExecutor';
-import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type { ILogger } from '@/application/ports/vscode/ILogger';
-import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import { TOKENS } from '@/composition/tokens';
+import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
+import { loggerMock } from '../vscode/loggerMock';
+import { telemetryMock } from '../vscode/telemetryMock';
+import { tempStorageMock } from './tempStorageMock';
 
 describe('ProcessExecutorAdapter', () => {
   let adapter: ProcessExecutorAdapter;
-  let tmpMock: MockProxy<ITempStorage>;
   let fsMock: MockProxy<IFileSystem>;
-  let clockMock: MockProxy<IClock>;
-  let loggerMock: MockProxy<ILogger>;
-  let telemetryMock: MockProxy<ITelemetry>;
 
   const realTmpDir = join(tmpdir(), `cph-test-${Date.now()}`);
 
   beforeEach(() => {
     mkdirSync(realTmpDir, { recursive: true });
 
-    tmpMock = mock<ITempStorage>();
     fsMock = mock<IFileSystem>();
-    clockMock = mock<IClock>();
-    loggerMock = mock<ILogger>();
-    telemetryMock = mock<ITelemetry>();
-
-    loggerMock.withScope.mockReturnValue(loggerMock);
-    clockMock.now.mockImplementation(Date.now);
-
-    let tmpCnt = 0;
-    tmpMock.create.mockImplementation(() => {
-      const p = join(realTmpDir, `tmp-${tmpCnt++}.txt`);
-      writeFileSync(p, '');
-      return p;
-    });
 
     fsMock.cwd.mockReturnValue(process.cwd());
     fsMock.dirname.mockImplementation((p) => dirname(p));
 
-    container.registerInstance(TOKENS.TempStorage, tmpMock);
-    container.registerInstance(TOKENS.Clock, clockMock);
+    container.registerInstance(TOKENS.TempStorage, tempStorageMock);
+    container.registerInstance(TOKENS.FileSystem, fsMock);
     container.registerInstance(TOKENS.Logger, loggerMock);
     container.registerInstance(TOKENS.Telemetry, telemetryMock);
-    container.registerInstance(TOKENS.FileSystem, fsMock);
+    container.registerSingleton(TOKENS.Clock, ClockAdapter);
 
     adapter = container.resolve(ProcessExecutorAdapter);
   });
@@ -115,7 +97,7 @@ describe('ProcessExecutorAdapter', () => {
   });
 
   it('should correctly handle stdin input (file mode)', async () => {
-    const inputFile = tmpMock.create();
+    const inputFile = tempStorageMock.create();
     writeFileSync(inputFile, 'hello_file');
     const result = await adapter.execute({
       cmd: [

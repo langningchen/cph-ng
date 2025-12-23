@@ -16,7 +16,6 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type { ExtensionContext } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 import { TOKENS } from '@/composition/tokens';
@@ -26,8 +25,7 @@ import type { Problem } from '@/types';
 export class PathRendererMock implements IPathRenderer {
   constructor(
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.ExtensionContext)
-    private readonly ctx: ExtensionContext,
+    @inject(TOKENS.ExtensionPath) private readonly path: string,
   ) {}
 
   private renderString(
@@ -50,7 +48,7 @@ export class PathRendererMock implements IPathRenderer {
       this.renderString(original, [
         ['tmp', this.fs.tmpdir()],
         ['home', this.fs.homedir()],
-        ['extensionPath', this.ctx.extensionPath],
+        ['extensionPath', this.path],
       ]),
     );
   }

@@ -17,7 +17,7 @@
 
 import type { TelemetryReporter } from '@vscode/extension-telemetry';
 import type { InjectionToken } from 'tsyringe';
-import type { ExtensionContext, LogOutputChannel } from 'vscode';
+import type { LogOutputChannel } from 'vscode';
 import type { IBuildInfo } from '@/application/ports/node/IBuildInfo';
 import type { IClock } from '@/application/ports/node/IClock';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
@@ -43,8 +43,7 @@ import type { RunSingleTc } from '@/application/useCases/RunSingleTc';
 
 export const TOKENS = {
   // VS Code context and utilities
-  ExtensionContext:
-    'vscode.ExtensionContext' as InjectionToken<ExtensionContext>,
+  ExtensionPath: 'vscode.ExtensionPath' as InjectionToken<string>,
   LogOutputChannel:
     'vscode.LogOutputChannel' as InjectionToken<LogOutputChannel>,
   TelemetryReporter:

@@ -16,7 +16,6 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type { ExtensionContext } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ISystem } from '@/application/ports/node/ISystem';
@@ -32,7 +31,7 @@ export class RunnerProviderAdapter implements IRunnerProvider {
   private compilationPromise: Promise<string> | null = null;
 
   constructor(
-    @inject(TOKENS.ExtensionContext) private readonly ctx: ExtensionContext,
+    @inject(TOKENS.ExtensionPath) private readonly path: string,
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.System) private readonly sys: ISystem,
     @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
@@ -42,10 +41,10 @@ export class RunnerProviderAdapter implements IRunnerProvider {
     this.logger = this.logger.withScope('RunnerProvider');
   }
 
-  public async getRunnerPath(): Promise<string> {
+  public async getRunnerPath(ac: AbortController): Promise<string> {
     if (this.cachedPath) return this.cachedPath;
     if (this.compilationPromise) return this.compilationPromise;
-    this.compilationPromise = this.resolveOrCompile();
+    this.compilationPromise = this.resolveOrCompile(ac);
     try {
       this.cachedPath = await this.compilationPromise;
       return this.cachedPath;
@@ -54,11 +53,11 @@ export class RunnerProviderAdapter implements IRunnerProvider {
     }
   }
 
-  private async resolveOrCompile(): Promise<string> {
+  private async resolveOrCompile(ac: AbortController): Promise<string> {
     const isWin = this.sys.type() === 'Windows_NT';
 
     const srcPath = this.fs.join(
-      this.ctx.extensionPath,
+      this.path,
       'res',
       isWin ? 'runner-windows.cpp' : 'runner-linux.cpp',
     );
@@ -77,7 +76,7 @@ export class RunnerProviderAdapter implements IRunnerProvider {
     const compiler = this.settings.compilation.cppCompiler;
     const flags = isWin ? ['-lpsapi', '-ladvapi32', '-static'] : ['-pthread'];
     const cmd = [compiler, srcPath, '-o', outputPath, ...flags, '-O3'];
-    const result = await this.executor.execute({ cmd });
+    const result = await this.executor.execute({ cmd, ac });
 
     if (result instanceof Error) {
       this.logger.error('Failed to compile runner', result);

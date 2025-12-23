@@ -65,7 +65,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
     RunStrategyFactoryAdapter,
   );
 
-  container.registerInstance(TOKENS.ExtensionContext, context);
+  container.registerInstance(TOKENS.ExtensionPath, context.extensionPath);
 
   const logOutputChannel = window.createOutputChannel('CPH-NG', { log: true });
   container.registerInstance(TOKENS.LogOutputChannel, logOutputChannel);

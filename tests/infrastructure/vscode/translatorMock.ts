@@ -15,6 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface IRunnerProvider {
-  getRunnerPath(ac: AbortController): Promise<string>;
-}
+import { mock } from 'vitest-mock-extended';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+
+export const translatorMock = mock<ITranslator>();
+translatorMock.t.mockImplementation(
+  (msg: string, ...args: Array<string | number | boolean>): string => {
+    return [msg, ...args].join(',');
+  },
+);

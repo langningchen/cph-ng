@@ -15,6 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface IRunnerProvider {
-  getRunnerPath(ac: AbortController): Promise<string>;
-}
+import { mock } from 'vitest-mock-extended';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+
+export const tempStorageMock = mock<ITempStorage>();
+tempStorageMock.create.mockImplementation(() => {
+  return `/tmp/file-${tempStorageMock.create.mock.calls.length - 1}`;
+});
+tempStorageMock.dispose.mockImplementation((_path: string | string[]) => {});
+tempStorageMock.startMonitor.mockResolvedValue();

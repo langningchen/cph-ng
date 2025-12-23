@@ -15,6 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface IRunnerProvider {
-  getRunnerPath(ac: AbortController): Promise<string>;
-}
+import { mock } from 'vitest-mock-extended';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
+
+export const cryptoMock = mock<ICrypto>();
+cryptoMock.randomUUID.mockImplementation(() => {
+  return `uuid-${cryptoMock.randomUUID.mock.calls.length - 1}`;
+});

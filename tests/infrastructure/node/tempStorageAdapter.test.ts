@@ -17,46 +17,33 @@
 
 import { join } from 'node:path';
 import { PathRendererMock } from '@t/infrastructure/services/pathRendererMock';
-import { SettingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { type MockProxy, mock } from 'vitest-mock-extended';
-import type { ExtensionContext } from 'vscode';
-import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
-import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
 import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
+import { extensionPathMock } from '../vscode/extensionPathMock';
+import { loggerMock } from '../vscode/loggerMock';
+import { settingsMock } from '../vscode/settingsMock';
+import { cryptoMock } from './cryptoMock';
 
 describe('TempStorageAdapter', () => {
   let adapter: TempStorageAdapter;
-  let loggerMock: MockProxy<ILogger>;
   let fsMock: MockProxy<IFileSystem>;
-  let cryptoMock: MockProxy<ICrypto>;
 
   beforeEach(() => {
-    loggerMock = mock<ILogger>();
+    vi.clearAllMocks();
+
     fsMock = mock<IFileSystem>();
-    cryptoMock = mock<ICrypto>();
-
-    loggerMock.withScope.mockReturnValue(loggerMock);
-
     fsMock.join.mockImplementation(join);
-
-    let uuidCnt = 0;
-    cryptoMock.randomUUID.mockImplementation(() => `uuid-${uuidCnt++}`);
 
     container.registerInstance(TOKENS.Logger, loggerMock);
     container.registerInstance(TOKENS.FileSystem, fsMock);
     container.registerInstance(TOKENS.Crypto, cryptoMock);
-    container.registerInstance(
-      TOKENS.ExtensionContext,
-      mock<ExtensionContext>({
-        extensionPath: '/home/langningchen/cph-ng',
-      }),
-    );
-    container.registerSingleton(TOKENS.Settings, SettingsMock);
+    container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
+    container.registerInstance(TOKENS.Settings, settingsMock);
     container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
     container.registerSingleton(TOKENS.PathRenderer, PathRendererMock);
 

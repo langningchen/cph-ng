@@ -172,7 +172,7 @@ import type { ISettings, ${sections.map(s => `I${s.className}`).join(', ')} } fr
  * A mock implementation of ISettings that returns default values defined in package.json.
  * Useful for unit testing.
  */
-export class SettingsMock implements ISettings {
+class SettingsMock implements ISettings {
 `;
 
 for (const section of sections) {
@@ -181,7 +181,9 @@ ${section.props.map(p => `    ${p.shortKey}: ${p.defaultValue}`).join(',\n')}
   };\n\n`;
 }
 
-mockContent += `}\n`;
+mockContent += `}
+
+export const settingsMock = new SettingsMock();\n\n`;
 
 fs.writeFileSync(mockPath, mockContent);
 

@@ -20,7 +20,7 @@
 import { existsSync } from 'node:fs';
 import { basename, dirname, extname, normalize, relative } from 'node:path';
 import { inject, injectable } from 'tsyringe';
-import { type ExtensionContext, Uri, window, workspace } from 'vscode';
+import { Uri, window, workspace } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
@@ -38,8 +38,7 @@ export class PathRendererAdapter implements IPathRenderer {
     @inject(TOKENS.Logger) private readonly logger: ILogger,
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.Translator) private readonly translator: ITranslator,
-    @inject(TOKENS.ExtensionContext)
-    private readonly ctx: ExtensionContext,
+    @inject(TOKENS.ExtensionPath) private readonly path: string,
   ) {}
 
   private renderString(
@@ -82,7 +81,7 @@ export class PathRendererAdapter implements IPathRenderer {
       this.renderString(original, [
         ['tmp', this.fs.tmpdir()],
         ['home', this.fs.homedir()],
-        ['extensionPath', this.ctx.extensionPath],
+        ['extensionPath', this.path],
       ]),
     );
   }

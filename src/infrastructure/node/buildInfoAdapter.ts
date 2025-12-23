@@ -16,7 +16,6 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type { ExtensionContext } from 'vscode';
 import type {
   BuildInfoData,
   IBuildInfo,
@@ -30,11 +29,11 @@ export class BuildInfoAdapter implements IBuildInfo {
 
   constructor(
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.ExtensionContext) private readonly ctx: ExtensionContext,
+    @inject(TOKENS.ExtensionPath) private readonly path: string,
   ) {}
 
   async load(): Promise<void> {
-    const path = this.fs.join(this.ctx.extensionPath, 'dist', 'generated.json');
+    const path = this.fs.join(this.path, 'dist', 'generated.json');
     const content = await this.fs.readFile(path);
     this.data = JSON.parse(content);
   }

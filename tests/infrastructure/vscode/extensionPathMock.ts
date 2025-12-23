@@ -15,6 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface IRunnerProvider {
-  getRunnerPath(ac: AbortController): Promise<string>;
-}
+import { join } from 'node:path';
+
+export const extensionPathMock = join(__dirname, '../../../');

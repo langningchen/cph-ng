@@ -83,7 +83,7 @@ export class ExternalRunnerStrategy implements IRunStrategy {
 
     let runnerPath: string;
     try {
-      runnerPath = await this.runner.getRunnerPath();
+      runnerPath = await this.runner.getRunnerPath(ac);
     } catch (e) {
       return new Error(
         this.translator.t(
@@ -93,9 +93,17 @@ export class ExternalRunnerStrategy implements IRunStrategy {
       );
     }
 
+    if (ctx.cmd.length !== 1) {
+      return new Error(
+        this.translator.t(
+          'External runner only supports single program without arguments',
+        ),
+      );
+    }
+
     const runnerCmd = [
       runnerPath,
-      ctx.cmd.join(' '),
+      ctx.cmd[0],
       userStdinPath,
       userStdoutPath,
       userStderrPath,
@@ -111,6 +119,7 @@ export class ExternalRunnerStrategy implements IRunStrategy {
 
     const unifiedAc = new AbortController();
     const onUserAbort = () => {
+      this.logger.warn(`Soft killing runner ${handle.pid} due to user abort`);
       unifiedAc.abort(AbortReason.UserAbort);
     };
     const onUnifiedAbort = () => {
@@ -164,6 +173,7 @@ export class ExternalRunnerStrategy implements IRunStrategy {
       this.tmp.dispose([userStdoutPath, userStderrPath]);
       throw new Error(this.translator.t('Runner output is invalid JSON'));
     }
+    this.logger.debug('Runner info', runInfo);
     if (runInfo.error) {
       this.tmp.dispose([userStdoutPath, userStderrPath]);
       throw new Error(

@@ -1,4 +1,4 @@
-import { SettingsMock } from '@t/infrastructure/vscode/settingsMock';
+import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { anyNumber, type MockProxy, mock } from 'vitest-mock-extended';
@@ -18,7 +18,7 @@ describe('NormalStrategy', () => {
     executorMock = mock<IProcessExecutor>();
 
     container.registerInstance(TOKENS.ProcessExecutor, executorMock);
-    container.registerSingleton(TOKENS.Settings, SettingsMock);
+    container.registerInstance(TOKENS.Settings, settingsMock);
 
     strategy = container.resolve(NormalStrategy);
   });
