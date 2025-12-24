@@ -67,7 +67,7 @@ export class WrapperStrategy implements IRunStrategy {
   private async extractWrapperData(
     stderrPath: string,
   ): Promise<WrapperData | null> {
-    const content = await this.fs.readFile(stderrPath, 'utf-8');
+    const content = await this.fs.readFile(stderrPath);
     const regex = /-----CPH DATA STARTS-----(\{.*?\})-----/s;
     const match = content.match(regex);
     if (!match) return null;

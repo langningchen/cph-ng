@@ -86,10 +86,9 @@ export class ExternalRunnerStrategy implements IRunStrategy {
       runnerPath = await this.runner.getRunnerPath(ac);
     } catch (e) {
       return new Error(
-        this.translator.t(
-          'Failed to prepare runner utility: {0}',
-          (e as Error).message,
-        ),
+        this.translator.t('Failed to prepare runner utility: {codeOrSignal}', {
+          codeOrSignal: (e as Error).message,
+        }),
       );
     }
 
@@ -153,10 +152,9 @@ export class ExternalRunnerStrategy implements IRunStrategy {
     if (runnerResult.codeOrSignal) {
       this.tmp.dispose([userStdoutPath, userStderrPath]);
       return new Error(
-        this.translator.t(
-          'Runner exited with code {0}',
-          runnerResult.codeOrSignal,
-        ),
+        this.translator.t('Runner exited with code {codeOrSignal}', {
+          codeOrSignal: runnerResult.codeOrSignal,
+        }),
       );
     }
 
@@ -177,11 +175,10 @@ export class ExternalRunnerStrategy implements IRunStrategy {
     if (runInfo.error) {
       this.tmp.dispose([userStdoutPath, userStderrPath]);
       throw new Error(
-        this.translator.t(
-          'Runner reported error: {0} (Code: {1})',
-          runInfo.error_type,
-          runInfo.error_code,
-        ),
+        this.translator.t('Runner reported error: {type} (Code: {code})', {
+          type: runInfo.error_type,
+          code: runInfo.error_code,
+        }),
       );
     }
 

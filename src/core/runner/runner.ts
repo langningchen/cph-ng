@@ -15,19 +15,20 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { readFile } from 'fs/promises';
+import { container } from 'tsyringe';
 import { l10n } from 'vscode';
-import { Checker } from '@/core/checker';
+import { ISolutionRunner } from '@/application/ports/problems/ISolutionRunner';
+import { TOKENS } from '@/composition/tokens';
+import { JudgeCoordinator } from '@/infrastructure/problems/judgeCoordinator';
 import type { CompileData } from '@/core/compiler';
 import type { Lang } from '@/core/langs/lang';
-import { ProcessResultHandler } from '@/helpers/processResultHandler';
-import Settings from '@/helpers/settings';
 import ProblemsManager from '@/modules/problems/manager';
 import { type Problem, TcIo, TcVerdicts, type TcWithResult } from '@/types';
 import { telemetry } from '@/utils/global';
-import { KnownResult } from '@/utils/result';
-import { Executor } from './executor';
 
+/**
+ * @deprecated Use RunSingleTc or RunAllTestCases use cases instead.
+ */
 export class Runner {
   public static async run(
     problem: Problem,
@@ -36,79 +37,77 @@ export class Runner {
     ac: AbortController,
     compileData: CompileData,
   ) {
+    const solutionRunner = container.resolve<ISolutionRunner>(
+      TOKENS.SolutionRunner,
+    );
+    const judgeCoordinator = container.resolve(JudgeCoordinator);
+
     const runTimerEnd = telemetry.start('run', {
       lang: lang.name,
       timeLimit: problem.timeLimit.toString(),
       memoryLimit: problem.memoryLimit.toString(),
       checker: String(!!problem.checker),
       interactor: String(!!problem.interactor),
-      useRunner: String(Settings.runner.useRunner),
-      unlimitedStack: String(Settings.runner.unlimitedStack),
     });
+
     try {
       tc.result.verdict = TcVerdicts.JG;
       await ProblemsManager.dataRefresh();
 
-      const runResult = await Executor.doRun(
-        {
-          cmd: await lang.getRunCommand(
-            compileData.src.outputPath,
-            problem.compilationSettings,
-          ),
-          timeLimit: problem.timeLimit,
-          stdin: tc.stdin,
-          ac,
-          enableRunner: lang.enableRunner,
-        },
-        compileData.interactor?.outputPath,
+      const cmd = await lang.getRunCommand(
+        compileData.src.outputPath,
+        problem.compilationSettings,
       );
-      if (runResult.data) {
-        const { time, memory, stdoutPath, stderrPath } = runResult.data;
 
-        // Update time and memory
-        tc.result.time = time;
-        tc.result.memory = memory;
+      const executionResult = await solutionRunner.run(
+        {
+          cmd,
+          stdin: tc.stdin,
+          timeLimitMs: problem.timeLimit,
+          memoryLimitMb: problem.memoryLimit,
+        },
+        ac,
+      );
 
-        // Handle stdout and stderr
-        tc.result.stdout = new TcIo(true, stdoutPath);
-        tc.result.stderr = new TcIo(true, stderrPath);
+      if (!(executionResult instanceof Error)) {
+        tc.result.time = executionResult.timeMs;
+        tc.result.memory = executionResult.memoryMb;
+        tc.result.stdout = new TcIo(true, executionResult.stdoutPath);
+        tc.result.stderr = new TcIo(true, executionResult.stderrPath);
         await ProblemsManager.dataRefresh();
       }
-      if (runResult instanceof KnownResult) {
-        tc.result.fromResult(runResult);
+
+      if (executionResult instanceof Error) {
+        tc.result.verdict = TcVerdicts.SE;
+        tc.result.msg.push(executionResult.message);
         return;
       }
-      tc.result.verdict = TcVerdicts.JGD;
 
-      // Determine verdict
-      if (tc.result.time && tc.result.time > problem.timeLimit) {
-        tc.result.verdict = TcVerdicts.TLE;
-      } else if (tc.result.memory && tc.result.memory > problem.memoryLimit) {
-        tc.result.verdict = TcVerdicts.MLE;
-      } else {
-        tc.result.verdict = TcVerdicts.CMP;
-        await ProblemsManager.dataRefresh();
-        if (compileData.checker) {
-          const checkerResult = await Checker.runChecker(
-            compileData.checker.outputPath,
-            tc,
-            ac,
-          );
-          tc.result.fromResult(checkerResult);
-          const stderrPath = checkerResult.data?.stderrPath;
-          if (stderrPath) {
-            tc.result.msg.push(await readFile(stderrPath, 'utf-8'));
-          }
-        } else {
-          tc.result.fromResult(
-            ProcessResultHandler.compareOutputs(
-              tc.result.stdout.toString(),
-              tc.answer.toString(),
-              tc.result.stderr.toString(),
-            ),
-          );
-        }
-      }
+      tc.result.verdict = TcVerdicts.JGD;
+      await ProblemsManager.dataRefresh();
+
+      const judgeResult = await judgeCoordinator.judge(
+        {
+          executionResult,
+          inputPath: tc.stdin.toPath(),
+          answerPath: tc.answer.toPath(),
+          checkerPath: compileData.checker?.outputPath,
+          timeLimitMs: problem.timeLimit,
+          memoryLimitMb: problem.memoryLimit,
+        },
+        ac,
+      );
+
+      // Map VerdictName to TcVerdict
+      // Note: VERDICTS from domain/verdict.ts has the same keys as TcVerdicts
+      // but TcVerdicts values are TcVerdict instances, while VERDICTS values are Verdict objects.
+      // We need to map back to TcVerdicts which are used in the legacy code.
+      // Fortunately, the keys are the same.
+      const verdictName = judgeResult.verdict;
+      // @ts-ignore - TcVerdicts keys match VerdictName
+      tc.result.verdict = TcVerdicts[verdictName];
+      tc.result.msg = judgeResult.messages;
+
       runTimerEnd({ verdict: tc.result.verdict.name });
     } catch (e) {
       tc.result.verdict = TcVerdicts.SE;

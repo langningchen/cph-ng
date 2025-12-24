@@ -19,6 +19,7 @@ import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { container } from 'tsyringe';
 import { type ExtensionContext, window } from 'vscode';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
+import { RunAllTestCases } from '@/application/useCases/RunAllTestCases';
 import { RunSingleTc } from '@/application/useCases/RunSingleTc';
 import { BuildInfoAdapter } from '@/infrastructure/node/buildInfoAdapter';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
@@ -32,6 +33,8 @@ import { CheckerRunnerAdapter } from '@/infrastructure/problems/runner/checkerRu
 import { RunStrategyFactoryAdapter } from '@/infrastructure/problems/runner/RunStrategyFactoryAdapter';
 import { RunnerProviderAdapter } from '@/infrastructure/problems/runner/runnerProviderAdapter';
 import { SolutionRunnerAdapter } from '@/infrastructure/problems/runner/solutionRunnerAdapter';
+import { CompilerService } from '@/infrastructure/services/compilerService';
+import { LanguageRegistry } from '@/infrastructure/services/languageRegistry';
 import { PathRendererAdapter } from '@/infrastructure/services/pathRendererAdapter';
 import { LoggerAdapter } from '@/infrastructure/vscode/loggerAdapter';
 import { SettingsAdapter } from '@/infrastructure/vscode/settingsAdapter';
@@ -53,6 +56,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.Runner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);
   container.registerSingleton(TOKENS.RunSingleTc, RunSingleTc);
+  container.registerSingleton(TOKENS.RunAllTestCases, RunAllTestCases);
   container.registerSingleton(TOKENS.Settings, SettingsAdapter);
   container.registerSingleton(TOKENS.SolutionRunner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.System, SystemAdapter);
@@ -64,6 +68,8 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
     TOKENS.RunStrategyFactory,
     RunStrategyFactoryAdapter,
   );
+  container.registerSingleton(TOKENS.LanguageRegistry, LanguageRegistry);
+  container.registerSingleton(TOKENS.CompilerService, CompilerService);
 
   container.registerInstance(TOKENS.ExtensionPath, context.extensionPath);
 

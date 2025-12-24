@@ -30,12 +30,15 @@ import type { ICompiler } from '@/application/ports/problems/ICompiler';
 import type { IRunnerProvider } from '@/application/ports/problems/IRunnerProvider';
 import type { IRunStrategyFactory } from '@/application/ports/problems/IRunStrategyFactory';
 import type { ISolutionRunner } from '@/application/ports/problems/ISolutionRunner';
+import type { ICompilerService } from '@/application/ports/services/ICompilerService';
+import type { ILanguageRegistry } from '@/application/ports/services/ILanguageRegistry';
 import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
+import type { RunAllTestCases } from '@/application/useCases/RunAllTestCases';
 import type { RunSingleTc } from '@/application/useCases/RunSingleTc';
 
 // Centralized DI tokens for tsyringe registrations
@@ -70,9 +73,14 @@ export const TOKENS = {
   BuildInfo: 'ports.BuildInfo' as InjectionToken<IBuildInfo>,
   RunStrategyFactory:
     'ports.RunStrategyFactory' as InjectionToken<IRunStrategyFactory>,
+  LanguageRegistry:
+    'ports.LanguageRegistry' as InjectionToken<ILanguageRegistry>,
+  CompilerService: 'ports.CompilerService' as InjectionToken<ICompilerService>,
 
   // Use cases
   RunSingleTc: 'useCases.RunSingleTc' as InjectionToken<RunSingleTc>,
+  RunAllTestCases:
+    'useCases.RunAllTestCases' as InjectionToken<RunAllTestCases>,
 };
 
 export type TokenKeys = keyof typeof TOKENS;

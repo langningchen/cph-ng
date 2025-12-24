@@ -20,7 +20,9 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 
 export const translatorMock = mock<ITranslator>();
 translatorMock.t.mockImplementation(
-  (msg: string, ...args: Array<string | number | boolean>): string => {
-    return [msg, ...args].join(',');
+  (message: string, args?: Record<string, unknown>): string => {
+    const parts = [message];
+    args && parts.push(...Object.values(args).map((v) => String(v)));
+    return parts.join(',');
   },
 );

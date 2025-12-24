@@ -103,9 +103,9 @@ export class JudgeCoordinator {
       };
     }
 
-    const stdout = await this.fs.readFile(res.stdoutPath, 'utf-8');
-    const answer = await this.fs.readFile(req.answerPath, 'utf-8');
-    const stderr = await this.fs.readFile(res.stderrPath, 'utf-8');
+    const stdout = await this.fs.readFile(res.stdoutPath);
+    const answer = await this.fs.readFile(req.answerPath);
+    const stderr = await this.fs.readFile(res.stderrPath);
 
     const verdict = this.grader.compareStrings(stdout, answer, stderr, {
       ignoreError: this.settings.comparing.ignoreError,

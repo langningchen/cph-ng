@@ -185,7 +185,7 @@ describe('ExternalRunnerStrategy', () => {
 
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).equals(
-      'Failed to prepare runner utility: {0},No runner binary',
+      'Failed to prepare runner utility: {codeOrSignal},No runner binary',
     );
   });
 
@@ -201,7 +201,9 @@ describe('ExternalRunnerStrategy', () => {
     const result = await strategy.execute(mockCtx, new AbortController());
 
     expect(result).toBeInstanceOf(Error);
-    expect((result as Error).message).equals('Runner exited with code {0},1');
+    expect((result as Error).message).equals(
+      'Runner exited with code {codeOrSignal},1',
+    );
   });
 
   it('should throw error if runner output is malformed JSON', async () => {
@@ -244,7 +246,7 @@ describe('ExternalRunnerStrategy', () => {
 
     await expect(
       strategy.execute(mockCtx, new AbortController()),
-    ).rejects.toThrow('Runner reported error: {0} (Code: {1}),1,101');
+    ).rejects.toThrow('Runner reported error: {type} (Code: {code}),1,101');
   });
 
   it('should handle User Abort correctly', async () => {

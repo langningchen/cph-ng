@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface ITranslator {
-  t(message: string, args?: Record<string, unknown>): string;
+import type { Lang } from '@/core/langs/lang';
+
+export interface ILanguageRegistry {
+  getLang(filePath: string): Lang | undefined;
 }

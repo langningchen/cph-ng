@@ -17,7 +17,7 @@
 
 import { access, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { homedir, tmpdir } from 'node:os';
-import { dirname, join, normalize } from 'node:path';
+import { basename, dirname, extname, join, normalize } from 'node:path';
 import { cwd } from 'node:process';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 
@@ -44,6 +44,14 @@ export class FileSystemAdapter implements IFileSystem {
 
   dirname(path: string): string {
     return dirname(path);
+  }
+
+  basename(path: string, suffix?: string): string {
+    return basename(path, suffix);
+  }
+
+  extname(path: string): string {
+    return extname(path);
   }
 
   async readFile(

@@ -15,22 +15,29 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { inject, injectable } from 'tsyringe';
 import type {
   CompileOutcome,
   ICompiler,
 } from '@/application/ports/problems/ICompiler';
-import { Compiler } from '@/core/compiler';
+import type { ICompilerService } from '@/application/ports/services/ICompilerService';
+import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/types';
 import { KnownResult } from '@/utils/result';
 
+@injectable()
 export class CompilerAdapter implements ICompiler {
+  constructor(
+    @inject(TOKENS.CompilerService) private readonly compiler: ICompilerService,
+  ) {}
+
   async compile(
     problem: Problem,
     compileFlag: boolean | null,
     ac: AbortController,
   ): Promise<CompileOutcome> {
     try {
-      const result = await Compiler.compileAll(problem, compileFlag, ac);
+      const result = await this.compiler.compileAll(problem, compileFlag, ac);
       if (result instanceof KnownResult) {
         return { ok: false, known: result };
       }

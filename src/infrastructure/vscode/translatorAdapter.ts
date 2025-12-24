@@ -19,7 +19,7 @@ import { l10n } from 'vscode';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 
 export class TranslatorAdapter implements ITranslator {
-  t(msg: string, ...args: Array<string | number | boolean>): string {
-    return l10n.t(msg, ...args);
+  t(message: string, args: Record<string, unknown>): string {
+    return l10n.t(message, args);
   }
 }

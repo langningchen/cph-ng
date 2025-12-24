@@ -63,7 +63,7 @@ export class PathRendererAdapter implements IPathRenderer {
     }
 
     try {
-      const template = await this.fs.readFile(templatePath, 'utf-8');
+      const template = await this.fs.readFile(templatePath);
       return this.renderString(template, [
         ['title', problem.name],
         ['timeLimit', problem.timeLimit.toString()],
