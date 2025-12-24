@@ -38,6 +38,17 @@ Companion 是一个浏览器扩展，可将在线评测的题目数据直接发�
 - **默认值**：`27121`
 - 浏览器扩展发送到此端口
 
+#### `cph-ng.companion.wsPort`
+
+- **默认值**：`-1`（自动使用 `listenPort + 1`）
+- VS Code 通过此 WebSocket 端口与 Companion Router 通信；如需自定义，改成
+	固定端口即可
+
+#### `cph-ng.companion.submissionTimeout`
+
+- **默认值**：`30000`
+- 控制等待 Companion Router 确认提交已消费的时间，单位毫秒。
+
 ## 工作原理
 
 1. 用户点击题目页面上的扩展图标

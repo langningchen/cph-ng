@@ -1,7 +1,15 @@
 import { existsSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { dirname } from 'path';
-import { commands, l10n, Uri, workspace } from 'vscode';
+import {
+  commands,
+  l10n,
+  QuickPick,
+  QuickPickItem,
+  Uri,
+  window,
+  workspace,
+} from 'vscode';
 import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
@@ -11,30 +19,62 @@ import { mkdirIfNotExists } from '@/utils/process';
 import { renderTemplate } from '@/utils/strTemplate';
 import { CphProblem } from '../problems/cphProblem';
 import ProblemsManager from '../problems/manager';
+import { CompanionClient } from './client';
 import { CompanionProblem } from './types';
 
 export class Handler {
   private static logger: Logger = new Logger('companionHandler');
-  private static batches: Map<string, CompanionProblem[]> = new Map();
+  private static claimedBatches = new Set<string>();
+  private static activeQuickPicks = new Map<string, QuickPick<QuickPickItem>>();
 
-  public static async handleIncomingProblem(data: CompanionProblem) {
-    this.logger.debug('Handling incoming problem', data);
-
-    const batchId = data.batch.id;
-    const batchSize = data.batch.size;
-    const currentBatch = Handler.batches.get(batchId) ?? [];
-    if (!Handler.batches.has(batchId)) {
-      Handler.batches.set(batchId, currentBatch);
+  public static handleBatchAvailable(
+    batchId: string,
+    problems: CompanionProblem[],
+  ) {
+    if (!problems || problems.length === 0) {
+      window.showWarningMessage(
+        l10n.t('No problems were received from Companion. Nothing to import.'),
+      );
+      return;
     }
-    currentBatch.push(data);
-    Handler.logger.info(
-      `Received problem ${data.name} for batch ${batchId} (${currentBatch.length}/${batchSize})`,
+    const quickPick = window.createQuickPick();
+    quickPick.items = [{ label: l10n.t('Yes') }, { label: l10n.t('No') }];
+    quickPick.placeholder = l10n.t(
+      'Received {count} problems from Companion. Import here?',
+      {
+        count: problems.length,
+      },
     );
+    quickPick.ignoreFocusOut = true;
 
-    if (currentBatch.length >= batchSize) {
-      const companionProblems = [...currentBatch];
-      Handler.batches.delete(batchId);
-      await Handler.processProblem(companionProblems);
+    quickPick.onDidAccept(async () => {
+      const selection = quickPick.selectedItems[0];
+      if (selection && selection.label === l10n.t('Yes')) {
+        if (Handler.claimedBatches.has(batchId)) {
+          Io.warn(l10n.t('Problems already imported by another instance'));
+        } else {
+          Handler.claimedBatches.add(batchId);
+          CompanionClient.claimBatch(batchId);
+          await Handler.processProblem(problems);
+        }
+      }
+      quickPick.hide();
+    });
+
+    quickPick.onDidHide(() => {
+      quickPick.dispose();
+      Handler.activeQuickPicks.delete(batchId);
+    });
+
+    Handler.activeQuickPicks.set(batchId, quickPick);
+    quickPick.show();
+  }
+
+  public static handleBatchClaimed(batchId: string) {
+    Handler.claimedBatches.add(batchId);
+    const quickPick = Handler.activeQuickPicks.get(batchId);
+    if (quickPick) {
+      quickPick.hide();
     }
   }
 
@@ -139,9 +179,5 @@ export class Handler {
       Handler.logger.error('Failed to create source file', e);
       throw new Error(`Failed to create source file: ${(e as Error).message}`);
     }
-  }
-
-  public static clearBatches() {
-    Handler.batches.clear();
   }
 }

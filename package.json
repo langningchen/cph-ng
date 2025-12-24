@@ -493,6 +493,11 @@
             "default": 27121,
             "markdownDescription": "%cph-ng.configuration.companion.properties.listenPort.markdownDescription%"
           },
+          "cph-ng.companion.wsPort": {
+            "type": "number",
+            "default": -1,
+            "markdownDescription": "%cph-ng.configuration.companion.properties.wsPort.markdownDescription%"
+          },
           "cph-ng.companion.customPathScript": {
             "type": "string",
             "default": "${extensionPath}/res/defaultScript.js",
@@ -509,6 +514,11 @@
               "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.89%",
               "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.91%"
             ]
+          },
+          "cph-ng.companion.submissionTimeout": {
+            "type": "number",
+            "default": 30000,
+            "markdownDescription": "%cph-ng.configuration.companion.properties.submissionTimeout.markdownDescription%"
           },
           "cph-ng.companion.addTimestamp": {
             "type": "boolean",
@@ -727,9 +737,10 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "webpack --mode production",
-    "compile": "webpack --mode production",
-    "watch": "webpack --watch --mode development",
+    "clean": "rimraf dist",
+    "vscode:prepublish": "pnpm run clean && webpack --mode production",
+    "compile": "pnpm run clean && webpack --mode production",
+    "watch": "pnpm run clean && webpack --watch --mode development",
     "package": "vsce package --allow-star-activation --no-dependencies",
     "publish": "vsce publish --allow-star-activation --no-dependencies",
     "publish:pre": "vsce publish --allow-star-activation --no-dependencies --pre-release",
@@ -762,10 +773,12 @@
     "@types/speed-measure-webpack-plugin": "^1.3.6",
     "@types/vscode": "1.95.0",
     "@types/webpack": "^5.28.5",
+    "@types/ws": "^8.18.1",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.7.1",
     "react-refresh": "^0.18.0",
+    "rimraf": "^6.1.2",
     "speed-measure-webpack-plugin": "^1.5.0",
     "swc-loader": "^0.2.6",
     "terser-webpack-plugin": "^5.3.16",
@@ -804,6 +817,7 @@
     "react-textarea-autosize": "^8.5.9",
     "semver": "^7.7.3",
     "source-map-support": "^0.5.21",
-    "stacktrace-js": "^2.0.2"
+    "stacktrace-js": "^2.0.2",
+    "ws": "^8.18.3"
   }
 }
