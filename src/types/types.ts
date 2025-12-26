@@ -15,13 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UUID } from 'crypto';
+import type { UUID } from 'crypto';
 
 export interface ITcVerdict {
   name: string;
   fullName: string;
   color: string;
 }
+
+export const isRunningVerdict = (verdict?: ITcVerdict): boolean => {
+  return (
+    verdict !== undefined &&
+    ['WT', 'CP', 'CPD', 'JG', 'JGD', 'CMP'].includes(verdict.name)
+  );
+};
+
+export const isExpandVerdict = (verdict?: ITcVerdict): boolean => {
+  return !(
+    (verdict !== undefined && ['AC', 'SK', 'RJ'].includes(verdict.name)) ||
+    isRunningVerdict(verdict)
+  );
+};
 
 export interface ITcIo {
   useFile: boolean;

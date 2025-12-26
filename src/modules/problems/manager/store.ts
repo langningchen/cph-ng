@@ -56,7 +56,7 @@ class Store {
     return fullProblem;
   }
 
-  public static async dataRefresh(noMsg = false) {
+  public static async dataRefresh(noMsg = false, fireFs = true) {
     this.logger.trace('Starting data refresh');
     const activePath = getActivePath();
     const idles: FullProblem[] = this.fullProblems.filter(
@@ -94,8 +94,9 @@ class Store {
       canImport,
       isRunning: !!fullProblem?.ac,
     });
-    fullProblem &&
-      (await problemFs.fireAuthorityChange(fullProblem.problem.src.path));
+    if (fullProblem && fireFs) {
+      await problemFs.fireAuthorityChange(fullProblem.problem.src.path);
+    }
   }
 
   public static async closeAll() {

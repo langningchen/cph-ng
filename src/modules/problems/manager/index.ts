@@ -14,8 +14,8 @@ export default class ProblemsManager {
   ): Promise<FullProblem | null> {
     return Store.getFullProblem(path);
   }
-  public static async dataRefresh() {
-    return Store.dataRefresh();
+  public static async dataRefresh(noMsg = false, fireFs = true) {
+    return Store.dataRefresh(noMsg, fireFs);
   }
   public static async closeAll() {
     return Store.closeAll();

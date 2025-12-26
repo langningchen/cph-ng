@@ -57,8 +57,17 @@ export class ProblemFs implements FileSystemProvider {
   private isFile = FileSystemError.FileNotADirectory();
   private isDir = FileSystemError.FileIsADirectory();
 
+  private mtimes = new Map<string, number>();
+
   public changeEmitter = new EventEmitter<FileChangeEvent[]>();
   onDidChangeFile: Event<FileChangeEvent[]> = this.changeEmitter.event;
+
+  private getMtime(uri: Uri): number {
+    return this.mtimes.get(uri.toString()) ?? 0;
+  }
+  private touch(uri: Uri): void {
+    this.mtimes.set(uri.toString(), Date.now());
+  }
 
   async parseUri(uri: Uri): Promise<CphFsItem> {
     const fullProblem = await ProblemsManager.getFullProblem(uri.authority);
@@ -78,7 +87,6 @@ export class ProblemFs implements FileSystemProvider {
           set: async (data: string) => {
             const newProblem = JSON.parse(data);
             Object.assign(problem, newProblem);
-            await ProblemsManager.dataRefresh();
           },
         },
       ],
@@ -161,28 +169,28 @@ export class ProblemFs implements FileSystemProvider {
       type: FileChangeType.Changed,
       uri: baseUri,
     });
+    this.touch(baseUri);
     events.push({
       type: FileChangeType.Changed,
       uri: Uri.joinPath(baseUri, 'problem.cph-ng.json'),
     });
+    this.touch(Uri.joinPath(baseUri, 'problem.cph-ng.json'));
     for (const [id, tc] of Object.entries(fullProblem.problem.tcs)) {
-      events.push({
-        type: FileChangeType.Changed,
-        uri: Uri.joinPath(baseUri, 'tcs', id, 'stdin'),
-      });
-      events.push({
-        type: FileChangeType.Changed,
-        uri: Uri.joinPath(baseUri, 'tcs', id, 'answer'),
-      });
+      const stdinUri = Uri.joinPath(baseUri, 'tcs', id, 'stdin');
+      events.push({ type: FileChangeType.Changed, uri: stdinUri });
+      this.touch(stdinUri);
+
+      const answerUri = Uri.joinPath(baseUri, 'tcs', id, 'answer');
+      events.push({ type: FileChangeType.Changed, uri: answerUri });
+      this.touch(answerUri);
       if (tc.result) {
-        events.push({
-          type: FileChangeType.Changed,
-          uri: Uri.joinPath(baseUri, 'tcs', id, 'stdout'),
-        });
-        events.push({
-          type: FileChangeType.Changed,
-          uri: Uri.joinPath(baseUri, 'tcs', id, 'stderr'),
-        });
+        const stdoutUri = Uri.joinPath(baseUri, 'tcs', id, 'stdout');
+        events.push({ type: FileChangeType.Changed, uri: stdoutUri });
+        this.touch(stdoutUri);
+
+        const stderrUri = Uri.joinPath(baseUri, 'tcs', id, 'stderr');
+        events.push({ type: FileChangeType.Changed, uri: stderrUri });
+        this.touch(stderrUri);
       }
     }
     this.changeEmitter.fire(events);
@@ -194,7 +202,7 @@ export class ProblemFs implements FileSystemProvider {
       return {
         type: FileType.Directory,
         ctime: 0,
-        mtime: Date.now(),
+        mtime: this.getMtime(uri),
         size: 0,
         permissions: FilePermission.Readonly,
       };
@@ -203,7 +211,7 @@ export class ProblemFs implements FileSystemProvider {
       return {
         type: FileType.File | FileType.SymbolicLink,
         ctime: 0,
-        mtime: Date.now(),
+        mtime: this.getMtime(uri),
         size: 0,
         permissions: item.set ? undefined : FilePermission.Readonly,
       };
@@ -211,7 +219,7 @@ export class ProblemFs implements FileSystemProvider {
     return {
       type: FileType.File,
       ctime: 0,
-      mtime: Date.now(),
+      mtime: this.getMtime(uri),
       size: item.data.length,
       permissions: item.set ? undefined : FilePermission.Readonly,
     };
@@ -236,9 +244,14 @@ export class ProblemFs implements FileSystemProvider {
     if (!item.set) {
       throw this.noPermissions;
     }
-    await item.set(content.toString());
-    this.changeEmitter.fire([{ type: FileChangeType.Changed, uri }]);
-    await ProblemsManager.dataRefresh();
+    const decoded = Buffer.from(content).toString('utf8');
+    await item.set(decoded);
+    this.touch(uri);
+
+    // When editing a virtual file, VS Code already owns the editor model for that URI.
+    // Avoid re-firing broad FS change events (which can cause flicker in code-server).
+    const shouldFireFs = uri.path === '/problem.cph-ng.json';
+    await ProblemsManager.dataRefresh(false, shouldFireFs);
   }
 
   watch(): Disposable {

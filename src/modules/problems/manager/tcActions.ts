@@ -78,7 +78,9 @@ export class TcActions {
       return;
     }
     fullProblem.problem.tcs[msg.id] = Tc.fromI(msg.tc);
-    await Store.dataRefresh(true);
+    // This message can be emitted on every keystroke from the webview.
+    // Avoid firing virtual FS change events on each update (can cause flicker in code-server).
+    await Store.dataRefresh(true, false);
   }
   public static async toggleDisable(msg: msgs.ToggleDisableMsg) {
     const fullProblem = await Store.getFullProblem(msg.activePath);
