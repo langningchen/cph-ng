@@ -114,12 +114,33 @@ const TcDataView = ({
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
   const [copied, setCopied] = useState(false);
-  const [internalValue, setInternalValue] = useState(value);
+  const [internalValue, setInternalValue] = useState<ITcIo>(() => ({
+    useFile: value.useFile,
+    data: value.data,
+  }));
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    setInternalValue(value);
-  }, [value]);
+    setInternalValue((prev) => {
+      const next: ITcIo = { useFile: value.useFile, data: value.data };
+      if (prev.useFile === next.useFile && prev.data === next.data) {
+        return prev;
+      }
+
+      const isEditing =
+        !readOnly &&
+        textareaRef.current !== null &&
+        document.activeElement === textareaRef.current;
+
+      // When typing, keep local state to avoid flicker / rollback caused by
+      // external refreshes (notably in code-server).
+      if (isEditing && prev.useFile === next.useFile) {
+        return prev;
+      }
+
+      return next;
+    });
+  }, [value.useFile, value.data, readOnly]);
 
   useEffect(() => {
     if (autoFocus && textareaRef.current) {

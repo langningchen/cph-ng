@@ -42,19 +42,6 @@ import {
   ITcVerdict,
 } from './types';
 
-export const isRunningVerdict = (verdict?: ITcVerdict): boolean => {
-  return (
-    verdict !== undefined &&
-    ['WT', 'CP', 'CPD', 'JG', 'JGD', 'CMP'].includes(verdict.name)
-  );
-};
-export const isExpandVerdict = (verdict?: ITcVerdict): boolean => {
-  return !(
-    (verdict !== undefined && ['AC', 'SK', 'RJ'].includes(verdict.name)) ||
-    isRunningVerdict(verdict)
-  );
-};
-
 export class TcVerdict implements ITcVerdict {
   constructor(
     public name: string,

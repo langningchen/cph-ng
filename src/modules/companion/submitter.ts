@@ -24,22 +24,25 @@ export class Submitter {
       'GNU G++17 7.3.0': 54,
       'GNU G++20 13.2 (64 bit, winlibs)': 89,
       'GNU G++23 14.2 (64 bit, msys2)': 91,
-    };
+    } as const;
     if (Submitter.isSubmitting) {
       Io.warn(l10n.t('A submission is already in progress.'));
       return Promise.reject(new Error('Submission already in progress'));
     }
 
     let submitLanguageId = Settings.companion.submitLanguage;
-    if (!Object.values(languageList).includes(submitLanguageId)) {
-      const choice = await window.showQuickPick(Object.keys(languageList), {
+    if (submitLanguageId === -1) {
+      const choices = Object.keys(languageList) as Array<
+        keyof typeof languageList
+      >;
+      const choice = (await window.showQuickPick(choices, {
         placeHolder: l10n.t('Choose submission language'),
-      });
+      })) as keyof typeof languageList | undefined;
       if (!choice) {
         Io.info(l10n.t('Submission cancelled.'));
         return;
       }
-      submitLanguageId = languageList[choice as keyof typeof languageList];
+      submitLanguageId = languageList[choice];
       Settings.companion.submitLanguage = submitLanguageId;
     }
 
