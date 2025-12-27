@@ -18,14 +18,15 @@
 import { basename, extname, join } from 'path';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
-import { FileWithHash } from '@/types';
+import type { FileWithHash } from '@/types';
 import { KnownResult, UnknownResult } from '@/utils/result';
 import {
-  CompileAdditionalData,
+  type CompileAdditionalData,
   DefaultCompileAdditionalData,
   Lang,
-  LangCompileResult,
+  type LangCompileResult,
 } from './lang';
+import { renderPath } from '@/utils/strTemplate';
 
 export class LangPython extends Lang {
   private logger: Logger = new Logger('langsPython');
@@ -42,7 +43,7 @@ export class LangPython extends Lang {
     this.logger.trace('compile', { src, forceCompile });
 
     const outputPath = join(
-      Settings.cache.directory,
+      renderPath(Settings.cache.directory),
       basename(src.path, extname(src.path)) + '.pyc',
     );
 

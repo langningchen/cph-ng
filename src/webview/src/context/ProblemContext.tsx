@@ -1,18 +1,18 @@
-import { UUID } from 'crypto';
+import type { UUID } from 'crypto';
 import React, {
   createContext,
-  ReactNode,
+  type ReactNode,
   useContext,
   useEffect,
   useState,
 } from 'react';
-import { IProblem } from '@/types';
-import {
+import type { IProblem } from '@/types';
+import type {
   ActivePathEvent,
   ProblemEvent,
   ProblemEventData,
 } from '../../../modules/sidebar';
-import { WebviewMsg } from '../msgs';
+import type { WebviewMsg } from '../msgs';
 import { msg as sendMsg } from '../utils';
 
 interface ProblemContextType {

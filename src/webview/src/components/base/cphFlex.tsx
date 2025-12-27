@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BoxProps } from '@mui/material/Box';
+import type { BoxProps } from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import React from 'react';
 import { delProps } from '../../utils';

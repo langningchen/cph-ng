@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { WebviewMsg } from './msgs';
+import type { WebviewMsg } from './msgs';
 
 export const basename = (path: string) => {
   if (path.includes('/')) {

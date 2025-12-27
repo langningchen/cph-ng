@@ -15,17 +15,20 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { extname } from 'path';
-import Logger from '@/helpers/logger';
+import { container } from 'tsyringe';
+import { ILanguageRegistry } from '@/application/ports/services/ILanguageRegistry';
+import { TOKENS } from '@/composition/tokens';
 import { LangC } from './c';
 import { LangCpp } from './cpp';
 import { LangJava } from './java';
 import { LangJavascript } from './javascript';
-import { Lang } from './lang';
+import type { Lang } from './lang';
 import { LangPython } from './python';
 
+/**
+ * @deprecated Use ILanguageRegistry instead
+ */
 export default class Langs {
-  private static logger = new Logger('langs');
   public static langs: Lang[] = [
     new LangCpp(),
     new LangC(),
@@ -35,11 +38,9 @@ export default class Langs {
   ];
 
   public static getLang(filePath: string): Lang | undefined {
-    const ext = extname(filePath).toLowerCase().slice(1);
-    const lang = this.langs.find((lang) => lang.extensions.includes(ext));
-    lang
-      ? this.logger.debug('Detected language for', filePath, lang.name)
-      : this.logger.debug('No language detected for', filePath);
-    return lang;
+    const registry = container.resolve<ILanguageRegistry>(
+      TOKENS.LanguageRegistry,
+    );
+    return registry.getLang(filePath);
   }
 }

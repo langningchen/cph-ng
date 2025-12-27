@@ -27,7 +27,7 @@ export default class FolderChooser {
   private static async getSubfoldersRecursively(
     folderUri: Uri,
   ): Promise<Uri[]> {
-    this.logger.trace('getSubfoldersRecursively', { folderUri });
+    FolderChooser.logger.trace('getSubfoldersRecursively', { folderUri });
     const subfolders: Uri[] = [];
     const entries = await workspace.fs.readDirectory(folderUri);
     for (const [name, type] of entries) {
@@ -35,7 +35,7 @@ export default class FolderChooser {
         const subfolderUri = Uri.joinPath(folderUri, name);
         subfolders.push(subfolderUri);
         const nestedSubfolders =
-          await this.getSubfoldersRecursively(subfolderUri);
+          await FolderChooser.getSubfoldersRecursively(subfolderUri);
         subfolders.push(...nestedSubfolders);
       }
     }
@@ -45,7 +45,7 @@ export default class FolderChooser {
   private static async chooseFolderWithDialog(
     title: string,
   ): Promise<Uri | null> {
-    this.logger.trace('chooseFolderWithDialog', { title });
+    FolderChooser.logger.trace('chooseFolderWithDialog', { title });
     const folderUri = await window.showOpenDialog({
       canSelectMany: false,
       title,
@@ -61,7 +61,7 @@ export default class FolderChooser {
   private static async chooseFolderWithQuickPick(
     title: string,
   ): Promise<Uri | null> {
-    this.logger.trace('chooseFolderWithQuickPick', { title });
+    FolderChooser.logger.trace('chooseFolderWithQuickPick', { title });
     if (!workspace.workspaceFolders) {
       Io.error(l10n.t('No workspace folder is open.'));
       return null;
@@ -69,14 +69,16 @@ export default class FolderChooser {
 
     const subfolders = await Promise.all(
       workspace.workspaceFolders.map(async (folder) => [
-        ...(await this.getSubfoldersRecursively(folder.uri)).map((uri) => ({
-          folder,
-          uri,
-        })),
+        ...(await FolderChooser.getSubfoldersRecursively(folder.uri)).map(
+          (uri) => ({
+            folder,
+            uri,
+          }),
+        ),
         { folder, uri: folder.uri },
       ]),
     ).then((results) => results.flat());
-    this.logger.debug('Got subfolders', { subfolders });
+    FolderChooser.logger.debug('Got subfolders', { subfolders });
 
     const selected = await window.showQuickPick(
       subfolders.map((subfolder) => ({
@@ -98,10 +100,10 @@ export default class FolderChooser {
   }
 
   static async chooseFolder(title: string): Promise<Uri | null> {
-    this.logger.trace('chooseFolder', { title });
+    FolderChooser.logger.trace('chooseFolder', { title });
     if (Settings.basic.folderOpener === 'tree') {
-      return await this.chooseFolderWithDialog(title);
+      return await FolderChooser.chooseFolderWithDialog(title);
     }
-    return await this.chooseFolderWithQuickPick(title);
+    return await FolderChooser.chooseFolderWithQuickPick(title);
   }
 }

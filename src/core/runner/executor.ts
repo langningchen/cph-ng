@@ -25,13 +25,14 @@ import Cache from '@/helpers/cache';
 import Logger from '@/helpers/logger';
 import ProcessExecutor from '@/helpers/processExecutor';
 import {
-  ProcessData,
+  type ProcessData,
   ProcessResultHandler,
 } from '@/helpers/processResultHandler';
 import Settings from '@/helpers/settings';
-import { TcIo, TcVerdicts } from '@/types';
+import { type TcIo, TcVerdicts } from '@/types';
 import { extensionPath } from '@/utils/global';
-import { KnownResult, Result } from '@/utils/result';
+import { KnownResult, type Result } from '@/utils/result';
+import { renderPath } from '@/utils/strTemplate';
 
 export interface RunOptions {
   cmd: string[];
@@ -49,10 +50,10 @@ export class Executor {
     options: RunOptions,
     interactor?: string,
   ): Promise<Result<ProcessData>> {
-    this.logger.trace('runExecutable', { options, interactor });
+    Executor.logger.trace('runExecutable', { options, interactor });
     return interactor
-      ? this.runWithInteractor(interactor, options)
-      : this.runWithoutInteractor(options);
+      ? Executor.runWithInteractor(interactor, options)
+      : Executor.runWithoutInteractor(options);
   }
 
   private static async getRunnerPath(): Promise<string | null> {
@@ -61,11 +62,11 @@ export class Executor {
         ? join(extensionPath, 'res', 'runner-windows.cpp')
         : join(extensionPath, 'res', 'runner-linux.cpp');
     const outputPath = join(
-      Settings.cache.directory,
+      renderPath(Settings.cache.directory),
       type() === 'Windows_NT' ? 'runner-windows.exe' : 'runner-linux',
     );
     if (existsSync(outputPath)) {
-      this.logger.debug('Using cached runner program', { outputPath });
+      Executor.logger.debug('Using cached runner program', { outputPath });
       return outputPath;
     }
     const runnerLang = new LangCpp();
@@ -83,11 +84,14 @@ export class Executor {
       },
     );
     if (langCompileResult instanceof KnownResult) {
-      this.logger.error('Failed to compile runner program', langCompileResult);
+      Executor.logger.error(
+        'Failed to compile runner program',
+        langCompileResult,
+      );
       return null;
     }
     if (langCompileResult.data.outputPath !== outputPath) {
-      this.logger.error('Runner program output path mismatch');
+      Executor.logger.error('Runner program output path mismatch');
       return null;
     }
     return outputPath;
@@ -105,7 +109,7 @@ export class Executor {
 
     let runnerPath: string | null = null;
     if (Settings.runner.useRunner && options.enableRunner) {
-      runnerPath = await this.getRunnerPath();
+      runnerPath = await Executor.getRunnerPath();
       if (!runnerPath) {
         return new KnownResult(
           TcVerdicts.SE,
@@ -159,7 +163,7 @@ export class Executor {
           ac: options.ac,
         },
       );
-    this.logger.debug('Interactor execution completed', {
+    Executor.logger.debug('Interactor execution completed', {
       solResult,
       intResult,
     });

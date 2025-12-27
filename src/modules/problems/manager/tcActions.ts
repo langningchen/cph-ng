@@ -1,4 +1,4 @@
-import * as msgs from '@w/msgs';
+import type * as msgs from '@w/msgs';
 import { stat, writeFile } from 'fs/promises';
 import { basename, dirname, extname, join } from 'path';
 import { commands, l10n, Uri, window } from 'vscode';

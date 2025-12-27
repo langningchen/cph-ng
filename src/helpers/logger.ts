@@ -30,7 +30,7 @@ export default class Logger {
     const messageData = args
       .map((arg) => (typeof arg === 'string' ? arg : JSON.stringify(arg)))
       .join(' ');
-    return `[${this.module}] ${messageData}`;
+    return `[legacy-${this.module}] ${messageData}`;
   }
   public trace(...args: any[]) {
     outputChannel.trace(this.message(...args));

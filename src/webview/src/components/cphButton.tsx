@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import IconButton, { IconButtonProps } from '@mui/material/IconButton';
-import SvgIcon from '@mui/material/SvgIcon';
+import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
+import type SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
 import { delProps } from '../utils';

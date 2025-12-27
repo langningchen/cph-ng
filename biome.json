@@ -1,9 +1,19 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
+  },
+  "files": {
+    "includes": [
+      "src/application/**",
+      "src/composition/**",
+      "src/domain/**",
+      "src/infrastructure/**",
+      "tests/**",
+      "scripts/**"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -16,29 +26,23 @@
     "bracketSameLine": false,
     "bracketSpacing": true,
     "expand": "auto",
-    "useEditorconfig": true,
-    "includes": ["**", "!**/testlib/"]
+    "useEditorconfig": true
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false,
+      "recommended": true,
       "style": {
-        "useBlockStatements": "warn",
         "noCommonJs": "on",
         "noUselessElse": "on",
-        "useConst": "on"
-      },
-      "suspicious": {
-        "noDoubleEquals": "on",
-        "noImplicitAnyLet": "error"
-      },
-      "correctness": {
-        "noUnusedImports": "on"
+        "noDefaultExport": "on"
       }
     }
   },
   "javascript": {
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    },
     "formatter": {
       "jsxQuoteStyle": "single",
       "quoteProperties": "asNeeded",

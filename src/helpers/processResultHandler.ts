@@ -21,8 +21,8 @@ import { l10n } from 'vscode';
 import Logger from '@/helpers/logger';
 import { TcVerdicts } from '@/types';
 import { telemetry } from '@/utils/global';
-import { KnownResult, Result, UnknownResult } from '@/utils/result';
-import { AbortReason, ExecuteResult } from './processExecutor';
+import { KnownResult, type Result, UnknownResult } from '@/utils/result';
+import { AbortReason, type ExecuteResult } from './processExecutor';
 import Settings from './settings';
 
 export interface WrapperData {
@@ -51,7 +51,10 @@ export class ProcessResultHandler {
       try {
         wrapperData = JSON.parse(wrapperDataStr) as WrapperData;
       } catch (e) {
-        this.logger.error('Failed to parse wrapper data JSON', e as Error);
+        ProcessResultHandler.logger.error(
+          'Failed to parse wrapper data JSON',
+          e as Error,
+        );
         telemetry.error('wrapperError', e, {
           output: wrapperDataStr,
         });
@@ -69,12 +72,17 @@ export class ProcessResultHandler {
     result: ExecuteResult,
     ignoreExitCode: boolean = false,
   ): Promise<Result<ProcessData>> {
-    this.logger.trace('parse', { result, ignoreExitCode });
-    this.logger.info('Parsing process result', { result, ignoreExitCode });
+    ProcessResultHandler.logger.trace('parse', { result, ignoreExitCode });
+    ProcessResultHandler.logger.info('Parsing process result', {
+      result,
+      ignoreExitCode,
+    });
     if (result instanceof Error) {
       return new KnownResult(TcVerdicts.SE, result.message);
     }
-    const wrapperData = await this.extractWrapperData(result.stderrPath);
+    const wrapperData = await ProcessResultHandler.extractWrapperData(
+      result.stderrPath,
+    );
 
     // Use wrapper time if available
     const time = wrapperData
@@ -121,7 +129,7 @@ export class ProcessResultHandler {
   public static async parseChecker(
     result: ExecuteResult,
   ): Promise<KnownResult<ProcessData>> {
-    const preResult = await this.parse(result, true);
+    const preResult = await ProcessResultHandler.parse(result, true);
     if (preResult instanceof KnownResult) {
       return preResult;
     }
@@ -130,7 +138,9 @@ export class ProcessResultHandler {
     assert(!(result instanceof Error));
     assert(typeof result.codeOrSignal === 'number');
 
-    const testlibVerdict = this.getTestlibVerdict(result.codeOrSignal);
+    const testlibVerdict = ProcessResultHandler.getTestlibVerdict(
+      result.codeOrSignal,
+    );
     return new KnownResult(testlibVerdict.verdict, testlibVerdict.msg, {
       time: result.time,
       memory: result.memory,
@@ -154,7 +164,10 @@ export class ProcessResultHandler {
       case 7:
         return new KnownResult(TcVerdicts.PC);
       default:
-        this.logger.warn('Testlib returned unknown exit code', code);
+        ProcessResultHandler.logger.warn(
+          'Testlib returned unknown exit code',
+          code,
+        );
         return new KnownResult(
           TcVerdicts.SE,
           l10n.t('Testlib returned unknown exit code: {code}', {

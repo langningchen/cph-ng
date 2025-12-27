@@ -24,9 +24,13 @@ import { CompilationIo } from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import ProcessExecutor, { AbortReason } from '@/helpers/processExecutor';
 import Settings from '@/helpers/settings';
-import { FileWithHash, ICompilationSettings, TcVerdicts } from '@/types';
+import {
+  type FileWithHash,
+  type ICompilationSettings,
+  TcVerdicts,
+} from '@/types';
 import { telemetry, waitUntil } from '@/utils/global';
-import { KnownResult, Result, UnknownResult } from '@/utils/result';
+import { KnownResult, type Result, UnknownResult } from '@/utils/result';
 
 export interface LangCompileData {
   outputPath: string;

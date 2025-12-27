@@ -1,4 +1,4 @@
-import { ColorThemeKind, env, Uri, Webview, window } from 'vscode';
+import { ColorThemeKind, env, Uri, type Webview, window } from 'vscode';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
 import { extensionUri } from '@/utils/global';

@@ -21,12 +21,12 @@ import { join } from 'path';
 import { EventEmitter } from 'stream';
 import {
   commands,
-  ExtensionContext,
+  type ExtensionContext,
   env,
   extensions,
   l10n,
   lm,
-  MessageItem,
+  type MessageItem,
   window,
   workspace,
 } from 'vscode';
@@ -34,6 +34,7 @@ import LlmDataInspector from '@/ai/llmDataInspector';
 import LlmTcRunner from '@/ai/llmTcRunner';
 import LlmTestCaseEditor from '@/ai/llmTestCaseEditor';
 import LlmTestCaseLister from '@/ai/llmTestCaseLister';
+import { setupContainer } from '@/composition/container';
 import Cache from '@/helpers/cache';
 import FolderChooser from '@/helpers/folderChooser';
 import Io from '@/helpers/io';
@@ -54,6 +55,7 @@ import {
 } from '@/utils/global';
 import { version } from '@/utils/packageInfo';
 import SidebarProvider from './sidebar';
+import { renderPath } from '@/utils/strTemplate';
 
 interface ContextEvent {
   hasProblem: boolean;
@@ -71,6 +73,8 @@ export default class ExtensionManager {
   public static async activate(context: ExtensionContext) {
     ExtensionManager.logger.info('Activating CPH-NG extension');
     try {
+      // Initialize DI container (no behavior changes yet)
+      await setupContainer(context);
       setExtensionUri(context.extensionUri);
       context.subscriptions.push(telemetry);
       await telemetry.init();
@@ -84,7 +88,7 @@ export default class ExtensionManager {
 
       if (Settings.cache.cleanOnStartup) {
         ExtensionManager.logger.info('Cleaning cache on startup');
-        await rm(Settings.cache.directory, {
+        await rm(renderPath(Settings.cache.directory), {
           force: true,
           recursive: true,
         });

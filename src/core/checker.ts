@@ -20,11 +20,11 @@ import Cache from '@/helpers/cache';
 import Logger from '@/helpers/logger';
 import ProcessExecutor from '@/helpers/processExecutor';
 import {
-  ProcessData,
+  type ProcessData,
   ProcessResultHandler,
 } from '@/helpers/processResultHandler';
-import { TcWithResult } from '@/types';
-import { KnownResult } from '@/utils/result';
+import type { TcWithResult } from '@/types';
+import type { KnownResult } from '@/utils/result';
 
 export class Checker {
   private static logger: Logger = new Logger('checker');
@@ -34,7 +34,7 @@ export class Checker {
     tc: TcWithResult,
     ac: AbortController,
   ): Promise<KnownResult<ProcessData>> {
-    this.logger.debug('Running checker', checkerPath, 'on tc', tc);
+    Checker.logger.debug('Running checker', checkerPath, 'on tc', tc);
 
     // The tc should have stdout and stderr stored in files
     // Because we directly pass the file paths in the runner.ts
@@ -48,14 +48,14 @@ export class Checker {
       cmd: [checkerPath, stdinPath, tc.result.stdout.data, answerPath],
       ac,
     });
-    this.logger.debug('Checker completed', result);
+    Checker.logger.debug('Checker completed', result);
 
     // Dispose the temp files created for tc
     tc.stdin.useFile || Cache.dispose(stdinPath);
     tc.answer.useFile || Cache.dispose(answerPath);
 
     const checkerResult = await ProcessResultHandler.parseChecker(result);
-    this.logger.debug('Parsed checker result', checkerResult);
+    Checker.logger.debug('Parsed checker result', checkerResult);
     return checkerResult;
   }
 }

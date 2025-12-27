@@ -31,7 +31,7 @@ import {
 import { createContext, Script } from 'vm';
 import { l10n, window } from 'vscode';
 import { renderWorkspacePath } from '@/utils/strTemplate';
-import { CompanionProblem } from '../modules/companion';
+import type { CompanionProblem } from '../modules/companion';
 import FolderChooser from './folderChooser';
 import Io from './io';
 import Logger from './logger';
@@ -64,7 +64,7 @@ export default class UserScriptManager {
       }
       code = await readFile(scriptFile, 'utf-8');
     } catch (e) {
-      this.logger.error('Could not read user script', e);
+      UserScriptManager.logger.error('Could not read user script', e);
       Io.error(l10n.t('Could not read user script'));
       return;
     }
@@ -91,11 +91,11 @@ export default class UserScriptManager {
         sanitize: (name: string) => name.replace(/[\\/:*?"<>|]/g, '_'),
       },
       logger: {
-        trace: this.outputChannel.trace,
-        debug: this.outputChannel.debug,
-        info: this.outputChannel.info,
-        warn: this.outputChannel.warn,
-        error: this.outputChannel.error,
+        trace: UserScriptManager.outputChannel.trace,
+        debug: UserScriptManager.outputChannel.debug,
+        info: UserScriptManager.outputChannel.info,
+        warn: UserScriptManager.outputChannel.warn,
+        error: UserScriptManager.outputChannel.error,
       },
       ui: {
         chooseFolder: async (title?: string) =>
@@ -131,7 +131,7 @@ export default class UserScriptManager {
         displayErrors: true,
         timeout: 2000,
       });
-      this.logger.debug('User script executed', result);
+      UserScriptManager.logger.debug('User script executed', result);
       if (typeof result === 'string') {
         Io.error(result);
       } else if (Array.isArray(result)) {
@@ -152,7 +152,7 @@ export default class UserScriptManager {
         Io.error(l10n.t('User script does not return a valid path array'));
       }
     } catch (e) {
-      this.logger.error('Error executing user script sandbox', e);
+      UserScriptManager.logger.error('Error executing user script sandbox', e);
       Io.error(l10n.t('Error executing user script sandbox'));
     }
   }

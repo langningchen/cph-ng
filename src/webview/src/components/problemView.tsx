@@ -17,7 +17,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { IProblem } from '@/types/types';
+import type { IProblem } from '@/types/types';
 import { useProblemContext } from '../context/ProblemContext';
 import CphFlex from './base/cphFlex';
 import CphMenu from './base/cphMenu';

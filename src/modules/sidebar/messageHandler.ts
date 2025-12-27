@@ -1,4 +1,4 @@
-import { WebviewMsg } from '@w/msgs';
+import type { WebviewMsg } from '@w/msgs';
 import { commands, l10n } from 'vscode';
 import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';

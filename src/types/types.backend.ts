@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { randomUUID, UUID } from 'crypto';
+import { randomUUID, type UUID } from 'crypto';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { readFile, stat, unlink, writeFile } from 'fs/promises';
 import { basename, dirname, extname, join, relative } from 'path';
@@ -28,10 +28,10 @@ import Settings from '@/helpers/settings';
 import { telemetry } from '@/utils/global';
 import { mkdirIfNotExists } from '@/utils/process';
 import { version } from '../utils/packageInfo';
-import { KnownResult } from '../utils/result';
-import { renderPathWithFile } from '../utils/strTemplate';
-import { migration, OldProblem } from './migration';
-import {
+import type { KnownResult } from '../utils/result';
+import { renderPath, renderPathWithFile } from '../utils/strTemplate';
+import { migration, type OldProblem } from './migration';
+import type {
   IBfCompare,
   ICompilationSettings,
   IFileWithHash,
@@ -41,19 +41,6 @@ import {
   ITcResult,
   ITcVerdict,
 } from './types';
-
-export const isRunningVerdict = (verdict?: ITcVerdict): boolean => {
-  return (
-    verdict !== undefined &&
-    ['WT', 'CP', 'CPD', 'JG', 'JGD', 'CMP'].includes(verdict.name)
-  );
-};
-export const isExpandVerdict = (verdict?: ITcVerdict): boolean => {
-  return !(
-    (verdict !== undefined && ['AC', 'SK', 'RJ'].includes(verdict.name)) ||
-    isRunningVerdict(verdict)
-  );
-};
 
 export class TcVerdict implements ITcVerdict {
   constructor(
@@ -79,7 +66,7 @@ export class TcResult implements ITcResult {
     this.stderr.fromI(result.stderr);
     this.msg = result.msg || [];
   }
-  public fromResult<T>(result: KnownResult<T>) {
+  public fromResult(result: KnownResult<unknown>) {
     this.verdict = result.verdict;
     result.msg && this.msg.push(result.msg);
   }
@@ -305,7 +292,7 @@ export class Problem implements IProblem {
         relative(dirname(problem.src.path), oldPath),
       );
       if (existsSync(newPath)) {
-        this.logger.debug('Fixed path', oldPath, 'to', newPath);
+        Problem.logger.debug('Fixed path', oldPath, 'to', newPath);
         return newPath;
       }
       return oldPath;
@@ -326,8 +313,8 @@ export class Problem implements IProblem {
     fixFileWithHash(problem.bfCompare?.bruteForce);
     problem.src.path = srcPath;
 
-    this.logger.info('Problem', problem.src.path, 'loaded');
-    this.logger.trace('Loaded problem data', { problem });
+    Problem.logger.info('Problem', problem.src.path, 'loaded');
+    Problem.logger.trace('Loaded problem data', { problem });
     return problem;
   }
 
@@ -365,7 +352,7 @@ export class Problem implements IProblem {
     }
 
     if (
-      path.startsWith(Settings.cache.directory.toLowerCase()) ||
+      path.startsWith(renderPath(Settings.cache.directory).toLowerCase()) ||
       this.src.path.toLowerCase() === path ||
       this.checker?.path.toLowerCase() === path ||
       this.interactor?.path.toLowerCase() === path ||

@@ -1,4 +1,4 @@
-import * as msgs from '@w/msgs';
+import type * as msgs from '@w/msgs';
 import { existsSync } from 'fs';
 import { readdir } from 'fs/promises';
 import { basename, dirname, extname, join } from 'path';
