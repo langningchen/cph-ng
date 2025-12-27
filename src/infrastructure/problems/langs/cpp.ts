@@ -1,10 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ISystem } from '@/application/ports/node/ISystem';
-import type {
-  CompileAdditionalData,
-  LangCompileResult,
-} from '@/application/ports/problems/ILanguageStrategy';
+import type { CompileAdditionalData } from '@/application/ports/problems/ILanguageStrategy';
 import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
@@ -44,7 +41,10 @@ export class LangCpp extends AbstractLanguageStrategy {
       compilationSettings,
       debug,
     }: CompileAdditionalData = DefaultCompileAdditionalData,
-  ): Promise<LangCompileResult> {
+  ): Promise<{
+    outputPath?: string;
+    hash?: string;
+  }> {
     this.logger.trace('compile', { src, forceCompile });
 
     const outputPath = this.fs.join(
@@ -67,9 +67,7 @@ export class LangCpp extends AbstractLanguageStrategy {
         this.settings.compilation.useHook,
       forceCompile,
     );
-    if (skip) {
-      return { outputPath, hash };
-    }
+    if (skip) return { outputPath, hash };
 
     const { objcopy, useWrapper, useHook } = this.settings.compilation;
     const compileCommands: string[][] = [];
@@ -130,20 +128,14 @@ export class LangCpp extends AbstractLanguageStrategy {
     for (const result of await Promise.all(
       compileCommands.map((cmd) => this._executeCompiler(cmd, ac)),
     )) {
-      if (result instanceof KnownResult) {
-        return new KnownResult(result.verdict, result.msg, {
-          outputPath,
-          hash,
-        });
+      if (result instanceof Error) {
+        return { outputPath, hash };
       }
     }
     for (const cmd of postCommands) {
       const result = await this._executeCompiler(cmd, ac);
-      if (result instanceof KnownResult) {
-        return new KnownResult(result.verdict, result.msg, {
-          outputPath,
-          hash,
-        });
+      if (result instanceof Error) {
+        return { outputPath, hash };
       }
     }
     return { outputPath, hash };

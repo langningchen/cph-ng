@@ -12,17 +12,25 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import Cache from '@/helpers/cache';
 import { CompilationIo } from '@/helpers/io';
 import ProcessExecutor, { AbortReason } from '@/helpers/processExecutor';
-import {
-  type FileWithHash,
-  type ICompilationSettings,
-  TcVerdicts,
-} from '@/types';
+import type { FileWithHash, ICompilationSettings } from '@/types';
 import { telemetry, waitUntil } from '@/utils/global';
-import { KnownResult, type Result, UnknownResult } from '@/utils/result';
 
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
   canUseWrapper: false,
 };
+
+export interface CompilerExecuteData {
+  isAborted?: boolean;
+  isTimeout?: boolean;
+  compilerFailed?: boolean;
+}
+export type CompilerExecuteResult = CompilerExecuteData | Error;
+
+export interface InternalCompileData {
+  outputPath?: string;
+  hash?: string;
+}
+export type InternalCompileResult = InternalCompileData | Error;
 
 export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
   public abstract readonly name: string;
@@ -54,6 +62,10 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     // Clear previous compilation IO
     CompilationIo.clear();
 
+    const result: LangCompileResult = {
+      outputExists: false,
+      internalError: false,
+    };
     try {
       const compileEnd = telemetry.start('compile', {
         lang: this.name,
@@ -65,22 +77,25 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
         forceCompile,
         additionalData,
       );
+      if (langCompileResult instanceof Error) {
+        return {
+          outputExists: false,
+          internalError: true,
+        };
+      }
       compileEnd({ ...langCompileResult });
 
-      // Check if the output file exists
-      if (
-        langCompileResult instanceof UnknownResult &&
-        !this.fs.exists(langCompileResult.data.outputPath)
-      ) {
-        return { msg: this.translator.t('Compilation failed') };
-      }
-      return langCompileResult;
+      result.outputPath = langCompileResult.outputPath;
+      result.hash = langCompileResult.hash;
     } catch (e) {
       this.logger.error('Compilation failed', e);
       CompilationIo.append((e as Error).message);
       telemetry.error('compileError', e);
-      return { msg: this.translator.t('Compilation failed') };
+      result.internalError = true;
     }
+    result.outputExists =
+      !!result.outputPath && (await this.fs.exists(result.outputPath));
+    return result;
   }
 
   protected abstract _compile(
@@ -88,44 +103,42 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     ac: AbortController,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData,
-  ): Promise<LangCompileResult>;
+  ): Promise<InternalCompileResult>;
 
   protected async _executeCompiler(
     cmd: string[],
     ac: AbortController,
-  ): Promise<Result<undefined>> {
+  ): Promise<CompilerExecuteResult> {
     const result = await ProcessExecutor.execute({
       cmd,
       ac,
       timeout: this.settings.compilation.timeout,
     });
     if (result instanceof Error) {
-      return new KnownResult(TcVerdicts.SE, result.message);
+      return result;
     }
     if (result.abortReason === AbortReason.UserAbort) {
-      return new KnownResult(
-        TcVerdicts.RJ,
-        this.translator.t('Compilation aborted by user'),
-      );
+      return {
+        isAborted: true,
+      };
     }
     if (result.abortReason === AbortReason.Timeout) {
-      return new KnownResult(
-        TcVerdicts.CE,
-        this.translator.t('Compilation timed out'),
-      );
+      return {
+        isTimeout: true,
+      };
     }
     CompilationIo.append(await this.fs.readFile(result.stdoutPath));
     CompilationIo.append(await this.fs.readFile(result.stderrPath));
     if (result.codeOrSignal) {
-      return new KnownResult(
-        TcVerdicts.CE,
-        this.translator.t('Compiler exited with code {code}', {
-          code: result.codeOrSignal,
-        }),
-      );
+      return {
+        compilerFailed: true,
+      };
     }
     Cache.dispose([result.stdoutPath, result.stderrPath]);
-    return new UnknownResult(undefined);
+    return {
+      isAborted: false,
+      isTimeout: false,
+    };
   }
 
   protected async checkHash(

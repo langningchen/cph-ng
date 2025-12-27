@@ -8,8 +8,9 @@ export interface CompileAdditionalData {
 
 export interface LangCompileResult {
   outputPath?: string;
+  outputExists: boolean;
+  internalError: boolean;
   hash?: string;
-  msg?: string;
 }
 
 export interface ILanguageStrategy {
