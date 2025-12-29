@@ -186,6 +186,7 @@
   "Waiting": "等待中",
   "Waiting response from cph-submit...": "正在等待 cph-submit 的响应...",
   "Wrong Answer": "答案错误",
+  "Zip file contains an invalid entry: {entry}": "ZIP 压缩包包含非法条目：{entry}",
   "Yes": "是",
   "answer": "答案",
   "not found": "未找到",

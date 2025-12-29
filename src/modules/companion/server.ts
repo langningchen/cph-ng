@@ -19,7 +19,7 @@ export class Server {
       request.on('data', (chunk) => {
         requestData += chunk;
       });
-      request.on('close', async () => {
+      request.on('end', async () => {
         Server.logger.debug('Received request', requestData);
         if (request.url === '/') {
           if (requestData.trim() === '') {
@@ -69,7 +69,7 @@ export class Server {
       'Companion server listen at port',
       Settings.companion.listenPort,
     );
-    Server.server.listen(Settings.companion.listenPort);
+    Server.server.listen(Settings.companion.listenPort, '127.0.0.1');
   }
 
   public static stopServer() {

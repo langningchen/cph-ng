@@ -19,7 +19,7 @@ import AdmZip from 'adm-zip';
 import { existsSync } from 'fs';
 import { readdir, unlink } from 'fs/promises';
 import { orderBy } from 'natural-orderby';
-import { basename, dirname, extname, join } from 'path';
+import { basename, dirname, extname, join, resolve, sep } from 'path';
 import { l10n, window } from 'vscode';
 import Io from '@/helpers/io';
 import Settings from '@/helpers/settings';
@@ -95,6 +95,22 @@ export default class TcFactory {
       return [];
     }
     await mkdirIfNotExists(folderPath);
+
+    const normalizePath = (path: string) =>
+      process.platform === 'win32' ? path.toLowerCase() : path;
+    const baseDir = normalizePath(resolve(folderPath) + sep);
+    for (const entry of zipData.getEntries()) {
+      const entryPath = normalizePath(resolve(folderPath, entry.entryName));
+      if (!entryPath.startsWith(baseDir)) {
+        Io.error(
+          l10n.t('Zip file contains an invalid entry: {entry}', {
+            entry: entry.entryName,
+          }),
+        );
+        return [];
+      }
+    }
+
     zipData.extractAllTo(folderPath, true);
     if (Settings.problem.deleteAfterUnzip) {
       await unlink(zipPath);
