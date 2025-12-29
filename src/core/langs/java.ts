@@ -15,10 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { createHash } from 'crypto';
 import { basename, dirname, extname, join } from 'path';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
 import { FileWithHash } from '@/types';
+import { mkdirIfNotExists } from '@/utils/process';
 import { KnownResult, UnknownResult } from '@/utils/result';
 import {
   CompileAdditionalData,
@@ -41,10 +43,16 @@ export class LangJava extends Lang {
   ): Promise<LangCompileResult> {
     this.logger.trace('compile', { src, forceCompile });
 
-    const outputPath = join(
+    const basenameNoExt = basename(src.path, extname(src.path));
+    const pathHash = createHash('sha256')
+      .update(src.path)
+      .digest('hex')
+      .slice(0, 8);
+    const outputDir = join(
       Settings.cache.directory,
-      basename(src.path, extname(src.path)) + '.class',
+      `${basenameNoExt}-${pathHash}`,
     );
+    const outputPath = join(outputDir, `${basenameNoExt}.class`);
 
     const compiler =
       compilationSettings?.compiler ?? Settings.compilation.javaCompiler;
@@ -57,14 +65,15 @@ export class LangJava extends Lang {
       compiler + args,
       forceCompile,
     );
-    if (!skip) {
+    if (skip) {
       return new UnknownResult({ outputPath, hash });
     }
 
     const compilerArgs = args.split(/\s+/).filter(Boolean);
 
+    await mkdirIfNotExists(outputDir);
     const result = await this._executeCompiler(
-      [compiler, ...compilerArgs, '-d', Settings.cache.directory, src.path],
+      [compiler, ...compilerArgs, '-d', outputDir, src.path],
       ac,
     );
     return result instanceof KnownResult

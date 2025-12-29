@@ -19,7 +19,7 @@ export class Server {
       request.on('data', (chunk) => {
         requestData += chunk;
       });
-      request.on('close', async () => {
+      request.on('end', async () => {
         Server.logger.debug('Received request', requestData);
         if (request.url === '/') {
           if (requestData.trim() === '') {
@@ -28,7 +28,7 @@ export class Server {
             try {
               await Handler.handleIncomingProblem(JSON.parse(requestData));
             } catch (e) {
-              this.logger.error('Error parsing request data', e);
+              Server.logger.error('Error parsing request data', e);
               if (e instanceof SyntaxError) {
                 Io.warn(l10n.t('Companion data is invalid JSON'));
               } else {
@@ -69,7 +69,7 @@ export class Server {
       'Companion server listen at port',
       Settings.companion.listenPort,
     );
-    Server.server.listen(Settings.companion.listenPort);
+    Server.server.listen(Settings.companion.listenPort, '127.0.0.1');
   }
 
   public static stopServer() {

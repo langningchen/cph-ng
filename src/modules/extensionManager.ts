@@ -17,7 +17,7 @@
 
 import { readFile, rm } from 'fs/promises';
 import { release } from 'os';
-import { join } from 'path';
+import { join, parse, resolve } from 'path';
 import { EventEmitter } from 'stream';
 import {
   commands,
@@ -83,11 +83,20 @@ export default class ExtensionManager {
       });
 
       if (Settings.cache.cleanOnStartup) {
-        ExtensionManager.logger.info('Cleaning cache on startup');
-        await rm(Settings.cache.directory, {
-          force: true,
-          recursive: true,
-        });
+        const cacheDir = resolve(Settings.cache.directory);
+        const isRootDir = cacheDir === parse(cacheDir).root;
+        const looksLikeCphNgCache = cacheDir.toLowerCase().includes('cph-ng');
+        if (!isRootDir && looksLikeCphNgCache) {
+          ExtensionManager.logger.info('Cleaning cache on startup');
+          await rm(cacheDir, {
+            force: true,
+            recursive: true,
+          });
+        } else {
+          ExtensionManager.logger.warn('Skip cleaning cache: unsafe path', {
+            cacheDir,
+          });
+        }
       }
 
       await Cache.ensureDir();

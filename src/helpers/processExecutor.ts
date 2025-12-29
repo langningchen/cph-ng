@@ -213,7 +213,10 @@ export default class ProcessExecutor {
           this.logger.error('Error parsing runner output', e);
           Cache.dispose([stdoutPath, stderrPath]);
           if (e instanceof SyntaxError) {
-            return this.toErrorResult(l10n.t('Runner output is invalid JSON'));
+            resolve(
+              this.toErrorResult(l10n.t('Runner output is invalid JSON')),
+            );
+            return;
           }
           resolve(
             this.toErrorResult(
@@ -242,13 +245,29 @@ export default class ProcessExecutor {
   public static async execute(options: LaunchOptions): Promise<ExecuteResult> {
     this.logger.trace('execute', options);
     const launch = this.launch(options);
-    return new Promise(async (resolve) => {
+    return new Promise<ExecuteResult>((resolve) => {
+      let settled = false;
+
+      const settle = (result: ExecuteResult) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        resolve(result);
+      };
+
       launch.child.on('close', async (code, signal) => {
-        resolve(await this.toResult(launch, code ?? signal!));
+        if (settled) {
+          return;
+        }
+        settle(await this.toResult(launch, code ?? signal!));
       });
       launch.child.on('error', (error) => {
-        Cache.dispose([launch.stderrPath, launch.stderrPath]);
-        error.name === 'AbortError' || resolve(this.toErrorResult(error));
+        if (error.name === 'AbortError' || settled) {
+          return;
+        }
+        Cache.dispose([launch.stdoutPath, launch.stderrPath]);
+        settle(this.toErrorResult(error));
       });
     });
   }

@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { createHash } from 'crypto';
 import { basename, extname, join } from 'path';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
@@ -41,9 +42,14 @@ export class LangPython extends Lang {
   ): Promise<LangCompileResult> {
     this.logger.trace('compile', { src, forceCompile });
 
+    const basenameNoExt = basename(src.path, extname(src.path));
+    const pathHash = createHash('sha256')
+      .update(src.path)
+      .digest('hex')
+      .slice(0, 8);
     const outputPath = join(
       Settings.cache.directory,
-      basename(src.path, extname(src.path)) + '.pyc',
+      `${basenameNoExt}-${pathHash}.pyc`,
     );
 
     const compiler =
