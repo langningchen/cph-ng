@@ -71,7 +71,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
         lang: this.name,
         forceCompile: forceCompile ? 'auto' : String(forceCompile),
       });
-      const langCompileResult = await this._compile(
+      const langCompileResult = await this.internalCompile(
         src,
         ac,
         forceCompile,
@@ -98,14 +98,14 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     return result;
   }
 
-  protected abstract _compile(
+  protected abstract internalCompile(
     src: FileWithHash,
     ac: AbortController,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData,
   ): Promise<InternalCompileResult>;
 
-  protected async _executeCompiler(
+  protected async executeCompiler(
     cmd: string[],
     ac: AbortController,
   ): Promise<CompilerExecuteResult> {

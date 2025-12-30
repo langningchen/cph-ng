@@ -10,6 +10,7 @@ import { TOKENS } from '@/composition/tokens';
 import {
   AbstractLanguageStrategy,
   DefaultCompileAdditionalData,
+  type InternalCompileResult,
 } from '@/infrastructure/problems/langs/abstractLanguageStrategy';
 import type { FileWithHash } from '@/types';
 
@@ -32,19 +33,12 @@ export class LangCpp extends AbstractLanguageStrategy {
     this.logger = this.logger.withScope('langsCpp');
   }
 
-  protected async _compile(
+  protected async internalCompile(
     src: FileWithHash,
     ac: AbortController,
     forceCompile: boolean | null,
-    {
-      canUseWrapper,
-      compilationSettings,
-      debug,
-    }: CompileAdditionalData = DefaultCompileAdditionalData,
-  ): Promise<{
-    outputPath?: string;
-    hash?: string;
-  }> {
+    additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
+  ): Promise<InternalCompileResult> {
     this.logger.trace('compile', { src, forceCompile });
 
     const outputPath = this.fs.join(
@@ -54,9 +48,11 @@ export class LangCpp extends AbstractLanguageStrategy {
     );
 
     const compiler =
-      compilationSettings?.compiler ?? this.settings.compilation.cppCompiler;
+      additionalData.compilationSettings?.compiler ??
+      this.settings.compilation.cppCompiler;
     const args =
-      compilationSettings?.compilerArgs ?? this.settings.compilation.cppArgs;
+      additionalData.compilationSettings?.compilerArgs ??
+      this.settings.compilation.cppArgs;
 
     const { skip, hash } = await this.checkHash(
       src,
@@ -73,7 +69,7 @@ export class LangCpp extends AbstractLanguageStrategy {
     const compileCommands: string[][] = [];
     const postCommands: string[][] = [];
     const compilerArgs = args.split(/\s+/).filter(Boolean);
-    if (canUseWrapper && useWrapper) {
+    if (additionalData.canUseWrapper && useWrapper) {
       const obj = `${outputPath}.o`;
       const wrapperObj = `${outputPath}.wrapper.o`;
       const linkObjects = [obj, wrapperObj];
@@ -121,22 +117,17 @@ export class LangCpp extends AbstractLanguageStrategy {
       ) {
         cmd.push('-Wl,--stack,268435456');
       }
-      debug && cmd.push('-g', '-O0');
       compileCommands.push(cmd);
     }
 
     for (const result of await Promise.all(
-      compileCommands.map((cmd) => this._executeCompiler(cmd, ac)),
+      compileCommands.map((cmd) => this.executeCompiler(cmd, ac)),
     )) {
-      if (result instanceof Error) {
-        return { outputPath, hash };
-      }
+      if (result instanceof Error) return result;
     }
     for (const cmd of postCommands) {
-      const result = await this._executeCompiler(cmd, ac);
-      if (result instanceof Error) {
-        return { outputPath, hash };
-      }
+      const result = await this.executeCompiler(cmd, ac);
+      if (result instanceof Error) return result;
     }
     return { outputPath, hash };
   }
