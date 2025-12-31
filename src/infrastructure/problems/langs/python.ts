@@ -17,17 +17,17 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { LangCompileData } from '@/application/ports/problems/ILanguageStrategy';
 import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import type { CompileAdditionalData } from '@/core/langs/lang';
-import type { FileWithHash } from '@/types';
+import type { FileWithHash, IOverwrites } from '@/types';
 import {
   AbstractLanguageStrategy,
   DefaultCompileAdditionalData,
-  type InternalCompileResult,
 } from './abstractLanguageStrategy';
 
 @injectable()
@@ -51,56 +51,53 @@ export class LangPython extends AbstractLanguageStrategy {
     ac: AbortController,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
-  ): Promise<InternalCompileResult> {
+  ): Promise<LangCompileData> {
     this.logger.trace('compile', { src, forceCompile });
 
-    const outputPath = this.fs.join(
+    const path = this.fs.join(
       this.renderer.renderPath(this.settings.cache.directory),
       `${this.fs.basename(src.path, this.fs.extname(src.path))}.pyc`,
     );
 
     const compiler =
-      additionalData.compilationSettings?.compiler ??
+      additionalData.overwrites?.compiler ??
       this.settings.compilation.pythonCompiler;
     const args =
-      additionalData.compilationSettings?.compilerArgs ??
+      additionalData.overwrites?.compilerArgs ??
       this.settings.compilation.pythonArgs;
 
     const { skip, hash } = await this.checkHash(
       src,
-      outputPath,
+      path,
       compiler + args,
       forceCompile,
     );
     if (skip) {
-      return { outputPath, hash };
+      return { path, hash };
     }
 
     const compilerArgs = args.split(/\s+/).filter(Boolean);
 
-    const result = await this.executeCompiler(
+    await this.executeCompiler(
       [
         compiler,
         '-c',
-        `import py_compile; py_compile.compile(r'${src.path}', cfile=r'${outputPath}', doraise=True)`,
+        `import py_compile; py_compile.compile(r'${src.path}', cfile=r'${path}', doraise=True)`,
         ...compilerArgs,
       ],
       ac,
     );
-    if (result instanceof Error) return result;
-    return { outputPath, hash };
+    return { path, hash };
   }
 
   public async getRunCommand(
     target: string,
-    compilationSettings?: CompileAdditionalData['compilationSettings'],
+    overwrites?: IOverwrites,
   ): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner =
-      compilationSettings?.runner ?? this.settings.compilation.pythonRunner;
+    const runner = overwrites?.runner ?? this.settings.compilation.pythonRunner;
     const runArgs =
-      compilationSettings?.runnerArgs ??
-      this.settings.compilation.pythonRunArgs;
+      overwrites?.runnerArgs ?? this.settings.compilation.pythonRunArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

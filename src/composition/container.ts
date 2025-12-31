@@ -28,12 +28,11 @@ import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
 import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
-import { CompilerAdapter } from '@/infrastructure/problems/compilerAdapter';
-import { CheckerRunnerAdapter } from '@/infrastructure/problems/runner/checkerRunnerAdapter';
-import { RunStrategyFactoryAdapter } from '@/infrastructure/problems/runner/RunStrategyFactoryAdapter';
-import { RunnerProviderAdapter } from '@/infrastructure/problems/runner/runnerProviderAdapter';
+import { CheckerRunnerAdapter } from '@/infrastructure/problems/checkerRunnerAdapter';
+import { CompilerService } from '@/infrastructure/problems/compilerService';
+import { ExecutionStrategyFactoryAdapter } from '@/infrastructure/problems/runner/execution/executionStrategyFactoryAdapter';
+import { RunnerProviderAdapter } from '@/infrastructure/problems/runner/execution/strategies/runnerProviderAdapter';
 import { SolutionRunnerAdapter } from '@/infrastructure/problems/runner/solutionRunnerAdapter';
-import { CompilerService } from '@/infrastructure/services/compilerService';
 import { LanguageRegistry } from '@/infrastructure/services/languageRegistry';
 import { PathRendererAdapter } from '@/infrastructure/services/pathRendererAdapter';
 import { LoggerAdapter } from '@/infrastructure/vscode/loggerAdapter';
@@ -47,7 +46,6 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.BuildInfo, BuildInfoAdapter);
   container.registerSingleton(TOKENS.CheckerRunner, CheckerRunnerAdapter);
   container.registerSingleton(TOKENS.Clock, ClockAdapter);
-  container.registerSingleton(TOKENS.Compiler, CompilerAdapter);
   container.registerSingleton(TOKENS.Crypto, CryptoAdapter);
   container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
   container.registerSingleton(TOKENS.Logger, LoggerAdapter);
@@ -65,8 +63,8 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.Translator, TranslatorAdapter);
   container.registerSingleton(TOKENS.WebviewEventBus, WebviewEventBusAdapter);
   container.registerSingleton(
-    TOKENS.RunStrategyFactory,
-    RunStrategyFactoryAdapter,
+    TOKENS.ExecutionStrategyFactory,
+    ExecutionStrategyFactoryAdapter,
   );
   container.registerSingleton(TOKENS.LanguageRegistry, LanguageRegistry);
   container.registerSingleton(TOKENS.CompilerService, CompilerService);

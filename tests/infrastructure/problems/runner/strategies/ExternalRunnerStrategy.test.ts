@@ -42,7 +42,7 @@ import type {
   ProcessHandle,
   ProcessOutput,
 } from '@/application/ports/node/IProcessExecutor';
-import type { IRunnerProvider } from '@/application/ports/problems/IRunnerProvider';
+import type { IRunnerProvider } from '@/application/ports/problems/runner/execution/strategies/IRunnerProvider';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext } from '@/domain/execution';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
@@ -51,8 +51,8 @@ import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
 import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
-import { RunnerProviderAdapter } from '@/infrastructure/problems/runner/runnerProviderAdapter';
-import { ExternalRunnerStrategy } from '@/infrastructure/problems/runner/strategies/ExternalRunnerStrategy';
+import { ExternalRunnerStrategy } from '@/infrastructure/problems/runner/execution/strategies/externalRunnerStrategy';
+import { RunnerProviderAdapter } from '@/infrastructure/problems/runner/execution/strategies/runnerProviderAdapter';
 
 describe('ExternalRunnerStrategy', () => {
   let strategy: ExternalRunnerStrategy;
@@ -171,7 +171,7 @@ describe('ExternalRunnerStrategy', () => {
     expect(processHandleMock.writeStdin).toHaveBeenCalledWith('k');
     expect(processHandleMock.closeStdin).toHaveBeenCalled();
     if (!(result instanceof Error)) {
-      expect(result.isAborted).toBe(false);
+      expect(result.isUserAborted).toBe(false);
       expect(result.timeMs).toBe(1200);
     }
   });
@@ -289,7 +289,7 @@ describe('ExternalRunnerStrategy', () => {
     expect(processHandleMock.writeStdin).toHaveBeenCalledWith('k');
     expect(processHandleMock.closeStdin).toHaveBeenCalled();
     if (!(result instanceof Error)) {
-      expect(result.isAborted).toBe(true);
+      expect(result.isUserAborted).toBe(true);
       expect(result.timeMs).toBe(50);
     }
   });
@@ -392,7 +392,7 @@ describe.runIf(hasCppCompiler)(
       console.log(result);
       expect(result).not.toBeInstanceOf(Error);
       if (!(result instanceof Error)) {
-        expect(result.isAborted).toBe(false);
+        expect(result.isUserAborted).toBe(false);
         expect(result.timeMs).toBeGreaterThanOrEqual(500);
       }
     });
@@ -412,7 +412,7 @@ describe.runIf(hasCppCompiler)(
       const result = await promise;
 
       if (!(result instanceof Error)) {
-        expect(result.isAborted).toBe(true);
+        expect(result.isUserAborted).toBe(true);
         expect(result.timeMs).toBeLessThan(1000);
       }
     });

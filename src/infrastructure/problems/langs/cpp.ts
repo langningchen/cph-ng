@@ -1,7 +1,10 @@
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ISystem } from '@/application/ports/node/ISystem';
-import type { CompileAdditionalData } from '@/application/ports/problems/ILanguageStrategy';
+import type {
+  CompileAdditionalData,
+  LangCompileData,
+} from '@/application/ports/problems/ILanguageStrategy';
 import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
@@ -10,7 +13,6 @@ import { TOKENS } from '@/composition/tokens';
 import {
   AbstractLanguageStrategy,
   DefaultCompileAdditionalData,
-  type InternalCompileResult,
 } from '@/infrastructure/problems/langs/abstractLanguageStrategy';
 import type { FileWithHash } from '@/types';
 
@@ -38,98 +40,89 @@ export class LangCpp extends AbstractLanguageStrategy {
     ac: AbortController,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
-  ): Promise<InternalCompileResult> {
+  ): Promise<LangCompileData> {
     this.logger.trace('compile', { src, forceCompile });
 
-    const outputPath = this.fs.join(
+    const path = this.fs.join(
       this.renderer.renderPath(this.settings.cache.directory),
       this.fs.basename(src.path, this.fs.extname(src.path)) +
         (this.system.type() === 'Windows_NT' ? '.exe' : ''),
     );
 
     const compiler =
-      additionalData.compilationSettings?.compiler ??
+      additionalData.overwrites?.compiler ??
       this.settings.compilation.cppCompiler;
     const args =
-      additionalData.compilationSettings?.compilerArgs ??
+      additionalData.overwrites?.compilerArgs ??
       this.settings.compilation.cppArgs;
+    const { objcopy, useWrapper, useHook } = this.settings.compilation;
 
     const { skip, hash } = await this.checkHash(
       src,
-      outputPath,
-      compiler +
-        args +
-        this.settings.compilation.useWrapper +
-        this.settings.compilation.useHook,
+      path,
+      compiler + args + useWrapper + useHook,
       forceCompile,
     );
-    if (skip) return { outputPath, hash };
+    if (skip) return { path, hash };
 
-    const { objcopy, useWrapper, useHook } = this.settings.compilation;
     const compileCommands: string[][] = [];
     const postCommands: string[][] = [];
     const compilerArgs = args.split(/\s+/).filter(Boolean);
     if (additionalData.canUseWrapper && useWrapper) {
-      const obj = `${outputPath}.o`;
-      const wrapperObj = `${outputPath}.wrapper.o`;
-      const linkObjects = [obj, wrapperObj];
+      const linkObjs = [];
 
-      compileCommands.push(
-        [compiler, src.path, ...compilerArgs, '-c', '-o', obj],
-        [
-          compiler,
-          '-fPIC',
-          '-c',
-          this.fs.join(this.path, 'res', 'wrapper.cpp'),
-          '-o',
-          wrapperObj,
-        ],
-      );
+      const solSrc = src.path;
+      const solObj = `${path}.o`;
+      compileCommands.push([
+        compiler,
+        solSrc,
+        ...compilerArgs,
+        '-c',
+        '-o',
+        solObj,
+      ]);
+      linkObjs.push(solObj);
+
+      const wrapperSrc = this.fs.join(this.path, 'res', 'wrapper.cpp');
+      const wrapperObj = `${path}.wrapper.o`;
+      compileCommands.push([
+        compiler,
+        '-fPIC',
+        '-c',
+        wrapperSrc,
+        '-o',
+        wrapperObj,
+      ]);
+      linkObjs.push(wrapperObj);
+
       if (useHook) {
-        const hookObj = `${outputPath}.hook.o`;
-        linkObjects.push(hookObj);
-        compileCommands.push([
-          compiler,
-          '-fPIC',
-          '-Wno-attributes',
-          '-c',
-          this.fs.join(this.path, 'res', 'hook.cpp'),
-          '-o',
-          hookObj,
-        ]);
+        const hookSrc = this.fs.join(this.path, 'res', 'hook.cpp');
+        const hookObj = `${path}.hook.o`;
+        compileCommands.push([compiler, '-fPIC', '-c', hookSrc, '-o', hookObj]);
+        linkObjs.push(hookObj);
       }
+
+      const linkCmd = [compiler, ...linkObjs, ...compilerArgs, '-o', path];
+      if (this.system.type() === 'Linux') linkCmd.push('-ldl');
       postCommands.push(
-        [objcopy, '--redefine-sym', 'main=original_main', obj],
-        [
-          compiler,
-          ...linkObjects,
-          ...compilerArgs,
-          '-o',
-          outputPath,
-          ...(this.system.type() === 'Linux' ? ['-ldl'] : []),
-        ],
+        [objcopy, '--redefine-sym', 'main=original_main', solObj],
+        linkCmd,
       );
     } else {
-      const cmd = [compiler, src.path, ...compilerArgs, '-o', outputPath];
+      const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
       if (
         this.settings.runner.unlimitedStack &&
         this.system.type() === 'Windows_NT'
-      ) {
+      )
         cmd.push('-Wl,--stack,268435456');
-      }
       compileCommands.push(cmd);
     }
 
-    for (const result of await Promise.all(
+    await Promise.all(
       compileCommands.map((cmd) => this.executeCompiler(cmd, ac)),
-    )) {
-      if (result instanceof Error) return result;
-    }
-    for (const cmd of postCommands) {
-      const result = await this.executeCompiler(cmd, ac);
-      if (result instanceof Error) return result;
-    }
-    return { outputPath, hash };
+    );
+    for (const cmd of postCommands) await this.executeCompiler(cmd, ac);
+    return { path, hash };
   }
   public async getRunCommand(target: string): Promise<string[]> {
     this.logger.trace('runCommand', { target });

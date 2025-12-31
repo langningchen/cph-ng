@@ -33,7 +33,7 @@ import { renderPath, renderPathWithFile } from '../utils/strTemplate';
 import { migration, type OldProblem } from './migration';
 import type {
   IBfCompare,
-  ICompilationSettings,
+  IOverwrites,
   IFileWithHash,
   IProblem,
   ITc,
@@ -173,7 +173,7 @@ export const TcVerdicts = {
   SE: new TcVerdict('SE', l10n.t('System Error'), '#000000'),
   WT: new TcVerdict('WT', l10n.t('Waiting'), '#4100d9'),
   FC: new TcVerdict('FC', l10n.t('Fetched'), '#4c00ff'),
-  CP: new TcVerdict('CP', l10n.t('Compiling'), '#5e19ff'),
+  CP: new TcVerdict('CP', l10n.t('Compiling'), '#5e19ff'), 
   CPD: new TcVerdict('CPD', l10n.t('Compiled'), '#7340ff'),
   JG: new TcVerdict('JG', l10n.t('Judging'), '#844fff'),
   JGD: new TcVerdict('JGD', l10n.t('Judged'), '#967fff'),
@@ -197,7 +197,7 @@ export class Problem implements IProblem {
   public interactor?: FileWithHash;
   public bfCompare?: IBfCompare;
   public timeElapsed: number = 0;
-  public compilationSettings?: ICompilationSettings;
+  public overwrites?: IOverwrites;
 
   constructor(name: string, src: string) {
     this.name = name;
@@ -235,8 +235,8 @@ export class Problem implements IProblem {
       this.bfCompare = { ...problem.bfCompare };
     }
     this.timeElapsed = problem.timeElapsed;
-    if (problem.compilationSettings) {
-      this.compilationSettings = { ...problem.compilationSettings };
+    if (problem.overwrites) {
+      this.overwrites = { ...problem.overwrites };
     }
   }
   public static async fromSrc(srcPath: string): Promise<Problem | null> {

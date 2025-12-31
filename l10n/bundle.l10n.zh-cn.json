@@ -28,6 +28,8 @@
   "Checker": "检查器",
   "Choose a folder containing test cases": "选择包含测试样例的文件夹",
   "Choose a zip file containing test cases": "选择包含测试样例的 ZIP 压缩文件",
+  "Compilation output does not exist": "编译输出文件不存在",
+  "Compilation failed with non-zero exit code": "编译失败，退出代码为非零",
   "Choose folder for problem": "选择题目文件夹",
   "Choose submission language": "选择提交语言",
   "Choose {type} file": "选择 {type} 文件",

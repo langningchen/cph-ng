@@ -1,17 +1,33 @@
-import type { FileWithHash, ICompilationSettings } from '@/types';
+// Copyright (C) 2025 Langning Chen
+//
+// This file is part of cph-ng.
+//
+// cph-ng is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// cph-ng is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
+
+import type { FileWithHash, IOverwrites } from '@/types';
 
 export interface CompileAdditionalData {
   canUseWrapper: boolean;
-  compilationSettings?: ICompilationSettings;
-  debug?: boolean;
+  overwrites?: IOverwrites;
 }
 
-export interface LangCompileResult {
-  outputPath?: string;
-  outputExists: boolean;
-  internalError: boolean;
+export interface LangCompileData {
+  path: string;
   hash?: string;
 }
+
+export type LangCompileResult = LangCompileData | Error;
 
 export interface ILanguageStrategy {
   readonly name: string;
@@ -25,8 +41,5 @@ export interface ILanguageStrategy {
     additionalData?: CompileAdditionalData,
   ): Promise<LangCompileResult>;
 
-  getRunCommand(
-    target: string,
-    compilationSettings?: ICompilationSettings,
-  ): Promise<string[]>;
+  getRunCommand(target: string, overwrites?: IOverwrites): Promise<string[]>;
 }

@@ -21,19 +21,19 @@ import {
   AbortReason,
   type IProcessExecutor,
 } from '@/application/ports/node/IProcessExecutor';
+import type { IExecutionStrategy } from '@/application/ports/problems/runner/execution/strategies/IExecutionStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext, ExecutionResult } from '@/domain/execution';
-import type { IRunStrategy } from '@/infrastructure/problems/runner/strategies/IRunStrategy';
 
 export interface WrapperData {
   time: number; // microseconds
 }
 
 @injectable()
-export class WrapperStrategy implements IRunStrategy {
+export class WrapperStrategy implements IExecutionStrategy {
   constructor(
     @inject(TOKENS.Logger) private readonly logger: ILogger,
     @inject(TOKENS.Telemetry) private readonly telemetry: ITelemetry,
@@ -51,16 +51,16 @@ export class WrapperStrategy implements IRunStrategy {
     const res = await this.executor.execute({
       cmd: ctx.cmd,
       timeoutMs: ctx.timeLimitMs + this.settings.runner.timeAddition,
-      stdin: ctx.stdin,
+      stdinPath: ctx.stdinPath,
       ac,
     });
     if (res instanceof Error) return res;
     const wrapperData = await this.extractWrapperData(res.stderrPath);
     const data: ExecutionResult = {
       ...res,
-      isAborted: res.abortReason === AbortReason.UserAbort,
+      isUserAborted: res.abortReason === AbortReason.UserAbort,
     };
-    if (wrapperData) data.timeMs = wrapperData.time / 1_000;
+    if (wrapperData) data.timeMs = wrapperData.time / 1000;
     return data;
   }
 

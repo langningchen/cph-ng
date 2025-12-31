@@ -69,7 +69,7 @@ export class ProblemActions {
     fullProblem.problem.url = msg.url;
     fullProblem.problem.timeLimit = msg.timeLimit;
     fullProblem.problem.memoryLimit = msg.memoryLimit;
-    fullProblem.problem.compilationSettings = msg.compilationSettings;
+    fullProblem.problem.overwrites = msg.compilationSettings;
     await Store.dataRefresh(true);
   }
   public static async delProblem(msg: msgs.DelProblemMsg) {
@@ -203,7 +203,7 @@ export class ProblemActions {
         null,
         {
           canUseWrapper: false,
-          compilationSettings: fullProblem.problem.compilationSettings,
+          overwrites: fullProblem.problem.overwrites,
           debug: true,
         },
       );

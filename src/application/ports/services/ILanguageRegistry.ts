@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Lang } from '@/core/langs/lang';
+import type { ILanguageStrategy } from '@/application/ports/problems/ILanguageStrategy';
 
 export interface ILanguageRegistry {
-  getLang(filePath: string): Lang | undefined;
+  getLang(filePath: string): ILanguageStrategy | undefined;
 }

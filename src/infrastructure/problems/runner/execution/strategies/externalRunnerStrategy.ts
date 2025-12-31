@@ -23,7 +23,8 @@ import {
   type ProcessHandle,
 } from '@/application/ports/node/IProcessExecutor';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type { IRunnerProvider } from '@/application/ports/problems/IRunnerProvider';
+import type { IExecutionStrategy } from '@/application/ports/problems/runner/execution/strategies/IExecutionStrategy';
+import type { IRunnerProvider } from '@/application/ports/problems/runner/execution/strategies/IRunnerProvider';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
@@ -34,7 +35,6 @@ import type {
   ExecutionData,
   ExecutionResult,
 } from '@/domain/execution';
-import type { IRunStrategy } from '@/infrastructure/problems/runner/strategies/IRunStrategy';
 
 type RunnerOutput =
   | {
@@ -52,7 +52,7 @@ type RunnerOutput =
     };
 
 @injectable()
-export class ExternalRunnerStrategy implements IRunStrategy {
+export class ExternalRunnerStrategy implements IExecutionStrategy {
   constructor(
     @inject(TOKENS.Logger) private readonly logger: ILogger,
     @inject(TOKENS.Telemetry) private readonly telemetry: ITelemetry,
@@ -73,13 +73,9 @@ export class ExternalRunnerStrategy implements IRunStrategy {
   ): Promise<ExecutionResult> {
     this.logger.trace('execute', ctx);
 
-    const userStdinPath = ctx.stdin.useFile
-      ? ctx.stdin.data
-      : this.tmp.create();
+    const userStdinPath = ctx.stdinPath;
     const userStdoutPath = this.tmp.create();
     const userStderrPath = this.tmp.create();
-    ctx.stdin.useFile ||
-      (await this.fs.safeWriteFile(userStdinPath, ctx.stdin.data));
 
     let runnerPath: string;
     try {
@@ -135,7 +131,6 @@ export class ExternalRunnerStrategy implements IRunStrategy {
 
     const runnerResult = await handle.wait();
     clearTimeout(timeoutId);
-    ctx.stdin.useFile || this.tmp.dispose(userStdinPath);
     if (runnerResult instanceof Error) {
       this.tmp.dispose([
         handle.stdoutPath,
@@ -188,7 +183,7 @@ export class ExternalRunnerStrategy implements IRunStrategy {
       stderrPath: userStderrPath,
       timeMs: runInfo.time,
       memoryMb: runInfo.memory,
-      isAborted: unifiedAc.signal.reason === AbortReason.UserAbort,
+      isUserAborted: unifiedAc.signal.reason === AbortReason.UserAbort,
     } satisfies ExecutionData;
   }
 

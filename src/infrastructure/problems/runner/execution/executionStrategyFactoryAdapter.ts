@@ -17,17 +17,19 @@
 
 import { container, injectable } from 'tsyringe';
 import type {
-  IRunStrategyFactory,
-  RunStrategyType,
-} from '@/application/ports/problems/IRunStrategyFactory';
-import { ExternalRunnerStrategy } from '@/infrastructure/problems/runner/strategies/ExternalRunnerStrategy';
-import type { IRunStrategy } from '@/infrastructure/problems/runner/strategies/IRunStrategy';
-import { NormalStrategy } from '@/infrastructure/problems/runner/strategies/NormalStrategy';
-import { WrapperStrategy } from '@/infrastructure/problems/runner/strategies/WrapperStrategy';
+  ExecutionStrategyType,
+  IExecutionStrategyFactory,
+} from '@/application/ports/problems/runner/execution/IExecutionStrategyFactory';
+import type { IExecutionStrategy } from '@/application/ports/problems/runner/execution/strategies/IExecutionStrategy';
+import { ExternalRunnerStrategy } from '@/infrastructure/problems/runner/execution/strategies/externalRunnerStrategy';
+import { NormalStrategy } from '@/infrastructure/problems/runner/execution/strategies/normalStrategy';
+import { WrapperStrategy } from '@/infrastructure/problems/runner/execution/strategies/wrapperStrategy';
 
 @injectable()
-export class RunStrategyFactoryAdapter implements IRunStrategyFactory {
-  public create(type: RunStrategyType): IRunStrategy {
+export class ExecutionStrategyFactoryAdapter
+  implements IExecutionStrategyFactory
+{
+  public create(type: ExecutionStrategyType): IExecutionStrategy {
     switch (type) {
       case 'external':
         return container.resolve(ExternalRunnerStrategy);

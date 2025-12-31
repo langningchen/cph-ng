@@ -26,11 +26,11 @@ import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ICheckerRunner } from '@/application/ports/problems/ICheckerRunner';
-import type { ICompiler } from '@/application/ports/problems/ICompiler';
-import type { IRunnerProvider } from '@/application/ports/problems/IRunnerProvider';
-import type { IRunStrategyFactory } from '@/application/ports/problems/IRunStrategyFactory';
-import type { ISolutionRunner } from '@/application/ports/problems/ISolutionRunner';
-import type { ICompilerService } from '@/application/ports/services/ICompilerService';
+import type { ICompilerService } from '@/application/ports/problems/ICompilerService';
+import type { IJudgeServiceFactory } from '@/application/ports/problems/IJudgeServiceFactory';
+import type { IExecutionStrategyFactory } from '@/application/ports/problems/runner/execution/IExecutionStrategyFactory';
+import type { IRunnerProvider } from '@/application/ports/problems/runner/execution/strategies/IRunnerProvider';
+import type { ISolutionRunner } from '@/application/ports/problems/runner/ISolutionRunner';
 import type { ILanguageRegistry } from '@/application/ports/services/ILanguageRegistry';
 import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
@@ -57,7 +57,6 @@ export const TOKENS = {
   FileSystem: 'ports.FileSystem' as InjectionToken<IFileSystem>,
   ProcessExecutor: 'ports.ProcessExecutor' as InjectionToken<IProcessExecutor>,
   Runner: 'ports.Runner' as InjectionToken<ISolutionRunner>,
-  Compiler: 'ports.Compiler' as InjectionToken<ICompiler>,
   SolutionRunner: 'ports.SolutionRunner' as InjectionToken<ISolutionRunner>,
   CheckerRunner: 'ports.CheckerRunner' as InjectionToken<ICheckerRunner>,
   Settings: 'ports.Settings' as InjectionToken<ISettings>,
@@ -67,12 +66,14 @@ export const TOKENS = {
   RunnerProvider: 'ports.RunnerProvider' as InjectionToken<IRunnerProvider>,
   Telemetry: 'ports.Telemetry' as InjectionToken<ITelemetry>,
   PathRenderer: 'ports.PathRenderer' as InjectionToken<IPathRenderer>,
+  JudgeServiceFactory:
+    'ports.JudgeServiceFactory' as InjectionToken<IJudgeServiceFactory>,
   TempStorage: 'ports.TempStorage' as InjectionToken<ITempStorage>,
   Clock: 'ports.Clock' as InjectionToken<IClock>,
   Crypto: 'ports.Crypto' as InjectionToken<ICrypto>,
   BuildInfo: 'ports.BuildInfo' as InjectionToken<IBuildInfo>,
-  RunStrategyFactory:
-    'ports.RunStrategyFactory' as InjectionToken<IRunStrategyFactory>,
+  ExecutionStrategyFactory:
+    'ports.ExecutionStrategyFactory' as InjectionToken<IExecutionStrategyFactory>,
   LanguageRegistry:
     'ports.LanguageRegistry' as InjectionToken<ILanguageRegistry>,
   CompilerService: 'ports.CompilerService' as InjectionToken<ICompilerService>,

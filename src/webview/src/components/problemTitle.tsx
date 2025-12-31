@@ -77,16 +77,16 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
     setEditedUrl(problem.url || '');
     setEditedTimeLimit(problem.timeLimit.toString());
     setEditedMemoryLimit(problem.memoryLimit.toString());
-    setEditedCompiler(problem.compilationSettings?.compiler || '');
-    setEditedCompilerArgs(problem.compilationSettings?.compilerArgs || '');
-    setEditedRunner(problem.compilationSettings?.runner || '');
-    setEditedRunnerArgs(problem.compilationSettings?.runnerArgs || '');
+    setEditedCompiler(problem.overwrites?.compiler || '');
+    setEditedCompilerArgs(problem.overwrites?.compilerArgs || '');
+    setEditedRunner(problem.overwrites?.runner || '');
+    setEditedRunnerArgs(problem.overwrites?.runnerArgs || '');
   }, [
     problem.name,
     problem.url,
     problem.timeLimit,
     problem.memoryLimit,
-    problem.compilationSettings,
+    problem.overwrites,
   ]);
   useEffect(() => {
     setTimeElapsed(Date.now() - startTime);
@@ -102,7 +102,7 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
 
   const handleEditDialogClose = () => {
     setEditDialogOpen(false);
-    const compilationSettings =
+    const overwrites =
       editedCompiler || editedCompilerArgs || editedRunner || editedRunnerArgs
         ? {
             compiler: editedCompiler || undefined,
@@ -117,7 +117,7 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
       url: editedUrl,
       timeLimit: parseInt(editedTimeLimit),
       memoryLimit: parseInt(editedMemoryLimit),
-      compilationSettings,
+       overwrites,
     });
   };
 

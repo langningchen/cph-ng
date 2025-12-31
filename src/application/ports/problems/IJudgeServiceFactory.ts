@@ -15,10 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IRunStrategy } from '@/infrastructure/problems/runner/strategies/IRunStrategy';
+import type { IJudgeService } from '@/application/ports/problems/IJudgeService';
+import type { IProblem } from '@/types';
 
-export type RunStrategyType = 'normal' | 'wrapper' | 'external';
-
-export interface IRunStrategyFactory {
-  create(type: RunStrategyType): IRunStrategy;
+export interface IJudgeServiceFactory {
+  create(problem: IProblem): IJudgeService;
 }

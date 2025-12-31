@@ -39,7 +39,7 @@ export class LangC extends Lang {
     ac: AbortController,
     forceCompile: boolean | null,
     {
-      compilationSettings,
+       overwrites,
       debug,
     }: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileResult> {
@@ -52,9 +52,9 @@ export class LangC extends Lang {
     );
 
     const compiler =
-      compilationSettings?.compiler ?? Settings.compilation.cCompiler;
+      overwrites?.compiler ?? Settings.compilation.cCompiler;
     const args =
-      compilationSettings?.compilerArgs ?? Settings.compilation.cArgs;
+      overwrites?.compilerArgs ?? Settings.compilation.cArgs;
 
     const { skip, hash } = await Lang.checkHash(
       src,

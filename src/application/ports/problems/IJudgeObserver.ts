@@ -15,8 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ExecutionContext, ExecutionResult } from '@/domain/execution';
+import type { FinalResult } from '@/infrastructure/problems/resultEvaluator';
+import type { TcVerdict } from '@/types';
 
-export interface IRunStrategy {
-  execute(ctx: ExecutionContext, ac: AbortController): Promise<ExecutionResult>;
+export interface IJudgeObserver {
+  onStatusChange(verdict: TcVerdict, message?: string): void;
+  onResult(result: FinalResult): void;
+  onError(error: Error): void;
 }

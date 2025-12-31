@@ -20,13 +20,13 @@ import {
   AbortReason,
   type IProcessExecutor,
 } from '@/application/ports/node/IProcessExecutor';
+import type { IExecutionStrategy } from '@/application/ports/problems/runner/execution/strategies/IExecutionStrategy';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext, ExecutionResult } from '@/domain/execution';
-import type { IRunStrategy } from '@/infrastructure/problems/runner/strategies/IRunStrategy';
 
 @injectable()
-export class NormalStrategy implements IRunStrategy {
+export class NormalStrategy implements IExecutionStrategy {
   constructor(
     @inject(TOKENS.Settings) private readonly settings: ISettings,
     @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
@@ -39,14 +39,13 @@ export class NormalStrategy implements IRunStrategy {
     const res = await this.executor.execute({
       cmd: ctx.cmd,
       timeoutMs: ctx.timeLimitMs + this.settings.runner.timeAddition,
-      stdin: ctx.stdin,
+      stdinPath: ctx.stdinPath,
       ac,
     });
     if (res instanceof Error) return res;
-    const data: ExecutionResult = {
+    return {
       ...res,
-      isAborted: res.abortReason === AbortReason.UserAbort,
+      isUserAborted: res.abortReason === AbortReason.UserAbort,
     };
-    return data;
   }
 }

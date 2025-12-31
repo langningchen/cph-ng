@@ -15,28 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface ExecutionContext {
-  cmd: string[];
-  stdinPath: string;
-  timeLimitMs: number;
-  memoryLimitMb?: number;
+import type { IExecutionStrategy } from '@/application/ports/problems/runner/execution/strategies/IExecutionStrategy';
+
+export type ExecutionStrategyType = 'normal' | 'wrapper' | 'external';
+
+export interface IExecutionStrategyFactory {
+  create(type: ExecutionStrategyType): IExecutionStrategy;
 }
-
-export interface ExecutionData {
-  codeOrSignal: number | string;
-  stdoutPath: string;
-  stderrPath: string;
-  timeMs: number;
-  memoryMb?: number;
-  isUserAborted: boolean;
-}
-
-export type ExecutionResult = ExecutionData | Error;
-
-export interface InteractiveExecutionData {
-  sol: ExecutionData;
-  int: ExecutionData;
-  feedbackPath: string;
-}
-
-export type InteractiveExecutionResult = InteractiveExecutionData | Error;

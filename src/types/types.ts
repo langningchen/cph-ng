@@ -69,7 +69,7 @@ export interface IBfCompare {
   msg: string;
 }
 
-export interface ICompilationSettings {
+export interface IOverwrites {
   compiler?: string;
   compilerArgs?: string;
   runner?: string;
@@ -89,5 +89,5 @@ export interface IProblem {
   interactor?: IFileWithHash;
   bfCompare?: IBfCompare;
   timeElapsed: number;
-  compilationSettings?: ICompilationSettings;
+  overwrites?: IOverwrites;
 }

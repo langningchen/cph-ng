@@ -76,7 +76,7 @@ export class Executor {
       null,
       {
         canUseWrapper: false,
-        compilationSettings: {
+        overwrites: {
           compiler: Settings.compilation.cppCompiler,
           compilerArgs:
             type() === 'Windows_NT' ? '-lpsapi -ladvapi32 -static' : '-pthread',

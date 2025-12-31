@@ -73,7 +73,7 @@ export const ProblemProvider = ({ children }: { children: ReactNode }) => {
         problem.url = msg.url;
         problem.timeLimit = msg.timeLimit;
         problem.memoryLimit = msg.memoryLimit;
-        problem.compilationSettings = msg.compilationSettings;
+        problem.overwrites = msg.overwrites;
         changed = true;
         break;
       case 'removeSrcFile':

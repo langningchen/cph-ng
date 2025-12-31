@@ -15,25 +15,24 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { CompileData } from '@/core/compiler';
-import type { Problem } from '@/types';
-import type { KnownResult } from '@/utils/result';
+import type { UUID } from 'node:crypto';
+import type { CompileData } from '@/application/ports/problems/ICompilerService';
+import type { IJudgeObserver } from '@/application/ports/problems/IJudgeObserver';
+import type { IProblem } from '@/types';
 
-export type CompileSuccess = { ok: true; data: CompileData };
-export type CompileKnownFailure = {
-  ok: false;
-  known: KnownResult<CompileData>;
-};
-export type CompileException = { ok: false; error: Error };
-export type CompileOutcome =
-  | CompileSuccess
-  | CompileKnownFailure
-  | CompileException;
+export interface JudgeContext {
+  problem: IProblem;
+  tcId: UUID;
+  stdinPath: string;
+  answerPath: string;
+  compile: boolean | null;
+  artifacts: CompileData;
+}
 
-export interface ICompiler {
-  compile(
-    problem: Problem,
-    compileFlag: boolean | null,
+export interface IJudgeService {
+  judge(
+    ctx: JudgeContext,
+    observer: IJudgeObserver,
     ac: AbortController,
-  ): Promise<CompileOutcome>;
+  ): Promise<void>;
 }

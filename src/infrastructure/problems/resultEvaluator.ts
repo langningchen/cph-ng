@@ -17,18 +17,23 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ICheckerRunner } from '@/application/ports/problems/ICheckerRunner';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
-import type { ExecutionResult } from '@/domain/execution';
+import type { ExecutionData } from '@/domain/execution';
 import { Grader } from '@/domain/services/Grader';
 import { VerdictName } from '@/domain/verdict';
 
 export interface JudgeRequest {
-  executionResult: ExecutionResult;
+  executionResult: ExecutionData;
   inputPath: string;
   answerPath: string;
   checkerPath?: string;
+  interactorResult?: {
+    execution: ExecutionData;
+    feedback: string;
+  };
   timeLimitMs: number;
   memoryLimitMb?: number;
 }
@@ -41,12 +46,13 @@ export interface FinalResult {
 }
 
 @injectable()
-export class JudgeCoordinator {
+export class ResultEvaluator {
   constructor(
     @inject(TOKENS.CheckerRunner)
     private readonly checkerRunner: ICheckerRunner,
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.Settings) private readonly settings: ISettings,
+    @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
     @inject(Grader) private readonly grader: Grader,
   ) {}
 
@@ -55,18 +61,12 @@ export class JudgeCoordinator {
     ac: AbortController,
   ): Promise<FinalResult> {
     const res = req.executionResult;
-    if (res instanceof Error)
-      return {
-        verdict: VerdictName.SE,
-        messages: [res.message],
-      };
-
     const executionStats = {
       timeMs: res.timeMs,
       memoryMb: res.memoryMb,
     };
 
-    if (res.isAborted)
+    if (res.isUserAborted)
       return { ...executionStats, verdict: VerdictName.RJ, messages: [] };
     if (res.timeMs > req.timeLimitMs)
       return { ...executionStats, verdict: VerdictName.TLE, messages: [] };
@@ -103,6 +103,23 @@ export class JudgeCoordinator {
       };
     }
 
+    if (req.interactorResult) {
+      const {
+        execution: { codeOrSignal, stdoutPath, stderrPath },
+        feedback,
+      } = req.interactorResult;
+      if (typeof codeOrSignal === 'string')
+        throw new Error('Interactor run failed');
+      const mapped = this.grader.mapTestlibExitCode(codeOrSignal);
+      const message = await this.fs.readFile(feedback);
+      this.tmp.dispose([stdoutPath, stderrPath]);
+      return {
+        ...executionStats,
+        verdict: mapped.verdict,
+        messages: [message, ...(mapped.msg ? [mapped.msg] : [])],
+      };
+    }
+
     const stdout = await this.fs.readFile(res.stdoutPath);
     const answer = await this.fs.readFile(req.answerPath);
     const stderr = await this.fs.readFile(res.stderrPath);
@@ -115,4 +132,6 @@ export class JudgeCoordinator {
 
     return { ...executionStats, verdict, messages: [] };
   }
+
+  public async interactiveJudge() {}
 }

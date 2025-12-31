@@ -29,7 +29,7 @@ import {
 } from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext } from '@/domain/execution';
-import { WrapperStrategy } from '@/infrastructure/problems/runner/strategies/WrapperStrategy';
+import { WrapperStrategy } from '@/infrastructure/problems/runner/execution/strategies/wrapperStrategy';
 
 describe('WrapperStrategy', () => {
   let strategy: WrapperStrategy;
@@ -124,7 +124,7 @@ describe('WrapperStrategy', () => {
     const result = await strategy.execute(mockCtx, new AbortController());
 
     if (!(result instanceof Error)) {
-      expect(result.isAborted).toBe(true);
+      expect(result.isUserAborted).toBe(true);
     }
   });
 

@@ -4,6 +4,7 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type {
   CompileAdditionalData,
   ILanguageStrategy,
+  LangCompileData,
   LangCompileResult,
 } from '@/application/ports/problems/ILanguageStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
@@ -12,25 +13,12 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import Cache from '@/helpers/cache';
 import { CompilationIo } from '@/helpers/io';
 import ProcessExecutor, { AbortReason } from '@/helpers/processExecutor';
-import type { FileWithHash, ICompilationSettings } from '@/types';
+import type { FileWithHash, IOverwrites } from '@/types';
 import { telemetry, waitUntil } from '@/utils/global';
 
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
   canUseWrapper: false,
 };
-
-export interface CompilerExecuteData {
-  isAborted?: boolean;
-  isTimeout?: boolean;
-  compilerFailed?: boolean;
-}
-export type CompilerExecuteResult = CompilerExecuteData | Error;
-
-export interface InternalCompileData {
-  outputPath?: string;
-  hash?: string;
-}
-export type InternalCompileResult = InternalCompileData | Error;
 
 export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
   public abstract readonly name: string;
@@ -62,40 +50,31 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     // Clear previous compilation IO
     CompilationIo.clear();
 
-    const result: LangCompileResult = {
-      outputExists: false,
-      internalError: false,
-    };
     try {
       const compileEnd = telemetry.start('compile', {
         lang: this.name,
         forceCompile: forceCompile ? 'auto' : String(forceCompile),
       });
-      const langCompileResult = await this.internalCompile(
+      const result = await this.internalCompile(
         src,
         ac,
         forceCompile,
         additionalData,
       );
-      if (langCompileResult instanceof Error) {
-        return {
-          outputExists: false,
-          internalError: true,
-        };
-      }
-      compileEnd({ ...langCompileResult });
+      compileEnd({ ...result });
 
-      result.outputPath = langCompileResult.outputPath;
-      result.hash = langCompileResult.hash;
+      if (!(await this.fs.exists(result.path))) {
+        return new Error(
+          this.translator.t('Compilation output does not exist'),
+        );
+      }
+      return result;
     } catch (e) {
       this.logger.error('Compilation failed', e);
       CompilationIo.append((e as Error).message);
       telemetry.error('compileError', e);
-      result.internalError = true;
+      return e as Error;
     }
-    result.outputExists =
-      !!result.outputPath && (await this.fs.exists(result.outputPath));
-    return result;
   }
 
   protected abstract internalCompile(
@@ -103,42 +82,29 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     ac: AbortController,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData,
-  ): Promise<InternalCompileResult>;
+  ): Promise<LangCompileData>;
 
   protected async executeCompiler(
     cmd: string[],
     ac: AbortController,
-  ): Promise<CompilerExecuteResult> {
+  ): Promise<void> {
     const result = await ProcessExecutor.execute({
       cmd,
       ac,
       timeout: this.settings.compilation.timeout,
     });
-    if (result instanceof Error) {
-      return result;
-    }
-    if (result.abortReason === AbortReason.UserAbort) {
-      return {
-        isAborted: true,
-      };
-    }
-    if (result.abortReason === AbortReason.Timeout) {
-      return {
-        isTimeout: true,
-      };
-    }
+    if (result instanceof Error) throw result;
+    if (result.abortReason === AbortReason.UserAbort)
+      throw new Error(this.translator.t('Compilation aborted by user'));
+    if (result.abortReason === AbortReason.Timeout)
+      throw new Error(this.translator.t('Compilation timed out'));
     CompilationIo.append(await this.fs.readFile(result.stdoutPath));
     CompilationIo.append(await this.fs.readFile(result.stderrPath));
-    if (result.codeOrSignal) {
-      return {
-        compilerFailed: true,
-      };
-    }
+    if (result.codeOrSignal)
+      throw new Error(
+        this.translator.t('Compilation failed with non-zero exit code'),
+      );
     Cache.dispose([result.stdoutPath, result.stderrPath]);
-    return {
-      isAborted: false,
-      isTimeout: false,
-    };
   }
 
   protected async checkHash(
@@ -159,11 +125,10 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     const hash = SHA256(
       (await this.fs.readFile(src.path)) + additionalHash,
     ).toString();
+    const outputExists = await this.fs.exists(outputPath);
     if (
-      forceCompile === false ||
-      (forceCompile !== true &&
-        src.hash === hash &&
-        (await this.fs.exists(outputPath)))
+      outputExists &&
+      (forceCompile === false || (forceCompile !== true && src.hash === hash))
     ) {
       this.logger.debug('Skipping compilation', {
         srcHash: src.hash,
@@ -172,12 +137,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
       });
       return { skip: true, hash };
     }
-    try {
-      await this.fs.rm(outputPath);
-      this.logger.debug('Removed existing output file', { outputPath });
-    } catch {
-      this.logger.debug('No existing output file to remove', { outputPath });
-    }
+    if (outputExists) await this.fs.rm(outputPath);
     this.logger.debug('Proceeding with compilation', {
       srcHash: src.hash,
       currentHash: hash,
@@ -188,6 +148,6 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
 
   public abstract getRunCommand(
     target: string,
-    compilationSettings?: ICompilationSettings,
+    compilationSettings?: IOverwrites,
   ): Promise<string[]>;
 }

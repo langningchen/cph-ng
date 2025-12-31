@@ -41,7 +41,7 @@ export class LangCpp extends Lang {
     forceCompile: boolean | null,
     {
       canUseWrapper,
-      compilationSettings,
+      overwrites,
       debug,
     }: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileResult> {
@@ -54,9 +54,9 @@ export class LangCpp extends Lang {
     );
 
     const compiler =
-      compilationSettings?.compiler ?? Settings.compilation.cppCompiler;
+      overwrites?.compiler ?? Settings.compilation.cppCompiler;
     const args =
-      compilationSettings?.compilerArgs ?? Settings.compilation.cppArgs;
+      overwrites?.compilerArgs ?? Settings.compilation.cppArgs;
 
     const { skip, hash } = await Lang.checkHash(
       src,

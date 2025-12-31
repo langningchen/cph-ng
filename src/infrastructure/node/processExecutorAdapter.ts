@@ -117,7 +117,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
 
   private internalLaunch(options: ProcessOptions): LaunchResult {
     this.logger.trace('createProcess', options);
-    const { cmd, ac, timeoutMs: timeout, stdin } = options;
+    const { cmd, ac, timeoutMs: timeout, stdinPath } = options;
 
     // Use a unified AbortController to handle both external and internal aborts
     const unifiedAc = new AbortController();
@@ -150,17 +150,12 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
     }
 
     // Process stdio
-    if (stdin) {
-      if (stdin.useFile) {
-        result.ioPromises.push(
-          pipeline(createReadStream(stdin.data), child.stdin).catch(
-            this.pipeFailed(child.pid, 'stdin'),
-          ),
-        );
-      } else {
-        child.stdin.write(stdin.data);
-        child.stdin.end();
-      }
+    if (stdinPath) {
+      result.ioPromises.push(
+        pipeline(createReadStream(stdinPath), child.stdin).catch(
+          this.pipeFailed(child.pid, 'stdin'),
+        ),
+      );
     }
     result.ioPromises.push(
       pipeline(child.stdout, createWriteStream(result.stdoutPath)).catch(

@@ -19,7 +19,7 @@ import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ISystem } from '@/application/ports/node/ISystem';
-import type { IRunnerProvider } from '@/application/ports/problems/IRunnerProvider';
+import type { IRunnerProvider } from '@/application/ports/problems/runner/execution/strategies/IRunnerProvider';
 import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';

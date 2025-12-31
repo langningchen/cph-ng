@@ -16,14 +16,14 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import {
   AbortReason,
   type IProcessExecutor,
 } from '@/application/ports/node/IProcessExecutor';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type { IRunStrategyFactory } from '@/application/ports/problems/IRunStrategyFactory';
-import type { ISolutionRunner } from '@/application/ports/problems/ISolutionRunner';
+import type { IExecutionStrategyFactory } from '@/application/ports/problems/runner/execution/IExecutionStrategyFactory';
+import type { IExecutionStrategy } from '@/application/ports/problems/runner/execution/strategies/IExecutionStrategy';
+import type { ISolutionRunner } from '@/application/ports/problems/runner/ISolutionRunner';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
@@ -33,7 +33,6 @@ import type {
   ExecutionResult,
   InteractiveExecutionResult,
 } from '@/domain/execution';
-import type { IRunStrategy } from '@/infrastructure/problems/runner/strategies/IRunStrategy';
 
 @injectable()
 export class SolutionRunnerAdapter implements ISolutionRunner {
@@ -43,9 +42,8 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
     @inject(TOKENS.Translator) private readonly translator: ITranslator,
     @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
     @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.RunStrategyFactory)
-    private readonly factory: IRunStrategyFactory,
+    @inject(TOKENS.ExecutionStrategyFactory)
+    private readonly factory: IExecutionStrategyFactory,
   ) {
     this.logger = this.logger.withScope('RunnerAdapter');
   }
@@ -59,7 +57,7 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
     return strategy.execute(ctx, ac);
   }
 
-  private getStrategy(): IRunStrategy | Error {
+  private getStrategy(): IExecutionStrategy | Error {
     const useRunner = this.settings.runner.useRunner;
     const useWrapper = this.settings.compilation.useWrapper;
     if (useRunner && useWrapper)
@@ -73,6 +71,7 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
     return this.factory.create('normal');
   }
 
+  // Interactive problem only supports the normal running strategy
   public async runInteractive(
     ctx: ExecutionContext,
     ac: AbortController,
@@ -81,9 +80,7 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
     const timeoutMs = ctx.timeLimitMs + this.settings.runner.timeAddition;
 
     // Prepare input and output files
-    const intStdinPath = ctx.stdin.useFile ? ctx.stdin.data : this.tmp.create();
-    ctx.stdin.useFile ||
-      (await this.fs.safeWriteFile(intStdinPath, ctx.stdin.data));
+    const intStdinPath = ctx.stdinPath;
     const intStdoutPath = this.tmp.create();
 
     // Launch both processes with pipe
@@ -97,23 +94,18 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
       intResult,
     });
 
-    // Dispose of input file if it was created by Cache
-    ctx.stdin.useFile || this.tmp.dispose(intStdinPath);
-
-    const sol: ExecutionResult =
-      solResult instanceof Error
-        ? solResult
-        : {
-            ...solResult,
-            isAborted: solResult.abortReason === AbortReason.UserAbort,
-          };
-    const int: ExecutionResult =
-      intResult instanceof Error
-        ? intResult
-        : {
-            ...intResult,
-            isAborted: intResult.abortReason === AbortReason.UserAbort,
-          };
-    return { sol, int, feedbackPath: intStdoutPath };
+    if (solResult instanceof Error) return solResult;
+    if (intResult instanceof Error) return intResult;
+    return {
+      sol: {
+        ...solResult,
+        isUserAborted: solResult.abortReason === AbortReason.UserAbort,
+      },
+      int: {
+        ...intResult,
+        isUserAborted: intResult.abortReason === AbortReason.UserAbort,
+      },
+      feedbackPath: intStdoutPath,
+    };
   }
 }

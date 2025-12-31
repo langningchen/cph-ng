@@ -42,7 +42,7 @@ export class LangJavascript extends Lang {
 
   public async getRunCommand(
     target: string,
-    compilationSettings?: CompileAdditionalData['compilationSettings'],
+    compilationSettings?: CompileAdditionalData['overwrites'],
   ): Promise<string[]> {
     this.logger.trace('runCommand', { target });
     const runner =

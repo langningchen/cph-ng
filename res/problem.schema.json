@@ -122,8 +122,8 @@
       "required": ["running", "msg"],
       "additionalProperties": false
     },
-    "CompilationSettings": {
-      "title": "CompilationSettings",
+    "CompileOptions": {
+      "title": "CompileOptions",
       "type": "object",
       "properties": {
         "compiler": {
@@ -200,8 +200,8 @@
       "type": "integer",
       "minimum": 0
     },
-    "compilationSettings": {
-      "$ref": "#/definitions/CompilationSettings"
+    "overwrites": {
+      "$ref": "#/definitions/CompileOptions"
     }
   },
   "required": [

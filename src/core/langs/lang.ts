@@ -26,7 +26,7 @@ import ProcessExecutor, { AbortReason } from '@/helpers/processExecutor';
 import Settings from '@/helpers/settings';
 import {
   type FileWithHash,
-  type ICompilationSettings,
+  type IOverwrites,
   TcVerdicts,
 } from '@/types';
 import { telemetry, waitUntil } from '@/utils/global';
@@ -41,7 +41,7 @@ const logger = new Logger('langsLang');
 
 export interface CompileAdditionalData {
   canUseWrapper: boolean;
-  compilationSettings?: ICompilationSettings;
+  overwrites?: IOverwrites;
   debug?: boolean;
 }
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
@@ -162,7 +162,7 @@ export class Lang {
 
   public async getRunCommand(
     _target: string,
-    _compilationSettings?: ICompilationSettings,
+    _compilationSettings?: IOverwrites,
   ): Promise<string[]> {
     throw new Error('Run method not implemented.');
   }

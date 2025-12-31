@@ -1,42 +1,58 @@
+// Copyright (C) 2025 Langning Chen
+//
+// This file is part of cph-ng.
+//
+// cph-ng is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// cph-ng is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
+
 import type * as msgs from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
-import type { ISolutionRunner } from '@/application/ports/problems/ISolutionRunner';
-import type { ICompilerService } from '@/application/ports/services/ICompilerService';
+import type { ICompilerService } from '@/application/ports/problems/ICompilerService';
+import type { IJudgeObserver } from '@/application/ports/problems/IJudgeObserver';
+import type { JudgeContext } from '@/application/ports/problems/IJudgeService';
+import type { IJudgeServiceFactory } from '@/application/ports/problems/IJudgeServiceFactory';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
 import { VERDICTS } from '@/domain/verdict';
-import { JudgeCoordinator } from '@/infrastructure/problems/judgeCoordinator';
+import type { FinalResult } from '@/infrastructure/problems/resultEvaluator';
 import ProblemsManager from '@/modules/problems/manager';
-import { isExpandVerdict, TcVerdicts, type TcWithResult } from '@/types';
+import { isExpandVerdict, TcVerdicts } from '@/types';
 import { TcResult } from '@/types/types.backend';
-import { KnownResult } from '@/utils/result';
 
 @injectable()
 export class RunAllTestCases {
   constructor(
-    @inject(TOKENS.CompilerService)
-    private readonly compilerService: ICompilerService,
-    @inject(TOKENS.SolutionRunner)
-    private readonly solutionRunner: ISolutionRunner,
-    @inject(JudgeCoordinator) private readonly judge: JudgeCoordinator,
+    @inject(TOKENS.JudgeServiceFactory)
+    private readonly judgeFactory: IJudgeServiceFactory,
     @inject(TOKENS.Settings) private readonly settings: ISettings,
+    @inject(TOKENS.CompilerService) private readonly compiler: ICompilerService,
   ) {}
 
   async exec(msg: msgs.RunTcsMsg): Promise<void> {
+    if (!msg.activePath) throw new Error('Active path is required');
+
     const fullProblem = await ProblemsManager.getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
+    if (!fullProblem) throw new Error('Problem not found');
+    const { problem } = fullProblem;
 
     let ac = new AbortController();
     fullProblem.ac?.abort();
     fullProblem.ac = ac;
 
     try {
-      const tcs = fullProblem.problem.tcs;
-      const tcOrder = [...fullProblem.problem.tcOrder].filter(
-        (id) => !tcs[id].isDisabled,
-      );
+      const tcs = problem.tcs;
+      const tcOrder = [...problem.tcOrder].filter((id) => !tcs[id].isDisabled);
+
       const expandMemo: Record<string, boolean> = {};
       for (const tcId of tcOrder) {
         tcs[tcId].result?.dispose();
@@ -46,39 +62,34 @@ export class RunAllTestCases {
       }
       await ProblemsManager.dataRefresh();
 
-      // Compile
-      const compileResult = await this.compilerService.compileAll(
-        fullProblem.problem,
+      const artifacts = await this.compiler.compileAll(
+        problem,
         msg.compile,
         ac,
       );
-
-      if (compileResult instanceof KnownResult) {
-        for (const tcId of tcOrder) {
-          tcs[tcId].result?.fromResult(compileResult);
-        }
+      if (artifacts instanceof Error) {
+        for (const tcId of tcOrder)
+          if (tcs[tcId].result) {
+            tcs[tcId].result.verdict = TcVerdicts.CE;
+            tcs[tcId].result.msg = [artifacts.message];
+          }
+        await ProblemsManager.dataRefresh();
         return;
       }
 
-      const compileData = compileResult.data;
-
-      for (const tcId of tcOrder) {
-        const result = tcs[tcId].result;
-        if (result) {
-          result.verdict = TcVerdicts.CPD;
-        }
-      }
+      for (const tcId of tcOrder)
+        if (tcs[tcId].result) tcs[tcId].result.verdict = TcVerdicts.CPD;
       await ProblemsManager.dataRefresh();
 
-      // Run
       const expandBehavior = this.settings.problem.expandBehavior;
       let hasAnyExpanded = false;
 
+      const judgeService = this.judgeFactory.create(problem);
+
       for (const tcId of tcOrder) {
-        const tc = tcs[tcId] as TcWithResult;
-        if (!tc.result) {
-          continue;
-        }
+        const tc = tcs[tcId];
+        if (!tc.result) continue;
+
         if (ac.signal.aborted) {
           if (ac.signal.reason === 'onlyOne') {
             ac = new AbortController();
@@ -89,59 +100,56 @@ export class RunAllTestCases {
           }
         }
 
-        tc.result.verdict = TcVerdicts.JG;
-        await ProblemsManager.dataRefresh();
+        const ctx: JudgeContext = {
+          problem,
+          tcId,
+          stdinPath: tc.stdin.toPath(),
+          answerPath: tc.answer.toPath(),
+          compile: false,
+          artifacts,
+        };
 
-        const runCommand = await compileData.srcLang.getRunCommand(
-          compileData.src.outputPath,
-          fullProblem.problem.compilationSettings,
-        );
-
-        const runRes = await this.solutionRunner.run(
-          {
-            cmd: runCommand,
-            stdin: tc.stdin,
-            timeLimitMs: fullProblem.problem.timeLimit,
-            memoryLimitMb: fullProblem.problem.memoryLimit,
+        const observer: IJudgeObserver = {
+          onStatusChange: (verdict, msg) => {
+            if (!tc.result) return;
+            tc.result.verdict = verdict;
+            if (msg) tc.result.msg = [msg];
+            ProblemsManager.dataRefresh();
           },
-          ac,
-        );
+          onResult: (res: FinalResult) => {
+            if (!tc.result) return;
+            tc.result.verdict = VERDICTS[res.verdict];
+            tc.result.time = res.timeMs;
+            tc.result.memory = res.memoryMb;
+            tc.result.msg = res.messages;
 
-        tc.result.verdict = TcVerdicts.JGD;
+            const currentVerdict = tc.result.verdict;
+            if (expandBehavior === 'always') {
+              tc.isExpand = true;
+            } else if (expandBehavior === 'never') {
+              tc.isExpand = false;
+            } else if (expandBehavior === 'failed') {
+              tc.isExpand = isExpandVerdict(currentVerdict);
+            } else if (expandBehavior === 'first') {
+              tc.isExpand = !hasAnyExpanded;
+            } else if (expandBehavior === 'firstFailed') {
+              tc.isExpand = !hasAnyExpanded && isExpandVerdict(currentVerdict);
+            } else if (expandBehavior === 'same') {
+              tc.isExpand = expandMemo[tcId];
+            }
 
-        const runOutcome = await this.judge.judge(
-          {
-            executionResult: runRes,
-            inputPath: tc.stdin.toPath(),
-            answerPath: tc.answer.toPath(),
-            checkerPath: compileData.checker?.outputPath,
-            timeLimitMs: fullProblem.problem.timeLimit,
-            memoryLimitMb: fullProblem.problem.memoryLimit,
+            hasAnyExpanded ||= tc.isExpand;
+            ProblemsManager.dataRefresh();
           },
-          ac,
-        );
+          onError: (err) => {
+            if (!tc.result) return;
+            tc.result.verdict = TcVerdicts.SE;
+            tc.result.msg = [err.message];
+            ProblemsManager.dataRefresh();
+          },
+        };
 
-        tc.result.verdict = VERDICTS[runOutcome.verdict];
-        tc.result.time = runOutcome.timeMs;
-        tc.result.memory = runOutcome.memoryMb;
-        tc.result.msg = runOutcome.messages;
-
-        // Expand logic
-        if (expandBehavior === 'always') {
-          tc.isExpand = true;
-        } else if (expandBehavior === 'never') {
-          tc.isExpand = false;
-        } else if (expandBehavior === 'failed') {
-          tc.isExpand = isExpandVerdict(tc.result.verdict);
-        } else if (expandBehavior === 'first') {
-          tc.isExpand = !hasAnyExpanded;
-        } else if (expandBehavior === 'firstFailed') {
-          tc.isExpand = !hasAnyExpanded && isExpandVerdict(tc.result.verdict);
-        } else if (expandBehavior === 'same') {
-          tc.isExpand = expandMemo[tcId];
-        }
-        await ProblemsManager.dataRefresh();
-        hasAnyExpanded ||= tc.isExpand;
+        await judgeService.judge(ctx, observer, ac);
       }
     } finally {
       fullProblem.ac = null;

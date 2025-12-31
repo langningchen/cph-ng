@@ -23,7 +23,7 @@ import { anyNumber } from 'vitest-mock-extended';
 import { AbortReason } from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext } from '@/domain/execution';
-import { NormalStrategy } from '@/infrastructure/problems/runner/strategies/NormalStrategy';
+import { NormalStrategy } from '@/infrastructure/problems/runner/execution/strategies/normalStrategy';
 
 describe('NormalStrategy', () => {
   let strategy: NormalStrategy;
@@ -67,7 +67,7 @@ describe('NormalStrategy', () => {
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
       expect(result.codeOrSignal).toBe(0);
-      expect(result.isAborted).toBe(false);
+      expect(result.isUserAborted).toBe(false);
       expect(result.stdoutPath).toBe(processOutput.stdoutPath);
     }
   });
@@ -88,7 +88,7 @@ describe('NormalStrategy', () => {
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
-      expect(result.isAborted).toBe(true);
+      expect(result.isUserAborted).toBe(true);
     }
   });
 
@@ -108,7 +108,7 @@ describe('NormalStrategy', () => {
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
-      expect(result.isAborted).toBe(false);
+      expect(result.isUserAborted).toBe(false);
     }
   });
 

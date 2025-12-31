@@ -38,7 +38,7 @@ export interface EditProblemDetailsMsg extends BaseMsg {
   url: string;
   timeLimit: number;
   memoryLimit: number;
-  compilationSettings?: {
+  overwrites?: {
     compiler?: string;
     compilerArgs?: string;
     runner?: string;

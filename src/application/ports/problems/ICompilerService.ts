@@ -15,43 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { container } from 'tsyringe';
-import { TOKENS } from '@/composition/tokens';
-import type {
-  Lang,
-  LangCompileData,
-  LangCompileResult,
-} from '@/core/langs/lang';
-import Langs from '@/core/langs/langs';
-import Logger from '@/helpers/logger';
-import { type FileWithHash, type Problem } from '@/types';
-import {type Result, UnknownResult } from '@/utils/result';
-import type { ICompilerService } from '@/application/ports/services/ICompilerService';
+import type { LangCompileData } from '@/application/ports/problems/ILanguageStrategy';
+import type { IProblem } from '@/types';
 
-export interface CompileData {
-  src: LangCompileData;
-  srcLang: Lang;
+export type CompileData = {
+  solution: LangCompileData;
   checker?: LangCompileData;
   interactor?: LangCompileData;
   bfCompare?: {
     generator: LangCompileData;
     bruteForce: LangCompileData;
   };
-}
-type CompileResult = Result<CompileData>;
+};
 
-/**
- * @deprecated Use ICompilerService instead
- */
-export class Compiler {
-  public static async compileAll(
-    problem: Problem,
+export type CompileResult = CompileData | Error;
+
+export interface ICompilerService {
+  compileAll(
+    problem: IProblem,
     compile: boolean | null,
     ac: AbortController,
-  ): Promise<CompileResult> {
-    const compilerService = container.resolve<ICompilerService>(
-      TOKENS.CompilerService,
-    );
-    return compilerService.compileAll(problem, compile, ac);
-  }
+  ): Promise<CompileResult>;
 }

@@ -37,7 +37,7 @@ export class LangJava extends Lang {
     ac: AbortController,
     forceCompile: boolean | null,
     {
-      compilationSettings,
+      overwrites: compilationSettings,
     }: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileResult> {
     this.logger.trace('compile', { src, forceCompile });
@@ -75,7 +75,7 @@ export class LangJava extends Lang {
 
   public async getRunCommand(
     target: string,
-    compilationSettings?: CompileAdditionalData['compilationSettings'],
+    compilationSettings?: CompileAdditionalData['overwrites'],
   ): Promise<string[]> {
     this.logger.trace('runCommand', { target });
     const runner =

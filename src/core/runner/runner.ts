@@ -17,9 +17,9 @@
 
 import { container } from 'tsyringe';
 import { l10n } from 'vscode';
-import { ISolutionRunner } from '@/application/ports/problems/ISolutionRunner';
+import { ISolutionRunner } from '@/application/ports/problems/runner/ISolutionRunner';
 import { TOKENS } from '@/composition/tokens';
-import { JudgeCoordinator } from '@/infrastructure/problems/judgeCoordinator';
+import { ResultEvaluator } from '@/infrastructure/problems/resultEvaluator';
 import type { CompileData } from '@/core/compiler';
 import type { Lang } from '@/core/langs/lang';
 import ProblemsManager from '@/modules/problems/manager';
@@ -40,7 +40,7 @@ export class Runner {
     const solutionRunner = container.resolve<ISolutionRunner>(
       TOKENS.SolutionRunner,
     );
-    const judgeCoordinator = container.resolve(JudgeCoordinator);
+    const judgeCoordinator = container.resolve(ResultEvaluator);
 
     const runTimerEnd = telemetry.start('run', {
       lang: lang.name,
@@ -56,7 +56,7 @@ export class Runner {
 
       const cmd = await lang.getRunCommand(
         compileData.src.outputPath,
-        problem.compilationSettings,
+        problem.overwrites,
       );
 
       const executionResult = await solutionRunner.run(
