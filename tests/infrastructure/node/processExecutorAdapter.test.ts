@@ -81,22 +81,7 @@ describe('ProcessExecutorAdapter', () => {
     }
   });
 
-  it('should correctly handle stdin input (string mode)', async () => {
-    const result = await adapter.execute({
-      cmd: [
-        'node',
-        '-e',
-        `process.stdin.on('data', (d) => process.stdout.write('rec:' + d));`,
-      ],
-      stdin: { useFile: false, data: 'hello_stdin' },
-    });
-    expect(result).not.toBeInstanceOf(Error);
-    if (!(result instanceof Error)) {
-      expect(readFileSync(result.stdoutPath, 'utf-8')).toBe('rec:hello_stdin');
-    }
-  });
-
-  it('should correctly handle stdin input (file mode)', async () => {
+  it('should correctly handle stdin input', async () => {
     const inputFile = tempStorageMock.create();
     writeFileSync(inputFile, 'hello_file');
     const result = await adapter.execute({
@@ -105,7 +90,7 @@ describe('ProcessExecutorAdapter', () => {
         '-e',
         `process.stdin.on('data', (d) => process.stdout.write('rec:' + d));`,
       ],
-      stdin: { useFile: true, data: inputFile },
+      stdinPath: inputFile,
     });
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {

@@ -51,9 +51,6 @@ export default class ProblemsManager {
   public static async openTestlib(msg: msgs.OpenTestlibMsg) {
     return ProblemActions.openTestlib(msg);
   }
-  public static async debugTc(msg: msgs.DebugTcMsg) {
-    return ProblemActions.debugTc(msg);
-  }
 
   // TC Actions
   public static async addTc(msg: msgs.AddTcMsg) {

@@ -94,7 +94,7 @@ describe('ExternalRunnerStrategy', () => {
 
   const mockCtx: ExecutionContext = {
     cmd: ['/tmp/solution'],
-    stdin: { useFile: false, data: 'input_data' },
+    stdinPath: '/tmp/input',
     timeLimitMs: 1000,
   };
 
@@ -293,34 +293,19 @@ describe('ExternalRunnerStrategy', () => {
       expect(result.timeMs).toBe(50);
     }
   });
-
-  it('should dispose temporary files created for stdin if not using file mode', async () => {
-    executorMock.spawn.mockResolvedValue(processHandleMock);
-    processHandleMock.wait.mockResolvedValue({
-      codeOrSignal: 0,
-      stdoutPath: '/tmp/out',
-      stderrPath: '/tmp/err',
-      timeMs: 1000,
-    });
-    fsMock.readFile.mockResolvedValue(
-      JSON.stringify({ error: false, time: 1 }),
-    );
-
-    await strategy.execute(mockCtx, new AbortController());
-
-    expect(tempStorageMock.dispose).toHaveBeenCalledWith('/tmp/file-0');
-  });
 });
 
 describe.runIf(hasCppCompiler)(
   'ExternalRunnerStrategy Real Integration',
   () => {
+    const inputFile = 'input.in';
     let strategy: ExternalRunnerStrategy;
     let testWorkspace: string;
 
     beforeEach(async () => {
-      testWorkspace = join(tmpdir(), `cph-real-test-${Date.now()}`);
+      testWorkspace = join(tmpdir(), `cph-ng-test-${Date.now()}`);
       mkdirSync(testWorkspace, { recursive: true });
+      writeFileSync(join(testWorkspace, inputFile), '');
       settingsMock.cache.directory = testWorkspace;
 
       container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
@@ -346,9 +331,7 @@ describe.runIf(hasCppCompiler)(
 
     afterEach(() => {
       container.clearInstances();
-      if (testWorkspace) {
-        rmSync(testWorkspace, { recursive: true, force: true });
-      }
+      testWorkspace && rmSync(testWorkspace, { recursive: true, force: true });
     });
 
     const createExecutableScript = (content: string): string => {
@@ -364,7 +347,7 @@ describe.runIf(hasCppCompiler)(
       );
       const ctx: ExecutionContext = {
         cmd: [scriptPath],
-        stdin: { useFile: false, data: '' },
+        stdinPath: join(testWorkspace, inputFile),
         timeLimitMs: 2000,
       };
       const result = await strategy.execute(ctx, new AbortController());
@@ -383,7 +366,7 @@ describe.runIf(hasCppCompiler)(
       const scriptPath = createExecutableScript('while (true) {}');
       const ctx: ExecutionContext = {
         cmd: [scriptPath],
-        stdin: { useFile: false, data: '' },
+        stdinPath: join(testWorkspace, inputFile),
         timeLimitMs: 500,
       };
 
@@ -401,7 +384,7 @@ describe.runIf(hasCppCompiler)(
       const scriptPath = createExecutableScript('while (true) {}');
       const ctx: ExecutionContext = {
         cmd: [scriptPath],
-        stdin: { useFile: false, data: '' },
+        stdinPath: join(testWorkspace, inputFile),
         timeLimitMs: 10000,
       };
 

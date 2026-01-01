@@ -38,9 +38,9 @@ describe('NormalStrategy', () => {
     container.clearInstances();
   });
 
-  const executionContext: ExecutionContext = {
+  const mockCtx: ExecutionContext = {
     cmd: ['echo', 'hello'],
-    stdin: { useFile: false, data: 'test_input' },
+    stdinPath: '/tmp/input',
     timeLimitMs: 1000,
   };
 
@@ -55,12 +55,12 @@ describe('NormalStrategy', () => {
     executorMock.execute.mockResolvedValue(processOutput);
 
     const abortController = new AbortController();
-    const result = await strategy.execute(executionContext, abortController);
+    const result = await strategy.execute(mockCtx, abortController);
 
     expect(executorMock.execute).toHaveBeenCalledWith({
-      cmd: executionContext.cmd,
+      cmd: mockCtx.cmd,
       timeoutMs: anyNumber(),
-      stdin: executionContext.stdin,
+      stdinPath: mockCtx.stdinPath,
       ac: abortController,
     });
 
@@ -81,10 +81,7 @@ describe('NormalStrategy', () => {
       abortReason: AbortReason.UserAbort,
     });
 
-    const result = await strategy.execute(
-      executionContext,
-      new AbortController(),
-    );
+    const result = await strategy.execute(mockCtx, new AbortController());
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
@@ -101,10 +98,7 @@ describe('NormalStrategy', () => {
       abortReason: AbortReason.Timeout,
     });
 
-    const result = await strategy.execute(
-      executionContext,
-      new AbortController(),
-    );
+    const result = await strategy.execute(mockCtx, new AbortController());
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
@@ -116,10 +110,7 @@ describe('NormalStrategy', () => {
     const executionError = new Error('Executable not found');
     executorMock.execute.mockResolvedValue(executionError);
 
-    const result = await strategy.execute(
-      executionContext,
-      new AbortController(),
-    );
+    const result = await strategy.execute(mockCtx, new AbortController());
 
     expect(result).toBeInstanceOf(Error);
     expect(result).toBe(executionError);

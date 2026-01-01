@@ -56,7 +56,7 @@ describe('WrapperStrategy', () => {
 
   const mockCtx: ExecutionContext = {
     cmd: ['/tmp/solution'],
-    stdin: { useFile: false, data: 'input' },
+    stdinPath: '/tmp/input',
     timeLimitMs: 1000,
   };
 

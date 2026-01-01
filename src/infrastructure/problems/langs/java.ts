@@ -33,19 +33,19 @@ import {
 } from './abstractLanguageStrategy';
 
 @injectable()
-export class LangPython extends AbstractLanguageStrategy {
-  public readonly name = 'Python';
-  public readonly extensions = ['py'];
+export class LangJavascript extends AbstractLanguageStrategy {
+  public readonly name = 'Java';
+  public readonly extensions = ['java'];
 
   constructor(
     @inject(TOKENS.FileSystem) protected readonly fs: IFileSystem,
     @inject(TOKENS.Logger) protected readonly logger: ILogger,
-    @inject(TOKENS.PathRenderer) private readonly renderer: IPathRenderer,
     @inject(TOKENS.Settings) protected readonly settings: ISettings,
+    @inject(TOKENS.PathRenderer) private readonly renderer: IPathRenderer,
     @inject(TOKENS.Translator) protected readonly translator: ITranslator,
   ) {
-    super(fs, logger.withScope('langsPython'), settings, translator);
-    this.logger = this.logger.withScope('langsPython');
+    super(fs, logger.withScope('langsJava'), settings, translator);
+    this.logger = this.logger.withScope('langsJava');
   }
 
   protected async internalCompile(
@@ -58,15 +58,15 @@ export class LangPython extends AbstractLanguageStrategy {
 
     const path = this.fs.join(
       this.renderer.renderPath(this.settings.cache.directory),
-      `${this.fs.basename(src.path, this.fs.extname(src.path))}.pyc`,
+      `${this.fs.basename(src.path, this.fs.extname(src.path))}.class`,
     );
 
     const compiler =
       additionalData.overwrites?.compiler ??
-      this.settings.compilation.pythonCompiler;
+      this.settings.compilation.javaCompiler;
     const args =
       additionalData.overwrites?.compilerArgs ??
-      this.settings.compilation.pythonArgs;
+      this.settings.compilation.javaArgs;
 
     const { skip, hash } = await this.checkHash(
       src,
@@ -74,21 +74,17 @@ export class LangPython extends AbstractLanguageStrategy {
       compiler + args,
       forceCompile,
     );
-    if (skip) {
-      return { path, hash };
-    }
+    if (skip) return { path, hash };
 
     const compilerArgs = args.split(/\s+/).filter(Boolean);
-
-    await this.executeCompiler(
-      [
-        compiler,
-        '-c',
-        `import py_compile; py_compile.compile(r'${src.path}', cfile=r'${path}', doraise=True)`,
-        ...compilerArgs,
-      ],
-      ac,
-    );
+    const cmd = [
+      compiler,
+      ...compilerArgs,
+      '-d',
+      this.renderer.renderPath(this.settings.cache.directory),
+      src.path,
+    ];
+    await this.executeCompiler(cmd, ac);
     return { path, hash };
   }
 
@@ -97,9 +93,10 @@ export class LangPython extends AbstractLanguageStrategy {
     overwrites?: IOverwrites,
   ): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner = overwrites?.runner ?? this.settings.compilation.pythonRunner;
+    const runner =
+      overwrites?.runner ?? this.settings.compilation.javascriptRunner;
     const runArgs =
-      overwrites?.runnerArgs ?? this.settings.compilation.pythonRunArgs;
+      overwrites?.runnerArgs ?? this.settings.compilation.javascriptRunArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

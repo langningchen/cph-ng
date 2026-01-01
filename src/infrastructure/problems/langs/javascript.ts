@@ -21,7 +21,6 @@ import type {
   CompileAdditionalData,
   LangCompileData,
 } from '@/application/ports/problems/ILanguageStrategy';
-import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
@@ -33,63 +32,27 @@ import {
 } from './abstractLanguageStrategy';
 
 @injectable()
-export class LangPython extends AbstractLanguageStrategy {
-  public readonly name = 'Python';
-  public readonly extensions = ['py'];
+export class LangJavascript extends AbstractLanguageStrategy {
+  public readonly name = 'JavaScript';
+  public readonly extensions = ['js'];
 
   constructor(
     @inject(TOKENS.FileSystem) protected readonly fs: IFileSystem,
     @inject(TOKENS.Logger) protected readonly logger: ILogger,
-    @inject(TOKENS.PathRenderer) private readonly renderer: IPathRenderer,
     @inject(TOKENS.Settings) protected readonly settings: ISettings,
     @inject(TOKENS.Translator) protected readonly translator: ITranslator,
   ) {
-    super(fs, logger.withScope('langsPython'), settings, translator);
-    this.logger = this.logger.withScope('langsPython');
+    super(fs, logger.withScope('langsJavascript'), settings, translator);
+    this.logger = this.logger.withScope('langsJavascript');
   }
 
   protected async internalCompile(
     src: FileWithHash,
-    ac: AbortController,
-    forceCompile: boolean | null,
-    additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
+    _ac: AbortController,
+    _forceCompile: boolean | null,
+    _additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileData> {
-    this.logger.trace('compile', { src, forceCompile });
-
-    const path = this.fs.join(
-      this.renderer.renderPath(this.settings.cache.directory),
-      `${this.fs.basename(src.path, this.fs.extname(src.path))}.pyc`,
-    );
-
-    const compiler =
-      additionalData.overwrites?.compiler ??
-      this.settings.compilation.pythonCompiler;
-    const args =
-      additionalData.overwrites?.compilerArgs ??
-      this.settings.compilation.pythonArgs;
-
-    const { skip, hash } = await this.checkHash(
-      src,
-      path,
-      compiler + args,
-      forceCompile,
-    );
-    if (skip) {
-      return { path, hash };
-    }
-
-    const compilerArgs = args.split(/\s+/).filter(Boolean);
-
-    await this.executeCompiler(
-      [
-        compiler,
-        '-c',
-        `import py_compile; py_compile.compile(r'${src.path}', cfile=r'${path}', doraise=True)`,
-        ...compilerArgs,
-      ],
-      ac,
-    );
-    return { path, hash };
+    return { path: src.path };
   }
 
   public async getRunCommand(
@@ -97,9 +60,10 @@ export class LangPython extends AbstractLanguageStrategy {
     overwrites?: IOverwrites,
   ): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner = overwrites?.runner ?? this.settings.compilation.pythonRunner;
+    const runner =
+      overwrites?.runner ?? this.settings.compilation.javascriptRunner;
     const runArgs =
-      overwrites?.runnerArgs ?? this.settings.compilation.pythonRunArgs;
+      overwrites?.runnerArgs ?? this.settings.compilation.javascriptRunArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

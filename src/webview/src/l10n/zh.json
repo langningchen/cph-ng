@@ -76,7 +76,6 @@
   "tcView.delete": "删除",
   "tcView.memory": "{{memory}} MB",
   "tcView.menu.clearTcStatus": "清除此测试样例状态",
-  "tcView.menu.debug": "使用此测试样例调试",
   "tcView.menu.disableTc": "禁用测试样例",
   "tcView.menu.enableTc": "启用测试样例",
   "tcView.message": "消息",

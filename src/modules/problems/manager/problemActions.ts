@@ -1,16 +1,13 @@
 import type * as msgs from '@w/msgs';
 import { existsSync } from 'fs';
 import { readdir } from 'fs/promises';
-import { basename, dirname, extname, join } from 'path';
-import { commands, debug, l10n, Uri, window } from 'vscode';
-import Langs from '@/core/langs/langs';
+import { basename, extname, join } from 'path';
+import { commands, l10n, Uri, window } from 'vscode';
 import Io from '@/helpers/io';
-import ProcessExecutor from '@/helpers/processExecutor';
 import Settings from '@/helpers/settings';
 import Companion from '@/modules/companion';
 import { Problem } from '@/types';
 import { extensionPath } from '@/utils/global';
-import { KnownResult } from '@/utils/result';
 import { CphProblem } from '../cphProblem';
 import ProblemFs from '../problemFs';
 import Store from './store';
@@ -69,7 +66,7 @@ export class ProblemActions {
     fullProblem.problem.url = msg.url;
     fullProblem.problem.timeLimit = msg.timeLimit;
     fullProblem.problem.memoryLimit = msg.memoryLimit;
-    fullProblem.problem.overwrites = msg.compilationSettings;
+    fullProblem.problem.overwrites = msg.overwrites;
     await Store.dataRefresh(true);
   }
   public static async delProblem(msg: msgs.DelProblemMsg) {
@@ -185,84 +182,5 @@ export class ProblemActions {
       Uri.file(join(extensionPath, 'dist', 'testlib', item)),
       Settings.companion.showPanel,
     );
-  }
-  public static async debugTc(msg: msgs.DebugTcMsg): Promise<void> {
-    try {
-      const fullProblem = await Store.getFullProblem(msg.activePath);
-      if (!fullProblem) {
-        return;
-      }
-      const srcLang = Langs.getLang(fullProblem.problem.src.path);
-      if (!srcLang) {
-        return;
-      }
-
-      const result = await srcLang.compile(
-        fullProblem.problem.src,
-        new AbortController(),
-        null,
-        {
-          canUseWrapper: false,
-          overwrites: fullProblem.problem.overwrites,
-          debug: true,
-        },
-      );
-      if (result instanceof KnownResult) {
-        Io.error(
-          l10n.t('Failed to compile the program: {msg}', {
-            msg: result.msg,
-          }),
-        );
-        return;
-      }
-      fullProblem.problem.src.hash = result.data!.hash;
-
-      const outputPath = result.data?.outputPath;
-      if (!outputPath) {
-        Io.error(l10n.t('Compile data is empty.'));
-        return;
-      }
-
-      const process = ProcessExecutor.launch({
-        cmd: [outputPath],
-        stdin: fullProblem.problem.tcs[msg.id].stdin,
-        debug: true,
-      });
-
-      try {
-        if (srcLang.name === 'C' || srcLang.name === 'C++') {
-          await debug.startDebugging(undefined, {
-            type: 'cppdbg',
-            name: `CPH-NG Debug`,
-            request: 'attach',
-            processId: process.child.pid,
-            program: outputPath,
-            cwd: dirname(fullProblem.problem.src.path),
-            setupCommands: [
-              {
-                description: 'Set breakpoint at main',
-                text: '-break-insert -f main',
-                ignoreFailures: false,
-              },
-            ],
-          });
-        } else {
-          Io.error(l10n.t('Debugging is not supported for this language yet.'));
-          return;
-        }
-      } catch (err) {
-        Io.error(
-          l10n.t('Failed to start debugger: {msg}', {
-            msg: (err as Error).message,
-          }),
-        );
-      }
-    } catch (err) {
-      Io.error(
-        l10n.t('Failed to debug test case: {msg}', {
-          msg: (err as Error).message,
-        }),
-      );
-    }
   }
 }

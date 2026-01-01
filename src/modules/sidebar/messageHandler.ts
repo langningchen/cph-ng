@@ -69,8 +69,6 @@ export const handleMessage = async (msg: WebviewMsg) => {
       await ProblemsManager.openFile(msg);
     } else if (msg.type === 'openTestlib') {
       await ProblemsManager.openTestlib(msg);
-    } else if (msg.type === 'debugTc') {
-      await ProblemsManager.debugTc(msg);
     } else if (msg.type === 'dragDrop') {
       await ProblemsManager.dragDrop(msg);
     } else if (msg.type === 'startChat') {

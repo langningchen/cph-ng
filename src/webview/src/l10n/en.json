@@ -76,7 +76,6 @@
   "tcView.delete": "Delete",
   "tcView.memory": "{{memory}} MB",
   "tcView.menu.clearTcStatus": "Clear Current Test Case Status",
-  "tcView.menu.debug": "Debug with this test case",
   "tcView.menu.disableTc": "Disable Test Case",
   "tcView.menu.enableTc": "Enable Test Case",
   "tcView.message": "Message",

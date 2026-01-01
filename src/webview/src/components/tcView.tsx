@@ -78,9 +78,6 @@ const TcView = ({
               [t('tcView.menu.clearTcStatus')]: () => {
                 dispatch({ type: 'clearTcStatus', id });
               },
-              [t('tcView.menu.debug')]: () => {
-                dispatch({ type: 'debugTc', id });
-              },
             }
       }
     >

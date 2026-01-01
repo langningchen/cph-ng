@@ -145,10 +145,6 @@ export interface OpenSettingsMsg extends BaseMsg {
   type: 'openSettings';
   item: string;
 }
-export interface DebugTcMsg extends BaseMsg {
-  type: 'debugTc';
-  id: UUID;
-}
 export interface DragDropMsg extends BaseMsg {
   type: 'dragDrop';
   items: string[];
@@ -182,5 +178,4 @@ export type WebviewMsg =
   | SubmitToCodeforcesMsg
   | StartChatMsg
   | OpenSettingsMsg
-  | DebugTcMsg
   | DragDropMsg;
