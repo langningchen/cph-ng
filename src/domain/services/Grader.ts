@@ -37,17 +37,13 @@ export class Grader {
     const fixedActual = fix(actual);
     const fixedExpected = fix(expected);
 
-    if (
-      config.oleSize &&
-      fixedActual.length > fixedExpected.length * config.oleSize
-    )
+    if (config.oleSize && fixedActual.length > fixedExpected.length * config.oleSize)
       return VerdictName.OLE;
 
     const compress = (s: string) => s.replace(/\s/g, '');
     if (compress(actual) !== compress(expected)) return VerdictName.WA;
 
-    if (fixedActual !== fixedExpected && !config.regardPEAsAC)
-      return VerdictName.PE;
+    if (fixedActual !== fixedExpected && !config.regardPEAsAC) return VerdictName.PE;
 
     return VerdictName.AC;
   }

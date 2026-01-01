@@ -61,9 +61,7 @@ class SettingsSectionBase {
 
 const getTsType = (prop) => {
   if (prop.enum) {
-    return prop.enum
-      .map((e) => (typeof e === 'string' ? `'${e}'` : e))
-      .join(' | ');
+    return prop.enum.map((e) => (typeof e === 'string' ? `'${e}'` : e)).join(' | ');
   }
   if (prop.type === 'array') {
     if (prop.items?.type) return `${prop.items.type}[]`;
@@ -78,8 +76,7 @@ const getTsType = (prop) => {
   return prop.type || 'any';
 };
 
-const formatDefaultValue = (val) =>
-  val === undefined ? 'undefined' : JSON.stringify(val);
+const formatDefaultValue = (val) => (val === undefined ? 'undefined' : JSON.stringify(val));
 
 function parseSections() {
   const packageJson = JSON.parse(readFileSync(PATHS.packageJson, 'utf8'));
@@ -158,49 +155,32 @@ function generateAdapter(sections) {
   const mainAdapter = [
     `@injectable()`,
     `export class SettingsAdapter implements ISettings {`,
-    sections
-      .map((s) => `  public readonly ${s.name}: ${s.className};`)
-      .join('\n'),
+    sections.map((s) => `  public readonly ${s.name}: ${s.className};`).join('\n'),
     ``,
     `  constructor(@inject(TOKENS.Logger) logger: ILogger) {`,
-    sections
-      .map((s) => `    this.${s.name} = new ${s.className}(logger);`)
-      .join('\n'),
+    sections.map((s) => `    this.${s.name} = new ${s.className}(logger);`).join('\n'),
     `  }`,
     `}`,
   ].join('\n');
 
-  return [
-    header,
-    imports,
-    ADAPTER_BASE_CLASS,
-    ...sectionClasses,
-    mainAdapter,
-  ].join('\n\n');
+  return [header, imports, ADAPTER_BASE_CLASS, ...sectionClasses, mainAdapter].join('\n\n');
 }
 
 function generateMock(sections) {
   const imports = `import type { ISettings, ${sections.map((s) => `I${s.className}`).join(', ')} } from '@/application/ports/vscode/ISettings';`;
 
   const mockProps = sections.map((s) => {
-    const fields = s.props
-      .map((p) => `    ${p.shortKey}: ${p.defaultValue}`)
-      .join(',\n');
+    const fields = s.props.map((p) => `    ${p.shortKey}: ${p.defaultValue}`).join(',\n');
     return `  public readonly ${s.name}: I${s.className} = {\n${fields}\n  };`;
   });
 
-  const classDef = [
-    `class SettingsMock implements ISettings {`,
-    mockProps.join('\n\n'),
-    `}`,
-  ].join('\n');
+  const classDef = [`class SettingsMock implements ISettings {`, mockProps.join('\n\n'), `}`].join(
+    '\n',
+  );
 
-  return [
-    header,
-    imports,
-    classDef,
-    `export const settingsMock = new SettingsMock();`,
-  ].join('\n\n');
+  return [header, imports, classDef, `export const settingsMock = new SettingsMock();`].join(
+    '\n\n',
+  );
 }
 
 const sections = parseSections();

@@ -55,18 +55,11 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
         lang: this.name,
         forceCompile: forceCompile ? 'auto' : String(forceCompile),
       });
-      const result = await this.internalCompile(
-        src,
-        ac,
-        forceCompile,
-        additionalData,
-      );
+      const result = await this.internalCompile(src, ac, forceCompile, additionalData);
       compileEnd({ ...result });
 
       if (!(await this.fs.exists(result.path))) {
-        return new Error(
-          this.translator.t('Compilation output does not exist'),
-        );
+        return new Error(this.translator.t('Compilation output does not exist'));
       }
       return result;
     } catch (e) {
@@ -84,10 +77,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     additionalData: CompileAdditionalData,
   ): Promise<LangCompileData>;
 
-  protected async executeCompiler(
-    cmd: string[],
-    ac: AbortController,
-  ): Promise<void> {
+  protected async executeCompiler(cmd: string[], ac: AbortController): Promise<void> {
     const result = await ProcessExecutor.execute({
       cmd,
       ac,
@@ -101,9 +91,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     CompilationIo.append(await this.fs.readFile(result.stdoutPath));
     CompilationIo.append(await this.fs.readFile(result.stderrPath));
     if (result.codeOrSignal)
-      throw new Error(
-        this.translator.t('Compilation failed with non-zero exit code'),
-      );
+      throw new Error(this.translator.t('Compilation failed with non-zero exit code'));
     Cache.dispose([result.stdoutPath, result.stderrPath]);
   }
 
@@ -122,14 +110,9 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
       additionalHash,
       forceCompile,
     });
-    const hash = SHA256(
-      (await this.fs.readFile(src.path)) + additionalHash,
-    ).toString();
+    const hash = SHA256((await this.fs.readFile(src.path)) + additionalHash).toString();
     const outputExists = await this.fs.exists(outputPath);
-    if (
-      outputExists &&
-      (forceCompile === false || (forceCompile !== true && src.hash === hash))
-    ) {
+    if (outputExists && (forceCompile === false || (forceCompile !== true && src.hash === hash))) {
       this.logger.debug('Skipping compilation', {
         srcHash: src.hash,
         currentHash: hash,

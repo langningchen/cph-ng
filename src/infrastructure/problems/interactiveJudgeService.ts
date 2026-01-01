@@ -1,9 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import type { IJudgeObserver } from '@/application/ports/problems/IJudgeObserver';
-import type {
-  IJudgeService,
-  JudgeContext,
-} from '@/application/ports/problems/IJudgeService';
+import type { IJudgeService, JudgeContext } from '@/application/ports/problems/IJudgeService';
 import type { ILanguageStrategy } from '@/application/ports/problems/ILanguageStrategy';
 import type { ISolutionRunner } from '@/application/ports/problems/runner/ISolutionRunner';
 import { TOKENS } from '@/composition/tokens';

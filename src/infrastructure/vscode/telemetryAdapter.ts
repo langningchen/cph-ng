@@ -15,10 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type {
-  TelemetryEventMeasurements,
-  TelemetryReporter,
-} from '@vscode/extension-telemetry';
+import type { TelemetryEventMeasurements, TelemetryReporter } from '@vscode/extension-telemetry';
 import { inject, injectable } from 'tsyringe';
 import { TelemetryTrustedValue as vsTelemetryTrustedValue } from 'vscode';
 import type { IClock } from '@/application/ports/node/IClock';
@@ -65,10 +62,7 @@ export class TelemetryAdapter implements ITelemetry {
       : this.reporter.sendTelemetryEvent)(name, eventProps, measurements);
   }
 
-  public event(
-    name: TelemetryEventName,
-    props?: Record<string, string | number | boolean>,
-  ): void {
+  public event(name: TelemetryEventName, props?: Record<string, string | number | boolean>): void {
     const stringProps: Record<string, string> = {};
     if (props) {
       for (const [key, value] of Object.entries(props)) {
@@ -78,11 +72,7 @@ export class TelemetryAdapter implements ITelemetry {
     this.reporter.sendTelemetryEvent(name, stringProps);
   }
 
-  public error(
-    name: TelemetryErrorName,
-    e: unknown,
-    props?: TelemetryEventProps,
-  ): void {
+  public error(name: TelemetryErrorName, e: unknown, props?: TelemetryEventProps): void {
     const error = e instanceof Error ? e : new Error(String(e));
     this.send(name, {
       name: error.name,
@@ -93,10 +83,7 @@ export class TelemetryAdapter implements ITelemetry {
     });
   }
 
-  public start(
-    name: TelemetryEventName,
-    props?: TelemetryEventProps,
-  ): () => void {
+  public start(name: TelemetryEventName, props?: TelemetryEventProps): () => void {
     const startTime = this.clock.now();
     return (endProps?: TelemetryEventProps) => {
       const duration = this.clock.now() - startTime;

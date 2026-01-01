@@ -20,8 +20,7 @@ export class LanguageRegistry implements ILanguageRegistry {
   getLang(filePath: string): ILanguageStrategy | undefined {
     const ext = extname(filePath).toLowerCase().slice(1);
     const lang = this.langs.find((lang) => lang.extensions.includes(ext));
-    if (lang)
-      this.logger.debug('Detected language for', { filePath, lang: lang.name });
+    if (lang) this.logger.debug('Detected language for', { filePath, lang: lang.name });
     else this.logger.debug('No language detected for', { filePath });
     return lang;
   }

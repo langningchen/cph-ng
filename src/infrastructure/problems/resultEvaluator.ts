@@ -56,18 +56,14 @@ export class ResultEvaluator {
     @inject(Grader) private readonly grader: Grader,
   ) {}
 
-  public async judge(
-    req: JudgeRequest,
-    ac: AbortController,
-  ): Promise<FinalResult> {
+  public async judge(req: JudgeRequest, ac: AbortController): Promise<FinalResult> {
     const res = req.executionResult;
     const executionStats = {
       timeMs: res.timeMs,
       memoryMb: res.memoryMb,
     };
 
-    if (res.isUserAborted)
-      return { ...executionStats, verdict: VerdictName.RJ, messages: [] };
+    if (res.isUserAborted) return { ...executionStats, verdict: VerdictName.RJ, messages: [] };
     if (res.timeMs > req.timeLimitMs)
       return { ...executionStats, verdict: VerdictName.TLE, messages: [] };
     if (res.codeOrSignal)
@@ -108,8 +104,7 @@ export class ResultEvaluator {
         execution: { codeOrSignal, stdoutPath, stderrPath },
         feedback,
       } = req.interactorResult;
-      if (typeof codeOrSignal === 'string')
-        throw new Error('Interactor run failed');
+      if (typeof codeOrSignal === 'string') throw new Error('Interactor run failed');
       const mapped = this.grader.mapTestlibExitCode(codeOrSignal);
       const message = await this.fs.readFile(feedback);
       this.tmp.dispose([stdoutPath, stderrPath]);

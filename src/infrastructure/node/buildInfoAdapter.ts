@@ -16,10 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type {
-  BuildInfoData,
-  IBuildInfo,
-} from '@/application/ports/node/IBuildInfo';
+import type { BuildInfoData, IBuildInfo } from '@/application/ports/node/IBuildInfo';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { TOKENS } from '@/composition/tokens';
 

@@ -16,10 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import {
-  AbortReason,
-  type IProcessExecutor,
-} from '@/application/ports/node/IProcessExecutor';
+import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { IExecutionStrategy } from '@/application/ports/problems/runner/execution/strategies/IExecutionStrategy';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
@@ -32,10 +29,7 @@ export class NormalStrategy implements IExecutionStrategy {
     @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
   ) {}
 
-  async execute(
-    ctx: ExecutionContext,
-    ac: AbortController,
-  ): Promise<ExecutionResult> {
+  async execute(ctx: ExecutionContext, ac: AbortController): Promise<ExecutionResult> {
     const res = await this.executor.execute({
       cmd: ctx.cmd,
       timeoutMs: ctx.timeLimitMs + this.settings.runner.timeAddition,

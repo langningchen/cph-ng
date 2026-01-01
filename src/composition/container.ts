@@ -62,10 +62,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.TempStorage, TempStorageAdapter);
   container.registerSingleton(TOKENS.Translator, TranslatorAdapter);
   container.registerSingleton(TOKENS.WebviewEventBus, WebviewEventBusAdapter);
-  container.registerSingleton(
-    TOKENS.ExecutionStrategyFactory,
-    ExecutionStrategyFactoryAdapter,
-  );
+  container.registerSingleton(TOKENS.ExecutionStrategyFactory, ExecutionStrategyFactoryAdapter);
   container.registerSingleton(TOKENS.LanguageRegistry, LanguageRegistry);
   container.registerSingleton(TOKENS.CompilerService, CompilerService);
 
@@ -78,9 +75,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   buildInfo.load && (await buildInfo.load());
   container.registerInstance(TOKENS.BuildInfo, buildInfo);
 
-  const logger = container
-    .resolve<ILogger>(TOKENS.Logger)
-    .withScope('container');
+  const logger = container.resolve<ILogger>(TOKENS.Logger).withScope('container');
   const connectionString =
     'InstrumentationKey=ee659d58-b2b5-48b3-b05b-48865365c0d1;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=6ff8b3ee-dc15-4a9b-bab8-ffaa956f1773';
   const commitHash = buildInfo.commitHash;

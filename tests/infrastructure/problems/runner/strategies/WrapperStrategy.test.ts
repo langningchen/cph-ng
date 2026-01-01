@@ -83,10 +83,7 @@ describe('WrapperStrategy', () => {
       expect(result.codeOrSignal).toBe(0);
     }
 
-    expect(fsMock.safeWriteFile).toHaveBeenCalledWith(
-      '/tmp/stderr',
-      expectedCleanStderr,
-    );
+    expect(fsMock.safeWriteFile).toHaveBeenCalledWith('/tmp/stderr', expectedCleanStderr);
   });
 
   it('should fallback to executor time if CPH data is missing', async () => {

@@ -21,10 +21,6 @@ export interface IPathRenderer {
   renderTemplate(problem: Problem): Promise<string>;
   renderPath(original: string): string;
   renderWorkspacePath(original: string): Promise<string | null>;
-  renderPathWithFile(
-    original: string,
-    filePath: string,
-    ignoreError?: boolean,
-  ): string | null;
+  renderPathWithFile(original: string, filePath: string, ignoreError?: boolean): string | null;
   renderUnzipFolder(srcPath: string, zipPath: string): string | null;
 }

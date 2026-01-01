@@ -62,11 +62,7 @@ export class RunAllTestCases {
       }
       await ProblemsManager.dataRefresh();
 
-      const artifacts = await this.compiler.compileAll(
-        problem,
-        msg.compile,
-        ac,
-      );
+      const artifacts = await this.compiler.compileAll(problem, msg.compile, ac);
       if (artifacts instanceof Error) {
         for (const tcId of tcOrder)
           if (tcs[tcId].result) {
@@ -77,8 +73,7 @@ export class RunAllTestCases {
         return;
       }
 
-      for (const tcId of tcOrder)
-        if (tcs[tcId].result) tcs[tcId].result.verdict = TcVerdicts.CPD;
+      for (const tcId of tcOrder) if (tcs[tcId].result) tcs[tcId].result.verdict = TcVerdicts.CPD;
       await ProblemsManager.dataRefresh();
 
       const expandBehavior = this.settings.problem.expandBehavior;

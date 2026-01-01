@@ -85,11 +85,7 @@ describe('ProcessExecutorAdapter', () => {
     const inputFile = tempStorageMock.create();
     writeFileSync(inputFile, 'hello_file');
     const result = await adapter.execute({
-      cmd: [
-        'node',
-        '-e',
-        `process.stdin.on('data', (d) => process.stdout.write('rec:' + d));`,
-      ],
+      cmd: ['node', '-e', `process.stdin.on('data', (d) => process.stdout.write('rec:' + d));`],
       stdinPath: inputFile,
     });
     expect(result).not.toBeInstanceOf(Error);
@@ -158,11 +154,7 @@ process.stdin.on('data', (d) => {
 
   it('should allow manual process control via handle in spawn mode', async () => {
     const handle = await adapter.spawn({
-      cmd: [
-        'node',
-        '-e',
-        `process.stdin.on('data', (d) => console.log('got:' + d));`,
-      ],
+      cmd: ['node', '-e', `process.stdin.on('data', (d) => console.log('got:' + d));`],
     });
     expect(handle.pid).toBeGreaterThan(0);
 
@@ -173,19 +165,13 @@ process.stdin.on('data', (d) => {
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
       expect(result.codeOrSignal).toBe(0);
-      expect(readFileSync(result.stdoutPath, 'utf-8').trim()).toBe(
-        'got:manual_input',
-      );
+      expect(readFileSync(result.stdoutPath, 'utf-8').trim()).toBe('got:manual_input');
     }
   });
 
   it('should allow manual process control via handle in spawn mode', async () => {
     const handle = await adapter.spawn({
-      cmd: [
-        'node',
-        '-e',
-        `process.stdin.on('data', (d) => console.log('got:' + d));`,
-      ],
+      cmd: ['node', '-e', `process.stdin.on('data', (d) => console.log('got:' + d));`],
     });
     expect(handle.pid).toBeGreaterThan(0);
 

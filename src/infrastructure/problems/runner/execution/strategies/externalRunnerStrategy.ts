@@ -30,11 +30,7 @@ import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
-import type {
-  ExecutionContext,
-  ExecutionData,
-  ExecutionResult,
-} from '@/domain/execution';
+import type { ExecutionContext, ExecutionData, ExecutionResult } from '@/domain/execution';
 
 type RunnerOutput =
   | {
@@ -67,10 +63,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     this.logger = this.logger.withScope('ExternalRunnerStrategy');
   }
 
-  async execute(
-    ctx: ExecutionContext,
-    ac: AbortController,
-  ): Promise<ExecutionResult> {
+  async execute(ctx: ExecutionContext, ac: AbortController): Promise<ExecutionResult> {
     this.logger.trace('execute', ctx);
 
     const userStdinPath = ctx.stdinPath;
@@ -90,19 +83,11 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
 
     if (ctx.cmd.length !== 1) {
       return new Error(
-        this.translator.t(
-          'External runner only supports single program without arguments',
-        ),
+        this.translator.t('External runner only supports single program without arguments'),
       );
     }
 
-    const runnerCmd = [
-      runnerPath,
-      ctx.cmd[0],
-      userStdinPath,
-      userStdoutPath,
-      userStderrPath,
-    ];
+    const runnerCmd = [runnerPath, ctx.cmd[0], userStdinPath, userStdoutPath, userStderrPath];
     if (this.settings.runner.unlimitedStack) {
       runnerCmd.push('--unlimited-stack');
     }
@@ -132,12 +117,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     const runnerResult = await handle.wait();
     clearTimeout(timeoutId);
     if (runnerResult instanceof Error) {
-      this.tmp.dispose([
-        handle.stdoutPath,
-        handle.stderrPath,
-        userStdoutPath,
-        userStderrPath,
-      ]);
+      this.tmp.dispose([handle.stdoutPath, handle.stderrPath, userStdoutPath, userStderrPath]);
       return runnerResult;
     }
 

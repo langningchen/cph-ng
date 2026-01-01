@@ -53,27 +53,18 @@ describe('TempStorageAdapter', () => {
 
     expect(path).contains('/uuid-0');
     expect(cryptoMock.randomUUID).toHaveBeenCalledTimes(1);
-    expect(loggerMock.trace).toHaveBeenCalledWith(
-      expect.stringContaining('Creating new'),
-      path,
-    );
+    expect(loggerMock.trace).toHaveBeenCalledWith(expect.stringContaining('Creating new'), path);
   });
 
   it('should reuse a path from the free pool after it has been disposed', () => {
     const path1 = adapter.create();
     adapter.dispose(path1);
-    expect(loggerMock.trace).toHaveBeenCalledWith(
-      expect.stringContaining('Disposing'),
-      path1,
-    );
+    expect(loggerMock.trace).toHaveBeenCalledWith(expect.stringContaining('Disposing'), path1);
 
     const path2 = adapter.create();
     expect(path2).toBe(path1);
     expect(cryptoMock.randomUUID).toHaveBeenCalledTimes(1);
-    expect(loggerMock.trace).toHaveBeenCalledWith(
-      expect.stringContaining('Reusing cached'),
-      path2,
-    );
+    expect(loggerMock.trace).toHaveBeenCalledWith(expect.stringContaining('Reusing cached'), path2);
   });
 
   it('should manage multiple paths in the pool correctly', () => {

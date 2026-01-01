@@ -26,9 +26,7 @@ import { NormalStrategy } from '@/infrastructure/problems/runner/execution/strat
 import { WrapperStrategy } from '@/infrastructure/problems/runner/execution/strategies/wrapperStrategy';
 
 @injectable()
-export class ExecutionStrategyFactoryAdapter
-  implements IExecutionStrategyFactory
-{
+export class ExecutionStrategyFactoryAdapter implements IExecutionStrategyFactory {
   public create(type: ExecutionStrategyType): IExecutionStrategy {
     switch (type) {
       case 'external':

@@ -122,9 +122,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
     // Use a unified AbortController to handle both external and internal aborts
     const unifiedAc = new AbortController();
     if (ac) {
-      ac.signal.addEventListener('abort', () =>
-        unifiedAc.abort(AbortReason.UserAbort),
-      );
+      ac.signal.addEventListener('abort', () => unifiedAc.abort(AbortReason.UserAbort));
     }
 
     const child = spawn(cmd[0], cmd.slice(1), {

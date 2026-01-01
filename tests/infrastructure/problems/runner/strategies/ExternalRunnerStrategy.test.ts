@@ -15,13 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  chmodSync,
-  mkdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
+import { chmodSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { hasCppCompiler } from '@t/check';
@@ -162,9 +156,7 @@ describe('ExternalRunnerStrategy', () => {
     );
 
     const resultPromise = strategy.execute(mockCtx, new AbortController());
-    await vi.advanceTimersByTimeAsync(
-      mockCtx.timeLimitMs + settingsMock.runner.timeAddition + 100,
-    );
+    await vi.advanceTimersByTimeAsync(mockCtx.timeLimitMs + settingsMock.runner.timeAddition + 100);
     const result = await resultPromise;
 
     expect(result).not.toBeInstanceOf(Error);
@@ -177,9 +169,7 @@ describe('ExternalRunnerStrategy', () => {
   });
 
   it('should return error if runner provider fails', async () => {
-    runnerProviderMock.getRunnerPath.mockRejectedValue(
-      new Error('No runner binary'),
-    );
+    runnerProviderMock.getRunnerPath.mockRejectedValue(new Error('No runner binary'));
 
     const result = await strategy.execute(mockCtx, new AbortController());
 
@@ -201,9 +191,7 @@ describe('ExternalRunnerStrategy', () => {
     const result = await strategy.execute(mockCtx, new AbortController());
 
     expect(result).toBeInstanceOf(Error);
-    expect((result as Error).message).equals(
-      'Runner exited with code {codeOrSignal},1',
-    );
+    expect((result as Error).message).equals('Runner exited with code {codeOrSignal},1');
   });
 
   it('should throw error if runner output is malformed JSON', async () => {
@@ -218,9 +206,9 @@ describe('ExternalRunnerStrategy', () => {
     });
     fsMock.readFile.mockResolvedValue('invalid-json');
 
-    await expect(
-      strategy.execute(mockCtx, new AbortController()),
-    ).rejects.toThrow('Runner output is invalid JSON');
+    await expect(strategy.execute(mockCtx, new AbortController())).rejects.toThrow(
+      'Runner output is invalid JSON',
+    );
 
     expect(console.error).toHaveBeenCalledWith(
       '[Telemetry Error] parseRunnerError',
@@ -244,9 +232,9 @@ describe('ExternalRunnerStrategy', () => {
       }),
     );
 
-    await expect(
-      strategy.execute(mockCtx, new AbortController()),
-    ).rejects.toThrow('Runner reported error: {type} (Code: {code}),1,101');
+    await expect(strategy.execute(mockCtx, new AbortController())).rejects.toThrow(
+      'Runner reported error: {type} (Code: {code}),1,101',
+    );
   });
 
   it('should handle User Abort correctly', async () => {
@@ -295,109 +283,101 @@ describe('ExternalRunnerStrategy', () => {
   });
 });
 
-describe.runIf(hasCppCompiler)(
-  'ExternalRunnerStrategy Real Integration',
-  () => {
-    const inputFile = 'input.in';
-    let strategy: ExternalRunnerStrategy;
-    let testWorkspace: string;
+describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => {
+  const inputFile = 'input.in';
+  let strategy: ExternalRunnerStrategy;
+  let testWorkspace: string;
 
-    beforeEach(async () => {
-      testWorkspace = join(tmpdir(), `cph-ng-test-${Date.now()}`);
-      mkdirSync(testWorkspace, { recursive: true });
-      writeFileSync(join(testWorkspace, inputFile), '');
-      settingsMock.cache.directory = testWorkspace;
+  beforeEach(async () => {
+    testWorkspace = join(tmpdir(), `cph-ng-test-${Date.now()}`);
+    mkdirSync(testWorkspace, { recursive: true });
+    writeFileSync(join(testWorkspace, inputFile), '');
+    settingsMock.cache.directory = testWorkspace;
 
-      container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
-      container.registerInstance(TOKENS.Logger, loggerMock);
-      container.registerInstance(TOKENS.Settings, settingsMock);
-      container.registerInstance(TOKENS.Telemetry, telemetryMock);
-      container.registerInstance(TOKENS.Translator, translatorMock);
+    container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
+    container.registerInstance(TOKENS.Logger, loggerMock);
+    container.registerInstance(TOKENS.Settings, settingsMock);
+    container.registerInstance(TOKENS.Telemetry, telemetryMock);
+    container.registerInstance(TOKENS.Translator, translatorMock);
 
-      container.registerSingleton(TOKENS.Clock, ClockAdapter);
-      container.registerSingleton(TOKENS.Crypto, CryptoAdapter);
-      container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
-      container.registerSingleton(TOKENS.PathRenderer, PathRendererMock);
-      container.registerSingleton(
-        TOKENS.ProcessExecutor,
-        ProcessExecutorAdapter,
-      );
-      container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);
-      container.registerSingleton(TOKENS.System, SystemAdapter);
-      container.registerSingleton(TOKENS.TempStorage, TempStorageAdapter);
+    container.registerSingleton(TOKENS.Clock, ClockAdapter);
+    container.registerSingleton(TOKENS.Crypto, CryptoAdapter);
+    container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
+    container.registerSingleton(TOKENS.PathRenderer, PathRendererMock);
+    container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
+    container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);
+    container.registerSingleton(TOKENS.System, SystemAdapter);
+    container.registerSingleton(TOKENS.TempStorage, TempStorageAdapter);
 
-      strategy = container.resolve(ExternalRunnerStrategy);
-    });
+    strategy = container.resolve(ExternalRunnerStrategy);
+  });
 
-    afterEach(() => {
-      container.clearInstances();
-      testWorkspace && rmSync(testWorkspace, { recursive: true, force: true });
-    });
+  afterEach(() => {
+    container.clearInstances();
+    testWorkspace && rmSync(testWorkspace, { recursive: true, force: true });
+  });
 
-    const createExecutableScript = (content: string): string => {
-      const scriptPath = join(testWorkspace, 'script.js');
-      writeFileSync(scriptPath, `#!/usr/bin/env node\n${content}`);
-      chmodSync(scriptPath, 0o755);
-      return scriptPath;
+  const createExecutableScript = (content: string): string => {
+    const scriptPath = join(testWorkspace, 'script.js');
+    writeFileSync(scriptPath, `#!/usr/bin/env node\n${content}`);
+    chmodSync(scriptPath, 0o755);
+    return scriptPath;
+  };
+
+  it('should execute a real program through the real runner binary', async () => {
+    const scriptPath = createExecutableScript('console.log("hello_from_node")');
+    const ctx: ExecutionContext = {
+      cmd: [scriptPath],
+      stdinPath: join(testWorkspace, inputFile),
+      timeLimitMs: 2000,
+    };
+    const result = await strategy.execute(ctx, new AbortController());
+
+    expect(result).not.toBeInstanceOf(Error);
+    if (!(result instanceof Error)) {
+      expect(result.codeOrSignal).toBe(0);
+      expect(result.timeMs).toBeGreaterThan(0);
+
+      const output = readFileSync(result.stdoutPath, 'utf-8');
+      expect(output.trim()).toBe('hello_from_node');
+    }
+  });
+
+  it('should successfully perform a "Soft Kill" on the real runner binary', async () => {
+    const scriptPath = createExecutableScript('while (true) {}');
+    const ctx: ExecutionContext = {
+      cmd: [scriptPath],
+      stdinPath: join(testWorkspace, inputFile),
+      timeLimitMs: 500,
     };
 
-    it('should execute a real program through the real runner binary', async () => {
-      const scriptPath = createExecutableScript(
-        'console.log("hello_from_node")',
-      );
-      const ctx: ExecutionContext = {
-        cmd: [scriptPath],
-        stdinPath: join(testWorkspace, inputFile),
-        timeLimitMs: 2000,
-      };
-      const result = await strategy.execute(ctx, new AbortController());
+    const result = await strategy.execute(ctx, new AbortController());
 
-      expect(result).not.toBeInstanceOf(Error);
-      if (!(result instanceof Error)) {
-        expect(result.codeOrSignal).toBe(0);
-        expect(result.timeMs).toBeGreaterThan(0);
+    console.log(result);
+    expect(result).not.toBeInstanceOf(Error);
+    if (!(result instanceof Error)) {
+      expect(result.isUserAborted).toBe(false);
+      expect(result.timeMs).toBeGreaterThanOrEqual(500);
+    }
+  });
 
-        const output = readFileSync(result.stdoutPath, 'utf-8');
-        expect(output.trim()).toBe('hello_from_node');
-      }
-    });
+  it('should handle User Abort by sending "k" to the real runner', async () => {
+    const scriptPath = createExecutableScript('while (true) {}');
+    const ctx: ExecutionContext = {
+      cmd: [scriptPath],
+      stdinPath: join(testWorkspace, inputFile),
+      timeLimitMs: 10000,
+    };
 
-    it('should successfully perform a "Soft Kill" on the real runner binary', async () => {
-      const scriptPath = createExecutableScript('while (true) {}');
-      const ctx: ExecutionContext = {
-        cmd: [scriptPath],
-        stdinPath: join(testWorkspace, inputFile),
-        timeLimitMs: 500,
-      };
+    const ac = new AbortController();
+    const promise = strategy.execute(ctx, ac);
+    setTimeout(() => ac.abort(), 200);
 
-      const result = await strategy.execute(ctx, new AbortController());
+    const result = await promise;
 
-      console.log(result);
-      expect(result).not.toBeInstanceOf(Error);
-      if (!(result instanceof Error)) {
-        expect(result.isUserAborted).toBe(false);
-        expect(result.timeMs).toBeGreaterThanOrEqual(500);
-      }
-    });
-
-    it('should handle User Abort by sending "k" to the real runner', async () => {
-      const scriptPath = createExecutableScript('while (true) {}');
-      const ctx: ExecutionContext = {
-        cmd: [scriptPath],
-        stdinPath: join(testWorkspace, inputFile),
-        timeLimitMs: 10000,
-      };
-
-      const ac = new AbortController();
-      const promise = strategy.execute(ctx, ac);
-      setTimeout(() => ac.abort(), 200);
-
-      const result = await promise;
-
-      if (!(result instanceof Error)) {
-        expect(result.isUserAborted).toBe(true);
-        expect(result.timeMs).toBeLessThan(1000);
-      }
-    });
-  },
-);
+    if (!(result instanceof Error)) {
+      expect(result.isUserAborted).toBe(true);
+      expect(result.timeMs).toBeLessThan(1000);
+    }
+  });
+});

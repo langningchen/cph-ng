@@ -54,10 +54,7 @@ export class FileSystemAdapter implements IFileSystem {
     return extname(path);
   }
 
-  async readFile(
-    path: string,
-    encoding: BufferEncoding = 'utf8',
-  ): Promise<string> {
+  async readFile(path: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
     return readFile(path, { encoding });
   }
 

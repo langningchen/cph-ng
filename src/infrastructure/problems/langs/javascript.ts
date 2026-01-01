@@ -26,10 +26,7 @@ import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import type { FileWithHash, IOverwrites } from '@/types';
-import {
-  AbstractLanguageStrategy,
-  DefaultCompileAdditionalData,
-} from './abstractLanguageStrategy';
+import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstractLanguageStrategy';
 
 @injectable()
 export class LangJavascript extends AbstractLanguageStrategy {
@@ -55,15 +52,10 @@ export class LangJavascript extends AbstractLanguageStrategy {
     return { path: src.path };
   }
 
-  public async getRunCommand(
-    target: string,
-    overwrites?: IOverwrites,
-  ): Promise<string[]> {
+  public async getRunCommand(target: string, overwrites?: IOverwrites): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner =
-      overwrites?.runner ?? this.settings.compilation.javascriptRunner;
-    const runArgs =
-      overwrites?.runnerArgs ?? this.settings.compilation.javascriptRunArgs;
+    const runner = overwrites?.runner ?? this.settings.compilation.javascriptRunner;
+    const runArgs = overwrites?.runnerArgs ?? this.settings.compilation.javascriptRunArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

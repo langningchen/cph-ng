@@ -27,8 +27,5 @@ export interface IFileSystem {
   readFile(path: string, encoding?: BufferEncoding): Promise<string>;
   safeWriteFile(path: string, data: string | Uint8Array): Promise<void>;
   exists(path: string): Promise<boolean>;
-  rm(
-    path: string,
-    options?: { recursive?: boolean; force?: boolean },
-  ): Promise<void>;
+  rm(path: string, options?: { recursive?: boolean; force?: boolean }): Promise<void>;
 }

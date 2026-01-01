@@ -41,10 +41,7 @@ export class PathRendererAdapter implements IPathRenderer {
     @inject(TOKENS.ExtensionPath) private readonly path: string,
   ) {}
 
-  private renderString(
-    original: string,
-    replacements: [string, string][],
-  ): string {
+  private renderString(original: string, replacements: [string, string][]): string {
     let result = original;
     for (const [key, value] of replacements) {
       result = result.replaceAll(`\${${key}}`, value);
@@ -93,23 +90,17 @@ export class PathRendererAdapter implements IPathRenderer {
       const folders = workspace.workspaceFolders;
       if (!folders || folders.length === 0) {
         this.logger.error(
-          this.translator.t(
-            'Path uses ${workspace}, but no workspace folder is open.',
-          ),
+          this.translator.t('Path uses ${workspace}, but no workspace folder is open.'),
         );
         return null;
       }
 
       const validFolders = folders
         .map((f) => f.uri.fsPath)
-        .filter((path) =>
-          existsSync(this.renderString(rendered, [['workspace', path]])),
-        );
+        .filter((path) => existsSync(this.renderString(rendered, [['workspace', path]])));
 
       if (validFolders.length === 0) {
-        this.logger.error(
-          this.translator.t('No workspace folder contains the required path.'),
-        );
+        this.logger.error(this.translator.t('No workspace folder contains the required path.'));
         return null;
       }
 
@@ -144,15 +135,10 @@ export class PathRendererAdapter implements IPathRenderer {
 
     let result = original;
 
-    if (
-      result.includes('${workspace}') ||
-      result.includes('${relativeDirname}')
-    ) {
+    if (result.includes('${workspace}') || result.includes('${relativeDirname}')) {
       if (!workspaceFolder) {
         if (!ignoreError) {
-          this.logger.error(
-            this.translator.t('File is not in a workspace folder.'),
-          );
+          this.logger.error(this.translator.t('File is not in a workspace folder.'));
         }
         return null;
       }
@@ -174,10 +160,7 @@ export class PathRendererAdapter implements IPathRenderer {
   }
 
   public renderUnzipFolder(srcPath: string, zipPath: string): string | null {
-    const original = this.renderPathWithFile(
-      this.settings.problem.unzipFolder,
-      srcPath,
-    );
+    const original = this.renderPathWithFile(this.settings.problem.unzipFolder, srcPath);
     if (!original) return null;
 
     return normalize(

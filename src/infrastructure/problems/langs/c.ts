@@ -48,27 +48,15 @@ export class LangC extends AbstractLanguageStrategy {
         (this.system.type() === 'Windows_NT' ? '.exe' : ''),
     );
 
-    const compiler =
-      additionalData.overwrites?.compiler ??
-      this.settings.compilation.cCompiler;
-    const args =
-      additionalData.overwrites?.compilerArgs ??
-      this.settings.compilation.cArgs;
+    const compiler = additionalData.overwrites?.compiler ?? this.settings.compilation.cCompiler;
+    const args = additionalData.overwrites?.compilerArgs ?? this.settings.compilation.cArgs;
 
-    const { skip, hash } = await this.checkHash(
-      src,
-      path,
-      compiler + args,
-      forceCompile,
-    );
+    const { skip, hash } = await this.checkHash(src, path, compiler + args, forceCompile);
     if (skip) return { path, hash };
 
     const compilerArgs = args.split(/\s+/).filter(Boolean);
     const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
-    if (
-      this.settings.runner.unlimitedStack &&
-      this.system.type() === 'Windows_NT'
-    )
+    if (this.settings.runner.unlimitedStack && this.system.type() === 'Windows_NT')
       cmd.push('-Wl,--stack,268435456');
     await this.executeCompiler(cmd, ac);
     return { path, hash };

@@ -17,10 +17,7 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
-import {
-  AbortReason,
-  type IProcessExecutor,
-} from '@/application/ports/node/IProcessExecutor';
+import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { IExecutionStrategy } from '@/application/ports/problems/runner/execution/strategies/IExecutionStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
@@ -44,10 +41,7 @@ export class WrapperStrategy implements IExecutionStrategy {
     this.logger = this.logger.withScope('WrapperStrategy');
   }
 
-  async execute(
-    ctx: ExecutionContext,
-    ac: AbortController,
-  ): Promise<ExecutionResult> {
+  async execute(ctx: ExecutionContext, ac: AbortController): Promise<ExecutionResult> {
     const res = await this.executor.execute({
       cmd: ctx.cmd,
       timeoutMs: ctx.timeLimitMs + this.settings.runner.timeAddition,
@@ -64,18 +58,13 @@ export class WrapperStrategy implements IExecutionStrategy {
     return data;
   }
 
-  private async extractWrapperData(
-    stderrPath: string,
-  ): Promise<WrapperData | null> {
+  private async extractWrapperData(stderrPath: string): Promise<WrapperData | null> {
     const content = await this.fs.readFile(stderrPath);
     const regex = /-----CPH DATA STARTS-----(\{.*?\})-----/s;
     const match = content.match(regex);
     if (!match) return null;
     try {
-      await this.fs.safeWriteFile(
-        stderrPath,
-        content.replace(regex, '').trim(),
-      );
+      await this.fs.safeWriteFile(stderrPath, content.replace(regex, '').trim());
       return JSON.parse(match[1]) as WrapperData;
     } catch (e) {
       this.logger.error('Failed to parse wrapper data JSON', e as Error);

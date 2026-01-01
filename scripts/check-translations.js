@@ -86,8 +86,7 @@ function findFilesRecursively(dir, exts, excludes) {
       if (ig.ignores(path)) continue;
       const stat = statSync(path);
       if (stat.isDirectory()) visit(path);
-      if (stat.isFile())
-        exts.includes(extname(path).slice(1)) && files.push(path);
+      if (stat.isFile()) exts.includes(extname(path).slice(1)) && files.push(path);
     }
   };
   existsSync(dir) && visit(dir);
@@ -105,10 +104,7 @@ function extractKeys(dir, exts, excludes = []) {
         const args = node.arguments;
         if (args.length > 0) {
           const firstArg = args[0];
-          if (
-            isStringLiteral(firstArg) ||
-            isNoSubstitutionTemplateLiteral(firstArg)
-          )
+          if (isStringLiteral(firstArg) || isNoSubstitutionTemplateLiteral(firstArg))
             keys.add(firstArg.text);
         }
       }
@@ -120,8 +116,7 @@ function extractKeys(dir, exts, excludes = []) {
 }
 
 function isTranslationCall(expression) {
-  if (isPropertyAccessExpression(expression))
-    return expression.name.text === 't';
+  if (isPropertyAccessExpression(expression)) return expression.name.text === 't';
   if (isIdentifier(expression)) return expression.text === 't';
   return false;
 }

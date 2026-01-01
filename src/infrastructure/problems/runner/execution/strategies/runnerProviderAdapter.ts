@@ -87,15 +87,11 @@ export class RunnerProviderAdapter implements IRunnerProvider {
     if (result.codeOrSignal !== 0) {
       const stderr = await this.fs.readFile(result.stderrPath);
       this.logger.error('Runner compilation failed', { stderr });
-      throw new Error(
-        `Runner compilation failed with code ${result.codeOrSignal}`,
-      );
+      throw new Error(`Runner compilation failed with code ${result.codeOrSignal}`);
     }
 
     if (!(await this.fs.exists(outputPath))) {
-      throw new Error(
-        'Compiler exited successfully but output file is missing',
-      );
+      throw new Error('Compiler exited successfully but output file is missing');
     }
 
     return outputPath;

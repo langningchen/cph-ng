@@ -27,9 +27,7 @@ const createLoggerMock = (
   const root = rootInstance || logger;
   const prefix = scope ? `[${scope}]` : '';
 
-  logger.withScope.mockImplementation((name: string) =>
-    createLoggerMock(name, root),
-  );
+  logger.withScope.mockImplementation((name: string) => createLoggerMock(name, root));
 
   const implementLog = (
     level: Exclude<keyof ILogger, 'withScope'>,

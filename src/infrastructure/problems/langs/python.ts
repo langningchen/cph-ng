@@ -27,10 +27,7 @@ import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import type { FileWithHash, IOverwrites } from '@/types';
-import {
-  AbstractLanguageStrategy,
-  DefaultCompileAdditionalData,
-} from './abstractLanguageStrategy';
+import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstractLanguageStrategy';
 
 @injectable()
 export class LangPython extends AbstractLanguageStrategy {
@@ -62,18 +59,10 @@ export class LangPython extends AbstractLanguageStrategy {
     );
 
     const compiler =
-      additionalData.overwrites?.compiler ??
-      this.settings.compilation.pythonCompiler;
-    const args =
-      additionalData.overwrites?.compilerArgs ??
-      this.settings.compilation.pythonArgs;
+      additionalData.overwrites?.compiler ?? this.settings.compilation.pythonCompiler;
+    const args = additionalData.overwrites?.compilerArgs ?? this.settings.compilation.pythonArgs;
 
-    const { skip, hash } = await this.checkHash(
-      src,
-      path,
-      compiler + args,
-      forceCompile,
-    );
+    const { skip, hash } = await this.checkHash(src, path, compiler + args, forceCompile);
     if (skip) {
       return { path, hash };
     }
@@ -92,14 +81,10 @@ export class LangPython extends AbstractLanguageStrategy {
     return { path, hash };
   }
 
-  public async getRunCommand(
-    target: string,
-    overwrites?: IOverwrites,
-  ): Promise<string[]> {
+  public async getRunCommand(target: string, overwrites?: IOverwrites): Promise<string[]> {
     this.logger.trace('runCommand', { target });
     const runner = overwrites?.runner ?? this.settings.compilation.pythonRunner;
-    const runArgs =
-      overwrites?.runnerArgs ?? this.settings.compilation.pythonRunArgs;
+    const runArgs = overwrites?.runnerArgs ?? this.settings.compilation.pythonRunArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

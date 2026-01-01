@@ -49,12 +49,8 @@ export class LangCpp extends AbstractLanguageStrategy {
         (this.system.type() === 'Windows_NT' ? '.exe' : ''),
     );
 
-    const compiler =
-      additionalData.overwrites?.compiler ??
-      this.settings.compilation.cppCompiler;
-    const args =
-      additionalData.overwrites?.compilerArgs ??
-      this.settings.compilation.cppArgs;
+    const compiler = additionalData.overwrites?.compiler ?? this.settings.compilation.cppCompiler;
+    const args = additionalData.overwrites?.compilerArgs ?? this.settings.compilation.cppArgs;
     const { objcopy, useWrapper, useHook } = this.settings.compilation;
 
     const { skip, hash } = await this.checkHash(
@@ -73,26 +69,12 @@ export class LangCpp extends AbstractLanguageStrategy {
 
       const solSrc = src.path;
       const solObj = `${path}.o`;
-      compileCommands.push([
-        compiler,
-        solSrc,
-        ...compilerArgs,
-        '-c',
-        '-o',
-        solObj,
-      ]);
+      compileCommands.push([compiler, solSrc, ...compilerArgs, '-c', '-o', solObj]);
       linkObjs.push(solObj);
 
       const wrapperSrc = this.fs.join(this.path, 'res', 'wrapper.cpp');
       const wrapperObj = `${path}.wrapper.o`;
-      compileCommands.push([
-        compiler,
-        '-fPIC',
-        '-c',
-        wrapperSrc,
-        '-o',
-        wrapperObj,
-      ]);
+      compileCommands.push([compiler, '-fPIC', '-c', wrapperSrc, '-o', wrapperObj]);
       linkObjs.push(wrapperObj);
 
       if (useHook) {
@@ -104,23 +86,15 @@ export class LangCpp extends AbstractLanguageStrategy {
 
       const linkCmd = [compiler, ...linkObjs, ...compilerArgs, '-o', path];
       if (this.system.type() === 'Linux') linkCmd.push('-ldl');
-      postCommands.push(
-        [objcopy, '--redefine-sym', 'main=original_main', solObj],
-        linkCmd,
-      );
+      postCommands.push([objcopy, '--redefine-sym', 'main=original_main', solObj], linkCmd);
     } else {
       const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
-      if (
-        this.settings.runner.unlimitedStack &&
-        this.system.type() === 'Windows_NT'
-      )
+      if (this.settings.runner.unlimitedStack && this.system.type() === 'Windows_NT')
         cmd.push('-Wl,--stack,268435456');
       compileCommands.push(cmd);
     }
 
-    await Promise.all(
-      compileCommands.map((cmd) => this.executeCompiler(cmd, ac)),
-    );
+    await Promise.all(compileCommands.map((cmd) => this.executeCompiler(cmd, ac)));
     for (const cmd of postCommands) await this.executeCompiler(cmd, ac);
     return { path, hash };
   }

@@ -43,10 +43,9 @@ export class CompilerService implements ICompilerService {
     const srcLang = this.lang.getLang(problem.src.path);
     if (!srcLang) {
       return new Error(
-        this.translator.t(
-          'Cannot determine the programming language of the source file: {file}.',
-          { file: problem.src.path },
-        ),
+        this.translator.t('Cannot determine the programming language of the source file: {file}.', {
+          file: problem.src.path,
+        }),
       );
     }
     const result = await srcLang.compile(problem.src, ac, compile, {
@@ -61,11 +60,7 @@ export class CompilerService implements ICompilerService {
 
     // Compile checker
     if (problem.checker) {
-      const checkerResult = await this.optionalCompile(
-        problem.checker,
-        ac,
-        compile,
-      );
+      const checkerResult = await this.optionalCompile(problem.checker, ac, compile);
       if (checkerResult instanceof Error) return checkerResult;
       problem.checker.hash = checkerResult.hash;
       data.checker = checkerResult;
@@ -73,11 +68,7 @@ export class CompilerService implements ICompilerService {
 
     // Compile interactor
     if (problem.interactor) {
-      const interactorResult = await this.optionalCompile(
-        problem.interactor,
-        ac,
-        compile,
-      );
+      const interactorResult = await this.optionalCompile(problem.interactor, ac, compile);
       if (interactorResult instanceof Error) return interactorResult;
       problem.interactor.hash = interactorResult.hash;
       data.interactor = interactorResult;
@@ -85,11 +76,7 @@ export class CompilerService implements ICompilerService {
 
     // Compile brute force comparison programs
     if (problem.bfCompare?.generator && problem.bfCompare?.bruteForce) {
-      const generatorResult = await this.optionalCompile(
-        problem.bfCompare.generator,
-        ac,
-        compile,
-      );
+      const generatorResult = await this.optionalCompile(problem.bfCompare.generator, ac, compile);
       if (generatorResult instanceof Error) return generatorResult;
       problem.bfCompare.generator.hash = generatorResult.hash;
 

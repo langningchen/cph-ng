@@ -47,10 +47,8 @@ import type { RunSingleTc } from '@/application/useCases/RunSingleTc';
 export const TOKENS = {
   // VS Code context and utilities
   ExtensionPath: 'vscode.ExtensionPath' as InjectionToken<string>,
-  LogOutputChannel:
-    'vscode.LogOutputChannel' as InjectionToken<LogOutputChannel>,
-  TelemetryReporter:
-    'vscode.TelemetryReporter' as InjectionToken<TelemetryReporter>,
+  LogOutputChannel: 'vscode.LogOutputChannel' as InjectionToken<LogOutputChannel>,
+  TelemetryReporter: 'vscode.TelemetryReporter' as InjectionToken<TelemetryReporter>,
 
   // Core ports
   System: 'ports.System' as InjectionToken<ISystem>,
@@ -66,22 +64,19 @@ export const TOKENS = {
   RunnerProvider: 'ports.RunnerProvider' as InjectionToken<IRunnerProvider>,
   Telemetry: 'ports.Telemetry' as InjectionToken<ITelemetry>,
   PathRenderer: 'ports.PathRenderer' as InjectionToken<IPathRenderer>,
-  JudgeServiceFactory:
-    'ports.JudgeServiceFactory' as InjectionToken<IJudgeServiceFactory>,
+  JudgeServiceFactory: 'ports.JudgeServiceFactory' as InjectionToken<IJudgeServiceFactory>,
   TempStorage: 'ports.TempStorage' as InjectionToken<ITempStorage>,
   Clock: 'ports.Clock' as InjectionToken<IClock>,
   Crypto: 'ports.Crypto' as InjectionToken<ICrypto>,
   BuildInfo: 'ports.BuildInfo' as InjectionToken<IBuildInfo>,
   ExecutionStrategyFactory:
     'ports.ExecutionStrategyFactory' as InjectionToken<IExecutionStrategyFactory>,
-  LanguageRegistry:
-    'ports.LanguageRegistry' as InjectionToken<ILanguageRegistry>,
+  LanguageRegistry: 'ports.LanguageRegistry' as InjectionToken<ILanguageRegistry>,
   CompilerService: 'ports.CompilerService' as InjectionToken<ICompilerService>,
 
   // Use cases
   RunSingleTc: 'useCases.RunSingleTc' as InjectionToken<RunSingleTc>,
-  RunAllTestCases:
-    'useCases.RunAllTestCases' as InjectionToken<RunAllTestCases>,
+  RunAllTestCases: 'useCases.RunAllTestCases' as InjectionToken<RunAllTestCases>,
 };
 
 export type TokenKeys = keyof typeof TOKENS;

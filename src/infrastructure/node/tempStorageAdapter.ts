@@ -44,9 +44,7 @@ export class TempStorageAdapter implements ITempStorage {
       return;
     }
     this.monitorInterval = setInterval(() => {
-      this.logger.debug(
-        `this Monitor: ${this.usedPool.size} used, ${this.freePool.size} free.`,
-      );
+      this.logger.debug(`this Monitor: ${this.usedPool.size} used, ${this.freePool.size} free.`);
       this.logger.trace('Used paths', Array.from(this.usedPool));
       this.logger.trace('Free paths', Array.from(this.freePool));
     }, 10000);
@@ -59,10 +57,7 @@ export class TempStorageAdapter implements ITempStorage {
       this.freePool.delete(path);
       this.logger.trace('Reusing cached path', path);
     } else {
-      path = this.fs.join(
-        renderPath(this.settings.cache.directory),
-        this.crypto.randomUUID(),
-      );
+      path = this.fs.join(renderPath(this.settings.cache.directory), this.crypto.randomUUID());
       this.logger.trace('Creating new cached path', path);
     }
     this.usedPool.add(path);
