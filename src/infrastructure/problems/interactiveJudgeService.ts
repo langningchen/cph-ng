@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 import type { IJudgeObserver } from '@/application/ports/problems/IJudgeObserver';
 import type { IJudgeService, JudgeContext } from '@/application/ports/problems/IJudgeService';
+import type { ILanguageRegistry } from '@/application/ports/problems/langs/ILanguageRegistry';
 import type { ISolutionRunner } from '@/application/ports/problems/runner/ISolutionRunner';
-import type { ILanguageRegistry } from '@/application/ports/services/ILanguageRegistry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import { ExecutionRejected } from '@/domain/execution';

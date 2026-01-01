@@ -20,7 +20,7 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type {
   CompileAdditionalData,
   LangCompileData,
-} from '@/application/ports/problems/ILanguageStrategy';
+} from '@/application/ports/problems/langs/ILanguageStrategy';
 import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';

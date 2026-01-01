@@ -8,7 +8,7 @@ import {
   type ILanguageStrategy,
   type LangCompileData,
   type LangCompileResult,
-} from '@/application/ports/problems/ILanguageStrategy';
+} from '@/application/ports/problems/langs/ILanguageStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';

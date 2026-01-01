@@ -4,8 +4,8 @@ import type {
   CompileResult,
   ICompilerService,
 } from '@/application/ports/problems/ICompilerService';
-import type { LangCompileResult } from '@/application/ports/problems/ILanguageStrategy';
-import type { ILanguageRegistry } from '@/application/ports/services/ILanguageRegistry';
+import type { ILanguageRegistry } from '@/application/ports/problems/langs/ILanguageRegistry';
+import type { LangCompileResult } from '@/application/ports/problems/langs/ILanguageStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';

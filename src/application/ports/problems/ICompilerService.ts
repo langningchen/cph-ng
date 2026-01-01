@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { LangCompileData } from '@/application/ports/problems/ILanguageStrategy';
+import type { LangCompileData } from '@/application/ports/problems/langs/ILanguageStrategy';
 import type { IProblem } from '@/types';
 
 export type CompileData = {

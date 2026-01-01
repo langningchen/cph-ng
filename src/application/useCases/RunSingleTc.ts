@@ -21,7 +21,10 @@ import type { ICompilerService } from '@/application/ports/problems/ICompilerSer
 import type { IJudgeObserver } from '@/application/ports/problems/IJudgeObserver';
 import type { JudgeContext } from '@/application/ports/problems/IJudgeService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/IJudgeServiceFactory';
-import { CompileError, CompileRejected } from '@/application/ports/problems/ILanguageStrategy';
+import {
+  CompileError,
+  CompileRejected,
+} from '@/application/ports/problems/langs/ILanguageStrategy';
 import { TOKENS } from '@/composition/tokens';
 import { VERDICTS } from '@/domain/verdict';
 import type { FinalResult } from '@/infrastructure/problems/resultEvaluator';
