@@ -22,16 +22,16 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DifferenceIcon from '@mui/icons-material/Difference';
 import DoneIcon from '@mui/icons-material/Done';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
+import Box from '@mui/material/Box';
 import { type AnserJsonEntry, ansiToJson } from 'anser';
 import React, { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
 import type { ITcIo } from '@/types/types';
-import { useProblemContext } from '../context/ProblemContext';
-import { basename } from '../utils';
-import CphFlex from './base/cphFlex';
-import CphLink from './base/cphLink';
-import CphButton from './cphButton';
+import { basename, msg } from '../utils';
+import { CphFlex } from './base/cphFlex';
+import { CphLink } from './base/cphLink';
+import { CphButton } from './cphButton';
 
 interface OutputActions {
   onSetAnswer: () => void;
@@ -53,7 +53,7 @@ interface CodeMirrorSectionProps {
 
 const ansiToReact = (ansi: string) => {
   return (
-    <div
+    <Box
       contentEditable
       suppressContentEditableWarning={true}
       onKeyDown={(e) => e.preventDefault()}
@@ -61,7 +61,7 @@ const ansiToReact = (ansi: string) => {
       onPaste={(e) => e.preventDefault()}
       style={{ cursor: 'text', outline: 'none' }}
     >
-      {ansiToJson(ansi).map((entry: AnserJsonEntry, idx: number) => {
+      {ansiToJson(ansi).map((entry: AnserJsonEntry) => {
         const styles: CSSProperties = {
           color: `rgb(${entry.fg})`,
           backgroundColor: `rgb(${entry.bg})`,
@@ -78,28 +78,24 @@ const ansiToReact = (ansi: string) => {
           } else if (decoration === 'blink') {
             styles.animation = 'blink 1s infinite';
           } else if (decoration === 'reverse') {
-            [styles.color, styles.backgroundColor] = [
-              styles.backgroundColor,
-              styles.color,
-            ];
+            [styles.color, styles.backgroundColor] = [styles.backgroundColor, styles.color];
           } else if (decoration === 'hidden') {
             styles.visibility = 'hidden';
           } else if (decoration === 'strikethrough') {
-            styles.textDecoration =
-              `${styles.textDecoration} line-through`.trim();
+            styles.textDecoration = `${styles.textDecoration} line-through`.trim();
           }
         }
         return (
-          <span key={idx} style={styles}>
+          <span key={entry.content} style={styles}>
             {entry.content}
           </span>
         );
       })}
-    </div>
+    </Box>
   );
 };
 
-const TcDataView = ({
+export const TcDataView = ({
   label,
   value,
   onChange,
@@ -112,7 +108,6 @@ const TcDataView = ({
   tabIndex,
 }: CodeMirrorSectionProps) => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
   const [copied, setCopied] = useState(false);
   const [internalValue, setInternalValue] = useState(value);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -163,7 +158,7 @@ const TcDataView = ({
             <CphLink
               name={internalValue.data}
               onClick={() => {
-                dispatch({
+                msg({
                   type: 'openFile',
                   path: internalValue.data,
                 });
@@ -192,7 +187,9 @@ const TcDataView = ({
             <CphButton
               name={t('tcDataView.clearFile')}
               icon={ClearIcon}
-              onClick={() => onChange && onChange('')}
+              onClick={() => {
+                if (onChange) onChange('');
+              }}
             />
           )
         ) : (
@@ -246,7 +243,7 @@ const TcDataView = ({
             ref={textareaRef}
             value={internalValue.data}
             onChange={(e) => {
-              onChange && onChange(e.target.value);
+              if (onChange) onChange(e.target.value);
               setInternalValue({
                 useFile: false,
                 data: e.target.value,
@@ -265,5 +262,3 @@ const TcDataView = ({
     </CphFlex>
   );
 };
-
-export default TcDataView;

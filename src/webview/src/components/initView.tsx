@@ -19,10 +19,10 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import CphFlex from './base/cphFlex';
-import CphText from './base/cphText';
+import { CphFlex } from './base/cphFlex';
+import { CphText } from './base/cphText';
 
-const InitView = () => {
+export const InitView = () => {
   const { t } = useTranslation();
   return (
     <Box flex={1} width={'100%'}>
@@ -35,5 +35,3 @@ const InitView = () => {
     </Box>
   );
 };
-
-export default InitView;

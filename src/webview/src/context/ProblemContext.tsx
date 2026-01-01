@@ -1,23 +1,13 @@
-import type { UUID } from 'crypto';
-import React, {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import type { UUID } from 'node:crypto';
+import React, { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
 import type { IProblem } from '@/types';
-import type {
-  ActivePathEvent,
-  ProblemEvent,
-  ProblemEventData,
-} from '../../../modules/sidebar';
-import type { WebviewMsg } from '../msgs';
+import type { ActivePathEvent, ProblemEvent, ProblemEventData } from '../../../modules/sidebar';
+import type { ProblemMsgCore } from '../msgs';
 import { msg as sendMsg } from '../utils';
 
 interface ProblemContextType {
   problemData: ProblemEventData | undefined;
-  dispatch: (msg: WebviewMsg) => void;
+  dispatch: (msg: ProblemMsgCore) => void;
 }
 
 const ProblemContext = createContext<ProblemContextType | undefined>(undefined);
@@ -31,9 +21,7 @@ export const useProblemContext = () => {
 };
 
 export const ProblemProvider = ({ children }: { children: ReactNode }) => {
-  const [problemData, setProblemData] = useState<
-    ProblemEventData | undefined
-  >();
+  const [problemData, setProblemData] = useState<ProblemEventData | undefined>();
 
   useEffect(() => {
     const handleMessage = (e: MessageEvent<ProblemEvent | ActivePathEvent>) => {
@@ -52,13 +40,11 @@ export const ProblemProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  const dispatch = (msg: WebviewMsg) => {
+  const dispatch = (msg: ProblemMsgCore) => {
     sendMsg(msg);
 
     // Optimistic updates
-    if (!problemData?.problem) {
-      return;
-    }
+    if (!problemData?.problem) return;
 
     const problemWrapper = { ...problemData.problem };
     const problem: IProblem = { ...problemWrapper.problem };
@@ -143,8 +129,6 @@ export const ProblemProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <ProblemContext.Provider value={{ problemData, dispatch }}>
-      {children}
-    </ProblemContext.Provider>
+    <ProblemContext.Provider value={{ problemData, dispatch }}>{children}</ProblemContext.Provider>
   );
 };

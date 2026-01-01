@@ -19,19 +19,19 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { IProblem } from '@/types/types';
 import { useProblemContext } from '../context/ProblemContext';
-import CphFlex from './base/cphFlex';
-import CphMenu from './base/cphMenu';
-import ErrorBoundary from './base/errorBoundary';
-import ProblemActions from './problemActions';
-import ProblemTitle from './problemTitle';
-import TcsView from './tcsView';
+import { CphFlex } from './base/cphFlex';
+import { CphMenu } from './base/cphMenu';
+import { ErrorBoundary } from './base/errorBoundary';
+import { ProblemActions } from './problemActions';
+import { ProblemTitle } from './problemTitle';
+import { TcsView } from './tcsView';
 
 interface ProblemViewProps {
   problem: IProblem;
   startTime: number;
 }
 
-const ProblemView = ({ problem, startTime }: ProblemViewProps) => {
+export const ProblemView = ({ problem, startTime }: ProblemViewProps) => {
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
   return (
@@ -71,5 +71,3 @@ const ProblemView = ({ problem, startTime }: ProblemViewProps) => {
     </>
   );
 };
-
-export default ProblemView;

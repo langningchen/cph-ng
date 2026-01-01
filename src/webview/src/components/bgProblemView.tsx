@@ -20,10 +20,10 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useProblemContext } from '../context/ProblemContext';
-import CphFlex from './base/cphFlex';
-import CphLink from './base/cphLink';
-import CphText from './base/cphText';
+import { msg } from '@/webview/src/utils';
+import { CphFlex } from './base/cphFlex';
+import { CphLink } from './base/cphLink';
+import { CphText } from './base/cphText';
 
 interface BgProblemViewProps {
   bgProblems: {
@@ -32,9 +32,8 @@ interface BgProblemViewProps {
   }[];
 }
 
-const BgProblemView = ({ bgProblems }: BgProblemViewProps) => {
+export const BgProblemView = ({ bgProblems }: BgProblemViewProps) => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
   const [open, setOpen] = useState(false);
 
   return (
@@ -64,9 +63,10 @@ const BgProblemView = ({ bgProblems }: BgProblemViewProps) => {
             <CphFlex>
               {bgProblems.map((bgProblem) => (
                 <CphLink
+                  key={bgProblem.name}
                   name={bgProblem.srcPath}
                   onClick={() => {
-                    dispatch({
+                    msg({
                       type: 'openFile',
                       path: bgProblem.srcPath,
                     });
@@ -85,5 +85,3 @@ const BgProblemView = ({ bgProblems }: BgProblemViewProps) => {
     </>
   );
 };
-
-export default BgProblemView;

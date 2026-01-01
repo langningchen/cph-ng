@@ -24,7 +24,7 @@ interface CphLinkProps extends LinkProps {
   name: string;
 }
 
-const CphLink = (props: CphLinkProps) => {
+export const CphLink = (props: CphLinkProps) => {
   return (
     <Tooltip disableInteractive title={props.name}>
       <Link
@@ -39,5 +39,3 @@ const CphLink = (props: CphLinkProps) => {
     </Tooltip>
   );
 };
-
-export default CphLink;

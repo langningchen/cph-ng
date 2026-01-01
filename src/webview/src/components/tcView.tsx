@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { UUID } from 'node:crypto';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import Accordion from '@mui/material/Accordion';
@@ -23,19 +24,18 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
-import type { UUID } from 'crypto';
 import { MD5 } from 'crypto-js';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type ITc, isRunningVerdict } from '@/types/types';
 import { useProblemContext } from '../context/ProblemContext';
 import { getCompile, msg } from '../utils';
-import CphFlex from './base/cphFlex';
-import CphMenu from './base/cphMenu';
-import CphText from './base/cphText';
-import ErrorBoundary from './base/errorBoundary';
-import CphButton from './cphButton';
-import TcDataView from './tcDataView';
+import { CphFlex } from './base/cphFlex';
+import { CphMenu } from './base/cphMenu';
+import { CphText } from './base/cphText';
+import { ErrorBoundary } from './base/errorBoundary';
+import { CphButton } from './cphButton';
+import { TcDataView } from './tcDataView';
 
 interface TcViewProp {
   tc: ITc;
@@ -47,7 +47,7 @@ interface TcViewProp {
   autoFocus?: boolean;
 }
 
-const TcView = ({
+export const TcView = ({
   tc,
   idx,
   id,
@@ -104,9 +104,7 @@ const TcView = ({
                   color = (color << 4) + hash[i];
                 }
                 color =
-                  (((color >> 16) & 0xff) << 16) |
-                  (((color >> 8) & 0xff) << 8) |
-                  (color & 0xff);
+                  (((color >> 16) & 0xff) << 16) | (((color >> 8) & 0xff) << 8) | (color & 0xff);
                 const colorStr = color.toString(16).padStart(6, '0');
                 return {
                   borderLeftColor: `#${colorStr}`,
@@ -146,11 +144,7 @@ const TcView = ({
           }}
           sx={{
             '& > span': { margin: '0 !important' },
-            cursor: isDragging
-              ? 'grabbing'
-              : tc.isDisabled
-                ? 'not-allowed'
-                : 'grab',
+            cursor: isDragging ? 'grabbing' : tc.isDisabled ? 'not-allowed' : 'grab',
             pointerEvents: tc.isDisabled ? 'none' : 'auto',
             '&[draggable="true"]': {
               pointerEvents: 'auto',
@@ -272,7 +266,7 @@ const TcView = ({
                     });
                   }}
                   onOpenVirtual={() => {
-                    dispatch({
+                    msg({
                       type: 'openFile',
                       path: `/tcs/${id}/stdin`,
                       isVirtual: true,
@@ -309,7 +303,7 @@ const TcView = ({
                     });
                   }}
                   onOpenVirtual={() => {
-                    dispatch({
+                    msg({
                       type: 'openFile',
                       path: `/tcs/${id}/answer`,
                       isVirtual: true,
@@ -330,7 +324,7 @@ const TcView = ({
                       readOnly={true}
                       outputActions={{
                         onSetAnswer: () => {
-                          tc.answer = tc.result!.stdout;
+                          if (tc.result) tc.answer = tc.result.stdout;
                           tc.result = undefined;
                           emitUpdate();
                         },
@@ -342,7 +336,7 @@ const TcView = ({
                         },
                       }}
                       onOpenVirtual={() => {
-                        dispatch({
+                        msg({
                           type: 'openFile',
                           path: `/tcs/${id}/stdout`,
                           isVirtual: true,
@@ -356,7 +350,7 @@ const TcView = ({
                       value={tc.result.stderr}
                       readOnly={true}
                       onOpenVirtual={() => {
-                        dispatch({
+                        msg({
                           type: 'openFile',
                           path: `/tcs/${id}/stderr`,
                           isVirtual: true,
@@ -383,5 +377,3 @@ const TcView = ({
     </CphMenu>
   );
 };
-
-export default TcView;

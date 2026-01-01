@@ -16,11 +16,7 @@ export class ProblemActions {
   public static async createProblem(msg: msgs.CreateProblemMsg): Promise<void> {
     const src = msg.activePath;
     if (!src) {
-      Io.warn(
-        l10n.t(
-          'No active editor found. Please open a file to create a problem.',
-        ),
-      );
+      Io.warn(l10n.t('No active editor found.'));
       return;
     }
     const binPath = await Problem.getBinBySrc(src);
@@ -35,11 +31,7 @@ export class ProblemActions {
   public static async importProblem(msg: msgs.ImportProblemMsg): Promise<void> {
     const src = msg.activePath;
     if (!src) {
-      Io.warn(
-        l10n.t(
-          'No active editor found. Please open a file to create a problem.',
-        ),
-      );
+      Io.warn(l10n.t('No active editor found.'));
       return;
     }
     const binPath = await Problem.getBinBySrc(src);

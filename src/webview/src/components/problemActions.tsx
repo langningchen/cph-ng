@@ -37,26 +37,25 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type IProblem, isRunningVerdict } from '@/types/types';
 import { useProblemContext } from '../context/ProblemContext';
-import { basename, getCompile } from '../utils';
-import CphFlex from './base/cphFlex';
-import CphLink from './base/cphLink';
-import CphMenu from './base/cphMenu';
-import CphButton from './cphButton';
+import { basename, getCompile, msg } from '../utils';
+import { CphFlex } from './base/cphFlex';
+import { CphLink } from './base/cphLink';
+import { CphMenu } from './base/cphMenu';
+import { CphButton } from './cphButton';
 
 interface ProblemActionsProps {
   problem: IProblem;
 }
 
-const ProblemActions = ({ problem }: ProblemActionsProps) => {
+export const ProblemActions = ({ problem }: ProblemActionsProps) => {
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
   const [clickTime, setClickTime] = useState<number[]>([]);
   const [isDelDialogOpen, setDelDialogOpen] = useState(false);
   const [isBfCompareDialogOpen, setBfCompareDialogOpen] = useState(false);
-  const hasRunning = Object.values(problem.tcs).some((tc) =>
-    isRunningVerdict(tc.result?.verdict),
-  );
+  const hasRunning = Object.values(problem.tcs).some((tc) => isRunningVerdict(tc.result?.verdict));
   useEffect(() => {
+    // biome-ignore lint/style/noNonNullAssertion: False positive
     if (clickTime.length === 10 && clickTime.at(-1)! - clickTime[0] < 2000) {
       window.easterEgg = !window.easterEgg;
       setClickTime([]);
@@ -192,9 +191,7 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
           color={'error'}
           onClick={() => setDelDialogOpen(true)}
         />
-        {window.easterEgg && (
-          <div title={t('problemActions.easterEgg')}>🐰</div>
-        )}
+        {window.easterEgg && <div title={t('problemActions.easterEgg')}>🐰</div>}
       </CphFlex>
       <Dialog
         fullWidth
@@ -204,9 +201,7 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
       >
         <DialogTitle>{t('problemActions.delDialog.title')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {t('problemActions.delDialog.content')}
-          </DialogContentText>
+          <DialogContentText>{t('problemActions.delDialog.content')}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDelDialogOpen(false)} color={'primary'}>
@@ -247,18 +242,17 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
         <DialogContent>
           <CphFlex column>
             <CphFlex>
-              <Typography>
-                {t('problemActions.bfCompareDialog.generator')}
-              </Typography>
+              <Typography>{t('problemActions.bfCompareDialog.generator')}</Typography>
               {problem.bfCompare?.generator ? (
                 <>
                   <CphLink
                     name={problem.bfCompare.generator.path}
                     onClick={() => {
-                      dispatch({
-                        type: 'openFile',
-                        path: problem.bfCompare!.generator!.path,
-                      });
+                      problem.bfCompare?.generator &&
+                        msg({
+                          type: 'openFile',
+                          path: problem.bfCompare.generator.path,
+                        });
                     }}
                   >
                     {basename(problem.bfCompare.generator.path)}
@@ -271,9 +265,7 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
                         fileType: 'generator',
                       });
                     }}
-                    name={t(
-                      'problemActions.bfCompareDialog.button.removeGenerator',
-                    )}
+                    name={t('problemActions.bfCompareDialog.button.removeGenerator')}
                   />
                 </>
               ) : (
@@ -285,25 +277,22 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
                       fileType: 'generator',
                     });
                   }}
-                  name={t(
-                    'problemActions.bfCompareDialog.button.chooseGenerator',
-                  )}
+                  name={t('problemActions.bfCompareDialog.button.chooseGenerator')}
                 />
               )}
             </CphFlex>
             <CphFlex>
-              <Typography>
-                {t('problemActions.bfCompareDialog.bruteForce')}
-              </Typography>
+              <Typography>{t('problemActions.bfCompareDialog.bruteForce')}</Typography>
               {problem.bfCompare?.bruteForce ? (
                 <>
                   <CphLink
                     name={problem.bfCompare.bruteForce.path}
                     onClick={() => {
-                      dispatch({
-                        type: 'openFile',
-                        path: problem.bfCompare!.bruteForce!.path,
-                      });
+                      problem.bfCompare?.bruteForce &&
+                        msg({
+                          type: 'openFile',
+                          path: problem.bfCompare.bruteForce.path,
+                        });
                     }}
                   >
                     {basename(problem.bfCompare.bruteForce.path)}
@@ -316,9 +305,7 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
                         fileType: 'bruteForce',
                       });
                     }}
-                    name={t(
-                      'problemActions.bfCompareDialog.button.removeBruteForce',
-                    )}
+                    name={t('problemActions.bfCompareDialog.button.removeBruteForce')}
                   />
                 </>
               ) : (
@@ -330,9 +317,7 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
                       fileType: 'bruteForce',
                     });
                   }}
-                  name={t(
-                    'problemActions.bfCompareDialog.button.chooseBruteForce',
-                  )}
+                  name={t('problemActions.bfCompareDialog.button.chooseBruteForce')}
                 />
               )}
             </CphFlex>
@@ -359,10 +344,7 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
                 }}
                 icon={PlayCircleIcon}
                 color={'success'}
-                disabled={
-                  !problem.bfCompare?.generator ||
-                  !problem.bfCompare?.bruteForce
-                }
+                disabled={!problem.bfCompare?.generator || !problem.bfCompare?.bruteForce}
               />
             )}
           </CphFlex>
@@ -371,5 +353,3 @@ const ProblemActions = ({ problem }: ProblemActionsProps) => {
     </>
   );
 };
-
-export default ProblemActions;

@@ -20,13 +20,13 @@ import i18n from 'i18next';
 import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initReactI18next } from 'react-i18next';
-import CphFlex from './components/base/cphFlex';
-import ErrorBoundary from './components/base/errorBoundary';
-import BgProblemView from './components/bgProblemView';
-import CreateProblemView from './components/createProblemView';
-import DragOverlay from './components/dragOverlay';
-import InitView from './components/initView';
-import ProblemView from './components/problemView';
+import { CphFlex } from './components/base/cphFlex';
+import { ErrorBoundary } from './components/base/errorBoundary';
+import { BgProblemView } from './components/bgProblemView';
+import { CreateProblemView } from './components/createProblemView';
+import { DragOverlay } from './components/dragOverlay';
+import { InitView } from './components/initView';
+import { ProblemView } from './components/problemView';
 import { ProblemProvider, useProblemContext } from './context/ProblemContext';
 import langEn from './l10n/en.json';
 import langZh from './l10n/zh.json';
@@ -104,5 +104,6 @@ const App = () => {
   );
 };
 
+// biome-ignore lint/style/noNonNullAssertion: We are certain that the element with id 'root' exists in the DOM
 const root = createRoot(document.getElementById('root')!);
 root.render(<App />);

@@ -17,15 +17,15 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import CphFlex from './base/cphFlex';
-import CphText from './base/cphText';
+import { CphFlex } from './base/cphFlex';
+import { CphText } from './base/cphText';
 
-const AcCongrats = () => {
+export const AcCongrats = () => {
   const { t } = useTranslation();
 
   return (
     <CphFlex column>
-      <img width={'30%'} src={partyUri} />
+      <img width={'30%'} src={partyUri} alt='AC congratulations gif' />
       <CphText textAlign={'center'}>
         {t('acCongrats.firstLine')}
         <br />
@@ -34,5 +34,3 @@ const AcCongrats = () => {
     </CphFlex>
   );
 };
-
-export default AcCongrats;

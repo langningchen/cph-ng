@@ -27,7 +27,7 @@ interface CphButtonProps extends IconButtonProps {
   larger?: boolean;
 }
 
-const CphButton = (props: CphButtonProps) => {
+export const CphButton = (props: CphButtonProps) => {
   return (
     <Tooltip disableInteractive title={props.name}>
       <IconButton
@@ -40,5 +40,3 @@ const CphButton = (props: CphButtonProps) => {
     </Tooltip>
   );
 };
-
-export default CphButton;

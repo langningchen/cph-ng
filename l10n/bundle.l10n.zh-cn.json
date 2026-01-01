@@ -109,7 +109,7 @@
   "Message: {msg}": "消息：{msg}",
   "Migrate problem {file} failed: {msg}.": "迁移题目 {file} 失败：{msg}。",
   "No CPH problem files found in the folder.": "在文件夹中未找到 CPH 题目文件。",
-  "No active editor found. Please open a file to create a problem.": "未找到活动编辑器，请打开一个文件以创建题目。",
+  "No active editor found.": "未找到活动编辑器。",
   "No execution result available for this run.": "此次运行没有可用的执行结果。",
   "No test cases are available to display.": "没有可显示的测试样例。",
   "No test cases are currently defined for this problem.": "当前题目尚未定义测试样例。",

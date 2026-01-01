@@ -15,8 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'crypto';
+import type { UUID } from 'node:crypto';
 import type { ITc } from '@/types/types';
+import type { DistributiveOmit } from '@/webview/src/utils';
 
 export interface BaseMsg {
   type: string;
@@ -118,11 +119,7 @@ export interface OpenFileMsg extends BaseMsg {
 export interface OpenTestlibMsg extends BaseMsg {
   type: 'openTestlib';
 }
-export type WebviewSrcFileTypes =
-  | 'checker'
-  | 'interactor'
-  | 'generator'
-  | 'bruteForce';
+export type WebviewSrcFileTypes = 'checker' | 'interactor' | 'generator' | 'bruteForce';
 export interface ChooseSrcFileMsg extends ProblemBaseMsg {
   type: 'chooseSrcFile';
   fileType: WebviewSrcFileTypes;
@@ -141,6 +138,11 @@ export interface StopBfCompareMsg extends ProblemBaseMsg {
 export interface SubmitToCodeforcesMsg extends ProblemBaseMsg {
   type: 'submitToCodeforces';
 }
+export interface DragDropMsg extends ProblemBaseMsg {
+  type: 'dragDrop';
+  items: string[];
+}
+
 export interface StartChatMsg extends BaseMsg {
   type: 'startChat';
 }
@@ -148,14 +150,8 @@ export interface OpenSettingsMsg extends BaseMsg {
   type: 'openSettings';
   item: string;
 }
-export interface DragDropMsg extends BaseMsg {
-  type: 'dragDrop';
-  items: string[];
-}
-export type WebviewMsg =
-  | CreateProblemMsg
-  | ImportProblemMsg
-  | InitMsg
+
+export type ProblemMsg =
   | EditProblemDetailsMsg
   | DelProblemMsg
   | RunTcsMsg
@@ -172,13 +168,21 @@ export type WebviewMsg =
   | ToggleTcFileMsg
   | DelTcMsg
   | ReorderTcMsg
-  | OpenFileMsg
-  | OpenTestlibMsg
   | ChooseSrcFileMsg
   | RemoveSrcFileMsg
   | StartBfCompareMsg
   | StopBfCompareMsg
   | SubmitToCodeforcesMsg
-  | StartChatMsg
-  | OpenSettingsMsg
   | DragDropMsg;
+
+export type ProblemMsgCore = DistributiveOmit<ProblemMsg, 'activePath'>;
+
+export type WebviewMsg =
+  | ProblemMsg
+  | CreateProblemMsg
+  | ImportProblemMsg
+  | InitMsg
+  | OpenFileMsg
+  | OpenTestlibMsg
+  | StartChatMsg
+  | OpenSettingsMsg;

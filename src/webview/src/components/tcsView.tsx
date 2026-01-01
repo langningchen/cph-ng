@@ -15,23 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { UUID } from 'node:crypto';
 import Box from '@mui/material/Box';
-import type { UUID } from 'crypto';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { IProblem } from '@/types/types';
 import { useProblemContext } from '../context/ProblemContext';
-import AcCongrats from './acCongrats';
-import CphFlex from './base/cphFlex';
-import ErrorBoundary from './base/errorBoundary';
-import NoTcs from './noTcs';
-import TcView from './tcView';
+import { AcCongrats } from './acCongrats';
+import { CphFlex } from './base/cphFlex';
+import { ErrorBoundary } from './base/errorBoundary';
+import { NoTcs } from './noTcs';
+import { TcView } from './tcView';
 
 interface TcsViewProps {
   problem: IProblem;
 }
 
-const TcsView = ({ problem }: TcsViewProps) => {
+export const TcsView = ({ problem }: TcsViewProps) => {
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
@@ -48,7 +48,7 @@ const TcsView = ({ problem }: TcsViewProps) => {
       }
     }
     setPrevTcOrder([...problem.tcOrder]);
-  }, [problem.tcOrder]);
+  }, [problem.tcOrder, prevTcOrder]);
 
   const handleDragStart = (idx: number, e: React.DragEvent) => {
     const states = problem.tcOrder.map((id) =>
@@ -78,11 +78,7 @@ const TcsView = ({ problem }: TcsViewProps) => {
   };
 
   const handleDragEnd = () => {
-    if (
-      draggedIdx !== null &&
-      dragOverIdx !== null &&
-      draggedIdx !== dragOverIdx
-    ) {
+    if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
       const [movedId] = problem.tcOrder.splice(draggedIdx, 1);
       problem.tcOrder.splice(dragOverIdx, 0, movedId);
       dispatch({ type: 'reorderTc', fromIdx: draggedIdx, toIdx: dragOverIdx });
@@ -90,11 +86,7 @@ const TcsView = ({ problem }: TcsViewProps) => {
 
     if (expandedStates.length > 0) {
       const reorderedStates = [...expandedStates];
-      if (
-        draggedIdx !== null &&
-        dragOverIdx !== null &&
-        draggedIdx !== dragOverIdx
-      ) {
+      if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
         const [movedState] = reorderedStates.splice(draggedIdx, 1);
         reorderedStates.splice(dragOverIdx, 0, movedState);
       }
@@ -128,19 +120,14 @@ const TcsView = ({ problem }: TcsViewProps) => {
       {problem.tcOrder.length ? (
         <>
           {partyUri &&
-          problem.tcOrder.every(
-            (id) => problem.tcs[id]?.result?.verdict.name === 'AC',
-          ) ? (
+          problem.tcOrder.every((id) => problem.tcs[id]?.result?.verdict.name === 'AC') ? (
             <AcCongrats />
           ) : null}
           <Box width={'100%'}>
             {displayOrder.map((originalIdx, displayIdx) => {
               const id = problem.tcOrder[originalIdx];
               const tc = problem.tcs[id];
-              if (
-                tc.result?.verdict &&
-                hiddenStatuses.includes(tc.result?.verdict.name)
-              ) {
+              if (tc.result?.verdict && hiddenStatuses.includes(tc.result?.verdict.name)) {
                 return null;
               }
 
@@ -186,5 +173,3 @@ const TcsView = ({ problem }: TcsViewProps) => {
     </CphFlex>
   );
 };
-
-export default TcsView;

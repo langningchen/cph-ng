@@ -26,7 +26,7 @@ interface CphFlexProps extends BoxProps {
   alignStart?: boolean;
 }
 
-const CphFlex = (props: CphFlexProps) => {
+export const CphFlex = (props: CphFlexProps) => {
   return (
     <Stack
       alignItems={props.alignStart ? 'flex-start' : 'center'}
@@ -40,5 +40,3 @@ const CphFlex = (props: CphFlexProps) => {
     </Stack>
   );
 };
-
-export default CphFlex;

@@ -11,6 +11,7 @@
       "src/composition/**",
       "src/domain/**",
       "src/infrastructure/**",
+      "src/webview/**",
       "tests/**",
       "scripts/**"
     ]

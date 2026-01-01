@@ -28,8 +28,8 @@ import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import StackTrace from 'stacktrace-js';
-import CphButton from '../cphButton';
-import CphFlex from './cphFlex';
+import { CphButton } from '../cphButton';
+import { CphFlex } from './cphFlex';
 
 interface ErrorFallbackProps {
   error: Error;
@@ -40,18 +40,14 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
-  const [stackTraceString, setStackTraceString] = useState<string>(
-    'Loading stack trace...',
-  );
+  const [stackTraceString, setStackTraceString] = useState<string>('Loading stack trace...');
   useEffect(() => {
     let isMounted = true;
 
     const parseStack = async () => {
       try {
         const frames = await StackTrace.fromError(error);
-        if (!isMounted) {
-          return;
-        }
+        if (!isMounted) return;
         setStackTraceString(
           frames
             .map((sf) => {
@@ -62,10 +58,8 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
             .filter(Boolean)
             .join('\n'),
         );
-      } catch (e) {
-        if (isMounted) {
-          setStackTraceString(error.stack || 'No stack trace available');
-        }
+      } catch {
+        isMounted && setStackTraceString(error.stack || 'No stack trace available');
       }
     };
 
@@ -133,7 +127,7 @@ interface State {
   showDialog: boolean;
 }
 
-class ErrorBoundary extends React.Component<Props, State> {
+export class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false, error: null, showDialog: false };
@@ -151,15 +145,8 @@ class ErrorBoundary extends React.Component<Props, State> {
 
   render() {
     if (this.state.hasError && this.state.error) {
-      return (
-        <ErrorFallback
-          error={this.state.error}
-          resetErrorBoundary={this.resetBoundary}
-        />
-      );
+      return <ErrorFallback error={this.state.error} resetErrorBoundary={this.resetBoundary} />;
     }
     return this.props.children;
   }
 }
-
-export default ErrorBoundary;

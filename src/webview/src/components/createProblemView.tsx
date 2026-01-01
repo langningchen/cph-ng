@@ -21,17 +21,16 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useProblemContext } from '../context/ProblemContext';
-import CphFlex from './base/cphFlex';
-import Tips from './tips';
+import { msg } from '@/webview/src/utils';
+import { CphFlex } from './base/cphFlex';
+import { Tips } from './tips';
 
 interface CreateProblemProps {
   canImport: boolean;
 }
 
-const CreateProblemView = ({ canImport }: CreateProblemProps) => {
+export const CreateProblemView = ({ canImport }: CreateProblemProps) => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
   return (
     <CphFlex column gap={5} paddingY={2}>
       <CphFlex column>
@@ -40,9 +39,7 @@ const CreateProblemView = ({ canImport }: CreateProblemProps) => {
           variant={'outlined'}
           severity={'warning'}
         >
-          {canImport
-            ? t('createProblemView.importAlert')
-            : t('createProblemView.createAlert')}
+          {canImport ? t('createProblemView.importAlert') : t('createProblemView.createAlert')}
         </Alert>
         <CphFlex>
           {canImport && (
@@ -51,7 +48,7 @@ const CreateProblemView = ({ canImport }: CreateProblemProps) => {
               variant={'contained'}
               endIcon={<InputIcon />}
               onClick={() => {
-                dispatch({ type: 'importProblem' });
+                msg({ type: 'importProblem' });
               }}
             >
               {t('createProblemView.importButton')}
@@ -62,7 +59,7 @@ const CreateProblemView = ({ canImport }: CreateProblemProps) => {
             variant={canImport ? 'outlined' : 'contained'}
             endIcon={<SendIcon />}
             onClick={() => {
-              dispatch({ type: 'createProblem' });
+              msg({ type: 'createProblem' });
             }}
           >
             {t('createProblemView.createButton')}
@@ -73,5 +70,3 @@ const CreateProblemView = ({ canImport }: CreateProblemProps) => {
     </CphFlex>
   );
 };
-
-export default CreateProblemView;

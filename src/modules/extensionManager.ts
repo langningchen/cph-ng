@@ -237,7 +237,6 @@ OS: ${release()}`;
           sidebarProvider.focus();
           await ProblemsManager.createProblem({
             type: 'createProblem',
-            activePath: getActivePath(),
           });
         }),
       );
@@ -246,59 +245,88 @@ OS: ${release()}`;
           sidebarProvider.focus();
           await ProblemsManager.importProblem({
             type: 'importProblem',
-            activePath: getActivePath(),
           });
         }),
       );
       context.subscriptions.push(
         commands.registerCommand('cph-ng.runTestCases', async () => {
           sidebarProvider.focus();
+          const activePath = getActivePath();
+          if (!activePath) {
+            Io.error(l10n.t('No active editor found.'));
+            return;
+          }
           await ProblemsManager.runTcs({
             type: 'runTcs',
             compile: null,
-            activePath: getActivePath(),
+            activePath,
           });
         }),
       );
       context.subscriptions.push(
         commands.registerCommand('cph-ng.stopTestCases', async () => {
           sidebarProvider.focus();
+          const activePath = getActivePath();
+          if (!activePath) {
+            Io.error(l10n.t('No active editor found.'));
+            return;
+          }
           await ProblemsManager.stopTcs({
             type: 'stopTcs',
             onlyOne: false,
-            activePath: getActivePath(),
+            activePath,
           });
         }),
       );
       context.subscriptions.push(
         commands.registerCommand('cph-ng.addTestCase', async () => {
+          const activePath = getActivePath();
+          if (!activePath) {
+            Io.error(l10n.t('No active editor found.'));
+            return;
+          }
           await ProblemsManager.addTc({
             type: 'addTc',
-            activePath: getActivePath(),
+            activePath,
           });
         }),
       );
       context.subscriptions.push(
         commands.registerCommand('cph-ng.loadTestCases', async () => {
+          const activePath = getActivePath();
+          if (!activePath) {
+            Io.error(l10n.t('No active editor found.'));
+            return;
+          }
           await ProblemsManager.loadTcs({
             type: 'loadTcs',
-            activePath: getActivePath(),
+            activePath,
           });
         }),
       );
       context.subscriptions.push(
         commands.registerCommand('cph-ng.deleteProblem', async () => {
+          const activePath = getActivePath();
+          if (!activePath) {
+            Io.error(l10n.t('No active editor found.'));
+            return;
+          }
           await ProblemsManager.delProblem({
             type: 'delProblem',
-            activePath: getActivePath(),
+            activePath,
           });
         }),
       );
       context.subscriptions.push(
         commands.registerCommand('cph-ng.submitToCodeforces', async () => {
+          const activePath = getActivePath();
+          if (!activePath) {
+            Io.error(l10n.t('No active editor found.'));
+            return;
+          }
           await ProblemsManager.submitToCodeforces({
             type: 'submitToCodeforces',
-            activePath: getActivePath(),
+            activePath,
           });
         }),
       );

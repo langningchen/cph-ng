@@ -17,10 +17,10 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import CphFlex from './base/cphFlex';
-import CphText from './base/cphText';
+import { CphFlex } from './base/cphFlex';
+import { CphText } from './base/cphText';
 
-const NoTcs = () => {
+export const NoTcs = () => {
   const { t } = useTranslation();
 
   return (
@@ -33,5 +33,3 @@ const NoTcs = () => {
     </CphFlex>
   );
 };
-
-export default NoTcs;

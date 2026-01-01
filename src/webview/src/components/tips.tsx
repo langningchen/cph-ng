@@ -23,55 +23,40 @@ import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useProblemContext } from '../context/ProblemContext';
-import CphFlex from './base/cphFlex';
-import CphText from './base/cphText';
-import CphButton from './cphButton';
+import { msg } from '@/webview/src/utils';
+import { CphFlex } from './base/cphFlex';
+import { CphText } from './base/cphText';
+import { CphButton } from './cphButton';
 
 type TipMessage = {
   msg: string;
   action?: () => void;
 };
 
-const Tips = () => {
+export const Tips = () => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
   const tipMessages: TipMessage[] = [
     { msg: t('tipMessage1') },
     { msg: t('tipMessage2') },
     { msg: t('tipMessage3') },
-    {
-      msg: t('tipMessage4'),
-      action: () => dispatch({ type: 'startChat' }),
-    },
+    { msg: t('tipMessage4'), action: () => msg({ type: 'startChat' }) },
     { msg: t('tipMessage5') },
     {
       msg: t('tipMessage6'),
-      action: () =>
-        dispatch({ type: 'openSettings', item: 'cph-ng.sidebar.showAcGif' }),
+      action: () => msg({ type: 'openSettings', item: 'cph-ng.sidebar.showAcGif' }),
     },
     {
       msg: t('tipMessage7'),
-      action: () =>
-        dispatch({
-          type: 'openSettings',
-          item: 'cph-ng.sidebar.hiddenStatuses',
-        }),
+      action: () => msg({ type: 'openSettings', item: 'cph-ng.sidebar.hiddenStatuses' }),
     },
     { msg: t('tipMessage8') },
     {
       msg: t('tipMessage9'),
-      action: () =>
-        dispatch({
-          type: 'openSettings',
-          item: 'cph-ng.compilation.useWrapper',
-        }),
+      action: () => msg({ type: 'openSettings', item: 'cph-ng.compilation.useWrapper' }),
     },
     { msg: t('tipMessage10') },
   ];
-  const [idx, setIdx] = useState(
-    Math.floor(Math.random() * tipMessages.length),
-  );
+  const [idx, setIdx] = useState(Math.floor(Math.random() * tipMessages.length));
   return (
     <Alert
       sx={{
@@ -93,16 +78,12 @@ const Tips = () => {
           <CphButton
             icon={NavigateBeforeIcon}
             name={t('tips.previousTip')}
-            onClick={() =>
-              setIdx((idx - 1 + tipMessages.length) % tipMessages.length)
-            }
+            onClick={() => setIdx((idx - 1 + tipMessages.length) % tipMessages.length)}
           />
           <CphButton
             icon={ShuffleIcon}
             name={t('tips.randomTip')}
-            onClick={() =>
-              setIdx(Math.floor(Math.random() * tipMessages.length))
-            }
+            onClick={() => setIdx(Math.floor(Math.random() * tipMessages.length))}
           />
           <CphButton
             icon={NavigateNextIcon}
@@ -117,5 +98,3 @@ const Tips = () => {
     </Alert>
   );
 };
-
-export default Tips;

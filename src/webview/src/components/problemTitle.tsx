@@ -32,12 +32,13 @@ import TextField from '@mui/material/TextField';
 import React, { type SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { IProblem } from '@/types/types';
+import { msg } from '@/webview/src/utils';
 import { useProblemContext } from '../context/ProblemContext';
-import CphFlex from './base/cphFlex';
-import CphLink from './base/cphLink';
-import CphMenu from './base/cphMenu';
-import CphText from './base/cphText';
-import CphButton from './cphButton';
+import { CphFlex } from './base/cphFlex';
+import { CphLink } from './base/cphLink';
+import { CphMenu } from './base/cphMenu';
+import { CphText } from './base/cphText';
+import { CphButton } from './cphButton';
 
 interface ProblemTitleProps {
   problem: IProblem;
@@ -56,7 +57,7 @@ const formatDuration = (ms: number) => {
   return `${hh}:${mm}:${ss}`;
 };
 
-const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
+export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
   const [isHoveringTitle, setHoveringTitle] = useState(false);
@@ -81,13 +82,7 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
     setEditedCompilerArgs(problem.overwrites?.compilerArgs || '');
     setEditedRunner(problem.overwrites?.runner || '');
     setEditedRunnerArgs(problem.overwrites?.runnerArgs || '');
-  }, [
-    problem.name,
-    problem.url,
-    problem.timeLimit,
-    problem.memoryLimit,
-    problem.overwrites,
-  ]);
+  }, [problem.name, problem.url, problem.timeLimit, problem.memoryLimit, problem.overwrites]);
   useEffect(() => {
     setTimeElapsed(Date.now() - startTime);
     const interval = setInterval(() => {
@@ -115,9 +110,9 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
       type: 'editProblemDetails',
       title: editedTitle,
       url: editedUrl,
-      timeLimit: parseInt(editedTimeLimit),
-      memoryLimit: parseInt(editedMemoryLimit),
-       overwrites,
+      timeLimit: parseInt(editedTimeLimit, 10),
+      memoryLimit: parseInt(editedMemoryLimit, 10),
+      overwrites,
     });
   };
 
@@ -154,12 +149,13 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
               <>
                 &emsp;
                 <CphLink
-                  name={problem.checker.path!}
+                  name={problem.checker.path}
                   onClick={() => {
-                    dispatch({
-                      type: 'openFile',
-                      path: problem.checker!.path,
-                    });
+                    problem.checker &&
+                      msg({
+                        type: 'openFile',
+                        path: problem.checker.path,
+                      });
                   }}
                 >
                   {t('problemTitle.specialJudge')}
@@ -170,12 +166,13 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
               <>
                 &emsp;
                 <CphLink
-                  name={problem.interactor.path!}
+                  name={problem.interactor.path}
                   onClick={() => {
-                    dispatch({
-                      type: 'openFile',
-                      path: problem.interactor!.path,
-                    });
+                    problem.interactor &&
+                      msg({
+                        type: 'openFile',
+                        path: problem.interactor.path,
+                      });
                   }}
                 >
                   {t('problemTitle.interact')}
@@ -192,7 +189,7 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
           <CphMenu
             menu={{
               [t('problemTitle.menu.editRaw')]: () => {
-                dispatch({
+                msg({
                   type: 'openFile',
                   path: '/problem.cph-ng.json',
                   isVirtual: true,
@@ -209,11 +206,7 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
           </CphMenu>
         )}
       </CphFlex>
-      <Dialog
-        fullScreen
-        open={isEditDialogOpen}
-        onClose={handleEditDialogClose}
-      >
+      <Dialog fullScreen open={isEditDialogOpen} onClose={handleEditDialogClose}>
         <DialogTitle>{t('problemTitle.dialog.title')}</DialogTitle>
         <DialogContent>
           <TabContext value={tabValue}>
@@ -221,19 +214,11 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
               <TabList
                 variant='scrollable'
                 scrollButtons='auto'
-                onChange={(_event: SyntheticEvent, value: string) =>
-                  setTabValue(value)
-                }
+                onChange={(_event: SyntheticEvent, value: string) => setTabValue(value)}
               >
                 <Tab label={t('problemTitle.dialog.tab.basic')} value='basic' />
-                <Tab
-                  label={t('problemTitle.dialog.tab.environment')}
-                  value='environment'
-                />
-                <Tab
-                  label={t('problemTitle.dialog.tab.advanced')}
-                  value='advanced'
-                />
+                <Tab label={t('problemTitle.dialog.tab.environment')} value='environment' />
+                <Tab label={t('problemTitle.dialog.tab.advanced')} value='advanced' />
               </TabList>
             </Box>
             <TabPanel value='basic' sx={{ padding: '0' }}>
@@ -263,9 +248,7 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                 fullWidth
                 slotProps={{
                   input: {
-                    endAdornment: (
-                      <InputAdornment position='end'>ms</InputAdornment>
-                    ),
+                    endAdornment: <InputAdornment position='end'>ms</InputAdornment>,
                   },
                 }}
               />
@@ -278,9 +261,7 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                 fullWidth
                 slotProps={{
                   input: {
-                    endAdornment: (
-                      <InputAdornment position='end'>MB</InputAdornment>
-                    ),
+                    endAdornment: <InputAdornment position='end'>MB</InputAdornment>,
                   },
                 }}
               />
@@ -326,10 +307,11 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                     label={t('problemTitle.dialog.field.specialJudge')}
                     variant='outlined'
                     onClick={() => {
-                      dispatch({
-                        type: 'openFile',
-                        path: problem.checker!.path,
-                      });
+                      problem.checker &&
+                        msg({
+                          type: 'openFile',
+                          path: problem.checker.path,
+                        });
                     }}
                     onDelete={() => {
                       dispatch({
@@ -354,10 +336,11 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                     label={t('problemTitle.dialog.field.interact')}
                     variant='outlined'
                     onClick={() => {
-                      dispatch({
-                        type: 'openFile',
-                        path: problem.interactor!.path,
-                      });
+                      problem.interactor &&
+                        msg({
+                          type: 'openFile',
+                          path: problem.interactor.path,
+                        });
                     }}
                     onDelete={() => {
                       dispatch({
@@ -380,7 +363,7 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                 <CphLink
                   name={t('problemTitle.dialog.testlib')}
                   onClick={() => {
-                    dispatch({
+                    msg({
                       type: 'openTestlib',
                     });
                   }}
@@ -403,5 +386,3 @@ const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
     </>
   );
 };
-
-export default ProblemTitle;

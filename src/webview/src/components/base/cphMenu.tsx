@@ -27,7 +27,7 @@ interface CphMenuProps extends BoxProps {
   menu: Record<string, () => void>;
 }
 
-const CphMenu = (props: CphMenuProps) => {
+export const CphMenu = (props: CphMenuProps) => {
   const [contextMenu, setContextMenu] = useState<PopoverPosition>();
   return (
     <Box
@@ -65,5 +65,3 @@ const CphMenu = (props: CphMenuProps) => {
     </Box>
   );
 };
-
-export default CphMenu;
