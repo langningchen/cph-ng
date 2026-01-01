@@ -21,6 +21,7 @@ import type { ICompilerService } from '@/application/ports/problems/ICompilerSer
 import type { IJudgeObserver } from '@/application/ports/problems/IJudgeObserver';
 import type { JudgeContext } from '@/application/ports/problems/IJudgeService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/IJudgeServiceFactory';
+import { CompileError, CompileRejected } from '@/application/ports/problems/ILanguageStrategy';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
 import { VERDICTS } from '@/domain/verdict';
@@ -30,12 +31,11 @@ import { isExpandVerdict, TcVerdicts } from '@/types';
 import { TcResult } from '@/types/types.backend';
 
 @injectable()
-export class RunAllTestCases {
+export class RunAllTcs {
   constructor(
-    @inject(TOKENS.JudgeServiceFactory)
-    private readonly judgeFactory: IJudgeServiceFactory,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
     @inject(TOKENS.CompilerService) private readonly compiler: ICompilerService,
+    @inject(TOKENS.JudgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
+    @inject(TOKENS.Settings) private readonly settings: ISettings,
   ) {}
 
   async exec(msg: msgs.RunTcsMsg): Promise<void> {
@@ -64,11 +64,18 @@ export class RunAllTestCases {
 
       const artifacts = await this.compiler.compileAll(problem, msg.compile, ac);
       if (artifacts instanceof Error) {
-        for (const tcId of tcOrder)
-          if (tcs[tcId].result) {
-            tcs[tcId].result.verdict = TcVerdicts.CE;
-            tcs[tcId].result.msg = [artifacts.message];
+        for (const tcId of tcOrder) {
+          const tc = tcs[tcId];
+          if (tc.result) {
+            tc.result.verdict =
+              artifacts instanceof CompileError
+                ? TcVerdicts.CE
+                : artifacts instanceof CompileRejected
+                  ? TcVerdicts.RJ
+                  : TcVerdicts.SE;
+            tc.result.msg = [artifacts.message];
           }
+        }
         await ProblemsManager.dataRefresh();
         return;
       }
@@ -86,10 +93,8 @@ export class RunAllTestCases {
         if (!tc.result) continue;
 
         if (ac.signal.aborted) {
-          if (ac.signal.reason === 'onlyOne') {
-            ac = new AbortController();
-            fullProblem.ac = ac;
-          } else {
+          if (ac.signal.reason === 'onlyOne') fullProblem.ac = ac = new AbortController();
+          else {
             tc.result.verdict = TcVerdicts.SK;
             continue;
           }
@@ -100,7 +105,6 @@ export class RunAllTestCases {
           tcId,
           stdinPath: tc.stdin.toPath(),
           answerPath: tc.answer.toPath(),
-          compile: false,
           artifacts,
         };
 
@@ -136,10 +140,10 @@ export class RunAllTestCases {
             hasAnyExpanded ||= tc.isExpand;
             ProblemsManager.dataRefresh();
           },
-          onError: (err) => {
+          onError: (e) => {
             if (!tc.result) return;
             tc.result.verdict = TcVerdicts.SE;
-            tc.result.msg = [err.message];
+            tc.result.msg = [e.message];
             ProblemsManager.dataRefresh();
           },
         };

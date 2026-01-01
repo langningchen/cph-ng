@@ -27,7 +27,21 @@ export interface LangCompileData {
   hash?: string;
 }
 
-export type LangCompileResult = LangCompileData | Error;
+export class CompileError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CompileError';
+  }
+}
+
+export class CompileRejected extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CompileRejected';
+  }
+}
+
+export type LangCompileResult = LangCompileData | CompileError | CompileRejected | Error;
 
 export interface ILanguageStrategy {
   readonly name: string;

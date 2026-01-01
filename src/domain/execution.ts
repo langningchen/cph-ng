@@ -31,7 +31,14 @@ export interface ExecutionData {
   isUserAborted: boolean;
 }
 
-export type ExecutionResult = ExecutionData | Error;
+export class ExecutionRejected extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ExecutionRejected';
+  }
+}
+
+export type ExecutionResult = ExecutionData | ExecutionRejected | Error;
 
 export interface InteractiveExecutionData {
   sol: ExecutionData;

@@ -53,11 +53,11 @@ interface LaunchResult {
 @injectable()
 export class ProcessExecutorAdapter implements IProcessExecutor {
   constructor(
-    @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
     @inject(TOKENS.Clock) private readonly clock: IClock,
+    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.Logger) private readonly logger: ILogger,
     @inject(TOKENS.Telemetry) private readonly telemetry: ITelemetry,
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
   ) {
     this.logger = this.logger.withScope('processExecutor');
   }

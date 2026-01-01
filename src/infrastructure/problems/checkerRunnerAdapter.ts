@@ -30,9 +30,9 @@ import { TOKENS } from '@/composition/tokens';
 @injectable()
 export class CheckerRunnerAdapter implements ICheckerRunner {
   constructor(
-    @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.Logger) private readonly logger: ILogger,
+    @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
     @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
   ) {
     this.logger = this.logger.withScope('CheckerRunner');

@@ -22,6 +22,9 @@ export interface BaseMsg {
   type: string;
   activePath?: string;
 }
+export interface ProblemBaseMsg extends BaseMsg {
+  activePath: string;
+}
 
 export interface CreateProblemMsg extends BaseMsg {
   type: 'createProblem';
@@ -32,7 +35,7 @@ export interface ImportProblemMsg extends BaseMsg {
 export interface InitMsg extends BaseMsg {
   type: 'init';
 }
-export interface EditProblemDetailsMsg extends BaseMsg {
+export interface EditProblemDetailsMsg extends ProblemBaseMsg {
   type: 'editProblemDetails';
   title: string;
   url: string;
@@ -45,64 +48,64 @@ export interface EditProblemDetailsMsg extends BaseMsg {
     runnerArgs?: string;
   };
 }
-export interface DelProblemMsg extends BaseMsg {
+export interface DelProblemMsg extends ProblemBaseMsg {
   type: 'delProblem';
 }
-export interface RunTcsMsg extends BaseMsg {
+export interface RunTcsMsg extends ProblemBaseMsg {
   type: 'runTcs';
   compile: boolean | null;
 }
-export interface StopTcsMsg extends BaseMsg {
+export interface StopTcsMsg extends ProblemBaseMsg {
   type: 'stopTcs';
   onlyOne: boolean;
 }
-export interface AddTcMsg extends BaseMsg {
+export interface AddTcMsg extends ProblemBaseMsg {
   type: 'addTc';
 }
-export interface LoadTcsMsg extends BaseMsg {
+export interface LoadTcsMsg extends ProblemBaseMsg {
   type: 'loadTcs';
 }
-export interface RunTcMsg extends BaseMsg {
+export interface RunTcMsg extends ProblemBaseMsg {
   type: 'runTc';
   id: UUID;
   compile: boolean | null;
 }
-export interface ToggleDisableMsg extends BaseMsg {
+export interface ToggleDisableMsg extends ProblemBaseMsg {
   type: 'toggleDisable';
   id: UUID;
 }
-export interface ClearTcStatusMsg extends BaseMsg {
+export interface ClearTcStatusMsg extends ProblemBaseMsg {
   type: 'clearTcStatus';
   id: UUID;
 }
-export interface ClearStatusMsg extends BaseMsg {
+export interface ClearStatusMsg extends ProblemBaseMsg {
   type: 'clearStatus';
 }
 export type WebviewTcFileTypes = 'stdin' | 'answer';
-export interface ChooseTcFileMsg extends BaseMsg {
+export interface ChooseTcFileMsg extends ProblemBaseMsg {
   type: 'chooseTcFile';
   id: UUID;
   label: WebviewTcFileTypes;
 }
-export interface UpdateTcMsg extends BaseMsg {
+export interface UpdateTcMsg extends ProblemBaseMsg {
   type: 'updateTc';
   id: UUID;
   tc: ITc;
 }
-export interface CompareTcMsg extends BaseMsg {
+export interface CompareTcMsg extends ProblemBaseMsg {
   type: 'compareTc';
   id: UUID;
 }
-export interface ToggleTcFileMsg extends BaseMsg {
+export interface ToggleTcFileMsg extends ProblemBaseMsg {
   type: 'toggleTcFile';
   id: UUID;
   label: WebviewTcFileTypes;
 }
-export interface DelTcMsg extends BaseMsg {
+export interface DelTcMsg extends ProblemBaseMsg {
   type: 'delTc';
   id: UUID;
 }
-export interface ReorderTcMsg extends BaseMsg {
+export interface ReorderTcMsg extends ProblemBaseMsg {
   type: 'reorderTc';
   fromIdx: number;
   toIdx: number;
@@ -120,22 +123,22 @@ export type WebviewSrcFileTypes =
   | 'interactor'
   | 'generator'
   | 'bruteForce';
-export interface ChooseSrcFileMsg extends BaseMsg {
+export interface ChooseSrcFileMsg extends ProblemBaseMsg {
   type: 'chooseSrcFile';
   fileType: WebviewSrcFileTypes;
 }
-export interface RemoveSrcFileMsg extends BaseMsg {
+export interface RemoveSrcFileMsg extends ProblemBaseMsg {
   type: 'removeSrcFile';
   fileType: WebviewSrcFileTypes;
 }
-export interface StartBfCompareMsg extends BaseMsg {
+export interface StartBfCompareMsg extends ProblemBaseMsg {
   type: 'startBfCompare';
   compile: boolean | null;
 }
-export interface StopBfCompareMsg extends BaseMsg {
+export interface StopBfCompareMsg extends ProblemBaseMsg {
   type: 'stopBfCompare';
 }
-export interface SubmitToCodeforcesMsg extends BaseMsg {
+export interface SubmitToCodeforcesMsg extends ProblemBaseMsg {
   type: 'submitToCodeforces';
 }
 export interface StartChatMsg extends BaseMsg {

@@ -38,7 +38,7 @@ import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
-import type { RunAllTestCases } from '@/application/useCases/RunAllTestCases';
+import type { RunAllTcs } from '@/application/useCases/RunAllTcs';
 import type { RunSingleTc } from '@/application/useCases/RunSingleTc';
 
 // Centralized DI tokens for tsyringe registrations
@@ -76,7 +76,7 @@ export const TOKENS = {
 
   // Use cases
   RunSingleTc: 'useCases.RunSingleTc' as InjectionToken<RunSingleTc>,
-  RunAllTestCases: 'useCases.RunAllTestCases' as InjectionToken<RunAllTestCases>,
+  RunAllTcs: 'useCases.RunAllTestCases' as InjectionToken<RunAllTcs>,
 };
 
 export type TokenKeys = keyof typeof TOKENS;

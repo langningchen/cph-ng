@@ -25,10 +25,11 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
-import type {
-  ExecutionContext,
-  ExecutionResult,
-  InteractiveExecutionResult,
+import {
+  type ExecutionContext,
+  ExecutionRejected,
+  type ExecutionResult,
+  type InteractiveExecutionResult,
 } from '@/domain/execution';
 
 @injectable()
@@ -55,8 +56,8 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
     const useRunner = this.settings.runner.useRunner;
     const useWrapper = this.settings.compilation.useWrapper;
     if (useRunner && useWrapper)
-      return new Error(
-        this.translator.t('Cannot use both external runner and wrapper at the same time.'),
+      return new ExecutionRejected(
+        this.translator.t('Cannot use both external runner and wrapper at the same time'),
       );
     if (useRunner) return this.factory.create('external');
     if (useWrapper) return this.factory.create('wrapper');

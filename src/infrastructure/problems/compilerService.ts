@@ -14,10 +14,9 @@ import type { FileWithHash, IProblem } from '@/types';
 @injectable()
 export class CompilerService implements ICompilerService {
   constructor(
+    @inject(TOKENS.LanguageRegistry) private readonly lang: ILanguageRegistry,
     @inject(TOKENS.Logger) private readonly logger: ILogger,
     @inject(TOKENS.Translator) private readonly translator: ITranslator,
-    @inject(TOKENS.LanguageRegistry)
-    private readonly lang: ILanguageRegistry,
   ) {
     this.logger = logger.withScope('CompilerService');
   }
@@ -28,9 +27,7 @@ export class CompilerService implements ICompilerService {
     forceCompile: boolean | null,
   ): Promise<LangCompileResult> {
     const checkerLang = this.lang.getLang(file.path);
-    if (checkerLang) {
-      return await checkerLang.compile(file, ac, forceCompile);
-    }
+    if (checkerLang) return await checkerLang.compile(file, ac, forceCompile);
     return { path: file.path };
   }
 

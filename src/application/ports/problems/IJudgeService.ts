@@ -25,7 +25,6 @@ export interface JudgeContext {
   tcId: UUID;
   stdinPath: string;
   answerPath: string;
-  compile: boolean | null;
   artifacts: CompileData;
 }
 

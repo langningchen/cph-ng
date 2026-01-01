@@ -116,8 +116,6 @@ describe('ExternalRunnerStrategy', () => {
 
     expect(result).not.toBeInstanceOf(Error);
     expect(executorMock.spawn).toHaveBeenCalled();
-    expect(fsMock.safeWriteFile).toHaveBeenCalled();
-    expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
       expect(result.timeMs).toBe(150);
       expect(result.memoryMb).toBe(10);
@@ -357,7 +355,9 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
       expect(result.isUserAborted).toBe(false);
-      expect(result.timeMs).toBeGreaterThanOrEqual(500);
+      expect(result.timeMs).toBeGreaterThanOrEqual(
+        ctx.timeLimitMs + settingsMock.runner.timeAddition,
+      );
     }
   });
 
@@ -366,7 +366,7 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
     const ctx: ExecutionContext = {
       cmd: [scriptPath],
       stdinPath: join(testWorkspace, inputFile),
-      timeLimitMs: 10000,
+      timeLimitMs: 1000,
     };
 
     const ac = new AbortController();

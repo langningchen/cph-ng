@@ -118,7 +118,7 @@
   "Not run yet": "尚未运行",
   "Number of test cases: {cnt}": "测试样例数量：{cnt}",
   "OK": "确认",
-  "Cannot use both external runner and wrapper at the same time.": "无法同时使用外部运行器和包装器。",
+  "Cannot use both external runner and wrapper at the same time": "无法同时使用外部运行器和包装器。",
   "Failed to prepare runner utility: {codeOrSignal}": "准备运行器工具失败: {codeOrSignal}",
   "External runner only supports single program without arguments": "外部运行器仅支持不带参数的单个程序",
   "Runner exited with code {codeOrSignal}": "运行器退出，代码: {codeOrSignal}",

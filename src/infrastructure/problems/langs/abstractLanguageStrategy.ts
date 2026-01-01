@@ -1,11 +1,13 @@
 import { SHA256 } from 'crypto-js';
 import { window } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
-import type {
-  CompileAdditionalData,
-  ILanguageStrategy,
-  LangCompileData,
-  LangCompileResult,
+import {
+  type CompileAdditionalData,
+  CompileError,
+  CompileRejected,
+  type ILanguageStrategy,
+  type LangCompileData,
+  type LangCompileResult,
 } from '@/application/ports/problems/ILanguageStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
@@ -58,9 +60,8 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
       const result = await this.internalCompile(src, ac, forceCompile, additionalData);
       compileEnd({ ...result });
 
-      if (!(await this.fs.exists(result.path))) {
-        return new Error(this.translator.t('Compilation output does not exist'));
-      }
+      if (!(await this.fs.exists(result.path)))
+        return new CompileError(this.translator.t('Compilation output does not exist'));
       return result;
     } catch (e) {
       this.logger.error('Compilation failed', e);
@@ -85,13 +86,13 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     });
     if (result instanceof Error) throw result;
     if (result.abortReason === AbortReason.UserAbort)
-      throw new Error(this.translator.t('Compilation aborted by user'));
+      throw new CompileRejected(this.translator.t('Compilation aborted by user'));
     if (result.abortReason === AbortReason.Timeout)
-      throw new Error(this.translator.t('Compilation timed out'));
+      throw new CompileError(this.translator.t('Compilation timed out'));
     CompilationIo.append(await this.fs.readFile(result.stdoutPath));
     CompilationIo.append(await this.fs.readFile(result.stderrPath));
     if (result.codeOrSignal)
-      throw new Error(this.translator.t('Compilation failed with non-zero exit code'));
+      throw new CompileError(this.translator.t('Compilation failed with non-zero exit code'));
     Cache.dispose([result.stdoutPath, result.stderrPath]);
   }
 

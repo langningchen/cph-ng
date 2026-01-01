@@ -21,24 +21,21 @@ import type { ICompilerService } from '@/application/ports/problems/ICompilerSer
 import type { IJudgeObserver } from '@/application/ports/problems/IJudgeObserver';
 import type { JudgeContext } from '@/application/ports/problems/IJudgeService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/IJudgeServiceFactory';
+import { CompileError, CompileRejected } from '@/application/ports/problems/ILanguageStrategy';
 import { TOKENS } from '@/composition/tokens';
 import { VERDICTS } from '@/domain/verdict';
 import type { FinalResult } from '@/infrastructure/problems/resultEvaluator';
 import ProblemsManager from '@/modules/problems/manager';
-import { isExpandVerdict, type TcVerdict } from '@/types';
 import { TcResult, TcVerdicts } from '@/types/types.backend';
 
 @injectable()
 export class RunSingleTc {
   constructor(
-    @inject(TOKENS.JudgeServiceFactory)
-    private readonly judgeFactory: IJudgeServiceFactory,
     @inject(TOKENS.CompilerService) private readonly compiler: ICompilerService,
+    @inject(TOKENS.JudgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
   ) {}
 
   async exec(msg: msgs.RunTcMsg): Promise<void> {
-    if (!msg.activePath) throw new Error('Active path is required');
-
     const fullProblem = await ProblemsManager.getFullProblem(msg.activePath);
     if (!fullProblem) throw new Error('Problem not found');
     const { problem } = fullProblem;
@@ -47,6 +44,8 @@ export class RunSingleTc {
     if (!tc) throw new Error('Test case not found');
 
     const ac = new AbortController();
+    fullProblem.ac?.abort();
+    fullProblem.ac = ac;
 
     tc.result?.dispose();
     tc.result = new TcResult(TcVerdicts.CP);
@@ -55,7 +54,12 @@ export class RunSingleTc {
 
     const artifacts = await this.compiler.compileAll(problem, msg.compile, ac);
     if (artifacts instanceof Error) {
-      tc.result.verdict = TcVerdicts.CE;
+      tc.result.verdict =
+        artifacts instanceof CompileError
+          ? TcVerdicts.CE
+          : artifacts instanceof CompileRejected
+            ? TcVerdicts.RJ
+            : TcVerdicts.SE;
       tc.result.msg = [artifacts.message];
       await ProblemsManager.dataRefresh();
       return;
@@ -67,15 +71,14 @@ export class RunSingleTc {
       tcId: msg.id,
       stdinPath: tc.stdin.toPath(),
       answerPath: tc.answer.toPath(),
-      compile: msg.compile,
       artifacts,
     };
 
     const observer: IJudgeObserver = {
-      onStatusChange: (verdict: TcVerdict, message?: string) => {
+      onStatusChange: (verdict, msg) => {
         if (!tc.result) return;
         tc.result.verdict = verdict;
-        if (message) tc.result.msg = [message];
+        if (msg) tc.result.msg = [msg];
         ProblemsManager.dataRefresh();
       },
       onResult: (res: FinalResult) => {
@@ -84,13 +87,13 @@ export class RunSingleTc {
         tc.result.time = res.timeMs;
         tc.result.memory = res.memoryMb;
         tc.result.msg = res.messages;
-        tc.isExpand = isExpandVerdict(tc.result.verdict);
+        tc.isExpand = true;
         ProblemsManager.dataRefresh();
       },
-      onError: (error: Error) => {
+      onError: (e) => {
         if (!tc.result) return;
         tc.result.verdict = TcVerdicts.SE;
-        tc.result.msg = [error.message];
+        tc.result.msg = [e.message];
         ProblemsManager.dataRefresh();
       },
     };

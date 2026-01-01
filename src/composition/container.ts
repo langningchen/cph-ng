@@ -19,7 +19,7 @@ import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { container } from 'tsyringe';
 import { type ExtensionContext, window } from 'vscode';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
-import { RunAllTestCases } from '@/application/useCases/RunAllTestCases';
+import { RunAllTcs } from '@/application/useCases/RunAllTcs';
 import { RunSingleTc } from '@/application/useCases/RunSingleTc';
 import { BuildInfoAdapter } from '@/infrastructure/node/buildInfoAdapter';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
@@ -30,6 +30,7 @@ import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
 import { CheckerRunnerAdapter } from '@/infrastructure/problems/checkerRunnerAdapter';
 import { CompilerService } from '@/infrastructure/problems/compilerService';
+import { JudgeServiceFactory } from '@/infrastructure/problems/judgeServiceFactoryAdapter';
 import { ExecutionStrategyFactoryAdapter } from '@/infrastructure/problems/runner/execution/executionStrategyFactoryAdapter';
 import { RunnerProviderAdapter } from '@/infrastructure/problems/runner/execution/strategies/runnerProviderAdapter';
 import { SolutionRunnerAdapter } from '@/infrastructure/problems/runner/solutionRunnerAdapter';
@@ -46,15 +47,19 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.BuildInfo, BuildInfoAdapter);
   container.registerSingleton(TOKENS.CheckerRunner, CheckerRunnerAdapter);
   container.registerSingleton(TOKENS.Clock, ClockAdapter);
+  container.registerSingleton(TOKENS.CompilerService, CompilerService);
   container.registerSingleton(TOKENS.Crypto, CryptoAdapter);
+  container.registerSingleton(TOKENS.ExecutionStrategyFactory, ExecutionStrategyFactoryAdapter);
   container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
+  container.registerSingleton(TOKENS.JudgeServiceFactory, JudgeServiceFactory);
+  container.registerSingleton(TOKENS.LanguageRegistry, LanguageRegistry);
   container.registerSingleton(TOKENS.Logger, LoggerAdapter);
   container.registerSingleton(TOKENS.PathRenderer, PathRendererAdapter);
   container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
+  container.registerSingleton(TOKENS.RunAllTcs, RunAllTcs);
   container.registerSingleton(TOKENS.Runner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);
   container.registerSingleton(TOKENS.RunSingleTc, RunSingleTc);
-  container.registerSingleton(TOKENS.RunAllTestCases, RunAllTestCases);
   container.registerSingleton(TOKENS.Settings, SettingsAdapter);
   container.registerSingleton(TOKENS.SolutionRunner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.System, SystemAdapter);
@@ -62,9 +67,6 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.TempStorage, TempStorageAdapter);
   container.registerSingleton(TOKENS.Translator, TranslatorAdapter);
   container.registerSingleton(TOKENS.WebviewEventBus, WebviewEventBusAdapter);
-  container.registerSingleton(TOKENS.ExecutionStrategyFactory, ExecutionStrategyFactoryAdapter);
-  container.registerSingleton(TOKENS.LanguageRegistry, LanguageRegistry);
-  container.registerSingleton(TOKENS.CompilerService, CompilerService);
 
   container.registerInstance(TOKENS.ExtensionPath, context.extensionPath);
 

@@ -73,6 +73,6 @@ export class FileSystemAdapter implements IFileSystem {
   }
 
   async rm(path: string, options?: { recursive?: boolean }): Promise<void> {
-    await rm(path, { recursive: options?.recursive });
+    await rm(path, { recursive: options?.recursive ?? false });
   }
 }

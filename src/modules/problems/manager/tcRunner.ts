@@ -1,6 +1,6 @@
 import type * as msgs from '@w/msgs';
 import { container } from 'tsyringe';
-import { RunAllTestCases } from '@/application/useCases/RunAllTestCases';
+import { RunAllTcs } from '@/application/useCases/RunAllTcs';
 import { RunSingleTc } from '@/application/useCases/RunSingleTc';
 import { TOKENS } from '@/composition/tokens';
 import {
@@ -17,8 +17,8 @@ export class TcRunner {
   }
 
   public static async runTcs(msg: msgs.RunTcsMsg): Promise<void> {
-    const runAllTestCases = container.resolve<RunAllTestCases>(
-      TOKENS.RunAllTestCases,
+    const runAllTestCases = container.resolve<RunAllTcs>(
+      TOKENS.RunAllTcs,
     );
     await runAllTestCases.exec(msg);
   }
