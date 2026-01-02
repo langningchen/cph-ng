@@ -251,12 +251,11 @@ export const TcDataView = ({
             }}
             tabIndex={tabIndex}
             maxRows={10}
-            style={
-              {
-                ...commonStyle,
-                resize: 'none',
-              } as any
-            }
+            style={{
+              ...commonStyle,
+              height: undefined,
+              resize: 'none',
+            }}
           />
         ))}
     </CphFlex>
