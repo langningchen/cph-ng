@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { join } from 'node:path';
-import { PathRendererMock } from '@t/infrastructure/services/pathRendererMock';
+import { PathResolverMock } from '@t/infrastructure/services/pathResolverMock';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { type MockProxy, mock } from 'vitest-mock-extended';
@@ -43,7 +43,7 @@ describe('TempStorageAdapter', () => {
     container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
     container.registerInstance(TOKENS.Settings, settingsMock);
     container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
-    container.registerSingleton(TOKENS.PathRenderer, PathRendererMock);
+    container.registerSingleton(TOKENS.PathRenderer, PathResolverMock);
 
     adapter = container.resolve(TempStorageAdapter);
   });

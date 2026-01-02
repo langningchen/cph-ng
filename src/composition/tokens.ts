@@ -36,7 +36,7 @@ import type { ILanguageStrategy } from '@/application/ports/problems/judge/langs
 import type { IExecutionStrategyFactory } from '@/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
 import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
 import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
-import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
@@ -67,7 +67,7 @@ export const TOKENS = {
   LanguageRegistry: 'ports.LanguageRegistry' as InjectionToken<ILanguageRegistry>,
   LanguageStrategy: 'ports.LanguageStrategy' as InjectionToken<ILanguageStrategy>,
   Logger: 'ports.Logger' as InjectionToken<ILogger>,
-  PathRenderer: 'ports.PathRenderer' as InjectionToken<IPathRenderer>,
+  PathRenderer: 'ports.PathRenderer' as InjectionToken<IPathResolver>,
   ProcessExecutor: 'ports.ProcessExecutor' as InjectionToken<IProcessExecutor>,
   ResultEvaluator: 'ports.ResultEvaluator' as InjectionToken<IResultEvaluator>,
   Runner: 'ports.Runner' as InjectionToken<ISolutionRunner>,

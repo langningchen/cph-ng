@@ -17,7 +17,7 @@
 
 import type { Problem } from '@/types/types.backend';
 
-export interface IPathRenderer {
+export interface IPathResolver {
   renderTemplate(problem: Problem): Promise<string>;
   renderPath(original: string): string;
   renderWorkspacePath(original: string): Promise<string | null>;

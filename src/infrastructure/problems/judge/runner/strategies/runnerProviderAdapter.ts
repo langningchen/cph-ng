@@ -20,7 +20,7 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
-import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
@@ -37,7 +37,7 @@ export class RunnerProviderAdapter implements IRunnerProvider {
     @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
     @inject(TOKENS.Settings) private readonly settings: ISettings,
     @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.PathRenderer) private readonly renderer: IPathRenderer,
+    @inject(TOKENS.PathRenderer) private readonly resolver: IPathResolver,
   ) {
     this.logger = this.logger.withScope('RunnerProvider');
   }
@@ -64,7 +64,7 @@ export class RunnerProviderAdapter implements IRunnerProvider {
     );
     const binaryName = isWin ? 'runner-windows.exe' : 'runner-linux';
     const outputPath = this.fs.join(
-      this.renderer.renderPath(this.settings.cache.directory),
+      this.resolver.renderPath(this.settings.cache.directory),
       binaryName,
     );
 

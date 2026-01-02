@@ -21,7 +21,7 @@ import type {
   CompileAdditionalData,
   LangCompileData,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
-import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
@@ -37,7 +37,7 @@ export class LangPython extends AbstractLanguageStrategy {
   constructor(
     @inject(TOKENS.FileSystem) protected readonly fs: IFileSystem,
     @inject(TOKENS.Logger) protected readonly logger: ILogger,
-    @inject(TOKENS.PathRenderer) private readonly renderer: IPathRenderer,
+    @inject(TOKENS.PathRenderer) private readonly resolver: IPathResolver,
     @inject(TOKENS.Settings) protected readonly settings: ISettings,
     @inject(TOKENS.Translator) protected readonly translator: ITranslator,
   ) {
@@ -54,7 +54,7 @@ export class LangPython extends AbstractLanguageStrategy {
     this.logger.trace('compile', { src, forceCompile });
 
     const path = this.fs.join(
-      this.renderer.renderPath(this.settings.cache.directory),
+      this.resolver.renderPath(this.settings.cache.directory),
       `${this.fs.basename(src.path, this.fs.extname(src.path))}.pyc`,
     );
 

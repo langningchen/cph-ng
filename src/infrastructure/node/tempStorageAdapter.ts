@@ -19,7 +19,7 @@ import { inject, injectable } from 'tsyringe';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
@@ -34,7 +34,7 @@ export class TempStorageAdapter implements ITempStorage {
     @inject(TOKENS.Crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.PathRenderer) private readonly renderer: IPathRenderer,
+    @inject(TOKENS.PathRenderer) private readonly resolver: IPathResolver,
     @inject(TOKENS.Settings) private readonly settings: ISettings,
   ) {
     this.logger = this.logger.withScope('cache');
@@ -61,7 +61,7 @@ export class TempStorageAdapter implements ITempStorage {
       this.logger.trace('Reusing cached path', path);
     } else {
       path = this.fs.join(
-        this.renderer.renderPath(this.settings.cache.directory),
+        this.resolver.renderPath(this.settings.cache.directory),
         this.crypto.randomUUID(),
       );
       this.logger.trace('Creating new cached path', path);

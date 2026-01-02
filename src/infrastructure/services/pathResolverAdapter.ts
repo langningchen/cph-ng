@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-// biome-ignore-all lint/suspicious/noTemplateCurlyInString: Expected curly for renderer
+// biome-ignore-all lint/suspicious/noTemplateCurlyInString: Expected curly for resolver
 
 import { existsSync } from 'node:fs';
 import { basename, dirname, extname, normalize, relative } from 'node:path';
 import { inject, injectable } from 'tsyringe';
 import { Uri, window, workspace } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
-import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
@@ -32,7 +32,7 @@ import type { Problem } from '@/types/types.backend';
 // TO-DO: Check the refactor: workspace selection
 
 @injectable()
-export class PathRendererAdapter implements IPathRenderer {
+export class PathResolverAdapter implements IPathResolver {
   constructor(
     @inject(TOKENS.Settings) private readonly settings: ISettings,
     @inject(TOKENS.Logger) private readonly logger: ILogger,

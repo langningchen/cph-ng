@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { join, normalize } from 'node:path';
-import { PathRendererMock } from '@t/infrastructure/services/pathRendererMock';
+import { PathResolverMock } from '@t/infrastructure/services/pathResolverMock';
 import { extensionPathMock } from '@t/infrastructure/vscode/extensionPathMock';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
@@ -49,7 +49,7 @@ describe('RunnerProviderAdapter', () => {
     container.registerInstance(TOKENS.ProcessExecutor, executorMock);
     container.registerInstance(TOKENS.Settings, settingsMock);
     container.registerInstance(TOKENS.Logger, loggerMock);
-    container.registerSingleton(TOKENS.PathRenderer, PathRendererMock);
+    container.registerSingleton(TOKENS.PathRenderer, PathResolverMock);
 
     adapter = container.resolve(RunnerProviderAdapter);
   });

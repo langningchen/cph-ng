@@ -17,12 +17,12 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
-import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/types';
 
 @injectable()
-export class PathRendererMock implements IPathRenderer {
+export class PathResolverMock implements IPathResolver {
   constructor(
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.ExtensionPath) private readonly path: string,

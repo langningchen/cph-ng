@@ -43,7 +43,7 @@ import { SolutionRunnerAdapter } from '@/infrastructure/problems/judge/runner/so
 import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 import { ProblemRepository } from '@/infrastructure/problems/problemRepository';
 import { ProblemsManager } from '@/infrastructure/problems/problemsManager';
-import { PathRendererAdapter } from '@/infrastructure/services/pathRendererAdapter';
+import { PathResolverAdapter } from '@/infrastructure/services/pathResolverAdapter';
 import { DocumentAdapter } from '@/infrastructure/vscode/documentAdapter';
 import { LoggerAdapter } from '@/infrastructure/vscode/loggerAdapter';
 import { SettingsAdapter } from '@/infrastructure/vscode/settingsAdapter';
@@ -64,7 +64,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.JudgeServiceFactory, JudgeServiceFactory);
   container.registerSingleton(TOKENS.LanguageRegistry, LanguageRegistry);
   container.registerSingleton(TOKENS.Logger, LoggerAdapter);
-  container.registerSingleton(TOKENS.PathRenderer, PathRendererAdapter);
+  container.registerSingleton(TOKENS.PathRenderer, PathResolverAdapter);
   container.registerSingleton(TOKENS.ProblemRepository, ProblemRepository);
   container.registerSingleton(TOKENS.ProblemsManager, ProblemsManager);
   container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
