@@ -26,8 +26,7 @@ import type { IProblem } from '@/types';
 export class JudgeServiceFactory implements IJudgeServiceFactory {
   constructor(
     @inject(TraditionalJudgeService) private standard: TraditionalJudgeService,
-    @inject(InteractiveJudgeService)
-    private interactive: InteractiveJudgeService,
+    @inject(InteractiveJudgeService) private interactive: InteractiveJudgeService,
   ) {}
 
   create(problem: IProblem): IJudgeService {

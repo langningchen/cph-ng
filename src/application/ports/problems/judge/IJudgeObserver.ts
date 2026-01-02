@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluator';
+import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import type { TcVerdict } from '@/types';
 
 export interface IJudgeObserver {

@@ -19,6 +19,7 @@ import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ICheckerRunner } from '@/application/ports/problems/judge/ICheckerRunner';
+import type { IResultEvaluator } from '@/application/ports/problems/judge/IResultEvaluator';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionData } from '@/domain/execution';
@@ -46,10 +47,9 @@ export interface FinalResult {
 }
 
 @injectable()
-export class ResultEvaluator {
+export class ResultEvaluatorAdaptor implements IResultEvaluator {
   constructor(
-    @inject(TOKENS.CheckerRunner)
-    private readonly checkerRunner: ICheckerRunner,
+    @inject(TOKENS.CheckerRunner) private readonly checkerRunner: ICheckerRunner,
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.Settings) private readonly settings: ISettings,
     @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,

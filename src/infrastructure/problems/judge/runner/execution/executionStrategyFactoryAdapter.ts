@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { container, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import type {
   ExecutionStrategyType,
   IExecutionStrategyFactory,
@@ -27,14 +27,20 @@ import { WrapperStrategy } from '@/infrastructure/problems/judge/runner/executio
 
 @injectable()
 export class ExecutionStrategyFactoryAdapter implements IExecutionStrategyFactory {
+  constructor(
+    @inject(ExternalRunnerStrategy) private external: ExternalRunnerStrategy,
+    @inject(WrapperStrategy) private wrapper: WrapperStrategy,
+    @inject(NormalStrategy) private normal: NormalStrategy,
+  ) {}
+
   public create(type: ExecutionStrategyType): IExecutionStrategy {
     switch (type) {
       case 'external':
-        return container.resolve(ExternalRunnerStrategy);
+        return this.external;
       case 'wrapper':
-        return container.resolve(WrapperStrategy);
+        return this.wrapper;
       case 'normal':
-        return container.resolve(NormalStrategy);
+        return this.normal;
       default:
         throw new Error(`Unknown strategy type: ${type}`);
     }

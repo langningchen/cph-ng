@@ -1,5 +1,7 @@
 #include <iostream>
 #include <chrono>
+#include <fstream>
+#include <cstdlib>
 #ifdef __linux__
 #include <sys/resource.h>
 #endif
@@ -18,16 +20,24 @@ namespace CPHNG
     void exit()
     {
         endTime = clock::now();
-        std::cerr << "-----CPH DATA STARTS-----{\"time\":" << std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count()
-                  << "}-----";
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
+        const char *reportPath = std::getenv("CPH_NG_REPORT_PATH");
+        if (!reportPath)
+            return;
+        std::ofstream reportFile(reportPath);
+        if (!reportFile.is_open())
+            return;
+        reportFile << "{\"time\":" << duration << "}";
+        reportFile.close();
     }
 }
 
-int main(int argc, char **argv)
+int main()
 {
     std::atexit(CPHNG::exit);
 #ifdef __linux__
-    if (argc > 1 && std::string(argv[1]) == "--unlimited-stack")
+    const char *unlimitedStack = std::getenv("CPH_NG_UNLIMITED_STACK");
+    if (unlimitedStack && std::string(unlimitedStack) == "1")
     {
         struct rlimit rl;
         rl.rlim_cur = RLIM_INFINITY;

@@ -7,13 +7,13 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import { ExecutionRejected } from '@/domain/execution';
 import { VerdictName } from '@/domain/verdict';
-import { ResultEvaluator } from '@/infrastructure/problems/judge/resultEvaluator';
+import type { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import { TcVerdicts } from '@/types';
 
 @injectable()
 export class TraditionalJudgeService implements IJudgeService {
   constructor(
-    @inject(ResultEvaluator) private readonly evaluator: ResultEvaluator,
+    @inject(TOKENS.ResultEvaluator) private readonly evaluator: ResultEvaluatorAdaptor,
     @inject(TOKENS.LanguageRegistry) private readonly lang: ILanguageRegistry,
     @inject(TOKENS.SolutionRunner) private readonly runner: ISolutionRunner,
     @inject(TOKENS.Translator) private readonly translator: ITranslator,

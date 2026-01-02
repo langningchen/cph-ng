@@ -15,18 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Problem } from '@/types';
+import type {
+  FinalResult,
+  JudgeRequest,
+} from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 
-export interface FullProblem {
-  problem: Problem;
-  ac: AbortController | null;
-  startTime: number;
-}
-
-export interface IProblemRepository {
-  listFullProblems(): Promise<FullProblem[]>;
-  getFullProblem(path?: string): Promise<FullProblem | null>;
-  removeProblem(fullProblem: FullProblem): void;
-  dataRefresh(noMsg?: boolean): Promise<void>;
-  closeAll(): Promise<void>;
+export interface IResultEvaluator {
+  judge(req: JudgeRequest, ac: AbortController): Promise<FinalResult>;
 }

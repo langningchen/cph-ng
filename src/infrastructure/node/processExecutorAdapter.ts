@@ -128,6 +128,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
     const child = spawn(cmd[0], cmd.slice(1), {
       cwd: cmd[0] ? this.fs.dirname(cmd[0]) : this.fs.cwd(),
       signal: unifiedAc.signal,
+      env: options.env ? { ...process.env, ...options.env } : process.env,
     });
     this.logger.info('Running executable', options, child.pid);
     const result: LaunchResult = {

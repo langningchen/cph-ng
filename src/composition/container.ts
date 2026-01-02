@@ -31,13 +31,20 @@ import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
 import { CheckerRunnerAdapter } from '@/infrastructure/problems/judge/checkerRunnerAdapter';
 import { CompilerService } from '@/infrastructure/problems/judge/compilerService';
 import { JudgeServiceFactory } from '@/infrastructure/problems/judge/judgeServiceFactoryAdapter';
+import { LangC } from '@/infrastructure/problems/judge/langs/c';
+import { LangCpp } from '@/infrastructure/problems/judge/langs/cpp';
+import { LangJava } from '@/infrastructure/problems/judge/langs/java';
+import { LangJavascript } from '@/infrastructure/problems/judge/langs/javascript';
 import { LanguageRegistry } from '@/infrastructure/problems/judge/langs/languageRegistry';
+import { LangPython } from '@/infrastructure/problems/judge/langs/python';
+import { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import { ExecutionStrategyFactoryAdapter } from '@/infrastructure/problems/judge/runner/execution/executionStrategyFactoryAdapter';
 import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/execution/strategies/runnerProviderAdapter';
 import { SolutionRunnerAdapter } from '@/infrastructure/problems/judge/runner/solutionRunnerAdapter';
 import { ProblemRepository } from '@/infrastructure/problems/problemRepository';
 import { ProblemsManager } from '@/infrastructure/problems/problemsManager';
 import { PathRendererAdapter } from '@/infrastructure/services/pathRendererAdapter';
+import { DocumentAdapter } from '@/infrastructure/vscode/documentAdapter';
 import { LoggerAdapter } from '@/infrastructure/vscode/loggerAdapter';
 import { SettingsAdapter } from '@/infrastructure/vscode/settingsAdapter';
 import { TelemetryAdapter } from '@/infrastructure/vscode/telemetryAdapter';
@@ -51,6 +58,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.Clock, ClockAdapter);
   container.registerSingleton(TOKENS.CompilerService, CompilerService);
   container.registerSingleton(TOKENS.Crypto, CryptoAdapter);
+  container.registerSingleton(TOKENS.Document, DocumentAdapter);
   container.registerSingleton(TOKENS.ExecutionStrategyFactory, ExecutionStrategyFactoryAdapter);
   container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
   container.registerSingleton(TOKENS.JudgeServiceFactory, JudgeServiceFactory);
@@ -58,8 +66,9 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.Logger, LoggerAdapter);
   container.registerSingleton(TOKENS.PathRenderer, PathRendererAdapter);
   container.registerSingleton(TOKENS.ProblemRepository, ProblemRepository);
-  container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
   container.registerSingleton(TOKENS.ProblemsManager, ProblemsManager);
+  container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
+  container.registerSingleton(TOKENS.ResultEvaluator, ResultEvaluatorAdaptor);
   container.registerSingleton(TOKENS.RunAllTcs, RunAllTcs);
   container.registerSingleton(TOKENS.Runner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);
@@ -71,6 +80,12 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.TempStorage, TempStorageAdapter);
   container.registerSingleton(TOKENS.Translator, TranslatorAdapter);
   container.registerSingleton(TOKENS.WebviewEventBus, WebviewEventBusAdapter);
+
+  container.register(TOKENS.LanguageStrategy, { useClass: LangC });
+  container.register(TOKENS.LanguageStrategy, { useClass: LangCpp });
+  container.register(TOKENS.LanguageStrategy, { useClass: LangJava });
+  container.register(TOKENS.LanguageStrategy, { useClass: LangJavascript });
+  container.register(TOKENS.LanguageStrategy, { useClass: LangPython });
 
   container.registerInstance(TOKENS.ExtensionPath, context.extensionPath);
 

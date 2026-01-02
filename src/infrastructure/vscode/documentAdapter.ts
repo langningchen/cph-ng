@@ -15,18 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Problem } from '@/types';
+import { window } from 'vscode';
+import type { IDocument } from '@/application/ports/vscode/IDocument';
+import { waitUntil } from '@/utils/global';
 
-export interface FullProblem {
-  problem: Problem;
-  ac: AbortController | null;
-  startTime: number;
-}
-
-export interface IProblemRepository {
-  listFullProblems(): Promise<FullProblem[]>;
-  getFullProblem(path?: string): Promise<FullProblem | null>;
-  removeProblem(fullProblem: FullProblem): void;
-  dataRefresh(noMsg?: boolean): Promise<void>;
-  closeAll(): Promise<void>;
+export class DocumentAdapter implements IDocument {
+  async save(path: string): Promise<void> {
+    const editor = window.visibleTextEditors.find((editor) => editor.document.fileName === path);
+    if (editor) {
+      await editor.document.save();
+      await waitUntil(() => !editor.document.isDirty);
+    }
+  }
 }

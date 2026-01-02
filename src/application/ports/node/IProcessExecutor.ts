@@ -26,6 +26,7 @@ export interface ProcessOptions {
   timeoutMs?: number;
   ac?: AbortController;
   stdinPath?: string;
+  env?: Record<string, string>;
 }
 
 export interface PipeProcessOptions {

@@ -26,15 +26,17 @@ import {
   CompileError,
   CompileRejected,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
+import type { IDocument } from '@/application/ports/vscode/IDocument';
 import { TOKENS } from '@/composition/tokens';
 import { VERDICTS } from '@/domain/verdict';
-import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluator';
+import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import { TcResult, TcVerdicts } from '@/types/types.backend';
 
 @injectable()
 export class RunSingleTc {
   constructor(
     @inject(TOKENS.CompilerService) private readonly compiler: ICompilerService,
+    @inject(TOKENS.Document) private readonly document: IDocument,
     @inject(TOKENS.JudgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
     @inject(TOKENS.ProblemsManager) private readonly problemsManager: IProblemsManager,
   ) {}
@@ -56,6 +58,7 @@ export class RunSingleTc {
     tc.isExpand = false;
     await this.problemsManager.dataRefresh();
 
+    await this.document.save(problem.src.path);
     const artifacts = await this.compiler.compileAll(problem, msg.compile, ac);
     if (artifacts instanceof Error) {
       tc.result.verdict =

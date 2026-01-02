@@ -30,11 +30,14 @@ import type { IProblemsManager } from '@/application/ports/problems/IProblemsMan
 import type { ICheckerRunner } from '@/application/ports/problems/judge/ICheckerRunner';
 import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
+import type { IResultEvaluator } from '@/application/ports/problems/judge/IResultEvaluator';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
+import type { ILanguageStrategy } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IExecutionStrategyFactory } from '@/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
 import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
 import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
 import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
+import type { IDocument } from '@/application/ports/vscode/IDocument';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
@@ -51,30 +54,33 @@ export const TOKENS = {
   ExtensionPath: 'vscode.ExtensionPath' as InjectionToken<string>,
   LogOutputChannel: 'vscode.LogOutputChannel' as InjectionToken<LogOutputChannel>,
   TelemetryReporter: 'vscode.TelemetryReporter' as InjectionToken<TelemetryReporter>,
+  Document: 'vscode.Document' as InjectionToken<IDocument>,
 
   // Core ports
-  System: 'ports.System' as InjectionToken<ISystem>,
-  FileSystem: 'ports.FileSystem' as InjectionToken<IFileSystem>,
-  ProcessExecutor: 'ports.ProcessExecutor' as InjectionToken<IProcessExecutor>,
-  Runner: 'ports.Runner' as InjectionToken<ISolutionRunner>,
-  SolutionRunner: 'ports.SolutionRunner' as InjectionToken<ISolutionRunner>,
-  CheckerRunner: 'ports.CheckerRunner' as InjectionToken<ICheckerRunner>,
-  Settings: 'ports.Settings' as InjectionToken<ISettings>,
-  WebviewEventBus: 'ports.WebviewEventBus' as InjectionToken<IWebviewEventBus>,
-  Logger: 'ports.Logger' as InjectionToken<ILogger>,
-  Translator: 'ports.Translator' as InjectionToken<ITranslator>,
-  RunnerProvider: 'ports.RunnerProvider' as InjectionToken<IRunnerProvider>,
-  Telemetry: 'ports.Telemetry' as InjectionToken<ITelemetry>,
-  PathRenderer: 'ports.PathRenderer' as InjectionToken<IPathRenderer>,
-  JudgeServiceFactory: 'ports.JudgeServiceFactory' as InjectionToken<IJudgeServiceFactory>,
-  TempStorage: 'ports.TempStorage' as InjectionToken<ITempStorage>,
-  Clock: 'ports.Clock' as InjectionToken<IClock>,
-  Crypto: 'ports.Crypto' as InjectionToken<ICrypto>,
   BuildInfo: 'ports.BuildInfo' as InjectionToken<IBuildInfo>,
+  CheckerRunner: 'ports.CheckerRunner' as InjectionToken<ICheckerRunner>,
+  Clock: 'ports.Clock' as InjectionToken<IClock>,
+  CompilerService: 'ports.CompilerService' as InjectionToken<ICompilerService>,
+  Crypto: 'ports.Crypto' as InjectionToken<ICrypto>,
+  FileSystem: 'ports.FileSystem' as InjectionToken<IFileSystem>,
+  JudgeServiceFactory: 'ports.JudgeServiceFactory' as InjectionToken<IJudgeServiceFactory>,
+  LanguageRegistry: 'ports.LanguageRegistry' as InjectionToken<ILanguageRegistry>,
+  LanguageStrategy: 'ports.LanguageStrategy' as InjectionToken<ILanguageStrategy>,
+  Logger: 'ports.Logger' as InjectionToken<ILogger>,
+  PathRenderer: 'ports.PathRenderer' as InjectionToken<IPathRenderer>,
+  ProcessExecutor: 'ports.ProcessExecutor' as InjectionToken<IProcessExecutor>,
+  ResultEvaluator: 'ports.ResultEvaluator' as InjectionToken<IResultEvaluator>,
+  Runner: 'ports.Runner' as InjectionToken<ISolutionRunner>,
+  RunnerProvider: 'ports.RunnerProvider' as InjectionToken<IRunnerProvider>,
+  Settings: 'ports.Settings' as InjectionToken<ISettings>,
+  SolutionRunner: 'ports.SolutionRunner' as InjectionToken<ISolutionRunner>,
+  System: 'ports.System' as InjectionToken<ISystem>,
+  Telemetry: 'ports.Telemetry' as InjectionToken<ITelemetry>,
+  TempStorage: 'ports.TempStorage' as InjectionToken<ITempStorage>,
+  Translator: 'ports.Translator' as InjectionToken<ITranslator>,
+  WebviewEventBus: 'ports.WebviewEventBus' as InjectionToken<IWebviewEventBus>,
   ExecutionStrategyFactory:
     'ports.ExecutionStrategyFactory' as InjectionToken<IExecutionStrategyFactory>,
-  LanguageRegistry: 'ports.LanguageRegistry' as InjectionToken<ILanguageRegistry>,
-  CompilerService: 'ports.CompilerService' as InjectionToken<ICompilerService>,
 
   // Use cases
   RunSingleTc: 'useCases.RunSingleTc' as InjectionToken<RunSingleTc>,

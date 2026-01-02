@@ -18,60 +18,66 @@
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { IExecutionStrategy } from '@/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
-import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext, ExecutionResult } from '@/domain/execution';
 
-export interface WrapperData {
+interface WrapperData {
   time: number; // microseconds
 }
 
 @injectable()
 export class WrapperStrategy implements IExecutionStrategy {
   constructor(
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.Telemetry) private readonly telemetry: ITelemetry,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.Logger) private readonly logger: ILogger,
     @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
+    @inject(TOKENS.Settings) private readonly settings: ISettings,
+    @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
   ) {
     this.logger = this.logger.withScope('WrapperStrategy');
   }
 
   async execute(ctx: ExecutionContext, ac: AbortController): Promise<ExecutionResult> {
+    const reportPath = this.tmp.create('wrapperStrategy.reportPath');
     const res = await this.executor.execute({
       cmd: ctx.cmd,
       timeoutMs: ctx.timeLimitMs + this.settings.runner.timeAddition,
       stdinPath: ctx.stdinPath,
       ac,
+      env: {
+        CPH_NG_REPORT_PATH: reportPath,
+        CPH_NG_UNLIMITED_STACK: this.settings.runner.unlimitedStack ? '1' : '0',
+      },
     });
     if (res instanceof Error) return res;
-    const wrapperData = await this.extractWrapperData(res.stderrPath);
     const data: ExecutionResult = {
       ...res,
       isUserAborted: res.abortReason === AbortReason.UserAbort,
     };
-    if (wrapperData) data.timeMs = wrapperData.time / 1000;
+    if (res.codeOrSignal === 0) {
+      const wrapperData = await this.readWrapperReport(reportPath);
+      if (wrapperData) {
+        data.timeMs = wrapperData.time / 1000;
+      } else {
+        this.logger.warn('Wrapper exited successfully but report file is missing');
+      }
+    }
     return data;
   }
 
-  private async extractWrapperData(stderrPath: string): Promise<WrapperData | null> {
-    const content = await this.fs.readFile(stderrPath);
-    const regex = /-----CPH DATA STARTS-----(\{.*?\})-----/s;
-    const match = content.match(regex);
-    if (!match) return null;
+  private async readWrapperReport(path: string): Promise<WrapperData | null> {
+    if (!(await this.fs.exists(path))) return null;
     try {
-      await this.fs.safeWriteFile(stderrPath, content.replace(regex, '').trim());
-      return JSON.parse(match[1]) as WrapperData;
+      const content = await this.fs.readFile(path);
+      if (!content.trim()) return null;
+      return JSON.parse(content) as WrapperData;
     } catch (e) {
-      this.logger.error('Failed to parse wrapper data JSON', e as Error);
-      this.telemetry.error('wrapperError', e, {
-        output: match[1],
-      });
+      this.logger.error('Failed to parse wrapper report', e as Error);
+      return null;
     }
-    return null;
   }
 }

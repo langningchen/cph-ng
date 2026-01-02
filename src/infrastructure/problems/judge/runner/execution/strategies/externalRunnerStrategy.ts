@@ -88,9 +88,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     }
 
     const runnerCmd = [runnerPath, ctx.cmd[0], userStdinPath, userStdoutPath, userStderrPath];
-    if (this.settings.runner.unlimitedStack) {
-      runnerCmd.push('--unlimited-stack');
-    }
+    if (this.settings.runner.unlimitedStack) runnerCmd.push('--unlimited-stack');
 
     // We use our own timeout handling to allow graceful exit
     const handle = await this.executor.spawn({

@@ -1,5 +1,4 @@
 import { SHA256 } from 'crypto-js';
-import { window } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import {
   type CompileAdditionalData,
@@ -16,7 +15,7 @@ import Cache from '@/helpers/cache';
 import { CompilationIo } from '@/helpers/io';
 import ProcessExecutor, { AbortReason } from '@/helpers/processExecutor';
 import type { FileWithHash, IOverwrites } from '@/types';
-import { telemetry, waitUntil } from '@/utils/global';
+import { telemetry } from '@/utils/global';
 
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
   canUseWrapper: false,
@@ -40,15 +39,6 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileResult> {
-    // Save the file if it's opened in an editor
-    const editor = window.visibleTextEditors.find(
-      (editor) => editor.document.fileName === src.path,
-    );
-    if (editor) {
-      await editor.document.save();
-      await waitUntil(() => !editor.document.isDirty);
-    }
-
     // Clear previous compilation IO
     CompilationIo.clear();
 
