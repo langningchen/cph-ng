@@ -49,7 +49,7 @@ describe('TempStorageAdapter', () => {
   });
 
   it('should create a new path using crypto and settings when pool is empty', () => {
-    const path = adapter.create();
+    const path = adapter.create('test');
 
     expect(path).contains('/uuid-0');
     expect(cryptoMock.randomUUID).toHaveBeenCalledTimes(1);
@@ -57,20 +57,20 @@ describe('TempStorageAdapter', () => {
   });
 
   it('should reuse a path from the free pool after it has been disposed', () => {
-    const path1 = adapter.create();
+    const path1 = adapter.create('test');
     adapter.dispose(path1);
     expect(loggerMock.trace).toHaveBeenCalledWith(expect.stringContaining('Disposing'), path1);
 
-    const path2 = adapter.create();
+    const path2 = adapter.create('test');
     expect(path2).toBe(path1);
     expect(cryptoMock.randomUUID).toHaveBeenCalledTimes(1);
     expect(loggerMock.trace).toHaveBeenCalledWith(expect.stringContaining('Reusing cached'), path2);
   });
 
   it('should manage multiple paths in the pool correctly', () => {
-    const p1 = adapter.create();
-    const p2 = adapter.create();
-    const p3 = adapter.create();
+    const p1 = adapter.create('test');
+    const p2 = adapter.create('test');
+    const p3 = adapter.create('test');
 
     expect(p1).not.toBe(p2);
     expect(p2).not.toBe(p3);
@@ -78,9 +78,9 @@ describe('TempStorageAdapter', () => {
 
     adapter.dispose([p1, p2]);
 
-    const r1 = adapter.create();
-    const r2 = adapter.create();
-    const r3 = adapter.create();
+    const r1 = adapter.create('test');
+    const r2 = adapter.create('test');
+    const r3 = adapter.create('test');
 
     const reusedPaths = [r1, r2];
     expect(reusedPaths).toContain(p1);
@@ -89,7 +89,7 @@ describe('TempStorageAdapter', () => {
   });
 
   it('should warn when disposing the same path multiple times', () => {
-    const path = adapter.create();
+    const path = adapter.create('test');
     adapter.dispose(path);
     adapter.dispose(path);
 
@@ -112,21 +112,21 @@ describe('TempStorageAdapter', () => {
   });
 
   it('should handle array of paths in dispose method', () => {
-    const paths = [adapter.create(), adapter.create()];
+    const paths = [adapter.create('test'), adapter.create('test')];
     adapter.dispose(paths);
 
-    const newPath = adapter.create();
+    const newPath = adapter.create('test');
     expect(paths).toContain(newPath);
   });
 
   it('should not reuse a path that is currently in use', () => {
-    const p1 = adapter.create();
-    const p2 = adapter.create();
+    const p1 = adapter.create('test');
+    const p2 = adapter.create('test');
 
     expect(p1).not.toBe(p2);
 
     adapter.dispose(p1);
-    const p3 = adapter.create();
+    const p3 = adapter.create('test');
 
     expect(p3).toBe(p1);
     expect(p3).not.toBe(p2);
@@ -135,8 +135,8 @@ describe('TempStorageAdapter', () => {
   it('should start monitor and log pool status periodically', () => {
     vi.useFakeTimers();
 
-    const p1 = adapter.create();
-    const p2 = adapter.create();
+    const p1 = adapter.create('test');
+    const p2 = adapter.create('test');
     adapter.dispose(p1);
 
     adapter.startMonitor();

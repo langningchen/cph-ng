@@ -26,7 +26,7 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class TempStorageAdapter implements ITempStorage {
-  private usedPool: Set<string> = new Set();
+  private usedPool: Map<string, string> = new Map();
   private freePool: Set<string> = new Set();
   private monitorInterval: NodeJS.Timeout | undefined;
 
@@ -46,13 +46,15 @@ export class TempStorageAdapter implements ITempStorage {
     }
     this.monitorInterval = setInterval(() => {
       this.logger.debug(`this Monitor: ${this.usedPool.size} used, ${this.freePool.size} free.`);
-      this.logger.trace('Used paths', Array.from(this.usedPool));
-      this.logger.trace('Free paths', Array.from(this.freePool));
+      this.logger.trace(
+        'Used paths',
+        Object.entries(this.usedPool).map(([key, value]) => `${key}: ${value}`),
+      );
     }, 10000);
     this.logger.info('Cache monitor started');
   }
 
-  create(): string {
+  create(description: string): string {
     let path = this.freePool.values().next().value;
     if (path) {
       this.freePool.delete(path);
@@ -64,7 +66,7 @@ export class TempStorageAdapter implements ITempStorage {
       );
       this.logger.trace('Creating new cached path', path);
     }
-    this.usedPool.add(path);
+    this.usedPool.set(path, description);
     // We do not actually create or empty the file here
     // Because the caller may want to write to it later
     return path;

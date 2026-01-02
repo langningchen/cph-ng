@@ -67,8 +67,8 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     this.logger.trace('execute', ctx);
 
     const userStdinPath = ctx.stdinPath;
-    const userStdoutPath = this.tmp.create();
-    const userStderrPath = this.tmp.create();
+    const userStdoutPath = this.tmp.create(`externalRunner.userStdoutPath`);
+    const userStderrPath = this.tmp.create(`externalRunner.userStderrPath`);
 
     let runnerPath: string;
     try {

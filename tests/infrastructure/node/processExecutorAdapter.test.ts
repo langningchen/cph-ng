@@ -82,7 +82,7 @@ describe('ProcessExecutorAdapter', () => {
   });
 
   it('should correctly handle stdin input', async () => {
-    const inputFile = tempStorageMock.create();
+    const inputFile = tempStorageMock.create('test');
     writeFileSync(inputFile, 'hello_file');
     const result = await adapter.execute({
       cmd: ['node', '-e', `process.stdin.on('data', (d) => process.stdout.write('rec:' + d));`],

@@ -19,7 +19,7 @@ import { mock } from 'vitest-mock-extended';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 
 export const tempStorageMock = mock<ITempStorage>();
-tempStorageMock.create.mockImplementation(() => {
+tempStorageMock.create.mockImplementation((_description) => {
   return `/tmp/file-${tempStorageMock.create.mock.calls.length - 1}`;
 });
 tempStorageMock.dispose.mockImplementation((_path: string | string[]) => {});

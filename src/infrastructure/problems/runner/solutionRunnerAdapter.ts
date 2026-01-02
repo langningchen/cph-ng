@@ -74,7 +74,7 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
 
     // Prepare input and output files
     const intStdinPath = ctx.stdinPath;
-    const intStdoutPath = this.tmp.create();
+    const intStdoutPath = this.tmp.create(`solutionRunner.intStdoutPath`);
 
     // Launch both processes with pipe
     const { res1: solResult, res2: intResult } = await this.executor.executeWithPipe(

@@ -17,6 +17,6 @@
 
 export interface ITempStorage {
   startMonitor(): Promise<void>;
-  create(): string;
+  create(description: string): string;
   dispose(paths: string | string[]): void;
 }

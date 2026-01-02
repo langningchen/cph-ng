@@ -133,8 +133,8 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
     const result: LaunchResult = {
       child,
       acSignal: unifiedAc.signal,
-      stdoutPath: this.tmp.create(),
-      stderrPath: this.tmp.create(),
+      stdoutPath: this.tmp.create(`processExecutor.stdoutPath (${options.cmd[0]})`),
+      stderrPath: this.tmp.create(`processExecutor.stderrPath (${options.cmd[0]})`),
       startTime: Date.now(),
       ioPromises: [],
     };
