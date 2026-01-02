@@ -47,7 +47,7 @@ export class LangPython extends AbstractLanguageStrategy {
 
   protected async internalCompile(
     src: FileWithHash,
-    ac: AbortController,
+    signal: AbortSignal,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileData> {
@@ -75,7 +75,7 @@ export class LangPython extends AbstractLanguageStrategy {
         `import py_compile; py_compile.compile(r'${src.path}', cfile=r'${path}', doraise=True)`,
         ...compilerArgs,
       ],
-      ac,
+      signal,
     );
     return { path, hash };
   }

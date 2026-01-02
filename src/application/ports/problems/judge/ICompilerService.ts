@@ -34,6 +34,6 @@ export interface ICompilerService {
   compileAll(
     problem: IProblem,
     compile: boolean | null,
-    ac: AbortController,
+    signal: AbortSignal,
   ): Promise<CompileResult>;
 }

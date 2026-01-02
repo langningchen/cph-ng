@@ -37,7 +37,7 @@ export class LangCpp extends AbstractLanguageStrategy {
 
   protected async internalCompile(
     src: FileWithHash,
-    ac: AbortController,
+    signal: AbortSignal,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileData> {
@@ -94,8 +94,8 @@ export class LangCpp extends AbstractLanguageStrategy {
       compileCommands.push(cmd);
     }
 
-    await Promise.all(compileCommands.map((cmd) => this.executeCompiler(cmd, ac)));
-    for (const cmd of postCommands) await this.executeCompiler(cmd, ac);
+    await Promise.all(compileCommands.map((cmd) => this.executeCompiler(cmd, signal)));
+    for (const cmd of postCommands) await this.executeCompiler(cmd, signal);
     return { path, hash };
   }
   public async getRunCommand(target: string): Promise<string[]> {

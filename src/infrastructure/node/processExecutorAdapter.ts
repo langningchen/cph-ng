@@ -117,12 +117,12 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
 
   private internalLaunch(options: ProcessOptions): LaunchResult {
     this.logger.trace('createProcess', options);
-    const { cmd, ac, timeoutMs: timeout, stdinPath } = options;
+    const { cmd, signal, timeoutMs: timeout, stdinPath } = options;
 
     // Use a unified AbortController to handle both external and internal aborts
     const unifiedAc = new AbortController();
-    if (ac) {
-      ac.signal.addEventListener('abort', () => unifiedAc.abort(AbortReason.UserAbort));
+    if (signal) {
+      signal.addEventListener('abort', () => unifiedAc.abort(AbortReason.UserAbort));
     }
 
     const child = spawn(cmd[0], cmd.slice(1), {

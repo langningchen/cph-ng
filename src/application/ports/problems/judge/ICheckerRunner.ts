@@ -30,5 +30,5 @@ export interface CheckerData {
 export type CheckerResult = CheckerData | Error;
 
 export interface ICheckerRunner {
-  run(options: CheckerOptions, ac: AbortController): Promise<CheckerResult>;
+  run(options: CheckerOptions, signal: AbortSignal): Promise<CheckerResult>;
 }

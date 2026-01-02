@@ -22,7 +22,7 @@ export class TraditionalJudgeService implements IJudgeService {
   public async judge(
     ctx: JudgeContext,
     observer: IJudgeObserver,
-    ac: AbortController,
+    signal: AbortSignal,
   ): Promise<void> {
     try {
       const srcPath = ctx.problem.src.path;
@@ -48,7 +48,7 @@ export class TraditionalJudgeService implements IJudgeService {
           timeLimitMs: ctx.problem.timeLimit,
           memoryLimitMb: ctx.problem.memoryLimit,
         },
-        ac,
+        signal,
       );
       if (executionResult instanceof Error) throw executionResult;
       observer.onStatusChange(TcVerdicts.JGD);
@@ -63,7 +63,7 @@ export class TraditionalJudgeService implements IJudgeService {
           timeLimitMs: ctx.problem.timeLimit,
           memoryLimitMb: ctx.problem.memoryLimit,
         },
-        ac,
+        signal,
       );
       observer.onResult(finalResult);
     } catch (e) {

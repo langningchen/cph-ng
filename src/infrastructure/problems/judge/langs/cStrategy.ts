@@ -36,7 +36,7 @@ export class LangC extends AbstractLanguageStrategy {
 
   protected async internalCompile(
     src: FileWithHash,
-    ac: AbortController,
+    signal: AbortSignal,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileData> {
@@ -58,7 +58,7 @@ export class LangC extends AbstractLanguageStrategy {
     const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
     if (this.settings.runner.unlimitedStack && this.system.type() === 'Windows_NT')
       cmd.push('-Wl,--stack,268435456');
-    await this.executeCompiler(cmd, ac);
+    await this.executeCompiler(cmd, signal);
     return { path, hash };
   }
   public async getRunCommand(target: string): Promise<string[]> {

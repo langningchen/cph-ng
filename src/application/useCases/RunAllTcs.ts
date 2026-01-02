@@ -69,7 +69,7 @@ export class RunAllTcs {
       await this.problemsManager.dataRefresh();
 
       await this.document.save(problem.src.path);
-      const artifacts = await this.compiler.compileAll(problem, msg.compile, ac);
+      const artifacts = await this.compiler.compileAll(problem, msg.compile, ac.signal);
       if (artifacts instanceof Error) {
         for (const tcId of tcOrder) {
           const tc = tcs[tcId];
@@ -155,7 +155,7 @@ export class RunAllTcs {
           },
         };
 
-        await judgeService.judge(ctx, observer, ac);
+        await judgeService.judge(ctx, observer, ac.signal);
       }
     } finally {
       fullProblem.ac = null;

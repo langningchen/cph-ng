@@ -54,14 +54,14 @@ describe('NormalStrategy', () => {
     };
     executorMock.execute.mockResolvedValue(processOutput);
 
-    const abortController = new AbortController();
-    const result = await strategy.execute(mockCtx, abortController);
+    const ac = new AbortController();
+    const result = await strategy.execute(mockCtx, ac.signal);
 
     expect(executorMock.execute).toHaveBeenCalledWith({
       cmd: mockCtx.cmd,
       timeoutMs: anyNumber(),
       stdinPath: mockCtx.stdinPath,
-      ac: abortController,
+      ac,
     });
 
     expect(result).not.toBeInstanceOf(Error);
@@ -81,7 +81,8 @@ describe('NormalStrategy', () => {
       abortReason: AbortReason.UserAbort,
     });
 
-    const result = await strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    const result = await strategy.execute(mockCtx, ac.signal);
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
@@ -98,7 +99,8 @@ describe('NormalStrategy', () => {
       abortReason: AbortReason.Timeout,
     });
 
-    const result = await strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    const result = await strategy.execute(mockCtx, ac.signal);
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
@@ -110,7 +112,8 @@ describe('NormalStrategy', () => {
     const executionError = new Error('Executable not found');
     executorMock.execute.mockResolvedValue(executionError);
 
-    const result = await strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    const result = await strategy.execute(mockCtx, ac.signal);
 
     expect(result).toBeInstanceOf(Error);
     expect(result).toBe(executionError);

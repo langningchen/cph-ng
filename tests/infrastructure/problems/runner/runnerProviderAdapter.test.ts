@@ -55,20 +55,20 @@ describe('RunnerProviderAdapter', () => {
   });
 
   it('should return cached path immediately if already resolved', async () => {
-    const abortController = new AbortController();
+    const ac = new AbortController();
 
     systemMock.type.mockReturnValue('Linux');
     fsMock.exists.mockResolvedValue(true);
 
-    const firstPath = await adapter.getRunnerPath(abortController);
-    const secondPath = await adapter.getRunnerPath(abortController);
+    const firstPath = await adapter.getRunnerPath(ac.signal);
+    const secondPath = await adapter.getRunnerPath(ac.signal);
 
     expect(firstPath).toBe(secondPath);
     expect(fsMock.exists).toHaveBeenCalledTimes(1);
   });
 
   it('should only trigger one compilation if multiple calls are made simultaneously', async () => {
-    const abortController = new AbortController();
+    const ac = new AbortController();
     systemMock.type.mockReturnValue('Linux');
 
     fsMock.exists.mockResolvedValueOnce(false).mockResolvedValue(true);
@@ -79,8 +79,8 @@ describe('RunnerProviderAdapter', () => {
     });
 
     const [path1, path2] = await Promise.all([
-      adapter.getRunnerPath(abortController),
-      adapter.getRunnerPath(abortController),
+      adapter.getRunnerPath(ac.signal),
+      adapter.getRunnerPath(ac.signal),
     ]);
 
     expect(path1).toBe(path2);
@@ -88,7 +88,7 @@ describe('RunnerProviderAdapter', () => {
   });
 
   it('should use correct compiler flags and names for Windows', async () => {
-    const abortController = new AbortController();
+    const ac = new AbortController();
     systemMock.type.mockReturnValue('Windows_NT');
     fsMock.exists.mockResolvedValue(false); // Does not exist
 
@@ -101,7 +101,7 @@ describe('RunnerProviderAdapter', () => {
 
     fsMock.exists.mockResolvedValueOnce(false).mockResolvedValue(true);
 
-    const path = await adapter.getRunnerPath(abortController);
+    const path = await adapter.getRunnerPath(ac.signal);
 
     expect(path).toContain('runner-windows.exe');
     expect(executorMock.execute).toHaveBeenCalledWith(
@@ -112,7 +112,7 @@ describe('RunnerProviderAdapter', () => {
   });
 
   it('should use correct compiler flags and names for Linux', async () => {
-    const abortController = new AbortController();
+    const ac = new AbortController();
     systemMock.type.mockReturnValue('Linux');
     fsMock.exists.mockResolvedValueOnce(false).mockResolvedValue(true);
 
@@ -123,7 +123,7 @@ describe('RunnerProviderAdapter', () => {
       timeMs: 0,
     });
 
-    const path = await adapter.getRunnerPath(abortController);
+    const path = await adapter.getRunnerPath(ac.signal);
 
     expect(path).toContain('runner-linux');
     expect(executorMock.execute).toHaveBeenCalledWith(
@@ -134,7 +134,7 @@ describe('RunnerProviderAdapter', () => {
   });
 
   it('should throw error if compilation returns non-zero exit code', async () => {
-    const abortController = new AbortController();
+    const ac = new AbortController();
     systemMock.type.mockReturnValue('Linux');
     fsMock.exists.mockResolvedValue(false);
 
@@ -146,26 +146,26 @@ describe('RunnerProviderAdapter', () => {
     });
     fsMock.readFile.mockResolvedValue('Syntax Error at line 1');
 
-    await expect(adapter.getRunnerPath(abortController)).rejects.toThrow(
+    await expect(adapter.getRunnerPath(ac.signal)).rejects.toThrow(
       'Runner compilation failed with code 1',
     );
     expect(loggerMock.error).toHaveBeenCalled();
   });
 
   it('should throw error if compilation returns an Error object', async () => {
-    const abortController = new AbortController();
+    const ac = new AbortController();
     systemMock.type.mockReturnValue('Linux');
     fsMock.exists.mockResolvedValue(false);
 
     executorMock.execute.mockResolvedValue(new Error('Compiler not found'));
 
-    await expect(adapter.getRunnerPath(abortController)).rejects.toThrow(
+    await expect(adapter.getRunnerPath(ac.signal)).rejects.toThrow(
       'Failed to compile runner utility: Compiler not found',
     );
   });
 
   it('should throw error if output file is missing after successful compilation', async () => {
-    const abortController = new AbortController();
+    const ac = new AbortController();
     systemMock.type.mockReturnValue('Linux');
 
     fsMock.exists.mockResolvedValue(false);
@@ -176,7 +176,7 @@ describe('RunnerProviderAdapter', () => {
       timeMs: 0,
     });
 
-    await expect(adapter.getRunnerPath(abortController)).rejects.toThrow(
+    await expect(adapter.getRunnerPath(ac.signal)).rejects.toThrow(
       'Compiler exited successfully but output file is missing',
     );
   });

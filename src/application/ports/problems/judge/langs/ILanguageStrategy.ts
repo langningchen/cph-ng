@@ -50,7 +50,7 @@ export interface ILanguageStrategy {
 
   compile(
     src: FileWithHash,
-    ac: AbortController,
+    signal: AbortSignal,
     forceCompile: boolean | null,
     additionalData?: CompileAdditionalData,
   ): Promise<LangCompileResult>;

@@ -59,7 +59,7 @@ export class RunSingleTc {
     await this.problemsManager.dataRefresh();
 
     await this.document.save(problem.src.path);
-    const artifacts = await this.compiler.compileAll(problem, msg.compile, ac);
+    const artifacts = await this.compiler.compileAll(problem, msg.compile, ac.signal);
     if (artifacts instanceof Error) {
       tc.result.verdict =
         artifacts instanceof CompileError
@@ -107,7 +107,7 @@ export class RunSingleTc {
 
     try {
       const judgeService = this.judgeFactory.create(problem);
-      await judgeService.judge(ctx, observer, ac);
+      await judgeService.judge(ctx, observer, ac.signal);
     } catch (err) {
       observer.onError(err as Error);
     }

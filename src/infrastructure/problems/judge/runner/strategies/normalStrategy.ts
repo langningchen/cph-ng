@@ -29,12 +29,12 @@ export class NormalStrategy implements IExecutionStrategy {
     @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
   ) {}
 
-  async execute(ctx: ExecutionContext, ac: AbortController): Promise<ExecutionResult> {
+  async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
     const res = await this.executor.execute({
       cmd: ctx.cmd,
       timeoutMs: ctx.timeLimitMs + this.settings.runner.timeAddition,
       stdinPath: ctx.stdinPath,
-      ac,
+      signal,
     });
     if (res instanceof Error) return res;
     return {

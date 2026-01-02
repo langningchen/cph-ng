@@ -41,13 +41,13 @@ export class WrapperStrategy implements IExecutionStrategy {
     this.logger = this.logger.withScope('WrapperStrategy');
   }
 
-  async execute(ctx: ExecutionContext, ac: AbortController): Promise<ExecutionResult> {
+  async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
     const reportPath = this.tmp.create('wrapperStrategy.reportPath');
     const res = await this.executor.execute({
       cmd: ctx.cmd,
       timeoutMs: ctx.timeLimitMs + this.settings.runner.timeAddition,
       stdinPath: ctx.stdinPath,
-      ac,
+      signal,
       env: {
         CPH_NG_REPORT_PATH: reportPath,
         CPH_NG_UNLIMITED_STACK: this.settings.runner.unlimitedStack ? '1' : '0',

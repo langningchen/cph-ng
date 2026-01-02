@@ -111,7 +111,8 @@ describe('ExternalRunnerStrategy', () => {
 
     fsMock.readFile.mockResolvedValue(JSON.stringify(mockRunnerOutput));
 
-    const resultPromise = strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    const resultPromise = strategy.execute(mockCtx, ac.signal);
     const result = await resultPromise;
 
     expect(result).not.toBeInstanceOf(Error);
@@ -153,7 +154,8 @@ describe('ExternalRunnerStrategy', () => {
       }),
     );
 
-    const resultPromise = strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    const resultPromise = strategy.execute(mockCtx, ac.signal);
     await vi.advanceTimersByTimeAsync(mockCtx.timeLimitMs + settingsMock.runner.timeAddition + 100);
     const result = await resultPromise;
 
@@ -169,7 +171,8 @@ describe('ExternalRunnerStrategy', () => {
   it('should return error if runner provider fails', async () => {
     runnerProviderMock.getRunnerPath.mockRejectedValue(new Error('No runner binary'));
 
-    const result = await strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    const result = await strategy.execute(mockCtx, ac.signal);
 
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).equals(
@@ -186,7 +189,8 @@ describe('ExternalRunnerStrategy', () => {
       timeMs: 1000,
     });
 
-    const result = await strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    const result = await strategy.execute(mockCtx, ac.signal);
 
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).equals('Runner exited with code {codeOrSignal},1');
@@ -204,7 +208,8 @@ describe('ExternalRunnerStrategy', () => {
     });
     fsMock.readFile.mockResolvedValue('invalid-json');
 
-    await expect(strategy.execute(mockCtx, new AbortController())).rejects.toThrow(
+    const ac = new AbortController();
+    await expect(strategy.execute(mockCtx, ac.signal)).rejects.toThrow(
       'Runner output is invalid JSON',
     );
 
@@ -230,7 +235,8 @@ describe('ExternalRunnerStrategy', () => {
       }),
     );
 
-    await expect(strategy.execute(mockCtx, new AbortController())).rejects.toThrow(
+    const ac = new AbortController();
+    await expect(strategy.execute(mockCtx, ac.signal)).rejects.toThrow(
       'Runner reported error: {type} (Code: {code}),1,101',
     );
   });
@@ -266,7 +272,7 @@ describe('ExternalRunnerStrategy', () => {
     );
 
     const ac = new AbortController();
-    const resultPromise = strategy.execute(mockCtx, ac);
+    const resultPromise = strategy.execute(mockCtx, ac.signal);
     setTimeout(() => ac.abort(), 200);
     await vi.advanceTimersToNextTimerAsync();
     const result = await resultPromise;
@@ -329,7 +335,8 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
       stdinPath: join(testWorkspace, inputFile),
       timeLimitMs: 2000,
     };
-    const result = await strategy.execute(ctx, new AbortController());
+    const ac = new AbortController();
+    const result = await strategy.execute(ctx, ac.signal);
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
@@ -349,7 +356,8 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
       timeLimitMs: 500,
     };
 
-    const result = await strategy.execute(ctx, new AbortController());
+    const ac = new AbortController();
+    const result = await strategy.execute(ctx, ac.signal);
 
     console.log(result);
     expect(result).not.toBeInstanceOf(Error);
@@ -370,7 +378,7 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
     };
 
     const ac = new AbortController();
-    const promise = strategy.execute(ctx, ac);
+    const promise = strategy.execute(ctx, ac.signal);
     setTimeout(() => ac.abort(), 200);
 
     const result = await promise;

@@ -46,10 +46,10 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
     this.logger = this.logger.withScope('RunnerAdapter');
   }
 
-  async run(ctx: ExecutionContext, ac: AbortController): Promise<ExecutionResult> {
+  async run(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
     const strategy = this.getStrategy();
     if (strategy instanceof Error) return strategy;
-    return strategy.execute(ctx, ac);
+    return strategy.execute(ctx, signal);
   }
 
   private getStrategy(): IExecutionStrategy | Error {
@@ -67,7 +67,7 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
   // Interactive problem only supports the normal running strategy
   public async runInteractive(
     ctx: ExecutionContext,
-    ac: AbortController,
+    signal: AbortSignal,
     interactorPath: string,
   ): Promise<InteractiveExecutionResult> {
     const timeoutMs = ctx.timeLimitMs + this.settings.runner.timeAddition;
@@ -78,8 +78,8 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
 
     // Launch both processes with pipe
     const { res1: solResult, res2: intResult } = await this.executor.executeWithPipe(
-      { cmd: ctx.cmd, timeoutMs, ac },
-      { cmd: [interactorPath, intStdinPath, intStdoutPath], timeoutMs, ac },
+      { cmd: ctx.cmd, timeoutMs, signal },
+      { cmd: [interactorPath, intStdinPath, intStdoutPath], timeoutMs, signal },
     );
     this.logger.debug('Interactor execution completed', {
       solResult,

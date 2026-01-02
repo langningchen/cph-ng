@@ -45,7 +45,7 @@ export class LangJavascript extends AbstractLanguageStrategy {
 
   protected async internalCompile(
     src: FileWithHash,
-    _ac: AbortController,
+    _signal: AbortSignal,
     _forceCompile: boolean | null,
     _additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileData> {

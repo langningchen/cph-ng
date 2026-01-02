@@ -32,7 +32,7 @@ import Settings from './settings';
 interface LaunchOptions {
   cmd: string[];
   timeout?: number;
-  ac?: AbortController;
+  signal?: AbortSignal;
   debug?: boolean;
   stdin?: TcIo;
 }
@@ -118,10 +118,10 @@ export default class ProcessExecutor {
       );
     }
 
-    const { cmd, stdin, ac, timeout } = options;
+    const { cmd, stdin, signal, timeout } = options;
     const unifiedAc = new AbortController();
-    if (ac) {
-      ac.signal.addEventListener('abort', () =>
+    if (signal) {
+      signal.addEventListener('abort', () =>
         unifiedAc.abort(AbortReason.UserAbort),
       );
     }
@@ -361,12 +361,12 @@ export default class ProcessExecutor {
 
   public static launch(options: LaunchOptions): LaunchResult {
     ProcessExecutor.logger.trace('createProcess', options);
-    const { cmd, ac, timeout, debug, stdin } = options;
+    const { cmd, signal, timeout, debug, stdin } = options;
 
     // Use a unified AbortController to handle both external and internal aborts
     const unifiedAc = new AbortController();
-    if (ac) {
-      ac.signal.addEventListener('abort', () =>
+    if (signal) {
+      signal.addEventListener('abort', () =>
         unifiedAc.abort(AbortReason.UserAbort),
       );
     }

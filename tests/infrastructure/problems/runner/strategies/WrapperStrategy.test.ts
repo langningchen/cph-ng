@@ -75,7 +75,8 @@ describe('WrapperStrategy', () => {
     executorMock.execute.mockResolvedValue(mockProcessResult);
     fsMock.readFile.mockResolvedValue(rawStderr);
 
-    const result = await strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    const result = await strategy.execute(mockCtx, ac.signal);
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
@@ -97,7 +98,8 @@ describe('WrapperStrategy', () => {
     executorMock.execute.mockResolvedValue(mockProcessResult);
     fsMock.readFile.mockResolvedValue('just regular stderr output');
 
-    const result = await strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    const result = await strategy.execute(mockCtx, ac.signal);
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
@@ -118,7 +120,8 @@ describe('WrapperStrategy', () => {
     executorMock.execute.mockResolvedValue(mockProcessResult);
     fsMock.readFile.mockResolvedValue('');
 
-    const result = await strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    const result = await strategy.execute(mockCtx, ac.signal);
 
     if (!(result instanceof Error)) {
       expect(result.isUserAborted).toBe(true);
@@ -129,7 +132,8 @@ describe('WrapperStrategy', () => {
     const execError = new Error('Execution failed');
     executorMock.execute.mockResolvedValue(execError);
 
-    const result = await strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    const result = await strategy.execute(mockCtx, ac.signal);
 
     expect(result).toBe(execError);
   });
@@ -144,7 +148,8 @@ describe('WrapperStrategy', () => {
     });
     fsMock.readFile.mockResolvedValue(malformedStderr);
 
-    const result = await strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    const result = await strategy.execute(mockCtx, ac.signal);
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
@@ -168,7 +173,8 @@ describe('WrapperStrategy', () => {
     });
     fsMock.readFile.mockResolvedValue('');
 
-    await strategy.execute(mockCtx, new AbortController());
+    const ac = new AbortController();
+    await strategy.execute(mockCtx, ac.signal);
 
     expect(executorMock.execute).toHaveBeenCalledWith(
       expect.objectContaining({

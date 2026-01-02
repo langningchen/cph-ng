@@ -29,5 +29,5 @@ export interface JudgeContext {
 }
 
 export interface IJudgeService {
-  judge(ctx: JudgeContext, observer: IJudgeObserver, ac: AbortController): Promise<void>;
+  judge(ctx: JudgeContext, observer: IJudgeObserver, signal: AbortSignal): Promise<void>;
 }

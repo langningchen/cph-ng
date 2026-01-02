@@ -140,7 +140,7 @@ process.stdin.on('data', (d) => {
     const ac = new AbortController();
     const promise = adapter.execute({
       cmd: ['node', '-e', 'setInterval(() => {}, 1000);'],
-      ac,
+      signal: ac.signal,
     });
     setTimeout(() => ac.abort(), 50);
 

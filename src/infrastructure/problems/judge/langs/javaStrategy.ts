@@ -47,7 +47,7 @@ export class LangJava extends AbstractLanguageStrategy {
 
   protected async internalCompile(
     src: FileWithHash,
-    ac: AbortController,
+    signal: AbortSignal,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileData> {
@@ -72,7 +72,7 @@ export class LangJava extends AbstractLanguageStrategy {
       this.renderer.renderPath(this.settings.cache.directory),
       src.path,
     ];
-    await this.executeCompiler(cmd, ac);
+    await this.executeCompiler(cmd, signal);
     return { path, hash };
   }
 

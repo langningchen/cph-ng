@@ -16,5 +16,5 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 export interface IRunnerProvider {
-  getRunnerPath(ac: AbortController): Promise<string>;
+  getRunnerPath(signal: AbortSignal): Promise<string>;
 }

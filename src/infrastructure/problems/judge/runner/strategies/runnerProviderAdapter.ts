@@ -42,10 +42,10 @@ export class RunnerProviderAdapter implements IRunnerProvider {
     this.logger = this.logger.withScope('RunnerProvider');
   }
 
-  public async getRunnerPath(ac: AbortController): Promise<string> {
+  public async getRunnerPath(signal: AbortSignal): Promise<string> {
     if (this.cachedPath) return this.cachedPath;
     if (this.compilationPromise) return this.compilationPromise;
-    this.compilationPromise = this.resolveOrCompile(ac);
+    this.compilationPromise = this.resolveOrCompile(signal);
     try {
       this.cachedPath = await this.compilationPromise;
       return this.cachedPath;
@@ -54,7 +54,7 @@ export class RunnerProviderAdapter implements IRunnerProvider {
     }
   }
 
-  private async resolveOrCompile(ac: AbortController): Promise<string> {
+  private async resolveOrCompile(signal: AbortSignal): Promise<string> {
     const isWin = this.sys.type() === 'Windows_NT';
 
     const srcPath = this.fs.join(
@@ -77,7 +77,7 @@ export class RunnerProviderAdapter implements IRunnerProvider {
     const compiler = this.settings.compilation.cppCompiler;
     const flags = isWin ? ['-lpsapi', '-ladvapi32', '-static'] : ['-pthread'];
     const cmd = [compiler, srcPath, '-o', outputPath, ...flags, '-O3'];
-    const result = await this.executor.execute({ cmd, ac });
+    const result = await this.executor.execute({ cmd, signal });
 
     if (result instanceof Error) {
       this.logger.error('Failed to compile runner', result);

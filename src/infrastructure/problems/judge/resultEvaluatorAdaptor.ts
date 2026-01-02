@@ -56,7 +56,7 @@ export class ResultEvaluatorAdaptor implements IResultEvaluator {
     @inject(Grader) private readonly grader: Grader,
   ) {}
 
-  public async judge(req: JudgeRequest, ac: AbortController): Promise<FinalResult> {
+  public async judge(req: JudgeRequest, signal: AbortSignal): Promise<FinalResult> {
     const res = req.executionResult;
     const executionStats = {
       timeMs: res.timeMs,
@@ -81,7 +81,7 @@ export class ResultEvaluatorAdaptor implements IResultEvaluator {
           outputPath: res.stdoutPath,
           answerPath: req.answerPath,
         },
-        ac,
+        signal,
       );
       if (spjRes instanceof Error) {
         return {

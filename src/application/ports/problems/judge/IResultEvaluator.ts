@@ -21,5 +21,5 @@ import type {
 } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 
 export interface IResultEvaluator {
-  judge(req: JudgeRequest, ac: AbortController): Promise<FinalResult>;
+  judge(req: JudgeRequest, signal: AbortSignal): Promise<FinalResult>;
 }

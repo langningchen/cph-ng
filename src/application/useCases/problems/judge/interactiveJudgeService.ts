@@ -22,7 +22,7 @@ export class InteractiveJudgeService implements IJudgeService {
   public async judge(
     ctx: JudgeContext,
     observer: IJudgeObserver,
-    ac: AbortController,
+    signal: AbortSignal,
   ): Promise<void> {
     try {
       if (!ctx.artifacts.interactor)
@@ -51,7 +51,7 @@ export class InteractiveJudgeService implements IJudgeService {
           timeLimitMs: ctx.problem.timeLimit,
           memoryLimitMb: ctx.problem.memoryLimit,
         },
-        ac,
+        signal,
         ctx.artifacts.interactor.path,
       );
       if (executionResult instanceof Error) throw executionResult;
@@ -70,7 +70,7 @@ export class InteractiveJudgeService implements IJudgeService {
           timeLimitMs: ctx.problem.timeLimit,
           memoryLimitMb: ctx.problem.memoryLimit,
         },
-        ac,
+        signal,
       );
       observer.onResult(finalResult);
     } catch (e) {

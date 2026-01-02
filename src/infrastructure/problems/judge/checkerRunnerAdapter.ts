@@ -38,14 +38,14 @@ export class CheckerRunnerAdapter implements ICheckerRunner {
     this.logger = this.logger.withScope('CheckerRunner');
   }
 
-  public async run(options: CheckerOptions, ac?: AbortController): Promise<CheckerResult> {
+  public async run(options: CheckerOptions, signal: AbortSignal): Promise<CheckerResult> {
     this.logger.trace('Running checker', options);
 
     // checker <InputFile> <OutputFile> <AnswerFile>
     // https://github.com/MikeMirzayanov/testlib?tab=readme-ov-file#checker
     const result = await this.executor.execute({
       cmd: [options.checkerPath, options.inputPath, options.outputPath, options.answerPath],
-      ac,
+      signal,
     });
     this.logger.debug('Checker completed', result);
     if (result instanceof Error) return result;

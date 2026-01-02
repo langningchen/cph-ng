@@ -23,18 +23,18 @@ export class CompilerService implements ICompilerService {
 
   private async optionalCompile(
     file: FileWithHash,
-    ac: AbortController,
+    signal: AbortSignal,
     forceCompile: boolean | null,
   ): Promise<LangCompileResult> {
     const checkerLang = this.lang.getLang(file.path);
-    if (checkerLang) return await checkerLang.compile(file, ac, forceCompile);
+    if (checkerLang) return await checkerLang.compile(file, signal, forceCompile);
     return { path: file.path };
   }
 
   public async compileAll(
     problem: IProblem,
     compile: boolean | null,
-    ac: AbortController,
+    signal: AbortSignal,
   ): Promise<CompileResult> {
     // Compile source code
     const srcLang = this.lang.getLang(problem.src.path);
@@ -45,7 +45,7 @@ export class CompilerService implements ICompilerService {
         }),
       );
     }
-    const result = await srcLang.compile(problem.src, ac, compile, {
+    const result = await srcLang.compile(problem.src, signal, compile, {
       canUseWrapper: true,
       overrides: problem.overrides,
     });
@@ -57,7 +57,7 @@ export class CompilerService implements ICompilerService {
 
     // Compile checker
     if (problem.checker) {
-      const checkerResult = await this.optionalCompile(problem.checker, ac, compile);
+      const checkerResult = await this.optionalCompile(problem.checker, signal, compile);
       if (checkerResult instanceof Error) return checkerResult;
       problem.checker.hash = checkerResult.hash;
       data.checker = checkerResult;
@@ -65,7 +65,7 @@ export class CompilerService implements ICompilerService {
 
     // Compile interactor
     if (problem.interactor) {
-      const interactorResult = await this.optionalCompile(problem.interactor, ac, compile);
+      const interactorResult = await this.optionalCompile(problem.interactor, signal, compile);
       if (interactorResult instanceof Error) return interactorResult;
       problem.interactor.hash = interactorResult.hash;
       data.interactor = interactorResult;
@@ -73,13 +73,17 @@ export class CompilerService implements ICompilerService {
 
     // Compile brute force comparison programs
     if (problem.bfCompare?.generator && problem.bfCompare?.bruteForce) {
-      const generatorResult = await this.optionalCompile(problem.bfCompare.generator, ac, compile);
+      const generatorResult = await this.optionalCompile(
+        problem.bfCompare.generator,
+        signal,
+        compile,
+      );
       if (generatorResult instanceof Error) return generatorResult;
       problem.bfCompare.generator.hash = generatorResult.hash;
 
       const bruteForceResult = await this.optionalCompile(
         problem.bfCompare.bruteForce,
-        ac,
+        signal,
         compile,
       );
       if (bruteForceResult instanceof Error) return bruteForceResult;

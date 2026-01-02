@@ -24,7 +24,7 @@ export interface ProcessOptions {
   cmd: string[];
   cwd?: string;
   timeoutMs?: number;
-  ac?: AbortController;
+  signal?: AbortSignal;
   stdinPath?: string;
   env?: Record<string, string>;
 }
@@ -33,7 +33,7 @@ export interface PipeProcessOptions {
   cmd: string[];
   cwd?: string;
   timeoutMs?: number;
-  ac?: AbortController;
+  signal?: AbortSignal;
 }
 
 export interface ProcessHandle {

@@ -35,7 +35,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
 
   public async compile(
     src: FileWithHash,
-    ac: AbortController,
+    signal: AbortSignal,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileResult> {
@@ -47,7 +47,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
         lang: this.name,
         forceCompile: forceCompile ? 'auto' : String(forceCompile),
       });
-      const result = await this.internalCompile(src, ac, forceCompile, additionalData);
+      const result = await this.internalCompile(src, signal, forceCompile, additionalData);
       compileEnd({ ...result });
 
       if (!(await this.fs.exists(result.path)))
@@ -63,15 +63,15 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
 
   protected abstract internalCompile(
     src: FileWithHash,
-    ac: AbortController,
+    signal: AbortSignal,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData,
   ): Promise<LangCompileData>;
 
-  protected async executeCompiler(cmd: string[], ac: AbortController): Promise<void> {
+  protected async executeCompiler(cmd: string[], signal: AbortSignal): Promise<void> {
     const result = await ProcessExecutor.execute({
       cmd,
-      ac,
+      signal,
       timeout: this.settings.compilation.timeout,
     });
     if (result instanceof Error) throw result;

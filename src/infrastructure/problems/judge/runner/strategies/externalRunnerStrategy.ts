@@ -63,7 +63,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     this.logger = this.logger.withScope('ExternalRunnerStrategy');
   }
 
-  async execute(ctx: ExecutionContext, ac: AbortController): Promise<ExecutionResult> {
+  async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
     this.logger.trace('execute', ctx);
 
     const userStdinPath = ctx.stdinPath;
@@ -72,7 +72,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
 
     let runnerPath: string;
     try {
-      runnerPath = await this.runner.getRunnerPath(ac);
+      runnerPath = await this.runner.getRunnerPath(signal);
     } catch (e) {
       return new Error(
         this.translator.t('Failed to prepare runner utility: {codeOrSignal}', {
@@ -103,7 +103,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     const onUnifiedAbort = () => {
       this.performSoftKill(handle);
     };
-    ac.signal.addEventListener('abort', onUserAbort);
+    signal.addEventListener('abort', onUserAbort);
     unifiedAc.signal.addEventListener('abort', onUnifiedAbort);
 
     const timeoutVal = ctx.timeLimitMs + this.settings.runner.timeAddition;
