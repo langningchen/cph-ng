@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { FileWithHash, IOverwrites } from '@/types';
+import type { FileWithHash, IOverrides } from '@/types';
 
 export interface CompileAdditionalData {
   canUseWrapper: boolean;
-  overwrites?: IOverwrites;
+  overrides?: IOverrides;
 }
 
 export interface LangCompileData {
@@ -55,5 +55,5 @@ export interface ILanguageStrategy {
     additionalData?: CompileAdditionalData,
   ): Promise<LangCompileResult>;
 
-  getRunCommand(target: string, overwrites?: IOverwrites): Promise<string[]>;
+  getRunCommand(target: string, overrides?: IOverrides): Promise<string[]>;
 }

@@ -37,7 +37,7 @@ export class TraditionalJudgeService implements IJudgeService {
 
       const runCmd = await srcLang.getRunCommand(
         ctx.artifacts.solution.path,
-        ctx.problem.overwrites,
+        ctx.problem.overrides,
       );
 
       observer.onStatusChange(TcVerdicts.JG);

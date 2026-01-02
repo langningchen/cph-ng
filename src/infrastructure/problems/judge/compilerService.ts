@@ -47,7 +47,7 @@ export class CompilerService implements ICompilerService {
     }
     const result = await srcLang.compile(problem.src, ac, compile, {
       canUseWrapper: true,
-      overwrites: problem.overwrites,
+      overrides: problem.overrides,
     });
     if (result instanceof Error) return result;
     problem.src.hash = result.hash;

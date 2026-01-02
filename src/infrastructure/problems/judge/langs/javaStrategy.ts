@@ -26,7 +26,7 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
-import type { FileWithHash, IOverwrites } from '@/types';
+import type { FileWithHash, IOverrides } from '@/types';
 import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstractLanguageStrategy';
 
 @injectable()
@@ -58,8 +58,8 @@ export class LangJava extends AbstractLanguageStrategy {
       `${this.fs.basename(src.path, this.fs.extname(src.path))}.class`,
     );
 
-    const compiler = additionalData.overwrites?.compiler ?? this.settings.compilation.javaCompiler;
-    const args = additionalData.overwrites?.compilerArgs ?? this.settings.compilation.javaArgs;
+    const compiler = additionalData.overrides?.compiler ?? this.settings.compilation.javaCompiler;
+    const args = additionalData.overrides?.compilerArgs ?? this.settings.compilation.javaArgs;
 
     const { skip, hash } = await this.checkHash(src, path, compiler + args, forceCompile);
     if (skip) return { path, hash };
@@ -76,10 +76,10 @@ export class LangJava extends AbstractLanguageStrategy {
     return { path, hash };
   }
 
-  public async getRunCommand(target: string, overwrites?: IOverwrites): Promise<string[]> {
+  public async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner = overwrites?.runner ?? this.settings.compilation.javascriptRunner;
-    const runArgs = overwrites?.runnerArgs ?? this.settings.compilation.javascriptRunArgs;
+    const runner = overrides?.runner ?? this.settings.compilation.javascriptRunner;
+    const runArgs = overrides?.runnerArgs ?? this.settings.compilation.javascriptRunArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

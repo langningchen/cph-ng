@@ -14,7 +14,7 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import Cache from '@/helpers/cache';
 import { CompilationIo } from '@/helpers/io';
 import ProcessExecutor, { AbortReason } from '@/helpers/processExecutor';
-import type { FileWithHash, IOverwrites } from '@/types';
+import type { FileWithHash, IOverrides } from '@/types';
 import { telemetry } from '@/utils/global';
 
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
@@ -122,6 +122,6 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
 
   public abstract getRunCommand(
     target: string,
-    compilationSettings?: IOverwrites,
+    compilationSettings?: IOverrides,
   ): Promise<string[]>;
 }

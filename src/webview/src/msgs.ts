@@ -42,7 +42,7 @@ export interface EditProblemDetailsMsg extends ProblemBaseMsg {
   url: string;
   timeLimit: number;
   memoryLimit: number;
-  overwrites?: {
+  overrides?: {
     compiler?: string;
     compilerArgs?: string;
     runner?: string;

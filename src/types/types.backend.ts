@@ -33,7 +33,7 @@ import { renderPath, renderPathWithFile } from '../utils/strTemplate';
 import { migration, type OldProblem } from './migration';
 import type {
   IBfCompare,
-  IOverwrites,
+  IOverrides,
   IFileWithHash,
   IProblem,
   ITc,
@@ -197,7 +197,7 @@ export class Problem implements IProblem {
   public interactor?: FileWithHash;
   public bfCompare?: IBfCompare;
   public timeElapsed: number = 0;
-  public overwrites?: IOverwrites;
+  public overrides?: IOverrides;
 
   constructor(name: string, src: string) {
     this.name = name;
@@ -235,8 +235,8 @@ export class Problem implements IProblem {
       this.bfCompare = { ...problem.bfCompare };
     }
     this.timeElapsed = problem.timeElapsed;
-    if (problem.overwrites) {
-      this.overwrites = { ...problem.overwrites };
+    if (problem.overrides) {
+      this.overrides = { ...problem.overrides };
     }
   }
   public static async fromSrc(srcPath: string): Promise<Problem | null> {

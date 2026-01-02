@@ -49,8 +49,8 @@ export class LangCpp extends AbstractLanguageStrategy {
         (this.system.type() === 'Windows_NT' ? '.exe' : ''),
     );
 
-    const compiler = additionalData.overwrites?.compiler ?? this.settings.compilation.cppCompiler;
-    const args = additionalData.overwrites?.compilerArgs ?? this.settings.compilation.cppArgs;
+    const compiler = additionalData.overrides?.compiler ?? this.settings.compilation.cppCompiler;
+    const args = additionalData.overrides?.compilerArgs ?? this.settings.compilation.cppArgs;
     const { objcopy, useWrapper, useHook } = this.settings.compilation;
 
     const { skip, hash } = await this.checkHash(

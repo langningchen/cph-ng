@@ -62,7 +62,7 @@ export class ProblemActions {
     fullProblem.problem.url = msg.url;
     fullProblem.problem.timeLimit = msg.timeLimit;
     fullProblem.problem.memoryLimit = msg.memoryLimit;
-    fullProblem.problem.overwrites = msg.overwrites;
+    fullProblem.problem.overrides = msg.overrides;
     await repository.dataRefresh(true);
   }
   public static async delProblem(msg: msgs.DelProblemMsg) {
