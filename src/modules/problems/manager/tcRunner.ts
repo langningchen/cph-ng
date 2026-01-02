@@ -8,9 +8,12 @@ import {
   TcVerdicts,
 } from '@/types';
 import { waitUntil } from '@/utils/global';
-import Store from './store';
 
 export class TcRunner {
+  private static getRepository() {
+    return container.resolve(TOKENS.ProblemRepository);
+  }
+
   public static async runTc(msg: msgs.RunTcMsg): Promise<void> {
     const runSingleTc = container.resolve<RunSingleTc>(TOKENS.RunSingleTc);
     await runSingleTc.exec(msg);
@@ -24,7 +27,7 @@ export class TcRunner {
   }
 
   public static async stopTcs(msg: msgs.StopTcsMsg): Promise<void> {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await TcRunner.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
@@ -40,6 +43,6 @@ export class TcRunner {
         tc.result.verdict = TcVerdicts.RJ;
       }
     }
-    await Store.dataRefresh();
+    await TcRunner.getRepository().dataRefresh();
   }
 }

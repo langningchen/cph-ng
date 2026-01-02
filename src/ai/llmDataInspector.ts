@@ -27,8 +27,9 @@ import {
   l10n,
   type PreparedToolInvocation,
 } from 'vscode';
+import { container } from 'tsyringe';
 import type { TcIo } from '@/types';
-import ProblemsManager from '../modules/problems/manager';
+import { TOKENS } from '@/composition/tokens';
 
 const MAX_PREVIEW_LENGTH = 1000;
 
@@ -117,7 +118,8 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
     }
 
     const activePath = options.input.activePath;
-    const bgProblem = await ProblemsManager.getFullProblem(activePath);
+    const problemsManager = container.resolve(TOKENS.ProblemsManager);
+    const bgProblem = await problemsManager.getFullProblem(activePath);
     if (!bgProblem) {
       result.content.push(
         new LanguageModelTextPart(

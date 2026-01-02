@@ -29,7 +29,7 @@ import {
 } from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext } from '@/domain/execution';
-import { WrapperStrategy } from '@/infrastructure/problems/runner/execution/strategies/wrapperStrategy';
+import { WrapperStrategy } from '@/infrastructure/problems/judge/runner/execution/strategies/wrapperStrategy';
 
 describe('WrapperStrategy', () => {
   let strategy: WrapperStrategy;

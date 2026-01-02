@@ -26,8 +26,9 @@ import {
   l10n,
   type PreparedToolInvocation,
 } from 'vscode';
+import { container } from 'tsyringe';
 import { Tc, TcIo } from '@/types';
-import ProblemsManager from '../modules/problems/manager';
+import { TOKENS } from '@/composition/tokens';
 
 interface LlmTestCaseEditorParams {
   activePath: string;
@@ -83,8 +84,9 @@ class LlmTestCaseEditor implements LanguageModelTool<LlmTestCaseEditorParams> {
       return result;
     }
 
+    const problemsManager = container.resolve(TOKENS.ProblemsManager);
     const activePath = options.input.activePath;
-    const bgProblem = await ProblemsManager.getFullProblem(activePath);
+    const bgProblem = await problemsManager.getFullProblem(activePath);
     if (!bgProblem) {
       result.content.push(
         new LanguageModelTextPart(
@@ -126,7 +128,7 @@ class LlmTestCaseEditor implements LanguageModelTool<LlmTestCaseEditorParams> {
         }
         // Clear previous execution result so it can be re-run
         tc.result = undefined;
-        await ProblemsManager.updateTc({
+        await problemsManager.updateTc({
           type: 'updateTc',
           activePath,
           id,
@@ -148,7 +150,7 @@ class LlmTestCaseEditor implements LanguageModelTool<LlmTestCaseEditorParams> {
           true,
         ),
       );
-      await ProblemsManager.dataRefresh();
+      await problemsManager.dataRefresh();
 
       result.content.push(
         new LanguageModelTextPart(

@@ -30,8 +30,9 @@ import {
   FileType,
   Uri,
 } from 'vscode';
+import { container } from 'tsyringe';
+import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/types';
-import ProblemsManager from './manager';
 
 export type UriTypes = 'stdin' | 'answer' | 'stdout' | 'stderr';
 export const generateTcUri = (problem: Problem, id: UUID, type: UriTypes) =>
@@ -61,7 +62,8 @@ export class ProblemFs implements FileSystemProvider {
   onDidChangeFile: Event<FileChangeEvent[]> = this.changeEmitter.event;
 
   async parseUri(uri: Uri): Promise<CphFsItem> {
-    const fullProblem = await ProblemsManager.getFullProblem(uri.authority);
+    const problemsManager = container.resolve(TOKENS.ProblemsManager);
+    const fullProblem = await problemsManager.getFullProblem(uri.authority);
     if (!fullProblem) {
       throw this.notFound;
     }
@@ -78,7 +80,7 @@ export class ProblemFs implements FileSystemProvider {
           set: async (data: string) => {
             const newProblem = JSON.parse(data);
             Object.assign(problem, newProblem);
-            await ProblemsManager.dataRefresh();
+            await problemsManager.dataRefresh();
           },
         },
       ],
@@ -147,7 +149,8 @@ export class ProblemFs implements FileSystemProvider {
     return current;
   }
   public async fireAuthorityChange(authority: string): Promise<void> {
-    const fullProblem = await ProblemsManager.getFullProblem(authority);
+    const problemsManager = container.resolve(TOKENS.ProblemsManager);
+    const fullProblem = await problemsManager.getFullProblem(authority);
     if (!fullProblem) {
       return;
     }
@@ -238,7 +241,8 @@ export class ProblemFs implements FileSystemProvider {
     }
     await item.set(content.toString());
     this.changeEmitter.fire([{ type: FileChangeType.Changed, uri }]);
-    await ProblemsManager.dataRefresh();
+    const problemsManager = container.resolve(TOKENS.ProblemsManager);
+    await problemsManager.dataRefresh();
   }
 
   watch(): Disposable {

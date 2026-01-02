@@ -1,21 +1,26 @@
 import type * as msgs from '@w/msgs';
 import { l10n } from 'vscode';
+import { container } from 'tsyringe';
 import Cache from '@/helpers/cache';
 import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
+import { TOKENS } from '@/composition/tokens';
 import { Tc, TcIo, TcResult, TcVerdicts, type TcWithResult } from '@/types';
 import { waitUntil } from '@/utils/global';
 import { KnownResult } from '@/utils/result';
-import Store from './store';
 
 export class BfCompare {
   private static logger = new Logger('problemsManagerBfCompare');
 
+  private static getRepository() {
+    return container.resolve(TOKENS.ProblemRepository);
+  }
+
   public static async startBfCompare(
     msg: msgs.StartBfCompareMsg,
   ): Promise<void> {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await BfCompare.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
@@ -49,7 +54,7 @@ export class BfCompare {
     try {
       bfCompare.running = true;
       bfCompare.msg = l10n.t('Compiling...');
-      await Store.dataRefresh();
+      await BfCompare.getRepository().dataRefresh();
       const compileResult = await Compiler.compileAll(
         fullProblem.problem,
         msg.compile,
@@ -77,7 +82,7 @@ export class BfCompare {
         bfCompare.msg = l10n.t('#{cnt} Running generator...', {
           cnt,
         });
-        await Store.dataRefresh();
+        await BfCompare.getRepository().dataRefresh();
         const generatorRunResult = await Executor.doRun({
           cmd: await generatorLang.getRunCommand(
             compileResult.data.bfCompare!.generator.outputPath,
@@ -105,7 +110,7 @@ export class BfCompare {
         bfCompare.msg = l10n.t('#{cnt} Running brute force...', {
           cnt,
         });
-        await Store.dataRefresh();
+        await BfCompare.getRepository().dataRefresh();
         const bruteForceRunResult = await Executor.doRun({
           cmd: await bruteForceLang.getRunCommand(
             compileResult.data.bfCompare!.bruteForce.outputPath,
@@ -133,7 +138,7 @@ export class BfCompare {
         bfCompare.msg = l10n.t('#{cnt} Running solution...', {
           cnt,
         });
-        await Store.dataRefresh();
+        await BfCompare.getRepository().dataRefresh();
         const tempTc = Tc.fromI({
           stdin,
           answer: new TcIo(true, bruteForceRunResult.data.stdoutPath),
@@ -174,12 +179,12 @@ export class BfCompare {
         );
       }
       fullProblem.ac = null;
-      await Store.dataRefresh();
+      await BfCompare.getRepository().dataRefresh();
     }
   }
 
   public static async stopBfCompare(msg: msgs.StopBfCompareMsg): Promise<void> {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await BfCompare.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
@@ -193,6 +198,6 @@ export class BfCompare {
     fullProblem.ac?.abort();
     await waitUntil(() => !fullProblem.ac);
     BfCompare.logger.info('Brute Force comparison stopped');
-    await Store.dataRefresh();
+    await BfCompare.getRepository().dataRefresh();
   }
 }

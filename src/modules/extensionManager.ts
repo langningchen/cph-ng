@@ -35,6 +35,7 @@ import LlmTcRunner from '@/ai/llmTcRunner';
 import LlmTestCaseEditor from '@/ai/llmTestCaseEditor';
 import LlmTestCaseLister from '@/ai/llmTestCaseLister';
 import { setupContainer } from '@/composition/container';
+import { TOKENS } from '@/composition/tokens';
 import Cache from '@/helpers/cache';
 import FolderChooser from '@/helpers/folderChooser';
 import Io from '@/helpers/io';
@@ -42,7 +43,6 @@ import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
 import Companion from '@/modules/companion';
 import { CphProblem } from '@/modules/problems/cphProblem';
-import ProblemsManager from '@/modules/problems/manager';
 import ProblemFs from '@/modules/problems/problemFs';
 import {
   extensionPath,
@@ -56,6 +56,7 @@ import {
 import { version } from '@/utils/packageInfo';
 import SidebarProvider from './sidebar';
 import { renderPath } from '@/utils/strTemplate';
+import { container } from 'tsyringe';
 
 interface ContextEvent {
   hasProblem: boolean;
@@ -75,6 +76,7 @@ export default class ExtensionManager {
     try {
       // Initialize DI container (no behavior changes yet)
       await setupContainer(context);
+      const problemsManager = container.resolve(TOKENS.ProblemsManager);
       setExtensionUri(context.extensionUri);
       context.subscriptions.push(telemetry);
       await telemetry.init();
@@ -135,7 +137,7 @@ export default class ExtensionManager {
           sidebarProvider.event.emit('activePath', {
             activePath: getActivePath(),
           });
-          await ProblemsManager.dataRefresh();
+          await problemsManager.dataRefresh();
         }),
       );
 
@@ -229,13 +231,13 @@ OS: ${release()}`;
             return;
           }
           await Promise.all(chosenIdx.map((idx) => problems[idx.value].save()));
-          await ProblemsManager.dataRefresh();
+          await problemsManager.dataRefresh();
         }),
       );
       context.subscriptions.push(
         commands.registerCommand('cph-ng.createProblem', async () => {
           sidebarProvider.focus();
-          await ProblemsManager.createProblem({
+          await problemsManager.createProblem({
             type: 'createProblem',
           });
         }),
@@ -243,7 +245,7 @@ OS: ${release()}`;
       context.subscriptions.push(
         commands.registerCommand('cph-ng.importProblem', async () => {
           sidebarProvider.focus();
-          await ProblemsManager.importProblem({
+          await problemsManager.importProblem({
             type: 'importProblem',
           });
         }),
@@ -256,7 +258,7 @@ OS: ${release()}`;
             Io.error(l10n.t('No active editor found.'));
             return;
           }
-          await ProblemsManager.runTcs({
+          await problemsManager.runTcs({
             type: 'runTcs',
             compile: null,
             activePath,
@@ -271,7 +273,7 @@ OS: ${release()}`;
             Io.error(l10n.t('No active editor found.'));
             return;
           }
-          await ProblemsManager.stopTcs({
+          await problemsManager.stopTcs({
             type: 'stopTcs',
             onlyOne: false,
             activePath,
@@ -285,7 +287,7 @@ OS: ${release()}`;
             Io.error(l10n.t('No active editor found.'));
             return;
           }
-          await ProblemsManager.addTc({
+          await problemsManager.addTc({
             type: 'addTc',
             activePath,
           });
@@ -298,7 +300,7 @@ OS: ${release()}`;
             Io.error(l10n.t('No active editor found.'));
             return;
           }
-          await ProblemsManager.loadTcs({
+          await problemsManager.loadTcs({
             type: 'loadTcs',
             activePath,
           });
@@ -311,7 +313,7 @@ OS: ${release()}`;
             Io.error(l10n.t('No active editor found.'));
             return;
           }
-          await ProblemsManager.delProblem({
+          await problemsManager.delProblem({
             type: 'delProblem',
             activePath,
           });
@@ -324,7 +326,7 @@ OS: ${release()}`;
             Io.error(l10n.t('No active editor found.'));
             return;
           }
-          await ProblemsManager.submitToCodeforces({
+          await problemsManager.submitToCodeforces({
             type: 'submitToCodeforces',
             activePath,
           });
@@ -332,7 +334,7 @@ OS: ${release()}`;
       );
 
       window.activeTextEditor && setActivePath(window.activeTextEditor);
-      await ProblemsManager.dataRefresh();
+      await problemsManager.dataRefresh();
       ExtensionManager.logger.info('CPH-NG extension activated successfully');
       activateEnd();
     } catch (e) {
@@ -349,7 +351,8 @@ OS: ${release()}`;
   public static async deactivate() {
     ExtensionManager.logger.info('Deactivating CPH-NG extension');
     Companion.stopServer();
-    await ProblemsManager.closeAll();
+    const problemsManager = container.resolve(TOKENS.ProblemsManager);
+    await problemsManager.closeAll();
     ExtensionManager.logger.info('CPH-NG extension deactivated');
   }
 }

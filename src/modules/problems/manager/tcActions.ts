@@ -2,6 +2,8 @@ import type * as msgs from '@w/msgs';
 import { stat, writeFile } from 'fs/promises';
 import { basename, dirname, extname, join } from 'path';
 import { commands, l10n, Uri, window } from 'vscode';
+import { container } from 'tsyringe';
+import { TOKENS } from '@/composition/tokens';
 import FolderChooser from '@/helpers/folderChooser';
 import Io from '@/helpers/io';
 import Settings from '@/helpers/settings';
@@ -9,19 +11,22 @@ import { Tc, TcIo } from '@/types';
 import { generateTcUri } from '../problemFs';
 import TcFactory from '../tcFactory';
 import { ProblemActions } from './problemActions';
-import Store from './store';
 
 export class TcActions {
+  private static getRepository() {
+    return container.resolve(TOKENS.ProblemRepository);
+  }
+
   public static async addTc(msg: msgs.AddTcMsg) {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
     fullProblem.problem.addTc(new Tc(new TcIo(), new TcIo(), true));
-    await Store.dataRefresh();
+    await TcActions.getRepository().dataRefresh();
   }
   public static async loadTcs(msg: msgs.LoadTcsMsg) {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
@@ -70,45 +75,45 @@ export class TcActions {
         await TcFactory.fromFolder(folderUri.fsPath),
       );
     }
-    await Store.dataRefresh();
+    await TcActions.getRepository().dataRefresh();
   }
   public static async updateTc(msg: msgs.UpdateTcMsg) {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
     fullProblem.problem.tcs[msg.id] = Tc.fromI(msg.tc);
-    await Store.dataRefresh(true);
+    await TcActions.getRepository().dataRefresh(true);
   }
   public static async toggleDisable(msg: msgs.ToggleDisableMsg) {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
     fullProblem.problem.tcs[msg.id].isDisabled =
       !fullProblem.problem.tcs[msg.id].isDisabled;
-    await Store.dataRefresh(true);
+    await TcActions.getRepository().dataRefresh(true);
   }
   public static async clearTcStatus(msg: msgs.ClearTcStatusMsg) {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
     fullProblem.problem.tcs[msg.id].result = undefined;
-    await Store.dataRefresh(true);
+    await TcActions.getRepository().dataRefresh(true);
   }
   public static async clearStatus(msg: msgs.ClearStatusMsg) {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
     for (const tc of Object.values(fullProblem.problem.tcs)) {
       tc.result = undefined;
     }
-    await Store.dataRefresh(true);
+    await TcActions.getRepository().dataRefresh(true);
   }
   public static async chooseTcFile(msg: msgs.ChooseTcFileMsg): Promise<void> {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
@@ -136,10 +141,10 @@ export class TcActions {
       (fullProblem.problem.tcs[msg.id].stdin = partialTc.stdin);
     partialTc.answer &&
       (fullProblem.problem.tcs[msg.id].answer = partialTc.answer);
-    await Store.dataRefresh();
+    await TcActions.getRepository().dataRefresh();
   }
   public static async compareTc(msg: msgs.CompareTcMsg): Promise<void> {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
@@ -162,7 +167,7 @@ export class TcActions {
     }
   }
   public static async toggleTcFile(msg: msgs.ToggleTcFileMsg): Promise<void> {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
@@ -202,37 +207,37 @@ export class TcActions {
       await writeFile(tempFilePath, fileIo.data);
       tc[msg.label] = new TcIo(true, tempFilePath);
     }
-    await Store.dataRefresh();
+    await TcActions.getRepository().dataRefresh();
   }
   public static async delTc(msg: msgs.DelTcMsg): Promise<void> {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
     fullProblem.problem.tcOrder = fullProblem.problem.tcOrder.filter(
       (id) => id !== msg.id,
     );
-    await Store.dataRefresh(true);
+    await TcActions.getRepository().dataRefresh(true);
   }
   public static async reorderTc(msg: msgs.ReorderTcMsg): Promise<void> {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
     const tcOrder = fullProblem.problem.tcOrder;
     const [movedTc] = tcOrder.splice(msg.fromIdx, 1);
     tcOrder.splice(msg.toIdx, 0, movedTc);
-    await Store.dataRefresh(true);
+    await TcActions.getRepository().dataRefresh(true);
   }
   public static async dragDrop(msg: msgs.DragDropMsg): Promise<void> {
     // Try to get the problem, if not exist, create a new one
-    let fullProblem = await Store.getFullProblem(msg.activePath);
+    let fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
       await ProblemActions.createProblem({
         type: 'createProblem',
         activePath: msg.activePath,
       });
-      fullProblem = await Store.getFullProblem(msg.activePath);
+      fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
       if (!fullProblem) {
         return;
       }
@@ -264,6 +269,6 @@ export class TcActions {
         );
       }
     }
-    await Store.dataRefresh();
+    await TcActions.getRepository().dataRefresh();
   }
 }

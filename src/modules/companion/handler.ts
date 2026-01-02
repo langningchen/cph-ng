@@ -2,15 +2,16 @@ import { existsSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { dirname } from 'path';
 import { commands, l10n, Uri, workspace } from 'vscode';
+import { container } from 'tsyringe';
 import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
 import UserScriptManager from '@/helpers/userScriptManager';
+import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/types';
 import { mkdirIfNotExists } from '@/utils/process';
 import { renderTemplate } from '@/utils/strTemplate';
 import { CphProblem } from '../problems/cphProblem';
-import ProblemsManager from '../problems/manager';
 import type { CompanionProblem } from './types';
 
 export class Handler {
@@ -103,7 +104,8 @@ export class Handler {
       }
     }
 
-    await ProblemsManager.dataRefresh();
+    const problemsManager = container.resolve(TOKENS.ProblemsManager);
+    await problemsManager.dataRefresh();
   }
 
   private static async createSourceFile(problem: Problem): Promise<void> {

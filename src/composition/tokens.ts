@@ -25,13 +25,15 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type { ICheckerRunner } from '@/application/ports/problems/ICheckerRunner';
-import type { ICompilerService } from '@/application/ports/problems/ICompilerService';
-import type { IJudgeServiceFactory } from '@/application/ports/problems/IJudgeServiceFactory';
-import type { ILanguageRegistry } from '@/application/ports/problems/langs/ILanguageRegistry';
-import type { IExecutionStrategyFactory } from '@/application/ports/problems/runner/execution/IExecutionStrategyFactory';
-import type { IRunnerProvider } from '@/application/ports/problems/runner/execution/strategies/IRunnerProvider';
-import type { ISolutionRunner } from '@/application/ports/problems/runner/ISolutionRunner';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemsManager } from '@/application/ports/problems/IProblemsManager';
+import type { ICheckerRunner } from '@/application/ports/problems/judge/ICheckerRunner';
+import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
+import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
+import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
+import type { IExecutionStrategyFactory } from '@/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
+import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
+import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
 import type { IPathRenderer } from '@/application/ports/services/IPathRenderer';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
@@ -77,6 +79,12 @@ export const TOKENS = {
   // Use cases
   RunSingleTc: 'useCases.RunSingleTc' as InjectionToken<RunSingleTc>,
   RunAllTcs: 'useCases.RunAllTestCases' as InjectionToken<RunAllTcs>,
+
+  // Repositories
+  ProblemRepository: 'repositories.ProblemRepository' as InjectionToken<IProblemRepository>,
+
+  // Modules (legacy facade - consider removing after full migration)
+  ProblemsManager: 'modules.ProblemsManager' as InjectionToken<IProblemsManager>,
 };
 
 export type TokenKeys = keyof typeof TOKENS;

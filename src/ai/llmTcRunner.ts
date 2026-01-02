@@ -26,8 +26,9 @@ import {
   l10n,
   type PreparedToolInvocation,
 } from 'vscode';
+import { container } from 'tsyringe';
 import { CompilationIo } from '@/helpers/io';
-import ProblemsManager from '../modules/problems/manager';
+import { TOKENS } from '@/composition/tokens';
 
 interface CphTestRunnerParams {
   activePath: string;
@@ -67,8 +68,9 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
     const { id } = options.input;
     const result = new LanguageModelToolResult([]);
 
+    const problemsManager = container.resolve(TOKENS.ProblemsManager);
     const activePath = options.input.activePath;
-    const bgProblem = await ProblemsManager.getFullProblem(activePath);
+    const bgProblem = await problemsManager.getFullProblem(activePath);
     if (!bgProblem) {
       result.content.push(
         new LanguageModelTextPart(
@@ -104,7 +106,7 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
 
     try {
       token.onCancellationRequested(async () => {
-        await ProblemsManager.stopTcs({
+        await problemsManager.stopTcs({
           type: 'stopTcs',
           activePath,
           onlyOne: false,
@@ -112,14 +114,14 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
       });
 
       if (id !== undefined) {
-        await ProblemsManager.runTc({
+        await problemsManager.runTc({
           type: 'runTc',
           activePath,
           id,
           compile: null,
         });
       } else {
-        await ProblemsManager.runTcs({
+        await problemsManager.runTcs({
           type: 'runTcs',
           activePath,
           compile: null,
@@ -136,7 +138,7 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
       return result;
     }
 
-    const refreshedBg = await ProblemsManager.getFullProblem(activePath);
+    const refreshedBg = await problemsManager.getFullProblem(activePath);
     if (!refreshedBg || !refreshedBg.problem) {
       result.content.push(
         new LanguageModelTextPart(

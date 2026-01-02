@@ -3,6 +3,8 @@ import { existsSync } from 'fs';
 import { readdir } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import { commands, l10n, Uri, window } from 'vscode';
+import { container } from 'tsyringe';
+import { TOKENS } from '@/composition/tokens';
 import Io from '@/helpers/io';
 import Settings from '@/helpers/settings';
 import Companion from '@/modules/companion';
@@ -10,7 +12,6 @@ import { Problem } from '@/types';
 import { extensionPath } from '@/utils/global';
 import { CphProblem } from '../cphProblem';
 import ProblemFs from '../problemFs';
-import Store from './store';
 
 export class ProblemActions {
   public static async createProblem(msg: msgs.CreateProblemMsg): Promise<void> {
@@ -26,7 +27,8 @@ export class ProblemActions {
     }
     const problem = new Problem(basename(src, extname(src)), src);
     await problem.save();
-    await Store.dataRefresh();
+    const repository = container.resolve(TOKENS.ProblemRepository);
+    await repository.dataRefresh();
   }
   public static async importProblem(msg: msgs.ImportProblemMsg): Promise<void> {
     const src = msg.activePath;
@@ -46,11 +48,13 @@ export class ProblemActions {
       return;
     }
     await problem.save();
-    await Store.dataRefresh();
+    const repository = container.resolve(TOKENS.ProblemRepository);
+    await repository.dataRefresh();
   }
 
   public static async editProblemDetails(msg: msgs.EditProblemDetailsMsg) {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const repository = container.resolve(TOKENS.ProblemRepository);
+    const fullProblem = await repository.getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
@@ -59,20 +63,22 @@ export class ProblemActions {
     fullProblem.problem.timeLimit = msg.timeLimit;
     fullProblem.problem.memoryLimit = msg.memoryLimit;
     fullProblem.problem.overwrites = msg.overwrites;
-    await Store.dataRefresh(true);
+    await repository.dataRefresh(true);
   }
   public static async delProblem(msg: msgs.DelProblemMsg) {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const repository = container.resolve(TOKENS.ProblemRepository);
+    const fullProblem = await repository.getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
     await fullProblem.problem.del();
-    Store.removeProblem(fullProblem);
-    await Store.dataRefresh();
+    repository.removeProblem(fullProblem);
+    await repository.dataRefresh();
   }
 
   public static async chooseSrcFile(msg: msgs.ChooseSrcFileMsg): Promise<void> {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const repository = container.resolve(TOKENS.ProblemRepository);
+    const fullProblem = await repository.getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
@@ -109,10 +115,11 @@ export class ProblemActions {
       }
       fullProblem.problem.bfCompare.bruteForce = { path };
     }
-    await Store.dataRefresh(true);
+    await repository.dataRefresh(true);
   }
   public static async removeSrcFile(msg: msgs.RemoveSrcFileMsg): Promise<void> {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const repository = container.resolve(TOKENS.ProblemRepository);
+    const fullProblem = await repository.getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
@@ -125,12 +132,13 @@ export class ProblemActions {
     } else if (msg.fileType === 'bruteForce' && fullProblem.problem.bfCompare) {
       fullProblem.problem.bfCompare.bruteForce = undefined;
     }
-    await Store.dataRefresh(true);
+    await repository.dataRefresh(true);
   }
   public static async submitToCodeforces(
     msg: msgs.SubmitToCodeforcesMsg,
   ): Promise<void> {
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const repository = container.resolve(TOKENS.ProblemRepository);
+    const fullProblem = await repository.getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }
@@ -145,7 +153,8 @@ export class ProblemActions {
       );
       return;
     }
-    const fullProblem = await Store.getFullProblem(msg.activePath);
+    const repository = container.resolve(TOKENS.ProblemRepository);
+    const fullProblem = await repository.getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
     }

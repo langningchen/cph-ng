@@ -17,18 +17,18 @@
 
 import type * as msgs from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
-import type { ICompilerService } from '@/application/ports/problems/ICompilerService';
-import type { IJudgeObserver } from '@/application/ports/problems/IJudgeObserver';
-import type { JudgeContext } from '@/application/ports/problems/IJudgeService';
-import type { IJudgeServiceFactory } from '@/application/ports/problems/IJudgeServiceFactory';
+import type { IProblemsManager } from '@/application/ports/problems/IProblemsManager';
+import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
+import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
+import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
+import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
 import {
   CompileError,
   CompileRejected,
-} from '@/application/ports/problems/langs/ILanguageStrategy';
+} from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import { TOKENS } from '@/composition/tokens';
 import { VERDICTS } from '@/domain/verdict';
-import type { FinalResult } from '@/infrastructure/problems/resultEvaluator';
-import ProblemsManager from '@/modules/problems/manager';
+import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluator';
 import { TcResult, TcVerdicts } from '@/types/types.backend';
 
 @injectable()
@@ -36,10 +36,11 @@ export class RunSingleTc {
   constructor(
     @inject(TOKENS.CompilerService) private readonly compiler: ICompilerService,
     @inject(TOKENS.JudgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
+    @inject(TOKENS.ProblemsManager) private readonly problemsManager: IProblemsManager,
   ) {}
 
   async exec(msg: msgs.RunTcMsg): Promise<void> {
-    const fullProblem = await ProblemsManager.getFullProblem(msg.activePath);
+    const fullProblem = await this.problemsManager.getFullProblem(msg.activePath);
     if (!fullProblem) throw new Error('Problem not found');
     const { problem } = fullProblem;
 
@@ -53,7 +54,7 @@ export class RunSingleTc {
     tc.result?.dispose();
     tc.result = new TcResult(TcVerdicts.CP);
     tc.isExpand = false;
-    await ProblemsManager.dataRefresh();
+    await this.problemsManager.dataRefresh();
 
     const artifacts = await this.compiler.compileAll(problem, msg.compile, ac);
     if (artifacts instanceof Error) {
@@ -64,7 +65,7 @@ export class RunSingleTc {
             ? TcVerdicts.RJ
             : TcVerdicts.SE;
       tc.result.msg = [artifacts.message];
-      await ProblemsManager.dataRefresh();
+      await this.problemsManager.dataRefresh();
       return;
     }
     tc.result.verdict = TcVerdicts.CPD;
@@ -82,7 +83,7 @@ export class RunSingleTc {
         if (!tc.result) return;
         tc.result.verdict = verdict;
         if (msg) tc.result.msg = [msg];
-        ProblemsManager.dataRefresh();
+        this.problemsManager.dataRefresh();
       },
       onResult: (res: FinalResult) => {
         if (!tc.result) return;
@@ -91,13 +92,13 @@ export class RunSingleTc {
         tc.result.memory = res.memoryMb;
         tc.result.msg = res.messages;
         tc.isExpand = true;
-        ProblemsManager.dataRefresh();
+        this.problemsManager.dataRefresh();
       },
       onError: (e) => {
         if (!tc.result) return;
         tc.result.verdict = TcVerdicts.SE;
         tc.result.msg = [e.message];
-        ProblemsManager.dataRefresh();
+        this.problemsManager.dataRefresh();
       },
     };
 

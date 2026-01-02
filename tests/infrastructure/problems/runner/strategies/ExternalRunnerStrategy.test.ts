@@ -36,7 +36,7 @@ import type {
   ProcessHandle,
   ProcessOutput,
 } from '@/application/ports/node/IProcessExecutor';
-import type { IRunnerProvider } from '@/application/ports/problems/runner/execution/strategies/IRunnerProvider';
+import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext } from '@/domain/execution';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
@@ -45,8 +45,8 @@ import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
 import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
-import { ExternalRunnerStrategy } from '@/infrastructure/problems/runner/execution/strategies/externalRunnerStrategy';
-import { RunnerProviderAdapter } from '@/infrastructure/problems/runner/execution/strategies/runnerProviderAdapter';
+import { ExternalRunnerStrategy } from '@/infrastructure/problems/judge/runner/execution/strategies/externalRunnerStrategy';
+import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/execution/strategies/runnerProviderAdapter';
 
 describe('ExternalRunnerStrategy', () => {
   let strategy: ExternalRunnerStrategy;

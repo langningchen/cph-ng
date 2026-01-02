@@ -1,9 +1,10 @@
 import type { WebviewMsg } from '@w/msgs';
 import { commands, l10n } from 'vscode';
+import { container } from 'tsyringe';
 import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import { getActivePath, sidebarProvider, telemetry } from '@/utils/global';
-import ProblemsManager from '../problems/manager';
+import { TOKENS } from '@/composition/tokens';
 
 const logger = new Logger('sidebarMessageHandler');
 
@@ -11,6 +12,7 @@ export const handleMessage = async (msg: WebviewMsg) => {
   logger.info('Received', msg.type, 'message');
   logger.debug('Received message data from webview', msg);
   try {
+    const problemsManager = container.resolve(TOKENS.ProblemsManager);
     const handleEnd = telemetry.start('sidebarMessage', {
       type: msg.type,
     });
@@ -18,59 +20,59 @@ export const handleMessage = async (msg: WebviewMsg) => {
       sidebarProvider.event.emit('activePath', {
         activePath: getActivePath(),
       });
-      await ProblemsManager.dataRefresh();
+      await problemsManager.dataRefresh();
     } else if (msg.type === 'createProblem') {
-      await ProblemsManager.createProblem(msg);
+      await problemsManager.createProblem(msg);
     } else if (msg.type === 'importProblem') {
-      await ProblemsManager.importProblem(msg);
+      await problemsManager.importProblem(msg);
     } else if (msg.type === 'editProblemDetails') {
-      await ProblemsManager.editProblemDetails(msg);
+      await problemsManager.editProblemDetails(msg);
     } else if (msg.type === 'delProblem') {
-      await ProblemsManager.delProblem(msg);
+      await problemsManager.delProblem(msg);
     } else if (msg.type === 'addTc') {
-      await ProblemsManager.addTc(msg);
+      await problemsManager.addTc(msg);
     } else if (msg.type === 'loadTcs') {
-      await ProblemsManager.loadTcs(msg);
+      await problemsManager.loadTcs(msg);
     } else if (msg.type === 'updateTc') {
-      await ProblemsManager.updateTc(msg);
+      await problemsManager.updateTc(msg);
     } else if (msg.type === 'runTc') {
-      await ProblemsManager.runTc(msg);
+      await problemsManager.runTc(msg);
     } else if (msg.type === 'toggleDisable') {
-      await ProblemsManager.toggleDisable(msg);
+      await problemsManager.toggleDisable(msg);
     } else if (msg.type === 'clearTcStatus') {
-      await ProblemsManager.clearTcStatus(msg);
+      await problemsManager.clearTcStatus(msg);
     } else if (msg.type === 'clearStatus') {
-      await ProblemsManager.clearStatus(msg);
+      await problemsManager.clearStatus(msg);
     } else if (msg.type === 'runTcs') {
-      await ProblemsManager.runTcs(msg);
+      await problemsManager.runTcs(msg);
     } else if (msg.type === 'stopTcs') {
-      await ProblemsManager.stopTcs(msg);
+      await problemsManager.stopTcs(msg);
     } else if (msg.type === 'chooseTcFile') {
-      await ProblemsManager.chooseTcFile(msg);
+      await problemsManager.chooseTcFile(msg);
     } else if (msg.type === 'compareTc') {
-      await ProblemsManager.compareTc(msg);
+      await problemsManager.compareTc(msg);
     } else if (msg.type === 'toggleTcFile') {
-      await ProblemsManager.toggleTcFile(msg);
+      await problemsManager.toggleTcFile(msg);
     } else if (msg.type === 'delTc') {
-      await ProblemsManager.delTc(msg);
+      await problemsManager.delTc(msg);
     } else if (msg.type === 'reorderTc') {
-      await ProblemsManager.reorderTc(msg);
+      await problemsManager.reorderTc(msg);
     } else if (msg.type === 'chooseSrcFile') {
-      await ProblemsManager.chooseSrcFile(msg);
+      await problemsManager.chooseSrcFile(msg);
     } else if (msg.type === 'removeSrcFile') {
-      await ProblemsManager.removeSrcFile(msg);
+      await problemsManager.removeSrcFile(msg);
     } else if (msg.type === 'startBfCompare') {
-      await ProblemsManager.startBfCompare(msg);
+      await problemsManager.startBfCompare(msg);
     } else if (msg.type === 'stopBfCompare') {
-      await ProblemsManager.stopBfCompare(msg);
+      await problemsManager.stopBfCompare(msg);
     } else if (msg.type === 'submitToCodeforces') {
-      await ProblemsManager.submitToCodeforces(msg);
+      await problemsManager.submitToCodeforces(msg);
     } else if (msg.type === 'openFile') {
-      await ProblemsManager.openFile(msg);
+      await problemsManager.openFile(msg);
     } else if (msg.type === 'openTestlib') {
-      await ProblemsManager.openTestlib(msg);
+      await problemsManager.openTestlib(msg);
     } else if (msg.type === 'dragDrop') {
-      await ProblemsManager.dragDrop(msg);
+      await problemsManager.dragDrop(msg);
     } else if (msg.type === 'startChat') {
       await commands.executeCommand('workbench.action.chat.open', {
         mode: 'agent',

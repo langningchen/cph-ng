@@ -25,7 +25,8 @@ import {
   l10n,
   type PreparedToolInvocation,
 } from 'vscode';
-import ProblemsManager from '../modules/problems/manager';
+import { container } from 'tsyringe';
+import { TOKENS } from '@/composition/tokens';
 
 interface LlmTestCaseListerParams {
   activePath: string;
@@ -52,8 +53,9 @@ class LlmTestCaseLister implements LanguageModelTool<LlmTestCaseListerParams> {
     _token: CancellationToken,
   ): Promise<LanguageModelToolResult> {
     const result = new LanguageModelToolResult([]);
+    const problemsManager = container.resolve(TOKENS.ProblemsManager);
     const activePath = options.input.activePath;
-    const bgProblem = await ProblemsManager.getFullProblem(activePath);
+    const bgProblem = await problemsManager.getFullProblem(activePath);
     if (!bgProblem) {
       result.content.push(
         new LanguageModelTextPart(
