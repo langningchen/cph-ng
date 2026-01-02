@@ -23,7 +23,7 @@ import { anyNumber } from 'vitest-mock-extended';
 import { AbortReason } from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext } from '@/domain/execution';
-import { NormalStrategy } from '@/infrastructure/problems/judge/runner/execution/strategies/normalStrategy';
+import { NormalStrategy } from '@/infrastructure/problems/judge/runner/strategies/normalStrategy';
 
 describe('NormalStrategy', () => {
   let strategy: NormalStrategy;

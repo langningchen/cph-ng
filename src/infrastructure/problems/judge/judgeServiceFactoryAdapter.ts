@@ -18,8 +18,8 @@
 import { inject, injectable } from 'tsyringe';
 import type { IJudgeService } from '@/application/ports/problems/judge/IJudgeService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
-import { InteractiveJudgeService } from '@/infrastructure/problems/judge/interactiveJudgeService';
-import { TraditionalJudgeService } from '@/infrastructure/problems/judge/traditionalJudgeService';
+import { InteractiveJudgeService } from '@/application/useCases/problems/judge/interactiveJudgeService';
+import { TraditionalJudgeService } from '@/application/useCases/problems/judge/traditionalJudgeService';
 import type { IProblem } from '@/types';
 
 @injectable()

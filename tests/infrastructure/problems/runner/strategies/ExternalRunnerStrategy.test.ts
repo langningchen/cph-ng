@@ -45,8 +45,8 @@ import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
 import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
-import { ExternalRunnerStrategy } from '@/infrastructure/problems/judge/runner/execution/strategies/externalRunnerStrategy';
-import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/execution/strategies/runnerProviderAdapter';
+import { ExternalRunnerStrategy } from '@/infrastructure/problems/judge/runner/strategies/externalRunnerStrategy';
+import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 
 describe('ExternalRunnerStrategy', () => {
   let strategy: ExternalRunnerStrategy;

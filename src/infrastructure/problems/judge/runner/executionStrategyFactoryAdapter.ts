@@ -21,9 +21,9 @@ import type {
   IExecutionStrategyFactory,
 } from '@/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
 import type { IExecutionStrategy } from '@/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
-import { ExternalRunnerStrategy } from '@/infrastructure/problems/judge/runner/execution/strategies/externalRunnerStrategy';
-import { NormalStrategy } from '@/infrastructure/problems/judge/runner/execution/strategies/normalStrategy';
-import { WrapperStrategy } from '@/infrastructure/problems/judge/runner/execution/strategies/wrapperStrategy';
+import { ExternalRunnerStrategy } from '@/infrastructure/problems/judge/runner/strategies/externalRunnerStrategy';
+import { NormalStrategy } from '@/infrastructure/problems/judge/runner/strategies/normalStrategy';
+import { WrapperStrategy } from '@/infrastructure/problems/judge/runner/strategies/wrapperStrategy';
 
 @injectable()
 export class ExecutionStrategyFactoryAdapter implements IExecutionStrategyFactory {

@@ -27,7 +27,7 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import { TOKENS } from '@/composition/tokens';
-import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/execution/strategies/runnerProviderAdapter';
+import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 
 describe('RunnerProviderAdapter', () => {
   let adapter: RunnerProviderAdapter;
