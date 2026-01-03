@@ -54,7 +54,7 @@ export interface DelProblemMsg extends ProblemBaseMsg {
 }
 export interface RunTcsMsg extends ProblemBaseMsg {
   type: 'runTcs';
-  compile: boolean | null;
+  forceCompile: boolean | null;
 }
 export interface StopTcsMsg extends ProblemBaseMsg {
   type: 'stopTcs';
@@ -69,7 +69,7 @@ export interface LoadTcsMsg extends ProblemBaseMsg {
 export interface RunTcMsg extends ProblemBaseMsg {
   type: 'runTc';
   id: UUID;
-  compile: boolean | null;
+  forceCompile: boolean | null;
 }
 export interface ToggleDisableMsg extends ProblemBaseMsg {
   type: 'toggleDisable';
@@ -130,7 +130,7 @@ export interface RemoveSrcFileMsg extends ProblemBaseMsg {
 }
 export interface StartBfCompareMsg extends ProblemBaseMsg {
   type: 'startBfCompare';
-  compile: boolean | null;
+  forceCompile: boolean | null;
 }
 export interface StopBfCompareMsg extends ProblemBaseMsg {
   type: 'stopBfCompare';

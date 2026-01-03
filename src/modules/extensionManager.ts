@@ -260,7 +260,7 @@ OS: ${release()}`;
           }
           await problemsManager.runTcs({
             type: 'runTcs',
-            compile: null,
+            forceCompile: null,
             activePath,
           });
         }),

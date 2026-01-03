@@ -118,13 +118,13 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
           type: 'runTc',
           activePath,
           id,
-          compile: null,
+          forceCompile: null,
         });
       } else {
         await problemsManager.runTcs({
           type: 'runTcs',
           activePath,
-          compile: null,
+          forceCompile: null,
         });
       }
     } catch (e: any) {

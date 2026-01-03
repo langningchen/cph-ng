@@ -59,7 +59,7 @@ export class RunSingleTc {
     await this.problemsManager.dataRefresh();
 
     await this.document.save(problem.src.path);
-    const artifacts = await this.compiler.compileAll(problem, msg.compile, ac.signal);
+    const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
     if (artifacts instanceof Error) {
       tc.result.verdict =
         artifacts instanceof CompileError

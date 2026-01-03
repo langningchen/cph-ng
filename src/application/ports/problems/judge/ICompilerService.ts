@@ -33,7 +33,7 @@ export type CompileResult = CompileData | Error;
 export interface ICompilerService {
   compileAll(
     problem: IProblem,
-    compile: boolean | null,
+    forceCompile: boolean | null,
     signal: AbortSignal,
   ): Promise<CompileResult>;
 }

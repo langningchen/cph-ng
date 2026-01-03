@@ -33,7 +33,7 @@ export class CompilerService implements ICompilerService {
 
   public async compileAll(
     problem: IProblem,
-    compile: boolean | null,
+    forceCompile: boolean | null,
     signal: AbortSignal,
   ): Promise<CompileResult> {
     // Compile source code
@@ -45,7 +45,7 @@ export class CompilerService implements ICompilerService {
         }),
       );
     }
-    const result = await srcLang.compile(problem.src, signal, compile, {
+    const result = await srcLang.compile(problem.src, signal, forceCompile, {
       canUseWrapper: true,
       overrides: problem.overrides,
     });
@@ -57,7 +57,7 @@ export class CompilerService implements ICompilerService {
 
     // Compile checker
     if (problem.checker) {
-      const checkerResult = await this.optionalCompile(problem.checker, signal, compile);
+      const checkerResult = await this.optionalCompile(problem.checker, signal, forceCompile);
       if (checkerResult instanceof Error) return checkerResult;
       problem.checker.hash = checkerResult.hash;
       data.checker = checkerResult;
@@ -65,7 +65,7 @@ export class CompilerService implements ICompilerService {
 
     // Compile interactor
     if (problem.interactor) {
-      const interactorResult = await this.optionalCompile(problem.interactor, signal, compile);
+      const interactorResult = await this.optionalCompile(problem.interactor, signal, forceCompile);
       if (interactorResult instanceof Error) return interactorResult;
       problem.interactor.hash = interactorResult.hash;
       data.interactor = interactorResult;
@@ -76,7 +76,7 @@ export class CompilerService implements ICompilerService {
       const generatorResult = await this.optionalCompile(
         problem.bfCompare.generator,
         signal,
-        compile,
+        forceCompile,
       );
       if (generatorResult instanceof Error) return generatorResult;
       problem.bfCompare.generator.hash = generatorResult.hash;
@@ -84,7 +84,7 @@ export class CompilerService implements ICompilerService {
       const bruteForceResult = await this.optionalCompile(
         problem.bfCompare.bruteForce,
         signal,
-        compile,
+        forceCompile,
       );
       if (bruteForceResult instanceof Error) return bruteForceResult;
       problem.bfCompare.bruteForce.hash = bruteForceResult.hash;

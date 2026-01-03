@@ -57,7 +57,7 @@ export class BfCompare {
       await BfCompare.getRepository().dataRefresh();
       const compileResult = await Compiler.compileAll(
         fullProblem.problem,
-        msg.compile,
+        msg.forceCompile,
         ac,
       );
       if (compileResult instanceof KnownResult) {

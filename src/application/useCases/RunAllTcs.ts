@@ -45,8 +45,6 @@ export class RunAllTcs {
   ) {}
 
   async exec(msg: msgs.RunTcsMsg): Promise<void> {
-    if (!msg.activePath) throw new Error('Active path is required');
-
     const fullProblem = await this.problemsManager.getFullProblem(msg.activePath);
     if (!fullProblem) throw new Error('Problem not found');
     const { problem } = fullProblem;
@@ -69,7 +67,7 @@ export class RunAllTcs {
       await this.problemsManager.dataRefresh();
 
       await this.document.save(problem.src.path);
-      const artifacts = await this.compiler.compileAll(problem, msg.compile, ac.signal);
+      const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
       if (artifacts instanceof Error) {
         for (const tcId of tcOrder) {
           const tc = tcs[tcId];

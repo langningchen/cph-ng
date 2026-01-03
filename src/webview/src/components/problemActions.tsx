@@ -111,13 +111,13 @@ export const ProblemActions = ({ problem }: ProblemActionsProps) => {
               [t('problemActions.runTcs.menu.forceCompile')]: () => {
                 dispatch({
                   type: 'runTcs',
-                  compile: true,
+                  forceCompile: true,
                 });
               },
               [t('problemActions.runTcs.menu.skipCompile')]: () => {
                 dispatch({
                   type: 'runTcs',
-                  compile: false,
+                  forceCompile: false,
                 });
               },
             }}
@@ -130,7 +130,7 @@ export const ProblemActions = ({ problem }: ProblemActionsProps) => {
               onClick={(e) => {
                 dispatch({
                   type: 'runTcs',
-                  compile: getCompile(e),
+                  forceCompile: getCompile(e),
                 });
               }}
             />
@@ -338,7 +338,7 @@ export const ProblemActions = ({ problem }: ProblemActionsProps) => {
                 onClick={(e) => {
                   dispatch({
                     type: 'startBfCompare',
-                    compile: getCompile(e),
+                    forceCompile: getCompile(e),
                   });
                 }}
                 icon={PlayCircleIcon}

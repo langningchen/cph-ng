@@ -194,14 +194,14 @@ export const TcView = ({
                   dispatch({
                     type: 'runTc',
                     id,
-                    compile: true,
+                    forceCompile: true,
                   });
                 },
                 [t('tcView.run.menu.skipCompile')]: () => {
                   dispatch({
                     type: 'runTc',
                     id,
-                    compile: false,
+                    forceCompile: false,
                   });
                 },
               }}
@@ -216,7 +216,7 @@ export const TcView = ({
                   dispatch({
                     type: 'runTc',
                     id,
-                    compile: getCompile(e),
+                    forceCompile: getCompile(e),
                   });
                 }}
               />
