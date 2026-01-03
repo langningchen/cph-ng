@@ -55,8 +55,7 @@ export const ProblemActions = ({ problem }: ProblemActionsProps) => {
   const [isBfCompareDialogOpen, setBfCompareDialogOpen] = useState(false);
   const hasRunning = Object.values(problem.tcs).some((tc) => isRunningVerdict(tc.result?.verdict));
   useEffect(() => {
-    // biome-ignore lint/style/noNonNullAssertion: False positive
-    if (clickTime.length === 10 && clickTime.at(-1)! - clickTime[0] < 2000) {
+    if (clickTime.length === 10 && clickTime[9] - clickTime[0] < 2000) {
       window.easterEgg = !window.easterEgg;
       setClickTime([]);
     }

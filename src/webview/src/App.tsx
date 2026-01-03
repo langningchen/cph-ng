@@ -104,6 +104,8 @@ const App = () => {
   );
 };
 
-// biome-ignore lint/style/noNonNullAssertion: We are certain that the element with id 'root' exists in the DOM
-const root = createRoot(document.getElementById('root')!);
-root.render(<App />);
+const element = document.getElementById('root');
+if (element) {
+  const root = createRoot(element);
+  root.render(<App />);
+}
