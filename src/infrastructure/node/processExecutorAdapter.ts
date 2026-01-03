@@ -20,7 +20,6 @@ import { createReadStream, createWriteStream } from 'node:fs';
 import { pipeline } from 'node:stream/promises';
 import { inject, injectable } from 'tsyringe';
 import type { IClock } from '@/application/ports/node/IClock';
-import type { IPath } from '@/application/ports/node/IPath';
 import {
   AbortReason,
   type IProcessExecutor,
@@ -29,7 +28,6 @@ import {
   type ProcessOptions,
   type ProcessOutput,
 } from '@/application/ports/node/IProcessExecutor';
-import type { ISystem } from '@/application/ports/node/ISystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
@@ -47,7 +45,6 @@ interface LaunchResult {
   stderrPath: string;
   startTime: number;
   endTime?: number;
-  memoryMb?: number;
   ioPromises: Promise<void>[];
 }
 
@@ -55,9 +52,7 @@ interface LaunchResult {
 export class ProcessExecutorAdapter implements IProcessExecutor {
   constructor(
     @inject(TOKENS.Clock) private readonly clock: IClock,
-    @inject(TOKENS.Path) private readonly path: IPath,
     @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.System) private readonly sys: ISystem,
     @inject(TOKENS.Telemetry) private readonly telemetry: ITelemetry,
     @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
   ) {
@@ -100,7 +95,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
       },
 
       kill: (signal?: NodeJS.Signals) => {
-        launch.child.kill(signal || 'SIGTERM');
+        launch.child.kill(signal);
       },
 
       wait: () => {
@@ -128,7 +123,6 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
     }
 
     const child = spawn(cmd[0], cmd.slice(1), {
-      cwd: cmd[0] ? this.path.dirname(cmd[0]) : this.sys.cwd(),
       signal: unifiedAc.signal,
       env: options.env ? { ...process.env, ...options.env } : process.env,
     });
@@ -183,7 +177,6 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
       stderrPath: launch.stderrPath,
       // A fallback for time if not set
       timeMs: (launch.endTime ?? this.clock.now()) - launch.startTime,
-      memoryMb: launch.memoryMb,
       abortReason: launch.acSignal.reason as AbortReason | undefined,
     };
   }

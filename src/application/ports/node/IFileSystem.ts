@@ -15,9 +15,29 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Interface for file system operations.
+ * @see {@link https://nodejs.org/api/fs.html | Node.js File System API}
+ */
 export interface IFileSystem {
+  /**
+   * Reads the entire contents of a file.
+   * @param encoding The file encoding, default is 'utf-8'.
+   * @throws {@link Error} If the file cannot be read.
+   * @returns The file contents as a string.
+   */
   readFile(path: string, encoding?: BufferEncoding): Promise<string>;
+
+  /**
+   * Writes data to a file.
+   * @remarks If the directories in the path do not exist, they will be created recursively.
+   * @throws {@link Error} If the file cannot be written.
+   */
   safeWriteFile(path: string, data: string | Uint8Array): Promise<void>;
+
+  /** Checks if a file or directory exists. */
   exists(path: string): Promise<boolean>;
-  rm(path: string, options?: { recursive?: boolean; force?: boolean }): Promise<void>;
+
+  /** Removes a file. */
+  rm(path: string): Promise<void>;
 }

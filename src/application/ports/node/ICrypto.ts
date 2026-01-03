@@ -15,6 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Interface for cryptographic operations.
+ * @see {@link https://nodejs.org/api/crypto.html | Node.js Crypto API}
+ */
 export interface ICrypto {
+  /**
+   * Generates a random UUID.
+   * @returns A randomly generated UUID string.
+   */
   randomUUID(): string;
 }

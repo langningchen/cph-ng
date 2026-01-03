@@ -47,5 +47,8 @@
     "tag:yaml.org,2002:python/name:pymdownx.superfences.fence_code_format",
     "tag:yaml.org,2002:python/object/apply:pymdownx.slugs.slugify mapping"
   ],
-  "typescript.preferences.importModuleSpecifier": "non-relative"
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "docthis.includeTypes": false,
+  "docthis.includeMemberOfOnClassMembers": false,
+  "docthis.includeMemberOfOnInterfaceMembers": false
 }
