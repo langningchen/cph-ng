@@ -16,14 +16,6 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 export interface IFileSystem {
-  cwd(): string;
-  tmpdir(): string;
-  homedir(): string;
-  normalize(path: string): string;
-  join(...paths: string[]): string;
-  dirname(path: string): string;
-  basename(path: string, suffix?: string): string;
-  extname(path: string): string;
   readFile(path: string, encoding?: BufferEncoding): Promise<string>;
   safeWriteFile(path: string, data: string | Uint8Array): Promise<void>;
   exists(path: string): Promise<boolean>;

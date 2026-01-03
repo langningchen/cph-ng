@@ -15,14 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { join } from 'node:path';
 import { PathResolverMock } from '@t/infrastructure/services/pathResolverMock';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { type MockProxy, mock } from 'vitest-mock-extended';
-import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { TOKENS } from '@/composition/tokens';
-import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
+import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
 import { extensionPathMock } from '../vscode/extensionPathMock';
 import { loggerMock } from '../vscode/loggerMock';
@@ -31,18 +28,13 @@ import { cryptoMock } from './cryptoMock';
 
 describe('TempStorageAdapter', () => {
   let adapter: TempStorageAdapter;
-  let fsMock: MockProxy<IFileSystem>;
 
   beforeEach(() => {
-    fsMock = mock<IFileSystem>();
-    fsMock.join.mockImplementation(join);
-
     container.registerInstance(TOKENS.Logger, loggerMock);
-    container.registerInstance(TOKENS.FileSystem, fsMock);
     container.registerInstance(TOKENS.Crypto, cryptoMock);
     container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
     container.registerInstance(TOKENS.Settings, settingsMock);
-    container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
+    container.registerSingleton(TOKENS.Path, PathAdapter);
     container.registerSingleton(TOKENS.PathRenderer, PathResolverMock);
 
     adapter = container.resolve(TempStorageAdapter);

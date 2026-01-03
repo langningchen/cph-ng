@@ -15,6 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+export type SystemPlatform = 'win32' | 'linux' | 'darwin';
+
 export interface ISystem {
-  type(): string;
+  cwd(): string;
+  tmpdir(): string;
+  homedir(): string;
+  platform(): SystemPlatform;
 }

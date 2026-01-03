@@ -15,21 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { homedir, platform, tmpdir } from 'node:os';
-import { cwd } from 'node:process';
-import type { ISystem, SystemPlatform } from '@/application/ports/node/ISystem';
+import { container } from 'tsyringe';
+import { TOKENS } from '@/composition/tokens';
 
-export class SystemAdapter implements ISystem {
-  cwd(): string {
-    return cwd();
-  }
-  tmpdir(): string {
-    return tmpdir();
-  }
-  homedir(): string {
-    return homedir();
-  }
-  platform(): SystemPlatform {
-    return platform() as SystemPlatform;
-  }
-}
+describe('DI Container Integrity', () => {
+  it('should be able to resolve all tokens', () => {
+    for (const key of Object.values(TOKENS)) {
+      container.resolve(key as string);
+    }
+  });
+});

@@ -17,6 +17,7 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
@@ -31,13 +32,14 @@ export class RunnerProviderAdapter implements IRunnerProvider {
   private compilationPromise: Promise<string> | null = null;
 
   constructor(
-    @inject(TOKENS.ExtensionPath) private readonly path: string,
+    @inject(TOKENS.ExtensionPath) private readonly extPath: string,
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.System) private readonly sys: ISystem,
+    @inject(TOKENS.Logger) private readonly logger: ILogger,
+    @inject(TOKENS.Path) private readonly path: IPath,
+    @inject(TOKENS.PathRenderer) private readonly resolver: IPathResolver,
     @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
     @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.PathRenderer) private readonly resolver: IPathResolver,
+    @inject(TOKENS.System) private readonly sys: ISystem,
   ) {
     this.logger = this.logger.withScope('RunnerProvider');
   }
@@ -55,15 +57,15 @@ export class RunnerProviderAdapter implements IRunnerProvider {
   }
 
   private async resolveOrCompile(signal: AbortSignal): Promise<string> {
-    const isWin = this.sys.type() === 'Windows_NT';
+    const isWin = this.sys.platform() === 'win32';
 
-    const srcPath = this.fs.join(
-      this.path,
+    const srcPath = this.path.join(
+      this.extPath,
       'res',
       isWin ? 'runner-windows.cpp' : 'runner-linux.cpp',
     );
     const binaryName = isWin ? 'runner-windows.exe' : 'runner-linux';
-    const outputPath = this.fs.join(
+    const outputPath = this.path.join(
       this.resolver.renderPath(this.settings.cache.directory),
       binaryName,
     );

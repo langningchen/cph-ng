@@ -16,7 +16,8 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { ISystem } from '@/application/ports/node/ISystem';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/types';
@@ -24,8 +25,9 @@ import type { Problem } from '@/types';
 @injectable()
 export class PathResolverMock implements IPathResolver {
   constructor(
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.ExtensionPath) private readonly path: string,
+    @inject(TOKENS.ExtensionPath) private readonly extPath: string,
+    @inject(TOKENS.Path) private readonly path: IPath,
+    @inject(TOKENS.System) private readonly sys: ISystem,
   ) {}
 
   private renderString(original: string, replacements: [string, string][]): string {
@@ -41,11 +43,11 @@ export class PathResolverMock implements IPathResolver {
   }
 
   public renderPath(original: string): string {
-    return this.fs.normalize(
+    return this.path.normalize(
       this.renderString(original, [
-        ['tmp', this.fs.tmpdir()],
-        ['home', this.fs.homedir()],
-        ['extensionPath', this.path],
+        ['tmp', this.sys.tmpdir()],
+        ['home', this.sys.homedir()],
+        ['extensionPath', this.extPath],
       ]),
     );
   }

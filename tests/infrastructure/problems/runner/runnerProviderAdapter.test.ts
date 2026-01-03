@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { join, normalize } from 'node:path';
 import { PathResolverMock } from '@t/infrastructure/services/pathResolverMock';
 import { extensionPathMock } from '@t/infrastructure/vscode/extensionPathMock';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
@@ -27,28 +26,27 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import { TOKENS } from '@/composition/tokens';
+import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 
 describe('RunnerProviderAdapter', () => {
   let adapter: RunnerProviderAdapter;
   let fsMock: MockProxy<IFileSystem>;
-  let systemMock: MockProxy<ISystem>;
+  let sys: MockProxy<ISystem>;
   let executorMock: MockProxy<IProcessExecutor>;
 
   beforeEach(() => {
     fsMock = mock<IFileSystem>();
-    systemMock = mock<ISystem>();
+    sys = mock<ISystem>();
     executorMock = mock<IProcessExecutor>();
-
-    fsMock.join.mockImplementation(join);
-    fsMock.normalize.mockImplementation(normalize);
 
     container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
     container.registerInstance(TOKENS.FileSystem, fsMock);
-    container.registerInstance(TOKENS.System, systemMock);
+    container.registerInstance(TOKENS.System, sys);
     container.registerInstance(TOKENS.ProcessExecutor, executorMock);
     container.registerInstance(TOKENS.Settings, settingsMock);
     container.registerInstance(TOKENS.Logger, loggerMock);
+    container.registerSingleton(TOKENS.Path, PathAdapter);
     container.registerSingleton(TOKENS.PathRenderer, PathResolverMock);
 
     adapter = container.resolve(RunnerProviderAdapter);
@@ -57,7 +55,7 @@ describe('RunnerProviderAdapter', () => {
   it('should return cached path immediately if already resolved', async () => {
     const ac = new AbortController();
 
-    systemMock.type.mockReturnValue('Linux');
+    sys.platform.mockReturnValue('linux');
     fsMock.exists.mockResolvedValue(true);
 
     const firstPath = await adapter.getRunnerPath(ac.signal);
@@ -69,7 +67,7 @@ describe('RunnerProviderAdapter', () => {
 
   it('should only trigger one compilation if multiple calls are made simultaneously', async () => {
     const ac = new AbortController();
-    systemMock.type.mockReturnValue('Linux');
+    sys.platform.mockReturnValue('linux');
 
     fsMock.exists.mockResolvedValueOnce(false).mockResolvedValue(true);
 
@@ -89,7 +87,7 @@ describe('RunnerProviderAdapter', () => {
 
   it('should use correct compiler flags and names for Windows', async () => {
     const ac = new AbortController();
-    systemMock.type.mockReturnValue('Windows_NT');
+    sys.platform.mockReturnValue('win32');
     fsMock.exists.mockResolvedValue(false); // Does not exist
 
     executorMock.execute.mockResolvedValue({
@@ -113,7 +111,7 @@ describe('RunnerProviderAdapter', () => {
 
   it('should use correct compiler flags and names for Linux', async () => {
     const ac = new AbortController();
-    systemMock.type.mockReturnValue('Linux');
+    sys.platform.mockReturnValue('linux');
     fsMock.exists.mockResolvedValueOnce(false).mockResolvedValue(true);
 
     executorMock.execute.mockResolvedValue({
@@ -135,7 +133,7 @@ describe('RunnerProviderAdapter', () => {
 
   it('should throw error if compilation returns non-zero exit code', async () => {
     const ac = new AbortController();
-    systemMock.type.mockReturnValue('Linux');
+    sys.platform.mockReturnValue('linux');
     fsMock.exists.mockResolvedValue(false);
 
     executorMock.execute.mockResolvedValue({
@@ -154,7 +152,7 @@ describe('RunnerProviderAdapter', () => {
 
   it('should throw error if compilation returns an Error object', async () => {
     const ac = new AbortController();
-    systemMock.type.mockReturnValue('Linux');
+    sys.platform.mockReturnValue('linux');
     fsMock.exists.mockResolvedValue(false);
 
     executorMock.execute.mockResolvedValue(new Error('Compiler not found'));
@@ -166,7 +164,7 @@ describe('RunnerProviderAdapter', () => {
 
   it('should throw error if output file is missing after successful compilation', async () => {
     const ac = new AbortController();
-    systemMock.type.mockReturnValue('Linux');
+    sys.platform.mockReturnValue('linux');
 
     fsMock.exists.mockResolvedValue(false);
     executorMock.execute.mockResolvedValue({

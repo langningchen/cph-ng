@@ -16,50 +16,21 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { access, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { homedir, tmpdir } from 'node:os';
-import { basename, dirname, extname, join, normalize } from 'node:path';
-import { cwd } from 'node:process';
+import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
+import { TOKENS } from '@/composition/tokens';
 
+@injectable()
 export class FileSystemAdapter implements IFileSystem {
-  cwd(): string {
-    return cwd();
-  }
-
-  tmpdir(): string {
-    return tmpdir();
-  }
-
-  homedir(): string {
-    return homedir();
-  }
-
-  normalize(path: string): string {
-    return normalize(path);
-  }
-
-  join(...paths: string[]): string {
-    return join(...paths);
-  }
-
-  dirname(path: string): string {
-    return dirname(path);
-  }
-
-  basename(path: string, suffix?: string): string {
-    return basename(path, suffix);
-  }
-
-  extname(path: string): string {
-    return extname(path);
-  }
+  constructor(@inject(TOKENS.Path) private readonly path: IPath) {}
 
   async readFile(path: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
     return readFile(path, { encoding });
   }
 
   async safeWriteFile(path: string, data: string | Uint8Array): Promise<void> {
-    await mkdir(dirname(path), { recursive: true });
+    await mkdir(this.path.dirname(path), { recursive: true });
     await writeFile(path, data);
   }
 

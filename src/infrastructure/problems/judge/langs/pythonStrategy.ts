@@ -17,6 +17,7 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
 import type {
   CompileAdditionalData,
   LangCompileData,
@@ -37,6 +38,7 @@ export class LangPython extends AbstractLanguageStrategy {
   constructor(
     @inject(TOKENS.FileSystem) protected readonly fs: IFileSystem,
     @inject(TOKENS.Logger) protected readonly logger: ILogger,
+    @inject(TOKENS.Path) protected readonly path: IPath,
     @inject(TOKENS.PathRenderer) private readonly resolver: IPathResolver,
     @inject(TOKENS.Settings) protected readonly settings: ISettings,
     @inject(TOKENS.Translator) protected readonly translator: ITranslator,
@@ -53,9 +55,9 @@ export class LangPython extends AbstractLanguageStrategy {
   ): Promise<LangCompileData> {
     this.logger.trace('compile', { src, forceCompile });
 
-    const path = this.fs.join(
+    const path = this.path.join(
       this.resolver.renderPath(this.settings.cache.directory),
-      `${this.fs.basename(src.path, this.fs.extname(src.path))}.pyc`,
+      `${this.path.basename(src.path, this.path.extname(src.path))}.pyc`,
     );
 
     const compiler = additionalData.overrides?.compiler ?? this.settings.compilation.pythonCompiler;

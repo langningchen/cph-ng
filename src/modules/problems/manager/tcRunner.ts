@@ -15,14 +15,12 @@ export class TcRunner {
   }
 
   public static async runTc(msg: msgs.RunTcMsg): Promise<void> {
-    const runSingleTc = container.resolve<RunSingleTc>(TOKENS.RunSingleTc);
+    const runSingleTc = container.resolve(RunSingleTc);
     await runSingleTc.exec(msg);
   }
 
   public static async runTcs(msg: msgs.RunTcsMsg): Promise<void> {
-    const runAllTestCases = container.resolve<RunAllTcs>(
-      TOKENS.RunAllTcs,
-    );
+    const runAllTestCases = container.resolve(RunAllTcs);
     await runAllTestCases.exec(msg);
   }
 

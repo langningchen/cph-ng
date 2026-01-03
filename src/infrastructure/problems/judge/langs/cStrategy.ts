@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type {
   CompileAdditionalData,
@@ -24,10 +25,11 @@ export class LangC extends AbstractLanguageStrategy {
 
   constructor(
     @inject(TOKENS.FileSystem) protected readonly fs: IFileSystem,
+    @inject(TOKENS.Path) protected readonly path: IPath,
     @inject(TOKENS.Logger) protected readonly logger: ILogger,
     @inject(TOKENS.PathRenderer) private readonly resolver: IPathResolver,
     @inject(TOKENS.Settings) protected readonly settings: ISettings,
-    @inject(TOKENS.System) private readonly system: ISystem,
+    @inject(TOKENS.System) private readonly sys: ISystem,
     @inject(TOKENS.Translator) protected readonly translator: ITranslator,
   ) {
     super(fs, logger.withScope('langsC'), settings, translator);
@@ -42,10 +44,10 @@ export class LangC extends AbstractLanguageStrategy {
   ): Promise<LangCompileData> {
     this.logger.trace('compile', { src, forceCompile });
 
-    const path = this.fs.join(
+    const path = this.path.join(
       this.resolver.renderPath(this.settings.cache.directory),
-      this.fs.basename(src.path, this.fs.extname(src.path)) +
-        (this.system.type() === 'Windows_NT' ? '.exe' : ''),
+      this.path.basename(src.path, this.path.extname(src.path)) +
+        (this.sys.platform() === 'win32' ? '.exe' : ''),
     );
 
     const compiler = additionalData.overrides?.compiler ?? this.settings.compilation.cCompiler;
@@ -56,7 +58,7 @@ export class LangC extends AbstractLanguageStrategy {
 
     const compilerArgs = args.split(/\s+/).filter(Boolean);
     const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
-    if (this.settings.runner.unlimitedStack && this.system.type() === 'Windows_NT')
+    if (this.settings.runner.unlimitedStack && this.sys.platform() === 'win32')
       cmd.push('-Wl,--stack,268435456');
     await this.executeCompiler(cmd, signal);
     return { path, hash };

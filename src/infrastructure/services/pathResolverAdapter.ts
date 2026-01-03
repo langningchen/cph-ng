@@ -22,6 +22,8 @@ import { basename, dirname, extname, normalize, relative } from 'node:path';
 import { inject, injectable } from 'tsyringe';
 import { Uri, window, workspace } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { ISystem } from '@/application/ports/node/ISystem';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
@@ -34,11 +36,13 @@ import type { Problem } from '@/types/types.backend';
 @injectable()
 export class PathResolverAdapter implements IPathResolver {
   constructor(
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
+    @inject(TOKENS.ExtensionPath) private readonly extPath: string,
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.Logger) private readonly logger: ILogger,
+    @inject(TOKENS.Path) private readonly path: IPath,
+    @inject(TOKENS.Settings) private readonly settings: ISettings,
+    @inject(TOKENS.System) private readonly sys: ISystem,
     @inject(TOKENS.Translator) private readonly translator: ITranslator,
-    @inject(TOKENS.ExtensionPath) private readonly path: string,
   ) {}
 
   private renderString(original: string, replacements: [string, string][]): string {
@@ -74,11 +78,11 @@ export class PathResolverAdapter implements IPathResolver {
   }
 
   public renderPath(original: string): string {
-    return this.fs.normalize(
+    return this.path.normalize(
       this.renderString(original, [
-        ['tmp', this.fs.tmpdir()],
-        ['home', this.fs.homedir()],
-        ['extensionPath', this.path],
+        ['tmp', this.sys.tmpdir()],
+        ['home', this.sys.homedir()],
+        ['extensionPath', this.extPath],
       ]),
     );
   }

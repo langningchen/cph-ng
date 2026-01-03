@@ -18,6 +18,7 @@
 import { inject, injectable } from 'tsyringe';
 import type { BuildInfoData, IBuildInfo } from '@/application/ports/node/IBuildInfo';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
 import { TOKENS } from '@/composition/tokens';
 
 @injectable()
@@ -25,13 +26,14 @@ export class BuildInfoAdapter implements IBuildInfo {
   private data: BuildInfoData | null = null;
 
   constructor(
-    @inject(TOKENS.ExtensionPath) private readonly path: string,
+    @inject(TOKENS.ExtensionPath) private readonly extPath: string,
+    @inject(TOKENS.Path) private readonly path: IPath,
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
   ) {}
 
   async load(): Promise<void> {
-    const path = this.fs.join(this.path, 'dist', 'generated.json');
-    const content = await this.fs.readFile(path);
+    const jsonPath = this.path.resolve(this.extPath, 'dist', 'generated.json');
+    const content = await this.fs.readFile(jsonPath);
     this.data = JSON.parse(content);
   }
 

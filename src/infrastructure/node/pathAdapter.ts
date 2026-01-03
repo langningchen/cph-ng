@@ -15,21 +15,33 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { homedir, platform, tmpdir } from 'node:os';
-import { cwd } from 'node:process';
-import type { ISystem, SystemPlatform } from '@/application/ports/node/ISystem';
+import { basename, dirname, extname, join, normalize, resolve } from 'node:path';
+import { injectable } from 'tsyringe';
+import type { IPath } from '@/application/ports/node/IPath';
 
-export class SystemAdapter implements ISystem {
-  cwd(): string {
-    return cwd();
+@injectable()
+export class PathAdapter implements IPath {
+  normalize(path: string): string {
+    return normalize(path);
   }
-  tmpdir(): string {
-    return tmpdir();
+
+  join(...paths: string[]): string {
+    return join(...paths);
   }
-  homedir(): string {
-    return homedir();
+
+  dirname(path: string): string {
+    return dirname(path);
   }
-  platform(): SystemPlatform {
-    return platform() as SystemPlatform;
+
+  basename(path: string, suffix?: string): string {
+    return basename(path, suffix);
+  }
+
+  extname(path: string): string {
+    return extname(path);
+  }
+
+  resolve(...paths: string[]): string {
+    return resolve(...paths);
   }
 }

@@ -15,21 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { homedir, platform, tmpdir } from 'node:os';
-import { cwd } from 'node:process';
-import type { ISystem, SystemPlatform } from '@/application/ports/node/ISystem';
-
-export class SystemAdapter implements ISystem {
-  cwd(): string {
-    return cwd();
-  }
-  tmpdir(): string {
-    return tmpdir();
-  }
-  homedir(): string {
-    return homedir();
-  }
-  platform(): SystemPlatform {
-    return platform() as SystemPlatform;
-  }
+export interface IPath {
+  normalize(path: string): string;
+  join(...paths: string[]): string;
+  dirname(path: string): string;
+  basename(path: string, suffix?: string): string;
+  extname(path: string): string;
+  resolve(...paths: string[]): string;
 }

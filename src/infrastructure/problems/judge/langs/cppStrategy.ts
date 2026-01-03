@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type {
   CompileAdditionalData,
@@ -23,13 +24,14 @@ export class LangCpp extends AbstractLanguageStrategy {
   public readonly enableRunner = true;
 
   constructor(
+    @inject(TOKENS.ExtensionPath) private readonly extPath: string,
     @inject(TOKENS.FileSystem) protected readonly fs: IFileSystem,
     @inject(TOKENS.Logger) protected readonly logger: ILogger,
+    @inject(TOKENS.Path) protected readonly path: IPath,
     @inject(TOKENS.PathRenderer) private readonly resolver: IPathResolver,
     @inject(TOKENS.Settings) protected readonly settings: ISettings,
-    @inject(TOKENS.System) private readonly system: ISystem,
+    @inject(TOKENS.System) private readonly sys: ISystem,
     @inject(TOKENS.Translator) protected readonly translator: ITranslator,
-    @inject(TOKENS.ExtensionPath) private readonly path: string,
   ) {
     super(fs, logger.withScope('langsCpp'), settings, translator);
     this.logger = this.logger.withScope('langsCpp');
@@ -43,10 +45,10 @@ export class LangCpp extends AbstractLanguageStrategy {
   ): Promise<LangCompileData> {
     this.logger.trace('compile', { src, forceCompile });
 
-    const path = this.fs.join(
+    const path = this.path.join(
       this.resolver.renderPath(this.settings.cache.directory),
-      this.fs.basename(src.path, this.fs.extname(src.path)) +
-        (this.system.type() === 'Windows_NT' ? '.exe' : ''),
+      this.path.basename(src.path, this.path.extname(src.path)) +
+        (this.sys.platform() === 'win32' ? '.exe' : ''),
     );
 
     const compiler = additionalData.overrides?.compiler ?? this.settings.compilation.cppCompiler;
@@ -72,24 +74,24 @@ export class LangCpp extends AbstractLanguageStrategy {
       compileCommands.push([compiler, solSrc, ...compilerArgs, '-c', '-o', solObj]);
       linkObjs.push(solObj);
 
-      const wrapperSrc = this.fs.join(this.path, 'res', 'wrapper.cpp');
+      const wrapperSrc = this.path.join(this.extPath, 'res', 'wrapper.cpp');
       const wrapperObj = `${path}.wrapper.o`;
       compileCommands.push([compiler, '-fPIC', '-c', wrapperSrc, '-o', wrapperObj]);
       linkObjs.push(wrapperObj);
 
       if (useHook) {
-        const hookSrc = this.fs.join(this.path, 'res', 'hook.cpp');
+        const hookSrc = this.path.join(this.extPath, 'res', 'hook.cpp');
         const hookObj = `${path}.hook.o`;
         compileCommands.push([compiler, '-fPIC', '-c', hookSrc, '-o', hookObj]);
         linkObjs.push(hookObj);
       }
 
       const linkCmd = [compiler, ...linkObjs, ...compilerArgs, '-o', path];
-      if (this.system.type() === 'Linux') linkCmd.push('-ldl');
+      if (this.sys.platform() === 'linux') linkCmd.push('-ldl');
       postCommands.push([objcopy, '--redefine-sym', 'main=original_main', solObj], linkCmd);
     } else {
       const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
-      if (this.settings.runner.unlimitedStack && this.system.type() === 'Windows_NT')
+      if (this.settings.runner.unlimitedStack && this.sys.platform() === 'win32')
         cmd.push('-Wl,--stack,268435456');
       compileCommands.push(cmd);
     }

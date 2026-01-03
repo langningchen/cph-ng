@@ -19,12 +19,11 @@ import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { container } from 'tsyringe';
 import { type ExtensionContext, window } from 'vscode';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
-import { RunAllTcs } from '@/application/useCases/RunAllTcs';
-import { RunSingleTc } from '@/application/useCases/RunSingleTc';
 import { BuildInfoAdapter } from '@/infrastructure/node/buildInfoAdapter';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
 import { CryptoAdapter } from '@/infrastructure/node/cryptoAdapter';
 import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
+import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
 import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
@@ -64,15 +63,14 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.JudgeServiceFactory, JudgeServiceFactory);
   container.registerSingleton(TOKENS.LanguageRegistry, LanguageRegistry);
   container.registerSingleton(TOKENS.Logger, LoggerAdapter);
+  container.registerSingleton(TOKENS.Path, PathAdapter);
   container.registerSingleton(TOKENS.PathRenderer, PathResolverAdapter);
   container.registerSingleton(TOKENS.ProblemRepository, ProblemRepository);
   container.registerSingleton(TOKENS.ProblemsManager, ProblemsManager);
   container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
   container.registerSingleton(TOKENS.ResultEvaluator, ResultEvaluatorAdaptor);
-  container.registerSingleton(TOKENS.RunAllTcs, RunAllTcs);
   container.registerSingleton(TOKENS.Runner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);
-  container.registerSingleton(TOKENS.RunSingleTc, RunSingleTc);
   container.registerSingleton(TOKENS.Settings, SettingsAdapter);
   container.registerSingleton(TOKENS.SolutionRunner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.System, SystemAdapter);
@@ -115,12 +113,4 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
     },
   );
   container.registerInstance(TOKENS.TelemetryReporter, telemetryReporter);
-
-  for (const key of Object.values(TOKENS)) {
-    try {
-      container.resolve(key as string);
-    } catch (err) {
-      logger.error(`Failed to resolve token ${key as string}: ${err}`);
-    }
-  }
 }

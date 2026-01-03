@@ -17,14 +17,13 @@
 
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import { container } from 'tsyringe';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
-import { type MockProxy, mock } from 'vitest-mock-extended';
-import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { AbortReason } from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
+import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
 import { loggerMock } from '../vscode/loggerMock';
 import { telemetryMock } from '../vscode/telemetryMock';
@@ -32,23 +31,17 @@ import { tempStorageMock } from './tempStorageMock';
 
 describe('ProcessExecutorAdapter', () => {
   let adapter: ProcessExecutorAdapter;
-  let fsMock: MockProxy<IFileSystem>;
 
   const realTmpDir = join(tmpdir(), `cph-test-${Date.now()}`);
 
   beforeEach(() => {
     mkdirSync(realTmpDir, { recursive: true });
 
-    fsMock = mock<IFileSystem>();
-
-    fsMock.cwd.mockReturnValue(process.cwd());
-    fsMock.dirname.mockImplementation((p) => dirname(p));
-
     container.registerInstance(TOKENS.TempStorage, tempStorageMock);
-    container.registerInstance(TOKENS.FileSystem, fsMock);
     container.registerInstance(TOKENS.Logger, loggerMock);
     container.registerInstance(TOKENS.Telemetry, telemetryMock);
     container.registerSingleton(TOKENS.Clock, ClockAdapter);
+    container.registerSingleton(TOKENS.Path, PathAdapter);
 
     adapter = container.resolve(ProcessExecutorAdapter);
   });

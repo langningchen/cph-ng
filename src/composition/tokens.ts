@@ -22,6 +22,7 @@ import type { IBuildInfo } from '@/application/ports/node/IBuildInfo';
 import type { IClock } from '@/application/ports/node/IClock';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
@@ -43,8 +44,6 @@ import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
-import type { RunAllTcs } from '@/application/useCases/RunAllTcs';
-import type { RunSingleTc } from '@/application/useCases/RunSingleTc';
 
 // Centralized DI tokens for tsyringe registrations
 // Keep these as string literals to avoid circular imports and enable tree-shaking
@@ -67,6 +66,7 @@ export const TOKENS = {
   LanguageRegistry: 'ports.LanguageRegistry' as InjectionToken<ILanguageRegistry>,
   LanguageStrategy: 'ports.LanguageStrategy' as InjectionToken<ILanguageStrategy>,
   Logger: 'ports.Logger' as InjectionToken<ILogger>,
+  Path: 'ports.Path' as InjectionToken<IPath>,
   PathRenderer: 'ports.PathRenderer' as InjectionToken<IPathResolver>,
   ProcessExecutor: 'ports.ProcessExecutor' as InjectionToken<IProcessExecutor>,
   ResultEvaluator: 'ports.ResultEvaluator' as InjectionToken<IResultEvaluator>,
@@ -81,10 +81,6 @@ export const TOKENS = {
   WebviewEventBus: 'ports.WebviewEventBus' as InjectionToken<IWebviewEventBus>,
   ExecutionStrategyFactory:
     'ports.ExecutionStrategyFactory' as InjectionToken<IExecutionStrategyFactory>,
-
-  // Use cases
-  RunSingleTc: 'useCases.RunSingleTc' as InjectionToken<RunSingleTc>,
-  RunAllTcs: 'useCases.RunAllTestCases' as InjectionToken<RunAllTcs>,
 
   // Repositories
   ProblemRepository: 'repositories.ProblemRepository' as InjectionToken<IProblemRepository>,
