@@ -124,13 +124,12 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
-  showDialog: boolean;
 }
 
 export class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null, showDialog: false };
+    this.state = { hasError: false, error: null };
   }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
