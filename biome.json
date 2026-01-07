@@ -29,7 +29,8 @@
         "noCommonJs": "on",
         "noUselessElse": "on",
         "noDefaultExport": "on",
-        "useConsistentObjectDefinitions": "on"
+        "useConsistentObjectDefinitions": "on",
+        "useConsistentArrayType": "on"
       }
     }
   },

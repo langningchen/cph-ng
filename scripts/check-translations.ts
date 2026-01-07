@@ -18,6 +18,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
 import ignore from 'ignore';
+import type { LeftHandSideExpression, Node } from 'typescript';
 import {
   createSourceFile,
   forEachChild,
@@ -29,25 +30,26 @@ import {
   ScriptTarget,
 } from 'typescript';
 
-const CONFIGS = [
+interface TranslationConfig {
+  title: string;
+  getKeys: () => Set<string>;
+  files: string[];
+}
+
+const CONFIGS: TranslationConfig[] = [
   {
     title: 'Extension Configuration',
     getKeys: () => {
-      const keys = new Set();
-      const visit = (obj) => {
-        if (typeof obj === 'string') {
-          if (obj.startsWith('%') && obj.endsWith('%')) {
-            keys.add(obj.slice(1, -1));
-          }
-        } else if (Array.isArray(obj)) {
+      const keys = new Set<string>();
+      const visit = (obj: unknown) => {
+        if (typeof obj === 'string')
+          obj.startsWith('%') && obj.endsWith('%') && keys.add(obj.slice(1, -1));
+        else if (Array.isArray(obj))
           obj.forEach((item) => {
             visit(item);
           });
-        } else if (typeof obj === 'object' && obj !== null) {
-          for (const value of Object.values(obj)) {
-            visit(value);
-          }
-        }
+        else if (typeof obj === 'object' && obj !== null)
+          for (const value of Object.values(obj)) visit(value);
       };
       visit(loadJsonFile('package.json'));
       return keys;
@@ -66,21 +68,20 @@ const CONFIGS = [
   },
 ];
 
-function loadJsonFile(filePath) {
+const loadJsonFile = (filePath: string): unknown => {
   try {
-    const content = readFileSync(filePath, 'utf8');
-    return JSON.parse(content);
+    return JSON.parse(readFileSync(filePath, 'utf8'));
   } catch (error) {
-    throw new Error(`Failed to load ${filePath}: ${error.message}`);
+    throw new Error(`Failed to load ${filePath}: ${String(error)}`);
   }
-}
+};
 
-function findFilesRecursively(dir, exts, excludes) {
-  const files = [];
+const findFilesRecursively = (dir: string, exts: string[], excludes: string[]) => {
+  const files: string[] = [];
   const ig = ignore();
   ig.add(excludes);
   ig.add(readFileSync('.gitignore', 'utf8'));
-  const visit = (dir) => {
+  const visit = (dir: string) => {
     for (const name of readdirSync(dir)) {
       const path = join(dir, name);
       if (ig.ignores(path)) continue;
@@ -91,15 +92,15 @@ function findFilesRecursively(dir, exts, excludes) {
   };
   existsSync(dir) && visit(dir);
   return files;
-}
+};
 
-function extractKeys(dir, exts, excludes = []) {
-  const keys = new Set();
+const extractKeys = (dir: string, exts: string[], excludes: string[] = []): Set<string> => {
+  const keys = new Set<string>();
   const files = findFilesRecursively(dir, exts, excludes);
   for (const file of files) {
     const content = readFileSync(file, 'utf8');
     const src = createSourceFile(file, content, ScriptTarget.Latest, true);
-    const visit = (node) => {
+    const visit = (node: Node) => {
       if (isCallExpression(node) && isTranslationCall(node.expression)) {
         const args = node.arguments;
         if (args.length > 0) {
@@ -113,20 +114,20 @@ function extractKeys(dir, exts, excludes = []) {
     visit(src);
   }
   return keys;
-}
+};
 
-function isTranslationCall(expression) {
+const isTranslationCall = (expression: LeftHandSideExpression) => {
   if (isPropertyAccessExpression(expression)) return expression.name.text === 't';
   if (isIdentifier(expression)) return expression.text === 't';
   return false;
-}
+};
 
-function checkTranslations(config) {
+const checkTranslations = (config: TranslationConfig) => {
   let hasErrors = false;
   const requiredKeys = config.getKeys();
   for (const file of config.files) {
     const data = loadJsonFile(file);
-    const keys = new Set(Object.keys(data));
+    const keys = new Set(Object.keys(data as object));
 
     const missingKeys = [...requiredKeys].filter((key) => !keys.has(key));
     if (missingKeys.length > 0) {
@@ -147,14 +148,10 @@ function checkTranslations(config) {
     }
   }
   return hasErrors;
-}
+};
 
 let hasError = false;
-for (const config of CONFIGS) {
-  hasError = hasError || checkTranslations(config);
-}
-if (hasError) {
-  process.exit(1);
-}
+for (const config of CONFIGS) hasError = hasError || checkTranslations(config);
+if (hasError) process.exit(1);
 
 process.exit(0);

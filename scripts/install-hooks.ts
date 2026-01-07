@@ -19,9 +19,7 @@ import { chmodSync, copyFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 try {
-  if (!existsSync('.git')) {
-    throw new Error('No .git directory found');
-  }
+  if (!existsSync('.git')) throw new Error('No .git directory found');
   const hooksDir = '.git/hooks';
   mkdirSync(hooksDir, { recursive: true });
   for (const type of ['pre-commit', 'commit-msg']) {

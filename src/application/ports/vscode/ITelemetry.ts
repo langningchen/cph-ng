@@ -15,8 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IDisposable } from '@/application/ports/IDisposable';
-
 export class TelemetryTrustedValue<T = string> {
   constructor(public readonly value: T) {}
 }
@@ -33,7 +31,7 @@ export const TELEMETRY_ERROR_NAMES = ['pipeFailed', 'wrapperError', 'parseRunner
 export type TelemetryErrorName = (typeof TELEMETRY_ERROR_NAMES)[number];
 export type TelemetryName = TelemetryEventName | TelemetryErrorName;
 
-export interface ITelemetry extends IDisposable {
+export interface ITelemetry {
   event(name: TelemetryEventName, props?: TelemetryEventProps): void;
   error(name: TelemetryErrorName, error: unknown, props?: TelemetryEventProps): void;
   start(

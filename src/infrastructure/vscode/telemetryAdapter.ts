@@ -90,8 +90,4 @@ export class TelemetryAdapter implements ITelemetry {
       this.send(name, { ...props, ...endProps }, { duration });
     };
   }
-
-  public async dispose(): Promise<void> {
-    await this.reporter.dispose();
-  }
 }
