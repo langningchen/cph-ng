@@ -1707,6 +1707,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    <span class="md-ellipsis">
+      WebSocket 端口
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="WebSocket 端口">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cph-ngcompanionwsport" class="md-nav__link">
+    <span class="md-ellipsis">
+      cph-ng.companion.wsPort
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       文件保存
@@ -1766,6 +1790,30 @@
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
+      提交超时
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="提交超时">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cph-ngcompanionsubmissiontimeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      cph-ng.companion.submissionTimeout
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
       工作原理
     </span>
   </a>
@@ -1773,7 +1821,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       磁盘操作
     </span>
@@ -1782,7 +1830,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       相关功能
     </span>
@@ -2194,6 +2242,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    <span class="md-ellipsis">
+      WebSocket 端口
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="WebSocket 端口">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cph-ngcompanionwsport" class="md-nav__link">
+    <span class="md-ellipsis">
+      cph-ng.companion.wsPort
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       文件保存
@@ -2253,6 +2325,30 @@
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
+      提交超时
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="提交超时">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cph-ngcompanionsubmissiontimeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      cph-ng.companion.submissionTimeout
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
       工作原理
     </span>
   </a>
@@ -2260,7 +2356,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       磁盘操作
     </span>
@@ -2269,7 +2365,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       相关功能
     </span>
@@ -2312,6 +2408,14 @@
 <li><strong>用户影响</strong>：CPH-NG 监听来自浏览器扩展的连接的端口。必须与 Competitive
   Companion 配置匹配。</li>
 </ul>
+<h2 id="websocket">WebSocket 端口<a class="headerlink" href="#websocket" title="Permanent link">&para;</a></h2>
+<h3 id="cph-ngcompanionwsport"><code>cph-ng.companion.wsPort</code><a class="headerlink" href="#cph-ngcompanionwsport" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>类型</strong>：数字</li>
+<li><strong>默认值</strong>：<code>-1</code>（自动使用 <code>listenPort + 1</code>）</li>
+<li><strong>用户影响</strong>：控制 Companion Router 暴露给 VS Code 的 WebSocket 端口。若需
+  将 HTTP 与 WS 端口完全分离，可指定具体值；保持 <code>-1</code> 时会维持旧行为。</li>
+</ul>
 <h2 id="_2">文件保存<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <h3 id="cph-ngcompanionshowpanel"><code>cph-ng.companion.showPanel</code><a class="headerlink" href="#cph-ngcompanionshowpanel" title="Permanent link">&para;</a></h3>
 <ul>
@@ -2332,7 +2436,15 @@
 <li><strong>默认值</strong>：根据评测而定</li>
 <li><strong>用户影响</strong>：提交到 Codeforces 时使用的编译器版本。</li>
 </ul>
-<h2 id="_4">工作原理<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_4">提交超时<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h3 id="cph-ngcompanionsubmissiontimeout"><code>cph-ng.companion.submissionTimeout</code><a class="headerlink" href="#cph-ngcompanionsubmissiontimeout" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>类型</strong>：数字（毫秒）</li>
+<li><strong>默认值</strong>：<code>30000</code></li>
+<li><strong>用户影响</strong>：等待 Companion Router 报告提交已被消费的最长时间。
+  队列拥堵或网络慢时可调大；想更快发现异常则可调小。</li>
+</ul>
+<h2 id="_5">工作原理<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p>使用 Competitive Companion 时：</p>
 <ol>
 <li>在评测网站上点击浏览器扩展图标</li>
@@ -2341,14 +2453,14 @@
 <li>创建具有 <code>defaultExtension</code> 的新文件</li>
 <li>题目数据保存在 <code>.cph-ng/</code> 中</li>
 </ol>
-<h2 id="_5">磁盘操作<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_6">磁盘操作<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>导入题目时创建：</p>
 <ul>
 <li>源文件：在工作区根或选定文件夹中</li>
 <li>题目数据：<code>.cph-ng/{filename}.bin</code></li>
 <li>测试样例：内联或外部文件</li>
 </ul>
-<h2 id="_6">相关功能<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_7">相关功能<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../../features/competitive-companion/">Competitive Companion</a> - 主要功能文档</li>
 <li><a href="../../features/submit-codeforces/">提交到 Codeforces</a> - 使用 submitLanguage</li>

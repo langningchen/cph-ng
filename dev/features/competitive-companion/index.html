@@ -2302,6 +2302,17 @@ Companion 是一个浏览器扩展，可将在线评测的题目数据直接发�
 <li><strong>默认值</strong>：<code>27121</code></li>
 <li>浏览器扩展发送到此端口</li>
 </ul>
+<h4 id="cph-ngcompanionwsport"><code>cph-ng.companion.wsPort</code><a class="headerlink" href="#cph-ngcompanionwsport" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>默认值</strong>：<code>-1</code>（自动使用 <code>listenPort + 1</code>）</li>
+<li>VS Code 通过此 WebSocket 端口与 Companion Router 通信；如需自定义，改成
+    固定端口即可</li>
+</ul>
+<h4 id="cph-ngcompanionsubmissiontimeout"><code>cph-ng.companion.submissionTimeout</code><a class="headerlink" href="#cph-ngcompanionsubmissiontimeout" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>默认值</strong>：<code>30000</code></li>
+<li>控制等待 Companion Router 确认提交已消费的时间，单位毫秒。</li>
+</ul>
 <h2 id="_7">工作原理<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <ol>
 <li>用户点击题目页面上的扩展图标</li>
