@@ -7,6 +7,7 @@ import { mkdirSync, writeFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
 import { fileURLToPath } from 'url';
+import webpack from 'webpack';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -89,6 +90,11 @@ const generateBuildInfo = () => {
 export default (_env, argv) => {
   const isProd = argv.mode === 'production';
 
+  const wsDefinePlugin = new webpack.DefinePlugin({
+    'process.env.WS_NO_BUFFER_UTIL': JSON.stringify(true),
+    'process.env.WS_NO_UTF_8_VALIDATE': JSON.stringify(true),
+  });
+
   /** @type WebpackConfig */
   const baseConfig = {
     mode: isProd ? 'production' : 'development',
@@ -98,6 +104,8 @@ export default (_env, argv) => {
       alias: {
         '@': resolve(__dirname, 'src'),
         '@w': resolve(__dirname, 'src/webview/src'),
+        bufferutil: false,
+        'utf-8-validate': false,
       },
     },
     module: {
@@ -154,12 +162,12 @@ export default (_env, argv) => {
         type: 'module',
       },
       chunkFormat: 'module',
-      clean: { keep: /generated\.json/ },
     },
     externals: { vscode: 'vscode' },
     plugins: [
       generateSettings(),
       generateBuildInfo(),
+      wsDefinePlugin,
       new CopyPlugin({
         patterns: [
           { from: 'testlib/testlib.h', to: 'testlib/testlib.h' },
@@ -204,5 +212,28 @@ export default (_env, argv) => {
     },
   };
 
-  return [extensionConfig, webviewConfig];
+  /** @type WebpackConfig */
+  const routerConfig = {
+    ...baseConfig,
+    target: 'node',
+    entry: './src/router/index.ts',
+    output: {
+      path: resolve(__dirname, 'dist'),
+      filename: 'router.js',
+      clean: false,
+      library: {
+        type: 'module',
+      },
+      chunkFormat: 'module',
+    },
+    experiments: { outputModule: true },
+    plugins: [wsDefinePlugin],
+    cache: {
+      type: 'filesystem',
+      buildDependencies: { config: [__filename] },
+      name: isProd ? 'prod-router' : 'dev-router',
+    },
+  };
+
+  return [extensionConfig, webviewConfig, routerConfig];
 };

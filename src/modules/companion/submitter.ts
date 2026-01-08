@@ -4,38 +4,35 @@ import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
 import { Problem } from '@/types';
+import { telemetry } from '@/utils/global';
+import { CompanionClient } from './client';
 import { CphSubmitEmpty, CphSubmitResponse } from './types';
+
+class CancellationError extends Error {
+  constructor() {
+    super('Cancelled');
+    this.name = 'CancellationError';
+  }
+}
 
 export class Submitter {
   private static logger: Logger = new Logger('companionSubmitter');
-  private static isSubmitting = false;
-  private static pendingSubmitData?: Exclude<
-    CphSubmitResponse,
-    { empty: true }
-  >;
-  private static pendingSubmitResolve?: () => void;
 
   public static async submit(problem?: Problem): Promise<void> {
     Submitter.logger.trace('submit', { problem });
     if (!problem) {
       return;
     }
+    // Map of language display names to submission language IDs used for QuickPick and persistence
     const languageList = {
       'GNU G++17 7.3.0': 54,
       'GNU G++20 13.2 (64 bit, winlibs)': 89,
       'GNU G++23 14.2 (64 bit, msys2)': 91,
     } as const;
-    if (Submitter.isSubmitting) {
-      Io.warn(l10n.t('A submission is already in progress.'));
-      return Promise.reject(new Error('Submission already in progress'));
-    }
 
     let submitLanguageId = Settings.companion.submitLanguage;
-    if (submitLanguageId === -1) {
-      const choices = Object.keys(languageList) as Array<
-        keyof typeof languageList
-      >;
-      const choice = (await window.showQuickPick(choices, {
+    if (!(Object.values(languageList) as number[]).includes(submitLanguageId)) {
+      const choice = (await window.showQuickPick(Object.keys(languageList), {
         placeHolder: l10n.t('Choose submission language'),
       })) as keyof typeof languageList | undefined;
       if (!choice) {
@@ -71,50 +68,64 @@ export class Submitter {
     };
     Submitter.logger.debug('Submission data', requestData);
 
-    Submitter.isSubmitting = true;
-    return await window.withProgress(
+    await window.withProgress(
       {
         location: ProgressLocation.Notification,
         title: l10n.t('Waiting response from cph-submit...'),
         cancellable: true,
       },
-      async (_, token) =>
-        new Promise<void>((resolve, _) => {
-          Submitter.pendingSubmitData = requestData;
+      async (progress, token) => {
+        try {
+          if (token.isCancellationRequested) {
+            Io.info(l10n.t('Submission cancelled by user.'));
+            return;
+          }
 
-          const cleanup = () => {
-            Submitter.isSubmitting = false;
-            Submitter.pendingSubmitData = undefined;
-            Submitter.pendingSubmitResolve = undefined;
-          };
-          Submitter.pendingSubmitResolve = () => {
-            Submitter.logger.info('Submission payload consumed by companion');
-            cleanup();
-            resolve();
-          };
+          const submissionId = CompanionClient.sendSubmit(requestData);
 
-          token.onCancellationRequested(() => {
-            Io.warn(l10n.t('Submission cancelled.'));
-            cleanup();
-            resolve();
-          });
-        }),
+          if (!submissionId) {
+            return;
+          }
+
+          const abortController = new AbortController();
+          let disposable: { dispose(): any } | undefined;
+          try {
+            await Promise.race([
+              CompanionClient.waitForSubmissionConsumed(
+                submissionId,
+                abortController.signal,
+              ),
+              new Promise((_, reject) => {
+                disposable = token.onCancellationRequested(() => {
+                  CompanionClient.sendCancelSubmit(submissionId);
+                  abortController.abort();
+                  reject(new CancellationError());
+                });
+              }),
+            ]);
+          } finally {
+            disposable?.dispose();
+            // Ensure we abort the wait if the race finished by other means (though here it's mostly for the cancellation path)
+            // If waitForSubmissionConsumed finished first, aborting does nothing.
+            // If cancellation happened, we already aborted above, but it's safe to call again.
+            abortController.abort();
+          }
+
+          Io.info(l10n.t('Submission payload consumed by companion'));
+        } catch (err: any) {
+          if (err instanceof CancellationError) {
+            Io.info(l10n.t('Submission cancelled by user.'));
+            return;
+          }
+          Submitter.logger.error('Submission failed', { error: err });
+          telemetry.error('companionSubmissionFailed', err);
+          window.showErrorMessage(
+            l10n.t('Submission failed: {msg}', {
+              msg: err instanceof Error ? err.message : String(err),
+            }),
+          );
+        }
+      },
     );
-  }
-
-  public static async processSubmit(): Promise<CphSubmitResponse> {
-    Submitter.logger.trace('processSubmit');
-    const data = Submitter.pendingSubmitData;
-    if (data) {
-      Submitter.logger.debug('Pending submission data found', data);
-      Submitter.pendingSubmitData = undefined;
-      return data;
-    }
-    Submitter.logger.trace('No pending submission data');
-    return { empty: true };
-  }
-
-  public static resolvePendingSubmit() {
-    Submitter.pendingSubmitResolve?.();
   }
 }

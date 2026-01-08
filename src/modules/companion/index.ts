@@ -16,15 +16,12 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Problem } from '@/types';
-import { Server } from './server';
+import { CompanionClient } from './client';
 import { Submitter } from './submitter';
 
 export default class Companion {
   public static init() {
-    Server.init();
-  }
-  public static stopServer() {
-    Server.stopServer();
+    CompanionClient.init();
   }
   public static async submit(problem?: Problem) {
     return Submitter.submit(problem);
