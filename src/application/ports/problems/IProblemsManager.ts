@@ -16,15 +16,8 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type * as msgs from '@w/msgs';
-import type { FullProblem } from '@/application/ports/problems/IProblemRepository';
 
 export interface IProblemsManager {
-  // Store Operations
-  listFullProblems(): Promise<FullProblem[]>;
-  getFullProblem(path?: string): Promise<FullProblem | null>;
-  dataRefresh(noMsg?: boolean): Promise<void>;
-  closeAll(): Promise<void>;
-
   // Problem Actions
   createProblem(msg: msgs.CreateProblemMsg): Promise<void>;
   importProblem(msg: msgs.ImportProblemMsg): Promise<void>;

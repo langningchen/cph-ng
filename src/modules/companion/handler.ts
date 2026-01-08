@@ -104,8 +104,8 @@ export class Handler {
       }
     }
 
-    const problemsManager = container.resolve(TOKENS.ProblemsManager);
-    await problemsManager.dataRefresh();
+    const repo = container.resolve(TOKENS.ProblemRepository);
+    await repo.dataRefresh();
   }
 
   private static async createSourceFile(problem: Problem): Promise<void> {

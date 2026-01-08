@@ -13,6 +13,7 @@ export const handleMessage = async (msg: WebviewMsg) => {
   logger.debug('Received message data from webview', msg);
   try {
     const problemsManager = container.resolve(TOKENS.ProblemsManager);
+    const repo = container.resolve(TOKENS.ProblemRepository);
     const handleEnd = telemetry.start('sidebarMessage', {
       type: msg.type,
     });
@@ -20,7 +21,7 @@ export const handleMessage = async (msg: WebviewMsg) => {
       sidebarProvider.event.emit('activePath', {
         activePath: getActivePath(),
       });
-      await problemsManager.dataRefresh();
+      await repo.dataRefresh();
     } else if (msg.type === 'createProblem') {
       await problemsManager.createProblem(msg);
     } else if (msg.type === 'importProblem') {

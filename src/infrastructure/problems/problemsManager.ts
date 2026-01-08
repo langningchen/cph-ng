@@ -16,35 +16,18 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type * as msgs from '@w/msgs';
-import { inject, injectable } from 'tsyringe';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import { container, injectable } from 'tsyringe';
 import type { IProblemsManager } from '@/application/ports/problems/IProblemsManager';
-import { TOKENS } from '@/composition/tokens';
+import { ClearTcStatus } from '@/application/useCases/ClearTcStatus';
+import { RunAllTcs } from '@/application/useCases/RunAllTcs';
+import { RunSingleTc } from '@/application/useCases/RunSingleTc';
+import { StopTcs } from '@/application/useCases/StopTcs';
 import { BfCompare } from '../../modules/problems/manager/bfCompare';
 import { ProblemActions } from '../../modules/problems/manager/problemActions';
 import { TcActions } from '../../modules/problems/manager/tcActions';
-import { TcRunner } from '../../modules/problems/manager/tcRunner';
 
 @injectable()
 export class ProblemsManager implements IProblemsManager {
-  constructor(@inject(TOKENS.ProblemRepository) private readonly repository: IProblemRepository) {}
-
-  async listFullProblems(): Promise<FullProblem[]> {
-    return this.repository.listFullProblems();
-  }
-  async getFullProblem(path?: string): Promise<FullProblem | null> {
-    return this.repository.getFullProblem(path);
-  }
-  async dataRefresh(noMsg = false): Promise<void> {
-    return this.repository.dataRefresh(noMsg);
-  }
-  async closeAll(): Promise<void> {
-    return this.repository.closeAll();
-  }
-
   async createProblem(msg: msgs.CreateProblemMsg): Promise<void> {
     return ProblemActions.createProblem(msg);
   }
@@ -86,7 +69,7 @@ export class ProblemsManager implements IProblemsManager {
     return TcActions.toggleDisable(msg);
   }
   async clearTcStatus(msg: msgs.ClearTcStatusMsg): Promise<void> {
-    return TcActions.clearTcStatus(msg);
+    await container.resolve(ClearTcStatus).exec(msg);
   }
   async clearStatus(msg: msgs.ClearStatusMsg): Promise<void> {
     return TcActions.clearStatus(msg);
@@ -111,13 +94,13 @@ export class ProblemsManager implements IProblemsManager {
   }
 
   async runTc(msg: msgs.RunTcMsg): Promise<void> {
-    return TcRunner.runTc(msg);
+    await container.resolve(RunSingleTc).exec(msg);
   }
   async runTcs(msg: msgs.RunTcsMsg): Promise<void> {
-    return TcRunner.runTcs(msg);
+    await container.resolve(RunAllTcs).exec(msg);
   }
   async stopTcs(msg: msgs.StopTcsMsg): Promise<void> {
-    return TcRunner.stopTcs(msg);
+    await container.resolve(StopTcs).exec(msg);
   }
 
   async startBfCompare(msg: msgs.StartBfCompareMsg): Promise<void> {

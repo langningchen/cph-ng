@@ -15,9 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type * as msgs from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
-import type { IProblemsManager } from '@/application/ports/problems/IProblemsManager';
+import type {
+  FullProblem,
+  IProblemRepository,
+} from '@/application/ports/problems/IProblemRepository';
 import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
@@ -27,22 +29,25 @@ import {
   CompileRejected,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
+import { BaseProblemUseCase } from '@/application/useCases/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import { VERDICTS } from '@/domain/verdict';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import { TcResult, TcVerdicts } from '@/types/types.backend';
+import type { RunTcMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class RunSingleTc {
+export class RunSingleTc extends BaseProblemUseCase<RunTcMsg> {
   constructor(
     @inject(TOKENS.CompilerService) private readonly compiler: ICompilerService,
     @inject(TOKENS.Document) private readonly document: IDocument,
     @inject(TOKENS.JudgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
-    @inject(TOKENS.ProblemsManager) private readonly problemsManager: IProblemsManager,
-  ) {}
+    @inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository,
+  ) {
+    super(repo, true);
+  }
 
-  async exec(msg: msgs.RunTcMsg): Promise<void> {
-    const fullProblem = await this.problemsManager.getFullProblem(msg.activePath);
+  protected async performAction(fullProblem: FullProblem, msg: RunTcMsg): Promise<void> {
     if (!fullProblem) throw new Error('Problem not found');
     const { problem } = fullProblem;
 
@@ -56,7 +61,7 @@ export class RunSingleTc {
     tc.result?.dispose();
     tc.result = new TcResult(TcVerdicts.CP);
     tc.isExpand = false;
-    await this.problemsManager.dataRefresh();
+    await this.repo.dataRefresh();
 
     await this.document.save(problem.src.path);
     const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
@@ -68,10 +73,12 @@ export class RunSingleTc {
             ? TcVerdicts.RJ
             : TcVerdicts.SE;
       tc.result.msg = [artifacts.message];
-      await this.problemsManager.dataRefresh();
+      await this.repo.dataRefresh();
       return;
     }
     tc.result.verdict = TcVerdicts.CPD;
+
+    const judgeService = this.judgeFactory.create(problem);
 
     const ctx: JudgeContext = {
       problem,
@@ -86,7 +93,7 @@ export class RunSingleTc {
         if (!tc.result) return;
         tc.result.verdict = verdict;
         if (msg) tc.result.msg = [msg];
-        this.problemsManager.dataRefresh();
+        this.repo.dataRefresh();
       },
       onResult: (res: FinalResult) => {
         if (!tc.result) return;
@@ -95,21 +102,17 @@ export class RunSingleTc {
         tc.result.memory = res.memoryMb;
         tc.result.msg = res.messages;
         tc.isExpand = true;
-        this.problemsManager.dataRefresh();
+        this.repo.dataRefresh();
       },
       onError: (e) => {
         if (!tc.result) return;
         tc.result.verdict = TcVerdicts.SE;
         tc.result.msg = [e.message];
-        this.problemsManager.dataRefresh();
+        this.repo.dataRefresh();
       },
     };
 
-    try {
-      const judgeService = this.judgeFactory.create(problem);
-      await judgeService.judge(ctx, observer, ac.signal);
-    } catch (err) {
-      observer.onError(err as Error);
-    }
+    await judgeService.judge(ctx, observer, ac.signal);
+    fullProblem.ac = null;
   }
 }

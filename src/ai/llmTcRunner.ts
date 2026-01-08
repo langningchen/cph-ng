@@ -69,8 +69,9 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
     const result = new LanguageModelToolResult([]);
 
     const problemsManager = container.resolve(TOKENS.ProblemsManager);
+    const repo = container.resolve(TOKENS.ProblemRepository);
     const activePath = options.input.activePath;
-    const bgProblem = await problemsManager.getFullProblem(activePath);
+    const bgProblem = await repo.getFullProblem(activePath);
     if (!bgProblem) {
       result.content.push(
         new LanguageModelTextPart(
@@ -138,7 +139,7 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
       return result;
     }
 
-    const refreshedBg = await problemsManager.getFullProblem(activePath);
+    const refreshedBg = await repo.getFullProblem(activePath);
     if (!refreshedBg || !refreshedBg.problem) {
       result.content.push(
         new LanguageModelTextPart(

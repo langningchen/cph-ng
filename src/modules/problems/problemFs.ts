@@ -63,7 +63,8 @@ export class ProblemFs implements FileSystemProvider {
 
   async parseUri(uri: Uri): Promise<CphFsItem> {
     const problemsManager = container.resolve(TOKENS.ProblemsManager);
-    const fullProblem = await problemsManager.getFullProblem(uri.authority);
+    const repo = container.resolve(TOKENS.ProblemRepository);
+    const fullProblem = await repo.getFullProblem(uri.authority);
     if (!fullProblem) {
       throw this.notFound;
     }
@@ -80,7 +81,7 @@ export class ProblemFs implements FileSystemProvider {
           set: async (data: string) => {
             const newProblem = JSON.parse(data);
             Object.assign(problem, newProblem);
-            await problemsManager.dataRefresh();
+            await repo.dataRefresh();
           },
         },
       ],
@@ -149,8 +150,8 @@ export class ProblemFs implements FileSystemProvider {
     return current;
   }
   public async fireAuthorityChange(authority: string): Promise<void> {
-    const problemsManager = container.resolve(TOKENS.ProblemsManager);
-    const fullProblem = await problemsManager.getFullProblem(authority);
+    const repo = container.resolve(TOKENS.ProblemRepository);
+    const fullProblem = await repo.getFullProblem(authority);
     if (!fullProblem) {
       return;
     }
@@ -241,8 +242,8 @@ export class ProblemFs implements FileSystemProvider {
     }
     await item.set(content.toString());
     this.changeEmitter.fire([{ type: FileChangeType.Changed, uri }]);
-    const problemsManager = container.resolve(TOKENS.ProblemsManager);
-    await problemsManager.dataRefresh();
+    const repo = container.resolve(TOKENS.ProblemRepository);
+    await repo.dataRefresh();
   }
 
   watch(): Disposable {
