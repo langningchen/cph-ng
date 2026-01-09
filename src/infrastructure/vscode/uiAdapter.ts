@@ -17,6 +17,7 @@
 
 import { inject, injectable } from 'tsyringe';
 import {
+  commands,
   FileType,
   type OpenDialogOptions,
   type SaveDialogOptions,
@@ -152,5 +153,9 @@ export class UiAdapter implements IUi {
 
   public alert(level: AlertLevel, title: string): void {
     if (level === 'warn') window.showWarningMessage(title);
+  }
+
+  public compareFiles(left: Uri, right: Uri): void {
+    commands.executeCommand('vscode.diff', left, right);
   }
 }

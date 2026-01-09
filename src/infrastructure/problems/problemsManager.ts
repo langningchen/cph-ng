@@ -20,6 +20,7 @@ import { container, injectable } from 'tsyringe';
 import type { IProblemsManager } from '@/application/ports/problems/IProblemsManager';
 import { AddTc } from '@/application/useCases/webview/AddTc';
 import { ClearTcStatus } from '@/application/useCases/webview/ClearTcStatus';
+import { CompareTc } from '@/application/useCases/webview/CompareTc';
 import { DelTc } from '@/application/useCases/webview/DelTc';
 import { LoadTcs } from '@/application/useCases/webview/LoadTcs';
 import { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
@@ -27,6 +28,7 @@ import { RunSingleTc } from '@/application/useCases/webview/RunSingleTc';
 import { StopTcs } from '@/application/useCases/webview/StopTcs';
 import { ToggleDisable } from '@/application/useCases/webview/ToggleDisable';
 import { ToggleTcFile } from '@/application/useCases/webview/ToggleTcFile';
+import { UpdateTc } from '@/application/useCases/webview/UpdateTc';
 import { BfCompare } from '../../modules/problems/manager/bfCompare';
 import { ProblemActions } from '../../modules/problems/manager/problemActions';
 import { TcActions } from '../../modules/problems/manager/tcActions';
@@ -68,7 +70,7 @@ export class ProblemsManager implements IProblemsManager {
     await container.resolve(LoadTcs).exec(msg);
   }
   async updateTc(msg: msgs.UpdateTcMsg): Promise<void> {
-    return TcActions.updateTc(msg);
+    await container.resolve(UpdateTc).exec(msg);
   }
   async toggleDisable(msg: msgs.ToggleDisableMsg): Promise<void> {
     await container.resolve(ToggleDisable).exec(msg);
@@ -80,7 +82,7 @@ export class ProblemsManager implements IProblemsManager {
     return TcActions.chooseTcFile(msg);
   }
   async compareTc(msg: msgs.CompareTcMsg): Promise<void> {
-    return TcActions.compareTc(msg);
+    await container.resolve(CompareTc).exec(msg);
   }
   async toggleTcFile(msg: msgs.ToggleTcFileMsg): Promise<void> {
     await container.resolve(ToggleTcFile).exec(msg);

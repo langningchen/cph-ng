@@ -15,13 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
-import type { FileSystemProvider, Uri } from 'vscode';
-import type { Problem } from '@/domain/entities/problem';
+import { inject, injectable } from 'tsyringe';
+import type {
+  FullProblem,
+  IProblemRepository,
+} from '@/application/ports/problems/IProblemRepository';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { TOKENS } from '@/composition/tokens';
+import type { UpdateTcMsg } from '@/webview/src/msgs';
 
-export type UriTypes = 'stdin' | 'answer' | 'stdout' | 'stderr';
+@injectable()
+export class UpdateTc extends BaseProblemUseCase<UpdateTcMsg> {
+  constructor(@inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository) {
+    super(repo, true);
+  }
 
-export interface IProblemFs extends FileSystemProvider {
-  getUri(problem: Problem, id: UUID, type: UriTypes): Uri;
-  fireAuthorityChange(authority: string): Promise<void>;
+  protected async performAction({ problem }: FullProblem, msg: UpdateTcMsg): Promise<void> {
+    problem.getTc(msg.id).fromI(msg.tc);
+  }
 }

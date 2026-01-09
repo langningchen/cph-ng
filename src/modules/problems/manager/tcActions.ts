@@ -16,14 +16,6 @@ export class TcActions {
     return container.resolve(TOKENS.ProblemRepository);
   }
   
-  public static async updateTc(msg: msgs.UpdateTcMsg) {
-    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    fullProblem.problem.tcs[msg.id] = Tc.fromI(msg.tc);
-    await TcActions.getRepository().dataRefresh(true);
-  }
   public static async chooseTcFile(msg: msgs.ChooseTcFileMsg): Promise<void> {
     const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
@@ -54,29 +46,6 @@ export class TcActions {
     partialTc.answer &&
       (fullProblem.problem.tcs[msg.id].answer = partialTc.answer);
     await TcActions.getRepository().dataRefresh();
-  }
-  public static async compareTc(msg: msgs.CompareTcMsg): Promise<void> {
-    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    const tc = fullProblem.problem.tcs[msg.id];
-    if (!tc.result) {
-      return;
-    }
-    try {
-      commands.executeCommand(
-        'vscode.diff',
-        generateTcUri(fullProblem.problem, msg.id, 'answer'),
-        generateTcUri(fullProblem.problem, msg.id, 'stdout'),
-      );
-    } catch (e) {
-      Io.error(
-        l10n.t('Failed to compare test case: {msg}', {
-          msg: (e as Error).message,
-        }),
-      );
-    }
   }
 
   public static async reorderTc(msg: msgs.ReorderTcMsg): Promise<void> {

@@ -42,8 +42,6 @@ export const handleMessage = async (msg: WebviewMsg) => {
       await problemsManager.toggleDisable(msg);
     } else if (msg.type === 'clearTcStatus') {
       await problemsManager.clearTcStatus(msg);
-    } else if (msg.type === 'clearStatus') {
-      await problemsManager.clearStatus(msg);
     } else if (msg.type === 'runTcs') {
       await problemsManager.runTcs(msg);
     } else if (msg.type === 'stopTcs') {

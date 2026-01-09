@@ -91,18 +91,19 @@ export const ProblemProvider = ({ children }: { children: ReactNode }) => {
         }
         break;
       case 'clearTcStatus':
-        if (problem.tcs[msg.id]) {
-          problem.tcs[msg.id] = { ...problem.tcs[msg.id] };
-          problem.tcs[msg.id].result = undefined;
+        if (msg.id) {
+          if (problem.tcs[msg.id]) {
+            problem.tcs[msg.id] = { ...problem.tcs[msg.id] };
+            problem.tcs[msg.id].result = undefined;
+            changed = true;
+          }
+        } else {
+          (Object.keys(problem.tcs) as UUID[]).forEach((id) => {
+            problem.tcs[id] = { ...problem.tcs[id] };
+            problem.tcs[id].result = undefined;
+          });
           changed = true;
         }
-        break;
-      case 'clearStatus':
-        (Object.keys(problem.tcs) as UUID[]).forEach((id) => {
-          problem.tcs[id] = { ...problem.tcs[id] };
-          problem.tcs[id].result = undefined;
-        });
-        changed = true;
         break;
       case 'delTc':
         delete problem.tcs[msg.id];

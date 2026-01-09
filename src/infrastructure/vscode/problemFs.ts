@@ -26,7 +26,6 @@ import {
   FilePermission,
   type FileStat,
   FileSystemError,
-  type FileSystemProvider,
   FileType,
   Uri,
 } from 'vscode';
@@ -34,16 +33,9 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { IProblemFs, UriTypes } from '@/application/ports/vscode/IProblemFs';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/domain/entities/problem';
-
-export type UriTypes = 'stdin' | 'answer' | 'stdout' | 'stderr';
-export const generateTcUri = (problem: Problem, id: UUID, type: UriTypes) =>
-  Uri.from({
-    scheme: ProblemFs.scheme,
-    authority: problem.src.path,
-    path: `/tcs/${id}/${type}`,
-  });
 
 type CphFsFile = {
   data: string | Uri;
@@ -54,7 +46,7 @@ type CphFsDir = CphFsDirItem[];
 type CphFsItem = CphFsFile | CphFsDir;
 
 @injectable()
-export class ProblemFs implements FileSystemProvider {
+export class ProblemFs implements IProblemFs {
   public static readonly scheme = 'cph-ng';
 
   public changeEmitter = new EventEmitter<FileChangeEvent[]>();
@@ -67,6 +59,14 @@ export class ProblemFs implements FileSystemProvider {
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
   ) {
     this.logger = this.logger.withScope('ProblemFs');
+  }
+
+  public getUri(problem: Problem, id: UUID, type: UriTypes) {
+    return Uri.from({
+      scheme: ProblemFs.scheme,
+      authority: problem.src.path,
+      path: `/tcs/${id}/${type}`,
+    });
   }
 
   async parseUri(uri: Uri): Promise<CphFsItem> {

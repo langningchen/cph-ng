@@ -55,7 +55,7 @@ export const ProblemView = ({ problem, startTime }: ProblemViewProps) => {
           <CphMenu
             menu={{
               [t('problemView.menu.clearStatus')]: () => {
-                dispatch({ type: 'clearStatus' });
+                dispatch({ type: 'clearTcStatus' });
               },
             }}
             flex={1}

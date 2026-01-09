@@ -15,7 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { OpenDialogOptions, QuickPickItem, QuickPickOptions, SaveDialogOptions } from 'vscode';
+import type {
+  OpenDialogOptions,
+  QuickPickItem,
+  QuickPickOptions,
+  SaveDialogOptions,
+  Uri,
+} from 'vscode';
 
 export type CustomOpenDialogOptions = Omit<OpenDialogOptions, 'defaultUri'> & {
   defaultPath?: string;
@@ -41,4 +47,5 @@ export interface IUi {
   quickPickMany<T>(items: CustomQuickPickItem<T>[], options?: CustomQuickPickOptions): Promise<T[]>;
   chooseFolder(title: string): Promise<string | undefined>;
   alert(level: AlertLevel, title: string): void;
+  compareFiles(left: Uri, right: Uri): void;
 }
