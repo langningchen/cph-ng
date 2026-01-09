@@ -20,7 +20,7 @@ import type { IJudgeService } from '@/application/ports/problems/judge/IJudgeSer
 import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
 import { InteractiveJudgeService } from '@/application/useCases/problems/judge/interactiveJudgeService';
 import { TraditionalJudgeService } from '@/application/useCases/problems/judge/traditionalJudgeService';
-import type { IProblem } from '@/types';
+import type { Problem } from '@/domain/entities/problem';
 
 @injectable()
 export class JudgeServiceFactory implements IJudgeServiceFactory {
@@ -29,7 +29,7 @@ export class JudgeServiceFactory implements IJudgeServiceFactory {
     @inject(InteractiveJudgeService) private interactive: InteractiveJudgeService,
   ) {}
 
-  create(problem: IProblem): IJudgeService {
+  create(problem: Problem): IJudgeService {
     if (problem.interactor) return this.interactive;
     return this.standard;
   }

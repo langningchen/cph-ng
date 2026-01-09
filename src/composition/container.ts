@@ -64,7 +64,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.LanguageRegistry, LanguageRegistry);
   container.registerSingleton(TOKENS.Logger, LoggerAdapter);
   container.registerSingleton(TOKENS.Path, PathAdapter);
-  container.registerSingleton(TOKENS.PathRenderer, PathResolverAdapter);
+  container.registerSingleton(TOKENS.PathResolver, PathResolverAdapter);
   container.registerSingleton(TOKENS.ProblemRepository, ProblemRepository);
   container.registerSingleton(TOKENS.ProblemsManager, ProblemsManager);
   container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);

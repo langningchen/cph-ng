@@ -15,11 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { VerdictName } from '@/domain/entities/verdict';
-import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
+import { injectable } from 'tsyringe';
+import { type SaveDialogOptions, Uri, window } from 'vscode';
+import type { IUi, SaveOptions } from '@/application/ports/vscode/IUi';
 
-export interface IJudgeObserver {
-  onStatusChange(verdict: VerdictName, message?: string): void;
-  onResult(result: FinalResult): void;
-  onError(error: Error): void;
+@injectable()
+export class UiAdapter implements IUi {
+  public async saveDialog(options: SaveOptions): Promise<string | undefined> {
+    const vscodeOptions: SaveDialogOptions = {};
+    if (options.defaultPath) vscodeOptions.defaultUri = Uri.file(options.defaultPath);
+    if (options.title) vscodeOptions.title = options.title;
+    const uri = await window.showSaveDialog(vscodeOptions);
+    return uri ? uri.fsPath : undefined;
+  }
 }

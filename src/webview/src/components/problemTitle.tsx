@@ -76,13 +76,13 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
   useEffect(() => {
     setEditedTitle(problem.name);
     setEditedUrl(problem.url || '');
-    setEditedTimeLimit(problem.timeLimit.toString());
-    setEditedMemoryLimit(problem.memoryLimit.toString());
+    setEditedTimeLimit(problem.timeLimitMs.toString());
+    setEditedMemoryLimit(problem.memoryLimitMb.toString());
     setEditedCompiler(problem.overrides?.compiler || '');
     setEditedCompilerArgs(problem.overrides?.compilerArgs || '');
     setEditedRunner(problem.overrides?.runner || '');
     setEditedRunnerArgs(problem.overrides?.runnerArgs || '');
-  }, [problem.name, problem.url, problem.timeLimit, problem.memoryLimit, problem.overrides]);
+  }, [problem.name, problem.url, problem.timeLimitMs, problem.memoryLimitMb, problem.overrides]);
   useEffect(() => {
     setTimeElapsed(Date.now() - startTime);
     const interval = setInterval(() => {
@@ -139,11 +139,11 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
           </CphText>
           <CphText fontSize={'0.8rem'} paddingRight={'4px'}>
             {t('problemTitle.timeLimit', {
-              time: problem.timeLimit,
+              time: problem.timeLimitMs,
             })}
             &emsp;
             {t('problemTitle.memoryLimit', {
-              memory: problem.memoryLimit,
+              memory: problem.memoryLimitMb,
             })}
             {problem.checker && (
               <>

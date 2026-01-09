@@ -24,7 +24,7 @@ export interface CheckerOptions {
 
 export interface CheckerData {
   exitCode: number;
-  message: string;
+  msg: string;
 }
 
 export type CheckerResult = CheckerData | Error;

@@ -47,7 +47,7 @@ describe('RunnerProviderAdapter', () => {
     container.registerInstance(TOKENS.Settings, settingsMock);
     container.registerInstance(TOKENS.Logger, loggerMock);
     container.registerSingleton(TOKENS.Path, PathAdapter);
-    container.registerSingleton(TOKENS.PathRenderer, PathResolverMock);
+    container.registerSingleton(TOKENS.PathResolver, PathResolverMock);
 
     adapter = container.resolve(RunnerProviderAdapter);
   });

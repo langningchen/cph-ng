@@ -85,33 +85,6 @@ export class TcActions {
     fullProblem.problem.tcs[msg.id] = Tc.fromI(msg.tc);
     await TcActions.getRepository().dataRefresh(true);
   }
-  public static async toggleDisable(msg: msgs.ToggleDisableMsg) {
-    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    fullProblem.problem.tcs[msg.id].isDisabled =
-      !fullProblem.problem.tcs[msg.id].isDisabled;
-    await TcActions.getRepository().dataRefresh(true);
-  }
-  public static async clearTcStatus(msg: msgs.ClearTcStatusMsg) {
-    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    fullProblem.problem.tcs[msg.id].result = undefined;
-    await TcActions.getRepository().dataRefresh(true);
-  }
-  public static async clearStatus(msg: msgs.ClearStatusMsg) {
-    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    for (const tc of Object.values(fullProblem.problem.tcs)) {
-      tc.result = undefined;
-    }
-    await TcActions.getRepository().dataRefresh(true);
-  }
   public static async chooseTcFile(msg: msgs.ChooseTcFileMsg): Promise<void> {
     const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {

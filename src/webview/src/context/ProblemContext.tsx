@@ -57,8 +57,8 @@ export const ProblemProvider = ({ children }: { children: ReactNode }) => {
       case 'editProblemDetails':
         problem.name = msg.title;
         problem.url = msg.url;
-        problem.timeLimit = msg.timeLimit;
-        problem.memoryLimit = msg.memoryLimit;
+        problem.timeLimitMs = msg.timeLimit;
+        problem.memoryLimitMb = msg.memoryLimit;
         problem.overrides = msg.overrides;
         changed = true;
         break;

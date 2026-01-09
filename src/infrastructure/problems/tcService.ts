@@ -16,26 +16,22 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
-import { BaseProblemUseCase } from '@/application/useCases/BaseProblemUseCase';
+import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
+import type { ITcService, PathsData } from '@/application/ports/problems/ITcService';
 import { TOKENS } from '@/composition/tokens';
-import type { ClearTcStatusMsg } from '@/webview/src/msgs';
+import type { Tc } from '@/domain/entities/tc';
 
 @injectable()
-export class ClearTcStatus extends BaseProblemUseCase<ClearTcStatusMsg> {
-  constructor(
-    @inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.TempStorage) protected readonly tmp: ITempStorage,
-  ) {
-    super(repo, true);
-  }
+export class TcService implements ITcService {
+  constructor(@inject(TOKENS.TcIoService) private tcIoService: ITcIoService) {}
 
-  protected async performAction({ problem }: FullProblem, msg: ClearTcStatusMsg): Promise<void> {
-    if (msg.id) this.tmp.dispose(problem.getTc(msg.id).clearResult());
-    else this.tmp.dispose(problem.clearResult());
+  public async getPaths(io: Tc): Promise<PathsData> {
+    return Promise.all([
+      this.tcIoService.ensureFilePath(io.stdin),
+      this.tcIoService.ensureFilePath(io.answer),
+    ]).then(([stdinPath, answerPath]) => ({
+      stdinPath,
+      answerPath,
+    }));
   }
 }

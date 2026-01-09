@@ -22,9 +22,9 @@ import type { ICheckerRunner } from '@/application/ports/problems/judge/IChecker
 import type { IResultEvaluator } from '@/application/ports/problems/judge/IResultEvaluator';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
+import { VerdictName } from '@/domain/entities/verdict';
 import type { ExecutionData } from '@/domain/execution';
 import { Grader } from '@/domain/services/Grader';
-import { VerdictName } from '@/domain/verdict';
 
 export interface JudgeRequest {
   executionResult: ExecutionData;
@@ -43,7 +43,7 @@ export interface FinalResult {
   verdict: VerdictName;
   timeMs?: number;
   memoryMb?: number;
-  messages: string[];
+  msg?: string;
 }
 
 @injectable()
@@ -63,14 +63,13 @@ export class ResultEvaluatorAdaptor implements IResultEvaluator {
       memoryMb: res.memoryMb,
     };
 
-    if (res.isUserAborted) return { ...executionStats, verdict: VerdictName.RJ, messages: [] };
-    if (res.timeMs > req.timeLimitMs)
-      return { ...executionStats, verdict: VerdictName.TLE, messages: [] };
+    if (res.isUserAborted) return { ...executionStats, verdict: VerdictName.RJ };
+    if (res.timeMs > req.timeLimitMs) return { ...executionStats, verdict: VerdictName.TLE };
     if (res.codeOrSignal)
       return {
         ...executionStats,
         verdict: VerdictName.RE,
-        messages: [`Program exited with code: ${res.codeOrSignal}`],
+        msg: `Program exited with code: ${res.codeOrSignal}`,
       };
 
     if (req.checkerPath) {
@@ -84,19 +83,11 @@ export class ResultEvaluatorAdaptor implements IResultEvaluator {
         signal,
       );
       if (spjRes instanceof Error) {
-        return {
-          ...executionStats,
-          verdict: VerdictName.SE,
-          messages: [spjRes.message],
-        };
+        return { ...executionStats, verdict: VerdictName.SE, msg: spjRes.message };
       }
 
-      const mapped = this.grader.mapTestlibExitCode(spjRes.exitCode);
-      return {
-        ...executionStats,
-        verdict: mapped.verdict,
-        messages: [spjRes.message, ...(mapped.msg ? [mapped.msg] : [])],
-      };
+      const verdict = this.grader.mapTestlibExitCode(spjRes.exitCode);
+      return { ...executionStats, verdict, msg: spjRes.msg };
     }
 
     if (req.interactorResult) {
@@ -105,14 +96,10 @@ export class ResultEvaluatorAdaptor implements IResultEvaluator {
         feedback,
       } = req.interactorResult;
       if (typeof codeOrSignal === 'string') throw new Error('Interactor run failed');
-      const mapped = this.grader.mapTestlibExitCode(codeOrSignal);
-      const message = await this.fs.readFile(feedback);
+      const verdict = this.grader.mapTestlibExitCode(codeOrSignal);
+      const msg = await this.fs.readFile(feedback);
       this.tmp.dispose([stdoutPath, stderrPath]);
-      return {
-        ...executionStats,
-        verdict: mapped.verdict,
-        messages: [message, ...(mapped.msg ? [mapped.msg] : [])],
-      };
+      return { ...executionStats, verdict, msg };
     }
 
     const stdout = await this.fs.readFile(res.stdoutPath);
@@ -125,7 +112,7 @@ export class ResultEvaluatorAdaptor implements IResultEvaluator {
       regardPEAsAC: this.settings.comparing.regardPEAsAC,
     });
 
-    return { ...executionStats, verdict, messages: [] };
+    return { ...executionStats, verdict };
   }
 
   public async interactiveJudge() {}

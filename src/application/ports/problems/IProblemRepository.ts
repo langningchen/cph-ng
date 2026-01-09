@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Problem } from '@/types';
+import type { Problem } from '@/domain/entities/problem';
 
 export interface FullProblem {
   problem: Problem;
@@ -24,6 +24,7 @@ export interface FullProblem {
 }
 
 export interface IProblemRepository {
+  getDataPath(srcPath: string): string | null;
   listFullProblems(): Promise<FullProblem[]>;
   getFullProblem(path?: string): Promise<FullProblem | null>;
   removeProblem(fullProblem: FullProblem): void;

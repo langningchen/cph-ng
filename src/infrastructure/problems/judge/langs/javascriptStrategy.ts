@@ -25,7 +25,8 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
-import type { FileWithHash, IOverrides } from '@/types';
+import type { FileWithHash } from '@/domain/entities/fileWithHash';
+import type { IOverrides } from '@/types';
 import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstractLanguageStrategy';
 
 @injectable()

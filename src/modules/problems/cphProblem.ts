@@ -107,8 +107,8 @@ export class CphProblem implements ICphProblem {
       url: this.url,
       tcs: {},
       tcOrder: [],
-      timeLimit: this.timeLimit,
-      memoryLimit: this.memoryLimit,
+      timeLimitMs: this.timeLimit,
+      memoryLimitMb: this.memoryLimit,
       src: { path: this.srcPath },
       timeElapsed: 0,
     });

@@ -15,11 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { VerdictName } from '@/domain/entities/verdict';
-import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
+import type { Problem } from '@/domain/entities/problem';
+import type { ITc } from '@/types';
 
-export interface IJudgeObserver {
-  onStatusChange(verdict: VerdictName, message?: string): void;
-  onResult(result: FinalResult): void;
-  onError(error: Error): void;
+export interface IProblemService {
+  loadBySrc(srcPath: string): Promise<Problem | null>;
+  applyTcs(problem: Problem, tcs: ITc[]): void;
+  save(problem: Problem): Promise<void>;
+  delete(problem: Problem): Promise<void>;
+  isRelated(problem: Problem, path: string): boolean;
+  getLimits(problem: Problem): { timeLimitMs: number; memoryLimitMb: number };
 }

@@ -16,10 +16,12 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type {
   FullProblem,
   IProblemRepository,
 } from '@/application/ports/problems/IProblemRepository';
+import type { ITcService } from '@/application/ports/problems/ITcService';
 import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
@@ -32,10 +34,8 @@ import type { IDocument } from '@/application/ports/vscode/IDocument';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { BaseProblemUseCase } from '@/application/useCases/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
-import { VERDICTS } from '@/domain/verdict';
+import { isExpandVerdict, VerdictName } from '@/domain/entities/verdict';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
-import { isExpandVerdict, TcVerdicts } from '@/types';
-import { TcResult } from '@/types/types.backend';
 import type { RunTcsMsg } from '@/webview/src/msgs';
 
 @injectable()
@@ -46,6 +46,8 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
     @inject(TOKENS.JudgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
     @inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.Settings) private readonly settings: ISettings,
+    @inject(TOKENS.TcService) private readonly tcService: ITcService,
+    @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
   ) {
     super(repo, true);
   }
@@ -56,37 +58,32 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
     fullProblem.ac?.abort();
     fullProblem.ac = ac;
 
-    const tcs = problem.tcs;
-    const tcOrder = [...problem.tcOrder].filter((id) => !tcs[id].isDisabled);
+    const tcOrder = problem.getEnabledTcIds();
 
     const expandMemo: Record<string, boolean> = {};
     for (const tcId of tcOrder) {
-      tcs[tcId].result?.dispose();
-      tcs[tcId].result = new TcResult(TcVerdicts.CP);
-      expandMemo[tcId] = tcs[tcId].isExpand;
-      tcs[tcId].isExpand = false;
+      const tc = problem.getTc(tcId);
+      this.tmp.dispose(tc.clearResult());
+      tc.updateResult(VerdictName.CP, { isExpand: false });
+      expandMemo[tcId] = tc.isExpand;
     }
     await this.repo.dataRefresh();
 
     await this.document.save(problem.src.path);
     const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
     if (artifacts instanceof Error) {
-      for (const tcId of tcOrder) {
-        const tc = tcs[tcId];
-        if (tc.result) {
-          tc.result.verdict =
-            artifacts instanceof CompileError
-              ? TcVerdicts.CE
-              : artifacts instanceof CompileRejected
-                ? TcVerdicts.RJ
-                : TcVerdicts.SE;
-          tc.result.msg = [artifacts.message];
-        }
-      }
+      problem.updateResult(
+        artifacts instanceof CompileError
+          ? VerdictName.CE
+          : artifacts instanceof CompileRejected
+            ? VerdictName.RJ
+            : VerdictName.SE,
+        { msg: artifacts.message },
+      );
       return;
     }
 
-    for (const tcId of tcOrder) if (tcs[tcId].result) tcs[tcId].result.verdict = TcVerdicts.CPD;
+    problem.updateResult(VerdictName.CPD);
     await this.repo.dataRefresh();
 
     const expandBehavior = this.settings.problem.expandBehavior;
@@ -95,13 +92,12 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
     const judgeService = this.judgeFactory.create(problem);
 
     for (const tcId of tcOrder) {
-      const tc = tcs[tcId];
-      if (!tc.result) continue;
+      const tc = problem.getTc(tcId);
 
       if (ac.signal.aborted) {
         if (ac.signal.reason === 'onlyOne') fullProblem.ac = ac = new AbortController();
         else {
-          tc.result.verdict = TcVerdicts.SK;
+          tc.updateResult(VerdictName.SK);
           continue;
         }
       }
@@ -109,47 +105,42 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
       const ctx: JudgeContext = {
         problem,
         tcId,
-        stdinPath: tc.stdin.toPath(),
-        answerPath: tc.answer.toPath(),
+        ...(await this.tcService.getPaths(tc)),
         artifacts,
       };
 
       const observer: IJudgeObserver = {
         onStatusChange: (verdict, msg) => {
-          if (!tc.result) return;
-          tc.result.verdict = verdict;
-          if (msg) tc.result.msg = [msg];
+          tc.updateResult(verdict, { msg });
           this.repo.dataRefresh();
         },
         onResult: (res: FinalResult) => {
-          if (!tc.result) return;
-          tc.result.verdict = VERDICTS[res.verdict];
-          tc.result.time = res.timeMs;
-          tc.result.memory = res.memoryMb;
-          tc.result.msg = res.messages;
-
-          const currentVerdict = tc.result.verdict;
+          let isExpand: boolean = false;
           if (expandBehavior === 'always') {
-            tc.isExpand = true;
+            isExpand = true;
           } else if (expandBehavior === 'never') {
-            tc.isExpand = false;
+            isExpand = false;
           } else if (expandBehavior === 'failed') {
-            tc.isExpand = isExpandVerdict(currentVerdict);
+            isExpand = isExpandVerdict(res.verdict);
           } else if (expandBehavior === 'first') {
-            tc.isExpand = !hasAnyExpanded;
+            isExpand = !hasAnyExpanded;
           } else if (expandBehavior === 'firstFailed') {
-            tc.isExpand = !hasAnyExpanded && isExpandVerdict(currentVerdict);
+            isExpand = !hasAnyExpanded && isExpandVerdict(res.verdict);
           } else if (expandBehavior === 'same') {
-            tc.isExpand = expandMemo[tcId];
+            isExpand = expandMemo[tcId];
           }
+          hasAnyExpanded ||= isExpand;
 
-          hasAnyExpanded ||= tc.isExpand;
+          tc.updateResult(res.verdict, {
+            isExpand,
+            timeMs: res.timeMs,
+            memoryMb: res.memoryMb,
+            msg: res.msg,
+          });
           this.repo.dataRefresh();
         },
         onError: (e) => {
-          if (!tc.result) return;
-          tc.result.verdict = TcVerdicts.SE;
-          tc.result.msg = [e.message];
+          tc.updateResult(VerdictName.SE, { msg: e.message });
           this.repo.dataRefresh();
         },
       };

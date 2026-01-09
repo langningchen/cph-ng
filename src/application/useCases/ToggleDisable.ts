@@ -15,11 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { VerdictName } from '@/domain/entities/verdict';
-import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
+import { inject, injectable } from 'tsyringe';
+import type {
+  FullProblem,
+  IProblemRepository,
+} from '@/application/ports/problems/IProblemRepository';
+import { BaseProblemUseCase } from '@/application/useCases/BaseProblemUseCase';
+import { TOKENS } from '@/composition/tokens';
+import type { ToggleDisableMsg } from '@/webview/src/msgs';
 
-export interface IJudgeObserver {
-  onStatusChange(verdict: VerdictName, message?: string): void;
-  onResult(result: FinalResult): void;
-  onError(error: Error): void;
+@injectable()
+export class ToggleDisable extends BaseProblemUseCase<ToggleDisableMsg> {
+  constructor(@inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository) {
+    super(repo, true);
+  }
+
+  protected async performAction({ problem }: FullProblem, msg: ToggleDisableMsg): Promise<void> {
+    problem.getTc(msg.id).toggleDisable();
+  }
 }

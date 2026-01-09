@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { LangCompileData } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
-import type { IProblem } from '@/types';
+import type { Problem } from '@/domain/entities/problem';
 
 export type CompileData = {
   solution: LangCompileData;
@@ -32,7 +32,7 @@ export type CompileResult = CompileData | Error;
 
 export interface ICompilerService {
   compileAll(
-    problem: IProblem,
+    problem: Problem,
     forceCompile: boolean | null,
     signal: AbortSignal,
   ): Promise<CompileResult>;

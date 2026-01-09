@@ -20,7 +20,7 @@ import type { IPath } from '@/application/ports/node/IPath';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import { TOKENS } from '@/composition/tokens';
-import type { Problem } from '@/types';
+import type { Problem } from '@/domain/entities/problem';
 
 @injectable()
 export class PathResolverMock implements IPathResolver {

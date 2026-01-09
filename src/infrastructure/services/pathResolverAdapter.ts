@@ -24,12 +24,13 @@ import { Uri, window, workspace } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
 import type { ISystem } from '@/application/ports/node/ISystem';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
-import type { Problem } from '@/types/types.backend';
+import type { Problem } from '@/domain/entities/problem';
 
 // TO-DO: Check the refactor: workspace selection
 
@@ -40,6 +41,7 @@ export class PathResolverAdapter implements IPathResolver {
     @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.Logger) private readonly logger: ILogger,
     @inject(TOKENS.Path) private readonly path: IPath,
+    @inject(TOKENS.ProblemService) private readonly problemService: IProblemService,
     @inject(TOKENS.Settings) private readonly settings: ISettings,
     @inject(TOKENS.System) private readonly sys: ISystem,
     @inject(TOKENS.Translator) private readonly translator: ITranslator,
@@ -65,10 +67,11 @@ export class PathResolverAdapter implements IPathResolver {
 
     try {
       const template = await this.fs.readFile(templatePath);
+      const limits = this.problemService.getLimits(problem);
       return this.renderString(template, [
         ['title', problem.name],
-        ['timeLimit', problem.timeLimit.toString()],
-        ['memoryLimit', problem.memoryLimit.toString()],
+        ['timeLimit', limits.timeLimitMs.toString()],
+        ['memoryLimit', limits.memoryLimitMb.toString()],
         ['url', problem.url || ''],
       ]);
     } catch (e) {

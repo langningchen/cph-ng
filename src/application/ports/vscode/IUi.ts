@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { VerdictName } from '@/domain/entities/verdict';
-import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
+export interface SaveOptions {
+  defaultPath?: string;
+  title?: string;
+}
 
-export interface IJudgeObserver {
-  onStatusChange(verdict: VerdictName, message?: string): void;
-  onResult(result: FinalResult): void;
-  onError(error: Error): void;
+export interface IUi {
+  saveDialog(options: SaveOptions): Promise<string | undefined>;
 }

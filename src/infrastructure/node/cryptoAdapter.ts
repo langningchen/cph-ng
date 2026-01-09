@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { randomUUID } from 'node:crypto';
+import { randomUUID, type UUID } from 'node:crypto';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 
 export class CryptoAdapter implements ICrypto {
-  randomUUID(): string {
+  randomUUID(): UUID {
     return randomUUID();
   }
 }

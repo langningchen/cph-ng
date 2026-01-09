@@ -22,6 +22,7 @@ import { ClearTcStatus } from '@/application/useCases/ClearTcStatus';
 import { RunAllTcs } from '@/application/useCases/RunAllTcs';
 import { RunSingleTc } from '@/application/useCases/RunSingleTc';
 import { StopTcs } from '@/application/useCases/StopTcs';
+import { ToggleDisable } from '@/application/useCases/ToggleDisable';
 import { BfCompare } from '../../modules/problems/manager/bfCompare';
 import { ProblemActions } from '../../modules/problems/manager/problemActions';
 import { TcActions } from '../../modules/problems/manager/tcActions';
@@ -66,13 +67,10 @@ export class ProblemsManager implements IProblemsManager {
     return TcActions.updateTc(msg);
   }
   async toggleDisable(msg: msgs.ToggleDisableMsg): Promise<void> {
-    return TcActions.toggleDisable(msg);
+    await container.resolve(ToggleDisable).exec(msg);
   }
   async clearTcStatus(msg: msgs.ClearTcStatusMsg): Promise<void> {
     await container.resolve(ClearTcStatus).exec(msg);
-  }
-  async clearStatus(msg: msgs.ClearStatusMsg): Promise<void> {
-    return TcActions.clearStatus(msg);
   }
   async chooseTcFile(msg: msgs.ChooseTcFileMsg): Promise<void> {
     return TcActions.chooseTcFile(msg);

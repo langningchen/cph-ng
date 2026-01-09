@@ -15,11 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { VerdictName } from '@/domain/entities/verdict';
-import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
+import type { IFileWithHash } from '@/types';
 
-export interface IJudgeObserver {
-  onStatusChange(verdict: VerdictName, message?: string): void;
-  onResult(result: FinalResult): void;
-  onError(error: Error): void;
+export class FileWithHash {
+  constructor(
+    public readonly path: string,
+    public hash?: string,
+  ) {}
+
+  public static fromI(file: IFileWithHash): FileWithHash {
+    return new FileWithHash(file.path, file.hash);
+  }
+
+  public toJSON(): IFileWithHash {
+    return { path: this.path, hash: this.hash };
+  }
 }

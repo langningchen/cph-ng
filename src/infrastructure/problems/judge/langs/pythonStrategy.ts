@@ -27,7 +27,8 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
-import type { FileWithHash, IOverrides } from '@/types';
+import type { FileWithHash } from '@/domain/entities/fileWithHash';
+import type { IOverrides } from '@/types';
 import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstractLanguageStrategy';
 
 @injectable()
@@ -39,7 +40,7 @@ export class LangPython extends AbstractLanguageStrategy {
     @inject(TOKENS.FileSystem) protected readonly fs: IFileSystem,
     @inject(TOKENS.Logger) protected readonly logger: ILogger,
     @inject(TOKENS.Path) protected readonly path: IPath,
-    @inject(TOKENS.PathRenderer) private readonly resolver: IPathResolver,
+    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
     @inject(TOKENS.Settings) protected readonly settings: ISettings,
     @inject(TOKENS.Translator) protected readonly translator: ITranslator,
   ) {

@@ -1,20 +1,21 @@
 import { inject, injectable } from 'tsyringe';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { IJudgeService, JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
+import { VerdictName } from '@/domain/entities/verdict';
 import { ExecutionRejected } from '@/domain/execution';
-import { VerdictName } from '@/domain/verdict';
 import type { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
-import { TcVerdicts } from '@/types';
 
 @injectable()
 export class TraditionalJudgeService implements IJudgeService {
   constructor(
     @inject(TOKENS.ResultEvaluator) private readonly evaluator: ResultEvaluatorAdaptor,
     @inject(TOKENS.LanguageRegistry) private readonly lang: ILanguageRegistry,
+    @inject(TOKENS.ProblemService) private readonly problemService: IProblemService,
     @inject(TOKENS.SolutionRunner) private readonly runner: ISolutionRunner,
     @inject(TOKENS.Translator) private readonly translator: ITranslator,
   ) {}
@@ -39,36 +40,30 @@ export class TraditionalJudgeService implements IJudgeService {
         ctx.artifacts.solution.path,
         ctx.problem.overrides,
       );
+      const limits = this.problemService.getLimits(ctx.problem);
 
-      observer.onStatusChange(TcVerdicts.JG);
+      observer.onStatusChange(VerdictName.JG);
       const executionResult = await this.runner.run(
-        {
-          cmd: runCmd,
-          stdinPath: ctx.stdinPath,
-          timeLimitMs: ctx.problem.timeLimit,
-          memoryLimitMb: ctx.problem.memoryLimit,
-        },
+        { cmd: runCmd, stdinPath: ctx.stdinPath, ...limits },
         signal,
       );
       if (executionResult instanceof Error) throw executionResult;
-      observer.onStatusChange(TcVerdicts.JGD);
-
-      observer.onStatusChange(TcVerdicts.CMP);
+      observer.onStatusChange(VerdictName.JGD);
+      observer.onStatusChange(VerdictName.CMP);
       const finalResult = await this.evaluator.judge(
         {
           executionResult,
           inputPath: ctx.stdinPath,
           answerPath: ctx.answerPath,
           checkerPath: ctx.artifacts.checker?.path,
-          timeLimitMs: ctx.problem.timeLimit,
-          memoryLimitMb: ctx.problem.memoryLimit,
+          ...limits,
         },
         signal,
       );
       observer.onResult(finalResult);
     } catch (e) {
       if (e instanceof ExecutionRejected)
-        observer.onResult({ verdict: VerdictName.RJ, messages: [e.message] });
+        observer.onResult({ verdict: VerdictName.RJ, msg: e.message });
       else observer.onError(e as Error);
     }
   }

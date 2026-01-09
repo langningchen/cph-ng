@@ -9,7 +9,8 @@ import type { LangCompileResult } from '@/application/ports/problems/judge/langs
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
-import type { FileWithHash, IProblem } from '@/types';
+import type { FileWithHash } from '@/domain/entities/fileWithHash';
+import type { Problem } from '@/domain/entities/problem';
 
 @injectable()
 export class CompilerService implements ICompilerService {
@@ -32,7 +33,7 @@ export class CompilerService implements ICompilerService {
   }
 
   public async compileAll(
-    problem: IProblem,
+    problem: Problem,
     forceCompile: boolean | null,
     signal: AbortSignal,
   ): Promise<CompileResult> {

@@ -40,4 +40,7 @@ export interface IPath {
 
   /** Resolves a sequence of paths or path segments into an absolute path. */
   resolve(...paths: string[]): string;
+
+  /** Solve the relative path based on the current working directory. */
+  relative(from: string, to: string): string;
 }

@@ -57,7 +57,7 @@ export class CheckerRunnerAdapter implements ICheckerRunner {
     }
     return {
       exitCode: result.codeOrSignal,
-      message: message.trim(),
+      msg: message.trim(),
     };
   }
 }

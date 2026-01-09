@@ -34,7 +34,7 @@ export class TempStorageAdapter implements ITempStorage {
     @inject(TOKENS.Crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.Path) private readonly path: IPath,
     @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.PathRenderer) private readonly resolver: IPathResolver,
+    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
     @inject(TOKENS.Settings) private readonly settings: ISettings,
   ) {
     this.logger = this.logger.withScope('cache');

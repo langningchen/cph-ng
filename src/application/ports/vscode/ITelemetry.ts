@@ -27,7 +27,14 @@ export interface TelemetryEventProps {
 
 export const TELEMETRY_EVENT_NAMES = ['run'] as const;
 export type TelemetryEventName = (typeof TELEMETRY_EVENT_NAMES)[number];
-export const TELEMETRY_ERROR_NAMES = ['pipeFailed', 'wrapperError', 'parseRunnerError'] as const;
+export const TELEMETRY_ERROR_NAMES = [
+  'pipeFailed',
+  'wrapperError',
+  'parseRunnerError',
+  'loadProblemError',
+  'saveError',
+  'deleteError',
+] as const;
 export type TelemetryErrorName = (typeof TELEMETRY_ERROR_NAMES)[number];
 export type TelemetryName = TelemetryEventName | TelemetryErrorName;
 

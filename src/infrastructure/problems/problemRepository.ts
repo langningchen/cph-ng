@@ -16,21 +16,36 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { existsSync } from 'node:fs';
-import { injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import type {
   FullProblem,
   IProblemRepository,
 } from '@/application/ports/problems/IProblemRepository';
-import Logger from '@/helpers/logger';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import { TOKENS } from '@/composition/tokens';
 import ExtensionManager from '@/modules/extensionManager';
 import { CphProblem } from '@/modules/problems/cphProblem';
-import { Problem } from '@/types';
 import { getActivePath, problemFs, sidebarProvider, waitUntil } from '@/utils/global';
 
 @injectable()
 export class ProblemRepository implements IProblemRepository {
-  private logger = new Logger('ProblemRepository');
   private fullProblems: FullProblem[] = [];
+
+  constructor(
+    @inject(TOKENS.ProblemService) private readonly problemService: IProblemService,
+    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
+    @inject(TOKENS.Settings) private readonly settings: ISettings,
+    @inject(TOKENS.Logger) private readonly logger: ILogger,
+  ) {
+    this.logger = this.logger.withScope('ProblemRepository');
+  }
+
+  public getDataPath(srcPath: string): string | null {
+    return this.resolver.renderPathWithFile(this.settings.problem.problemFilePath, srcPath, true);
+  }
 
   async listFullProblems(): Promise<FullProblem[]> {
     return this.fullProblems;
@@ -46,7 +61,7 @@ export class ProblemRepository implements IProblemRepository {
         return fullProblem;
       }
     }
-    const problem = await Problem.fromSrc(path);
+    const problem = await this.problemService.loadBySrc(path);
     if (!problem) {
       this.logger.debug('Failed to load problem for path', path);
       return null;
@@ -68,15 +83,19 @@ export class ProblemRepository implements IProblemRepository {
   async dataRefresh(noMsg = false): Promise<void> {
     this.logger.trace('Starting data refresh');
     const activePath = getActivePath();
-    const idles: FullProblem[] = this.fullProblems.filter(
-      (fullProblem) => !fullProblem.ac && !fullProblem.problem.isRelated(activePath),
-    );
-    for (const idle of idles) {
-      idle.problem.timeElapsed += Date.now() - idle.startTime;
-      await idle.problem.save();
-      this.logger.debug('Closed idle problem', idle.problem.src.path);
+    if (activePath) {
+      const idles: FullProblem[] = this.fullProblems.filter(
+        (fullProblem) =>
+          !fullProblem.ac && // No running task
+          !fullProblem.problem.isRelated(activePath), // Not the active problem
+      );
+      for (const idle of idles) {
+        idle.problem.addTimeElapsed(Date.now() - idle.startTime);
+        await this.problemService.save(idle.problem);
+        this.logger.debug('Closed idle problem', idle.problem.src.path);
+      }
+      this.fullProblems = this.fullProblems.filter((p) => !idles.includes(p));
     }
-    this.fullProblems = this.fullProblems.filter((p) => !idles.includes(p));
 
     const fullProblem = await this.getFullProblem(activePath);
     const canImport = !!activePath && existsSync(CphProblem.getProbBySrc(activePath));
@@ -106,8 +125,8 @@ export class ProblemRepository implements IProblemRepository {
     for (const fullProblem of this.fullProblems) {
       fullProblem.ac?.abort();
       await waitUntil(() => !fullProblem.ac);
-      fullProblem.problem.timeElapsed += Date.now() - fullProblem.startTime;
-      await fullProblem.problem.save();
+      fullProblem.problem.addTimeElapsed(Date.now() - fullProblem.startTime);
+      await this.problemService.save(fullProblem.problem);
     }
     this.fullProblems = [];
   }

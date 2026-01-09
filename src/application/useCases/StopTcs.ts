@@ -22,7 +22,7 @@ import type {
 } from '@/application/ports/problems/IProblemRepository';
 import { BaseProblemUseCase } from '@/application/useCases/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
-import { isRunningVerdict, TcVerdicts } from '@/types';
+import { isRunningVerdict, VerdictName } from '@/domain/entities/verdict';
 import { waitUntil } from '@/utils/global';
 import type { StopTcsMsg } from '@/webview/src/msgs';
 
@@ -38,7 +38,10 @@ export class StopTcs extends BaseProblemUseCase<StopTcsMsg> {
       if (msg.onlyOne) return;
       await waitUntil(() => !ac);
     }
-    for (const tc of Object.values(problem.tcs))
-      if (tc.result && isRunningVerdict(tc.result.verdict)) tc.result.verdict = TcVerdicts.RJ;
+    const tcOrder = problem.getEnabledTcIds();
+    for (const tcId of tcOrder) {
+      const tc = problem.getTc(tcId);
+      if (isRunningVerdict(tc.verdict)) tc.updateResult(VerdictName.RJ);
+    }
   }
 }

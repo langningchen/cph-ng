@@ -35,7 +35,6 @@ export interface IProblemsManager {
   updateTc(msg: msgs.UpdateTcMsg): Promise<void>;
   toggleDisable(msg: msgs.ToggleDisableMsg): Promise<void>;
   clearTcStatus(msg: msgs.ClearTcStatusMsg): Promise<void>;
-  clearStatus(msg: msgs.ClearStatusMsg): Promise<void>;
   chooseTcFile(msg: msgs.ChooseTcFileMsg): Promise<void>;
   compareTc(msg: msgs.CompareTcMsg): Promise<void>;
   toggleTcFile(msg: msgs.ToggleTcFileMsg): Promise<void>;

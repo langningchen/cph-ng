@@ -190,7 +190,7 @@ const migrateFunctions: Record<string, (oldProblem: any) => any> = {
     problem satisfies Problem_0_0_3,
 };
 
-export const migration = (problem: OldProblem): Problem => {
+export const migration = (problem: OldProblem): IProblem => {
   logger.trace('Starting migration', problem);
   while (true) {
     const detectedVer: string = (() => {
@@ -235,5 +235,5 @@ export const migration = (problem: OldProblem): Problem => {
     problem = newProblem;
     logger.trace('Migrated to version', problem);
   }
-  return Problem.fromI(problem as unknown as IProblem);
+  return problem as unknown as IProblem;
 };

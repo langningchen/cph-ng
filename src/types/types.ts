@@ -15,20 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { FileWithHash } from '@/domain/entities/fileWithHash';
+import type { VerdictName } from '@/domain/entities/verdict';
 import type { UUID } from 'crypto';
-
-export const isRunningVerdict = (verdict?: ITcVerdict): boolean => {
-  return (
-    verdict !== undefined &&
-    ['WT', 'CP', 'CPD', 'JG', 'JGD', 'CMP'].includes(verdict.name)
-  );
-};
-export const isExpandVerdict = (verdict?: ITcVerdict): boolean => {
-  return !(
-    (verdict !== undefined && ['AC', 'SK', 'RJ'].includes(verdict.name)) ||
-    isRunningVerdict(verdict)
-  );
-};
 
 export interface ITcVerdict {
   name: string;
@@ -42,12 +31,12 @@ export interface ITcIo {
 }
 
 export interface ITcResult {
-  verdict: ITcVerdict;
+  verdict: VerdictName;
   time?: number;
   memory?: number;
-  stdout: ITcIo;
-  stderr: ITcIo;
-  msg: string[];
+  stdout?: ITcIo;
+  stderr?: ITcIo;
+  msg?: string;
 }
 export interface ITc {
   stdin: ITcIo;
@@ -70,6 +59,8 @@ export interface IBfCompare {
 }
 
 export interface IOverrides {
+  timeLimitMs?: number;
+  memoryLimitMb?: number;
   compiler?: string;
   compilerArgs?: string;
   runner?: string;
@@ -82,8 +73,6 @@ export interface IProblem {
   url?: string;
   tcs: Record<UUID, ITc>;
   tcOrder: UUID[];
-  timeLimit: number;
-  memoryLimit: number;
   src: IFileWithHash;
   checker?: IFileWithHash;
   interactor?: IFileWithHash;

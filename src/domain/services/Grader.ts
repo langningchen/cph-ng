@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { injectable } from 'tsyringe';
-import { VerdictName } from '@/domain/verdict';
+import { VerdictName } from '@/domain/entities/verdict';
 
 @injectable()
 export class Grader {
@@ -48,28 +48,15 @@ export class Grader {
     return VerdictName.AC;
   }
 
-  public mapTestlibExitCode(code: number): {
-    verdict: VerdictName;
-    msg?: string;
-  } {
-    switch (code) {
-      case 0:
-        return { verdict: VerdictName.AC };
-      case 1:
-        return { verdict: VerdictName.WA };
-      case 2:
-        return { verdict: VerdictName.PE };
-      case 3:
-        return { verdict: VerdictName.SE };
-      case 4:
-        return { verdict: VerdictName.WA, msg: 'Unexpected EOF' };
-      case 7:
-        return { verdict: VerdictName.PC };
-      default:
-        return {
-          verdict: VerdictName.SE,
-          msg: `Unknown testlib code: ${code}`,
-        };
-    }
+  public mapTestlibExitCode(code: number): VerdictName {
+    const VERDICTS_MAP: Record<number, VerdictName> = {
+      0: VerdictName.AC,
+      1: VerdictName.WA,
+      2: VerdictName.PE,
+      3: VerdictName.SE,
+      4: VerdictName.WA,
+      7: VerdictName.PC,
+    };
+    return VERDICTS_MAP[code] ?? VerdictName.SE;
   }
 }

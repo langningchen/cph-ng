@@ -18,10 +18,10 @@
 import type { UUID } from 'node:crypto';
 import type { CompileData } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
-import type { IProblem } from '@/types';
+import type { Problem } from '@/domain/entities/problem';
 
 export interface JudgeContext {
-  problem: IProblem;
+  problem: Problem;
   tcId: UUID;
   stdinPath: string;
   answerPath: string;

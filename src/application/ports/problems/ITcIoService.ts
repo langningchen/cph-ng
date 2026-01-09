@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { VerdictName } from '@/domain/entities/verdict';
-import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
+import type { TcIo } from '@/domain/entities/tcIo';
 
-export interface IJudgeObserver {
-  onStatusChange(verdict: VerdictName, message?: string): void;
-  onResult(result: FinalResult): void;
-  onError(error: Error): void;
+export interface ITcIoService {
+  readContent(io: TcIo): Promise<string>;
+  ensureFilePath(io: TcIo): Promise<string>;
+  tryInlining(io: TcIo): Promise<TcIo>;
+  dispose(io: TcIo): Promise<void>;
 }

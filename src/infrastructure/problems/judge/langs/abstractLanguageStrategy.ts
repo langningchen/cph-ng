@@ -11,10 +11,11 @@ import {
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { FileWithHash } from '@/domain/entities/fileWithHash';
 import Cache from '@/helpers/cache';
 import { CompilationIo } from '@/helpers/io';
 import ProcessExecutor, { AbortReason } from '@/helpers/processExecutor';
-import type { FileWithHash, IOverrides } from '@/types';
+import type { IOverrides } from '@/types';
 import { telemetry } from '@/utils/global';
 
 export const DefaultCompileAdditionalData: CompileAdditionalData = {

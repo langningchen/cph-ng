@@ -27,7 +27,10 @@ import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IProblemsManager } from '@/application/ports/problems/IProblemsManager';
+import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
+import type { ITcService } from '@/application/ports/problems/ITcService';
 import type { ICheckerRunner } from '@/application/ports/problems/judge/ICheckerRunner';
 import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
@@ -43,6 +46,7 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 
 // Centralized DI tokens for tsyringe registrations
@@ -67,7 +71,8 @@ export const TOKENS = {
   LanguageStrategy: 'ports.LanguageStrategy' as InjectionToken<ILanguageStrategy>,
   Logger: 'ports.Logger' as InjectionToken<ILogger>,
   Path: 'ports.Path' as InjectionToken<IPath>,
-  PathRenderer: 'ports.PathRenderer' as InjectionToken<IPathResolver>,
+  PathResolver: 'ports.PathResolver' as InjectionToken<IPathResolver>,
+  ProblemService: 'ports.ProblemService' as InjectionToken<IProblemService>,
   ProcessExecutor: 'ports.ProcessExecutor' as InjectionToken<IProcessExecutor>,
   ResultEvaluator: 'ports.ResultEvaluator' as InjectionToken<IResultEvaluator>,
   Runner: 'ports.Runner' as InjectionToken<ISolutionRunner>,
@@ -75,9 +80,12 @@ export const TOKENS = {
   Settings: 'ports.Settings' as InjectionToken<ISettings>,
   SolutionRunner: 'ports.SolutionRunner' as InjectionToken<ISolutionRunner>,
   System: 'ports.System' as InjectionToken<ISystem>,
+  TcIoService: 'ports.TcIoService' as InjectionToken<ITcIoService>,
+  TcService: 'ports.TcService' as InjectionToken<ITcService>,
   Telemetry: 'ports.Telemetry' as InjectionToken<ITelemetry>,
   TempStorage: 'ports.TempStorage' as InjectionToken<ITempStorage>,
   Translator: 'ports.Translator' as InjectionToken<ITranslator>,
+  Ui: 'ports.Ui' as InjectionToken<IUi>,
   WebviewEventBus: 'ports.WebviewEventBus' as InjectionToken<IWebviewEventBus>,
   ExecutionStrategyFactory:
     'ports.ExecutionStrategyFactory' as InjectionToken<IExecutionStrategyFactory>,

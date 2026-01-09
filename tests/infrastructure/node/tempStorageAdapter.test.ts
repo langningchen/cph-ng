@@ -35,7 +35,7 @@ describe('TempStorageAdapter', () => {
     container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
     container.registerInstance(TOKENS.Settings, settingsMock);
     container.registerSingleton(TOKENS.Path, PathAdapter);
-    container.registerSingleton(TOKENS.PathRenderer, PathResolverMock);
+    container.registerSingleton(TOKENS.PathResolver, PathResolverMock);
 
     adapter = container.resolve(TempStorageAdapter);
   });
@@ -43,7 +43,7 @@ describe('TempStorageAdapter', () => {
   it('should create a new path using crypto and settings when pool is empty', () => {
     const path = adapter.create('test');
 
-    expect(path).contains('/uuid-0');
+    expect(path).contains('/u-u-i-d-0');
     expect(cryptoMock.randomUUID).toHaveBeenCalledTimes(1);
     expect(loggerMock.trace).toHaveBeenCalledWith(expect.stringContaining('Creating new'), path);
   });
@@ -77,7 +77,7 @@ describe('TempStorageAdapter', () => {
     const reusedPaths = [r1, r2];
     expect(reusedPaths).toContain(p1);
     expect(reusedPaths).toContain(p2);
-    expect(r3).contains('/uuid-3');
+    expect(r3).contains('/u-u-i-d-3');
   });
 
   it('should warn when disposing the same path multiple times', () => {

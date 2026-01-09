@@ -13,7 +13,8 @@
       "src/infrastructure/**",
       "src/webview/**",
       "tests/**",
-      "scripts/**"
+      "scripts/**",
+      "src/types/types.backend.ts"
     ]
   },
   "formatter": {

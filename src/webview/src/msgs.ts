@@ -77,10 +77,7 @@ export interface ToggleDisableMsg extends ProblemBaseMsg {
 }
 export interface ClearTcStatusMsg extends ProblemBaseMsg {
   type: 'clearTcStatus';
-  id: UUID;
-}
-export interface ClearStatusMsg extends ProblemBaseMsg {
-  type: 'clearStatus';
+  id?: UUID;
 }
 export type WebviewTcFileTypes = 'stdin' | 'answer';
 export interface ChooseTcFileMsg extends ProblemBaseMsg {
@@ -161,7 +158,6 @@ export type ProblemMsg =
   | RunTcMsg
   | ToggleDisableMsg
   | ClearTcStatusMsg
-  | ClearStatusMsg
   | ChooseTcFileMsg
   | UpdateTcMsg
   | CompareTcMsg

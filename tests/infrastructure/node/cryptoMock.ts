@@ -20,5 +20,5 @@ import type { ICrypto } from '@/application/ports/node/ICrypto';
 
 export const cryptoMock = mock<ICrypto>();
 cryptoMock.randomUUID.mockImplementation(() => {
-  return `uuid-${cryptoMock.randomUUID.mock.calls.length - 1}`;
+  return `u-u-i-d-${cryptoMock.randomUUID.mock.calls.length - 1}`;
 });

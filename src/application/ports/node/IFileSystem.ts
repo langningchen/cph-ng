@@ -38,6 +38,9 @@ export interface IFileSystem {
   /** Checks if a file or directory exists. */
   exists(path: string): Promise<boolean>;
 
+  /** Get the status of a file or directory. */
+  stat(path: string): Promise<{ size: number; isFile(): boolean; isDirectory(): boolean }>;
+
   /** Removes a file. */
   rm(path: string): Promise<void>;
 }

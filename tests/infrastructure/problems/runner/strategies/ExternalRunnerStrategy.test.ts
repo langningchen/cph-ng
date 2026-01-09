@@ -76,7 +76,7 @@ describe('ExternalRunnerStrategy', () => {
     container.registerInstance(TOKENS.Telemetry, telemetryMock);
     container.registerInstance(TOKENS.TempStorage, tempStorageMock);
     container.registerInstance(TOKENS.Translator, translatorMock);
-    container.registerSingleton(TOKENS.PathRenderer, PathResolverMock);
+    container.registerSingleton(TOKENS.PathResolver, PathResolverMock);
 
     strategy = container.resolve(ExternalRunnerStrategy);
   });
@@ -307,7 +307,7 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
     container.registerSingleton(TOKENS.Clock, ClockAdapter);
     container.registerSingleton(TOKENS.Crypto, CryptoAdapter);
     container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
-    container.registerSingleton(TOKENS.PathRenderer, PathResolverMock);
+    container.registerSingleton(TOKENS.PathResolver, PathResolverMock);
     container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
     container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);
     container.registerSingleton(TOKENS.System, SystemAdapter);
