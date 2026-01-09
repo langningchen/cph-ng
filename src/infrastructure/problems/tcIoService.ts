@@ -31,30 +31,35 @@ export class TcIoService implements ITcIoService {
     @inject(TOKENS.Settings) private settings: ISettings,
   ) {}
 
-  public async readContent(tcIo: TcIo): Promise<string> {
-    if (!tcIo.useFile) return tcIo.data;
-    return await this.fs.readFile(tcIo.data);
+  public async readContent(io: TcIo): Promise<string> {
+    if (!io.useFile) return io.data;
+    return await this.fs.readFile(io.data);
   }
 
-  public async ensureFilePath(tcIo: TcIo): Promise<string> {
-    if (tcIo.useFile) return tcIo.data;
+  public async writeContent(io: TcIo, content: string): Promise<void> {
+    if (!io.useFile) io.data = content;
+    else await this.fs.safeWriteFile(io.data, content);
+  }
+
+  public async ensureFilePath(io: TcIo): Promise<string> {
+    if (io.useFile) return io.data;
     const tempPath = this.temp.create('TcIoService');
-    await this.fs.safeWriteFile(tempPath, tcIo.data);
+    await this.fs.safeWriteFile(tempPath, io.data);
     return tempPath;
   }
 
-  public async tryInlining(tcIo: TcIo): Promise<TcIo> {
-    if (!tcIo.useFile) return tcIo;
+  public async tryInlining(io: TcIo): Promise<TcIo> {
+    if (!io.useFile) return io;
 
-    const stats = await this.fs.stat(tcIo.data);
+    const stats = await this.fs.stat(io.data);
     if (stats.size <= this.settings.problem.maxInlineDataLength) {
-      const content = await this.fs.readFile(tcIo.data);
+      const content = await this.fs.readFile(io.data);
       return new TcIo(false, content);
     }
-    return tcIo;
+    return io;
   }
 
-  public async dispose(tcIo: TcIo): Promise<void> {
-    if (tcIo.useFile) this.temp.dispose(tcIo.data);
+  public async dispose(io: TcIo): Promise<void> {
+    if (io.useFile) this.temp.dispose(io.data);
   }
 }

@@ -32,7 +32,7 @@ import {
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
-import { BaseProblemUseCase } from '@/application/useCases/BaseProblemUseCase';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import { isExpandVerdict, VerdictName } from '@/domain/entities/verdict';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';

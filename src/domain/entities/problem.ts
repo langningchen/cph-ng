@@ -89,6 +89,9 @@ export class Problem {
     if (!this.tcs[uuid]) throw new Error('Test case not found');
     return this.tcs[uuid];
   }
+  public deleteTc(uuid: UUID): void {
+    this.tcOrder = this.tcOrder.filter((id) => id !== uuid);
+  }
   public clearTcs() {
     this.tcOrder = [];
   }

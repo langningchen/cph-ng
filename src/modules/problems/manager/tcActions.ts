@@ -9,74 +9,13 @@ import Io from '@/helpers/io';
 import Settings from '@/helpers/settings';
 import { Tc, TcIo } from '@/types';
 import { generateTcUri } from '../problemFs';
-import TcFactory from '../tcFactory';
 import { ProblemActions } from './problemActions';
 
 export class TcActions {
   private static getRepository() {
     return container.resolve(TOKENS.ProblemRepository);
   }
-
-  public static async addTc(msg: msgs.AddTcMsg) {
-    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    fullProblem.problem.addTc(new Tc(new TcIo(), new TcIo(), true));
-    await TcActions.getRepository().dataRefresh();
-  }
-  public static async loadTcs(msg: msgs.LoadTcsMsg) {
-    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-
-    const option = (
-      await window.showQuickPick(
-        [
-          {
-            label: l10n.t('Load from a zip file'),
-            value: 'zip',
-          },
-          {
-            label: l10n.t('Load from a folder'),
-            value: 'folder',
-          },
-        ],
-        { canPickMany: false },
-      )
-    )?.value;
-    if (!option) {
-      return undefined;
-    }
-
-    if (option === 'zip') {
-      const zipFile = await window.showOpenDialog({
-        title: l10n.t('Choose a zip file containing test cases'),
-        filters: { 'Zip files': ['zip'], 'All files': ['*'] },
-      });
-      if (!zipFile) {
-        return undefined;
-      }
-      fullProblem.problem.applyTcs(
-        await TcFactory.fromZip(
-          fullProblem.problem.src.path,
-          zipFile[0].fsPath,
-        ),
-      );
-    } else if (option === 'folder') {
-      const folderUri = await FolderChooser.chooseFolder(
-        l10n.t('Choose a folder containing test cases'),
-      );
-      if (!folderUri) {
-        return undefined;
-      }
-      fullProblem.problem.applyTcs(
-        await TcFactory.fromFolder(folderUri.fsPath),
-      );
-    }
-    await TcActions.getRepository().dataRefresh();
-  }
+  
   public static async updateTc(msg: msgs.UpdateTcMsg) {
     const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {
@@ -139,59 +78,7 @@ export class TcActions {
       );
     }
   }
-  public static async toggleTcFile(msg: msgs.ToggleTcFileMsg): Promise<void> {
-    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    const tc = fullProblem.problem.tcs[msg.id];
-    const fileIo = tc[msg.label];
-    if (fileIo.useFile) {
-      const data = fileIo.toString();
-      if (
-        data.length <= Settings.problem.maxInlineDataLength ||
-        (await Io.confirm(
-          l10n.t(
-            'The file size is {size} bytes, which may be large. Are you sure you want to load it inline?',
-            { size: data.length },
-          ),
-        ))
-      ) {
-        tc[msg.label] = new TcIo(false, data);
-      }
-    } else {
-      const ext = {
-        stdin: Settings.problem.inputFileExtensionList[0] || '.in',
-        answer: Settings.problem.outputFileExtensionList[0] || '.ans',
-      }[msg.label];
-      let tempFilePath: string | undefined = join(
-        dirname(fullProblem.problem.src.path),
-        `${basename(fullProblem.problem.src.path, extname(fullProblem.problem.src.path))}-${msg.id + 1}${ext}`,
-      );
-      tempFilePath = await window
-        .showSaveDialog({
-          defaultUri: Uri.file(tempFilePath),
-          saveLabel: l10n.t('Select location to save'),
-        })
-        .then((uri) => (uri ? uri.fsPath : undefined));
-      if (!tempFilePath) {
-        return;
-      }
-      await writeFile(tempFilePath, fileIo.data);
-      tc[msg.label] = new TcIo(true, tempFilePath);
-    }
-    await TcActions.getRepository().dataRefresh();
-  }
-  public static async delTc(msg: msgs.DelTcMsg): Promise<void> {
-    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    fullProblem.problem.tcOrder = fullProblem.problem.tcOrder.filter(
-      (id) => id !== msg.id,
-    );
-    await TcActions.getRepository().dataRefresh(true);
-  }
+
   public static async reorderTc(msg: msgs.ReorderTcMsg): Promise<void> {
     const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {

@@ -71,6 +71,12 @@ export class Tc {
   get verdict(): VerdictName | undefined {
     return this._result?.verdict;
   }
+  get stdout(): TcIo | undefined {
+    return this._result?.stdout;
+  }
+  get stderr(): TcIo | undefined {
+    return this._result?.stderr;
+  }
 
   public toggleExpand() {
     this._isExpand = !this._isExpand;

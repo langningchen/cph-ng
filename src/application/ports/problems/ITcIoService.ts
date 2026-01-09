@@ -19,6 +19,7 @@ import type { TcIo } from '@/domain/entities/tcIo';
 
 export interface ITcIoService {
   readContent(io: TcIo): Promise<string>;
+  writeContent(io: TcIo, content: string): Promise<void>;
   ensureFilePath(io: TcIo): Promise<string>;
   tryInlining(io: TcIo): Promise<TcIo>;
   dispose(io: TcIo): Promise<void>;

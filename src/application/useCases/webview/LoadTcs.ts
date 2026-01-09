@@ -20,17 +20,21 @@ import type {
   FullProblem,
   IProblemRepository,
 } from '@/application/ports/problems/IProblemRepository';
-import { BaseProblemUseCase } from '@/application/useCases/BaseProblemUseCase';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
-import type { ToggleDisableMsg } from '@/webview/src/msgs';
+import type { LoadTcsMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class ToggleDisable extends BaseProblemUseCase<ToggleDisableMsg> {
-  constructor(@inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository) {
+export class LoadTcs extends BaseProblemUseCase<LoadTcsMsg> {
+  constructor(
+    @inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.ProblemService) protected readonly problemService: IProblemService,
+  ) {
     super(repo, true);
   }
 
-  protected async performAction({ problem }: FullProblem, msg: ToggleDisableMsg): Promise<void> {
-    problem.getTc(msg.id).toggleDisable();
+  protected async performAction({ problem }: FullProblem, _msg: LoadTcsMsg): Promise<void> {
+    await this.problemService.loadTcs(problem);
   }
 }

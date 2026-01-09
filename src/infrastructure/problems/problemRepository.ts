@@ -24,11 +24,12 @@ import type {
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
 import ExtensionManager from '@/modules/extensionManager';
 import { CphProblem } from '@/modules/problems/cphProblem';
-import { getActivePath, problemFs, sidebarProvider, waitUntil } from '@/utils/global';
+import { getActivePath, sidebarProvider, waitUntil } from '@/utils/global';
 
 @injectable()
 export class ProblemRepository implements IProblemRepository {
@@ -39,6 +40,7 @@ export class ProblemRepository implements IProblemRepository {
     @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
     @inject(TOKENS.Settings) private readonly settings: ISettings,
     @inject(TOKENS.Logger) private readonly logger: ILogger,
+    @inject(TOKENS.ProblemFs) private readonly problemFs: IProblemFs,
   ) {
     this.logger = this.logger.withScope('ProblemRepository');
   }
@@ -118,7 +120,7 @@ export class ProblemRepository implements IProblemRepository {
       canImport,
       isRunning: !!fullProblem?.ac,
     });
-    fullProblem && (await problemFs.fireAuthorityChange(fullProblem.problem.src.path));
+    fullProblem && (await this.problemFs.fireAuthorityChange(fullProblem.problem.src.path));
   }
 
   async closeAll(): Promise<void> {

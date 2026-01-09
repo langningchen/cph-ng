@@ -15,35 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ITcIo } from '@/types';
+import { inject, injectable } from 'tsyringe';
+import type {
+  FullProblem,
+  IProblemRepository,
+} from '@/application/ports/problems/IProblemRepository';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { TOKENS } from '@/composition/tokens';
+import type { ToggleDisableMsg } from '@/webview/src/msgs';
 
-export class TcIo {
-  constructor(
-    public useFile: boolean = false,
-    public data: string = '',
-  ) {}
-  public static fromI(tc: ITcIo): TcIo {
-    const instance = new TcIo();
-    instance.fromI(tc);
-    return instance;
-  }
-  public fromI(tc: ITcIo) {
-    this.useFile = tc.useFile;
-    this.data = tc.data;
+@injectable()
+export class ToggleDisable extends BaseProblemUseCase<ToggleDisableMsg> {
+  constructor(@inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository) {
+    super(repo, true);
   }
 
-  public getDisposables(): string[] {
-    if (!this.useFile) return [];
-    return [this.data];
-  }
-  public isRelated(path: string): boolean {
-    return this.useFile && this.data.toLowerCase() === path;
-  }
-
-  public toJSON(): ITcIo {
-    return {
-      useFile: this.useFile,
-      data: this.data,
-    };
+  protected async performAction({ problem }: FullProblem, msg: ToggleDisableMsg): Promise<void> {
+    problem.getTc(msg.id).toggleDisable();
   }
 }

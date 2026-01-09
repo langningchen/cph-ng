@@ -15,27 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import AdmZip from 'adm-zip';
 import { inject, injectable } from 'tsyringe';
-import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
-import { BaseProblemUseCase } from '@/application/useCases/BaseProblemUseCase';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IArchive } from '@/application/ports/services/IArchive';
 import { TOKENS } from '@/composition/tokens';
-import type { ClearTcStatusMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class ClearTcStatus extends BaseProblemUseCase<ClearTcStatusMsg> {
-  constructor(
-    @inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.TempStorage) protected readonly tmp: ITempStorage,
-  ) {
-    super(repo, true);
-  }
+export class NodeArchiveService implements IArchive {
+  constructor(@inject(TOKENS.FileSystem) private readonly fs: IFileSystem) {}
 
-  protected async performAction({ problem }: FullProblem, msg: ClearTcStatusMsg): Promise<void> {
-    if (msg.id) this.tmp.dispose(problem.getTc(msg.id).clearResult());
-    else this.tmp.dispose(problem.clearResult());
+  public async unzip(zipPath: string, destPath: string): Promise<void> {
+    const zip = new AdmZip(zipPath);
+    await this.fs.mkdir(destPath);
+    zip.extractAllTo(destPath, true);
   }
 }

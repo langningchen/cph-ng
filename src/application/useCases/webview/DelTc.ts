@@ -20,28 +20,21 @@ import type {
   FullProblem,
   IProblemRepository,
 } from '@/application/ports/problems/IProblemRepository';
-import { BaseProblemUseCase } from '@/application/useCases/BaseProblemUseCase';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
-import { isRunningVerdict, VerdictName } from '@/domain/entities/verdict';
-import { waitUntil } from '@/utils/global';
-import type { StopTcsMsg } from '@/webview/src/msgs';
+import type { DelTcMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class StopTcs extends BaseProblemUseCase<StopTcsMsg> {
-  constructor(@inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository) {
+export class DelTc extends BaseProblemUseCase<DelTcMsg> {
+  constructor(
+    @inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.ProblemService) protected readonly problemService: IProblemService,
+  ) {
     super(repo, true);
   }
 
-  protected async performAction({ problem, ac }: FullProblem, msg: StopTcsMsg): Promise<void> {
-    if (ac) {
-      ac.abort(msg.onlyOne ? 'onlyOne' : undefined);
-      if (msg.onlyOne) return;
-      await waitUntil(() => !ac);
-    }
-    const tcOrder = problem.getEnabledTcIds();
-    for (const tcId of tcOrder) {
-      const tc = problem.getTc(tcId);
-      if (isRunningVerdict(tc.verdict)) tc.updateResult(VerdictName.RJ);
-    }
+  protected async performAction({ problem }: FullProblem, msg: DelTcMsg): Promise<void> {
+    problem.deleteTc(msg.id);
   }
 }

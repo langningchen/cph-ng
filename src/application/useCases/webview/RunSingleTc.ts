@@ -31,7 +31,7 @@ import {
   CompileRejected,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
-import { BaseProblemUseCase } from '@/application/useCases/BaseProblemUseCase';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import { VerdictName } from '@/domain/entities/verdict';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';

@@ -15,35 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ITcIo } from '@/types';
+import type { FileSystemProvider } from 'vscode';
 
-export class TcIo {
-  constructor(
-    public useFile: boolean = false,
-    public data: string = '',
-  ) {}
-  public static fromI(tc: ITcIo): TcIo {
-    const instance = new TcIo();
-    instance.fromI(tc);
-    return instance;
-  }
-  public fromI(tc: ITcIo) {
-    this.useFile = tc.useFile;
-    this.data = tc.data;
-  }
-
-  public getDisposables(): string[] {
-    if (!this.useFile) return [];
-    return [this.data];
-  }
-  public isRelated(path: string): boolean {
-    return this.useFile && this.data.toLowerCase() === path;
-  }
-
-  public toJSON(): ITcIo {
-    return {
-      useFile: this.useFile,
-      data: this.data,
-    };
-  }
+export interface IProblemFs extends FileSystemProvider {
+  fireAuthorityChange(authority: string): Promise<void>;
 }

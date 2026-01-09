@@ -40,9 +40,11 @@ import type { ILanguageStrategy } from '@/application/ports/problems/judge/langs
 import type { IExecutionStrategyFactory } from '@/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
 import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
 import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
+import type { IArchive } from '@/application/ports/services/IArchive';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
@@ -60,6 +62,7 @@ export const TOKENS = {
   Document: 'vscode.Document' as InjectionToken<IDocument>,
 
   // Core ports
+  Archive: 'ports.Archive' as InjectionToken<IArchive>,
   BuildInfo: 'ports.BuildInfo' as InjectionToken<IBuildInfo>,
   CheckerRunner: 'ports.CheckerRunner' as InjectionToken<ICheckerRunner>,
   Clock: 'ports.Clock' as InjectionToken<IClock>,
@@ -92,6 +95,7 @@ export const TOKENS = {
 
   // Repositories
   ProblemRepository: 'repositories.ProblemRepository' as InjectionToken<IProblemRepository>,
+  ProblemFs: 'repositories.ProblemFs' as InjectionToken<IProblemFs>,
 
   // Modules (legacy facade - consider removing after full migration)
   ProblemsManager: 'modules.ProblemsManager' as InjectionToken<IProblemsManager>,

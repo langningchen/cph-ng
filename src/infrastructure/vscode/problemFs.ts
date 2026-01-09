@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'crypto';
-import { readFile } from 'fs/promises';
+import type { UUID } from 'node:crypto';
+import { container, inject, injectable } from 'tsyringe';
 import {
   Disposable,
   type Event,
@@ -30,9 +30,12 @@ import {
   FileType,
   Uri,
 } from 'vscode';
-import { container } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
-import type { Problem } from '@/types';
+import type { Problem } from '@/domain/entities/problem';
 
 export type UriTypes = 'stdin' | 'answer' | 'stdout' | 'stderr';
 export const generateTcUri = (problem: Problem, id: UUID, type: UriTypes) =>
@@ -50,30 +53,29 @@ type CphFsDirItem = [string, CphFsItem];
 type CphFsDir = CphFsDirItem[];
 type CphFsItem = CphFsFile | CphFsDir;
 
+@injectable()
 export class ProblemFs implements FileSystemProvider {
   public static readonly scheme = 'cph-ng';
-
-  private notFound = FileSystemError.FileNotFound();
-  private noPermissions = FileSystemError.NoPermissions();
-  private isFile = FileSystemError.FileNotADirectory();
-  private isDir = FileSystemError.FileIsADirectory();
 
   public changeEmitter = new EventEmitter<FileChangeEvent[]>();
   onDidChangeFile: Event<FileChangeEvent[]> = this.changeEmitter.event;
 
+  constructor(
+    @inject(TOKENS.ProblemRepository) private readonly repo: IProblemRepository,
+    @inject(TOKENS.TcIoService) private readonly tcIoService: ITcIoService,
+    @inject(TOKENS.Logger) private readonly logger: ILogger,
+    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
+  ) {
+    this.logger = this.logger.withScope('ProblemFs');
+  }
+
   async parseUri(uri: Uri): Promise<CphFsItem> {
-    const problemsManager = container.resolve(TOKENS.ProblemsManager);
-    const repo = container.resolve(TOKENS.ProblemRepository);
-    const fullProblem = await repo.getFullProblem(uri.authority);
-    if (!fullProblem) {
-      throw this.notFound;
-    }
+    const fullProblem = await this.repo.getFullProblem(uri.authority);
+    if (!fullProblem) throw FileSystemError.FileNotFound();
     const problem = fullProblem.problem;
-    const path = uri.path.split('/').slice(1);
-    if (path[0] === '') {
-      path.length = 0;
-    }
-    let current: CphFsItem = [
+    const pathParts = uri.path.split('/').filter((p) => p.length > 0);
+    const tcIds = problem.getEnabledTcIds();
+    const root: CphFsDir = [
       [
         'problem.cph-ng.json',
         {
@@ -81,115 +83,75 @@ export class ProblemFs implements FileSystemProvider {
           set: async (data: string) => {
             const newProblem = JSON.parse(data);
             Object.assign(problem, newProblem);
-            await repo.dataRefresh();
+            await this.repo.dataRefresh();
           },
         },
       ],
       [
         'tcs',
-        Object.entries(problem.tcs).map(([id, tc]): [string, CphFsItem] => {
+        tcIds.map((tcId) => {
+          const tc = problem.getTc(tcId);
           const items: CphFsDir = [
             [
               'stdin',
               {
-                data: tc.stdin.useFile
-                  ? Uri.file(tc.stdin.data)
-                  : tc.stdin.data,
+                data: tc.stdin.useFile ? Uri.file(tc.stdin.data) : tc.stdin.data,
                 set: async (data: string) => {
-                  tc.stdin.fromString(data);
+                  await this.tcIoService.writeContent(tc.stdin, data);
                 },
               },
             ],
             [
               'answer',
               {
-                data: tc.answer.useFile
-                  ? Uri.file(tc.answer.data)
-                  : tc.answer.data,
+                data: tc.answer.useFile ? Uri.file(tc.answer.data) : tc.answer.data,
                 set: async (data: string) => {
-                  tc.answer.fromString(data);
+                  await this.tcIoService.writeContent(tc.answer, data);
                 },
               },
             ],
           ];
-          if (tc.result) {
+          tc.stdout &&
             items.push([
               'stdout',
-              {
-                data: tc.result.stdout.useFile
-                  ? Uri.file(tc.result.stdout.data)
-                  : tc.result.stdout.data,
-              },
+              { data: tc.stdout.useFile ? Uri.file(tc.stdout.data) : tc.stdout.data },
             ]);
+          tc.stderr &&
             items.push([
               'stderr',
-              {
-                data: tc.result.stderr.useFile
-                  ? Uri.file(tc.result.stderr.data)
-                  : tc.result.stderr.data,
-              },
+              { data: tc.stderr.useFile ? Uri.file(tc.stderr.data) : tc.stderr.data },
             ]);
-          }
-          return [id, items];
+          return [tcId, items];
         }),
       ],
     ];
-    for (const part of path) {
+    let current: CphFsItem = root;
+    for (const part of pathParts) {
       if (Array.isArray(current)) {
-        const next: CphFsDirItem | undefined = current.find(
-          ([name]) => name === part,
-        );
-        if (!next) {
-          throw this.notFound;
-        }
+        const next = current.find(([name]) => name === part) as CphFsDirItem | undefined;
+        if (!next) throw FileSystemError.FileNotFound();
         current = next[1];
-      } else {
-        throw this.notFound;
-      }
+      } else throw FileSystemError.FileNotFound();
     }
     return current;
   }
   public async fireAuthorityChange(authority: string): Promise<void> {
-    const repo = container.resolve(TOKENS.ProblemRepository);
-    const fullProblem = await repo.getFullProblem(authority);
-    if (!fullProblem) {
-      return;
+    const fullProblem = await this.repo.getFullProblem(authority);
+    if (!fullProblem) return;
+    const tcIds = fullProblem.problem.getEnabledTcIds();
+    const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority, path: '/' });
+
+    const files: Uri[] = [];
+    files.push(baseUri);
+    files.push(Uri.joinPath(baseUri, 'problem.cph-ng.json'));
+    for (const tcId of tcIds) {
+      const tc = fullProblem.problem.getTc(tcId);
+      files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'stdin'));
+      files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'answer'));
+      tc.stdout && files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'stdout'));
+      tc.stderr && files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'stderr'));
     }
-    const events: FileChangeEvent[] = [];
-    const baseUri = Uri.from({
-      scheme: ProblemFs.scheme,
-      authority,
-      path: '/',
-    });
-    events.push({
-      type: FileChangeType.Changed,
-      uri: baseUri,
-    });
-    events.push({
-      type: FileChangeType.Changed,
-      uri: Uri.joinPath(baseUri, 'problem.cph-ng.json'),
-    });
-    for (const [id, tc] of Object.entries(fullProblem.problem.tcs)) {
-      events.push({
-        type: FileChangeType.Changed,
-        uri: Uri.joinPath(baseUri, 'tcs', id, 'stdin'),
-      });
-      events.push({
-        type: FileChangeType.Changed,
-        uri: Uri.joinPath(baseUri, 'tcs', id, 'answer'),
-      });
-      if (tc.result) {
-        events.push({
-          type: FileChangeType.Changed,
-          uri: Uri.joinPath(baseUri, 'tcs', id, 'stdout'),
-        });
-        events.push({
-          type: FileChangeType.Changed,
-          uri: Uri.joinPath(baseUri, 'tcs', id, 'stderr'),
-        });
-      }
-    }
-    this.changeEmitter.fire(events);
+    this.changeEmitter.fire(files.map((uri) => ({ type: FileChangeType.Changed, uri })));
   }
 
   async stat(uri: Uri): Promise<FileStat> {
@@ -223,23 +185,15 @@ export class ProblemFs implements FileSystemProvider {
 
   async readFile(uri: Uri): Promise<Uint8Array> {
     const item = await this.parseUri(uri);
-    if (Array.isArray(item)) {
-      throw this.isDir;
-    }
-    if (item.data instanceof Uri) {
-      return await readFile(item.data.fsPath);
-    }
-    return Buffer.from(item.data);
+    if (Array.isArray(item)) throw FileSystemError.FileIsADirectory();
+    const data = item.data instanceof Uri ? await this.fs.readFile(item.data.fsPath) : item.data;
+    return Buffer.from(data);
   }
 
   async writeFile(uri: Uri, content: Uint8Array): Promise<void> {
     const item = await this.parseUri(uri);
-    if (Array.isArray(item)) {
-      throw this.isDir;
-    }
-    if (!item.set) {
-      throw this.noPermissions;
-    }
+    if (Array.isArray(item)) throw FileSystemError.FileIsADirectory();
+    if (!item.set) throw FileSystemError.NoPermissions();
     await item.set(content.toString());
     this.changeEmitter.fire([{ type: FileChangeType.Changed, uri }]);
     const repo = container.resolve(TOKENS.ProblemRepository);
@@ -250,24 +204,24 @@ export class ProblemFs implements FileSystemProvider {
     return new Disposable(() => {});
   }
   delete(): void {
-    throw this.noPermissions;
+    throw FileSystemError.NoPermissions();
   }
   rename(): void {
-    throw this.noPermissions;
+    throw FileSystemError.NoPermissions();
   }
   async readDirectory(uri: Uri): Promise<[string, FileType][]> {
     const item = await this.parseUri(uri);
-    if (!Array.isArray(item)) {
-      throw this.isFile;
-    }
+    if (!Array.isArray(item)) throw FileSystemError.FileNotADirectory();
     return item.map(([name, child]) => [
       name,
-      Array.isArray(child) ? FileType.Directory : FileType.File,
+      Array.isArray(child)
+        ? FileType.Directory
+        : child.data instanceof Uri
+          ? FileType.File | FileType.SymbolicLink
+          : FileType.File,
     ]);
   }
   createDirectory(): void {
-    throw this.noPermissions;
+    throw FileSystemError.NoPermissions();
   }
 }
-
-export default ProblemFs;

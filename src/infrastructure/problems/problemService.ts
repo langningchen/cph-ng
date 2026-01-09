@@ -28,9 +28,12 @@ import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
 import { Problem } from '@/domain/entities/problem';
 import { Tc } from '@/domain/entities/tc';
+import { TcScanner } from '@/domain/services/TcScanner';
 import {
   type IFileWithHash,
   type IProblem,
@@ -43,15 +46,18 @@ import {
 @injectable()
 export class ProblemService implements IProblemService {
   constructor(
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.Path) private readonly path: IPath,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
     @inject(TOKENS.Crypto) private readonly crypto: ICrypto,
-    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
+    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.Telemetry) private readonly telemetry: ITelemetry,
+    @inject(TOKENS.Path) private readonly path: IPath,
+    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
     @inject(TOKENS.ProblemRepository) private readonly repo: IProblemRepository,
+    @inject(TOKENS.Settings) private readonly settings: ISettings,
+    @inject(TOKENS.Telemetry) private readonly telemetry: ITelemetry,
     @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
+    @inject(TOKENS.Translator) private readonly translator: ITranslator,
+    @inject(TOKENS.Ui) private readonly ui: IUi,
+    @inject(TcScanner) private readonly tcScanner: TcScanner,
   ) {
     this.logger = this.logger.withScope('ProblemRepository');
   }
@@ -77,6 +83,33 @@ export class ProblemService implements IProblemService {
     this.logger.info('Problem', problem.src.path, 'loaded');
     this.logger.trace('Loaded problem data', { problem });
     return Problem.fromI(problem);
+  }
+
+  public async loadTcs(problem: Problem): Promise<void> {
+    const option = await this.ui.quickPick(
+      [
+        { label: this.translator.t('Load from a zip file'), value: 'zip' },
+        { label: this.translator.t('Load from a folder'), value: 'folder' },
+      ],
+      {},
+    );
+    if (!option) return;
+
+    if (option === 'zip') {
+      const zipFile = await this.ui.openDialog({
+        title: this.translator.t('Choose a zip file containing test cases'),
+        filters: { 'Zip files': ['zip'], 'All files': ['*'] },
+      });
+      if (!zipFile) return;
+      this.applyTcs(problem, await this.tcScanner.fromZip(problem.src.path, zipFile));
+    } else if (option === 'folder') {
+      const folderUri = await this.ui.chooseFolder(
+        this.translator.t('Choose a folder containing test cases'),
+      );
+      if (!folderUri) return;
+      this.applyTcs(problem, await this.tcScanner.fromFolder(folderUri));
+    }
+    await this.repo.dataRefresh();
   }
 
   public applyTcs(problem: Problem, tcs: ITc[]): void {

@@ -17,7 +17,6 @@
 
 import type { TextEditor, Uri } from 'vscode';
 import Telemetry from '@/helpers/telemetry';
-import ProblemFs from '../modules/problems/problemFs';
 import SidebarProvider from '../modules/sidebar';
 
 export let extensionUri: Uri;
@@ -26,7 +25,6 @@ export const setExtensionUri = (uri: Uri) => {
   extensionUri = uri;
   extensionPath = uri.fsPath;
 };
-export const problemFs = new ProblemFs();
 export const sidebarProvider = new SidebarProvider();
 export const telemetry = new Telemetry();
 

@@ -25,13 +25,13 @@ import type {
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
-import { BaseProblemUseCase } from '@/application/useCases/BaseProblemUseCase';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import { TcIo } from '@/domain/entities/tcIo';
 import type { ToggleTcFileMsg, WebviewTcFileTypes } from '@/webview/src/msgs';
 
 @injectable()
-export class ToggleFile extends BaseProblemUseCase<ToggleTcFileMsg> {
+export class ToggleTcFile extends BaseProblemUseCase<ToggleTcFileMsg> {
   constructor(
     @inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.Settings) protected readonly settings: ISettings,

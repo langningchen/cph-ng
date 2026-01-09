@@ -38,9 +38,15 @@ export interface IFileSystem {
   /** Checks if a file or directory exists. */
   exists(path: string): Promise<boolean>;
 
+  /** Recursive creates a directory. */
+  mkdir(path: string): Promise<void>;
+
   /** Get the status of a file or directory. */
   stat(path: string): Promise<{ size: number; isFile(): boolean; isDirectory(): boolean }>;
 
   /** Removes a file. */
   rm(path: string): Promise<void>;
+
+  /** Walks through a directory. */
+  walk(path: string): Promise<string[]>;
 }

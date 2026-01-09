@@ -18,11 +18,15 @@
 import type * as msgs from '@w/msgs';
 import { container, injectable } from 'tsyringe';
 import type { IProblemsManager } from '@/application/ports/problems/IProblemsManager';
-import { ClearTcStatus } from '@/application/useCases/ClearTcStatus';
-import { RunAllTcs } from '@/application/useCases/RunAllTcs';
-import { RunSingleTc } from '@/application/useCases/RunSingleTc';
-import { StopTcs } from '@/application/useCases/StopTcs';
-import { ToggleDisable } from '@/application/useCases/ToggleDisable';
+import { AddTc } from '@/application/useCases/webview/AddTc';
+import { ClearTcStatus } from '@/application/useCases/webview/ClearTcStatus';
+import { DelTc } from '@/application/useCases/webview/DelTc';
+import { LoadTcs } from '@/application/useCases/webview/LoadTcs';
+import { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
+import { RunSingleTc } from '@/application/useCases/webview/RunSingleTc';
+import { StopTcs } from '@/application/useCases/webview/StopTcs';
+import { ToggleDisable } from '@/application/useCases/webview/ToggleDisable';
+import { ToggleTcFile } from '@/application/useCases/webview/ToggleTcFile';
 import { BfCompare } from '../../modules/problems/manager/bfCompare';
 import { ProblemActions } from '../../modules/problems/manager/problemActions';
 import { TcActions } from '../../modules/problems/manager/tcActions';
@@ -58,10 +62,10 @@ export class ProblemsManager implements IProblemsManager {
   }
 
   async addTc(msg: msgs.AddTcMsg): Promise<void> {
-    return TcActions.addTc(msg);
+    await container.resolve(AddTc).exec(msg);
   }
   async loadTcs(msg: msgs.LoadTcsMsg): Promise<void> {
-    return TcActions.loadTcs(msg);
+    await container.resolve(LoadTcs).exec(msg);
   }
   async updateTc(msg: msgs.UpdateTcMsg): Promise<void> {
     return TcActions.updateTc(msg);
@@ -79,10 +83,10 @@ export class ProblemsManager implements IProblemsManager {
     return TcActions.compareTc(msg);
   }
   async toggleTcFile(msg: msgs.ToggleTcFileMsg): Promise<void> {
-    return TcActions.toggleTcFile(msg);
+    await container.resolve(ToggleTcFile).exec(msg);
   }
   async delTc(msg: msgs.DelTcMsg): Promise<void> {
-    return TcActions.delTc(msg);
+    await container.resolve(DelTc).exec(msg);
   }
   async reorderTc(msg: msgs.ReorderTcMsg): Promise<void> {
     return TcActions.reorderTc(msg);

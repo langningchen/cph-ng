@@ -20,6 +20,7 @@ import type { ITc } from '@/types';
 
 export interface IProblemService {
   loadBySrc(srcPath: string): Promise<Problem | null>;
+  loadTcs(problem: Problem): Promise<void>;
   applyTcs(problem: Problem, tcs: ITc[]): void;
   save(problem: Problem): Promise<void>;
   delete(problem: Problem): Promise<void>;

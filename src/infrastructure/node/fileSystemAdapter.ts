@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { access, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { access, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
@@ -43,6 +43,10 @@ export class FileSystemAdapter implements IFileSystem {
     }
   }
 
+  async mkdir(path: string): Promise<void> {
+    await mkdir(path, { recursive: true });
+  }
+
   async stat(path: string): Promise<{ size: number; isFile(): boolean; isDirectory(): boolean }> {
     const stats = await stat(path);
     return {
@@ -54,5 +58,16 @@ export class FileSystemAdapter implements IFileSystem {
 
   async rm(path: string): Promise<void> {
     await rm(path);
+  }
+
+  async walk(path: string): Promise<string[]> {
+    const entries = await readdir(path, { withFileTypes: true });
+    const files = await Promise.all(
+      entries.map((entry) => {
+        const fullPath = this.path.join(path, entry.name);
+        return entry.isDirectory() ? this.walk(fullPath) : fullPath;
+      }),
+    );
+    return files.flat();
   }
 }

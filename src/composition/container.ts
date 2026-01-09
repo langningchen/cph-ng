@@ -45,6 +45,7 @@ import { ProblemsManager } from '@/infrastructure/problems/problemsManager';
 import { PathResolverAdapter } from '@/infrastructure/services/pathResolverAdapter';
 import { DocumentAdapter } from '@/infrastructure/vscode/documentAdapter';
 import { LoggerAdapter } from '@/infrastructure/vscode/loggerAdapter';
+import { ProblemFs } from '@/infrastructure/vscode/problemFs';
 import { SettingsAdapter } from '@/infrastructure/vscode/settingsAdapter';
 import { TelemetryAdapter } from '@/infrastructure/vscode/telemetryAdapter';
 import { TranslatorAdapter } from '@/infrastructure/vscode/translatorAdapter';
@@ -65,6 +66,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.Logger, LoggerAdapter);
   container.registerSingleton(TOKENS.Path, PathAdapter);
   container.registerSingleton(TOKENS.PathResolver, PathResolverAdapter);
+  container.registerSingleton(TOKENS.ProblemFs, ProblemFs);
   container.registerSingleton(TOKENS.ProblemRepository, ProblemRepository);
   container.registerSingleton(TOKENS.ProblemsManager, ProblemsManager);
   container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
