@@ -35,10 +35,10 @@ export class LangJavascript extends AbstractLanguageStrategy {
   public readonly extensions = ['js'];
 
   constructor(
-    @inject(TOKENS.FileSystem) protected readonly fs: IFileSystem,
-    @inject(TOKENS.Logger) protected readonly logger: ILogger,
-    @inject(TOKENS.Settings) protected readonly settings: ISettings,
-    @inject(TOKENS.Translator) protected readonly translator: ITranslator,
+    @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
+    @inject(TOKENS.logger) protected readonly logger: ILogger,
+    @inject(TOKENS.settings) protected readonly settings: ISettings,
+    @inject(TOKENS.translator) protected readonly translator: ITranslator,
   ) {
     super(fs, logger.withScope('langsJavascript'), settings, translator);
     this.logger = this.logger.withScope('langsJavascript');

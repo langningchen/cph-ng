@@ -43,21 +43,21 @@ type RunnerOutput =
     }
   | {
       error: true;
-      error_type: number;
-      error_code: number;
+      errorType: number;
+      errorCode: number;
     };
 
 @injectable()
 export class ExternalRunnerStrategy implements IExecutionStrategy {
   constructor(
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.Telemetry) private readonly telemetry: ITelemetry,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
-    @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
-    @inject(TOKENS.Translator) private readonly translator: ITranslator,
-    @inject(TOKENS.RunnerProvider)
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
+    @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TOKENS.runnerProvider)
     private readonly runner: IRunnerProvider,
   ) {
     this.logger = this.logger.withScope('ExternalRunnerStrategy');
@@ -149,8 +149,8 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
       this.tmp.dispose([userStdoutPath, userStderrPath]);
       throw new Error(
         this.translator.t('Runner reported error: {type} (Code: {code})', {
-          type: runInfo.error_type,
-          code: runInfo.error_code,
+          type: runInfo.errorType,
+          code: runInfo.errorCode,
         }),
       );
     }

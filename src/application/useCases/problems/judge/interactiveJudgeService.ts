@@ -13,11 +13,11 @@ import type { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/res
 @injectable()
 export class InteractiveJudgeService implements IJudgeService {
   constructor(
-    @inject(TOKENS.LanguageRegistry) private readonly lang: ILanguageRegistry,
-    @inject(TOKENS.ProblemService) private readonly problemService: IProblemService,
-    @inject(TOKENS.ResultEvaluator) private readonly evaluator: ResultEvaluatorAdaptor,
-    @inject(TOKENS.SolutionRunner) private readonly runner: ISolutionRunner,
-    @inject(TOKENS.Translator) private readonly translator: ITranslator,
+    @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,
+    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
+    @inject(TOKENS.resultEvaluator) private readonly evaluator: ResultEvaluatorAdaptor,
+    @inject(TOKENS.solutionRunner) private readonly runner: ISolutionRunner,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
   ) {}
 
   public async judge(
@@ -45,16 +45,16 @@ export class InteractiveJudgeService implements IJudgeService {
       );
       const limits = this.problemService.getLimits(ctx.problem);
 
-      observer.onStatusChange(VerdictName.JG);
+      observer.onStatusChange(VerdictName.judging);
       const executionResult = await this.runner.runInteractive(
         { cmd: runCmd, stdinPath: ctx.stdinPath, ...limits },
         signal,
         ctx.artifacts.interactor.path,
       );
       if (executionResult instanceof Error) throw executionResult;
-      observer.onStatusChange(VerdictName.JGD);
+      observer.onStatusChange(VerdictName.judged);
 
-      observer.onStatusChange(VerdictName.CMP);
+      observer.onStatusChange(VerdictName.comparing);
       const finalResult = await this.evaluator.judge(
         {
           executionResult: executionResult.sol,
@@ -71,7 +71,7 @@ export class InteractiveJudgeService implements IJudgeService {
       observer.onResult(finalResult);
     } catch (e) {
       if (e instanceof ExecutionRejected)
-        observer.onResult({ verdict: VerdictName.RJ, msg: e.message });
+        observer.onResult({ verdict: VerdictName.rejected, msg: e.message });
       else observer.onError(e as Error);
     }
   }

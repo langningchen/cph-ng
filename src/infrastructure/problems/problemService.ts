@@ -46,17 +46,17 @@ import {
 @injectable()
 export class ProblemService implements IProblemService {
   constructor(
-    @inject(TOKENS.Crypto) private readonly crypto: ICrypto,
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.Path) private readonly path: IPath,
-    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
-    @inject(TOKENS.ProblemRepository) private readonly repo: IProblemRepository,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.Telemetry) private readonly telemetry: ITelemetry,
-    @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
-    @inject(TOKENS.Translator) private readonly translator: ITranslator,
-    @inject(TOKENS.Ui) private readonly ui: IUi,
+    @inject(TOKENS.crypto) private readonly crypto: ICrypto,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.path) private readonly path: IPath,
+    @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
+    @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
+    @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TOKENS.ui) private readonly ui: IUi,
     @inject(TcScanner) private readonly tcScanner: TcScanner,
   ) {
     this.logger = this.logger.withScope('ProblemRepository');

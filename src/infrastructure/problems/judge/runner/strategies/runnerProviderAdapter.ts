@@ -32,14 +32,14 @@ export class RunnerProviderAdapter implements IRunnerProvider {
   private compilationPromise: Promise<string> | null = null;
 
   constructor(
-    @inject(TOKENS.ExtensionPath) private readonly extPath: string,
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.Path) private readonly path: IPath,
-    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
-    @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.System) private readonly sys: ISystem,
+    @inject(TOKENS.extensionPath) private readonly extPath: string,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.path) private readonly path: IPath,
+    @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
+    @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.system) private readonly sys: ISystem,
   ) {
     this.logger = this.logger.withScope('RunnerProvider');
   }

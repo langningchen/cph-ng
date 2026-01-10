@@ -49,10 +49,10 @@ export interface FinalResult {
 @injectable()
 export class ResultEvaluatorAdaptor implements IResultEvaluator {
   constructor(
-    @inject(TOKENS.CheckerRunner) private readonly checkerRunner: ICheckerRunner,
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
+    @inject(TOKENS.checkerRunner) private readonly checkerRunner: ICheckerRunner,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
     @inject(Grader) private readonly grader: Grader,
   ) {}
 
@@ -63,12 +63,13 @@ export class ResultEvaluatorAdaptor implements IResultEvaluator {
       memoryMb: res.memoryMb,
     };
 
-    if (res.isUserAborted) return { ...executionStats, verdict: VerdictName.RJ };
-    if (res.timeMs > req.timeLimitMs) return { ...executionStats, verdict: VerdictName.TLE };
+    if (res.isUserAborted) return { ...executionStats, verdict: VerdictName.rejected };
+    if (res.timeMs > req.timeLimitMs)
+      return { ...executionStats, verdict: VerdictName.timeLimitExceed };
     if (res.codeOrSignal)
       return {
         ...executionStats,
-        verdict: VerdictName.RE,
+        verdict: VerdictName.runtimeError,
         msg: `Program exited with code: ${res.codeOrSignal}`,
       };
 
@@ -83,7 +84,7 @@ export class ResultEvaluatorAdaptor implements IResultEvaluator {
         signal,
       );
       if (spjRes instanceof Error) {
-        return { ...executionStats, verdict: VerdictName.SE, msg: spjRes.message };
+        return { ...executionStats, verdict: VerdictName.systemError, msg: spjRes.message };
       }
 
       const verdict = this.grader.mapTestlibExitCode(spjRes.exitCode);

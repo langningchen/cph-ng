@@ -8,8 +8,8 @@ import { TOKENS } from '@/composition/tokens';
 @injectable()
 export class LanguageRegistry implements ILanguageRegistry {
   constructor(
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @injectAll(TOKENS.LanguageStrategy) private readonly langs: ILanguageStrategy[],
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @injectAll(TOKENS.languageStrategy) private readonly langs: ILanguageStrategy[],
   ) {
     this.logger = logger.withScope('LanguageRegistry');
   }

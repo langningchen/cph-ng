@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-type UUID = `${string}-${string}-${string}-${string}-${string}`;
+type Uuid = `${string}-${string}-${string}-${string}-${string}`;
 
 /**
  * Interface for cryptographic operations.
@@ -26,5 +26,5 @@ export interface ICrypto {
    * Generates a random UUID.
    * @returns A randomly generated UUID string.
    */
-  randomUUID(): UUID;
+  randomUUID(): Uuid;
 }

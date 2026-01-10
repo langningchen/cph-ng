@@ -36,7 +36,7 @@ interface TranslationConfig {
   files: string[];
 }
 
-const CONFIGS: TranslationConfig[] = [
+const Configs: TranslationConfig[] = [
   {
     title: 'Extension Configuration',
     getKeys: () => {
@@ -151,7 +151,7 @@ const checkTranslations = (config: TranslationConfig) => {
 };
 
 let hasError = false;
-for (const config of CONFIGS) hasError = hasError || checkTranslations(config);
+for (const config of Configs) hasError = hasError || checkTranslations(config);
 if (hasError) process.exit(1);
 
 process.exit(0);

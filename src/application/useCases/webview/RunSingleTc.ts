@@ -40,12 +40,12 @@ import type { RunTcMsg } from '@/webview/src/msgs';
 @injectable()
 export class RunSingleTc extends BaseProblemUseCase<RunTcMsg> {
   constructor(
-    @inject(TOKENS.CompilerService) private readonly compiler: ICompilerService,
-    @inject(TOKENS.Document) private readonly document: IDocument,
-    @inject(TOKENS.JudgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
-    @inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.TcService) private readonly tcService: ITcService,
-    @inject(TOKENS.TempStorage) protected readonly tmp: ITempStorage,
+    @inject(TOKENS.compilerService) private readonly compiler: ICompilerService,
+    @inject(TOKENS.document) private readonly document: IDocument,
+    @inject(TOKENS.judgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.tcService) private readonly tcService: ITcService,
+    @inject(TOKENS.tempStorage) protected readonly tmp: ITempStorage,
   ) {
     super(repo, true);
   }
@@ -62,7 +62,7 @@ export class RunSingleTc extends BaseProblemUseCase<RunTcMsg> {
     fullProblem.ac = ac;
 
     this.tmp.dispose(tc.clearResult());
-    tc.updateResult(VerdictName.CP, { isExpand: false });
+    tc.updateResult(VerdictName.compiling, { isExpand: false });
     await this.repo.dataRefresh();
 
     await this.document.save(problem.src.path);
@@ -70,16 +70,16 @@ export class RunSingleTc extends BaseProblemUseCase<RunTcMsg> {
     if (artifacts instanceof Error) {
       tc.updateResult(
         artifacts instanceof CompileError
-          ? VerdictName.CE
+          ? VerdictName.compilationError
           : artifacts instanceof CompileRejected
-            ? VerdictName.RJ
-            : VerdictName.SE,
+            ? VerdictName.rejected
+            : VerdictName.systemError,
         { msg: artifacts.message },
       );
       await this.repo.dataRefresh();
       return;
     }
-    tc.updateResult(VerdictName.CPD);
+    tc.updateResult(VerdictName.compiled);
 
     const judgeService = this.judgeFactory.create(problem);
 
@@ -105,7 +105,7 @@ export class RunSingleTc extends BaseProblemUseCase<RunTcMsg> {
         this.repo.dataRefresh();
       },
       onError: (e) => {
-        tc.updateResult(VerdictName.SE, { msg: e.message });
+        tc.updateResult(VerdictName.systemError, { msg: e.message });
         this.repo.dataRefresh();
       },
     };

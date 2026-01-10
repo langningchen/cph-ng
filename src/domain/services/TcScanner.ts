@@ -31,13 +31,13 @@ import { TcIo } from '@/types';
 @injectable()
 export class TcScanner {
   constructor(
-    @inject(TOKENS.Archive) private readonly archive: IArchive,
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.Path) private readonly path: IPath,
-    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.Translator) private readonly translator: ITranslator,
-    @inject(TOKENS.Ui) private readonly ui: IUi,
+    @inject(TOKENS.archive) private readonly archive: IArchive,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.path) private readonly path: IPath,
+    @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TOKENS.ui) private readonly ui: IUi,
     @inject(TcMatcher) private readonly matcher: TcMatcher,
   ) {}
 

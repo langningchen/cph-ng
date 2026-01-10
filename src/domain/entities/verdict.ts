@@ -16,27 +16,27 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 export const VerdictName = {
-  UKE: 'UKE',
-  AC: 'AC',
-  PC: 'PC',
-  PE: 'PE',
-  WA: 'WA',
-  TLE: 'TLE',
-  MLE: 'MLE',
-  OLE: 'OLE',
-  RE: 'RE',
-  RF: 'RF',
-  CE: 'CE',
-  SE: 'SE',
-  WT: 'WT',
-  FC: 'FC',
-  CP: 'CP',
-  CPD: 'CPD',
-  JG: 'JG',
-  JGD: 'JGD',
-  CMP: 'CMP',
-  SK: 'SK',
-  RJ: 'RJ',
+  unknownError: 'UKE',
+  accepted: 'AC',
+  partiallyCorrect: 'PC',
+  presentationError: 'PE',
+  wrongAnswer: 'WA',
+  timeLimitExceed: 'TLE',
+  memoryLimitExceed: 'MLE',
+  outputLimitExceed: 'OLE',
+  runtimeError: 'RE',
+  restrictedFunction: 'RF',
+  compilationError: 'CE',
+  systemError: 'SE',
+  waiting: 'WT',
+  fetched: 'FC',
+  compiling: 'CP',
+  compiled: 'CPD',
+  judging: 'JG',
+  judged: 'JGD',
+  comparing: 'CMP',
+  skipped: 'SK',
+  rejected: 'RJ',
 } as const;
 export type VerdictName = (typeof VerdictName)[keyof typeof VerdictName];
 
@@ -47,42 +47,90 @@ export interface Verdict {
 }
 
 export const VERDICTS: Record<VerdictName, Verdict> = {
-  [VerdictName.UKE]: { name: VerdictName.UKE, fullName: 'Unknown Error', color: '#0000ff' },
-  [VerdictName.AC]: { name: VerdictName.AC, fullName: 'Accepted', color: '#49cd32' },
-  [VerdictName.PC]: { name: VerdictName.PC, fullName: 'Partially Correct', color: '#ed9813' },
-  [VerdictName.PE]: { name: VerdictName.PE, fullName: 'Presentation Error', color: '#ff778e' },
-  [VerdictName.WA]: { name: VerdictName.WA, fullName: 'Wrong Answer', color: '#d3140d' },
-  [VerdictName.TLE]: { name: VerdictName.TLE, fullName: 'Time Limit Exceed', color: '#0c0066' },
-  [VerdictName.MLE]: { name: VerdictName.MLE, fullName: 'Memory Limit Exceed', color: '#5300a7' },
-  [VerdictName.OLE]: { name: VerdictName.OLE, fullName: 'Output Limit Exceed', color: '#8300a7' },
-  [VerdictName.RE]: { name: VerdictName.RE, fullName: 'Runtime Error', color: '#1a26c8' },
-  [VerdictName.RF]: { name: VerdictName.RF, fullName: 'Restricted Function', color: '#008f81' },
-  [VerdictName.CE]: { name: VerdictName.CE, fullName: 'Compilation Error', color: '#8b7400' },
-  [VerdictName.SE]: { name: VerdictName.SE, fullName: 'System Error', color: '#000000' },
-  [VerdictName.WT]: { name: VerdictName.WT, fullName: 'Waiting', color: '#4100d9' },
-  [VerdictName.FC]: { name: VerdictName.FC, fullName: 'Fetched', color: '#4c00ff' },
-  [VerdictName.CP]: { name: VerdictName.CP, fullName: 'Compiling', color: '#5e19ff' },
-  [VerdictName.CPD]: { name: VerdictName.CPD, fullName: 'Compiled', color: '#7340ff' },
-  [VerdictName.JG]: { name: VerdictName.JG, fullName: 'Judging', color: '#844fff' },
-  [VerdictName.JGD]: { name: VerdictName.JGD, fullName: 'Judged', color: '#967fff' },
-  [VerdictName.CMP]: { name: VerdictName.CMP, fullName: 'Comparing', color: '#a87dff' },
-  [VerdictName.SK]: { name: VerdictName.SK, fullName: 'Skipped', color: '#4b4b4b' },
-  [VerdictName.RJ]: { name: VerdictName.RJ, fullName: 'Rejected', color: '#4e0000' },
+  [VerdictName.unknownError]: {
+    name: VerdictName.unknownError,
+    fullName: 'Unknown Error',
+    color: '#0000ff',
+  },
+  [VerdictName.accepted]: { name: VerdictName.accepted, fullName: 'Accepted', color: '#49cd32' },
+  [VerdictName.partiallyCorrect]: {
+    name: VerdictName.partiallyCorrect,
+    fullName: 'Partially Correct',
+    color: '#ed9813',
+  },
+  [VerdictName.presentationError]: {
+    name: VerdictName.presentationError,
+    fullName: 'Presentation Error',
+    color: '#ff778e',
+  },
+  [VerdictName.wrongAnswer]: {
+    name: VerdictName.wrongAnswer,
+    fullName: 'Wrong Answer',
+    color: '#d3140d',
+  },
+  [VerdictName.timeLimitExceed]: {
+    name: VerdictName.timeLimitExceed,
+    fullName: 'Time Limit Exceed',
+    color: '#0c0066',
+  },
+  [VerdictName.memoryLimitExceed]: {
+    name: VerdictName.memoryLimitExceed,
+    fullName: 'Memory Limit Exceed',
+    color: '#5300a7',
+  },
+  [VerdictName.outputLimitExceed]: {
+    name: VerdictName.outputLimitExceed,
+    fullName: 'Output Limit Exceed',
+    color: '#8300a7',
+  },
+  [VerdictName.runtimeError]: {
+    name: VerdictName.runtimeError,
+    fullName: 'Runtime Error',
+    color: '#1a26c8',
+  },
+  [VerdictName.restrictedFunction]: {
+    name: VerdictName.restrictedFunction,
+    fullName: 'Restricted Function',
+    color: '#008f81',
+  },
+  [VerdictName.compilationError]: {
+    name: VerdictName.compilationError,
+    fullName: 'Compilation Error',
+    color: '#8b7400',
+  },
+  [VerdictName.systemError]: {
+    name: VerdictName.systemError,
+    fullName: 'System Error',
+    color: '#000000',
+  },
+  [VerdictName.waiting]: { name: VerdictName.waiting, fullName: 'Waiting', color: '#4100d9' },
+  [VerdictName.fetched]: { name: VerdictName.fetched, fullName: 'Fetched', color: '#4c00ff' },
+  [VerdictName.compiling]: { name: VerdictName.compiling, fullName: 'Compiling', color: '#5e19ff' },
+  [VerdictName.compiled]: { name: VerdictName.compiled, fullName: 'Compiled', color: '#7340ff' },
+  [VerdictName.judging]: { name: VerdictName.judging, fullName: 'Judging', color: '#844fff' },
+  [VerdictName.judged]: { name: VerdictName.judged, fullName: 'Judged', color: '#967fff' },
+  [VerdictName.comparing]: { name: VerdictName.comparing, fullName: 'Comparing', color: '#a87dff' },
+  [VerdictName.skipped]: { name: VerdictName.skipped, fullName: 'Skipped', color: '#4b4b4b' },
+  [VerdictName.rejected]: { name: VerdictName.rejected, fullName: 'Rejected', color: '#4e0000' },
 };
 
-const RUNNING_SET = new Set<VerdictName>([
-  VerdictName.WT,
-  VerdictName.CP,
-  VerdictName.CPD,
-  VerdictName.JG,
-  VerdictName.JGD,
-  VerdictName.CMP,
+const RunningSet = new Set<VerdictName>([
+  VerdictName.waiting,
+  VerdictName.compiling,
+  VerdictName.compiled,
+  VerdictName.judging,
+  VerdictName.judged,
+  VerdictName.comparing,
 ]);
 export const isRunningVerdict = (verdict?: VerdictName): boolean => {
-  return verdict !== undefined && RUNNING_SET.has(verdict);
+  return verdict !== undefined && RunningSet.has(verdict);
 };
 
-const PASSED_SET = new Set<VerdictName>([VerdictName.AC, VerdictName.SK, VerdictName.RJ]);
+const PassedSet = new Set<VerdictName>([
+  VerdictName.accepted,
+  VerdictName.skipped,
+  VerdictName.rejected,
+]);
 export const isExpandVerdict = (verdict?: VerdictName): boolean => {
-  return verdict !== undefined && !RUNNING_SET.has(verdict) && !PASSED_SET.has(verdict);
+  return verdict !== undefined && !RunningSet.has(verdict) && !PassedSet.has(verdict);
 };

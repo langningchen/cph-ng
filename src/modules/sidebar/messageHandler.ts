@@ -12,8 +12,8 @@ export const handleMessage = async (msg: WebviewMsg) => {
   logger.info('Received', msg.type, 'message');
   logger.debug('Received message data from webview', msg);
   try {
-    const problemsManager = container.resolve(TOKENS.ProblemsManager);
-    const repo = container.resolve(TOKENS.ProblemRepository);
+    const problemsManager = container.resolve(TOKENS.problemsManager);
+    const repo = container.resolve(TOKENS.problemRepository);
     const handleEnd = telemetry.start('sidebarMessage', {
       type: msg.type,
     });

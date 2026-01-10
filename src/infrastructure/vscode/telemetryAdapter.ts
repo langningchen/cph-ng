@@ -33,9 +33,9 @@ import { TOKENS } from '@/composition/tokens';
 @injectable()
 export class TelemetryAdapter implements ITelemetry {
   constructor(
-    @inject(TOKENS.TelemetryReporter)
+    @inject(TOKENS.telemetryReporter)
     private readonly reporter: TelemetryReporter,
-    @inject(TOKENS.Clock) private readonly clock: IClock,
+    @inject(TOKENS.clock) private readonly clock: IClock,
   ) {}
 
   private isErrorName(name: TelemetryName): name is TelemetryErrorName {

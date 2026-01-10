@@ -24,13 +24,13 @@ export class LangC extends AbstractLanguageStrategy {
   public readonly enableRunner = true;
 
   constructor(
-    @inject(TOKENS.FileSystem) protected readonly fs: IFileSystem,
-    @inject(TOKENS.Path) protected readonly path: IPath,
-    @inject(TOKENS.Logger) protected readonly logger: ILogger,
-    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
-    @inject(TOKENS.Settings) protected readonly settings: ISettings,
-    @inject(TOKENS.System) private readonly sys: ISystem,
-    @inject(TOKENS.Translator) protected readonly translator: ITranslator,
+    @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
+    @inject(TOKENS.path) protected readonly path: IPath,
+    @inject(TOKENS.logger) protected readonly logger: ILogger,
+    @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
+    @inject(TOKENS.settings) protected readonly settings: ISettings,
+    @inject(TOKENS.system) private readonly sys: ISystem,
+    @inject(TOKENS.translator) protected readonly translator: ITranslator,
   ) {
     super(fs, logger.withScope('langsC'), settings, translator);
     this.logger = this.logger.withScope('langsC');

@@ -13,41 +13,9 @@ import { ProblemActions } from './problemActions';
 
 export class TcActions {
   private static getRepository() {
-    return container.resolve(TOKENS.ProblemRepository);
+    return container.resolve(TOKENS.problemRepository);
   }
   
-  public static async chooseTcFile(msg: msgs.ChooseTcFileMsg): Promise<void> {
-    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    const isInput = msg.label === 'stdin';
-    const mainExt = isInput
-      ? Settings.problem.inputFileExtensionList
-      : Settings.problem.outputFileExtensionList;
-    const fileUri = await window.showOpenDialog({
-      canSelectFiles: true,
-      canSelectFolders: false,
-      canSelectMany: false,
-      title: l10n.t('Choose {type} file', {
-        type: isInput ? l10n.t('stdin') : l10n.t('answer'),
-      }),
-      filters: {
-        [l10n.t('Text files')]: mainExt.map((ext) => ext.substring(1)),
-        [l10n.t('All files')]: ['*'],
-      },
-    });
-    if (!fileUri || !fileUri.length) {
-      return;
-    }
-    const partialTc = await TcFactory.fromFile(fileUri[0].fsPath, isInput);
-    partialTc.stdin &&
-      (fullProblem.problem.tcs[msg.id].stdin = partialTc.stdin);
-    partialTc.answer &&
-      (fullProblem.problem.tcs[msg.id].answer = partialTc.answer);
-    await TcActions.getRepository().dataRefresh();
-  }
-
   public static async reorderTc(msg: msgs.ReorderTcMsg): Promise<void> {
     const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
     if (!fullProblem) {

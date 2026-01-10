@@ -20,18 +20,18 @@ import type {
   IProblemRepository,
 } from '@/application/ports/problems/IProblemRepository';
 
-export abstract class BaseProblemUseCase<TRequest extends { activePath: string }> {
+export abstract class BaseProblemUseCase<T extends { activePath: string }> {
   constructor(
     protected readonly repo: IProblemRepository,
     private readonly sendResponse: boolean,
   ) {}
 
-  async exec(msg: TRequest): Promise<void> {
+  async exec(msg: T): Promise<void> {
     const fullProblem = await this.repo.getFullProblem(msg.activePath);
     if (!fullProblem) throw new Error('Problem not found');
     await this.performAction(fullProblem, msg);
     await this.repo.dataRefresh(!this.sendResponse);
   }
 
-  protected abstract performAction(fullProblem: FullProblem, msg: TRequest): Promise<void>;
+  protected abstract performAction(fullProblem: FullProblem, msg: T): Promise<void>;
 }

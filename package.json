@@ -828,6 +828,7 @@
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.7.1",
     "ignore": "^7.0.5",
+    "knip": "^5.80.2",
     "react-refresh": "^0.18.0",
     "speed-measure-webpack-plugin": "^1.5.0",
     "swc-loader": "^0.2.6",

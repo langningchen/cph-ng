@@ -53,7 +53,7 @@ class LlmTestCaseLister implements LanguageModelTool<LlmTestCaseListerParams> {
     _token: CancellationToken,
   ): Promise<LanguageModelToolResult> {
     const result = new LanguageModelToolResult([]);
-    const repo = container.resolve(TOKENS.ProblemRepository);
+    const repo = container.resolve(TOKENS.problemRepository);
     const activePath = options.input.activePath;
     const bgProblem = await repo.getFullProblem(activePath);
     if (!bgProblem) {

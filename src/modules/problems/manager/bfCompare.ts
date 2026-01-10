@@ -14,7 +14,7 @@ export class BfCompare {
   private static logger = new Logger('problemsManagerBfCompare');
 
   private static getRepository() {
-    return container.resolve(TOKENS.ProblemRepository);
+    return container.resolve(TOKENS.problemRepository);
   }
 
   public static async startBfCompare(

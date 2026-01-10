@@ -51,52 +51,62 @@ import { TelemetryAdapter } from '@/infrastructure/vscode/telemetryAdapter';
 import { TranslatorAdapter } from '@/infrastructure/vscode/translatorAdapter';
 import { WebviewEventBusAdapter } from '@/infrastructure/vscode/webviewEventBus';
 import { TOKENS } from './tokens';
+import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
+import { ProblemService } from '@/infrastructure/problems/problemService';
+import { TcIoService } from '@/infrastructure/problems/tcIoService';
+import { TcService } from '@/infrastructure/problems/tcService';
+import { UiAdapter } from '@/infrastructure/vscode/uiAdapter';
 
 export async function setupContainer(context: ExtensionContext): Promise<void> {
-  container.registerSingleton(TOKENS.BuildInfo, BuildInfoAdapter);
-  container.registerSingleton(TOKENS.CheckerRunner, CheckerRunnerAdapter);
-  container.registerSingleton(TOKENS.Clock, ClockAdapter);
-  container.registerSingleton(TOKENS.CompilerService, CompilerService);
-  container.registerSingleton(TOKENS.Crypto, CryptoAdapter);
-  container.registerSingleton(TOKENS.Document, DocumentAdapter);
-  container.registerSingleton(TOKENS.ExecutionStrategyFactory, ExecutionStrategyFactoryAdapter);
-  container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
-  container.registerSingleton(TOKENS.JudgeServiceFactory, JudgeServiceFactory);
-  container.registerSingleton(TOKENS.LanguageRegistry, LanguageRegistry);
-  container.registerSingleton(TOKENS.Logger, LoggerAdapter);
-  container.registerSingleton(TOKENS.Path, PathAdapter);
-  container.registerSingleton(TOKENS.PathResolver, PathResolverAdapter);
-  container.registerSingleton(TOKENS.ProblemFs, ProblemFs);
-  container.registerSingleton(TOKENS.ProblemRepository, ProblemRepository);
-  container.registerSingleton(TOKENS.ProblemsManager, ProblemsManager);
-  container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
-  container.registerSingleton(TOKENS.ResultEvaluator, ResultEvaluatorAdaptor);
-  container.registerSingleton(TOKENS.Runner, SolutionRunnerAdapter);
-  container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);
-  container.registerSingleton(TOKENS.Settings, SettingsAdapter);
-  container.registerSingleton(TOKENS.SolutionRunner, SolutionRunnerAdapter);
-  container.registerSingleton(TOKENS.System, SystemAdapter);
-  container.registerSingleton(TOKENS.Telemetry, TelemetryAdapter);
-  container.registerSingleton(TOKENS.TempStorage, TempStorageAdapter);
-  container.registerSingleton(TOKENS.Translator, TranslatorAdapter);
-  container.registerSingleton(TOKENS.WebviewEventBus, WebviewEventBusAdapter);
+  container.registerSingleton(TOKENS.archive, ArchiveAdapter);
+  container.registerSingleton(TOKENS.buildInfo, BuildInfoAdapter);
+  container.registerSingleton(TOKENS.checkerRunner, CheckerRunnerAdapter);
+  container.registerSingleton(TOKENS.clock, ClockAdapter);
+  container.registerSingleton(TOKENS.compilerService, CompilerService);
+  container.registerSingleton(TOKENS.crypto, CryptoAdapter);
+  container.registerSingleton(TOKENS.document, DocumentAdapter);
+  container.registerSingleton(TOKENS.executionStrategyFactory, ExecutionStrategyFactoryAdapter);
+  container.registerSingleton(TOKENS.fileSystem, FileSystemAdapter);
+  container.registerSingleton(TOKENS.judgeServiceFactory, JudgeServiceFactory);
+  container.registerSingleton(TOKENS.languageRegistry, LanguageRegistry);
+  container.registerSingleton(TOKENS.logger, LoggerAdapter);
+  container.registerSingleton(TOKENS.path, PathAdapter);
+  container.registerSingleton(TOKENS.pathResolver, PathResolverAdapter);
+  container.registerSingleton(TOKENS.problemFs, ProblemFs);
+  container.registerSingleton(TOKENS.problemRepository, ProblemRepository);
+  container.registerSingleton(TOKENS.problemService, ProblemService);
+  container.registerSingleton(TOKENS.problemsManager, ProblemsManager);
+  container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
+  container.registerSingleton(TOKENS.resultEvaluator, ResultEvaluatorAdaptor);
+  container.registerSingleton(TOKENS.runner, SolutionRunnerAdapter);
+  container.registerSingleton(TOKENS.runnerProvider, RunnerProviderAdapter);
+  container.registerSingleton(TOKENS.settings, SettingsAdapter);
+  container.registerSingleton(TOKENS.solutionRunner, SolutionRunnerAdapter);
+  container.registerSingleton(TOKENS.system, SystemAdapter);
+  container.registerSingleton(TOKENS.tcIoService, TcIoService);
+  container.registerSingleton(TOKENS.tcService, TcService);
+  container.registerSingleton(TOKENS.telemetry, TelemetryAdapter);
+  container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
+  container.registerSingleton(TOKENS.translator, TranslatorAdapter);
+  container.registerSingleton(TOKENS.ui, UiAdapter);
+  container.registerSingleton(TOKENS.webviewEventBus, WebviewEventBusAdapter);
 
-  container.register(TOKENS.LanguageStrategy, { useClass: LangC });
-  container.register(TOKENS.LanguageStrategy, { useClass: LangCpp });
-  container.register(TOKENS.LanguageStrategy, { useClass: LangJava });
-  container.register(TOKENS.LanguageStrategy, { useClass: LangJavascript });
-  container.register(TOKENS.LanguageStrategy, { useClass: LangPython });
+  container.register(TOKENS.languageStrategy, { useClass: LangC });
+  container.register(TOKENS.languageStrategy, { useClass: LangCpp });
+  container.register(TOKENS.languageStrategy, { useClass: LangJava });
+  container.register(TOKENS.languageStrategy, { useClass: LangJavascript });
+  container.register(TOKENS.languageStrategy, { useClass: LangPython });
 
-  container.registerInstance(TOKENS.ExtensionPath, context.extensionPath);
+  container.registerInstance(TOKENS.extensionPath, context.extensionPath);
 
   const logOutputChannel = window.createOutputChannel('CPH-NG', { log: true });
-  container.registerInstance(TOKENS.LogOutputChannel, logOutputChannel);
+  container.registerInstance(TOKENS.logOutputChannel, logOutputChannel);
 
-  const buildInfo = container.resolve(TOKENS.BuildInfo);
+  const buildInfo = container.resolve(TOKENS.buildInfo);
   buildInfo.load && (await buildInfo.load());
-  container.registerInstance(TOKENS.BuildInfo, buildInfo);
+  container.registerInstance(TOKENS.buildInfo, buildInfo);
 
-  const logger = container.resolve<ILogger>(TOKENS.Logger).withScope('container');
+  const logger = container.resolve<ILogger>(TOKENS.logger).withScope('container');
   const connectionString =
     'InstrumentationKey=ee659d58-b2b5-48b3-b05b-48865365c0d1;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=6ff8b3ee-dc15-4a9b-bab8-ffaa956f1773';
   const commitHash = buildInfo.commitHash;
@@ -114,5 +124,5 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
       };
     },
   );
-  container.registerInstance(TOKENS.TelemetryReporter, telemetryReporter);
+  container.registerInstance(TOKENS.telemetryReporter, telemetryReporter);
 }

@@ -28,8 +28,8 @@ import type { ClearTcStatusMsg } from '@/webview/src/msgs';
 @injectable()
 export class ClearTcStatus extends BaseProblemUseCase<ClearTcStatusMsg> {
   constructor(
-    @inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.TempStorage) protected readonly tmp: ITempStorage,
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.tempStorage) protected readonly tmp: ITempStorage,
   ) {
     super(repo, true);
   }

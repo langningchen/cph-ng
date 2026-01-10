@@ -19,6 +19,7 @@ import type * as msgs from '@w/msgs';
 import { container, injectable } from 'tsyringe';
 import type { IProblemsManager } from '@/application/ports/problems/IProblemsManager';
 import { AddTc } from '@/application/useCases/webview/AddTc';
+import { ChooseTcFile } from '@/application/useCases/webview/ChooseTcFile';
 import { ClearTcStatus } from '@/application/useCases/webview/ClearTcStatus';
 import { CompareTc } from '@/application/useCases/webview/CompareTc';
 import { DelTc } from '@/application/useCases/webview/DelTc';
@@ -79,7 +80,7 @@ export class ProblemsManager implements IProblemsManager {
     await container.resolve(ClearTcStatus).exec(msg);
   }
   async chooseTcFile(msg: msgs.ChooseTcFileMsg): Promise<void> {
-    return TcActions.chooseTcFile(msg);
+    await container.resolve(ChooseTcFile).exec(msg);
   }
   async compareTc(msg: msgs.CompareTcMsg): Promise<void> {
     await container.resolve(CompareTc).exec(msg);

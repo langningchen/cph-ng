@@ -15,9 +15,9 @@ import type { Problem } from '@/domain/entities/problem';
 @injectable()
 export class CompilerService implements ICompilerService {
   constructor(
-    @inject(TOKENS.LanguageRegistry) private readonly lang: ILanguageRegistry,
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.Translator) private readonly translator: ITranslator,
+    @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
   ) {
     this.logger = logger.withScope('CompilerService');
   }

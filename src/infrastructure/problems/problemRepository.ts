@@ -36,11 +36,11 @@ export class ProblemRepository implements IProblemRepository {
   private fullProblems: FullProblem[] = [];
 
   constructor(
-    @inject(TOKENS.ProblemService) private readonly problemService: IProblemService,
-    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.ProblemFs) private readonly problemFs: IProblemFs,
+    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
+    @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
   ) {
     this.logger = this.logger.withScope('ProblemRepository');
   }

@@ -37,12 +37,12 @@ export class LangPython extends AbstractLanguageStrategy {
   public readonly extensions = ['py'];
 
   constructor(
-    @inject(TOKENS.FileSystem) protected readonly fs: IFileSystem,
-    @inject(TOKENS.Logger) protected readonly logger: ILogger,
-    @inject(TOKENS.Path) protected readonly path: IPath,
-    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
-    @inject(TOKENS.Settings) protected readonly settings: ISettings,
-    @inject(TOKENS.Translator) protected readonly translator: ITranslator,
+    @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
+    @inject(TOKENS.logger) protected readonly logger: ILogger,
+    @inject(TOKENS.path) protected readonly path: IPath,
+    @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
+    @inject(TOKENS.settings) protected readonly settings: ISettings,
+    @inject(TOKENS.translator) protected readonly translator: ITranslator,
   ) {
     super(fs, logger.withScope('langsPython'), settings, translator);
     this.logger = this.logger.withScope('langsPython');

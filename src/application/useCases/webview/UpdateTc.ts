@@ -26,7 +26,7 @@ import type { UpdateTcMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class UpdateTc extends BaseProblemUseCase<UpdateTcMsg> {
-  constructor(@inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository) {
+  constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
     super(repo, true);
   }
 

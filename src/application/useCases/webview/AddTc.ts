@@ -31,9 +31,9 @@ import type { AddTcMsg } from '@/webview/src/msgs';
 @injectable()
 export class AddTc extends BaseProblemUseCase<AddTcMsg> {
   constructor(
-    @inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.ProblemService) protected readonly problemService: IProblemService,
-    @inject(TOKENS.Crypto) protected readonly crypto: ICrypto,
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.problemService) protected readonly problemService: IProblemService,
+    @inject(TOKENS.crypto) protected readonly crypto: ICrypto,
   ) {
     super(repo, true);
   }

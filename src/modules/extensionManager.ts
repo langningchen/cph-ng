@@ -76,7 +76,7 @@ export default class ExtensionManager {
     try {
       // Initialize DI container (no behavior changes yet)
       await setupContainer(context);
-      const problemsManager = container.resolve(TOKENS.ProblemsManager);
+      const problemsManager = container.resolve(TOKENS.problemsManager);
       setExtensionUri(context.extensionUri);
       context.subscriptions.push(telemetry);
       await telemetry.init();
@@ -351,7 +351,7 @@ OS: ${release()}`;
   public static async deactivate() {
     ExtensionManager.logger.info('Deactivating CPH-NG extension');
     Companion.stopServer();
-    const problemsManager = container.resolve(TOKENS.ProblemsManager);
+    const problemsManager = container.resolve(TOKENS.problemsManager);
     await problemsManager.closeAll();
     ExtensionManager.logger.info('CPH-NG extension deactivated');
   }

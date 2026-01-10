@@ -1,0 +1,68 @@
+// Copyright (C) 2026 Langning Chen
+//
+// This file is part of cph-ng.
+//
+// cph-ng is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// cph-ng is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
+
+import { inject, injectable } from 'tsyringe';
+import type {
+  FullProblem,
+  IProblemRepository,
+} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { TOKENS } from '@/composition/tokens';
+import { TcScanner } from '@/domain/services/TcScanner';
+import type { ChooseTcFileMsg } from '@/webview/src/msgs';
+
+@injectable()
+export class ChooseTcFile extends BaseProblemUseCase<ChooseTcFileMsg> {
+  constructor(
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.problemService) protected readonly problemService: IProblemService,
+    @inject(TOKENS.settings) protected readonly settings: ISettings,
+    @inject(TOKENS.ui) protected readonly ui: IUi,
+    @inject(TOKENS.translator) protected readonly translator: ITranslator,
+    @inject(TcScanner) protected readonly tcScanner: TcScanner,
+  ) {
+    super(repo, true);
+  }
+
+  protected async performAction({ problem }: FullProblem, msg: ChooseTcFileMsg): Promise<void> {
+    const isInput = msg.label === 'stdin';
+    const mainExt = isInput
+      ? this.settings.problem.inputFileExtensionList
+      : this.settings.problem.outputFileExtensionList;
+    const fileUri = await this.ui.openDialog({
+      canSelectFiles: true,
+      canSelectFolders: false,
+      canSelectMany: false,
+      title: this.translator.t('Choose {type} file', {
+        type: isInput ? this.translator.t('stdin') : this.translator.t('answer'),
+      }),
+      filters: {
+        [this.translator.t('Text files')]: mainExt.map((ext) => ext.substring(1)),
+        [this.translator.t('All files')]: ['*'],
+      },
+    });
+    if (!fileUri?.length) return;
+    const tc = problem.getTc(msg.id);
+    const partialTc = (await this.tcScanner.fromFile(fileUri))[0];
+    if (partialTc.stdin) tc.stdin = partialTc.stdin;
+    if (partialTc.answer) tc.answer = partialTc.answer;
+  }
+}

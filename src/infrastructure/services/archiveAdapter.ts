@@ -22,8 +22,8 @@ import type { IArchive } from '@/application/ports/services/IArchive';
 import { TOKENS } from '@/composition/tokens';
 
 @injectable()
-export class NodeArchiveService implements IArchive {
-  constructor(@inject(TOKENS.FileSystem) private readonly fs: IFileSystem) {}
+export class ArchiveAdapter implements IArchive {
+  constructor(@inject(TOKENS.fileSystem) private readonly fs: IFileSystem) {}
 
   public async unzip(zipPath: string, destPath: string): Promise<void> {
     const zip = new AdmZip(zipPath);

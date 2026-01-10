@@ -53,10 +53,10 @@ export class ProblemFs implements IProblemFs {
   onDidChangeFile: Event<FileChangeEvent[]> = this.changeEmitter.event;
 
   constructor(
-    @inject(TOKENS.ProblemRepository) private readonly repo: IProblemRepository,
-    @inject(TOKENS.TcIoService) private readonly tcIoService: ITcIoService,
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
+    @inject(TOKENS.tcIoService) private readonly tcIoService: ITcIoService,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
   ) {
     this.logger = this.logger.withScope('ProblemFs');
   }
@@ -196,7 +196,7 @@ export class ProblemFs implements IProblemFs {
     if (!item.set) throw FileSystemError.NoPermissions();
     await item.set(content.toString());
     this.changeEmitter.fire([{ type: FileChangeType.Changed, uri }]);
-    const repo = container.resolve(TOKENS.ProblemRepository);
+    const repo = container.resolve(TOKENS.problemRepository);
     await repo.dataRefresh();
   }
 

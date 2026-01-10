@@ -104,7 +104,7 @@ export class Handler {
       }
     }
 
-    const repo = container.resolve(TOKENS.ProblemRepository);
+    const repo = container.resolve(TOKENS.problemRepository);
     await repo.dataRefresh();
   }
 

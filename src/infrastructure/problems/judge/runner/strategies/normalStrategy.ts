@@ -25,8 +25,8 @@ import type { ExecutionContext, ExecutionResult } from '@/domain/execution';
 @injectable()
 export class NormalStrategy implements IExecutionStrategy {
   constructor(
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
   ) {}
 
   async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {

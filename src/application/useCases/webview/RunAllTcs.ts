@@ -41,13 +41,13 @@ import type { RunTcsMsg } from '@/webview/src/msgs';
 @injectable()
 export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
   constructor(
-    @inject(TOKENS.CompilerService) private readonly compiler: ICompilerService,
-    @inject(TOKENS.Document) private readonly document: IDocument,
-    @inject(TOKENS.JudgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
-    @inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.TcService) private readonly tcService: ITcService,
-    @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
+    @inject(TOKENS.compilerService) private readonly compiler: ICompilerService,
+    @inject(TOKENS.document) private readonly document: IDocument,
+    @inject(TOKENS.judgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.tcService) private readonly tcService: ITcService,
+    @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
     super(repo, true);
   }
@@ -64,7 +64,7 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
     for (const tcId of tcOrder) {
       const tc = problem.getTc(tcId);
       this.tmp.dispose(tc.clearResult());
-      tc.updateResult(VerdictName.CP, { isExpand: false });
+      tc.updateResult(VerdictName.compiling, { isExpand: false });
       expandMemo[tcId] = tc.isExpand;
     }
     await this.repo.dataRefresh();
@@ -74,16 +74,16 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
     if (artifacts instanceof Error) {
       problem.updateResult(
         artifacts instanceof CompileError
-          ? VerdictName.CE
+          ? VerdictName.compilationError
           : artifacts instanceof CompileRejected
-            ? VerdictName.RJ
-            : VerdictName.SE,
+            ? VerdictName.rejected
+            : VerdictName.systemError,
         { msg: artifacts.message },
       );
       return;
     }
 
-    problem.updateResult(VerdictName.CPD);
+    problem.updateResult(VerdictName.compiled);
     await this.repo.dataRefresh();
 
     const expandBehavior = this.settings.problem.expandBehavior;
@@ -97,7 +97,7 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
       if (ac.signal.aborted) {
         if (ac.signal.reason === 'onlyOne') fullProblem.ac = ac = new AbortController();
         else {
-          tc.updateResult(VerdictName.SK);
+          tc.updateResult(VerdictName.skipped);
           continue;
         }
       }
@@ -140,7 +140,7 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
           this.repo.dataRefresh();
         },
         onError: (e) => {
-          tc.updateResult(VerdictName.SE, { msg: e.message });
+          tc.updateResult(VerdictName.systemError, { msg: e.message });
           this.repo.dataRefresh();
         },
       };

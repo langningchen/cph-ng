@@ -23,7 +23,7 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class FileSystemAdapter implements IFileSystem {
-  constructor(@inject(TOKENS.Path) private readonly path: IPath) {}
+  constructor(@inject(TOKENS.path) private readonly path: IPath) {}
 
   async readFile(path: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
     return readFile(path, { encoding });

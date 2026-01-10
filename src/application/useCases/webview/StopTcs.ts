@@ -28,7 +28,7 @@ import type { StopTcsMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class StopTcs extends BaseProblemUseCase<StopTcsMsg> {
-  constructor(@inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository) {
+  constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
     super(repo, true);
   }
 
@@ -41,7 +41,7 @@ export class StopTcs extends BaseProblemUseCase<StopTcsMsg> {
     const tcOrder = problem.getEnabledTcIds();
     for (const tcId of tcOrder) {
       const tc = problem.getTc(tcId);
-      if (isRunningVerdict(tc.verdict)) tc.updateResult(VerdictName.RJ);
+      if (isRunningVerdict(tc.verdict)) tc.updateResult(VerdictName.rejected);
     }
   }
 }

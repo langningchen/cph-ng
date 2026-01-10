@@ -40,11 +40,11 @@ describe('WrapperStrategy', () => {
     fsMock = mock<IFileSystem>();
     executorMock = mock<IProcessExecutor>();
 
-    container.registerInstance(TOKENS.Logger, loggerMock);
-    container.registerInstance(TOKENS.Telemetry, telemetryMock);
-    container.registerInstance(TOKENS.Settings, settingsMock);
-    container.registerInstance(TOKENS.FileSystem, fsMock);
-    container.registerInstance(TOKENS.ProcessExecutor, executorMock);
+    container.registerInstance(TOKENS.logger, loggerMock);
+    container.registerInstance(TOKENS.telemetry, telemetryMock);
+    container.registerInstance(TOKENS.settings, settingsMock);
+    container.registerInstance(TOKENS.fileSystem, fsMock);
+    container.registerInstance(TOKENS.processExecutor, executorMock);
 
     strategy = container.resolve(WrapperStrategy);
   });

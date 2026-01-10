@@ -29,8 +29,8 @@ describe('NormalStrategy', () => {
   let strategy: NormalStrategy;
 
   beforeEach(() => {
-    container.registerInstance(TOKENS.ProcessExecutor, executorMock);
-    container.registerInstance(TOKENS.Settings, settingsMock);
+    container.registerInstance(TOKENS.processExecutor, executorMock);
+    container.registerInstance(TOKENS.settings, settingsMock);
     strategy = container.resolve(NormalStrategy);
   });
 

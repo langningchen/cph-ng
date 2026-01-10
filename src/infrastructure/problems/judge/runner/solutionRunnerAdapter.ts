@@ -35,12 +35,12 @@ import {
 @injectable()
 export class SolutionRunnerAdapter implements ISolutionRunner {
   constructor(
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.Translator) private readonly translator: ITranslator,
-    @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
-    @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
-    @inject(TOKENS.ExecutionStrategyFactory)
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
+    @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
+    @inject(TOKENS.executionStrategyFactory)
     private readonly factory: IExecutionStrategyFactory,
   ) {
     this.logger = this.logger.withScope('RunnerAdapter');

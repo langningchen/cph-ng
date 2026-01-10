@@ -26,9 +26,9 @@ export class BuildInfoAdapter implements IBuildInfo {
   private data: BuildInfoData | null = null;
 
   constructor(
-    @inject(TOKENS.ExtensionPath) private readonly extPath: string,
-    @inject(TOKENS.Path) private readonly path: IPath,
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.extensionPath) private readonly extPath: string,
+    @inject(TOKENS.path) private readonly path: IPath,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
   ) {}
 
   async load(): Promise<void> {

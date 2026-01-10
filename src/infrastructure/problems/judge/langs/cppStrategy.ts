@@ -24,14 +24,14 @@ export class LangCpp extends AbstractLanguageStrategy {
   public readonly enableRunner = true;
 
   constructor(
-    @inject(TOKENS.ExtensionPath) private readonly extPath: string,
-    @inject(TOKENS.FileSystem) protected readonly fs: IFileSystem,
-    @inject(TOKENS.Logger) protected readonly logger: ILogger,
-    @inject(TOKENS.Path) protected readonly path: IPath,
-    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
-    @inject(TOKENS.Settings) protected readonly settings: ISettings,
-    @inject(TOKENS.System) private readonly sys: ISystem,
-    @inject(TOKENS.Translator) protected readonly translator: ITranslator,
+    @inject(TOKENS.extensionPath) private readonly extPath: string,
+    @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
+    @inject(TOKENS.logger) protected readonly logger: ILogger,
+    @inject(TOKENS.path) protected readonly path: IPath,
+    @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
+    @inject(TOKENS.settings) protected readonly settings: ISettings,
+    @inject(TOKENS.system) private readonly sys: ISystem,
+    @inject(TOKENS.translator) protected readonly translator: ITranslator,
   ) {
     super(fs, logger.withScope('langsCpp'), settings, translator);
     this.logger = this.logger.withScope('langsCpp');

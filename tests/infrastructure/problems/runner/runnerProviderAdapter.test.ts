@@ -40,14 +40,14 @@ describe('RunnerProviderAdapter', () => {
     sys = mock<ISystem>();
     executorMock = mock<IProcessExecutor>();
 
-    container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
-    container.registerInstance(TOKENS.FileSystem, fsMock);
-    container.registerInstance(TOKENS.System, sys);
-    container.registerInstance(TOKENS.ProcessExecutor, executorMock);
-    container.registerInstance(TOKENS.Settings, settingsMock);
-    container.registerInstance(TOKENS.Logger, loggerMock);
-    container.registerSingleton(TOKENS.Path, PathAdapter);
-    container.registerSingleton(TOKENS.PathResolver, PathResolverMock);
+    container.registerInstance(TOKENS.extensionPath, extensionPathMock);
+    container.registerInstance(TOKENS.fileSystem, fsMock);
+    container.registerInstance(TOKENS.system, sys);
+    container.registerInstance(TOKENS.processExecutor, executorMock);
+    container.registerInstance(TOKENS.settings, settingsMock);
+    container.registerInstance(TOKENS.logger, loggerMock);
+    container.registerSingleton(TOKENS.path, PathAdapter);
+    container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
 
     adapter = container.resolve(RunnerProviderAdapter);
   });

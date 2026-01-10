@@ -118,7 +118,7 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
     }
 
     const activePath = options.input.activePath;
-    const repo = container.resolve(TOKENS.ProblemRepository);
+    const repo = container.resolve(TOKENS.problemRepository);
     const bgProblem = await repo.getFullProblem(activePath);
     if (!bgProblem) {
       result.content.push(

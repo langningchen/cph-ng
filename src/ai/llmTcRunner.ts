@@ -68,8 +68,8 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
     const { id } = options.input;
     const result = new LanguageModelToolResult([]);
 
-    const problemsManager = container.resolve(TOKENS.ProblemsManager);
-    const repo = container.resolve(TOKENS.ProblemRepository);
+    const problemsManager = container.resolve(TOKENS.problemsManager);
+    const repo = container.resolve(TOKENS.problemRepository);
     const activePath = options.input.activePath;
     const bgProblem = await repo.getFullProblem(activePath);
     if (!bgProblem) {

@@ -32,11 +32,11 @@ interface WrapperData {
 @injectable()
 export class WrapperStrategy implements IExecutionStrategy {
   constructor(
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.ProcessExecutor) private readonly executor: IProcessExecutor,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.TempStorage) private readonly tmp: ITempStorage,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
     this.logger = this.logger.withScope('WrapperStrategy');
   }

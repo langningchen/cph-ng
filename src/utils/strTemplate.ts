@@ -21,7 +21,7 @@ import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { Problem } from '@/domain/entities/problem';
 
 const getRenderer = (): IPathResolver => {
-  return container.resolve<IPathResolver>(TOKENS.PathResolver);
+  return container.resolve<IPathResolver>(TOKENS.pathResolver);
 };
 
 /**

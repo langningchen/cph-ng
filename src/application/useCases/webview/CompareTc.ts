@@ -29,9 +29,9 @@ import type { CompareTcMsg } from '@/webview/src/msgs';
 @injectable()
 export class CompareTc extends BaseProblemUseCase<CompareTcMsg> {
   constructor(
-    @inject(TOKENS.ProblemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.ProblemFs) protected readonly problemFs: IProblemFs,
-    @inject(TOKENS.Ui) protected readonly ui: IUi,
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.problemFs) protected readonly problemFs: IProblemFs,
+    @inject(TOKENS.ui) protected readonly ui: IUi,
   ) {
     super(repo, true);
   }

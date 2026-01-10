@@ -55,7 +55,7 @@ describe('ExternalRunnerStrategy', () => {
   let runnerProviderMock: MockProxy<IRunnerProvider>;
   let processHandleMock: MockProxy<ProcessHandle>;
 
-  const MOCK_RUNNER_PATH = '/path/to/runner';
+  const MockRunnerPath = '/path/to/runner';
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -65,18 +65,18 @@ describe('ExternalRunnerStrategy', () => {
     runnerProviderMock = mock<IRunnerProvider>();
     processHandleMock = mock<ProcessHandle>();
 
-    runnerProviderMock.getRunnerPath.mockResolvedValue(MOCK_RUNNER_PATH);
+    runnerProviderMock.getRunnerPath.mockResolvedValue(MockRunnerPath);
 
-    container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
-    container.registerInstance(TOKENS.FileSystem, fsMock);
-    container.registerInstance(TOKENS.Logger, loggerMock);
-    container.registerInstance(TOKENS.ProcessExecutor, executorMock);
-    container.registerInstance(TOKENS.RunnerProvider, runnerProviderMock);
-    container.registerInstance(TOKENS.Settings, settingsMock);
-    container.registerInstance(TOKENS.Telemetry, telemetryMock);
-    container.registerInstance(TOKENS.TempStorage, tempStorageMock);
-    container.registerInstance(TOKENS.Translator, translatorMock);
-    container.registerSingleton(TOKENS.PathResolver, PathResolverMock);
+    container.registerInstance(TOKENS.extensionPath, extensionPathMock);
+    container.registerInstance(TOKENS.fileSystem, fsMock);
+    container.registerInstance(TOKENS.logger, loggerMock);
+    container.registerInstance(TOKENS.processExecutor, executorMock);
+    container.registerInstance(TOKENS.runnerProvider, runnerProviderMock);
+    container.registerInstance(TOKENS.settings, settingsMock);
+    container.registerInstance(TOKENS.telemetry, telemetryMock);
+    container.registerInstance(TOKENS.tempStorage, tempStorageMock);
+    container.registerInstance(TOKENS.translator, translatorMock);
+    container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
 
     strategy = container.resolve(ExternalRunnerStrategy);
   });
@@ -230,8 +230,8 @@ describe('ExternalRunnerStrategy', () => {
     fsMock.readFile.mockResolvedValue(
       JSON.stringify({
         error: true,
-        error_type: 1,
-        error_code: 101,
+        errorType: 1,
+        errorCode: 101,
       }),
     );
 
@@ -298,20 +298,20 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
     writeFileSync(join(testWorkspace, inputFile), '');
     settingsMock.cache.directory = testWorkspace;
 
-    container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
-    container.registerInstance(TOKENS.Logger, loggerMock);
-    container.registerInstance(TOKENS.Settings, settingsMock);
-    container.registerInstance(TOKENS.Telemetry, telemetryMock);
-    container.registerInstance(TOKENS.Translator, translatorMock);
+    container.registerInstance(TOKENS.extensionPath, extensionPathMock);
+    container.registerInstance(TOKENS.logger, loggerMock);
+    container.registerInstance(TOKENS.settings, settingsMock);
+    container.registerInstance(TOKENS.telemetry, telemetryMock);
+    container.registerInstance(TOKENS.translator, translatorMock);
 
-    container.registerSingleton(TOKENS.Clock, ClockAdapter);
-    container.registerSingleton(TOKENS.Crypto, CryptoAdapter);
-    container.registerSingleton(TOKENS.FileSystem, FileSystemAdapter);
-    container.registerSingleton(TOKENS.PathResolver, PathResolverMock);
-    container.registerSingleton(TOKENS.ProcessExecutor, ProcessExecutorAdapter);
-    container.registerSingleton(TOKENS.RunnerProvider, RunnerProviderAdapter);
-    container.registerSingleton(TOKENS.System, SystemAdapter);
-    container.registerSingleton(TOKENS.TempStorage, TempStorageAdapter);
+    container.registerSingleton(TOKENS.clock, ClockAdapter);
+    container.registerSingleton(TOKENS.crypto, CryptoAdapter);
+    container.registerSingleton(TOKENS.fileSystem, FileSystemAdapter);
+    container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
+    container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
+    container.registerSingleton(TOKENS.runnerProvider, RunnerProviderAdapter);
+    container.registerSingleton(TOKENS.system, SystemAdapter);
+    container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
 
     strategy = container.resolve(ExternalRunnerStrategy);
   });

@@ -37,11 +37,11 @@ describe('ProcessExecutorAdapter', () => {
   beforeEach(() => {
     mkdirSync(realTmpDir, { recursive: true });
 
-    container.registerInstance(TOKENS.TempStorage, tempStorageMock);
-    container.registerInstance(TOKENS.Logger, loggerMock);
-    container.registerInstance(TOKENS.Telemetry, telemetryMock);
-    container.registerSingleton(TOKENS.Clock, ClockAdapter);
-    container.registerSingleton(TOKENS.Path, PathAdapter);
+    container.registerInstance(TOKENS.tempStorage, tempStorageMock);
+    container.registerInstance(TOKENS.logger, loggerMock);
+    container.registerInstance(TOKENS.telemetry, telemetryMock);
+    container.registerSingleton(TOKENS.clock, ClockAdapter);
+    container.registerSingleton(TOKENS.path, PathAdapter);
 
     adapter = container.resolve(ProcessExecutorAdapter);
   });

@@ -30,12 +30,12 @@ describe('TempStorageAdapter', () => {
   let adapter: TempStorageAdapter;
 
   beforeEach(() => {
-    container.registerInstance(TOKENS.Logger, loggerMock);
-    container.registerInstance(TOKENS.Crypto, cryptoMock);
-    container.registerInstance(TOKENS.ExtensionPath, extensionPathMock);
-    container.registerInstance(TOKENS.Settings, settingsMock);
-    container.registerSingleton(TOKENS.Path, PathAdapter);
-    container.registerSingleton(TOKENS.PathResolver, PathResolverMock);
+    container.registerInstance(TOKENS.logger, loggerMock);
+    container.registerInstance(TOKENS.crypto, cryptoMock);
+    container.registerInstance(TOKENS.extensionPath, extensionPathMock);
+    container.registerInstance(TOKENS.settings, settingsMock);
+    container.registerSingleton(TOKENS.path, PathAdapter);
+    container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
 
     adapter = container.resolve(TempStorageAdapter);
   });

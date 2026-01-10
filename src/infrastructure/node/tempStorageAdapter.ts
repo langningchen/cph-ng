@@ -31,11 +31,11 @@ export class TempStorageAdapter implements ITempStorage {
   private monitorInterval: NodeJS.Timeout | undefined;
 
   constructor(
-    @inject(TOKENS.Crypto) private readonly crypto: ICrypto,
-    @inject(TOKENS.Path) private readonly path: IPath,
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.PathResolver) private readonly resolver: IPathResolver,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
+    @inject(TOKENS.crypto) private readonly crypto: ICrypto,
+    @inject(TOKENS.path) private readonly path: IPath,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
   ) {
     this.logger = this.logger.withScope('cache');
   }

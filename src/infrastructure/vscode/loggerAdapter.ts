@@ -23,7 +23,7 @@ import { TOKENS } from '@/composition/tokens';
 @injectable()
 export class LoggerAdapter implements ILogger {
   constructor(
-    @inject(TOKENS.LogOutputChannel) private readonly logger: LogOutputChannel,
+    @inject(TOKENS.logOutputChannel) private readonly logger: LogOutputChannel,
     private readonly module = 'base',
   ) {}
 

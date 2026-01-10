@@ -37,14 +37,14 @@ import type { Problem } from '@/domain/entities/problem';
 @injectable()
 export class PathResolverAdapter implements IPathResolver {
   constructor(
-    @inject(TOKENS.ExtensionPath) private readonly extPath: string,
-    @inject(TOKENS.FileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.Logger) private readonly logger: ILogger,
-    @inject(TOKENS.Path) private readonly path: IPath,
-    @inject(TOKENS.ProblemService) private readonly problemService: IProblemService,
-    @inject(TOKENS.Settings) private readonly settings: ISettings,
-    @inject(TOKENS.System) private readonly sys: ISystem,
-    @inject(TOKENS.Translator) private readonly translator: ITranslator,
+    @inject(TOKENS.extensionPath) private readonly extPath: string,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.path) private readonly path: IPath,
+    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.system) private readonly sys: ISystem,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
   ) {}
 
   private renderString(original: string, replacements: [string, string][]): string {

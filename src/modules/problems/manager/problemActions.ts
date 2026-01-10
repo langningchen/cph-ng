@@ -27,7 +27,7 @@ export class ProblemActions {
     }
     const problem = new Problem(basename(src, extname(src)), src);
     await problem.save();
-    const repository = container.resolve(TOKENS.ProblemRepository);
+    const repository = container.resolve(TOKENS.problemRepository);
     await repository.dataRefresh();
   }
   public static async importProblem(msg: msgs.ImportProblemMsg): Promise<void> {
@@ -48,12 +48,12 @@ export class ProblemActions {
       return;
     }
     await problem.save();
-    const repository = container.resolve(TOKENS.ProblemRepository);
+    const repository = container.resolve(TOKENS.problemRepository);
     await repository.dataRefresh();
   }
 
   public static async editProblemDetails(msg: msgs.EditProblemDetailsMsg) {
-    const repository = container.resolve(TOKENS.ProblemRepository);
+    const repository = container.resolve(TOKENS.problemRepository);
     const fullProblem = await repository.getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
@@ -66,7 +66,7 @@ export class ProblemActions {
     await repository.dataRefresh(true);
   }
   public static async delProblem(msg: msgs.DelProblemMsg) {
-    const repository = container.resolve(TOKENS.ProblemRepository);
+    const repository = container.resolve(TOKENS.problemRepository);
     const fullProblem = await repository.getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
@@ -77,7 +77,7 @@ export class ProblemActions {
   }
 
   public static async chooseSrcFile(msg: msgs.ChooseSrcFileMsg): Promise<void> {
-    const repository = container.resolve(TOKENS.ProblemRepository);
+    const repository = container.resolve(TOKENS.problemRepository);
     const fullProblem = await repository.getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
@@ -118,7 +118,7 @@ export class ProblemActions {
     await repository.dataRefresh(true);
   }
   public static async removeSrcFile(msg: msgs.RemoveSrcFileMsg): Promise<void> {
-    const repository = container.resolve(TOKENS.ProblemRepository);
+    const repository = container.resolve(TOKENS.problemRepository);
     const fullProblem = await repository.getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
@@ -137,7 +137,7 @@ export class ProblemActions {
   public static async submitToCodeforces(
     msg: msgs.SubmitToCodeforcesMsg,
   ): Promise<void> {
-    const repository = container.resolve(TOKENS.ProblemRepository);
+    const repository = container.resolve(TOKENS.problemRepository);
     const fullProblem = await repository.getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;
@@ -153,7 +153,7 @@ export class ProblemActions {
       );
       return;
     }
-    const repository = container.resolve(TOKENS.ProblemRepository);
+    const repository = container.resolve(TOKENS.problemRepository);
     const fullProblem = await repository.getFullProblem(msg.activePath);
     if (!fullProblem) {
       return;

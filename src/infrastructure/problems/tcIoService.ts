@@ -26,9 +26,9 @@ import { TcIo } from '@/domain/entities/tcIo';
 @injectable()
 export class TcIoService implements ITcIoService {
   constructor(
-    @inject(TOKENS.FileSystem) private fs: IFileSystem,
-    @inject(TOKENS.TempStorage) private temp: ITempStorage,
-    @inject(TOKENS.Settings) private settings: ISettings,
+    @inject(TOKENS.fileSystem) private fs: IFileSystem,
+    @inject(TOKENS.tempStorage) private temp: ITempStorage,
+    @inject(TOKENS.settings) private settings: ISettings,
   ) {}
 
   public async readContent(io: TcIo): Promise<string> {

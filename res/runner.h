@@ -27,8 +27,8 @@ void print_info(bool killed, long double time, long double memory, unsigned long
 void print_error(RunError error, int error_code)
 {
     std::cout << "{\"error\":true"
-              << ",\"error_type\":" << error
-              << ",\"error_code\":" << error_code
+              << ",\"errorType\":" << error
+              << ",\"errorCode\":" << error_code
               << "}" << std::endl;
     std::exit(0);
 }
