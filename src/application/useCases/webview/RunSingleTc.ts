@@ -45,7 +45,7 @@ export class RunSingleTc extends BaseProblemUseCase<RunTcMsg> {
     @inject(TOKENS.judgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.tcService) private readonly tcService: ITcService,
-    @inject(TOKENS.tempStorage) protected readonly tmp: ITempStorage,
+    @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
     super(repo, true);
   }

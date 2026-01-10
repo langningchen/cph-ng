@@ -16,16 +16,6 @@ export class TcActions {
     return container.resolve(TOKENS.problemRepository);
   }
   
-  public static async reorderTc(msg: msgs.ReorderTcMsg): Promise<void> {
-    const fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    const tcOrder = fullProblem.problem.tcOrder;
-    const [movedTc] = tcOrder.splice(msg.fromIdx, 1);
-    tcOrder.splice(msg.toIdx, 0, movedTc);
-    await TcActions.getRepository().dataRefresh(true);
-  }
   public static async dragDrop(msg: msgs.DragDropMsg): Promise<void> {
     // Try to get the problem, if not exist, create a new one
     let fullProblem = await TcActions.getRepository().getFullProblem(msg.activePath);

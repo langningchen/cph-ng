@@ -1,0 +1,8 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "project": ["src/**/*.{ts,tsx}!", "tests/**/*.{ts,tsx}!"],
+  "entry": [
+    "tests/**/*.test.ts!"
+  ],
+  "include": ["classMembers"]
+}

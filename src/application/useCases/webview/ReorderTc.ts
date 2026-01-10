@@ -20,26 +20,17 @@ import type {
   FullProblem,
   IProblemRepository,
 } from '@/application/ports/problems/IProblemRepository';
-import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
-import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
-import type { CompareTcMsg } from '@/webview/src/msgs';
+import type { ReorderTcMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class CompareTc extends BaseProblemUseCase<CompareTcMsg> {
-  constructor(
-    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
-    @inject(TOKENS.ui) private readonly ui: IUi,
-  ) {
+export class ReorderTc extends BaseProblemUseCase<ReorderTcMsg> {
+  constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
     super(repo, true);
   }
 
-  protected async performAction({ problem }: FullProblem, msg: CompareTcMsg): Promise<void> {
-    this.ui.compareFiles(
-      this.problemFs.getUri(problem, msg.id, 'answer'),
-      this.problemFs.getUri(problem, msg.id, 'stdout'),
-    );
+  protected async performAction({ problem }: FullProblem, msg: ReorderTcMsg): Promise<void> {
+    problem.moveTc(msg.fromIdx, msg.toIdx);
   }
 }

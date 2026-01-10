@@ -33,12 +33,12 @@ import type { ToggleTcFileMsg, WebviewTcFileTypes } from '@/webview/src/msgs';
 @injectable()
 export class ToggleTcFile extends BaseProblemUseCase<ToggleTcFileMsg> {
   constructor(
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.settings) protected readonly settings: ISettings,
-    @inject(TOKENS.path) protected readonly path: IPath,
-    @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
-    @inject(TOKENS.translator) protected readonly translator: ITranslator,
-    @inject(TOKENS.ui) protected readonly ui: IUi,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TOKENS.ui) private readonly ui: IUi,
   ) {
     super(repo, true);
   }

@@ -14,9 +14,9 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { FileWithHash } from '@/domain/entities/fileWithHash';
 import Cache from '@/helpers/cache';
 import { CompilationIo } from '@/helpers/io';
-import ProcessExecutor, { AbortReason } from '@/helpers/processExecutor';
 import type { IOverrides } from '@/types';
 import { telemetry } from '@/utils/global';
+import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
   canUseWrapper: false,
@@ -32,6 +32,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     protected readonly logger: ILogger,
     protected readonly settings: ISettings,
     protected readonly translator: ITranslator,
+    protected readonly processExecutor: IProcessExecutor,
   ) {}
 
   public async compile(
@@ -70,10 +71,10 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
   ): Promise<LangCompileData>;
 
   protected async executeCompiler(cmd: string[], signal: AbortSignal): Promise<void> {
-    const result = await ProcessExecutor.execute({
+    const result = await this.processExecutor.execute({
       cmd,
       signal,
-      timeout: this.settings.compilation.timeout,
+      timeoutMs: this.settings.compilation.timeout,
     });
     if (result instanceof Error) throw result;
     if (result.abortReason === AbortReason.UserAbort)

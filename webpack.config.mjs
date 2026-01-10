@@ -21,7 +21,7 @@ const generateSettings = () => {
     apply: (compiler) => {
       const runScript = () => {
         try {
-          execSync('node scripts/generate-settings.js', { stdio: 'inherit' });
+          execSync('pnpm run generate-settings', { stdio: 'inherit' });
         } catch (error) {
           console.error('Failed to generate settings:', error);
         }

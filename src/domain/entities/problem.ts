@@ -95,6 +95,10 @@ export class Problem {
   public clearTcs() {
     this.tcOrder = [];
   }
+  public moveTc(fromIdx: number, toIdx: number): void {
+    const [movedTc] = this.tcOrder.splice(fromIdx, 1);
+    this.tcOrder.splice(toIdx, 0, movedTc);
+  }
   public getEnabledTcIds(): UUID[] {
     return this.tcOrder.filter((id) => !this.tcs[id].isDisabled);
   }

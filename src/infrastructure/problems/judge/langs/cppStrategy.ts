@@ -16,6 +16,7 @@ import {
   AbstractLanguageStrategy,
   DefaultCompileAdditionalData,
 } from '@/infrastructure/problems/judge/langs/abstractLanguageStrategy';
+import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 
 @injectable()
 export class LangCpp extends AbstractLanguageStrategy {
@@ -29,11 +30,12 @@ export class LangCpp extends AbstractLanguageStrategy {
     @inject(TOKENS.logger) protected readonly logger: ILogger,
     @inject(TOKENS.path) protected readonly path: IPath,
     @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
+    @inject(TOKENS.processExecutor) protected readonly processExecutor: IProcessExecutor,
     @inject(TOKENS.settings) protected readonly settings: ISettings,
     @inject(TOKENS.system) private readonly sys: ISystem,
     @inject(TOKENS.translator) protected readonly translator: ITranslator,
   ) {
-    super(fs, logger.withScope('langsCpp'), settings, translator);
+    super(fs, logger.withScope('langsCpp'), settings, translator, processExecutor);
     this.logger = this.logger.withScope('langsCpp');
   }
 

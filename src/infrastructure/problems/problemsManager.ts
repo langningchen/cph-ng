@@ -24,6 +24,7 @@ import { ClearTcStatus } from '@/application/useCases/webview/ClearTcStatus';
 import { CompareTc } from '@/application/useCases/webview/CompareTc';
 import { DelTc } from '@/application/useCases/webview/DelTc';
 import { LoadTcs } from '@/application/useCases/webview/LoadTcs';
+import { ReorderTc } from '@/application/useCases/webview/ReorderTc';
 import { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
 import { RunSingleTc } from '@/application/useCases/webview/RunSingleTc';
 import { StopTcs } from '@/application/useCases/webview/StopTcs';
@@ -92,7 +93,7 @@ export class ProblemsManager implements IProblemsManager {
     await container.resolve(DelTc).exec(msg);
   }
   async reorderTc(msg: msgs.ReorderTcMsg): Promise<void> {
-    return TcActions.reorderTc(msg);
+    await container.resolve(ReorderTc).exec(msg);
   }
   async dragDrop(msg: msgs.DragDropMsg): Promise<void> {
     return TcActions.dragDrop(msg);

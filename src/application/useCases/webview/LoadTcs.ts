@@ -29,7 +29,7 @@ import type { LoadTcsMsg } from '@/webview/src/msgs';
 export class LoadTcs extends BaseProblemUseCase<LoadTcsMsg> {
   constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.problemService) protected readonly problemService: IProblemService,
+    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
   ) {
     super(repo, true);
   }

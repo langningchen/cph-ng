@@ -41,7 +41,11 @@ import { ExecutionStrategyFactoryAdapter } from '@/infrastructure/problems/judge
 import { SolutionRunnerAdapter } from '@/infrastructure/problems/judge/runner/solutionRunnerAdapter';
 import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 import { ProblemRepository } from '@/infrastructure/problems/problemRepository';
+import { ProblemService } from '@/infrastructure/problems/problemService';
 import { ProblemsManager } from '@/infrastructure/problems/problemsManager';
+import { TcIoService } from '@/infrastructure/problems/tcIoService';
+import { TcService } from '@/infrastructure/problems/tcService';
+import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
 import { PathResolverAdapter } from '@/infrastructure/services/pathResolverAdapter';
 import { DocumentAdapter } from '@/infrastructure/vscode/documentAdapter';
 import { LoggerAdapter } from '@/infrastructure/vscode/loggerAdapter';
@@ -49,13 +53,9 @@ import { ProblemFs } from '@/infrastructure/vscode/problemFs';
 import { SettingsAdapter } from '@/infrastructure/vscode/settingsAdapter';
 import { TelemetryAdapter } from '@/infrastructure/vscode/telemetryAdapter';
 import { TranslatorAdapter } from '@/infrastructure/vscode/translatorAdapter';
+import { UiAdapter } from '@/infrastructure/vscode/uiAdapter';
 import { WebviewEventBusAdapter } from '@/infrastructure/vscode/webviewEventBus';
 import { TOKENS } from './tokens';
-import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
-import { ProblemService } from '@/infrastructure/problems/problemService';
-import { TcIoService } from '@/infrastructure/problems/tcIoService';
-import { TcService } from '@/infrastructure/problems/tcService';
-import { UiAdapter } from '@/infrastructure/vscode/uiAdapter';
 
 export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.archive, ArchiveAdapter);

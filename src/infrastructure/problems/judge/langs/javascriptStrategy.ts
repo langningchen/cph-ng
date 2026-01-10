@@ -28,6 +28,7 @@ import { TOKENS } from '@/composition/tokens';
 import type { FileWithHash } from '@/domain/entities/fileWithHash';
 import type { IOverrides } from '@/types';
 import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstractLanguageStrategy';
+import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 
 @injectable()
 export class LangJavascript extends AbstractLanguageStrategy {
@@ -39,8 +40,9 @@ export class LangJavascript extends AbstractLanguageStrategy {
     @inject(TOKENS.logger) protected readonly logger: ILogger,
     @inject(TOKENS.settings) protected readonly settings: ISettings,
     @inject(TOKENS.translator) protected readonly translator: ITranslator,
+    @inject(TOKENS.processExecutor) protected readonly processExecutor: IProcessExecutor,
   ) {
-    super(fs, logger.withScope('langsJavascript'), settings, translator);
+    super(fs, logger.withScope('langsJavascript'), settings, translator, processExecutor);
     this.logger = this.logger.withScope('langsJavascript');
   }
 

@@ -33,11 +33,10 @@ import type { ChooseTcFileMsg } from '@/webview/src/msgs';
 export class ChooseTcFile extends BaseProblemUseCase<ChooseTcFileMsg> {
   constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.problemService) protected readonly problemService: IProblemService,
-    @inject(TOKENS.settings) protected readonly settings: ISettings,
-    @inject(TOKENS.ui) protected readonly ui: IUi,
-    @inject(TOKENS.translator) protected readonly translator: ITranslator,
-    @inject(TcScanner) protected readonly tcScanner: TcScanner,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.ui) private readonly ui: IUi,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TcScanner) private readonly tcScanner: TcScanner,
   ) {
     super(repo, true);
   }
