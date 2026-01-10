@@ -51,6 +51,10 @@ export class FileSystemAdapter implements IFileSystem {
     await mkdir(path, { recursive: true });
   }
 
+  async readdir(path: string): Promise<string[]> {
+    return readdir(path);
+  }
+
   async stat(path: string): Promise<{ size: number; isFile(): boolean; isDirectory(): boolean }> {
     const stats = await stat(path);
     return {

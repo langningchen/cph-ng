@@ -15,13 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import type { FileSystemProvider, Uri } from 'vscode';
 import type { Problem } from '@/domain/entities/problem';
 
 export type UriTypes = 'stdin' | 'answer' | 'stdout' | 'stderr';
 
 export interface IProblemFs extends FileSystemProvider {
-  getUri(problem: Problem, id: UUID, type: UriTypes): Uri;
+  getUri(problem: Problem, path: string): Uri;
   fireAuthorityChange(authority: string): Promise<void>;
 }

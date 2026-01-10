@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import { container, inject, injectable } from 'tsyringe';
 import {
   Disposable,
@@ -33,7 +32,7 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
-import type { IProblemFs, UriTypes } from '@/application/ports/vscode/IProblemFs';
+import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/domain/entities/problem';
 
@@ -61,11 +60,11 @@ export class ProblemFs implements IProblemFs {
     this.logger = this.logger.withScope('ProblemFs');
   }
 
-  public getUri(problem: Problem, id: UUID, type: UriTypes) {
+  public getUri(problem: Problem, path: string) {
     return Uri.from({
       scheme: ProblemFs.scheme,
       authority: problem.src.path,
-      path: `/tcs/${id}/${type}`,
+      path,
     });
   }
 

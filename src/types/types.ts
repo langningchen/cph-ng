@@ -80,3 +80,15 @@ export interface IProblem {
   timeElapsed: number;
   overrides?: IOverrides;
 }
+
+export interface ICphProblem {
+  name: string;
+  url: string;
+  tests: { id: number; input: string; output: string }[];
+  interactive: boolean;
+  memoryLimit: number;
+  timeLimit: number;
+  srcPath: string;
+  group: string;
+  local: boolean;
+}

@@ -47,5 +47,6 @@ export interface IUi {
   quickPickMany<T>(items: CustomQuickPickItem<T>[], options?: CustomQuickPickOptions): Promise<T[]>;
   chooseFolder(title: string): Promise<string | undefined>;
   alert(level: AlertLevel, title: string): void;
+  openFile(uri: Uri): void;
   compareFiles(left: Uri, right: Uri): void;
 }

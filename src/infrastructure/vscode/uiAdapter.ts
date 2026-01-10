@@ -155,6 +155,9 @@ export class UiAdapter implements IUi {
     if (level === 'warn') window.showWarningMessage(title);
   }
 
+  public openFile(uri: Uri): void {
+    commands.executeCommand('vscode.open', uri, this.settings.companion.showPanel);
+  }
   public compareFiles(left: Uri, right: Uri): void {
     commands.executeCommand('vscode.diff', left, right);
   }

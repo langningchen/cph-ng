@@ -16,30 +16,29 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import { Uri } from 'vscode';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { IUi } from '@/application/ports/vscode/IUi';
-import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
-import type { CompareTcMsg } from '@/webview/src/msgs';
+import type { OpenFileMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class CompareTc extends BaseProblemUseCase<CompareTcMsg> {
+export class OpenFile {
   constructor(
-    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
+    @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.ui) private readonly ui: IUi,
-  ) {
-    super(repo, true);
-  }
+  ) {}
 
-  protected async performAction({ problem }: FullProblem, msg: CompareTcMsg): Promise<void> {
-    this.ui.compareFiles(
-      this.problemFs.getUri(problem, `/tcs/${msg.id}/answer`),
-      this.problemFs.getUri(problem, `/tcs/${msg.id}/stdout`),
-    );
+  async exec(msg: OpenFileMsg): Promise<void> {
+    if (!msg.isVirtual) {
+      this.ui.openFile(Uri.file(msg.path));
+      return;
+    }
+    const fullProblem = await this.repo.getFullProblem(msg.activePath);
+    if (!fullProblem) throw new Error('Problem not found');
+    const { problem } = fullProblem;
+    this.ui.openFile(this.problemFs.getUri(problem, msg.path));
   }
 }

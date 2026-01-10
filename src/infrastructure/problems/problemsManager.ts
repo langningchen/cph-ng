@@ -28,6 +28,8 @@ import { DelTc } from '@/application/useCases/webview/DelTc';
 import { DragDrop } from '@/application/useCases/webview/DragDrop';
 import { EditProblemDetails } from '@/application/useCases/webview/EditProblemDetails';
 import { LoadTcs } from '@/application/useCases/webview/LoadTcs';
+import { OpenFile } from '@/application/useCases/webview/OpenFile';
+import { OpenTestlib } from '@/application/useCases/webview/OpenTestlib';
 import { ReorderTc } from '@/application/useCases/webview/ReorderTc';
 import { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
 import { RunSingleTc } from '@/application/useCases/webview/RunSingleTc';
@@ -62,10 +64,10 @@ export class ProblemsManager implements IProblemsManager {
     return ProblemActions.submitToCodeforces(msg);
   }
   async openFile(msg: msgs.OpenFileMsg): Promise<void> {
-    return ProblemActions.openFile(msg);
+    await container.resolve(OpenFile).exec(msg);
   }
   async openTestlib(msg: msgs.OpenTestlibMsg): Promise<void> {
-    return ProblemActions.openTestlib(msg);
+    await container.resolve(OpenTestlib).exec(msg);
   }
 
   async addTc(msg: msgs.AddTcMsg): Promise<void> {

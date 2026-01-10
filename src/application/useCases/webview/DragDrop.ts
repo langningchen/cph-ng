@@ -29,12 +29,12 @@ import type { DragDropMsg } from '@/webview/src/msgs';
 @injectable()
 export class DragDrop {
   constructor(
-    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.path) private readonly path: IPath,
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.settings) private readonly settings: ISettings,
-    @inject(TOKENS.path) private readonly path: IPath,
-    @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     private readonly tcScanner: TcScanner,
   ) {}
 

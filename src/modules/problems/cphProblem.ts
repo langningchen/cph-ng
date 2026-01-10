@@ -24,18 +24,6 @@ import Logger from '@/helpers/logger';
 import { Problem, Tc, TcIo } from '@/types';
 import { version } from '@/utils/packageInfo';
 
-export interface ICphProblem {
-  name: string;
-  url: string;
-  tests: { id: number; input: string; output: string }[];
-  interactive: boolean;
-  memoryLimit: number;
-  timeLimit: number;
-  srcPath: string;
-  group: string;
-  local: boolean;
-}
-
 export class CphProblem implements ICphProblem {
   private static logger: Logger = new Logger('problemsCphProblem');
 

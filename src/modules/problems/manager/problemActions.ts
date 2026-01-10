@@ -1,17 +1,12 @@
 import type * as msgs from '@w/msgs';
 import { existsSync } from 'fs';
-import { readdir } from 'fs/promises';
-import { basename, extname, join } from 'path';
-import { commands, l10n, Uri, window } from 'vscode';
+import { l10n, window } from 'vscode';
 import { container } from 'tsyringe';
 import { TOKENS } from '@/composition/tokens';
 import Io from '@/helpers/io';
-import Settings from '@/helpers/settings';
 import Companion from '@/modules/companion';
 import { Problem } from '@/types';
-import { extensionPath } from '@/utils/global';
 import { CphProblem } from '../cphProblem';
-import ProblemFs from '../problemFs';
 
 export class ProblemActions {
   public static async importProblem(msg: msgs.ImportProblemMsg): Promise<void> {
@@ -103,45 +98,5 @@ export class ProblemActions {
       return;
     }
     Companion.submit(fullProblem.problem);
-  }
-  public static async openFile(msg: msgs.OpenFileMsg): Promise<void> {
-    if (!msg.isVirtual) {
-      await commands.executeCommand(
-        'vscode.open',
-        Uri.file(msg.path),
-        Settings.companion.showPanel,
-      );
-      return;
-    }
-    const repository = container.resolve(TOKENS.problemRepository);
-    const fullProblem = await repository.getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    await commands.executeCommand(
-      'vscode.open',
-      Uri.from({
-        scheme: ProblemFs.scheme,
-        authority: fullProblem.problem.src.path,
-        path: msg.path,
-      }),
-      Settings.companion.showPanel,
-    );
-  }
-  public static async openTestlib(_msg: msgs.OpenTestlibMsg): Promise<void> {
-    const item = await window.showQuickPick(
-      await readdir(join(extensionPath, 'dist', 'testlib')),
-      {
-        placeHolder: l10n.t('Select a file to open'),
-      },
-    );
-    if (!item) {
-      return;
-    }
-    await commands.executeCommand(
-      'vscode.open',
-      Uri.file(join(extensionPath, 'dist', 'testlib', item)),
-      Settings.companion.showPanel,
-    );
   }
 }

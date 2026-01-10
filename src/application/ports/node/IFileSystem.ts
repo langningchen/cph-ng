@@ -48,6 +48,9 @@ export interface IFileSystem {
   /** Recursive creates a directory. */
   mkdir(path: string): Promise<void>;
 
+  /** Reads the contents of a directory. */
+  readdir(path: string): Promise<string[]>;
+
   /** Get the status of a file or directory. */
   stat(path: string): Promise<{ size: number; isFile(): boolean; isDirectory(): boolean }>;
 
