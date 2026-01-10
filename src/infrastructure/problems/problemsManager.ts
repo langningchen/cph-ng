@@ -22,7 +22,10 @@ import { AddTc } from '@/application/useCases/webview/AddTc';
 import { ChooseTcFile } from '@/application/useCases/webview/ChooseTcFile';
 import { ClearTcStatus } from '@/application/useCases/webview/ClearTcStatus';
 import { CompareTc } from '@/application/useCases/webview/CompareTc';
+import { CreateProblem } from '@/application/useCases/webview/CreateProblem';
 import { DelTc } from '@/application/useCases/webview/DelTc';
+import { DragDrop } from '@/application/useCases/webview/DragDrop';
+import { EditProblemDetails } from '@/application/useCases/webview/EditProblemDetails';
 import { LoadTcs } from '@/application/useCases/webview/LoadTcs';
 import { ReorderTc } from '@/application/useCases/webview/ReorderTc';
 import { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
@@ -33,18 +36,17 @@ import { ToggleTcFile } from '@/application/useCases/webview/ToggleTcFile';
 import { UpdateTc } from '@/application/useCases/webview/UpdateTc';
 import { BfCompare } from '../../modules/problems/manager/bfCompare';
 import { ProblemActions } from '../../modules/problems/manager/problemActions';
-import { TcActions } from '../../modules/problems/manager/tcActions';
 
 @injectable()
 export class ProblemsManager implements IProblemsManager {
   async createProblem(msg: msgs.CreateProblemMsg): Promise<void> {
-    return ProblemActions.createProblem(msg);
+    await container.resolve(CreateProblem).exec(msg);
   }
   async importProblem(msg: msgs.ImportProblemMsg): Promise<void> {
     return ProblemActions.importProblem(msg);
   }
   async editProblemDetails(msg: msgs.EditProblemDetailsMsg): Promise<void> {
-    return ProblemActions.editProblemDetails(msg);
+    await container.resolve(EditProblemDetails).exec(msg);
   }
   async delProblem(msg: msgs.DelProblemMsg): Promise<void> {
     return ProblemActions.delProblem(msg);
@@ -96,7 +98,7 @@ export class ProblemsManager implements IProblemsManager {
     await container.resolve(ReorderTc).exec(msg);
   }
   async dragDrop(msg: msgs.DragDropMsg): Promise<void> {
-    return TcActions.dragDrop(msg);
+    await container.resolve(DragDrop).exec(msg);
   }
 
   async runTc(msg: msgs.RunTcMsg): Promise<void> {

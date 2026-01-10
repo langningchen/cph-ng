@@ -14,22 +14,6 @@ import { CphProblem } from '../cphProblem';
 import ProblemFs from '../problemFs';
 
 export class ProblemActions {
-  public static async createProblem(msg: msgs.CreateProblemMsg): Promise<void> {
-    const src = msg.activePath;
-    if (!src) {
-      Io.warn(l10n.t('No active editor found.'));
-      return;
-    }
-    const binPath = await Problem.getBinBySrc(src);
-    if (binPath && existsSync(binPath)) {
-      Io.warn(l10n.t('Problem already exists for this file.'));
-      return;
-    }
-    const problem = new Problem(basename(src, extname(src)), src);
-    await problem.save();
-    const repository = container.resolve(TOKENS.problemRepository);
-    await repository.dataRefresh();
-  }
   public static async importProblem(msg: msgs.ImportProblemMsg): Promise<void> {
     const src = msg.activePath;
     if (!src) {
@@ -52,19 +36,6 @@ export class ProblemActions {
     await repository.dataRefresh();
   }
 
-  public static async editProblemDetails(msg: msgs.EditProblemDetailsMsg) {
-    const repository = container.resolve(TOKENS.problemRepository);
-    const fullProblem = await repository.getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    fullProblem.problem.name = msg.title;
-    fullProblem.problem.url = msg.url;
-    fullProblem.problem.timeLimitMs = msg.timeLimit;
-    fullProblem.problem.memoryLimitMb = msg.memoryLimit;
-    fullProblem.problem.overrides = msg.overrides;
-    await repository.dataRefresh(true);
-  }
   public static async delProblem(msg: msgs.DelProblemMsg) {
     const repository = container.resolve(TOKENS.problemRepository);
     const fullProblem = await repository.getFullProblem(msg.activePath);

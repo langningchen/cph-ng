@@ -38,11 +38,11 @@ export interface InitMsg extends BaseMsg {
 }
 export interface EditProblemDetailsMsg extends ProblemBaseMsg {
   type: 'editProblemDetails';
-  title: string;
-  url: string;
-  timeLimit: number;
-  memoryLimit: number;
+  name: string;
+  url?: string;
   overrides?: {
+    timeLimitMs?: number;
+    memoryLimitMb?: number;
     compiler?: string;
     compilerArgs?: string;
     runner?: string;

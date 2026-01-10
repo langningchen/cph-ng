@@ -25,6 +25,10 @@ import { TOKENS } from '@/composition/tokens';
 export class FileSystemAdapter implements IFileSystem {
   constructor(@inject(TOKENS.path) private readonly path: IPath) {}
 
+  async readRawFile(path: string): Promise<Buffer<ArrayBuffer>> {
+    return readFile(path);
+  }
+
   async readFile(path: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
     return readFile(path, { encoding });
   }

@@ -108,10 +108,10 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
         : undefined;
     dispatch({
       type: 'editProblemDetails',
-      title: editedTitle,
+      name: editedTitle,
       url: editedUrl,
-      timeLimit: parseInt(editedTimeLimit, 10),
-      memoryLimit: parseInt(editedMemoryLimit, 10),
+      timeLimitMs: parseInt(editedTimeLimit, 10),
+      memoryLimitMb: parseInt(editedMemoryLimit, 10),
       overrides,
     });
   };

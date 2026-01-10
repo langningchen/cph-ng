@@ -1,5 +1,6 @@
 import { SHA256 } from 'crypto-js';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import {
   type CompileAdditionalData,
   CompileError,
@@ -16,7 +17,6 @@ import Cache from '@/helpers/cache';
 import { CompilationIo } from '@/helpers/io';
 import type { IOverrides } from '@/types';
 import { telemetry } from '@/utils/global';
-import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
   canUseWrapper: false,

@@ -62,11 +62,24 @@ export class ProblemService implements IProblemService {
     this.logger = this.logger.withScope('ProblemRepository');
   }
 
+  public async create(srcPath: string): Promise<Problem | null> {
+    const binPath = this.repo.getDataPath(srcPath);
+    if (!binPath) return null;
+    const problem = new Problem(this.path.basename(srcPath, this.path.extname(srcPath)), srcPath);
+    await this.save(problem);
+    return problem;
+  }
+
   public async loadBySrc(srcPath: string): Promise<Problem | null> {
     const binPath = this.repo.getDataPath(srcPath);
     if (!binPath) return null;
 
-    var data = await this.fs.readFile(binPath);
+    var data: Buffer<ArrayBuffer>;
+    try {
+      data = await this.fs.readRawFile(binPath);
+    } catch {
+      return null;
+    }
 
     var oldProblem: OldProblem;
     try {

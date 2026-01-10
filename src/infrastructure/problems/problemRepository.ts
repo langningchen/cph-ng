@@ -53,20 +53,26 @@ export class ProblemRepository implements IProblemRepository {
     return this.fullProblems;
   }
 
-  async getFullProblem(path?: string): Promise<FullProblem | null> {
-    if (!path) {
-      return null;
-    }
+  async getFullProblem(path?: string, allowCreate?: boolean): Promise<FullProblem | null> {
+    if (!path) return null;
     for (const fullProblem of this.fullProblems) {
       if (fullProblem.problem.isRelated(path)) {
         this.logger.trace('Found loaded problem', fullProblem.problem.src.path, 'for path', path);
         return fullProblem;
       }
     }
-    const problem = await this.problemService.loadBySrc(path);
+    let problem = await this.problemService.loadBySrc(path);
     if (!problem) {
-      this.logger.debug('Failed to load problem for path', path);
-      return null;
+      if (!allowCreate) {
+        this.logger.debug('No problem found for path', path);
+        return null;
+      }
+      this.logger.debug('No problem found for path', path, ', creating new one');
+      problem = await this.problemService.create(path);
+      if (!problem) {
+        this.logger.error('Failed to create problem for path', path);
+        return null;
+      }
     }
     this.logger.debug('Loaded problem', problem.src.path, 'for path', path);
     const fullProblem: FullProblem = {

@@ -21,6 +21,13 @@
  */
 export interface IFileSystem {
   /**
+   * Reads the entire contents of a file as a raw buffer.
+   * @throws {@link Error} If the file cannot be read.
+   * @returns The file contents as a Buffer.
+   */
+  readRawFile(path: string): Promise<Buffer<ArrayBuffer>>;
+
+  /**
    * Reads the entire contents of a file.
    * @param encoding The file encoding, default is 'utf-8'.
    * @throws {@link Error} If the file cannot be read.

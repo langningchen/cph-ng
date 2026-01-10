@@ -18,6 +18,7 @@
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
+import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type {
   CompileAdditionalData,
   LangCompileData,
@@ -30,7 +31,6 @@ import { TOKENS } from '@/composition/tokens';
 import type { FileWithHash } from '@/domain/entities/fileWithHash';
 import type { IOverrides } from '@/types';
 import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstractLanguageStrategy';
-import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 
 @injectable()
 export class LangPython extends AbstractLanguageStrategy {

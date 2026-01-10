@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
+import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type {
   CompileAdditionalData,
@@ -16,7 +17,6 @@ import {
   AbstractLanguageStrategy,
   DefaultCompileAdditionalData,
 } from '@/infrastructure/problems/judge/langs/abstractLanguageStrategy';
-import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 
 @injectable()
 export class LangCpp extends AbstractLanguageStrategy {

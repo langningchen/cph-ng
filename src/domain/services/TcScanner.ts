@@ -41,7 +41,7 @@ export class TcScanner {
     @inject(TcMatcher) private readonly matcher: TcMatcher,
   ) {}
 
-  public async fromFile(path: string): Promise<Tc[]> {
+  public async fromFile(path: string): Promise<Tc> {
     const { inputFileExtensionList: inputExts, outputFileExtensionList: outputExts } =
       this.settings.problem;
     const isInput = inputExts.includes(this.path.extname(path).toLowerCase());
@@ -75,7 +75,7 @@ export class TcScanner {
       }
     }
 
-    return [this.toEntity({ input, output })];
+    return this.toEntity({ input, output });
   }
 
   public async fromZip(srcPath: string, zipPath: string): Promise<Tc[]> {

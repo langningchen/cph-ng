@@ -20,7 +20,6 @@ import type {
   FullProblem,
   IProblemRepository,
 } from '@/application/ports/problems/IProblemRepository';
-import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';

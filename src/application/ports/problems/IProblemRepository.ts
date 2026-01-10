@@ -26,7 +26,7 @@ export interface FullProblem {
 export interface IProblemRepository {
   getDataPath(srcPath: string): string | null;
   listFullProblems(): Promise<FullProblem[]>;
-  getFullProblem(path?: string): Promise<FullProblem | null>;
+  getFullProblem(path?: string, allowCreate?: boolean): Promise<FullProblem | null>;
   removeProblem(fullProblem: FullProblem): void;
   dataRefresh(noMsg?: boolean): Promise<void>;
   closeAll(): Promise<void>;

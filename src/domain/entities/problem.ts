@@ -23,8 +23,8 @@ import type { IOverrides, IProblem, ITc } from '@/types';
 import { version } from '@/utils/packageInfo';
 
 export class Problem {
-  private _name: string;
-  private _url?: string;
+  public name: string;
+  public url?: string;
   private tcs: Record<UUID, Tc> = {};
   private tcOrder: UUID[] = [];
   private _src: FileWithHash;
@@ -32,10 +32,10 @@ export class Problem {
   private _interactor?: FileWithHash;
   private _bfCompare?: BfCompare;
   private timeElapsedMs: number = 0;
-  private _overrides?: IOverrides;
+  public overrides?: IOverrides;
 
   constructor(name: string, src: string) {
-    this._name = name;
+    this.name = name;
     this._src = new FileWithHash(src);
   }
 
@@ -45,8 +45,8 @@ export class Problem {
     return instance;
   }
   public fromI(problem: IProblem): void {
-    this._name = problem.name;
-    this._url = problem.url;
+    this.name = problem.name;
+    this.url = problem.url;
     (Object.entries(problem.tcs) as [UUID, ITc][]).forEach(([id, tc]) => {
       this.tcs[id] = Tc.fromI(tc);
     });
@@ -56,15 +56,9 @@ export class Problem {
     if (problem.interactor) this._interactor = FileWithHash.fromI(problem.interactor);
     if (problem.bfCompare) this._bfCompare = BfCompare.fromI(problem.bfCompare);
     this.timeElapsedMs = problem.timeElapsed;
-    if (problem.overrides) this._overrides = { ...problem.overrides };
+    if (problem.overrides) this.overrides = { ...problem.overrides };
   }
 
-  get name() {
-    return this._name;
-  }
-  get url() {
-    return this._url;
-  }
   get src() {
     return this._src;
   }
@@ -76,9 +70,6 @@ export class Problem {
   }
   get bfCompare() {
     return this._bfCompare;
-  }
-  get overrides() {
-    return this._overrides;
   }
 
   public addTc(uuid: UUID, tc: Tc) {
@@ -144,8 +135,8 @@ export class Problem {
     for (const [id, tc] of Object.entries(this.tcs) as [UUID, Tc][]) tcs[id] = tc.toJSON();
     return {
       version,
-      name: this._name,
-      url: this._url,
+      name: this.name,
+      url: this.url,
       tcs,
       tcOrder: this.tcOrder,
       src: this._src.toJSON(),
@@ -153,7 +144,7 @@ export class Problem {
       interactor: this._interactor?.toJSON(),
       bfCompare: this._bfCompare ? { ...this._bfCompare } : undefined,
       timeElapsed: this.timeElapsedMs,
-      overrides: this._overrides ? { ...this._overrides } : undefined,
+      overrides: this.overrides ? { ...this.overrides } : undefined,
     };
   }
 }

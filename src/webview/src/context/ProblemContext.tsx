@@ -55,10 +55,10 @@ export const ProblemProvider = ({ children }: { children: ReactNode }) => {
 
     switch (msg.type) {
       case 'editProblemDetails':
-        problem.name = msg.title;
+        problem.name = msg.name;
         problem.url = msg.url;
-        problem.timeLimitMs = msg.timeLimit;
-        problem.memoryLimitMb = msg.memoryLimit;
+        problem.timeLimitMs = msg.timeLimitMs;
+        problem.memoryLimitMb = msg.memoryLimitMb;
         problem.overrides = msg.overrides;
         changed = true;
         break;

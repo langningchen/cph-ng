@@ -15,16 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Problem } from '@/domain/entities/problem';
-import type { ITc } from '@/types';
+import { inject, injectable } from 'tsyringe';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import { TOKENS } from '@/composition/tokens';
+import type { CreateProblemMsg } from '@/webview/src/msgs';
 
-export interface IProblemService {
-  create(srcPath: string): Promise<Problem | null>;
-  loadBySrc(srcPath: string): Promise<Problem | null>;
-  loadTcs(problem: Problem): Promise<void>;
-  applyTcs(problem: Problem, tcs: ITc[]): void;
-  save(problem: Problem): Promise<void>;
-  delete(problem: Problem): Promise<void>;
-  isRelated(problem: Problem, path: string): boolean;
-  getLimits(problem: Problem): { timeLimitMs: number; memoryLimitMb: number };
+@injectable()
+export class CreateProblem {
+  constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {}
+
+  async exec(msg: CreateProblemMsg): Promise<void> {
+    if (!msg.activePath) throw new Error('Active path is required');
+    await this.repo.getFullProblem(msg.activePath, true);
+    await this.repo.dataRefresh();
+  }
 }
