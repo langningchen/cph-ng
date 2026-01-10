@@ -36,17 +36,6 @@ export class ProblemActions {
     await repository.dataRefresh();
   }
 
-  public static async delProblem(msg: msgs.DelProblemMsg) {
-    const repository = container.resolve(TOKENS.problemRepository);
-    const fullProblem = await repository.getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    await fullProblem.problem.del();
-    repository.removeProblem(fullProblem);
-    await repository.dataRefresh();
-  }
-
   public static async chooseSrcFile(msg: msgs.ChooseSrcFileMsg): Promise<void> {
     const repository = container.resolve(TOKENS.problemRepository);
     const fullProblem = await repository.getFullProblem(msg.activePath);

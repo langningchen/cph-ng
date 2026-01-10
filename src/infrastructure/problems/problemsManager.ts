@@ -23,6 +23,7 @@ import { ChooseTcFile } from '@/application/useCases/webview/ChooseTcFile';
 import { ClearTcStatus } from '@/application/useCases/webview/ClearTcStatus';
 import { CompareTc } from '@/application/useCases/webview/CompareTc';
 import { CreateProblem } from '@/application/useCases/webview/CreateProblem';
+import { DelProblem } from '@/application/useCases/webview/DelProblem';
 import { DelTc } from '@/application/useCases/webview/DelTc';
 import { DragDrop } from '@/application/useCases/webview/DragDrop';
 import { EditProblemDetails } from '@/application/useCases/webview/EditProblemDetails';
@@ -49,7 +50,7 @@ export class ProblemsManager implements IProblemsManager {
     await container.resolve(EditProblemDetails).exec(msg);
   }
   async delProblem(msg: msgs.DelProblemMsg): Promise<void> {
-    return ProblemActions.delProblem(msg);
+    await container.resolve(DelProblem).exec(msg);
   }
   async chooseSrcFile(msg: msgs.ChooseSrcFileMsg): Promise<void> {
     return ProblemActions.chooseSrcFile(msg);
