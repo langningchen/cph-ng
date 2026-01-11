@@ -15,8 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { UUID } from 'node:crypto';
+import type { BfCompareState } from '@/domain/entities/bfCompare';
 import type { VerdictName } from '@/domain/entities/verdict';
-import type { UUID } from 'crypto';
 
 export interface ITcVerdict {
   name: string;
@@ -24,9 +25,11 @@ export interface ITcVerdict {
   color: string;
 }
 
-export type ITcIo = {
-  data: string;
-} | {path:string}
+export type ITcIo =
+  | {
+      data: string;
+    }
+  | { path: string };
 
 export interface ITcResult {
   verdict: VerdictName;
@@ -52,8 +55,8 @@ export interface IFileWithHash {
 export interface IBfCompare {
   generator?: IFileWithHash;
   bruteForce?: IFileWithHash;
-  running: boolean;
-  msg: string;
+  cnt: number;
+  state: BfCompareState;
 }
 
 export interface IOverrides {

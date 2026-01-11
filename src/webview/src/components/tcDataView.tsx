@@ -27,7 +27,7 @@ import { type AnserJsonEntry, ansiToJson } from 'anser';
 import React, { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
-import type { ITcIo } from '@/types/types';
+import type { ITcIo } from '@/domain/types';
 import { basename, msg } from '../utils';
 import { CphFlex } from './base/cphFlex';
 import { CphLink } from './base/cphLink';

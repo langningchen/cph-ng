@@ -16,9 +16,9 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { UUID } from 'node:crypto';
-import type { BfCompare } from '@/domain/entities/bfCompare';
+import { BfCompare } from '@/domain/entities/bfCompare';
 import type { Tc } from '@/domain/entities/tc';
-import type { IFileWithHash, IOverrides } from '@/types';
+import type { IFileWithHash, IOverrides } from '@/domain/types';
 
 export class Problem {
   public name: string;
@@ -28,7 +28,7 @@ export class Problem {
   public readonly src: IFileWithHash;
   private _checker?: IFileWithHash;
   private _interactor?: IFileWithHash;
-  private _bfCompare?: BfCompare;
+  private _bfCompare: BfCompare = new BfCompare();
   private _timeElapsedMs: number = 0;
   public overrides: IOverrides = {};
 
@@ -59,7 +59,7 @@ export class Problem {
   public get bfCompare() {
     return this._bfCompare;
   }
-  public set bfCompare(bfCompare: BfCompare | undefined) {
+  public set bfCompare(bfCompare: BfCompare) {
     this._bfCompare = bfCompare;
   }
   public get timeElapsedMs() {

@@ -27,7 +27,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { MD5 } from 'crypto-js';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type ITc, isRunningVerdict } from '@/types/types';
+import { type ITc, isRunningVerdict } from '@/domain/types';
 import { useProblemContext } from '../context/ProblemContext';
 import { getCompile, msg } from '../utils';
 import { CphFlex } from './base/cphFlex';

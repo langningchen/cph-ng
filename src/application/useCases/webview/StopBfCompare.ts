@@ -15,6 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export * from './migration';
-export * from './types';
-export * from './types.backend';
+import { inject, injectable } from 'tsyringe';
+import type {
+  FullProblem,
+  IProblemRepository,
+} from '@/application/ports/problems/IProblemRepository';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { TOKENS } from '@/composition/tokens';
+import type { StopBfCompareMsg } from '@/webview/src/msgs';
+
+@injectable()
+export class StopBfCompare extends BaseProblemUseCase<StopBfCompareMsg> {
+  constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
+    super(repo, true);
+  }
+
+  protected async performAction({ ac }: FullProblem, _msg: StopBfCompareMsg): Promise<void> {
+    ac?.abort();
+  }
+}

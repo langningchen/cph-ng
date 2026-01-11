@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ITcIo } from '@/types';
+import type { ITcIo } from '@/domain/types';
 
 export class TcIo {
   public readonly path?: string;

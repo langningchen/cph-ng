@@ -10,7 +10,7 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/domain/entities/problem';
-import type { IFileWithHash } from '@/types';
+import type { IFileWithHash } from '@/domain/types';
 
 @injectable()
 export class CompilerService implements ICompilerService {

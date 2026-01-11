@@ -1,6 +1,6 @@
 import type { UUID } from 'node:crypto';
 import React, { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
-import type { IProblem } from '@/types';
+import type { IProblem } from '@/domain/types';
 import type { ActivePathEvent, ProblemEvent, ProblemEventData } from '../../../modules/sidebar';
 import type { ProblemMsgCore } from '../msgs';
 import { msg as sendMsg } from '../utils';

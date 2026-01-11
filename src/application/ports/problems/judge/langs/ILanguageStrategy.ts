@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileWithHash, IOverrides } from '@/types';
+import type { IFileWithHash, IOverrides } from '@/domain/types';
 
 export interface CompileAdditionalData {
   canUseWrapper: boolean;

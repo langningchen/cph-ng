@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { UUID } from 'node:crypto';
-import type { IOverrides, ITc } from '@/types/types';
+import type { IOverrides, ITc } from '@/domain/types';
 import type { DistributiveOmit } from '@/webview/src/utils';
 
 export interface BaseMsg {

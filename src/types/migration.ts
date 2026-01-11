@@ -29,7 +29,7 @@ import type { Problem as Problem_0_2_3 } from './history/0.2.3';
 import type { Problem as Problem_0_2_4 } from './history/0.2.4';
 import type { Problem as Problem_0_3_7 } from './history/0.3.7';
 import type { Problem as Problem_0_4_3 } from './history/0.4.3';
-import type { IProblem, IProblem as Problem_0_4_8 } from './types';
+import type { IProblem, IProblem as Problem_0_4_8 } from '../domain/types';
 
 const logger = new Logger('migration');
 

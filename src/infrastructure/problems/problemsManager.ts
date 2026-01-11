@@ -36,12 +36,13 @@ import { RemoveSrcFile } from '@/application/useCases/webview/RemoveSrcFile';
 import { ReorderTc } from '@/application/useCases/webview/ReorderTc';
 import { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
 import { RunSingleTc } from '@/application/useCases/webview/RunSingleTc';
+import { StartBfCompare } from '@/application/useCases/webview/StartBfCompare';
+import { StopBfCompare } from '@/application/useCases/webview/StopBfCompare';
 import { StopTcs } from '@/application/useCases/webview/StopTcs';
 import { SubmitToCodeforces } from '@/application/useCases/webview/SubmitToCodeforces';
 import { ToggleDisable } from '@/application/useCases/webview/ToggleDisable';
 import { ToggleTcFile } from '@/application/useCases/webview/ToggleTcFile';
 import { UpdateTc } from '@/application/useCases/webview/UpdateTc';
-import { BfCompare } from '../../modules/problems/manager/bfCompare';
 
 @injectable()
 export class ProblemsManager implements IProblemsManager {
@@ -118,9 +119,9 @@ export class ProblemsManager implements IProblemsManager {
   }
 
   async startBfCompare(msg: msgs.StartBfCompareMsg): Promise<void> {
-    return BfCompare.startBfCompare(msg);
+    await container.resolve(StartBfCompare).exec(msg);
   }
   async stopBfCompare(msg: msgs.StopBfCompareMsg): Promise<void> {
-    return BfCompare.stopBfCompare(msg);
+    await container.resolve(StopBfCompare).exec(msg);
   }
 }

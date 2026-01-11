@@ -28,7 +28,7 @@ import {
   type PreparedToolInvocation,
 } from 'vscode';
 import { container } from 'tsyringe';
-import type { TcIo } from '@/types';
+import type { TcIo } from '@/domain/types';
 import { TOKENS } from '@/composition/tokens';
 
 const MAX_PREVIEW_LENGTH = 1000;

@@ -34,15 +34,9 @@ import { TOKENS } from '@/composition/tokens';
 import { Problem } from '@/domain/entities/problem';
 import type { Tc } from '@/domain/entities/tc';
 import type { TcScanner } from '@/domain/services/TcScanner';
+import type { IFileWithHash, IProblem, ITc, ITcIo } from '@/domain/types';
 import type { ProblemMapper } from '@/infrastructure/problems/problemMapper';
-import {
-  type IFileWithHash,
-  type IProblem,
-  type ITc,
-  type ITcIo,
-  migration,
-  type OldProblem,
-} from '@/types';
+import { migration, type OldProblem } from '@/types/migration';
 
 @injectable()
 export class ProblemService implements IProblemService {

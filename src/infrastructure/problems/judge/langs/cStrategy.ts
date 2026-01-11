@@ -12,11 +12,11 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
+import type { IFileWithHash } from '@/domain/types';
 import {
   AbstractLanguageStrategy,
   DefaultCompileAdditionalData,
 } from '@/infrastructure/problems/judge/langs/abstractLanguageStrategy';
-import type { IFileWithHash } from '@/types';
 
 @injectable()
 export class LangC extends AbstractLanguageStrategy {

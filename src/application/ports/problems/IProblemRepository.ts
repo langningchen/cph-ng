@@ -17,6 +17,7 @@
 
 import type { Problem } from '@/domain/entities/problem';
 
+// TO-DO: Use full problem class instead of interface
 export interface FullProblem {
   problem: Problem;
   ac: AbortController | null;

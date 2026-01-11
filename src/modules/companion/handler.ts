@@ -8,7 +8,7 @@ import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
 import UserScriptManager from '@/helpers/userScriptManager';
 import { TOKENS } from '@/composition/tokens';
-import type { Problem } from '@/types';
+import type { Problem } from '@/domain/types';
 import { mkdirIfNotExists } from '@/utils/process';
 import { renderTemplate } from '@/utils/strTemplate';
 import { CphProblem } from '../problems/cphProblem';

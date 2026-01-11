@@ -104,7 +104,6 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
 
       const ctx: JudgeContext = {
         problem,
-        tcId,
         ...(await this.tcService.getPaths(tc)),
         artifacts,
       };

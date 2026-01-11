@@ -31,7 +31,7 @@ import Tab from '@mui/material/Tab';
 import TextField from '@mui/material/TextField';
 import React, { type SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { IProblem } from '@/types/types';
+import type { IProblem } from '@/domain/types';
 import { msg } from '@/webview/src/utils';
 import { useProblemContext } from '../context/ProblemContext';
 import { CphFlex } from './base/cphFlex';

@@ -15,14 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import type { CompileData } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { Problem } from '@/domain/entities/problem';
 
 export interface JudgeContext {
   problem: Problem;
-  tcId: UUID;
   stdinPath: string;
   answerPath: string;
   artifacts: CompileData;

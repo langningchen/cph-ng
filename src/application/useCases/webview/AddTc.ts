@@ -24,7 +24,7 @@ import type {
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import { Tc } from '@/domain/entities/tc';
-import { TcIo } from '@/types';
+import { TcIo } from '@/domain/entities/tcIo';
 import type { AddTcMsg } from '@/webview/src/msgs';
 
 @injectable()

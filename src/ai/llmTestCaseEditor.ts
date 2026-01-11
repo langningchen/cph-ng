@@ -27,7 +27,7 @@ import {
   type PreparedToolInvocation,
 } from 'vscode';
 import { container } from 'tsyringe';
-import { Tc, TcIo } from '@/types';
+import { Tc, TcIo } from '@/domain/types';
 import { TOKENS } from '@/composition/tokens';
 
 interface LlmTestCaseEditorParams {

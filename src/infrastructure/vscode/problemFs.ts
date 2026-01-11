@@ -35,7 +35,7 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/domain/entities/problem';
-import type { TcIo } from '@/types';
+import type { TcIo } from '@/domain/entities/tcIo';
 
 type CphFsFile = {
   data: string | Uri;

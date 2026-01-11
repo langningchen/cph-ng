@@ -19,7 +19,7 @@ import type { UUID } from 'node:crypto';
 import Box from '@mui/material/Box';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { IProblem } from '@/types/types';
+import type { IProblem } from '@/domain/types';
 import { useProblemContext } from '../context/ProblemContext';
 import { AcCongrats } from './acCongrats';
 import { CphFlex } from './base/cphFlex';

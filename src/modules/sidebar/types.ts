@@ -1,4 +1,4 @@
-import type { IProblem } from '@/types';
+import type { IProblem } from '@/domain/types';
 
 export interface ProblemEventData {
   canImport: boolean;

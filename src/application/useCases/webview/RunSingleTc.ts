@@ -85,7 +85,6 @@ export class RunSingleTc extends BaseProblemUseCase<RunTcMsg> {
 
     const ctx: JudgeContext = {
       problem,
-      tcId: msg.id,
       ...(await this.tcService.getPaths(tc)),
       artifacts,
     };

@@ -25,7 +25,7 @@ import { TOKENS } from '@/composition/tokens';
 import { Problem } from '@/domain/entities/problem';
 import { Tc } from '@/domain/entities/tc';
 import { TcIo } from '@/domain/entities/tcIo';
-import type { ICphProblem } from '@/types';
+import type { ICphProblem } from '@/domain/types';
 
 @injectable()
 export class CphMigrationService implements ICphMigrationService {

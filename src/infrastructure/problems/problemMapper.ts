@@ -21,7 +21,7 @@ import { TOKENS } from '@/composition/tokens';
 import { BfCompare } from '@/domain/entities/bfCompare';
 import { Problem } from '@/domain/entities/problem';
 import { Tc } from '@/domain/entities/tc';
-import { type IBfCompare, type IProblem, type ITc, type ITcIo, TcIo } from '@/types';
+import { type IBfCompare, type IProblem, type ITc, type ITcIo, TcIo } from '@/domain/types';
 
 @injectable()
 export class ProblemMapper {
@@ -109,8 +109,8 @@ export class ProblemMapper {
     const bfCompare = new BfCompare();
     bfCompare.generator = dto.generator;
     bfCompare.bruteForce = dto.bruteForce;
-    bfCompare.running = dto.running;
-    bfCompare.msg = dto.msg;
+    bfCompare.cnt = dto.cnt;
+    bfCompare.state = dto.state;
     return bfCompare;
   }
 
@@ -118,8 +118,8 @@ export class ProblemMapper {
     return {
       generator: bfCompare.generator,
       bruteForce: bfCompare.bruteForce,
-      running: bfCompare.running,
-      msg: bfCompare.msg,
+      cnt: bfCompare.cnt,
+      state: bfCompare.state,
     };
   }
 }
