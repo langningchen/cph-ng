@@ -12,11 +12,11 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
-import type { FileWithHash } from '@/domain/entities/fileWithHash';
 import {
   AbstractLanguageStrategy,
   DefaultCompileAdditionalData,
 } from '@/infrastructure/problems/judge/langs/abstractLanguageStrategy';
+import type { IFileWithHash } from '@/types';
 
 @injectable()
 export class LangCpp extends AbstractLanguageStrategy {
@@ -40,7 +40,7 @@ export class LangCpp extends AbstractLanguageStrategy {
   }
 
   protected async internalCompile(
-    src: FileWithHash,
+    src: IFileWithHash,
     signal: AbortSignal,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData = DefaultCompileAdditionalData,

@@ -318,7 +318,7 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
 
   afterEach(() => {
     container.clearInstances();
-    testWorkspace && rmSync(testWorkspace, { recursive: true, force: true });
+    if (testWorkspace) rmSync(testWorkspace, { recursive: true, force: true });
   });
 
   const createExecutableScript = (content: string): string => {

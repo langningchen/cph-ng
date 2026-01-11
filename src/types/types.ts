@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { FileWithHash } from '@/domain/entities/fileWithHash';
 import type { VerdictName } from '@/domain/entities/verdict';
 import type { UUID } from 'crypto';
 
@@ -25,10 +24,9 @@ export interface ITcVerdict {
   color: string;
 }
 
-export interface ITcIo {
-  useFile: boolean;
+export type ITcIo = {
   data: string;
-}
+} | {path:string}
 
 export interface ITcResult {
   verdict: VerdictName;
@@ -77,7 +75,7 @@ export interface IProblem {
   checker?: IFileWithHash;
   interactor?: IFileWithHash;
   bfCompare?: IBfCompare;
-  timeElapsed: number;
+  timeElapsedMs: number;
   overrides?: IOverrides;
 }
 

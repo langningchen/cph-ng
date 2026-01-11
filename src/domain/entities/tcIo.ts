@@ -18,32 +18,26 @@
 import type { ITcIo } from '@/types';
 
 export class TcIo {
-  constructor(
-    public useFile: boolean = false,
-    public data: string = '',
-  ) {}
-  public static fromI(tc: ITcIo): TcIo {
-    const instance = new TcIo();
-    instance.fromI(tc);
-    return instance;
-  }
-  public fromI(tc: ITcIo) {
-    this.useFile = tc.useFile;
-    this.data = tc.data;
+  public readonly path?: string;
+  public readonly data?: string;
+
+  constructor(o: ITcIo) {
+    if ('path' in o) {
+      this.path = o.path.toLowerCase();
+      this.data = undefined;
+    } else {
+      this.data = o.data;
+      this.path = undefined;
+    }
   }
 
+  public match<T>(onPath: (path: string) => T, onData: (data: string) => T): T {
+    if (this.path !== undefined) return onPath(this.path);
+    if (this.data !== undefined) return onData(this.data);
+    throw new Error('TcIo is empty');
+  }
   public getDisposables(): string[] {
-    if (!this.useFile) return [];
-    return [this.data];
-  }
-  public isRelated(path: string): boolean {
-    return this.useFile && this.data.toLowerCase() === path;
-  }
-
-  public toJSON(): ITcIo {
-    return {
-      useFile: this.useFile,
-      data: this.data,
-    };
+    if (!this.path) return [];
+    return [this.path];
   }
 }

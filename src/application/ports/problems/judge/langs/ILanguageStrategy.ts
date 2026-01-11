@@ -15,8 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { FileWithHash } from '@/domain/entities/fileWithHash';
-import type { IOverrides } from '@/types';
+import type { IFileWithHash, IOverrides } from '@/types';
 
 export interface CompileAdditionalData {
   canUseWrapper: boolean;
@@ -50,7 +49,7 @@ export interface ILanguageStrategy {
   readonly enableRunner: boolean;
 
   compile(
-    src: FileWithHash,
+    src: IFileWithHash,
     signal: AbortSignal,
     forceCompile: boolean | null,
     additionalData?: CompileAdditionalData,

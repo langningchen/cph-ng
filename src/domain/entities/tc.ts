@@ -17,7 +17,6 @@
 
 import { TcIo } from '@/domain/entities/tcIo';
 import type { VerdictName } from '@/domain/entities/verdict';
-import type { ITc } from '@/types';
 
 export interface UpdatedResult {
   isExpand?: boolean;
@@ -26,41 +25,23 @@ export interface UpdatedResult {
   msg?: string;
 }
 
+interface ITcResult {
+  readonly verdict: VerdictName;
+  readonly time?: number;
+  readonly memory?: number;
+  readonly stdout?: TcIo;
+  readonly stderr?: TcIo;
+  readonly msg?: string;
+}
+
 export class Tc {
   constructor(
-    public stdin: TcIo = new TcIo(),
-    public answer: TcIo = new TcIo(),
+    public stdin: TcIo = new TcIo({ data: '' }),
+    public answer: TcIo = new TcIo({ data: '' }),
     private _isExpand: boolean = false,
     private _isDisabled: boolean = false,
-    private _result?: {
-      verdict: VerdictName;
-      time?: number;
-      memory?: number;
-      stdout?: TcIo;
-      stderr?: TcIo;
-      msg?: string;
-    },
+    private _result?: ITcResult,
   ) {}
-  public static fromI(tc: ITc): Tc {
-    const instance = new Tc();
-    instance.fromI(tc);
-    return instance;
-  }
-  public fromI(tc: ITc): void {
-    this.stdin.fromI(tc.stdin);
-    this.answer.fromI(tc.answer);
-    this._isExpand = tc.isExpand;
-    this._isDisabled = tc.isDisabled;
-    if (tc.result)
-      this._result = {
-        verdict: tc.result.verdict,
-        time: tc.result.time,
-        memory: tc.result.memory,
-        stdout: tc.result.stdout && TcIo.fromI(tc.result.stdout),
-        stderr: tc.result.stderr && TcIo.fromI(tc.result.stderr),
-        msg: tc.result.msg,
-      };
-  }
 
   get isExpand(): boolean {
     return this._isExpand;
@@ -71,11 +52,20 @@ export class Tc {
   get verdict(): VerdictName | undefined {
     return this._result?.verdict;
   }
+  get time(): number | undefined {
+    return this._result?.time;
+  }
+  get memory(): number | undefined {
+    return this._result?.memory;
+  }
   get stdout(): TcIo | undefined {
     return this._result?.stdout;
   }
   get stderr(): TcIo | undefined {
     return this._result?.stderr;
+  }
+  get msg(): string | undefined {
+    return this._result?.msg;
   }
 
   public toggleExpand() {
@@ -97,16 +87,15 @@ export class Tc {
     verdict: VerdictName,
     { isExpand, timeMs, memoryMb, msg }: UpdatedResult = {},
   ): void {
-    if (!this._result) this._result = { verdict };
-    else this._result.verdict = verdict;
+    const current = this._result || { verdict };
+    this._result = {
+      ...current,
+      verdict,
+      time: timeMs ?? current.time,
+      memory: memoryMb ?? current.memory,
+      msg: this.formatMessage(current.msg, msg),
+    };
     if (isExpand !== undefined) this._isExpand = isExpand;
-    if (timeMs !== undefined) this._result.time = timeMs;
-    if (memoryMb !== undefined) this._result.memory = memoryMb;
-    if (msg !== undefined) {
-      msg = `${msg.trim()}\n`;
-      if (!this._result.msg) this._result.msg = msg;
-      else this._result.msg += `\n${msg}`;
-    }
   }
   public getDisposables(): string[] {
     return [
@@ -117,28 +106,18 @@ export class Tc {
     ];
   }
   public isRelated(path: string): boolean {
+    path = path.toLowerCase();
     return (
-      this.stdin.isRelated(path) ||
-      this.answer.isRelated(path) ||
-      (this._result?.stdout?.isRelated(path) ?? false) ||
-      (this._result?.stderr?.isRelated(path) ?? false)
+      this.stdin.path === path ||
+      this.answer.path === path ||
+      this._result?.stdout?.path === path ||
+      this._result?.stderr?.path === path
     );
   }
-
-  public toJSON(): ITc {
-    return {
-      stdin: this.stdin.toJSON(),
-      answer: this.answer.toJSON(),
-      isExpand: this._isExpand,
-      isDisabled: this._isDisabled,
-      result: this._result && {
-        verdict: this._result.verdict,
-        time: this._result.time,
-        memory: this._result.memory,
-        stdout: this._result.stdout?.toJSON(),
-        stderr: this._result.stderr?.toJSON(),
-        msg: this._result.msg,
-      },
-    };
+  private formatMessage(oldMsg?: string, newMsg?: string): string | undefined {
+    if (!newMsg) return oldMsg;
+    const trimmed = newMsg.trim();
+    if (!oldMsg) return `${trimmed}\n`;
+    return `${oldMsg}\n${trimmed}\n`;
   }
 }

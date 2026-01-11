@@ -15,19 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileWithHash } from '@/types';
+import { injectable } from 'tsyringe';
+import pkg from '@/../package.json';
+import type { IMetadata } from '@/application/ports/node/IMetadata';
 
-export class FileWithHash {
-  constructor(
-    public readonly path: string,
-    public hash?: string,
-  ) {}
-
-  public static fromI(file: IFileWithHash): FileWithHash {
-    return new FileWithHash(file.path, file.hash);
-  }
-
-  public toJSON(): IFileWithHash {
-    return { path: this.path, hash: this.hash };
-  }
+@injectable()
+export class MetadataAdapter implements IMetadata {
+  public readonly version = pkg.version;
+  public readonly name = pkg.name;
 }

@@ -247,7 +247,7 @@ export const ProblemActions = ({ problem }: ProblemActionsProps) => {
                   <CphLink
                     name={problem.bfCompare.generator.path}
                     onClick={() => {
-                      problem.bfCompare?.generator &&
+                      if (problem.bfCompare?.generator)
                         msg({
                           type: 'openFile',
                           path: problem.bfCompare.generator.path,
@@ -287,7 +287,7 @@ export const ProblemActions = ({ problem }: ProblemActionsProps) => {
                   <CphLink
                     name={problem.bfCompare.bruteForce.path}
                     onClick={() => {
-                      problem.bfCompare?.bruteForce &&
+                      if (problem.bfCompare?.bruteForce)
                         msg({
                           type: 'openFile',
                           path: problem.bfCompare.bruteForce.path,

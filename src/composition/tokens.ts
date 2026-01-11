@@ -57,6 +57,7 @@ import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventB
 export const TOKENS = {
   // VS Code context and utilities
   extensionPath: 'vscode.ExtensionPath' as InjectionToken<string>,
+  version: 'vscode.Version' as InjectionToken<string>,
   logOutputChannel: 'vscode.LogOutputChannel' as InjectionToken<LogOutputChannel>,
   telemetryReporter: 'vscode.TelemetryReporter' as InjectionToken<TelemetryReporter>,
   document: 'vscode.Document' as InjectionToken<IDocument>,

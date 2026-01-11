@@ -21,6 +21,6 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 export const translatorMock = mock<ITranslator>();
 translatorMock.t.mockImplementation((message: string, args?: Record<string, unknown>): string => {
   const parts = [message];
-  args && parts.push(...Object.values(args).map((v) => String(v)));
+  if (args) parts.push(...Object.values(args).map((v) => String(v)));
   return parts.join(',');
 });

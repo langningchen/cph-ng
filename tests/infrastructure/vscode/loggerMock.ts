@@ -36,7 +36,7 @@ const createLoggerMock = (
   ) => {
     logger[level].mockImplementation((...args) => {
       consoleMethod(tag, prefix, ...args);
-      logger !== root && root[level](...args);
+      if (logger !== root) root[level](...args);
     });
   };
 

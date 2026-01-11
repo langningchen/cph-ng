@@ -16,135 +16,116 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { UUID } from 'node:crypto';
-import { BfCompare } from '@/domain/entities/bfCompare';
-import { FileWithHash } from '@/domain/entities/fileWithHash';
-import { Tc } from '@/domain/entities/tc';
-import type { IOverrides, IProblem, ITc } from '@/types';
-import { version } from '@/utils/packageInfo';
+import type { BfCompare } from '@/domain/entities/bfCompare';
+import type { Tc } from '@/domain/entities/tc';
+import type { IFileWithHash, IOverrides } from '@/types';
 
 export class Problem {
   public name: string;
   public url?: string;
-  private tcs: Record<UUID, Tc> = {};
-  private tcOrder: UUID[] = [];
-  private _src: FileWithHash;
-  private _checker?: FileWithHash;
-  private _interactor?: FileWithHash;
+  private _tcs: Record<UUID, Tc> = {};
+  private _tcOrder: UUID[] = [];
+  public readonly src: IFileWithHash;
+  private _checker?: IFileWithHash;
+  private _interactor?: IFileWithHash;
   private _bfCompare?: BfCompare;
-  private timeElapsedMs: number = 0;
+  private _timeElapsedMs: number = 0;
   public overrides?: IOverrides;
 
-  constructor(name: string, src: string) {
+  constructor(name: string, src: string | IFileWithHash) {
     this.name = name;
-    this._src = new FileWithHash(src);
+    if (typeof src === 'string') this.src = { path: src };
+    else this.src = src;
   }
 
-  public static fromI(problem: IProblem): Problem {
-    const instance = new Problem(problem.name, problem.src.path);
-    instance.fromI(problem);
-    return instance;
+  public get tcs(): Readonly<Record<UUID, Tc>> {
+    return this._tcs;
   }
-  public fromI(problem: IProblem): void {
-    this.name = problem.name;
-    this.url = problem.url;
-    (Object.entries(problem.tcs) as [UUID, ITc][]).forEach(([id, tc]) => {
-      this.tcs[id] = Tc.fromI(tc);
-    });
-    this.tcOrder = [...problem.tcOrder];
-    this._src = FileWithHash.fromI(problem.src);
-    if (problem.checker) this._checker = FileWithHash.fromI(problem.checker);
-    if (problem.interactor) this._interactor = FileWithHash.fromI(problem.interactor);
-    if (problem.bfCompare) this._bfCompare = BfCompare.fromI(problem.bfCompare);
-    this.timeElapsedMs = problem.timeElapsed;
-    if (problem.overrides) this.overrides = { ...problem.overrides };
+  public get tcOrder(): readonly UUID[] {
+    return this._tcOrder;
   }
-
-  get src() {
-    return this._src;
-  }
-  get checker() {
+  public get checker() {
     return this._checker;
   }
-  get interactor() {
+  public set checker(file: IFileWithHash | undefined) {
+    this._checker = file;
+  }
+  public get interactor() {
     return this._interactor;
   }
-  get bfCompare() {
+  public set interactor(file: IFileWithHash | undefined) {
+    this._interactor = file;
+  }
+  public get bfCompare() {
     return this._bfCompare;
+  }
+  public set bfCompare(bfCompare: BfCompare | undefined) {
+    this._bfCompare = bfCompare;
+  }
+  public get timeElapsedMs() {
+    return this._timeElapsedMs;
   }
 
   public addTc(uuid: UUID, tc: Tc) {
-    this.tcs[uuid] = tc;
-    this.tcOrder.push(uuid);
+    this._tcs[uuid] = tc;
+    this._tcOrder.push(uuid);
   }
   public getTc(uuid: UUID): Tc {
-    if (!this.tcs[uuid]) throw new Error('Test case not found');
-    return this.tcs[uuid];
+    if (!this._tcs[uuid]) throw new Error('Test case not found');
+    return this._tcs[uuid];
   }
   public deleteTc(uuid: UUID): void {
-    this.tcOrder = this.tcOrder.filter((id) => id !== uuid);
+    this._tcOrder = this._tcOrder.filter((id) => id !== uuid);
   }
-  public clearTcs() {
-    this.tcOrder = [];
+  public clearTcs(): string[] {
+    const disposables = this.purgeUnusedTcs();
+    this._tcOrder = [];
+    for (const tc of Object.values(this._tcs)) disposables.push(...tc.getDisposables());
+    this._tcs = {};
+    return disposables;
   }
   public moveTc(fromIdx: number, toIdx: number): void {
-    const [movedTc] = this.tcOrder.splice(fromIdx, 1);
-    this.tcOrder.splice(toIdx, 0, movedTc);
+    const [movedTc] = this._tcOrder.splice(fromIdx, 1);
+    this._tcOrder.splice(toIdx, 0, movedTc);
   }
   public getEnabledTcIds(): UUID[] {
-    return this.tcOrder.filter((id) => !this.tcs[id].isDisabled);
+    return this._tcOrder.filter((id) => !this._tcs[id].isDisabled);
   }
   public purgeUnusedTcs(): string[] {
-    const activeIds = new Set(this.tcOrder);
+    const activeIds = new Set(this._tcOrder);
     const disposables: string[] = [];
-    for (const id of Object.keys(this.tcs) as UUID[])
+    for (const id of Object.keys(this._tcs) as UUID[])
       if (!activeIds.has(id)) {
-        disposables.push(...this.tcs[id].getDisposables());
-        delete this.tcs[id];
+        disposables.push(...this._tcs[id].getDisposables());
+        delete this._tcs[id];
       }
     return disposables;
   }
 
   public clearResult(): string[] {
     const disposables: string[] = [];
-    for (const id of this.tcOrder) disposables.push(...this.tcs[id].clearResult());
+    for (const id of this._tcOrder) disposables.push(...this._tcs[id].clearResult());
     return disposables;
   }
 
   public isRelated(path: string): boolean {
+    path = path.toLowerCase();
     if (
-      this._src.path.toLowerCase() === path ||
-      this._checker?.path.toLowerCase() === path ||
-      this._interactor?.path.toLowerCase() === path ||
-      this._bfCompare?.bruteForce?.path.toLowerCase() === path ||
-      this._bfCompare?.generator?.path.toLowerCase() === path
+      this.src.path === path ||
+      this._checker?.path === path ||
+      this._interactor?.path === path ||
+      this._bfCompare?.bruteForce?.path === path ||
+      this._bfCompare?.generator?.path === path
     )
       return true;
-    for (const tc of Object.values(this.tcs)) if (tc.isRelated(path)) return true;
+    for (const tc of Object.values(this._tcs)) if (tc.isRelated(path)) return true;
     return false;
   }
 
   public addTimeElapsed(addMs: number) {
-    this.timeElapsedMs += addMs;
+    this._timeElapsedMs += addMs;
   }
   public updateResult(...params: Parameters<Tc['updateResult']>) {
-    for (const tcId of this.tcOrder) this.tcs[tcId].updateResult(...params);
-  }
-
-  public toJSON(): IProblem {
-    const tcs: Record<UUID, ITc> = {};
-    for (const [id, tc] of Object.entries(this.tcs) as [UUID, Tc][]) tcs[id] = tc.toJSON();
-    return {
-      version,
-      name: this.name,
-      url: this.url,
-      tcs,
-      tcOrder: this.tcOrder,
-      src: this._src.toJSON(),
-      checker: this._checker?.toJSON(),
-      interactor: this._interactor?.toJSON(),
-      bfCompare: this._bfCompare ? { ...this._bfCompare } : undefined,
-      timeElapsed: this.timeElapsedMs,
-      overrides: this.overrides ? { ...this.overrides } : undefined,
-    };
+    for (const tcId of this._tcOrder) this._tcs[tcId].updateResult(...params);
   }
 }

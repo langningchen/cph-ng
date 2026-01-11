@@ -114,8 +114,8 @@ export class TcScanner {
 
   private toEntity(pair: FilePair): Tc {
     return new Tc(
-      new TcIo(!!pair.input, pair.input || ''),
-      new TcIo(!!pair.output, pair.output || ''),
+      new TcIo(pair.input ? { path: pair.input } : { data: '' }),
+      new TcIo(pair.output ? { path: pair.output } : { data: '' }),
     );
   }
 }

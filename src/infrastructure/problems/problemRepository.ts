@@ -107,7 +107,7 @@ export class ProblemRepository implements IProblemRepository {
 
     const fullProblem = await this.getFullProblem(activePath);
     const canImport = !!activePath && existsSync(CphProblem.getProbBySrc(activePath));
-    noMsg ||
+    if (!noMsg)
       sidebarProvider.event.emit('problem', {
         problem: fullProblem && {
           problem: fullProblem.problem,
@@ -126,7 +126,7 @@ export class ProblemRepository implements IProblemRepository {
       canImport,
       isRunning: !!fullProblem?.ac,
     });
-    fullProblem && (await this.problemFs.fireAuthorityChange(fullProblem.problem.src.path));
+    if (fullProblem) await this.problemFs.fireAuthorityChange(fullProblem.problem.src.path);
   }
 
   async closeAll(): Promise<void> {

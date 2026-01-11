@@ -103,7 +103,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerInstance(TOKENS.logOutputChannel, logOutputChannel);
 
   const buildInfo = container.resolve(TOKENS.buildInfo);
-  buildInfo.load && (await buildInfo.load());
+  if (buildInfo.load) await buildInfo.load();
   container.registerInstance(TOKENS.buildInfo, buildInfo);
 
   const logger = container.resolve<ILogger>(TOKENS.logger).withScope('container');

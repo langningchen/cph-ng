@@ -29,6 +29,7 @@ import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUs
 import { TOKENS } from '@/composition/tokens';
 import { TcIo } from '@/domain/entities/tcIo';
 import type { ToggleTcFileMsg, WebviewTcFileTypes } from '@/webview/src/msgs';
+import type { TcIoService } from '@/infrastructure/problems/tcIoService';
 
 @injectable()
 export class ToggleTcFile extends BaseProblemUseCase<ToggleTcFileMsg> {
@@ -36,6 +37,7 @@ export class ToggleTcFile extends BaseProblemUseCase<ToggleTcFileMsg> {
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.tcIoService) protected readonly tcIoService: TcIoService,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
@@ -46,26 +48,29 @@ export class ToggleTcFile extends BaseProblemUseCase<ToggleTcFileMsg> {
   protected async performAction({ problem }: FullProblem, msg: ToggleTcFileMsg): Promise<void> {
     const tc = problem.getTc(msg.id);
     const fileIo = tc[msg.label];
-    if (fileIo.useFile) {
-      const data = fileIo.toString();
-      if (data.length > this.settings.problem.maxInlineDataLength)
-        throw new Error('File too large to inline');
-      tc[msg.label] = new TcIo(false, data);
-    } else {
-      const ext = this.getDefaultExt(msg.label);
-
-      const defaultPath = this.path.join(
-        this.path.dirname(problem.src.path),
-        `${this.path.basename(problem.src.path, this.path.extname(problem.src.path))}-${msg.id + 1}${ext}`,
-      );
-      const path = await this.ui.saveDialog({
-        defaultPath,
-        title: this.translator.t('Select location to save'),
-      });
-      if (!path) return;
-      await this.fs.safeWriteFile(path, fileIo.data);
-      tc[msg.label] = new TcIo(true, path);
-    }
+    await fileIo.match(
+      async (path) => {
+        const stat = await this.fs.stat(path);
+        if (stat.size > this.settings.problem.maxInlineDataLength)
+          throw new Error('File too large to inline');
+        const data = await this.fs.readFile(path);
+        tc[msg.label] = new TcIo({ data });
+      },
+      async (data) => {
+        const ext = this.getDefaultExt(msg.label);
+        const defaultPath = this.path.resolve(
+          this.path.dirname(problem.src.path),
+          `${this.path.basename(problem.src.path, this.path.extname(problem.src.path))}-${msg.id + 1}${ext}`,
+        );
+        const path = await this.ui.saveDialog({
+          defaultPath,
+          title: this.translator.t('Select location to save'),
+        });
+        if (!path) return;
+        await this.fs.safeWriteFile(path, data);
+        tc[msg.label] = new TcIo({ path });
+      },
+    );
   }
 
   private getDefaultExt(label: WebviewTcFileTypes): string {

@@ -12,10 +12,9 @@ import {
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
-import type { FileWithHash } from '@/domain/entities/fileWithHash';
 import Cache from '@/helpers/cache';
 import { CompilationIo } from '@/helpers/io';
-import type { IOverrides } from '@/types';
+import type { IFileWithHash, IOverrides } from '@/types';
 import { telemetry } from '@/utils/global';
 
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
@@ -36,7 +35,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
   ) {}
 
   public async compile(
-    src: FileWithHash,
+    src: IFileWithHash,
     signal: AbortSignal,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
@@ -64,7 +63,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
   }
 
   protected abstract internalCompile(
-    src: FileWithHash,
+    src: IFileWithHash,
     signal: AbortSignal,
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData,
@@ -89,7 +88,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
   }
 
   protected async checkHash(
-    src: FileWithHash,
+    src: IFileWithHash,
     outputPath: string,
     additionalHash: string,
     forceCompile: boolean | null,

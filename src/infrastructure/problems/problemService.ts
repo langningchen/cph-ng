@@ -32,8 +32,9 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
 import { Problem } from '@/domain/entities/problem';
-import { Tc } from '@/domain/entities/tc';
-import { TcScanner } from '@/domain/services/TcScanner';
+import type { Tc } from '@/domain/entities/tc';
+import type { TcScanner } from '@/domain/services/TcScanner';
+import type { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 import {
   type IFileWithHash,
   type IProblem,
@@ -57,7 +58,8 @@ export class ProblemService implements IProblemService {
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
-    @inject(TcScanner) private readonly tcScanner: TcScanner,
+    private readonly mapper: ProblemMapper,
+    private readonly tcScanner: TcScanner,
   ) {
     this.logger = this.logger.withScope('ProblemRepository');
   }
@@ -95,7 +97,7 @@ export class ProblemService implements IProblemService {
 
     this.logger.info('Problem', problem.src.path, 'loaded');
     this.logger.trace('Loaded problem data', { problem });
-    return Problem.fromI(problem);
+    return this.mapper.toEntity(problem);
   }
 
   public async loadTcs(problem: Problem): Promise<void> {
@@ -125,9 +127,9 @@ export class ProblemService implements IProblemService {
     await this.repo.dataRefresh();
   }
 
-  public applyTcs(problem: Problem, tcs: ITc[]): void {
-    if (this.settings.problem.clearBeforeLoad) problem.clearTcs();
-    for (const tc of tcs) problem.addTc(this.crypto.randomUUID(), Tc.fromI(tc));
+  public applyTcs(problem: Problem, tcs: Tc[]): void {
+    if (this.settings.problem.clearBeforeLoad) this.tmp.dispose(problem.clearTcs());
+    for (const tc of tcs) problem.addTc(this.crypto.randomUUID(), tc);
   }
 
   public async save(problem: Problem): Promise<void> {
@@ -194,20 +196,19 @@ export class ProblemService implements IProblemService {
       return oldPath;
     };
     const fixTcIo = async (tcIo: ITcIo) => {
-      if (tcIo.useFile) tcIo.data = await fix(tcIo.data);
+      if ('path' in tcIo) tcIo.path = await fix(tcIo.path);
     };
     const fixFileWithHash = async (fileWithHash?: IFileWithHash) => {
       if (fileWithHash) fileWithHash.path = await fix(fileWithHash.path);
     };
 
-    for (const tc of Object.values(problem.tcs)) {
-      fixTcIo(tc.stdin);
-      fixTcIo(tc.answer);
-    }
-    fixFileWithHash(problem.checker);
-    fixFileWithHash(problem.interactor);
-    fixFileWithHash(problem.bfCompare?.generator);
-    fixFileWithHash(problem.bfCompare?.bruteForce);
+    await Promise.all([
+      ...Object.values(problem.tcs).flatMap((tc: ITc) => [fixTcIo(tc.stdin), fixTcIo(tc.answer)]),
+      fixFileWithHash(problem.checker),
+      fixFileWithHash(problem.interactor),
+      fixFileWithHash(problem.bfCompare?.generator),
+      fixFileWithHash(problem.bfCompare?.bruteForce),
+    ]);
     problem.src.path = newSrcPath;
   }
 

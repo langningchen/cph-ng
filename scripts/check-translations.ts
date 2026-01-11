@@ -42,8 +42,8 @@ const Configs: TranslationConfig[] = [
     getKeys: () => {
       const keys = new Set<string>();
       const visit = (obj: unknown) => {
-        if (typeof obj === 'string')
-          obj.startsWith('%') && obj.endsWith('%') && keys.add(obj.slice(1, -1));
+        if (typeof obj === 'string' && obj.startsWith('%') && obj.endsWith('%'))
+          keys.add(obj.slice(1, -1));
         else if (Array.isArray(obj))
           obj.forEach((item) => {
             visit(item);
@@ -87,10 +87,10 @@ const findFilesRecursively = (dir: string, exts: string[], excludes: string[]) =
       if (ig.ignores(path)) continue;
       const stat = statSync(path);
       if (stat.isDirectory()) visit(path);
-      if (stat.isFile()) exts.includes(extname(path).slice(1)) && files.push(path);
+      if (stat.isFile() && exts.includes(extname(path).slice(1))) files.push(path);
     }
   };
-  existsSync(dir) && visit(dir);
+  if (existsSync(dir)) visit(dir);
   return files;
 };
 

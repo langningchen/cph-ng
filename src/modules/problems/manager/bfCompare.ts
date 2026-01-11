@@ -24,7 +24,7 @@ export class BfCompare {
     if (!fullProblem) {
       return;
     }
-    const bfCompare = fullProblem.problem.bfCompare;
+    const bfCompare = fullProblem.problem._bfCompare;
     if (!bfCompare || !bfCompare.generator || !bfCompare.bruteForce) {
       Io.warn(
         l10n.t('Please choose both generator and brute force files first.'),
@@ -189,8 +189,8 @@ export class BfCompare {
       return;
     }
     if (
-      !fullProblem.problem.bfCompare ||
-      !fullProblem.problem.bfCompare.running
+      !fullProblem.problem._bfCompare ||
+      !fullProblem.problem._bfCompare.running
     ) {
       Io.warn(l10n.t('Brute Force comparison is not running.'));
       return;

@@ -151,7 +151,7 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                 <CphLink
                   name={problem.checker.path}
                   onClick={() => {
-                    problem.checker &&
+                    if (problem.checker)
                       msg({
                         type: 'openFile',
                         path: problem.checker.path,
@@ -168,7 +168,7 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                 <CphLink
                   name={problem.interactor.path}
                   onClick={() => {
-                    problem.interactor &&
+                    if (problem.interactor)
                       msg({
                         type: 'openFile',
                         path: problem.interactor.path,
@@ -181,7 +181,7 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
             )}
             &emsp;
             <span title={t('problemTitle.timeElapsed')} className='defaultBlur'>
-              {formatDuration(problem.timeElapsed + timeElapsed)}
+              {formatDuration(problem.timeElapsedMs + timeElapsed)}
             </span>
           </CphText>
         </CphFlex>
@@ -307,7 +307,7 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                     label={t('problemTitle.dialog.field.specialJudge')}
                     variant='outlined'
                     onClick={() => {
-                      problem.checker &&
+                      if (problem.checker)
                         msg({
                           type: 'openFile',
                           path: problem.checker.path,
@@ -336,7 +336,7 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                     label={t('problemTitle.dialog.field.interact')}
                     variant='outlined'
                     onClick={() => {
-                      problem.interactor &&
+                      if (problem.interactor)
                         msg({
                           type: 'openFile',
                           path: problem.interactor.path,

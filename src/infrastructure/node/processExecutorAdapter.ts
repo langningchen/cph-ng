@@ -68,7 +68,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
       });
       launch.child.on('error', async (error) => {
         this.tmp.dispose([launch.stdoutPath, launch.stderrPath]);
-        error.name === 'AbortError' || resolve(this.collectError(error));
+        if (error.name !== 'AbortError') resolve(this.collectError(error));
       });
     });
   }

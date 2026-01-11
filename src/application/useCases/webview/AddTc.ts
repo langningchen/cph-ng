@@ -37,6 +37,9 @@ export class AddTc extends BaseProblemUseCase<AddTcMsg> {
   }
 
   protected async performAction({ problem }: FullProblem, _msg: AddTcMsg): Promise<void> {
-    problem.addTc(this.crypto.randomUUID(), new Tc(new TcIo(), new TcIo(), true));
+    problem.addTc(
+      this.crypto.randomUUID(),
+      new Tc(new TcIo({ data: '' }), new TcIo({ data: '' }), true),
+    );
   }
 }

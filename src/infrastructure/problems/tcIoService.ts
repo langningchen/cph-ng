@@ -32,34 +32,50 @@ export class TcIoService implements ITcIoService {
   ) {}
 
   public async readContent(io: TcIo): Promise<string> {
-    if (!io.useFile) return io.data;
-    return await this.fs.readFile(io.data);
+    return io.match(
+      (path) => this.fs.readFile(path),
+      (data) => Promise.resolve(data),
+    );
   }
 
-  public async writeContent(io: TcIo, content: string): Promise<void> {
-    if (!io.useFile) io.data = content;
-    else await this.fs.safeWriteFile(io.data, content);
+  public async writeContent(io: TcIo, content: string): Promise<TcIo> {
+    return io.match(
+      async (path) => {
+        await this.fs.safeWriteFile(path, content);
+        return new TcIo({ path });
+      },
+      async () => {
+        return new TcIo({ data: content });
+      },
+    );
   }
 
   public async ensureFilePath(io: TcIo): Promise<string> {
-    if (io.useFile) return io.data;
-    const tempPath = this.temp.create('TcIoService');
-    await this.fs.safeWriteFile(tempPath, io.data);
-    return tempPath;
+    return io.match(
+      async (path) => path,
+      async (data) => {
+        const tempPath = this.temp.create('TcIoService');
+        await this.fs.safeWriteFile(tempPath, data);
+        return tempPath;
+      },
+    );
   }
 
   public async tryInlining(io: TcIo): Promise<TcIo> {
-    if (!io.useFile) return io;
-
-    const stats = await this.fs.stat(io.data);
-    if (stats.size <= this.settings.problem.maxInlineDataLength) {
-      const content = await this.fs.readFile(io.data);
-      return new TcIo(false, content);
-    }
-    return io;
+    return io.match(
+      async (path) => {
+        const stats = await this.fs.stat(path);
+        if (stats.size <= this.settings.problem.maxInlineDataLength) {
+          const content = await this.fs.readFile(path);
+          return new TcIo({ data: content });
+        }
+        return new TcIo({ path });
+      },
+      async (data) => new TcIo({ data }),
+    );
   }
 
   public async dispose(io: TcIo): Promise<void> {
-    if (io.useFile) this.temp.dispose(io.data);
+    if (io.path) this.temp.dispose(io.path);
   }
 }

@@ -35,6 +35,7 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/domain/entities/problem';
+import type { TcIo } from '@/types';
 
 type CphFsFile = {
   data: string | Uri;
@@ -90,11 +91,16 @@ export class ProblemFs implements IProblemFs {
         'tcs',
         tcIds.map((tcId) => {
           const tc = problem.getTc(tcId);
+          const tcIoToStringOrUri = (io: TcIo): string | Uri => {
+            if (io.data) return io.data;
+            if (io.path) return Uri.file(io.path);
+            throw new Error('TcIo has neither data nor path');
+          };
           const items: CphFsDir = [
             [
               'stdin',
               {
-                data: tc.stdin.useFile ? Uri.file(tc.stdin.data) : tc.stdin.data,
+                data: tcIoToStringOrUri(tc.stdin),
                 set: async (data: string) => {
                   await this.tcIoService.writeContent(tc.stdin, data);
                 },
@@ -103,23 +109,15 @@ export class ProblemFs implements IProblemFs {
             [
               'answer',
               {
-                data: tc.answer.useFile ? Uri.file(tc.answer.data) : tc.answer.data,
+                data: tcIoToStringOrUri(tc.answer),
                 set: async (data: string) => {
                   await this.tcIoService.writeContent(tc.answer, data);
                 },
               },
             ],
           ];
-          tc.stdout &&
-            items.push([
-              'stdout',
-              { data: tc.stdout.useFile ? Uri.file(tc.stdout.data) : tc.stdout.data },
-            ]);
-          tc.stderr &&
-            items.push([
-              'stderr',
-              { data: tc.stderr.useFile ? Uri.file(tc.stderr.data) : tc.stderr.data },
-            ]);
+          if (tc.stdout) items.push(['stdout', { data: tcIoToStringOrUri(tc.stdout) }]);
+          if (tc.stderr) items.push(['stderr', { data: tcIoToStringOrUri(tc.stderr) }]);
           return [tcId, items];
         }),
       ],
@@ -147,8 +145,8 @@ export class ProblemFs implements IProblemFs {
       const tc = fullProblem.problem.getTc(tcId);
       files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'stdin'));
       files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'answer'));
-      tc.stdout && files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'stdout'));
-      tc.stderr && files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'stderr'));
+      if (tc.stdout) files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'stdout'));
+      if (tc.stderr) files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'stderr'));
     }
     this.changeEmitter.fire(files.map((uri) => ({ type: FileChangeType.Changed, uri })));
   }

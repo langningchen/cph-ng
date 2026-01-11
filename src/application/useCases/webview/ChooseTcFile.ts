@@ -59,7 +59,7 @@ export class ChooseTcFile extends BaseProblemUseCase<ChooseTcFileMsg> {
     });
     if (!fileUri?.length) return;
     const tc = problem.getTc(msg.id);
-    const partialTc = (await this.tcScanner.fromFile(fileUri))[0];
+    const partialTc = await this.tcScanner.fromFile(fileUri);
     if (partialTc.stdin) tc.stdin = partialTc.stdin;
     if (partialTc.answer) tc.answer = partialTc.answer;
   }

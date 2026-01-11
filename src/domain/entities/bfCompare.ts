@@ -15,34 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FileWithHash } from '@/domain/entities/fileWithHash';
-import type { IBfCompare } from '@/types';
+import type { IFileWithHash } from '@/types';
 
 export class BfCompare {
   constructor(
-    public generator?: FileWithHash,
-    public bruteForce?: FileWithHash,
+    public generator?: IFileWithHash,
+    public bruteForce?: IFileWithHash,
     public running: boolean = false,
     public msg: string = '',
   ) {}
-  public static fromI(bfCompare: IBfCompare): BfCompare {
-    const instance = new BfCompare();
-    instance.fromI(bfCompare);
-    return instance;
-  }
-  public fromI(bfCompare: IBfCompare) {
-    if (bfCompare.generator) this.generator = FileWithHash.fromI(bfCompare.generator);
-    if (bfCompare.bruteForce) this.bruteForce = FileWithHash.fromI(bfCompare.bruteForce);
-    this.running = bfCompare.running;
-    this.msg = bfCompare.msg;
-  }
-
-  public toJSON(): IBfCompare {
-    return {
-      generator: this.generator ? this.generator.toJSON() : undefined,
-      bruteForce: this.bruteForce ? this.bruteForce.toJSON() : undefined,
-      running: this.running,
-      msg: this.msg,
-    };
-  }
 }

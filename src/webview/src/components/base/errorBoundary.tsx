@@ -44,9 +44,8 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
   useEffect(() => {
     let isMounted = true;
 
-    const parseStack = async () => {
-      try {
-        const frames = await StackTrace.fromError(error);
+    StackTrace.fromError(error)
+      .then((frames) => {
         if (!isMounted) return;
         setStackTraceString(
           frames
@@ -58,12 +57,10 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
             .filter(Boolean)
             .join('\n'),
         );
-      } catch {
-        isMounted && setStackTraceString(error.stack || 'No stack trace available');
-      }
-    };
-
-    parseStack();
+      })
+      .catch(() => {
+        if (isMounted) setStackTraceString(error.stack || 'No stack trace available');
+      });
 
     return () => {
       isMounted = false;

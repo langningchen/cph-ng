@@ -56,19 +56,19 @@ export class ProblemActions {
     }
     const path = checkerFileUri[0].fsPath;
     if (msg.fileType === 'checker') {
-      fullProblem.problem.checker = { path };
+      fullProblem.problem._checker = { path };
     } else if (msg.fileType === 'interactor') {
-      fullProblem.problem.interactor = { path };
+      fullProblem.problem._interactor = { path };
     } else if (msg.fileType === 'generator') {
-      if (!fullProblem.problem.bfCompare) {
-        fullProblem.problem.bfCompare = { running: false, msg: '' };
+      if (!fullProblem.problem._bfCompare) {
+        fullProblem.problem._bfCompare = { running: false, msg: '' };
       }
-      fullProblem.problem.bfCompare.generator = { path };
+      fullProblem.problem._bfCompare.generator = { path };
     } else {
-      if (!fullProblem.problem.bfCompare) {
-        fullProblem.problem.bfCompare = { running: false, msg: '' };
+      if (!fullProblem.problem._bfCompare) {
+        fullProblem.problem._bfCompare = { running: false, msg: '' };
       }
-      fullProblem.problem.bfCompare.bruteForce = { path };
+      fullProblem.problem._bfCompare.bruteForce = { path };
     }
     await repository.dataRefresh(true);
   }
@@ -79,13 +79,13 @@ export class ProblemActions {
       return;
     }
     if (msg.fileType === 'checker') {
-      fullProblem.problem.checker = undefined;
+      fullProblem.problem._checker = undefined;
     } else if (msg.fileType === 'interactor') {
-      fullProblem.problem.interactor = undefined;
-    } else if (msg.fileType === 'generator' && fullProblem.problem.bfCompare) {
-      fullProblem.problem.bfCompare.generator = undefined;
-    } else if (msg.fileType === 'bruteForce' && fullProblem.problem.bfCompare) {
-      fullProblem.problem.bfCompare.bruteForce = undefined;
+      fullProblem.problem._interactor = undefined;
+    } else if (msg.fileType === 'generator' && fullProblem.problem._bfCompare) {
+      fullProblem.problem._bfCompare.generator = undefined;
+    } else if (msg.fileType === 'bruteForce' && fullProblem.problem._bfCompare) {
+      fullProblem.problem._bfCompare.bruteForce = undefined;
     }
     await repository.dataRefresh(true);
   }
