@@ -28,8 +28,8 @@ import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import { TcIo } from '@/domain/entities/tcIo';
-import type { ToggleTcFileMsg, WebviewTcFileTypes } from '@/webview/src/msgs';
 import type { TcIoService } from '@/infrastructure/problems/tcIoService';
+import type { ToggleTcFileMsg, WebviewTcFileTypes } from '@/webview/src/msgs';
 
 @injectable()
 export class ToggleTcFile extends BaseProblemUseCase<ToggleTcFileMsg> {

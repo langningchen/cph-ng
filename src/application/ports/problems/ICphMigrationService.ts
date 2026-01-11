@@ -15,22 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-type Uuid = `${string}-${string}-${string}-${string}-${string}`;
+import type { Problem } from '@/domain/entities/problem';
 
-/**
- * Interface for cryptographic operations.
- * @see {@link https://nodejs.org/api/crypto.html | Node.js Crypto API}
- */
-export interface ICrypto {
-  /**
-   * Generates a random UUID.
-   * @returns A randomly generated UUID string.
-   */
-  randomUUID(): Uuid;
-
-  /**
-   * Hashes the input data using MD5 algorithm.
-   * @returns HEX string of MD5 hash of the input data.
-   */
-  md5(data: string): string;
+export interface ICphMigrationService {
+  canMigrate(srcPath: string): Promise<boolean>;
+  migrateFromSource(srcPath: string): Promise<Problem | undefined>;
+  migrateFolder(folderPath: string): Promise<Problem[]>;
 }

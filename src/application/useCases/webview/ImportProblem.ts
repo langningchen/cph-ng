@@ -16,16 +16,25 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
+import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import { TOKENS } from '@/composition/tokens';
-import type { CreateProblemMsg } from '@/webview/src/msgs';
+import type { ImportProblemMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class CreateProblem {
-  constructor(@inject(TOKENS.problemRepository) private readonly repo: IProblemRepository) {}
+export class ImportProblem {
+  constructor(
+    @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
+    @inject(TOKENS.cphMigrationService) private readonly cphMigration: ICphMigrationService,
+    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
+  ) {}
 
-  async exec(msg: CreateProblemMsg): Promise<void> {
+  async exec(msg: ImportProblemMsg): Promise<void> {
     if (!msg.activePath) throw new Error('Active path is required');
+    const problem = await this.cphMigration.migrateFromSource(msg.activePath);
+    if (!problem) throw new Error('No migratable problem found at the specified path');
+    await this.problemService.save(problem);
     await this.repo.getFullProblem(msg.activePath, true);
     await this.repo.dataRefresh();
   }

@@ -19,6 +19,7 @@ import type * as msgs from '@w/msgs';
 import { container, injectable } from 'tsyringe';
 import type { IProblemsManager } from '@/application/ports/problems/IProblemsManager';
 import { AddTc } from '@/application/useCases/webview/AddTc';
+import { ChooseSrcFile } from '@/application/useCases/webview/ChooseSrcFile';
 import { ChooseTcFile } from '@/application/useCases/webview/ChooseTcFile';
 import { ClearTcStatus } from '@/application/useCases/webview/ClearTcStatus';
 import { CompareTc } from '@/application/useCases/webview/CompareTc';
@@ -27,21 +28,20 @@ import { DelProblem } from '@/application/useCases/webview/DelProblem';
 import { DelTc } from '@/application/useCases/webview/DelTc';
 import { DragDrop } from '@/application/useCases/webview/DragDrop';
 import { EditProblemDetails } from '@/application/useCases/webview/EditProblemDetails';
+import { ImportProblem } from '@/application/useCases/webview/ImportProblem';
 import { LoadTcs } from '@/application/useCases/webview/LoadTcs';
 import { OpenFile } from '@/application/useCases/webview/OpenFile';
 import { OpenTestlib } from '@/application/useCases/webview/OpenTestlib';
+import { RemoveSrcFile } from '@/application/useCases/webview/RemoveSrcFile';
 import { ReorderTc } from '@/application/useCases/webview/ReorderTc';
 import { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
 import { RunSingleTc } from '@/application/useCases/webview/RunSingleTc';
 import { StopTcs } from '@/application/useCases/webview/StopTcs';
+import { SubmitToCodeforces } from '@/application/useCases/webview/SubmitToCodeforces';
 import { ToggleDisable } from '@/application/useCases/webview/ToggleDisable';
 import { ToggleTcFile } from '@/application/useCases/webview/ToggleTcFile';
 import { UpdateTc } from '@/application/useCases/webview/UpdateTc';
 import { BfCompare } from '../../modules/problems/manager/bfCompare';
-import { ProblemActions } from '../../modules/problems/manager/problemActions';
-import { ChooseSrcFile } from '@/application/useCases/webview/ChooseSrcFile';
-import { RemoveSrcFile } from '@/application/useCases/webview/RemoveSrcFile';
-import { SubmitToCodeforces } from '@/application/useCases/webview/SubmitToCodeforces';
 
 @injectable()
 export class ProblemsManager implements IProblemsManager {
@@ -49,7 +49,7 @@ export class ProblemsManager implements IProblemsManager {
     await container.resolve(CreateProblem).exec(msg);
   }
   async importProblem(msg: msgs.ImportProblemMsg): Promise<void> {
-    return ProblemActions.importProblem(msg);
+    await container.resolve(ImportProblem).exec(msg);
   }
   async editProblemDetails(msg: msgs.EditProblemDetailsMsg): Promise<void> {
     await container.resolve(EditProblemDetails).exec(msg);

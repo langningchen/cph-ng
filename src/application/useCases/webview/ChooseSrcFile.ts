@@ -20,11 +20,11 @@ import type {
   FullProblem,
   IProblemRepository,
 } from '@/application/ports/problems/IProblemRepository';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { ChooseSrcFileMsg } from '@/webview/src/msgs';
-import type { IUi } from '@/application/ports/vscode/IUi';
-import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 
 @injectable()
 export class ChooseSrcFile extends BaseProblemUseCase<ChooseSrcFileMsg> {

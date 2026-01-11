@@ -26,6 +26,7 @@ import type { IPath } from '@/application/ports/node/IPath';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IProblemsManager } from '@/application/ports/problems/IProblemsManager';
@@ -74,6 +75,7 @@ export const TOKENS = {
   languageRegistry: 'ports.LanguageRegistry' as InjectionToken<ILanguageRegistry>,
   languageStrategy: 'ports.LanguageStrategy' as InjectionToken<ILanguageStrategy>,
   logger: 'ports.Logger' as InjectionToken<ILogger>,
+  cphMigrationService: 'ports.CphMigrationService' as InjectionToken<ICphMigrationService>,
   path: 'ports.Path' as InjectionToken<IPath>,
   pathResolver: 'ports.PathResolver' as InjectionToken<IPathResolver>,
   problemService: 'ports.ProblemService' as InjectionToken<IProblemService>,

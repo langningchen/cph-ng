@@ -22,8 +22,8 @@ import type {
 } from '@/application/ports/problems/IProblemRepository';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
-import type { SubmitToCodeforcesMsg } from '@/webview/src/msgs';
 import Companion from '@/modules/companion';
+import type { SubmitToCodeforcesMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class SubmitToCodeforces extends BaseProblemUseCase<SubmitToCodeforcesMsg> {

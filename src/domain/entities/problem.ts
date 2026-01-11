@@ -30,7 +30,7 @@ export class Problem {
   private _interactor?: IFileWithHash;
   private _bfCompare?: BfCompare;
   private _timeElapsedMs: number = 0;
-  public overrides?: IOverrides;
+  public overrides: IOverrides = {};
 
   constructor(name: string, src: string | IFileWithHash) {
     this.name = name;

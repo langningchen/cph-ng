@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { UUID } from 'node:crypto';
-import type { ITc } from '@/types/types';
+import type { IOverrides, ITc } from '@/types/types';
 import type { DistributiveOmit } from '@/webview/src/utils';
 
 export interface BaseMsg {
@@ -40,14 +40,7 @@ export interface EditProblemDetailsMsg extends ProblemBaseMsg {
   type: 'editProblemDetails';
   name: string;
   url?: string;
-  overrides?: {
-    timeLimitMs?: number;
-    memoryLimitMb?: number;
-    compiler?: string;
-    compilerArgs?: string;
-    runner?: string;
-    runnerArgs?: string;
-  };
+  overrides: IOverrides;
 }
 export interface DelProblemMsg extends ProblemBaseMsg {
   type: 'delProblem';

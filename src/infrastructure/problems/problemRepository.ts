@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { existsSync } from 'node:fs';
 import { inject, injectable } from 'tsyringe';
+import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
 import type {
   FullProblem,
   IProblemRepository,
@@ -28,7 +28,6 @@ import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
 import ExtensionManager from '@/modules/extensionManager';
-import { CphProblem } from '@/modules/problems/cphProblem';
 import { getActivePath, sidebarProvider, waitUntil } from '@/utils/global';
 
 @injectable()
@@ -40,6 +39,7 @@ export class ProblemRepository implements IProblemRepository {
     @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.cphMigrationService) private readonly cphMigration: ICphMigrationService,
     @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
   ) {
     this.logger = this.logger.withScope('ProblemRepository');
@@ -106,7 +106,7 @@ export class ProblemRepository implements IProblemRepository {
     }
 
     const fullProblem = await this.getFullProblem(activePath);
-    const canImport = !!activePath && existsSync(CphProblem.getProbBySrc(activePath));
+    const canImport = !!activePath && (await this.cphMigration.canMigrate(activePath));
     if (!noMsg)
       sidebarProvider.event.emit('problem', {
         problem: fullProblem && {

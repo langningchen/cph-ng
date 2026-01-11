@@ -41,7 +41,7 @@ export class ProblemMapper {
       interactor: entity.interactor,
       bfCompare: entity.bfCompare ? this.bfCompareToDTO(entity.bfCompare) : undefined,
       timeElapsedMs: entity.timeElapsedMs,
-      overrides: entity.overrides ? { ...entity.overrides } : undefined,
+      overrides: { ...entity.overrides },
     };
   }
 
