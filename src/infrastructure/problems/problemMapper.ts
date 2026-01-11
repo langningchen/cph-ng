@@ -21,15 +21,16 @@ import { TOKENS } from '@/composition/tokens';
 import { BfCompare } from '@/domain/entities/bfCompare';
 import { Problem } from '@/domain/entities/problem';
 import { Tc } from '@/domain/entities/tc';
-import { type IBfCompare, type IProblem, type ITc, type ITcIo, TcIo } from '@/domain/types';
+import { TcIo } from '@/domain/entities/tcIo';
+import type { IBfCompare, IProblem, ITc, ITcIo } from '@/domain/types';
 
 @injectable()
 export class ProblemMapper {
   constructor(@inject(TOKENS.version) private readonly version: string) {}
 
-  public toDTO(entity: Problem): IProblem {
+  public toDto(entity: Problem): IProblem {
     const tcs: Record<UUID, ITc> = {};
-    for (const id of entity.tcOrder) tcs[id] = this.tcToDTO(entity.tcs[id]);
+    for (const id of entity.tcOrder) tcs[id] = this.tcToDto(entity.tcs[id]);
     return {
       version: this.version,
       name: entity.name,
@@ -39,12 +40,11 @@ export class ProblemMapper {
       src: entity.src,
       checker: entity.checker,
       interactor: entity.interactor,
-      bfCompare: entity.bfCompare ? this.bfCompareToDTO(entity.bfCompare) : undefined,
+      bfCompare: entity.bfCompare ? this.bfCompareToDto(entity.bfCompare) : undefined,
       timeElapsedMs: entity.timeElapsedMs,
       overrides: { ...entity.overrides },
     };
   }
-
   public toEntity(dto: IProblem): Problem {
     const problem = new Problem(dto.name, dto.src.path);
     problem.url = dto.url;
@@ -57,21 +57,20 @@ export class ProblemMapper {
     return problem;
   }
 
-  private tcIoToDTO(tcIo: TcIo): ITcIo {
+  private tcIoToDto(tcIo: TcIo): ITcIo {
     return tcIo.match<ITcIo>(
       (path) => ({ path }),
       (data) => ({ data }),
     );
   }
-
   private tcIoToEntity(dto: ITcIo): TcIo {
     return new TcIo(dto);
   }
 
-  private tcToDTO(tc: Tc): ITc {
+  private tcToDto(tc: Tc): ITc {
     return {
-      stdin: this.tcIoToDTO(tc.stdin),
-      answer: this.tcIoToDTO(tc.answer),
+      stdin: this.tcIoToDto(tc.stdin),
+      answer: this.tcIoToDto(tc.answer),
       isExpand: tc.isExpand,
       isDisabled: tc.isDisabled,
       result: tc.verdict
@@ -79,8 +78,8 @@ export class ProblemMapper {
             verdict: tc.verdict,
             time: tc.time,
             memory: tc.memory,
-            stdout: tc.stdout ? this.tcIoToDTO(tc.stdout) : undefined,
-            stderr: tc.stderr ? this.tcIoToDTO(tc.stderr) : undefined,
+            stdout: tc.stdout ? this.tcIoToDto(tc.stdout) : undefined,
+            stderr: tc.stderr ? this.tcIoToDto(tc.stderr) : undefined,
             msg: tc.msg,
           }
         : undefined,
@@ -105,6 +104,14 @@ export class ProblemMapper {
     );
   }
 
+  private bfCompareToDto(bfCompare: BfCompare): IBfCompare {
+    return {
+      generator: bfCompare.generator,
+      bruteForce: bfCompare.bruteForce,
+      cnt: bfCompare.cnt,
+      state: bfCompare.state,
+    };
+  }
   private bfCompareToEntity(dto: IBfCompare): BfCompare {
     const bfCompare = new BfCompare();
     bfCompare.generator = dto.generator;
@@ -112,14 +119,5 @@ export class ProblemMapper {
     bfCompare.cnt = dto.cnt;
     bfCompare.state = dto.state;
     return bfCompare;
-  }
-
-  private bfCompareToDTO(bfCompare: BfCompare): IBfCompare {
-    return {
-      generator: bfCompare.generator,
-      bruteForce: bfCompare.bruteForce,
-      cnt: bfCompare.cnt,
-      state: bfCompare.state,
-    };
   }
 }

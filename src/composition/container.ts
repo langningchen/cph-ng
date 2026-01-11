@@ -56,6 +56,7 @@ import { TranslatorAdapter } from '@/infrastructure/vscode/translatorAdapter';
 import { UiAdapter } from '@/infrastructure/vscode/uiAdapter';
 import { WebviewEventBusAdapter } from '@/infrastructure/vscode/webviewEventBus';
 import { TOKENS } from './tokens';
+import { CphMigrationService } from '@/infrastructure/problems/cphMigrationService';
 
 export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.archive, ArchiveAdapter);
@@ -63,6 +64,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.checkerRunner, CheckerRunnerAdapter);
   container.registerSingleton(TOKENS.clock, ClockAdapter);
   container.registerSingleton(TOKENS.compilerService, CompilerService);
+  container.registerSingleton(TOKENS.cphMigrationService, CphMigrationService);
   container.registerSingleton(TOKENS.crypto, CryptoAdapter);
   container.registerSingleton(TOKENS.document, DocumentAdapter);
   container.registerSingleton(TOKENS.executionStrategyFactory, ExecutionStrategyFactoryAdapter);
@@ -97,6 +99,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.register(TOKENS.languageStrategy, { useClass: LangJavascript });
   container.register(TOKENS.languageStrategy, { useClass: LangPython });
 
+  container.registerInstance(TOKENS.version, context.extension.packageJSON.version);
   container.registerInstance(TOKENS.extensionPath, context.extensionPath);
 
   const logOutputChannel = window.createOutputChannel('CPH-NG', { log: true });

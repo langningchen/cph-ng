@@ -133,12 +133,13 @@ export class ProblemService implements IProblemService {
 
     this.tmp.dispose(problem.purgeUnusedTcs());
 
+    const problemDto = this.mapper.toDto(problem);
     try {
-      await this.fs.safeWriteFile(binPath, gzipSync(Buffer.from(JSON.stringify(this))));
+      await this.fs.safeWriteFile(binPath, gzipSync(Buffer.from(JSON.stringify(problemDto))));
       this.logger.info('Saved problem', problem.src.path);
     } catch (e) {
       this.telemetry.error('saveError', e, {
-        problem: JSON.stringify(this),
+        problem: JSON.stringify(problemDto),
       });
       throw e;
     }

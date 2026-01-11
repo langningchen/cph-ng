@@ -19,6 +19,7 @@ import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type {
   CompileAdditionalData,
   LangCompileData,
@@ -44,8 +45,9 @@ export class LangPython extends AbstractLanguageStrategy {
     @inject(TOKENS.settings) protected readonly settings: ISettings,
     @inject(TOKENS.translator) protected readonly translator: ITranslator,
     @inject(TOKENS.processExecutor) protected readonly processExecutor: IProcessExecutor,
+    @inject(TOKENS.tempStorage) protected readonly tmp: ITempStorage,
   ) {
-    super(fs, logger.withScope('langsPython'), settings, translator, processExecutor);
+    super(fs, logger.withScope('langsPython'), settings, translator, processExecutor, tmp);
     this.logger = this.logger.withScope('langsPython');
   }
 

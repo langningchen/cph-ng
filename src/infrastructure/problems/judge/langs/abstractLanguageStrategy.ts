@@ -1,6 +1,7 @@
 import { SHA256 } from 'crypto-js';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import {
   type CompileAdditionalData,
   CompileError,
@@ -13,7 +14,6 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IFileWithHash, IOverrides } from '@/domain/types';
-import Cache from '@/helpers/cache';
 import { CompilationIo } from '@/helpers/io';
 import { telemetry } from '@/utils/global';
 
@@ -32,6 +32,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     protected readonly settings: ISettings,
     protected readonly translator: ITranslator,
     protected readonly processExecutor: IProcessExecutor,
+    protected readonly tmp: ITempStorage,
   ) {}
 
   public async compile(
@@ -84,7 +85,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     CompilationIo.append(await this.fs.readFile(result.stderrPath));
     if (result.codeOrSignal)
       throw new CompileError(this.translator.t('Compilation failed with non-zero exit code'));
-    Cache.dispose([result.stdoutPath, result.stderrPath]);
+    this.tmp.dispose([result.stdoutPath, result.stderrPath]);
   }
 
   protected async checkHash(
