@@ -39,6 +39,9 @@ import { ToggleTcFile } from '@/application/useCases/webview/ToggleTcFile';
 import { UpdateTc } from '@/application/useCases/webview/UpdateTc';
 import { BfCompare } from '../../modules/problems/manager/bfCompare';
 import { ProblemActions } from '../../modules/problems/manager/problemActions';
+import { ChooseSrcFile } from '@/application/useCases/webview/ChooseSrcFile';
+import { RemoveSrcFile } from '@/application/useCases/webview/RemoveSrcFile';
+import { SubmitToCodeforces } from '@/application/useCases/webview/SubmitToCodeforces';
 
 @injectable()
 export class ProblemsManager implements IProblemsManager {
@@ -55,13 +58,13 @@ export class ProblemsManager implements IProblemsManager {
     await container.resolve(DelProblem).exec(msg);
   }
   async chooseSrcFile(msg: msgs.ChooseSrcFileMsg): Promise<void> {
-    return ProblemActions.chooseSrcFile(msg);
+    await container.resolve(ChooseSrcFile).exec(msg);
   }
   async removeSrcFile(msg: msgs.RemoveSrcFileMsg): Promise<void> {
-    return ProblemActions.removeSrcFile(msg);
+    await container.resolve(RemoveSrcFile).exec(msg);
   }
   async submitToCodeforces(msg: msgs.SubmitToCodeforcesMsg): Promise<void> {
-    return ProblemActions.submitToCodeforces(msg);
+    await container.resolve(SubmitToCodeforces).exec(msg);
   }
   async openFile(msg: msgs.OpenFileMsg): Promise<void> {
     await container.resolve(OpenFile).exec(msg);

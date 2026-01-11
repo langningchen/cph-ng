@@ -1,10 +1,9 @@
 import type * as msgs from '@w/msgs';
 import { existsSync } from 'fs';
-import { l10n, window } from 'vscode';
+import { l10n } from 'vscode';
 import { container } from 'tsyringe';
 import { TOKENS } from '@/composition/tokens';
 import Io from '@/helpers/io';
-import Companion from '@/modules/companion';
 import { Problem } from '@/types';
 import { CphProblem } from '../cphProblem';
 
@@ -29,74 +28,5 @@ export class ProblemActions {
     await problem.save();
     const repository = container.resolve(TOKENS.problemRepository);
     await repository.dataRefresh();
-  }
-
-  public static async chooseSrcFile(msg: msgs.ChooseSrcFileMsg): Promise<void> {
-    const repository = container.resolve(TOKENS.problemRepository);
-    const fullProblem = await repository.getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-
-    const checkerFileUri = await window.showOpenDialog({
-      canSelectFiles: true,
-      canSelectFolders: false,
-      canSelectMany: false,
-      title: l10n.t('Select {fileType} File', {
-        fileType: {
-          checker: l10n.t('Checker'),
-          interactor: l10n.t('Interactor'),
-          generator: l10n.t('Generator'),
-          bruteForce: l10n.t('Brute Force'),
-        }[msg.fileType],
-      }),
-    });
-    if (!checkerFileUri) {
-      return;
-    }
-    const path = checkerFileUri[0].fsPath;
-    if (msg.fileType === 'checker') {
-      fullProblem.problem._checker = { path };
-    } else if (msg.fileType === 'interactor') {
-      fullProblem.problem._interactor = { path };
-    } else if (msg.fileType === 'generator') {
-      if (!fullProblem.problem._bfCompare) {
-        fullProblem.problem._bfCompare = { running: false, msg: '' };
-      }
-      fullProblem.problem._bfCompare.generator = { path };
-    } else {
-      if (!fullProblem.problem._bfCompare) {
-        fullProblem.problem._bfCompare = { running: false, msg: '' };
-      }
-      fullProblem.problem._bfCompare.bruteForce = { path };
-    }
-    await repository.dataRefresh(true);
-  }
-  public static async removeSrcFile(msg: msgs.RemoveSrcFileMsg): Promise<void> {
-    const repository = container.resolve(TOKENS.problemRepository);
-    const fullProblem = await repository.getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    if (msg.fileType === 'checker') {
-      fullProblem.problem._checker = undefined;
-    } else if (msg.fileType === 'interactor') {
-      fullProblem.problem._interactor = undefined;
-    } else if (msg.fileType === 'generator' && fullProblem.problem._bfCompare) {
-      fullProblem.problem._bfCompare.generator = undefined;
-    } else if (msg.fileType === 'bruteForce' && fullProblem.problem._bfCompare) {
-      fullProblem.problem._bfCompare.bruteForce = undefined;
-    }
-    await repository.dataRefresh(true);
-  }
-  public static async submitToCodeforces(
-    msg: msgs.SubmitToCodeforcesMsg,
-  ): Promise<void> {
-    const repository = container.resolve(TOKENS.problemRepository);
-    const fullProblem = await repository.getFullProblem(msg.activePath);
-    if (!fullProblem) {
-      return;
-    }
-    Companion.submit(fullProblem.problem);
   }
 }
