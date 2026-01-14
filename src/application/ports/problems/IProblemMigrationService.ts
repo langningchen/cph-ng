@@ -15,39 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface TestCaseVerdict {
-  name: string;
-  fullName: string;
-  color: string;
-}
+import type * as History from '@/application/ports/problems/history';
+import type { IProblem } from '@/domain/types';
 
-export type TestCaseIO =
-  | { useFile: true; path: string }
-  | { useFile: false; data: string };
+export type OldProblem =
+  | History.Problem_0_4_8
+  | History.Problem_0_4_3
+  | History.Problem_0_3_7
+  | History.Problem_0_2_4
+  | History.Problem_0_2_3
+  | History.Problem_0_2_1
+  | History.Problem_0_1_1
+  | History.Problem_0_1_0
+  | History.Problem_0_0_5
+  | History.Problem_0_0_4
+  | History.Problem_0_0_3
+  | History.Problem_0_0_1;
 
-export interface TestCaseResult {
-  verdict: TestCaseVerdict;
-  time: number;
-  stdout: TestCaseIO;
-  stderr: TestCaseIO;
-  message: string;
-}
-
-export interface TestCase {
-  stdin: TestCaseIO;
-  answer: TestCaseIO;
-  isExpand: boolean;
-  result?: TestCaseResult;
-}
-
-export interface Problem {
-  name: string;
-  url?: string;
-  testCases: TestCase[];
-  timeLimit: number;
-  srcPath: string;
-  srcHash?: string;
-  isSpecialJudge?: boolean;
-  checkerPath?: string;
-  checkerHash?: string;
+export interface IProblemMigrationService {
+  migrate(rawData: OldProblem): IProblem;
 }

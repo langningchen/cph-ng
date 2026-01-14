@@ -15,27 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'crypto';
-
-export class TCVerdict {
+export interface TCVerdict {
   name: string;
   fullName: string;
   color: string;
-
-  constructor(name: string, fullName: string, color: string) {
-    this.name = name;
-    this.fullName = fullName;
-    this.color = color;
-  }
 }
 
-export type TCIO =
-  | { useFile: true; path: string }
-  | { useFile: false; data: string };
+export type TCIO = { useFile: true; path: string } | { useFile: false; data: string };
 
 export interface TCResult {
   verdict: TCVerdict;
-  memory?: number;
   time: number;
   stdout: TCIO;
   stderr: TCIO;
@@ -61,25 +50,25 @@ export interface BFCompare {
   msg: string;
 }
 
-export interface CompilationSettings {
-  compiler?: string;
-  compilerArgs?: string;
-  runner?: string;
-  runnerArgs?: string;
-}
-
 export interface Problem {
   version: string;
   name: string;
   url?: string;
-  tcs: Record<UUID, TC>;
-  tcOrder: UUID[];
+  tcs: TC[];
   timeLimit: number;
-  memoryLimit: number;
   src: FileWithHash;
   checker?: FileWithHash;
   interactor?: FileWithHash;
   bfCompare?: BFCompare;
-  timeElapsed: number;
-  compilationSettings?: CompilationSettings;
+}
+export interface EmbeddedProblem {
+  name: string;
+  url?: string;
+  tcs: {
+    stdin: string;
+    answer: string;
+  }[];
+  timeLimit: number;
+  spjCode?: string;
+  interactorCode?: string;
 }

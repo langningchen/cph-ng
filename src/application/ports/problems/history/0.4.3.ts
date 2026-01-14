@@ -15,28 +15,36 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface TCVerdict {
+import type { UUID } from 'node:crypto';
+
+export class TCVerdict {
   name: string;
   fullName: string;
   color: string;
+
+  constructor(name: string, fullName: string, color: string) {
+    this.name = name;
+    this.fullName = fullName;
+    this.color = color;
+  }
 }
 
-export type TCIO =
-  | { useFile: true; path: string }
-  | { useFile: false; data: string };
+export type TCIO = { useFile: true; path: string } | { useFile: false; data: string };
 
 export interface TCResult {
   verdict: TCVerdict;
-  time: number;
+  time?: number;
+  memory?: number;
   stdout: TCIO;
   stderr: TCIO;
-  msg: string;
+  msg?: string;
 }
 
 export interface TC {
   stdin: TCIO;
   answer: TCIO;
   isExpand: boolean;
+  isDisabled: boolean;
   result?: TCResult;
 }
 
@@ -52,22 +60,25 @@ export interface BFCompare {
   msg: string;
 }
 
+export interface CompilationSettings {
+  compiler?: string;
+  compilerArgs?: string;
+  runner?: string;
+  runnerArgs?: string;
+}
+
 export interface Problem {
+  version: string;
   name: string;
   url?: string;
-  tcs: TC[];
+  tcs: Record<UUID, TC>;
+  tcOrder: UUID[];
   timeLimit: number;
+  memoryLimit: number;
   src: FileWithHash;
   checker?: FileWithHash;
+  interactor?: FileWithHash;
   bfCompare?: BFCompare;
-}
-export interface EmbeddedProblem {
-  name: string;
-  url?: string;
-  tcs: {
-    stdin: string;
-    answer: string;
-  }[];
-  timeLimit: number;
-  spjCode?: string;
+  timeElapsed: number;
+  compilationSettings?: CompilationSettings;
 }

@@ -22,6 +22,10 @@ import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type {
+  IProblemMigrationService,
+  OldProblem,
+} from '@/application/ports/problems/IProblemMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
@@ -36,7 +40,6 @@ import type { Tc } from '@/domain/entities/tc';
 import type { TcScanner } from '@/domain/services/TcScanner';
 import type { IFileWithHash, IProblem, ITc, ITcIo } from '@/domain/types';
 import type { ProblemMapper } from '@/infrastructure/problems/problemMapper';
-import { migration, type OldProblem } from '@/types/migration';
 
 @injectable()
 export class ProblemService implements IProblemService {
@@ -50,6 +53,7 @@ export class ProblemService implements IProblemService {
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
+    @inject(TOKENS.problemMigrationService) private readonly migration: IProblemMigrationService,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
     private readonly mapper: ProblemMapper,
@@ -86,7 +90,7 @@ export class ProblemService implements IProblemService {
     }
 
     // Migrate old problem data to the latest version
-    var problem = migration(oldProblem);
+    var problem = this.migration.migrate(oldProblem);
     await this.fixMovedPaths(problem, srcPath);
 
     this.logger.info('Problem', problem.src.path, 'loaded');

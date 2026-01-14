@@ -27,6 +27,7 @@ import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
+import type { IProblemMigrationService } from '@/application/ports/problems/IProblemMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
@@ -94,6 +95,8 @@ export const TOKENS = {
   translator: 'ports.Translator' as InjectionToken<ITranslator>,
   ui: 'ports.Ui' as InjectionToken<IUi>,
   webviewEventBus: 'ports.WebviewEventBus' as InjectionToken<IWebviewEventBus>,
+  problemMigrationService:
+    'ports.ProblemMigrationService' as InjectionToken<IProblemMigrationService>,
   executionStrategyFactory:
     'ports.ExecutionStrategyFactory' as InjectionToken<IExecutionStrategyFactory>,
 

@@ -99,6 +99,16 @@
           }
         }
       }
+    },
+    {
+      "includes": ["src/application/ports/problems/history/*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useNamingConvention": "off"
+          }
+        }
+      }
     }
   ]
 }

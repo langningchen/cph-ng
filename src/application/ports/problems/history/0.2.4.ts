@@ -21,12 +21,11 @@ export interface TCVerdict {
   color: string;
 }
 
-export type TCIO =
-  | { useFile: true; path: string }
-  | { useFile: false; data: string };
+export type TCIO = { useFile: true; path: string } | { useFile: false; data: string };
 
 export interface TCResult {
   verdict: TCVerdict;
+  memory?: number;
   time: number;
   stdout: TCIO;
   stderr: TCIO;
@@ -52,25 +51,24 @@ export interface BFCompare {
   msg: string;
 }
 
+export interface CompilationSettings {
+  compiler?: string;
+  compilerArgs?: string;
+  runner?: string;
+  runnerArgs?: string;
+}
+
 export interface Problem {
   version: string;
   name: string;
   url?: string;
   tcs: TC[];
   timeLimit: number;
+  memoryLimit: number;
   src: FileWithHash;
   checker?: FileWithHash;
   interactor?: FileWithHash;
   bfCompare?: BFCompare;
-}
-export interface EmbeddedProblem {
-  name: string;
-  url?: string;
-  tcs: {
-    stdin: string;
-    answer: string;
-  }[];
-  timeLimit: number;
-  spjCode?: string;
-  interactorCode?: string;
+  timeElapsed: number;
+  compilationSettings?: CompilationSettings;
 }

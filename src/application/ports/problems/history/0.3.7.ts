@@ -15,18 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface TCVerdict {
+import type { UUID } from 'node:crypto';
+
+export class TCVerdict {
   name: string;
   fullName: string;
   color: string;
+
+  constructor(name: string, fullName: string, color: string) {
+    this.name = name;
+    this.fullName = fullName;
+    this.color = color;
+  }
 }
 
-export type TCIO =
-  | { useFile: true; path: string }
-  | { useFile: false; data: string };
+export type TCIO = { useFile: true; path: string } | { useFile: false; data: string };
 
 export interface TCResult {
   verdict: TCVerdict;
+  memory?: number;
   time: number;
   stdout: TCIO;
   stderr: TCIO;
@@ -40,14 +47,37 @@ export interface TC {
   result?: TCResult;
 }
 
+export interface FileWithHash {
+  path: string;
+  hash?: string;
+}
+
+export interface BFCompare {
+  generator?: FileWithHash;
+  bruteForce?: FileWithHash;
+  running: boolean;
+  msg: string;
+}
+
+export interface CompilationSettings {
+  compiler?: string;
+  compilerArgs?: string;
+  runner?: string;
+  runnerArgs?: string;
+}
+
 export interface Problem {
+  version: string;
   name: string;
   url?: string;
-  tcs: TC[];
+  tcs: Record<UUID, TC>;
+  tcOrder: UUID[];
   timeLimit: number;
-  srcPath: string;
-  srcHash?: string;
-  isSpecialJudge?: boolean;
-  checkerPath?: string;
-  checkerHash?: string;
+  memoryLimit: number;
+  src: FileWithHash;
+  checker?: FileWithHash;
+  interactor?: FileWithHash;
+  bfCompare?: BFCompare;
+  timeElapsed: number;
+  compilationSettings?: CompilationSettings;
 }
