@@ -22,6 +22,7 @@ import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type {
   CompileAdditionalData,
+  ILanguageDefaultValues,
   LangCompileData,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
@@ -34,8 +35,9 @@ import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstra
 
 @injectable()
 export class LangJava extends AbstractLanguageStrategy {
-  public readonly name = 'Java';
-  public readonly extensions = ['java'];
+  public override readonly name = 'Java';
+  public override readonly extensions = ['java'];
+  public override readonly defaultValues;
 
   constructor(
     @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
@@ -49,9 +51,15 @@ export class LangJava extends AbstractLanguageStrategy {
   ) {
     super(fs, logger.withScope('langsJava'), settings, translator, processExecutor, tmp);
     this.logger = this.logger.withScope('langsJava');
+    this.defaultValues = {
+      compiler: this.settings.compilation.javaCompiler,
+      compilerArgs: this.settings.compilation.javaArgs,
+      runner: this.settings.compilation.javaRunner,
+      runnerArgs: this.settings.compilation.javaRunArgs,
+    } satisfies ILanguageDefaultValues;
   }
 
-  protected async internalCompile(
+  protected override async internalCompile(
     src: IFileWithHash,
     signal: AbortSignal,
     forceCompile: boolean | null,
@@ -64,8 +72,8 @@ export class LangJava extends AbstractLanguageStrategy {
       `${this.path.basename(src.path, this.path.extname(src.path))}.class`,
     );
 
-    const compiler = additionalData.overrides?.compiler ?? this.settings.compilation.javaCompiler;
-    const args = additionalData.overrides?.compilerArgs ?? this.settings.compilation.javaArgs;
+    const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
+    const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
 
     const { skip, hash } = await this.checkHash(src, path, compiler + args, forceCompile);
     if (skip) return { path, hash };
@@ -82,7 +90,7 @@ export class LangJava extends AbstractLanguageStrategy {
     return { path, hash };
   }
 
-  public async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
+  public override async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
     this.logger.trace('runCommand', { target });
     const runner = overrides?.runner ?? this.settings.compilation.javascriptRunner;
     const runArgs = overrides?.runnerArgs ?? this.settings.compilation.javascriptRunArgs;

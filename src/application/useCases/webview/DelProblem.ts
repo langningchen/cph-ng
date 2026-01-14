@@ -16,13 +16,11 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import type { DelProblemMsg } from '@/webview/src/msgs';
 
 @injectable()
@@ -31,10 +29,13 @@ export class DelProblem extends BaseProblemUseCase<DelProblemMsg> {
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.problemService) protected readonly service: IProblemService,
   ) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction({ problem }: FullProblem, _msg: DelProblemMsg): Promise<void> {
+  protected async performAction(
+    { problem }: BackgroundProblem,
+    _msg: DelProblemMsg,
+  ): Promise<void> {
     this.service.delete(problem);
   }
 }

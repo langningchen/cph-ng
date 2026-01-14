@@ -16,14 +16,12 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import type { CompareTcMsg } from '@/webview/src/msgs';
 
 @injectable()
@@ -33,10 +31,10 @@ export class CompareTc extends BaseProblemUseCase<CompareTcMsg> {
     @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
     @inject(TOKENS.ui) private readonly ui: IUi,
   ) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction({ problem }: FullProblem, msg: CompareTcMsg): Promise<void> {
+  protected async performAction({ problem }: BackgroundProblem, msg: CompareTcMsg): Promise<void> {
     this.ui.compareFiles(
       this.problemFs.getUri(problem, `/tcs/${msg.id}/answer`),
       this.problemFs.getUri(problem, `/tcs/${msg.id}/stdout`),

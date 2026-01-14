@@ -36,9 +36,9 @@ export class OpenFile {
       this.ui.openFile(Uri.file(msg.path));
       return;
     }
-    const fullProblem = await this.repo.getFullProblem(msg.activePath);
-    if (!fullProblem) throw new Error('Problem not found');
-    const { problem } = fullProblem;
+    const backgroundProblem = await this.repo.get(msg.problemId);
+    if (!backgroundProblem) throw new Error('Problem not found');
+    const { problem } = backgroundProblem;
     this.ui.openFile(this.problemFs.getUri(problem, msg.path));
   }
 }

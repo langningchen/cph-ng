@@ -39,7 +39,7 @@ export class DragDrop {
   ) {}
 
   async exec(msg: DragDropMsg): Promise<void> {
-    const fullProblem = await this.repo.getFullProblem(msg.activePath, true);
+    const fullProblem = await this.repo.get(msg.activePath, true);
     if (!fullProblem) throw new Error('Problem not found');
     const { problem } = fullProblem;
 

@@ -18,8 +18,6 @@
 import type { FileSystemProvider, Uri } from 'vscode';
 import type { Problem } from '@/domain/entities/problem';
 
-export type UriTypes = 'stdin' | 'answer' | 'stdout' | 'stderr';
-
 export interface IProblemFs extends FileSystemProvider {
   getUri(problem: Problem, path: string): Uri;
   fireAuthorityChange(authority: string): Promise<void>;

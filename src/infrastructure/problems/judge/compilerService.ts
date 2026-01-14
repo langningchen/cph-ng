@@ -24,7 +24,7 @@ export class CompilerService implements ICompilerService {
 
   private async optionalCompile(
     file: IFileWithHash,
-    signal: AbortSignal,
+    signal: Readonly<AbortSignal>,
     forceCompile: boolean | null,
   ): Promise<LangCompileResult> {
     const checkerLang = this.lang.getLang(file.path);
@@ -33,9 +33,9 @@ export class CompilerService implements ICompilerService {
   }
 
   public async compileAll(
-    problem: Problem,
+    problem: Readonly<Problem>,
     forceCompile: boolean | null,
-    signal: AbortSignal,
+    signal: Readonly<AbortSignal>,
   ): Promise<CompileResult> {
     // Compile source code
     const srcLang = this.lang.getLang(problem.src.path);

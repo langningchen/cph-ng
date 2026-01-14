@@ -29,7 +29,6 @@ import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
-import type { IProblemsManager } from '@/application/ports/problems/IProblemsManager';
 import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
 import type { ITcService } from '@/application/ports/problems/ITcService';
 import type { ICheckerRunner } from '@/application/ports/problems/judge/ICheckerRunner';
@@ -44,6 +43,7 @@ import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/
 import type { IArchive } from '@/application/ports/services/IArchive';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
+import type { IExtensionContext } from '@/application/ports/vscode/IExtensionContext';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
@@ -58,6 +58,7 @@ import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventB
 export const TOKENS = {
   // VS Code context and utilities
   extensionPath: 'vscode.ExtensionPath' as InjectionToken<string>,
+  extensionContext: 'vscode.ExtensionContext' as InjectionToken<IExtensionContext>,
   version: 'vscode.Version' as InjectionToken<string>,
   logOutputChannel: 'vscode.LogOutputChannel' as InjectionToken<LogOutputChannel>,
   telemetryReporter: 'vscode.TelemetryReporter' as InjectionToken<TelemetryReporter>,
@@ -99,9 +100,6 @@ export const TOKENS = {
   // Repositories
   problemRepository: 'repositories.ProblemRepository' as InjectionToken<IProblemRepository>,
   problemFs: 'repositories.ProblemFs' as InjectionToken<IProblemFs>,
-
-  // Modules (legacy facade - consider removing after full migration)
-  problemsManager: 'modules.ProblemsManager' as InjectionToken<IProblemsManager>,
 };
 
 export type TokenKeys = keyof typeof TOKENS;

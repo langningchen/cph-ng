@@ -19,67 +19,64 @@ import type { UUID } from 'node:crypto';
 import type { BfCompareState } from '@/domain/entities/bfCompare';
 import type { VerdictName } from '@/domain/entities/verdict';
 
-export type ITcIo = { data: string } | { path: string };
+export type IWebviewTcIo = { data: string } | { path: string; base: string };
 
-export interface ITcResult {
+export interface IWebviewTcResult {
   verdict: VerdictName;
   timeMs?: number;
   memoryMb?: number;
-  stdout?: ITcIo;
-  stderr?: ITcIo;
+  stdout?: IWebviewTcIo;
+  stderr?: IWebviewTcIo;
   msg?: string;
 }
-export interface ITc {
-  stdin: ITcIo;
-  answer: ITcIo;
+export interface IWebviewTc {
+  stdin: IWebviewTcIo;
+  answer: IWebviewTcIo;
   isExpand: boolean;
   isDisabled: boolean;
-  result?: ITcResult;
+  result?: IWebviewTcResult;
 }
 
-export interface IFileWithHash {
+export interface IWebviewFileWithHash {
   path: string;
-  hash?: string;
+  base: string;
 }
 
-export interface IBfCompare {
-  generator?: IFileWithHash;
-  bruteForce?: IFileWithHash;
+export interface IWebviewBfCompare {
+  generator?: IWebviewFileWithHash;
+  bruteForce?: IWebviewFileWithHash;
   cnt: number;
   state: BfCompareState;
 }
 
-export interface IOverrides {
-  timeLimitMs?: number;
-  memoryLimitMb?: number;
-  compiler?: string;
-  compilerArgs?: string;
-  runner?: string;
-  runnerArgs?: string;
+export interface IWebviewOverride<T> {
+  defaultValue: T;
+  override?: T;
 }
 
-export interface IProblem {
-  version: string;
+export interface IWebviewOverrides {
+  timeLimitMs: IWebviewOverride<number>;
+  memoryLimitMb: IWebviewOverride<number>;
+  compiler?: IWebviewOverride<string>;
+  compilerArgs?: IWebviewOverride<string>;
+  runner?: IWebviewOverride<string>;
+  runnerArgs?: IWebviewOverride<string>;
+}
+
+export interface IWebviewProblem {
   name: string;
   url?: string;
-  tcs: Record<UUID, ITc>;
+  tcs: Record<UUID, IWebviewTc>;
   tcOrder: UUID[];
-  src: IFileWithHash;
-  checker?: IFileWithHash;
-  interactor?: IFileWithHash;
-  bfCompare?: IBfCompare;
+  src: IWebviewFileWithHash;
+  checker?: IWebviewFileWithHash;
+  interactor?: IWebviewFileWithHash;
+  bfCompare?: IWebviewBfCompare;
   timeElapsedMs: number;
-  overrides: IOverrides;
+  overrides: IWebviewOverrides;
 }
 
-export interface ICphProblem {
+export interface IWebviewBackgroundProblem {
   name: string;
-  url: string;
-  tests: { id: number; input: string; output: string }[];
-  interactive: boolean;
-  memoryLimit: number;
-  timeLimit: number;
   srcPath: string;
-  group: string;
-  local: boolean;
 }

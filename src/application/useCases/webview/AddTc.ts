@@ -17,12 +17,10 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { Tc } from '@/domain/entities/tc';
 import { TcIo } from '@/domain/entities/tcIo';
 import type { AddTcMsg } from '@/webview/src/msgs';
@@ -33,10 +31,10 @@ export class AddTc extends BaseProblemUseCase<AddTcMsg> {
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
   ) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction({ problem }: FullProblem, _msg: AddTcMsg): Promise<void> {
+  protected async performAction({ problem }: BackgroundProblem, _msg: AddTcMsg): Promise<void> {
     problem.addTc(
       this.crypto.randomUUID(),
       new Tc(new TcIo({ data: '' }), new TcIo({ data: '' }), true),

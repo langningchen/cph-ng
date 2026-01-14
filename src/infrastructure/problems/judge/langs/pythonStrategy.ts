@@ -22,6 +22,7 @@ import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type {
   CompileAdditionalData,
+  ILanguageDefaultValues,
   LangCompileData,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
@@ -34,8 +35,9 @@ import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstra
 
 @injectable()
 export class LangPython extends AbstractLanguageStrategy {
-  public readonly name = 'Python';
-  public readonly extensions = ['py'];
+  public override readonly name = 'Python';
+  public override readonly extensions = ['py'];
+  public override readonly defaultValues;
 
   constructor(
     @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
@@ -49,9 +51,15 @@ export class LangPython extends AbstractLanguageStrategy {
   ) {
     super(fs, logger.withScope('langsPython'), settings, translator, processExecutor, tmp);
     this.logger = this.logger.withScope('langsPython');
+    this.defaultValues = {
+      compiler: this.settings.compilation.pythonCompiler,
+      compilerArgs: this.settings.compilation.pythonArgs,
+      runner: this.settings.compilation.pythonRunner,
+      runnerArgs: this.settings.compilation.pythonRunArgs,
+    } satisfies ILanguageDefaultValues;
   }
 
-  protected async internalCompile(
+  protected override async internalCompile(
     src: IFileWithHash,
     signal: AbortSignal,
     forceCompile: boolean | null,
@@ -64,8 +72,8 @@ export class LangPython extends AbstractLanguageStrategy {
       `${this.path.basename(src.path, this.path.extname(src.path))}.pyc`,
     );
 
-    const compiler = additionalData.overrides?.compiler ?? this.settings.compilation.pythonCompiler;
-    const args = additionalData.overrides?.compilerArgs ?? this.settings.compilation.pythonArgs;
+    const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
+    const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
 
     const { skip, hash } = await this.checkHash(src, path, compiler + args, forceCompile);
     if (skip) {
@@ -86,10 +94,10 @@ export class LangPython extends AbstractLanguageStrategy {
     return { path, hash };
   }
 
-  public async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
+  public override async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner = overrides?.runner ?? this.settings.compilation.pythonRunner;
-    const runArgs = overrides?.runnerArgs ?? this.settings.compilation.pythonRunArgs;
+    const runner = overrides?.runner ?? this.defaultValues.runner;
+    const runArgs = overrides?.runnerArgs ?? this.defaultValues.runnerArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

@@ -67,9 +67,6 @@ interface ContextEvent {
 export default class ExtensionManager {
   private static logger: Logger = new Logger('extensionManager');
   private static compatibleTimer: NodeJS.Timeout;
-  public static event: EventEmitter<{
-    context: ContextEvent[];
-  }> = new EventEmitter();
 
   public static async activate(context: ExtensionContext) {
     ExtensionManager.logger.info('Activating CPH-NG extension');
@@ -81,12 +78,6 @@ export default class ExtensionManager {
       context.subscriptions.push(telemetry);
       await telemetry.init();
       const activateEnd = telemetry.start('activate');
-
-      ExtensionManager.event.on('context', (context) => {
-        for (const [key, value] of Object.entries(context)) {
-          commands.executeCommand('setContext', `cph-ng.${key}`, value);
-        }
-      });
 
       if (Settings.cache.cleanOnStartup) {
         ExtensionManager.logger.info('Cleaning cache on startup');

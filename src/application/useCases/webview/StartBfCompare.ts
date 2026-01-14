@@ -19,10 +19,7 @@ import { inject, injectable } from 'tsyringe';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
 import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
@@ -33,6 +30,7 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { BfCompareState } from '@/domain/entities/bfCompare';
 import { Tc } from '@/domain/entities/tc';
 import { TcIo } from '@/domain/entities/tcIo';
@@ -54,10 +52,13 @@ export class StartBfCompare extends BaseProblemUseCase<StartBfCompareMsg> {
     @inject(TOKENS.tcIoService) private readonly tcIoService: ITcIoService,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
   ) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction(fullProblem: FullProblem, msg: StartBfCompareMsg): Promise<void> {
+  protected async performAction(
+    fullProblem: BackgroundProblem,
+    msg: StartBfCompareMsg,
+  ): Promise<void> {
     const { problem } = fullProblem;
     const bf = problem.bfCompare;
     if (!bf || !bf.generator || !bf.bruteForce) {
@@ -73,7 +74,6 @@ export class StartBfCompare extends BaseProblemUseCase<StartBfCompareMsg> {
     fullProblem.ac = ac;
 
     bf.state = BfCompareState.compiling;
-    await this.repo.dataRefresh();
 
     const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
     if (artifacts instanceof Error) {
@@ -86,25 +86,23 @@ export class StartBfCompare extends BaseProblemUseCase<StartBfCompareMsg> {
     }
 
     const judgeService = this.judgeFactory.create(problem);
-    bf.cnt = 0;
+    bf.clearCnt();
 
     while (!ac.signal.aborted) {
-      bf.cnt++;
-
+      bf.count();
       bf.state = BfCompareState.generating;
-      await this.repo.dataRefresh();
       const genRes = await this.executor.execute({
         cmd: [artifacts.bfCompare.generator.path],
         timeoutMs: this.settings.bfCompare.generatorTimeLimit,
         signal: ac.signal,
       });
       if (genRes instanceof Error) {
-        bf.error(genRes);
+        bf.state = BfCompareState.internalError;
+        this.ui.alert('warn', genRes.message);
         break;
       }
 
       bf.state = BfCompareState.runningBruteForce;
-      await this.repo.dataRefresh();
       const bfRes = await this.executor.execute({
         cmd: [artifacts.bfCompare.bruteForce.path],
         timeoutMs: this.settings.bfCompare.bruteForceTimeLimit,
@@ -112,7 +110,8 @@ export class StartBfCompare extends BaseProblemUseCase<StartBfCompareMsg> {
         stdinPath: genRes.stdoutPath,
       });
       if (bfRes instanceof Error) {
-        bf.error(bfRes);
+        bf.state = BfCompareState.internalError;
+        this.ui.alert('warn', bfRes.message);
         break;
       }
 
@@ -144,18 +143,17 @@ export class StartBfCompare extends BaseProblemUseCase<StartBfCompareMsg> {
           }
         },
         onError: (e) => {
-          bf.error(e);
+          bf.state = BfCompareState.internalError;
+          this.ui.alert('warn', e.message);
         },
       };
 
       bf.state = BfCompareState.runningSolution;
-      await this.repo.dataRefresh();
       await judgeService.judge(ctx, observer, ac.signal);
       if (!bf.isRunning) break;
-      await this.repo.dataRefresh();
 
       this.tmp.dispose([genRes.stdoutPath, genRes.stderrPath, bfRes.stdoutPath, bfRes.stderrPath]);
     }
-    fullProblem.ac = null;
+    fullProblem.abort();
   }
 }

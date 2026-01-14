@@ -55,7 +55,7 @@ class LlmTestCaseLister implements LanguageModelTool<LlmTestCaseListerParams> {
     const result = new LanguageModelToolResult([]);
     const repo = container.resolve(TOKENS.problemRepository);
     const activePath = options.input.activePath;
-    const bgProblem = await repo.getFullProblem(activePath);
+    const bgProblem = await repo.get(activePath);
     if (!bgProblem) {
       result.content.push(
         new LanguageModelTextPart(

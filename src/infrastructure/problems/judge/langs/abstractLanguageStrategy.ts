@@ -6,6 +6,7 @@ import {
   type CompileAdditionalData,
   CompileError,
   CompileRejected,
+  type ILanguageDefaultValues,
   type ILanguageStrategy,
   type LangCompileData,
   type LangCompileResult,
@@ -25,6 +26,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
   public abstract readonly name: string;
   public abstract readonly extensions: string[];
   public readonly enableRunner: boolean = false;
+  public abstract readonly defaultValues: ILanguageDefaultValues;
 
   constructor(
     protected readonly fs: IFileSystem,
@@ -63,12 +65,14 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     }
   }
 
-  protected abstract internalCompile(
+  protected async internalCompile(
     src: IFileWithHash,
-    signal: AbortSignal,
-    forceCompile: boolean | null,
-    additionalData: CompileAdditionalData,
-  ): Promise<LangCompileData>;
+    _signal: AbortSignal,
+    _forceCompile: boolean | null,
+    _additionalData: CompileAdditionalData,
+  ): Promise<LangCompileData> {
+    return { path: src.path };
+  }
 
   protected async executeCompiler(cmd: string[], signal: AbortSignal): Promise<void> {
     const result = await this.processExecutor.execute({
@@ -122,8 +126,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     return { skip: false, hash };
   }
 
-  public abstract getRunCommand(
-    target: string,
-    compilationSettings?: IOverrides,
-  ): Promise<string[]>;
+  public async getRunCommand(target: string, _compilationSettings?: IOverrides): Promise<string[]> {
+    return [target];
+  }
 }

@@ -118,7 +118,6 @@ export class ProblemService implements IProblemService {
       if (!folderUri) return;
       this.applyTcs(problem, await this.tcScanner.fromFolder(folderUri));
     }
-    await this.repo.dataRefresh();
   }
 
   public applyTcs(problem: Problem, tcs: Tc[]): void {

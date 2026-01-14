@@ -30,6 +30,7 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type {
+  AlertArgs,
   AlertLevel,
   CustomOpenDialogOptions,
   CustomQuickPickItem,
@@ -151,14 +152,41 @@ export class UiAdapter implements IUi {
     return await this.chooseFolderWithDialog(title);
   }
 
-  public alert(level: AlertLevel, title: string): void {
-    if (level === 'warn') window.showWarningMessage(title);
+  public async alert(
+    level: AlertLevel,
+    message: string,
+    ...args: AlertArgs
+  ): Promise<string | undefined> {
+    // biome-ignore lint/suspicious/noExplicitAny: Casting to any is required to match the overloaded signature.
+    const safeArgs = args as any[];
+    if (level === 'warn') return await window.showWarningMessage(message, ...safeArgs);
+    if (level === 'error') return await window.showErrorMessage(message, ...safeArgs);
+    if (level === 'info') return await window.showInformationMessage(message, ...safeArgs);
   }
 
   public openFile(uri: Uri): void {
     commands.executeCommand('vscode.open', uri, this.settings.companion.showPanel);
   }
+
+  public openChat(topic: string): void {
+    commands.executeCommand('workbench.action.chat.open', {
+      mode: 'agent',
+      query: topic,
+      isPartialQuery: true,
+    });
+  }
+
+  public openSettings(item: string): void {
+    commands.executeCommand('workbench.action.openSettings', item);
+  }
+
   public compareFiles(left: Uri, right: Uri): void {
     commands.executeCommand('vscode.diff', left, right);
+  }
+
+  public showSidebar(): void {
+    const editor = window.activeTextEditor;
+    commands.executeCommand('workbench.view.extension.cphNgContainer');
+    if (editor) window.showTextDocument(editor.document);
   }
 }

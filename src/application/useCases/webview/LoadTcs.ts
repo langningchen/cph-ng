@@ -16,13 +16,11 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import type { LoadTcsMsg } from '@/webview/src/msgs';
 
 @injectable()
@@ -31,10 +29,10 @@ export class LoadTcs extends BaseProblemUseCase<LoadTcsMsg> {
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
   ) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction({ problem }: FullProblem, _msg: LoadTcsMsg): Promise<void> {
+  protected async performAction({ problem }: BackgroundProblem, _msg: LoadTcsMsg): Promise<void> {
     await this.problemService.loadTcs(problem);
   }
 }

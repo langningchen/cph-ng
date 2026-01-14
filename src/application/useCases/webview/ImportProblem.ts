@@ -35,7 +35,7 @@ export class ImportProblem {
     const problem = await this.cphMigration.migrateFromSource(msg.activePath);
     if (!problem) throw new Error('No migratable problem found at the specified path');
     await this.problemService.save(problem);
-    await this.repo.getFullProblem(msg.activePath, true);
+    await this.repo.get(msg.activePath, true);
     await this.repo.dataRefresh();
   }
 }

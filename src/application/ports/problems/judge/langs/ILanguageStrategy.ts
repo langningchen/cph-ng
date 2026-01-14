@@ -27,6 +27,13 @@ export interface LangCompileData {
   hash?: string;
 }
 
+export interface ILanguageDefaultValues {
+  compiler?: string;
+  compilerArgs?: string;
+  runner?: string;
+  runnerArgs?: string;
+}
+
 export class CompileError extends Error {
   constructor(message: string) {
     super(message);
@@ -47,6 +54,7 @@ export interface ILanguageStrategy {
   readonly name: string;
   readonly extensions: string[];
   readonly enableRunner: boolean;
+  readonly defaultValues: ILanguageDefaultValues;
 
   compile(
     src: IFileWithHash,

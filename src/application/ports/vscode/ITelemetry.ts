@@ -25,7 +25,7 @@ export interface TelemetryEventProps {
   readonly [key: string]: TelemetryEventProp<string | number | boolean>;
 }
 
-export const TELEMETRY_EVENT_NAMES = ['run'] as const;
+export const TELEMETRY_EVENT_NAMES = ['run', 'webviewMessage'] as const;
 export type TelemetryEventName = (typeof TELEMETRY_EVENT_NAMES)[number];
 export const TELEMETRY_ERROR_NAMES = [
   'pipeFailed',

@@ -18,15 +18,13 @@
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { TcIo } from '@/domain/entities/tcIo';
 import type { TcIoService } from '@/infrastructure/problems/tcIoService';
 import type { ToggleTcFileMsg, WebviewTcFileTypes } from '@/webview/src/msgs';
@@ -42,10 +40,13 @@ export class ToggleTcFile extends BaseProblemUseCase<ToggleTcFileMsg> {
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
   ) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction({ problem }: FullProblem, msg: ToggleTcFileMsg): Promise<void> {
+  protected async performAction(
+    { problem }: BackgroundProblem,
+    msg: ToggleTcFileMsg,
+  ): Promise<void> {
     const tc = problem.getTc(msg.id);
     const fileIo = tc[msg.label];
     await fileIo.match(

@@ -6,6 +6,7 @@ import type { ISystem } from '@/application/ports/node/ISystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type {
   CompileAdditionalData,
+  ILanguageDefaultValues,
   LangCompileData,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
@@ -21,9 +22,10 @@ import {
 
 @injectable()
 export class LangCpp extends AbstractLanguageStrategy {
-  public readonly name = 'C++';
-  public readonly extensions = ['cpp', 'cc', 'cxx', 'c++'];
-  public readonly enableRunner = true;
+  public override readonly name = 'C++';
+  public override readonly extensions = ['cpp', 'cc', 'cxx', 'c++'];
+  public override readonly enableRunner = true;
+  public override readonly defaultValues;
 
   constructor(
     @inject(TOKENS.extensionPath) private readonly extPath: string,
@@ -39,9 +41,13 @@ export class LangCpp extends AbstractLanguageStrategy {
   ) {
     super(fs, logger.withScope('langsCpp'), settings, translator, processExecutor, tmp);
     this.logger = this.logger.withScope('langsCpp');
+    this.defaultValues = {
+      compiler: this.settings.compilation.cppCompiler,
+      compilerArgs: this.settings.compilation.cppArgs,
+    } satisfies ILanguageDefaultValues;
   }
 
-  protected async internalCompile(
+  protected override async internalCompile(
     src: IFileWithHash,
     signal: AbortSignal,
     forceCompile: boolean | null,
@@ -55,8 +61,8 @@ export class LangCpp extends AbstractLanguageStrategy {
         (this.sys.platform() === 'win32' ? '.exe' : ''),
     );
 
-    const compiler = additionalData.overrides?.compiler ?? this.settings.compilation.cppCompiler;
-    const args = additionalData.overrides?.compilerArgs ?? this.settings.compilation.cppArgs;
+    const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
+    const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
     const { objcopy, useWrapper, useHook } = this.settings.compilation;
 
     const { skip, hash } = await this.checkHash(
@@ -103,9 +109,5 @@ export class LangCpp extends AbstractLanguageStrategy {
     await Promise.all(compileCommands.map((cmd) => this.executeCompiler(cmd, signal)));
     for (const cmd of postCommands) await this.executeCompiler(cmd, signal);
     return { path, hash };
-  }
-  public async getRunCommand(target: string): Promise<string[]> {
-    this.logger.trace('runCommand', { target });
-    return [target];
   }
 }

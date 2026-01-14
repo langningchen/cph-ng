@@ -16,6 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type {
+  MessageOptions,
   OpenDialogOptions,
   QuickPickItem,
   QuickPickOptions,
@@ -34,7 +35,8 @@ export type CustomSaveDialogOptions = Omit<SaveDialogOptions, 'defaultUri'> & {
 export type CustomQuickPickItem<T> = Omit<QuickPickItem, 'iconPath' | 'buttons'> & { value: T };
 export type CustomQuickPickOptions = Omit<QuickPickOptions, 'canPickMany'>;
 
-export type AlertLevel = 'warn';
+export type AlertLevel = 'error' | 'warn' | 'info';
+export type AlertArgs = [...items: string[]] | [options: MessageOptions, ...items: string[]];
 
 export interface IUi {
   openDialog(options: CustomOpenDialogOptions): Promise<string | undefined>;
@@ -46,7 +48,10 @@ export interface IUi {
   ): Promise<T | undefined>;
   quickPickMany<T>(items: CustomQuickPickItem<T>[], options?: CustomQuickPickOptions): Promise<T[]>;
   chooseFolder(title: string): Promise<string | undefined>;
-  alert(level: AlertLevel, title: string): void;
+  alert(level: AlertLevel, message: string, ...args: AlertArgs): Promise<string | undefined>;
   openFile(uri: Uri): void;
+  openChat(topic: string): void;
+  openSettings(item: string): void;
   compareFiles(left: Uri, right: Uri): void;
+  showSidebar(): void;
 }

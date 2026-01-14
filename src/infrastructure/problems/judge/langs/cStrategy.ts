@@ -6,6 +6,7 @@ import type { ISystem } from '@/application/ports/node/ISystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type {
   CompileAdditionalData,
+  ILanguageDefaultValues,
   LangCompileData,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
@@ -21,9 +22,10 @@ import {
 
 @injectable()
 export class LangC extends AbstractLanguageStrategy {
-  public readonly name = 'C';
-  public readonly extensions = ['c'];
-  public readonly enableRunner = true;
+  public override readonly name = 'C';
+  public override readonly extensions = ['c'];
+  public override readonly enableRunner = true;
+  public override readonly defaultValues;
 
   constructor(
     @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
@@ -38,9 +40,13 @@ export class LangC extends AbstractLanguageStrategy {
   ) {
     super(fs, logger.withScope('langsC'), settings, translator, processExecutor, tmp);
     this.logger = this.logger.withScope('langsC');
+    this.defaultValues = {
+      compiler: this.settings.compilation.cCompiler,
+      compilerArgs: this.settings.compilation.cArgs,
+    } satisfies ILanguageDefaultValues;
   }
 
-  protected async internalCompile(
+  protected override async internalCompile(
     src: IFileWithHash,
     signal: AbortSignal,
     forceCompile: boolean | null,
@@ -54,8 +60,8 @@ export class LangC extends AbstractLanguageStrategy {
         (this.sys.platform() === 'win32' ? '.exe' : ''),
     );
 
-    const compiler = additionalData.overrides?.compiler ?? this.settings.compilation.cCompiler;
-    const args = additionalData.overrides?.compilerArgs ?? this.settings.compilation.cArgs;
+    const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
+    const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
 
     const { skip, hash } = await this.checkHash(src, path, compiler + args, forceCompile);
     if (skip) return { path, hash };
@@ -66,9 +72,5 @@ export class LangC extends AbstractLanguageStrategy {
       cmd.push('-Wl,--stack,268435456');
     await this.executeCompiler(cmd, signal);
     return { path, hash };
-  }
-  public async getRunCommand(target: string): Promise<string[]> {
-    this.logger.trace('runCommand', { target });
-    return [target];
   }
 }

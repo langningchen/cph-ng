@@ -16,15 +16,13 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { TcScanner } from '@/domain/services/TcScanner';
 import type { ChooseTcFileMsg } from '@/webview/src/msgs';
 
@@ -37,10 +35,13 @@ export class ChooseTcFile extends BaseProblemUseCase<ChooseTcFileMsg> {
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TcScanner) private readonly tcScanner: TcScanner,
   ) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction({ problem }: FullProblem, msg: ChooseTcFileMsg): Promise<void> {
+  protected async performAction(
+    { problem }: BackgroundProblem,
+    msg: ChooseTcFileMsg,
+  ): Promise<void> {
     const isInput = msg.label === 'stdin';
     const mainExt = isInput
       ? this.settings.problem.inputFileExtensionList

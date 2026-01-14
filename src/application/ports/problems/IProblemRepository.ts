@@ -15,20 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Problem } from '@/domain/entities/problem';
-
-// TO-DO: Use full problem class instead of interface
-export interface FullProblem {
-  problem: Problem;
-  ac: AbortController | null;
-  startTime: number;
-}
+import type { UUID } from 'node:crypto';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 export interface IProblemRepository {
   getDataPath(srcPath: string): string | null;
-  listFullProblems(): Promise<FullProblem[]>;
-  getFullProblem(path?: string, allowCreate?: boolean): Promise<FullProblem | null>;
-  removeProblem(fullProblem: FullProblem): void;
-  dataRefresh(noMsg?: boolean): Promise<void>;
-  closeAll(): Promise<void>;
+  loadByPath(srcPath: string, allowCreate?: boolean): Promise<UUID | null>;
+  get(problemId?: UUID): Promise<BackgroundProblem | undefined>;
+  getIdByPath(srcPath: string): Promise<UUID | undefined>;
+  persist(problemId: UUID): Promise<boolean>;
 }

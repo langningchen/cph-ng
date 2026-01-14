@@ -16,21 +16,19 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import type { ReorderTcMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class ReorderTc extends BaseProblemUseCase<ReorderTcMsg> {
   constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction({ problem }: FullProblem, msg: ReorderTcMsg): Promise<void> {
+  protected async performAction({ problem }: BackgroundProblem, msg: ReorderTcMsg): Promise<void> {
     problem.moveTc(msg.fromIdx, msg.toIdx);
   }
 }

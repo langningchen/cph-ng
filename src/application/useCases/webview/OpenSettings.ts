@@ -16,24 +16,15 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import type { IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
-import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import type { EditProblemDetailsMsg } from '@/webview/src/msgs';
+import type { OpenSettingsMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class EditProblemDetails extends BaseProblemUseCase<EditProblemDetailsMsg> {
-  constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
-    super(repo);
-  }
+export class OpenSettings {
+  constructor(@inject(TOKENS.ui) private readonly ui: IUi) {}
 
-  protected async performAction(
-    { problem }: BackgroundProblem,
-    msg: EditProblemDetailsMsg,
-  ): Promise<void> {
-    problem.name = msg.name;
-    problem.url = msg.url;
-    problem.overrides = msg.overrides;
+  async exec(msg: OpenSettingsMsg): Promise<void> {
+    this.ui.openSettings(msg.item);
   }
 }

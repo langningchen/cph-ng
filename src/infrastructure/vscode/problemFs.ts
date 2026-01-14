@@ -15,7 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { container, inject, injectable } from 'tsyringe';
+import type { UUID } from 'node:crypto';
+import { inject, injectable } from 'tsyringe';
 import {
   Disposable,
   type Event,
@@ -36,6 +37,7 @@ import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/domain/entities/problem';
 import type { TcIo } from '@/domain/entities/tcIo';
+import type { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
 
 type CphFsFile = {
   data: string | Uri;
@@ -57,6 +59,7 @@ export class ProblemFs implements IProblemFs {
     @inject(TOKENS.tcIoService) private readonly tcIoService: ITcIoService,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+    private readonly coordinator: ActiveProblemCoordinator,
   ) {
     this.logger = this.logger.withScope('ProblemFs');
   }
@@ -70,7 +73,7 @@ export class ProblemFs implements IProblemFs {
   }
 
   async parseUri(uri: Uri): Promise<CphFsItem> {
-    const fullProblem = await this.repo.getFullProblem(uri.authority);
+    const fullProblem = await this.repo.get(uri.authority as UUID);
     if (!fullProblem) throw FileSystemError.FileNotFound();
     const problem = fullProblem.problem;
     const pathParts = uri.path.split('/').filter((p) => p.length > 0);
@@ -83,7 +86,7 @@ export class ProblemFs implements IProblemFs {
           set: async (data: string) => {
             const newProblem = JSON.parse(data);
             Object.assign(problem, newProblem);
-            await this.repo.dataRefresh();
+            await this.coordinator.dispatchFullData();
           },
         },
       ],
@@ -102,7 +105,7 @@ export class ProblemFs implements IProblemFs {
               {
                 data: tcIoToStringOrUri(tc.stdin),
                 set: async (data: string) => {
-                  await this.tcIoService.writeContent(tc.stdin, data);
+                  tc.stdin = await this.tcIoService.writeContent(tc.stdin, data);
                 },
               },
             ],
@@ -111,7 +114,7 @@ export class ProblemFs implements IProblemFs {
               {
                 data: tcIoToStringOrUri(tc.answer),
                 set: async (data: string) => {
-                  await this.tcIoService.writeContent(tc.answer, data);
+                  tc.answer = await this.tcIoService.writeContent(tc.answer, data);
                 },
               },
             ],
@@ -132,8 +135,8 @@ export class ProblemFs implements IProblemFs {
     }
     return current;
   }
-  public async fireAuthorityChange(authority: string): Promise<void> {
-    const fullProblem = await this.repo.getFullProblem(authority);
+  public async fireAuthorityChange(authority: UUID): Promise<void> {
+    const fullProblem = await this.repo.get(authority);
     if (!fullProblem) return;
     const tcIds = fullProblem.problem.getEnabledTcIds();
     const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority, path: '/' });
@@ -193,8 +196,6 @@ export class ProblemFs implements IProblemFs {
     if (!item.set) throw FileSystemError.NoPermissions();
     await item.set(content.toString());
     this.changeEmitter.fire([{ type: FileChangeType.Changed, uri }]);
-    const repo = container.resolve(TOKENS.problemRepository);
-    await repo.dataRefresh();
   }
 
   watch(): Disposable {

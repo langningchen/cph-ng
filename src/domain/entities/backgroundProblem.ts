@@ -15,20 +15,29 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface CheckerOptions {
-  checkerPath: string;
-  inputPath: string;
-  outputPath: string;
-  answerPath: string;
-}
+import type { UUID } from 'node:crypto';
+import type { Problem } from '@/domain/entities/problem';
 
-interface CheckerData {
-  exitCode: number;
-  msg: string;
-}
+export class BackgroundProblem {
+  private _ac: AbortController | null = null;
 
-export type CheckerResult = CheckerData | Error;
+  constructor(
+    public readonly id: UUID,
+    public problem: Problem,
+    private startTime: number,
+  ) {}
 
-export interface ICheckerRunner {
-  run(options: CheckerOptions, signal: AbortSignal): Promise<CheckerResult>;
+  set ac(value: AbortController) {
+    this._ac?.abort();
+    this._ac = value;
+  }
+  public abort(reason?: string) {
+    this._ac?.abort(reason);
+    this._ac = null;
+  }
+
+  public addTimeElapsed(now: number) {
+    this.problem.addTimeElapsed(now - this.startTime);
+    this.startTime = now;
+  }
 }

@@ -16,32 +16,30 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { isRunningVerdict, VerdictName } from '@/domain/entities/verdict';
-import { waitUntil } from '@/utils/global';
 import type { StopTcsMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class StopTcs extends BaseProblemUseCase<StopTcsMsg> {
   constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction({ problem, ac }: FullProblem, msg: StopTcsMsg): Promise<void> {
-    if (ac) {
-      ac.abort(msg.onlyOne ? 'onlyOne' : undefined);
-      if (msg.onlyOne) return;
-      await waitUntil(() => !ac);
-    }
-    const tcOrder = problem.getEnabledTcIds();
-    for (const tcId of tcOrder) {
-      const tc = problem.getTc(tcId);
-      if (isRunningVerdict(tc.verdict)) tc.updateResult(VerdictName.rejected);
+  protected async performAction(
+    { problem, abort }: BackgroundProblem,
+    msg: StopTcsMsg,
+  ): Promise<void> {
+    abort(msg.onlyOne ? 'onlyOne' : undefined);
+    if (!msg.onlyOne) {
+      const tcOrder = problem.getEnabledTcIds();
+      for (const tcId of tcOrder) {
+        const tc = problem.getTc(tcId);
+        if (isRunningVerdict(tc.verdict)) tc.updateResult(VerdictName.rejected);
+      }
     }
   }
 }

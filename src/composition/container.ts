@@ -27,6 +27,7 @@ import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
 import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
+import { CphMigrationService } from '@/infrastructure/problems/cphMigrationService';
 import { CheckerRunnerAdapter } from '@/infrastructure/problems/judge/checkerRunnerAdapter';
 import { CompilerService } from '@/infrastructure/problems/judge/compilerService';
 import { JudgeServiceFactory } from '@/infrastructure/problems/judge/judgeServiceFactoryAdapter';
@@ -42,7 +43,6 @@ import { SolutionRunnerAdapter } from '@/infrastructure/problems/judge/runner/so
 import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 import { ProblemRepository } from '@/infrastructure/problems/problemRepository';
 import { ProblemService } from '@/infrastructure/problems/problemService';
-import { ProblemsManager } from '@/infrastructure/problems/problemsManager';
 import { TcIoService } from '@/infrastructure/problems/tcIoService';
 import { TcService } from '@/infrastructure/problems/tcService';
 import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
@@ -56,7 +56,6 @@ import { TranslatorAdapter } from '@/infrastructure/vscode/translatorAdapter';
 import { UiAdapter } from '@/infrastructure/vscode/uiAdapter';
 import { WebviewEventBusAdapter } from '@/infrastructure/vscode/webviewEventBus';
 import { TOKENS } from './tokens';
-import { CphMigrationService } from '@/infrastructure/problems/cphMigrationService';
 
 export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.archive, ArchiveAdapter);
@@ -77,7 +76,6 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.problemFs, ProblemFs);
   container.registerSingleton(TOKENS.problemRepository, ProblemRepository);
   container.registerSingleton(TOKENS.problemService, ProblemService);
-  container.registerSingleton(TOKENS.problemsManager, ProblemsManager);
   container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
   container.registerSingleton(TOKENS.resultEvaluator, ResultEvaluatorAdaptor);
   container.registerSingleton(TOKENS.runner, SolutionRunnerAdapter);

@@ -16,15 +16,15 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { UUID } from 'node:crypto';
-import type { IOverrides, ITc } from '@/domain/types';
+import type { IOverrides } from '@/domain/types';
 import type { DistributiveOmit } from '@/webview/src/utils';
 
 export interface BaseMsg {
   type: string;
-  activePath?: string;
+  problemId?: UUID;
 }
 export interface ProblemBaseMsg extends BaseMsg {
-  activePath: string;
+  problemId: UUID;
 }
 
 export interface CreateProblemMsg extends BaseMsg {
@@ -81,7 +81,7 @@ export interface ChooseTcFileMsg extends ProblemBaseMsg {
 export interface UpdateTcMsg extends ProblemBaseMsg {
   type: 'updateTc';
   id: UUID;
-  tc: ITc;
+  event: 'toggleDisable' | 'toggleExpand';
 }
 export interface CompareTcMsg extends ProblemBaseMsg {
   type: 'compareTc';

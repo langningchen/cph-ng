@@ -15,11 +15,87 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { AppEvent, IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
-import { sidebarProvider } from '@/utils/global';
+import type { UUID } from 'node:crypto';
+import { EventEmitter } from 'node:stream';
+import type TypedEventEmitter from 'typed-emitter';
+import type {
+  IWebviewEventBus,
+  WebviewEvent,
+  WebviewProblemMetaPayload,
+} from '@/application/ports/vscode/IWebviewEventBus';
+import type {
+  IWebviewBackgroundProblem,
+  IWebviewBfCompare,
+  IWebviewProblem,
+  IWebviewTc,
+  IWebviewTcResult,
+} from '@/domain/webviewTypes';
+
+type WebviewEvents = {
+  message: (payload: WebviewEvent) => void;
+};
 
 export class WebviewEventBusAdapter implements IWebviewEventBus {
-  publish<T = unknown>(event: AppEvent<T>): void {
-    sidebarProvider.event.emit(event.type, event.payload);
+  private readonly emitter: TypedEventEmitter<WebviewEvents> = new EventEmitter();
+
+  public onMessage(handler: (data: WebviewEvent) => void) {
+    this.emitter.on('message', handler);
+  }
+
+  public fullProblem(problemId: UUID, payload: IWebviewProblem): void {
+    this.emitter.emit('message', {
+      name: 'FULL_PROBLEM',
+      problemId,
+      payload,
+    });
+  }
+  public patchMeta(problemId: UUID, payload: WebviewProblemMetaPayload): void {
+    this.emitter.emit('message', {
+      name: 'PATCH_META',
+      problemId,
+      payload,
+    });
+  }
+  public patchBfCompare(problemId: UUID, payload: Partial<IWebviewBfCompare>): void {
+    this.emitter.emit('message', {
+      name: 'PATCH_BF_COMPARE',
+      problemId,
+      payload,
+    });
+  }
+  public patchTc(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTc>): void {
+    this.emitter.emit('message', {
+      name: 'PATCH_TC',
+      problemId,
+      tcId,
+      payload,
+    });
+  }
+  public patchTcResult(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTcResult>): void {
+    this.emitter.emit('message', {
+      name: 'PATCH_TC_RESULT',
+      problemId,
+      tcId,
+      payload,
+    });
+  }
+  public deleteTc(problemId: UUID, tcId: UUID): void {
+    this.emitter.emit('message', {
+      name: 'DELETE_TC',
+      problemId,
+      tcId,
+    });
+  }
+  public background(payload: IWebviewBackgroundProblem[]): void {
+    this.emitter.emit('message', {
+      name: 'BACKGROUND',
+      payload,
+    });
+  }
+  public noProblem(canImport: boolean): void {
+    this.emitter.emit('message', {
+      name: 'NO_PROBLEM',
+      canImport,
+    });
   }
 }

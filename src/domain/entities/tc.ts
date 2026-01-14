@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import EventEmitter from 'node:events';
+import type TypedEventEmitter from 'typed-emitter';
 import { TcIo } from '@/domain/entities/tcIo';
 import type { VerdictName } from '@/domain/entities/verdict';
 
@@ -25,24 +27,45 @@ export interface UpdatedResult {
   msg?: string;
 }
 
-interface ITcResult {
-  readonly verdict: VerdictName;
-  readonly time?: number;
-  readonly memory?: number;
-  readonly stdout?: TcIo;
-  readonly stderr?: TcIo;
-  readonly msg?: string;
+export interface TcResult {
+  verdict: VerdictName;
+  timeMs?: number;
+  memoryMb?: number;
+  stdout?: TcIo;
+  stderr?: TcIo;
+  msg?: string;
 }
 
+export type TcEvents = {
+  patchTc: (payload: Partial<Tc>) => void;
+  patchTcResult: (payload: Partial<TcResult>) => void;
+};
+
 export class Tc {
+  public readonly signals: TypedEventEmitter<TcEvents> = new EventEmitter();
+
   constructor(
-    public stdin: TcIo = new TcIo({ data: '' }),
-    public answer: TcIo = new TcIo({ data: '' }),
+    private _stdin: TcIo = new TcIo({ data: '' }),
+    private _answer: TcIo = new TcIo({ data: '' }),
     private _isExpand: boolean = false,
     private _isDisabled: boolean = false,
-    private _result?: ITcResult,
+    private _result?: TcResult,
   ) {}
 
+  get stdin(): TcIo {
+    return this._stdin;
+  }
+  set stdin(value: TcIo) {
+    this._stdin = value;
+    this.signals.emit('patchTc', { stdin: value });
+  }
+  get answer(): TcIo {
+    return this._answer;
+  }
+  set answer(value: TcIo) {
+    this._answer = value;
+    this.signals.emit('patchTc', { answer: value });
+  }
   get isExpand(): boolean {
     return this._isExpand;
   }
@@ -52,11 +75,11 @@ export class Tc {
   get verdict(): VerdictName | undefined {
     return this._result?.verdict;
   }
-  get time(): number | undefined {
-    return this._result?.time;
+  get timeMs(): number | undefined {
+    return this._result?.timeMs;
   }
-  get memory(): number | undefined {
-    return this._result?.memory;
+  get memoryMb(): number | undefined {
+    return this._result?.memoryMb;
   }
   get stdout(): TcIo | undefined {
     return this._result?.stdout;
@@ -89,13 +112,16 @@ export class Tc {
   ): void {
     const current = this._result || { verdict };
     this._result = {
-      ...current,
       verdict,
-      time: timeMs ?? current.time,
-      memory: memoryMb ?? current.memory,
+      timeMs: timeMs ?? current.timeMs,
+      memoryMb: memoryMb ?? current.memoryMb,
       msg: this.formatMessage(current.msg, msg),
     };
-    if (isExpand !== undefined) this._isExpand = isExpand;
+    this.signals.emit('patchTcResult', { verdict, timeMs, memoryMb, msg });
+    if (isExpand !== undefined) {
+      this._isExpand = isExpand;
+      this.signals.emit('patchTc', { isExpand });
+    }
   }
   public getDisposables(): string[] {
     return [

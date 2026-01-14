@@ -17,12 +17,10 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import type { ClearTcStatusMsg } from '@/webview/src/msgs';
 
 @injectable()
@@ -31,10 +29,13 @@ export class ClearTcStatus extends BaseProblemUseCase<ClearTcStatusMsg> {
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction({ problem }: FullProblem, msg: ClearTcStatusMsg): Promise<void> {
+  protected async performAction(
+    { problem }: BackgroundProblem,
+    msg: ClearTcStatusMsg,
+  ): Promise<void> {
     if (msg.id) this.tmp.dispose(problem.getTc(msg.id).clearResult());
     else this.tmp.dispose(problem.clearResult());
   }

@@ -19,21 +19,19 @@ import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type {
-  CompileAdditionalData,
-  LangCompileData,
-} from '@/application/ports/problems/judge/langs/ILanguageStrategy';
+import type { ILanguageDefaultValues } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
-import type { IFileWithHash, IOverrides } from '@/domain/types';
-import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstractLanguageStrategy';
+import type { IOverrides } from '@/domain/types';
+import { AbstractLanguageStrategy } from './abstractLanguageStrategy';
 
 @injectable()
 export class LangJavascript extends AbstractLanguageStrategy {
-  public readonly name = 'JavaScript';
-  public readonly extensions = ['js'];
+  public override readonly name = 'JavaScript';
+  public override readonly extensions = ['js'];
+  public override readonly defaultValues;
 
   constructor(
     @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
@@ -45,21 +43,16 @@ export class LangJavascript extends AbstractLanguageStrategy {
   ) {
     super(fs, logger.withScope('langsJavascript'), settings, translator, processExecutor, tmp);
     this.logger = this.logger.withScope('langsJavascript');
+    this.defaultValues = {
+      runner: this.settings.compilation.javascriptRunner,
+      runnerArgs: this.settings.compilation.javascriptRunArgs,
+    } satisfies ILanguageDefaultValues;
   }
 
-  protected async internalCompile(
-    src: IFileWithHash,
-    _signal: AbortSignal,
-    _forceCompile: boolean | null,
-    _additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
-  ): Promise<LangCompileData> {
-    return { path: src.path };
-  }
-
-  public async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
+  public override async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner = overrides?.runner ?? this.settings.compilation.javascriptRunner;
-    const runArgs = overrides?.runnerArgs ?? this.settings.compilation.javascriptRunArgs;
+    const runner = overrides?.runner ?? this.defaultValues.runner;
+    const runArgs = overrides?.runnerArgs ?? this.defaultValues.runnerArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

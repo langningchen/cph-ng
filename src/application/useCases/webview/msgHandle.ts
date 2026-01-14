@@ -15,20 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface CheckerOptions {
-  checkerPath: string;
-  inputPath: string;
-  outputPath: string;
-  answerPath: string;
-}
-
-interface CheckerData {
-  exitCode: number;
-  msg: string;
-}
-
-export type CheckerResult = CheckerData | Error;
-
-export interface ICheckerRunner {
-  run(options: CheckerOptions, signal: AbortSignal): Promise<CheckerResult>;
+export interface IMsgHandle<T> {
+  exec(msg: T): Promise<void>;
 }

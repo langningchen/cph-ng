@@ -25,8 +25,8 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { CustomQuickPickItem, IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
 import { Tc } from '@/domain/entities/tc';
+import { TcIo } from '@/domain/entities/tcIo';
 import { type FilePair, TcMatcher } from '@/domain/services/TcMatcher';
-import { TcIo } from '@/domain/types';
 
 @injectable()
 export class TcScanner {

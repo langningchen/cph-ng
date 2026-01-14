@@ -16,29 +16,51 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { UUID } from 'node:crypto';
+import EventEmitter from 'node:events';
+import type TypedEventEmitter from 'typed-emitter';
 import { BfCompare } from '@/domain/entities/bfCompare';
-import type { Tc } from '@/domain/entities/tc';
+import type { Tc, TcResult } from '@/domain/entities/tc';
 import type { IFileWithHash, IOverrides } from '@/domain/types';
 
+export interface ProblemMetaPayload {
+  checker?: IFileWithHash;
+  interactor?: IFileWithHash;
+}
+export type ProblemEvents = {
+  patchMeta: (payload: ProblemMetaPayload) => void;
+  patchBfCompare: (payload: Partial<BfCompare>) => void;
+  addTc: (id: UUID, payload: Tc) => void;
+  deleteTc: (id: UUID) => void;
+  patchTc: (id: UUID, payload: Partial<Tc>) => void;
+  patchTcResult: (id: UUID, payload: Partial<TcResult>) => void;
+};
+
 export class Problem {
-  public name: string;
-  public url?: string;
-  private _tcs: Record<UUID, Tc> = {};
-  private _tcOrder: UUID[] = [];
   public readonly src: IFileWithHash;
+  public url?: string;
+  private _tcs: Map<UUID, Tc> = new Map();
+  private _tcOrder: UUID[] = [];
   private _checker?: IFileWithHash;
   private _interactor?: IFileWithHash;
   private _bfCompare: BfCompare = new BfCompare();
   private _timeElapsedMs: number = 0;
   public overrides: IOverrides = {};
+  public readonly signals: TypedEventEmitter<ProblemEvents> = new EventEmitter();
 
-  constructor(name: string, src: string | IFileWithHash) {
-    this.name = name;
+  constructor(
+    public name: string,
+    src: string | IFileWithHash,
+  ) {
     if (typeof src === 'string') this.src = { path: src };
     else this.src = src;
+    this._bfCompare.signals.on('change', this.bfCompareChanged);
   }
 
-  public get tcs(): Readonly<Record<UUID, Tc>> {
+  private bfCompareChanged(payload: Partial<BfCompare>) {
+    this.signals.emit('patchBfCompare', payload);
+  }
+
+  public get tcs(): Readonly<Map<UUID, Tc>> {
     return this._tcs;
   }
   public get tcOrder(): readonly UUID[] {
@@ -49,30 +71,45 @@ export class Problem {
   }
   public set checker(file: IFileWithHash | undefined) {
     this._checker = file;
+    this.signals.emit('patchMeta', { checker: file });
   }
   public get interactor() {
     return this._interactor;
   }
   public set interactor(file: IFileWithHash | undefined) {
     this._interactor = file;
+    this.signals.emit('patchMeta', { interactor: file });
   }
-  public get bfCompare() {
+  public get bfCompare(): BfCompare {
     return this._bfCompare;
   }
   public set bfCompare(bfCompare: BfCompare) {
+    this._bfCompare.signals.off('change', this.bfCompareChanged);
     this._bfCompare = bfCompare;
+    this._bfCompare.signals.on('change', this.bfCompareChanged);
   }
   public get timeElapsedMs() {
     return this._timeElapsedMs;
   }
 
+  private onPatchTc(uuid: UUID, payload: Partial<Tc>) {
+    this.signals.emit('patchTc', uuid, payload);
+  }
+  private onPatchTcResult(uuid: UUID, payload: Partial<TcResult>) {
+    this.signals.emit('patchTcResult', uuid, payload);
+  }
+
   public addTc(uuid: UUID, tc: Tc) {
-    this._tcs[uuid] = tc;
+    this._tcs.set(uuid, tc);
     this._tcOrder.push(uuid);
+    this.signals.emit('addTc', uuid, tc);
+    tc.signals.on('patchTc', this.onPatchTc.bind(this, uuid));
+    tc.signals.on('patchTcResult', this.onPatchTcResult.bind(this, uuid));
   }
   public getTc(uuid: UUID): Tc {
-    if (!this._tcs[uuid]) throw new Error('Test case not found');
-    return this._tcs[uuid];
+    const tc = this._tcs.get(uuid);
+    if (!tc) throw new Error('Test case not found');
+    return tc;
   }
   public deleteTc(uuid: UUID): void {
     this._tcOrder = this._tcOrder.filter((id) => id !== uuid);
@@ -80,8 +117,11 @@ export class Problem {
   public clearTcs(): string[] {
     const disposables = this.purgeUnusedTcs();
     this._tcOrder = [];
-    for (const tc of Object.values(this._tcs)) disposables.push(...tc.getDisposables());
-    this._tcs = {};
+    for (const [id, tc] of this._tcs) {
+      disposables.push(...tc.getDisposables());
+      this.signals.emit('deleteTc', id);
+    }
+    this._tcs.clear();
     return disposables;
   }
   public moveTc(fromIdx: number, toIdx: number): void {
@@ -89,25 +129,28 @@ export class Problem {
     this._tcOrder.splice(toIdx, 0, movedTc);
   }
   public getEnabledTcIds(): UUID[] {
-    return this._tcOrder.filter((id) => !this._tcs[id].isDisabled);
+    const enabledIds: UUID[] = [];
+    for (const id of this._tcOrder) {
+      const tc = this._tcs.get(id);
+      if (tc && !tc.isDisabled) enabledIds.push(id);
+    }
+    return enabledIds;
   }
   public purgeUnusedTcs(): string[] {
     const activeIds = new Set(this._tcOrder);
     const disposables: string[] = [];
-    for (const id of Object.keys(this._tcs) as UUID[])
+    for (const [id, tc] of this._tcs)
       if (!activeIds.has(id)) {
-        disposables.push(...this._tcs[id].getDisposables());
-        delete this._tcs[id];
+        disposables.push(...tc.getDisposables());
+        this._tcs.delete(id);
       }
     return disposables;
   }
-
   public clearResult(): string[] {
     const disposables: string[] = [];
-    for (const id of this._tcOrder) disposables.push(...this._tcs[id].clearResult());
+    for (const id of this._tcOrder) disposables.push(...this.getTc(id).clearResult());
     return disposables;
   }
-
   public isRelated(path: string): boolean {
     path = path.toLowerCase();
     if (
@@ -121,11 +164,10 @@ export class Problem {
     for (const tc of Object.values(this._tcs)) if (tc.isRelated(path)) return true;
     return false;
   }
-
   public addTimeElapsed(addMs: number) {
     this._timeElapsedMs += addMs;
   }
   public updateResult(...params: Parameters<Tc['updateResult']>) {
-    for (const tcId of this._tcOrder) this._tcs[tcId].updateResult(...params);
+    for (const tcId of this._tcOrder) this._tcs.get(tcId)?.updateResult(...params);
   }
 }

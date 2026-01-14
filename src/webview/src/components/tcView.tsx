@@ -164,10 +164,10 @@ export const TcView = ({
                 <CphText>{tc.result?.verdict.name}</CphText>
               </Tooltip>
             </CphFlex>
-            {tc.result?.memory !== undefined && (
+            {tc.result?.memoryMb !== undefined && (
               <Chip
                 label={t('tcView.memory', {
-                  memory: tc.result.memory.toFixed(1),
+                  memory: tc.result.memoryMb.toFixed(1),
                 })}
                 size={'small'}
                 sx={{
@@ -176,10 +176,10 @@ export const TcView = ({
                 }}
               />
             )}
-            {tc.result?.time !== undefined && (
+            {tc.result?.timeMs !== undefined && (
               <Chip
                 label={t('tcView.time', {
-                  time: tc.result.time.toFixed(1),
+                  time: tc.result.timeMs.toFixed(1),
                 })}
                 size={'small'}
                 sx={{

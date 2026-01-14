@@ -15,20 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface CheckerOptions {
-  checkerPath: string;
-  inputPath: string;
-  outputPath: string;
-  answerPath: string;
-}
+import { injectable } from 'tsyringe';
+import type { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
+import type { InitMsg } from '@/webview/src/msgs';
 
-interface CheckerData {
-  exitCode: number;
-  msg: string;
-}
+@injectable()
+export class Init {
+  constructor(private readonly coordinator: ActiveProblemCoordinator) {}
 
-export type CheckerResult = CheckerData | Error;
-
-export interface ICheckerRunner {
-  run(options: CheckerOptions, signal: AbortSignal): Promise<CheckerResult>;
+  async exec(_msg: InitMsg): Promise<void> {
+    await this.coordinator.dispatchFullData();
+  }
 }

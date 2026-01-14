@@ -17,10 +17,7 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ITcService } from '@/application/ports/problems/ITcService';
 import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
@@ -34,6 +31,7 @@ import type { IDocument } from '@/application/ports/vscode/IDocument';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { isExpandVerdict, VerdictName } from '@/domain/entities/verdict';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import type { RunTcsMsg } from '@/webview/src/msgs';
@@ -49,14 +47,13 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
     @inject(TOKENS.tcService) private readonly tcService: ITcService,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction(fullProblem: FullProblem, msg: RunTcsMsg): Promise<void> {
-    const { problem } = fullProblem;
+  protected async performAction(bgProblem: BackgroundProblem, msg: RunTcsMsg): Promise<void> {
+    const { problem } = bgProblem;
     let ac = new AbortController();
-    fullProblem.ac?.abort();
-    fullProblem.ac = ac;
+    bgProblem.ac = ac;
 
     const tcOrder = problem.getEnabledTcIds();
 
@@ -67,24 +64,20 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
       tc.updateResult(VerdictName.compiling, { isExpand: false });
       expandMemo[tcId] = tc.isExpand;
     }
-    await this.repo.dataRefresh();
 
     await this.document.save(problem.src.path);
     const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
     if (artifacts instanceof Error) {
-      problem.updateResult(
+      const verdict =
         artifacts instanceof CompileError
           ? VerdictName.compilationError
           : artifacts instanceof CompileRejected
             ? VerdictName.rejected
-            : VerdictName.systemError,
-        { msg: artifacts.message },
-      );
+            : VerdictName.systemError;
+      problem.updateResult(verdict, { msg: artifacts.message });
       return;
     }
-
     problem.updateResult(VerdictName.compiled);
-    await this.repo.dataRefresh();
 
     const expandBehavior = this.settings.problem.expandBehavior;
     let hasAnyExpanded = false;
@@ -95,7 +88,7 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
       const tc = problem.getTc(tcId);
 
       if (ac.signal.aborted) {
-        if (ac.signal.reason === 'onlyOne') fullProblem.ac = ac = new AbortController();
+        if (ac.signal.reason === 'onlyOne') bgProblem.ac = ac = new AbortController();
         else {
           tc.updateResult(VerdictName.skipped);
           continue;
@@ -111,7 +104,6 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
       const observer: IJudgeObserver = {
         onStatusChange: (verdict, msg) => {
           tc.updateResult(verdict, { msg });
-          this.repo.dataRefresh();
         },
         onResult: (res: FinalResult) => {
           let isExpand: boolean = false;
@@ -136,16 +128,14 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
             memoryMb: res.memoryMb,
             msg: res.msg,
           });
-          this.repo.dataRefresh();
         },
         onError: (e) => {
           tc.updateResult(VerdictName.systemError, { msg: e.message });
-          this.repo.dataRefresh();
         },
       };
 
       await judgeService.judge(ctx, observer, ac.signal);
     }
-    fullProblem.ac = null;
+    bgProblem.abort();
   }
 }

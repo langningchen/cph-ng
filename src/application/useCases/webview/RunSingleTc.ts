@@ -17,10 +17,7 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ITcService } from '@/application/ports/problems/ITcService';
 import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
@@ -33,6 +30,7 @@ import {
 import type { IDocument } from '@/application/ports/vscode/IDocument';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { VerdictName } from '@/domain/entities/verdict';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import type { RunTcMsg } from '@/webview/src/msgs';
@@ -47,23 +45,21 @@ export class RunSingleTc extends BaseProblemUseCase<RunTcMsg> {
     @inject(TOKENS.tcService) private readonly tcService: ITcService,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction(fullProblem: FullProblem, msg: RunTcMsg): Promise<void> {
-    if (!fullProblem) throw new Error('Problem not found');
-    const { problem } = fullProblem;
+  protected async performAction(bgProblem: BackgroundProblem, msg: RunTcMsg): Promise<void> {
+    if (!bgProblem) throw new Error('Problem not found');
+    const { problem } = bgProblem;
 
     const tc = problem.getTc(msg.id);
     if (!tc) throw new Error('Test case not found');
 
     const ac = new AbortController();
-    fullProblem.ac?.abort();
-    fullProblem.ac = ac;
+    bgProblem.ac = ac;
 
     this.tmp.dispose(tc.clearResult());
     tc.updateResult(VerdictName.compiling, { isExpand: false });
-    await this.repo.dataRefresh();
 
     await this.document.save(problem.src.path);
     const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
@@ -76,23 +72,16 @@ export class RunSingleTc extends BaseProblemUseCase<RunTcMsg> {
             : VerdictName.systemError,
         { msg: artifacts.message },
       );
-      await this.repo.dataRefresh();
       return;
     }
     tc.updateResult(VerdictName.compiled);
 
     const judgeService = this.judgeFactory.create(problem);
-
-    const ctx: JudgeContext = {
-      problem,
-      ...(await this.tcService.getPaths(tc)),
-      artifacts,
-    };
+    const ctx: JudgeContext = { problem, ...(await this.tcService.getPaths(tc)), artifacts };
 
     const observer: IJudgeObserver = {
       onStatusChange: (verdict, msg) => {
         tc.updateResult(verdict, { msg });
-        this.repo.dataRefresh();
       },
       onResult: (res: FinalResult) => {
         tc.updateResult(res.verdict, {
@@ -101,15 +90,13 @@ export class RunSingleTc extends BaseProblemUseCase<RunTcMsg> {
           memoryMb: res.memoryMb,
           msg: res.msg,
         });
-        this.repo.dataRefresh();
       },
       onError: (e) => {
         tc.updateResult(VerdictName.systemError, { msg: e.message });
-        this.repo.dataRefresh();
       },
     };
 
     await judgeService.judge(ctx, observer, ac.signal);
-    fullProblem.ac = null;
+    bgProblem.abort();
   }
 }

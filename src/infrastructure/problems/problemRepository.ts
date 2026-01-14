@@ -15,32 +15,32 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { UUID } from 'node:crypto';
 import { inject, injectable } from 'tsyringe';
-import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IClock } from '@/application/ports/node/IClock';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
-import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@/composition/tokens';
-import ExtensionManager from '@/modules/extensionManager';
-import { getActivePath, sidebarProvider, waitUntil } from '@/utils/global';
+import { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import type { IWebviewBackgroundProblem } from '@/domain/webviewTypes';
 
 @injectable()
 export class ProblemRepository implements IProblemRepository {
-  private fullProblems: FullProblem[] = [];
+  private backgroundProblems: Map<UUID, BackgroundProblem> = new Map();
 
   constructor(
-    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
-    @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
-    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.clock) private readonly clock: IClock,
+    @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.logger) private readonly logger: ILogger,
-    @inject(TOKENS.cphMigrationService) private readonly cphMigration: ICphMigrationService,
-    @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
+    @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
+    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
   ) {
     this.logger = this.logger.withScope('ProblemRepository');
   }
@@ -49,93 +49,96 @@ export class ProblemRepository implements IProblemRepository {
     return this.resolver.renderPathWithFile(this.settings.problem.problemFilePath, srcPath, true);
   }
 
-  async listFullProblems(): Promise<FullProblem[]> {
-    return this.fullProblems;
+  private fireBackgroundEvent() {
+    const backgroundProblems: IWebviewBackgroundProblem[] = [];
+    for (const bgProblem of this.backgroundProblems.values())
+      backgroundProblems.push({
+        name: bgProblem.problem.name,
+        srcPath: bgProblem.problem.src.path,
+      });
+    this.eventBus.background(backgroundProblems);
   }
 
-  async getFullProblem(path?: string, allowCreate?: boolean): Promise<FullProblem | null> {
-    if (!path) return null;
-    for (const fullProblem of this.fullProblems) {
-      if (fullProblem.problem.isRelated(path)) {
-        this.logger.trace('Found loaded problem', fullProblem.problem.src.path, 'for path', path);
-        return fullProblem;
-      }
-    }
-    let problem = await this.problemService.loadBySrc(path);
+  async loadByPath(srcPath: string, allowCreate = true): Promise<UUID | null> {
+    let problem = await this.problemService.loadBySrc(srcPath);
     if (!problem) {
       if (!allowCreate) {
-        this.logger.debug('No problem found for path', path);
+        this.logger.debug('No problem found for path', srcPath);
         return null;
       }
-      this.logger.debug('No problem found for path', path, ', creating new one');
-      problem = await this.problemService.create(path);
+      this.logger.debug('No problem found for path', srcPath, ', creating new one');
+      problem = await this.problemService.create(srcPath);
       if (!problem) {
-        this.logger.error('Failed to create problem for path', path);
+        this.logger.error('Failed to create problem for path', srcPath);
         return null;
       }
     }
-    this.logger.debug('Loaded problem', problem.src.path, 'for path', path);
-    const fullProblem: FullProblem = {
-      problem,
-      ac: null,
-      startTime: Date.now(),
-    };
-    this.fullProblems.push(fullProblem);
-    return fullProblem;
+    this.logger.debug('Loaded problem', problem.src.path, 'for path', srcPath);
+    const problemId = this.crypto.randomUUID();
+    this.backgroundProblems.set(
+      problemId,
+      new BackgroundProblem(problemId, problem, this.clock.now()),
+    );
+    this.fireBackgroundEvent();
+    return problemId;
   }
 
-  removeProblem(fullProblem: FullProblem): void {
-    this.fullProblems = this.fullProblems.filter((p) => p !== fullProblem);
+  async get(problemId?: UUID): Promise<BackgroundProblem | undefined> {
+    if (!problemId) return undefined;
+    return this.backgroundProblems.get(problemId);
   }
 
-  async dataRefresh(noMsg = false): Promise<void> {
-    this.logger.trace('Starting data refresh');
-    const activePath = getActivePath();
-    if (activePath) {
-      const idles: FullProblem[] = this.fullProblems.filter(
-        (fullProblem) =>
-          !fullProblem.ac && // No running task
-          !fullProblem.problem.isRelated(activePath), // Not the active problem
-      );
-      for (const idle of idles) {
-        idle.problem.addTimeElapsed(Date.now() - idle.startTime);
-        await this.problemService.save(idle.problem);
-        this.logger.debug('Closed idle problem', idle.problem.src.path);
-      }
-      this.fullProblems = this.fullProblems.filter((p) => !idles.includes(p));
-    }
-
-    const fullProblem = await this.getFullProblem(activePath);
-    const canImport = !!activePath && (await this.cphMigration.canMigrate(activePath));
-    if (!noMsg)
-      sidebarProvider.event.emit('problem', {
-        problem: fullProblem && {
-          problem: fullProblem.problem,
-          startTime: fullProblem.startTime,
-        },
-        bgProblems: this.fullProblems
-          .map((bgProblem) => ({
-            name: bgProblem.problem.name,
-            srcPath: bgProblem.problem.src.path,
-          }))
-          .filter((bgProblem) => bgProblem.srcPath !== fullProblem?.problem.src.path),
-        canImport,
-      });
-    ExtensionManager.event.emit('context', {
-      hasProblem: !!fullProblem,
-      canImport,
-      isRunning: !!fullProblem?.ac,
-    });
-    if (fullProblem) await this.problemFs.fireAuthorityChange(fullProblem.problem.src.path);
+  async getIdByPath(srcPath: string): Promise<UUID | undefined> {
+    for (const [problemId, fullProblem] of this.backgroundProblems.entries())
+      if (fullProblem.problem.isRelated(srcPath)) return problemId;
+    return undefined;
   }
 
-  async closeAll(): Promise<void> {
-    for (const fullProblem of this.fullProblems) {
-      fullProblem.ac?.abort();
-      await waitUntil(() => !fullProblem.ac);
-      fullProblem.problem.addTimeElapsed(Date.now() - fullProblem.startTime);
-      await this.problemService.save(fullProblem.problem);
-    }
-    this.fullProblems = [];
+  async persist(problemId: UUID): Promise<boolean> {
+    const fullProblem = this.backgroundProblems.get(problemId);
+    if (!fullProblem || fullProblem.ac) return false;
+    fullProblem.addTimeElapsed(this.clock.now());
+    await this.problemService.save(fullProblem.problem);
+    this.backgroundProblems.delete(problemId);
+    this.fireBackgroundEvent();
+    this.logger.debug('Persisted problem', problemId);
+    return true;
   }
+
+  // async dataRefresh(noMsg = false): Promise<void> {
+  //   this.logger.trace('Starting data refresh');
+  //   const activePath = getActivePath();
+  // if (activePath) {
+  //   const idles: FullProblem[] = this.fullProblems.filter(
+  //     (fullProblem) =>
+  //       !fullProblem.ac && // No running task
+  //       !fullProblem.problem.isRelated(activePath), // Not the active problem
+  //   );
+  //   for (const idle of idles)
+  //     this.fullProblems.delete(idle.problem);
+  // }
+
+  //   const fullProblem = await this.getProblem(activePath);
+  //   const canImport = !!activePath && (await this.cphMigration.canMigrate(activePath));
+  //   if (!noMsg)
+  //     sidebarProvider.event.emit('problem', {
+  //       problem: fullProblem && {
+  //         problem: fullProblem.problem,
+  //         startTime: fullProblem.startTime,
+  //       },
+  //       bgProblems: this.fullProblems
+  //         .map((bgProblem) => ({
+  //           name: bgProblem.problem.name,
+  //           srcPath: bgProblem.problem.src.path,
+  //         }))
+  //         .filter((bgProblem) => bgProblem.srcPath !== fullProblem?.problem.src.path),
+  //       canImport,
+  //     });
+  //   ExtensionManager.event.emit('context', {
+  //     hasProblem: !!fullProblem,
+  //     canImport,
+  //     isRunning: !!fullProblem?.ac,
+  //   });
+  //   if (fullProblem) await this.problemFs.fireAuthorityChange(fullProblem.problem.src.path);
+  // }
 }

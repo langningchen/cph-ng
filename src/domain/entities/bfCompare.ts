@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { EventEmitter } from 'node:stream';
 import type { IFileWithHash } from '@/domain/types';
 
 export const BfCompareState = {
@@ -29,29 +30,43 @@ export const BfCompareState = {
 } as const;
 export type BfCompareState = (typeof BfCompareState)[keyof typeof BfCompareState];
 
+export interface BfCompareEvents {
+  change: [Partial<BfCompare>];
+}
+
 export class BfCompare {
+  public readonly signals: EventEmitter<BfCompareEvents> = new EventEmitter();
+
   constructor(
-    public generator?: IFileWithHash,
-    public bruteForce?: IFileWithHash,
-    public cnt: number = 0,
+    private _generator?: IFileWithHash,
+    private _bruteForce?: IFileWithHash,
+    private _cnt: number = 0,
     private _state: BfCompareState = BfCompareState.inactive,
-    private _msg?: string,
   ) {}
 
-  public error(e: Error) {
-    this.state = BfCompareState.internalError;
-    this._msg = e.message;
+  get generator(): IFileWithHash | undefined {
+    return this._generator;
   }
-
+  set generator(value: IFileWithHash | undefined) {
+    this._generator = value;
+    this.signals.emit('change', { generator: value });
+  }
+  get bruteForce(): IFileWithHash | undefined {
+    return this._bruteForce;
+  }
+  set bruteForce(value: IFileWithHash | undefined) {
+    this._bruteForce = value;
+    this.signals.emit('change', { bruteForce: value });
+  }
   get state(): BfCompareState {
     return this._state;
   }
+  get cnt(): number {
+    return this._cnt;
+  }
   set state(value: BfCompareState) {
     this._state = value;
-    this._msg = undefined;
-  }
-  get msg(): string | undefined {
-    return this._msg;
+    this.signals.emit('change', { state: value });
   }
   get isRunning(): boolean {
     return (
@@ -60,5 +75,14 @@ export class BfCompare {
       this.state === BfCompareState.runningBruteForce ||
       this.state === BfCompareState.runningSolution
     );
+  }
+
+  public clearCnt() {
+    this._cnt = 0;
+    this.signals.emit('change', { cnt: this._cnt });
+  }
+  public count() {
+    this._cnt++;
+    this.signals.emit('change', { cnt: this._cnt });
   }
 }

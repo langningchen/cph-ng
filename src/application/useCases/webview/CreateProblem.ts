@@ -26,7 +26,7 @@ export class CreateProblem {
 
   async exec(msg: CreateProblemMsg): Promise<void> {
     if (!msg.activePath) throw new Error('Active path is required');
-    await this.repo.getFullProblem(msg.activePath, true);
+    await this.repo.get(msg.activePath, true);
     await this.repo.dataRefresh();
   }
 }

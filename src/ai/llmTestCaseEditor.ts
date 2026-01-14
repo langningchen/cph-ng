@@ -87,7 +87,7 @@ class LlmTestCaseEditor implements LanguageModelTool<LlmTestCaseEditorParams> {
     const problemsManager = container.resolve(TOKENS.problemsManager);
     const repo = container.resolve(TOKENS.problemRepository);
     const activePath = options.input.activePath;
-    const bgProblem = await repo.getFullProblem(activePath);
+    const bgProblem = await repo.get(activePath);
     if (!bgProblem) {
       result.content.push(
         new LanguageModelTextPart(

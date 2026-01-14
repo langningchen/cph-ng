@@ -16,23 +16,21 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import Companion from '@/modules/companion';
 import type { SubmitToCodeforcesMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class SubmitToCodeforces extends BaseProblemUseCase<SubmitToCodeforcesMsg> {
   constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
-    super(repo, true);
+    super(repo);
   }
 
   protected async performAction(
-    { problem }: FullProblem,
+    { problem }: BackgroundProblem,
     _msg: SubmitToCodeforcesMsg,
   ): Promise<void> {
     Companion.submit(problem);

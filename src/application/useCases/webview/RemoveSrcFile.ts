@@ -16,21 +16,22 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type {
-  FullProblem,
-  IProblemRepository,
-} from '@/application/ports/problems/IProblemRepository';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import type { RemoveSrcFileMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class RemoveSrcFile extends BaseProblemUseCase<RemoveSrcFileMsg> {
   constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
-    super(repo, true);
+    super(repo);
   }
 
-  protected async performAction({ problem }: FullProblem, msg: RemoveSrcFileMsg): Promise<void> {
+  protected async performAction(
+    { problem }: BackgroundProblem,
+    msg: RemoveSrcFileMsg,
+  ): Promise<void> {
     if (msg.fileType === 'checker') problem.checker = undefined;
     else if (msg.fileType === 'interactor') problem.interactor = undefined;
     else if (msg.fileType === 'generator' && problem.bfCompare)

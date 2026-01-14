@@ -15,11 +15,89 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface AppEvent<T = unknown> {
-  type: string;
-  payload?: T;
+import type { UUID } from 'node:crypto';
+import type {
+  IWebviewBackgroundProblem,
+  IWebviewBfCompare,
+  IWebviewFileWithHash,
+  IWebviewProblem,
+  IWebviewTc,
+  IWebviewTcResult,
+} from '@/domain/webviewTypes';
+
+export interface WebviewProblemMetaPayload {
+  checker?: IWebviewFileWithHash;
+  interactor?: IWebviewFileWithHash;
 }
+export const WebviewEventName = {
+  FULL_PROBLEM: 'FULL_PROBLEM',
+  PATCH_META: 'PATCH_META',
+  PATCH_BF_COMPARE: 'PATCH_BF_COMPARE',
+  PATCH_TC: 'PATCH_TC',
+  PATCH_TC_RESULT: 'PATCH_TC_RESULT',
+  DELETE_TC: 'DELETE_TC',
+  BACKGROUND: 'BACKGROUND',
+  NO_PROBLEM: 'NO_PROBLEM',
+} as const;
+export type WebviewEventName = (typeof WebviewEventName)[keyof typeof WebviewEventName];
+export interface WebviewFullProblemEvent {
+  name: typeof WebviewEventName.FULL_PROBLEM;
+  problemId: UUID;
+  payload: IWebviewProblem;
+}
+export interface WebviewPatchMetaEvent {
+  name: typeof WebviewEventName.PATCH_META;
+  problemId: UUID;
+  payload: WebviewProblemMetaPayload;
+}
+export interface WebviewPatchBfCompareEvent {
+  name: typeof WebviewEventName.PATCH_BF_COMPARE;
+  problemId: UUID;
+  payload: Partial<IWebviewBfCompare>;
+}
+export interface WebviewPatchTcEvent {
+  name: typeof WebviewEventName.PATCH_TC;
+  problemId: UUID;
+  tcId: UUID;
+  payload: Partial<IWebviewTc>;
+}
+export interface WebviewPatchTcResultEvent {
+  name: typeof WebviewEventName.PATCH_TC_RESULT;
+  problemId: UUID;
+  tcId: UUID;
+  payload: Partial<IWebviewTcResult>;
+}
+export interface WebviewDeleteTcEvent {
+  name: typeof WebviewEventName.DELETE_TC;
+  problemId: UUID;
+  tcId: UUID;
+}
+export interface WebviewBackgroundEvent {
+  name: typeof WebviewEventName.BACKGROUND;
+  payload: IWebviewBackgroundProblem[];
+}
+export interface WebviewNoProblemEvent {
+  name: typeof WebviewEventName.NO_PROBLEM;
+  canImport: boolean;
+}
+export type WebviewEvent =
+  | WebviewFullProblemEvent
+  | WebviewPatchMetaEvent
+  | WebviewPatchBfCompareEvent
+  | WebviewPatchTcEvent
+  | WebviewPatchTcResultEvent
+  | WebviewDeleteTcEvent
+  | WebviewBackgroundEvent
+  | WebviewNoProblemEvent;
 
 export interface IWebviewEventBus {
-  publish<T = unknown>(event: AppEvent<T>): void;
+  onMessage(callback: (data: WebviewEvent) => void): void;
+  fullProblem(problemId: UUID, payload: IWebviewProblem): void;
+  patchMeta(problemId: UUID, payload: WebviewProblemMetaPayload): void;
+  patchBfCompare(problemId: UUID, payload: Partial<IWebviewBfCompare>): void;
+  patchTc(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTc>): void;
+  patchTcResult(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTcResult>): void;
+  deleteTc(problemId: UUID, tcId: UUID): void;
+  background(payload: IWebviewBackgroundProblem[]): void;
+  noProblem(canImport: boolean): void;
 }

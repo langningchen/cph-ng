@@ -30,7 +30,10 @@ export class ProblemMapper {
 
   public toDto(entity: Problem): IProblem {
     const tcs: Record<UUID, ITc> = {};
-    for (const id of entity.tcOrder) tcs[id] = this.tcToDto(entity.tcs[id]);
+    for (const id of entity.tcOrder) {
+      const tc = entity.tcs.get(id);
+      if (tc) tcs[id] = this.tcToDto(tc);
+    }
     return {
       version: this.version,
       name: entity.name,
@@ -76,8 +79,8 @@ export class ProblemMapper {
       result: tc.verdict
         ? {
             verdict: tc.verdict,
-            time: tc.time,
-            memory: tc.memory,
+            timeMs: tc.timeMs,
+            memoryMb: tc.memoryMb,
             stdout: tc.stdout ? this.tcIoToDto(tc.stdout) : undefined,
             stderr: tc.stderr ? this.tcIoToDto(tc.stderr) : undefined,
             msg: tc.msg,
@@ -94,8 +97,8 @@ export class ProblemMapper {
       dto.result
         ? {
             verdict: dto.result.verdict,
-            time: dto.result.time,
-            memory: dto.result.memory,
+            timeMs: dto.result.timeMs,
+            memoryMb: dto.result.memoryMb,
             stdout: dto.result.stdout ? this.tcIoToEntity(dto.result.stdout) : undefined,
             stderr: dto.result.stderr ? this.tcIoToEntity(dto.result.stderr) : undefined,
             msg: dto.result.msg,
@@ -113,11 +116,6 @@ export class ProblemMapper {
     };
   }
   private bfCompareToEntity(dto: IBfCompare): BfCompare {
-    const bfCompare = new BfCompare();
-    bfCompare.generator = dto.generator;
-    bfCompare.bruteForce = dto.bruteForce;
-    bfCompare.cnt = dto.cnt;
-    bfCompare.state = dto.state;
-    return bfCompare;
+    return new BfCompare(dto.generator, dto.bruteForce, dto.cnt, dto.state);
   }
 }
