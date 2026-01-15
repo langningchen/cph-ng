@@ -47,7 +47,7 @@ export class Problem {
   public overrides: IOverrides = {};
   public readonly signals: TypedEventEmitter<ProblemEvents> = new EventEmitter();
 
-  constructor(
+  public constructor(
     public name: string,
     src: string | IFileWithHash,
   ) {

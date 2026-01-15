@@ -25,7 +25,7 @@ import { TcIo } from '@/domain/entities/tcIo';
 
 @injectable()
 export class TcIoService implements ITcIoService {
-  constructor(
+  public constructor(
     @inject(TOKENS.fileSystem) private fs: IFileSystem,
     @inject(TOKENS.tempStorage) private temp: ITempStorage,
     @inject(TOKENS.settings) private settings: ISettings,

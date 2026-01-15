@@ -34,7 +34,7 @@ import {
 
 @injectable()
 export class SolutionRunnerAdapter implements ISolutionRunner {
-  constructor(
+  public constructor(
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
@@ -46,7 +46,7 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
     this.logger = this.logger.withScope('RunnerAdapter');
   }
 
-  async run(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
+  public async run(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
     const strategy = this.getStrategy();
     if (strategy instanceof Error) return strategy;
     return strategy.execute(ctx, signal);

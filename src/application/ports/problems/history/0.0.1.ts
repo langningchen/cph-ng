@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface TestCaseStatus {
+interface TestCaseStatus {
   name: string;
   fullName: string;
   color: string;
 }
 
-export interface TestCase {
+interface TestCase {
   input: string;
   inputFile: boolean;
   answer: string;

@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 export class TelemetryTrustedValue<T = string> {
-  constructor(public readonly value: T) {}
+  public constructor(public readonly value: T) {}
 }
 
 export type TelemetryEventProp<T> = T | TelemetryTrustedValue<T>;
@@ -25,7 +25,7 @@ export interface TelemetryEventProps {
   readonly [key: string]: TelemetryEventProp<string | number | boolean>;
 }
 
-export const TELEMETRY_EVENT_NAMES = ['run', 'webviewMessage', 'activate', 'compile'] as const;
+const TELEMETRY_EVENT_NAMES = ['run', 'webviewMessage', 'activate', 'compile'] as const;
 export type TelemetryEventName = (typeof TELEMETRY_EVENT_NAMES)[number];
 export const TELEMETRY_ERROR_NAMES = [
   'pipeFailed',

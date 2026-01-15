@@ -22,7 +22,7 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class WebviewHtmlRenderer {
-  constructor(@inject(TOKENS.settings) private readonly settings: ISettings) {}
+  public constructor(@inject(TOKENS.settings) private readonly settings: ISettings) {}
 
   public render(webview: Webview, extensionPath: string): string {
     const getUri = (filename: string) =>

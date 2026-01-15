@@ -25,31 +25,31 @@ import { TOKENS } from '@/composition/tokens';
 export class BuildInfoAdapter implements IBuildInfo {
   private data: BuildInfoData | null = null;
 
-  constructor(
+  public constructor(
     @inject(TOKENS.extensionPath) private readonly extPath: string,
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
   ) {}
 
-  async load(): Promise<void> {
+  public async load(): Promise<void> {
     const jsonPath = this.path.resolve(this.extPath, 'dist', 'generated.json');
     const content = await this.fs.readFile(jsonPath);
     this.data = JSON.parse(content);
   }
 
-  get commitHash(): string {
+  public get commitHash(): string {
     return this.data?.commitHash || 'unknown';
   }
 
-  get buildTime(): string {
+  public get buildTime(): string {
     return this.data?.buildTime || 'unknown';
   }
 
-  get buildBy(): string {
+  public get buildBy(): string {
     return this.data?.buildBy || 'unknown';
   }
 
-  get buildType(): string {
+  public get buildType(): string {
     return this.data?.buildType || 'unknown';
   }
 }

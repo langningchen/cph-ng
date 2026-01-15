@@ -31,7 +31,7 @@ import Companion from '@/modules/companion';
 export class EnvironmentModule implements IExtensionModule {
   private timer?: NodeJS.Timeout;
 
-  constructor(
+  public constructor(
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
@@ -40,7 +40,7 @@ export class EnvironmentModule implements IExtensionModule {
     @inject(TOKENS.translator) private readonly translator: ITranslator,
   ) {}
 
-  async setup(context: ExtensionContext) {
+  public async setup(context: ExtensionContext) {
     if (this.settings.cache.cleanOnStartup) {
       const cacheDir = this.resolver.renderPath(this.settings.cache.directory);
       await this.fs.rm(cacheDir, { force: true, recursive: true }).catch(() => {});
@@ -60,7 +60,7 @@ export class EnvironmentModule implements IExtensionModule {
     context.subscriptions.push({ dispose: () => this.dispose() });
   }
 
-  dispose() {
+  public dispose() {
     if (this.timer) clearInterval(this.timer);
     Companion.stopServer();
   }

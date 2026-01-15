@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["src/**", "!src/ai", "!src/modules", "tests/**", "scripts/**"]
+    "includes": ["src/**", "!src/ai", "!src/modules", "!src/webview", "tests/**", "scripts/**"]
   },
   "formatter": {
     "enabled": true,
@@ -33,6 +33,12 @@
                 "formats": ["camelCase", "CONSTANT_CASE"]
               }
             ]
+          }
+        },
+        "useConsistentMemberAccessibility": {
+          "level": "on",
+          "options": {
+            "accessibility": "explicit"
           }
         }
       },

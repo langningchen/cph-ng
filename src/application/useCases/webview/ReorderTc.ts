@@ -24,7 +24,9 @@ import type { ReorderTcMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class ReorderTc extends BaseProblemUseCase<ReorderTcMsg> {
-  constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
+  public constructor(
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+  ) {
     super(repo);
   }
 

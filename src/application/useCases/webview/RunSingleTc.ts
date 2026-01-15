@@ -37,7 +37,7 @@ import type { RunTcMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class RunSingleTc extends BaseProblemUseCase<RunTcMsg> {
-  constructor(
+  public constructor(
     @inject(TOKENS.compilerService) private readonly compiler: ICompilerService,
     @inject(TOKENS.document) private readonly document: IDocument,
     @inject(TOKENS.judgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,

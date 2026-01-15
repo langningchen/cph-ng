@@ -29,7 +29,7 @@ import type { ICphProblem } from '@/domain/types';
 
 @injectable()
 export class CphMigrationService implements ICphMigrationService {
-  constructor(
+  public constructor(
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,

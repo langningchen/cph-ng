@@ -106,5 +106,3 @@ export const TOKENS = {
   problemRepository: 'repositories.ProblemRepository' as InjectionToken<IProblemRepository>,
   problemFs: 'repositories.ProblemFs' as InjectionToken<IProblemFs>,
 };
-
-export type TokenKeys = keyof typeof TOKENS;

@@ -29,7 +29,7 @@ import type { DragDropMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class DragDrop {
-  constructor(
+  public constructor(
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.path) private readonly path: IPath,
@@ -40,7 +40,7 @@ export class DragDrop {
     private readonly tcScanner: TcScanner,
   ) {}
 
-  async exec(msg: DragDropMsg): Promise<void> {
+  public async exec(msg: DragDropMsg): Promise<void> {
     const activePath = this.activePath.getActivePath();
     if (!activePath) throw new Error('Active path is required');
     const problemId = await this.repo.loadByPath(activePath, true);

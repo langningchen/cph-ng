@@ -17,21 +17,15 @@
 
 import type { UUID } from 'node:crypto';
 
-export class TCVerdict {
+interface TCVerdict {
   name: string;
   fullName: string;
   color: string;
-
-  constructor(name: string, fullName: string, color: string) {
-    this.name = name;
-    this.fullName = fullName;
-    this.color = color;
-  }
 }
 
-export type TCIO = { useFile: true; path: string } | { useFile: false; data: string };
+type TCIO = { useFile: true; path: string } | { useFile: false; data: string };
 
-export interface TCResult {
+interface TCResult {
   verdict: TCVerdict;
   memory?: number;
   time: number;
@@ -40,26 +34,26 @@ export interface TCResult {
   msg: string;
 }
 
-export interface TC {
+interface TC {
   stdin: TCIO;
   answer: TCIO;
   isExpand: boolean;
   result?: TCResult;
 }
 
-export interface FileWithHash {
+interface FileWithHash {
   path: string;
   hash?: string;
 }
 
-export interface BFCompare {
+interface BFCompare {
   generator?: FileWithHash;
   bruteForce?: FileWithHash;
   running: boolean;
   msg: string;
 }
 
-export interface CompilationSettings {
+interface CompilationSettings {
   compiler?: string;
   compilerArgs?: string;
   runner?: string;

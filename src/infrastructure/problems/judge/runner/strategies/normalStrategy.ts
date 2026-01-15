@@ -24,12 +24,12 @@ import type { ExecutionContext, ExecutionResult } from '@/domain/execution';
 
 @injectable()
 export class NormalStrategy implements IExecutionStrategy {
-  constructor(
+  public constructor(
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
   ) {}
 
-  async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
+  public async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
     const res = await this.executor.execute({
       cmd: ctx.cmd,
       timeoutMs: ctx.timeLimitMs + this.settings.runner.timeAddition,

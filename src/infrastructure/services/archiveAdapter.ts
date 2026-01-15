@@ -23,7 +23,7 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class ArchiveAdapter implements IArchive {
-  constructor(@inject(TOKENS.fileSystem) private readonly fs: IFileSystem) {}
+  public constructor(@inject(TOKENS.fileSystem) private readonly fs: IFileSystem) {}
 
   public async unzip(zipPath: string, destPath: string): Promise<void> {
     const zip = new AdmZip(zipPath);

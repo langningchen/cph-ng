@@ -32,7 +32,7 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class TelemetryAdapter implements ITelemetry {
-  constructor(
+  public constructor(
     @inject(TOKENS.telemetryReporter)
     private readonly reporter: TelemetryReporter,
     @inject(TOKENS.clock) private readonly clock: IClock,

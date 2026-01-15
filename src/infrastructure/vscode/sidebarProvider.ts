@@ -30,7 +30,7 @@ export class SidebarProvider implements WebviewViewProvider {
   public static readonly viewType = 'cphNgSidebar';
   private _view?: WebviewView;
 
-  constructor(
+  public constructor(
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.extensionPath) private readonly extPath: string,
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,

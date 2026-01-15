@@ -25,14 +25,14 @@ import type { ImportProblemMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class ImportProblem {
-  constructor(
+  public constructor(
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.cphMigrationService) private readonly cphMigration: ICphMigrationService,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.activePathService) private readonly activePath: IActivePathService,
   ) {}
 
-  async exec(_msg: ImportProblemMsg): Promise<void> {
+  public async exec(_msg: ImportProblemMsg): Promise<void> {
     const activePath = this.activePath.getActivePath();
     if (!activePath) throw new Error('Active path is required');
     const problem = await this.cphMigration.migrateFromSource(activePath);

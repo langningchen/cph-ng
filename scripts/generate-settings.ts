@@ -50,7 +50,7 @@ const header = [
 
 const AdapterBaseClass = `
 class SettingsSectionBase {
-  constructor(
+  public constructor(
     protected readonly section: string,
     protected readonly logger: ILogger,
   ) {
@@ -193,7 +193,7 @@ const generateAdapter = (sections: Section[]) => {
 
     return [
       `class ${s.className} extends SettingsSectionBase implements I${s.className} {`,
-      `  constructor(logger: ILogger) {`,
+      `  public constructor(logger: ILogger) {`,
       `    super('${s.name}', logger);`,
       `  }`,
       gettersAndSetters,
@@ -206,7 +206,7 @@ const generateAdapter = (sections: Section[]) => {
     `export class SettingsAdapter implements ISettings {`,
     sections.map((s) => `  public readonly ${s.name}: ${s.className};`).join('\n'),
     ``,
-    `  constructor(@inject(TOKENS.logger) logger: ILogger) {`,
+    `  public constructor(@inject(TOKENS.logger) logger: ILogger) {`,
     sections.map((s) => `    this.${s.name} = new ${s.className}(logger);`).join('\n'),
     `  }`,
     `}`,

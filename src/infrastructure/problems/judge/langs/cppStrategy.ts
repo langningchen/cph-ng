@@ -28,7 +28,7 @@ export class LangCpp extends AbstractLanguageStrategy {
   public override readonly enableRunner = true;
   public override readonly defaultValues;
 
-  constructor(
+  public constructor(
     @inject(TOKENS.extensionPath) private readonly extPath: string,
     @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
     @inject(TOKENS.logger) protected readonly logger: ILogger,

@@ -27,7 +27,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
   public readonly enableRunner: boolean = false;
   public abstract readonly defaultValues: ILanguageDefaultValues;
 
-  constructor(
+  public constructor(
     protected readonly fs: IFileSystem,
     protected readonly logger: ILogger,
     protected readonly settings: ISettings,

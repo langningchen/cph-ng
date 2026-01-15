@@ -23,7 +23,7 @@ import type { Tc } from '@/domain/entities/tc';
 
 @injectable()
 export class TcService implements ITcService {
-  constructor(@inject(TOKENS.tcIoService) private tcIoService: ITcIoService) {}
+  public constructor(@inject(TOKENS.tcIoService) private tcIoService: ITcIoService) {}
 
   public async getPaths(io: Tc): Promise<PathsData> {
     return Promise.all([

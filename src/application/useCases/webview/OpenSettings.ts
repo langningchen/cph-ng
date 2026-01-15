@@ -22,9 +22,9 @@ import type { OpenSettingsMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class OpenSettings {
-  constructor(@inject(TOKENS.ui) private readonly ui: IUi) {}
+  public constructor(@inject(TOKENS.ui) private readonly ui: IUi) {}
 
-  async exec(msg: OpenSettingsMsg): Promise<void> {
+  public async exec(msg: OpenSettingsMsg): Promise<void> {
     this.ui.openSettings(msg.item);
   }
 }

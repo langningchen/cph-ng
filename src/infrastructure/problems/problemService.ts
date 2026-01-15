@@ -43,7 +43,7 @@ import type { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 
 @injectable()
 export class ProblemService implements IProblemService {
-  constructor(
+  public constructor(
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.logger) private readonly logger: ILogger,

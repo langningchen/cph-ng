@@ -21,7 +21,7 @@ export class TcIo {
   public readonly path?: string;
   public readonly data?: string;
 
-  constructor(o: ITcIo) {
+  public constructor(o: ITcIo) {
     if ('path' in o) {
       this.path = o.path.toLowerCase();
       this.data = undefined;

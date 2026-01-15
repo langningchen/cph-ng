@@ -31,7 +31,7 @@ import type { ProviderModule } from '@/infrastructure/vscode/extensionModule/pro
 export class ExtensionManager {
   private readonly modules: IExtensionModule[];
 
-  constructor(
+  public constructor(
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
     providerModule: ProviderModule,

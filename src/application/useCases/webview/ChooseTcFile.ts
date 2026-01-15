@@ -28,7 +28,7 @@ import type { ChooseTcFileMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class ChooseTcFile extends BaseProblemUseCase<ChooseTcFileMsg> {
-  constructor(
+  public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.ui) private readonly ui: IUi,

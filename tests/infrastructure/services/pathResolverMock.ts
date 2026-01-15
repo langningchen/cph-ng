@@ -24,7 +24,7 @@ import type { Problem } from '@/domain/entities/problem';
 
 @injectable()
 export class PathResolverMock implements IPathResolver {
-  constructor(
+  public constructor(
     @inject(TOKENS.extensionPath) private readonly extPath: string,
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.system) private readonly sys: ISystem,

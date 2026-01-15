@@ -14,7 +14,7 @@ import type { IFileWithHash } from '@/domain/types';
 
 @injectable()
 export class CompilerService implements ICompilerService {
-  constructor(
+  public constructor(
     @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.translator) private readonly translator: ITranslator,

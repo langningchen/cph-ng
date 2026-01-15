@@ -23,12 +23,12 @@ import type { CreateProblemMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class CreateProblem {
-  constructor(
+  public constructor(
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.activePathService) private readonly activePath: IActivePathService,
   ) {}
 
-  async exec(_msg: CreateProblemMsg): Promise<void> {
+  public async exec(_msg: CreateProblemMsg): Promise<void> {
     const activePath = this.activePath.getActivePath();
     if (!activePath) throw new Error('Active path is required');
     await this.repo.loadByPath(activePath, true);

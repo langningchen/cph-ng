@@ -48,7 +48,7 @@ export interface FinalResult {
 
 @injectable()
 export class ResultEvaluatorAdaptor implements IResultEvaluator {
-  constructor(
+  public constructor(
     @inject(TOKENS.checkerRunner) private readonly checkerRunner: ICheckerRunner,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.settings) private readonly settings: ISettings,

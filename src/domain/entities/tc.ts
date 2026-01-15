@@ -44,7 +44,7 @@ export type TcEvents = {
 export class Tc {
   public readonly signals: TypedEventEmitter<TcEvents> = new EventEmitter();
 
-  constructor(
+  public constructor(
     private _stdin: TcIo = new TcIo({ data: '' }),
     private _answer: TcIo = new TcIo({ data: '' }),
     private _isExpand: boolean = false,
@@ -52,42 +52,42 @@ export class Tc {
     private _result?: TcResult,
   ) {}
 
-  get stdin(): TcIo {
+  public get stdin(): TcIo {
     return this._stdin;
   }
-  set stdin(value: TcIo) {
+  public set stdin(value: TcIo) {
     this._stdin = value;
     this.signals.emit('patchTc', { stdin: value });
   }
-  get answer(): TcIo {
+  public get answer(): TcIo {
     return this._answer;
   }
-  set answer(value: TcIo) {
+  public set answer(value: TcIo) {
     this._answer = value;
     this.signals.emit('patchTc', { answer: value });
   }
-  get isExpand(): boolean {
+  public get isExpand(): boolean {
     return this._isExpand;
   }
-  get isDisabled(): boolean {
+  public get isDisabled(): boolean {
     return this._isDisabled;
   }
-  get verdict(): VerdictName | undefined {
+  public get verdict(): VerdictName | undefined {
     return this._result?.verdict;
   }
-  get timeMs(): number | undefined {
+  public get timeMs(): number | undefined {
     return this._result?.timeMs;
   }
-  get memoryMb(): number | undefined {
+  public get memoryMb(): number | undefined {
     return this._result?.memoryMb;
   }
-  get stdout(): TcIo | undefined {
+  public get stdout(): TcIo | undefined {
     return this._result?.stdout;
   }
-  get stderr(): TcIo | undefined {
+  public get stderr(): TcIo | undefined {
     return this._result?.stderr;
   }
-  get msg(): string | undefined {
+  public get msg(): string | undefined {
     return this._result?.msg;
   }
 

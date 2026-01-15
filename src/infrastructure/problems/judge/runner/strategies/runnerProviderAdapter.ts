@@ -31,7 +31,7 @@ export class RunnerProviderAdapter implements IRunnerProvider {
   private cachedPath: string | null = null;
   private compilationPromise: Promise<string> | null = null;
 
-  constructor(
+  public constructor(
     @inject(TOKENS.extensionPath) private readonly extPath: string,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.logger) private readonly logger: ILogger,

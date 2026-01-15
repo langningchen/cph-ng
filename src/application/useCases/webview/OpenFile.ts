@@ -25,13 +25,13 @@ import type { OpenFileMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class OpenFile {
-  constructor(
+  public constructor(
     @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.ui) private readonly ui: IUi,
   ) {}
 
-  async exec(msg: OpenFileMsg): Promise<void> {
+  public async exec(msg: OpenFileMsg): Promise<void> {
     if (!msg.isVirtual) {
       this.ui.openFile(Uri.file(msg.path));
       return;

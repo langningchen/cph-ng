@@ -24,7 +24,9 @@ import type { StopBfCompareMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class StopBfCompare extends BaseProblemUseCase<StopBfCompareMsg> {
-  constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
+  public constructor(
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+  ) {
     super(repo);
   }
 

@@ -29,25 +29,25 @@ export class ExtensionContextAdapter implements IExtensionContext {
     commands.executeCommand('setContext', `cph-ng.${key}`, value);
   }
 
-  get hasProblem() {
+  public get hasProblem() {
     return this._hasProblem;
   }
-  get canImport() {
+  public get canImport() {
     return this._canImport;
   }
-  get isRunning() {
+  public get isRunning() {
     return this._isRunning;
   }
 
-  set hasProblem(value: boolean) {
+  public set hasProblem(value: boolean) {
     this.setContext('hasProblem', value);
     this._hasProblem = value;
   }
-  set canImport(value: boolean) {
+  public set canImport(value: boolean) {
     this.setContext('canImport', value);
     this._canImport = value;
   }
-  set isRunning(value: boolean) {
+  public set isRunning(value: boolean) {
     this.setContext('isRunning', value);
     this._isRunning = value;
   }

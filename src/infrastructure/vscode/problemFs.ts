@@ -52,9 +52,9 @@ export class ProblemFs implements IProblemFs {
   public static readonly scheme = 'cph-ng';
 
   public changeEmitter = new EventEmitter<FileChangeEvent[]>();
-  onDidChangeFile: Event<FileChangeEvent[]> = this.changeEmitter.event;
+  public onDidChangeFile: Event<FileChangeEvent[]> = this.changeEmitter.event;
 
-  constructor(
+  public constructor(
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.tcIoService) private readonly tcIoService: ITcIoService,
     @inject(TOKENS.logger) private readonly logger: ILogger,
@@ -72,7 +72,7 @@ export class ProblemFs implements IProblemFs {
     });
   }
 
-  async parseUri(uri: Uri): Promise<CphFsItem> {
+  public async parseUri(uri: Uri): Promise<CphFsItem> {
     const fullProblem = await this.repo.get(uri.authority as UUID);
     if (!fullProblem) throw FileSystemError.FileNotFound();
     const problem = fullProblem.problem;
@@ -154,7 +154,7 @@ export class ProblemFs implements IProblemFs {
     this.changeEmitter.fire(files.map((uri) => ({ type: FileChangeType.Changed, uri })));
   }
 
-  async stat(uri: Uri): Promise<FileStat> {
+  public async stat(uri: Uri): Promise<FileStat> {
     const item = await this.parseUri(uri);
     if (Array.isArray(item)) {
       return {
@@ -183,14 +183,14 @@ export class ProblemFs implements IProblemFs {
     };
   }
 
-  async readFile(uri: Uri): Promise<Uint8Array> {
+  public async readFile(uri: Uri): Promise<Uint8Array> {
     const item = await this.parseUri(uri);
     if (Array.isArray(item)) throw FileSystemError.FileIsADirectory();
     const data = item.data instanceof Uri ? await this.fs.readFile(item.data.fsPath) : item.data;
     return Buffer.from(data);
   }
 
-  async writeFile(uri: Uri, content: Uint8Array): Promise<void> {
+  public async writeFile(uri: Uri, content: Uint8Array): Promise<void> {
     const item = await this.parseUri(uri);
     if (Array.isArray(item)) throw FileSystemError.FileIsADirectory();
     if (!item.set) throw FileSystemError.NoPermissions();
@@ -198,16 +198,16 @@ export class ProblemFs implements IProblemFs {
     this.changeEmitter.fire([{ type: FileChangeType.Changed, uri }]);
   }
 
-  watch(): Disposable {
+  public watch(): Disposable {
     return new Disposable(() => {});
   }
-  delete(): void {
+  public delete(): void {
     throw FileSystemError.NoPermissions();
   }
-  rename(): void {
+  public rename(): void {
     throw FileSystemError.NoPermissions();
   }
-  async readDirectory(uri: Uri): Promise<[string, FileType][]> {
+  public async readDirectory(uri: Uri): Promise<[string, FileType][]> {
     const item = await this.parseUri(uri);
     if (!Array.isArray(item)) throw FileSystemError.FileNotADirectory();
     return item.map(([name, child]) => [
@@ -219,7 +219,7 @@ export class ProblemFs implements IProblemFs {
           : FileType.File,
     ]);
   }
-  createDirectory(): void {
+  public createDirectory(): void {
     throw FileSystemError.NoPermissions();
   }
 }

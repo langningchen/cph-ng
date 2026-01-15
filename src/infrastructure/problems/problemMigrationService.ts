@@ -27,7 +27,7 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class ProblemMigrationService implements IProblemMigrationService {
-  constructor(
+  public constructor(
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
   ) {

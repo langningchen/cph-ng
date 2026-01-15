@@ -25,7 +25,7 @@ import type { DelTcMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class DelTc extends BaseProblemUseCase<DelTcMsg> {
-  constructor(
+  public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.problemService) protected readonly problemService: IProblemService,
   ) {

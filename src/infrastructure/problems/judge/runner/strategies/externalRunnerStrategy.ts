@@ -49,7 +49,7 @@ type RunnerOutput =
 
 @injectable()
 export class ExternalRunnerStrategy implements IExecutionStrategy {
-  constructor(
+  public constructor(
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
     @inject(TOKENS.settings) private readonly settings: ISettings,
@@ -63,7 +63,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     this.logger = this.logger.withScope('ExternalRunnerStrategy');
   }
 
-  async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
+  public async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
     this.logger.trace('execute', ctx);
 
     const userStdinPath = ctx.stdinPath;

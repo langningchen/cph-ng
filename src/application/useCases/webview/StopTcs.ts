@@ -25,7 +25,9 @@ import type { StopTcsMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class StopTcs extends BaseProblemUseCase<StopTcsMsg> {
-  constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
+  public constructor(
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+  ) {
     super(repo);
   }
 

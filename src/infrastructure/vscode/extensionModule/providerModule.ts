@@ -25,13 +25,13 @@ import { SidebarProvider } from '../sidebarProvider';
 
 @injectable()
 export class ProviderModule implements IExtensionModule {
-  constructor(
+  public constructor(
     @inject(TOKENS.settings) private readonly settings: ISettings,
     private readonly sidebarProvider: SidebarProvider,
     private readonly problemFs: ProblemFs,
   ) {}
 
-  setup(context: ExtensionContext) {
+  public setup(context: ExtensionContext) {
     context.subscriptions.push(
       window.registerWebviewViewProvider(SidebarProvider.viewType, this.sidebarProvider, {
         webviewOptions: { retainContextWhenHidden: this.settings.sidebar.retainWhenHidden },

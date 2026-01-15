@@ -26,7 +26,7 @@ import type { IBfCompare, IProblem, ITc, ITcIo } from '@/domain/types';
 
 @injectable()
 export class ProblemMapper {
-  constructor(@inject(TOKENS.version) private readonly version: string) {}
+  public constructor(@inject(TOKENS.version) private readonly version: string) {}
 
   public toDto(entity: Problem): IProblem {
     const tcs: Record<UUID, ITc> = {};

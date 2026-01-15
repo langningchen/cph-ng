@@ -22,9 +22,9 @@ import type { StartChatMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class StartChat {
-  constructor(@inject(TOKENS.ui) private readonly ui: IUi) {}
+  public constructor(@inject(TOKENS.ui) private readonly ui: IUi) {}
 
-  async exec(_msg: StartChatMsg): Promise<void> {
+  public async exec(_msg: StartChatMsg): Promise<void> {
     this.ui.openChat('#cphNgRunTestCases ');
   }
 }

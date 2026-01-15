@@ -24,7 +24,9 @@ import type { ToggleDisableMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class ToggleDisable extends BaseProblemUseCase<ToggleDisableMsg> {
-  constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
+  public constructor(
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+  ) {
     super(repo);
   }
 

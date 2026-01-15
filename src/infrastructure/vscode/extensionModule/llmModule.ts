@@ -29,7 +29,7 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class LlmModule implements IExtensionModule {
-  constructor(
+  public constructor(
     @inject(TOKENS.logger) private readonly logger: ILogger,
     private readonly tcRunner: LlmTcRunner,
     private readonly dataInspector: LlmDataInspector,

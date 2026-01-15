@@ -35,7 +35,7 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class CommandModule implements IExtensionModule {
-  constructor(
+  public constructor(
     @inject(TOKENS.activePathService) private readonly activePath: IActivePathService,
     @inject(TOKENS.cphMigrationService) private readonly cph: ICphMigrationService,
     @inject(TOKENS.extensionPath) private readonly extPath: string,
@@ -62,7 +62,7 @@ export class CommandModule implements IExtensionModule {
     return problemId;
   }
 
-  setup(context: ExtensionContext) {
+  public setup(context: ExtensionContext) {
     const cmdMap: Record<string, () => Promise<void>> = {
       'cph-ng.versionInfo': () => this.showVersionInfo(),
       'cph-ng.importFromCph': () => this.handleBatchImport(),

@@ -24,22 +24,22 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class FileSystemAdapter implements IFileSystem {
-  constructor(@inject(TOKENS.path) private readonly path: IPath) {}
+  public constructor(@inject(TOKENS.path) private readonly path: IPath) {}
 
-  async readRawFile(path: string): Promise<Buffer<ArrayBuffer>> {
+  public async readRawFile(path: string): Promise<Buffer<ArrayBuffer>> {
     return readFile(path);
   }
 
-  async readFile(path: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
+  public async readFile(path: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
     return readFile(path, { encoding });
   }
 
-  async safeWriteFile(path: string, data: string | Uint8Array): Promise<void> {
+  public async safeWriteFile(path: string, data: string | Uint8Array): Promise<void> {
     await mkdir(this.path.dirname(path), { recursive: true });
     await writeFile(path, data);
   }
 
-  async exists(path: string): Promise<boolean> {
+  public async exists(path: string): Promise<boolean> {
     try {
       await access(path);
       return true;
@@ -48,15 +48,17 @@ export class FileSystemAdapter implements IFileSystem {
     }
   }
 
-  async mkdir(path: string): Promise<void> {
+  public async mkdir(path: string): Promise<void> {
     await mkdir(path, { recursive: true });
   }
 
-  async readdir(path: string): Promise<string[]> {
+  public async readdir(path: string): Promise<string[]> {
     return readdir(path);
   }
 
-  async stat(path: string): Promise<{ size: number; isFile(): boolean; isDirectory(): boolean }> {
+  public async stat(
+    path: string,
+  ): Promise<{ size: number; isFile(): boolean; isDirectory(): boolean }> {
     const stats = await stat(path);
     return {
       size: stats.size,
@@ -65,11 +67,11 @@ export class FileSystemAdapter implements IFileSystem {
     };
   }
 
-  async rm(path: string, options?: RmOptions): Promise<void> {
+  public async rm(path: string, options?: RmOptions): Promise<void> {
     await rm(path, options);
   }
 
-  async walk(path: string): Promise<string[]> {
+  public async walk(path: string): Promise<string[]> {
     const entries = await readdir(path, { withFileTypes: true });
     const files = await Promise.all(
       entries.map((entry) => {

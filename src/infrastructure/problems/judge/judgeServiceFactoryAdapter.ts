@@ -24,12 +24,12 @@ import type { Problem } from '@/domain/entities/problem';
 
 @injectable()
 export class JudgeServiceFactory implements IJudgeServiceFactory {
-  constructor(
+  public constructor(
     @inject(TraditionalJudgeService) private standard: TraditionalJudgeService,
     @inject(InteractiveJudgeService) private interactive: InteractiveJudgeService,
   ) {}
 
-  create(problem: Problem): IJudgeService {
+  public create(problem: Problem): IJudgeService {
     if (problem.interactor) return this.interactive;
     return this.standard;
   }

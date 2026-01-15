@@ -30,7 +30,7 @@ import { type FilePair, TcMatcher } from '@/domain/services/TcMatcher';
 
 @injectable()
 export class TcScanner {
-  constructor(
+  public constructor(
     @inject(TOKENS.archive) private readonly archive: IArchive,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.path) private readonly path: IPath,

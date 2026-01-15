@@ -27,7 +27,7 @@ import { WrapperStrategy } from '@/infrastructure/problems/judge/runner/strategi
 
 @injectable()
 export class ExecutionStrategyFactoryAdapter implements IExecutionStrategyFactory {
-  constructor(
+  public constructor(
     @inject(ExternalRunnerStrategy) private external: ExternalRunnerStrategy,
     @inject(WrapperStrategy) private wrapper: WrapperStrategy,
     @inject(NormalStrategy) private normal: NormalStrategy,

@@ -28,7 +28,7 @@ export class LangC extends AbstractLanguageStrategy {
   public override readonly enableRunner = true;
   public override readonly defaultValues;
 
-  constructor(
+  public constructor(
     @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
     @inject(TOKENS.logger) protected readonly logger: ILogger,
     @inject(TOKENS.path) protected readonly path: IPath,

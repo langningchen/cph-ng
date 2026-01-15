@@ -42,7 +42,7 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class UiAdapter implements IUi {
-  constructor(
+  public constructor(
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.translator) private readonly translator: ITranslator,

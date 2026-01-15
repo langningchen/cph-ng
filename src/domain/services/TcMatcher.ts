@@ -28,7 +28,7 @@ export interface FilePair {
 
 @injectable()
 export class TcMatcher {
-  constructor(
+  public constructor(
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.path) private readonly path: IPath,
   ) {}

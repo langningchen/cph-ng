@@ -24,7 +24,9 @@ import type { RemoveSrcFileMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class RemoveSrcFile extends BaseProblemUseCase<RemoveSrcFileMsg> {
-  constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
+  public constructor(
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+  ) {
     super(repo);
   }
 

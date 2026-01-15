@@ -22,32 +22,32 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class LoggerAdapter implements ILogger {
-  constructor(
+  public constructor(
     @inject(TOKENS.logOutputChannel) private readonly logger: LogOutputChannel,
     private readonly module = 'base',
   ) {}
 
-  info(message: string, ...args: unknown[]): void {
+  public info(message: string, ...args: unknown[]): void {
     this.logger.info(`[${this.module}]`, message, ...args);
   }
 
-  warn(message: string, ...args: unknown[]): void {
+  public warn(message: string, ...args: unknown[]): void {
     this.logger.warn(`[${this.module}]`, message, ...args);
   }
 
-  error(message: string, ...args: unknown[]): void {
+  public error(message: string, ...args: unknown[]): void {
     this.logger.error(`[${this.module}]`, message, ...args);
   }
 
-  debug(message: string, ...args: unknown[]): void {
+  public debug(message: string, ...args: unknown[]): void {
     this.logger.debug(`[${this.module}]`, message, ...args);
   }
 
-  trace(message: string, ...args: unknown[]): void {
+  public trace(message: string, ...args: unknown[]): void {
     this.logger.trace(`[${this.module}]`, message, ...args);
   }
 
-  withScope(module: string): ILogger {
+  public withScope(module: string): ILogger {
     return new LoggerAdapter(this.logger, module);
   }
 }

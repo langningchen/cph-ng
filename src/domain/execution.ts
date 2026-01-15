@@ -32,7 +32,7 @@ export interface ExecutionData {
 }
 
 export class ExecutionRejected extends Error {
-  constructor(message: string) {
+  public constructor(message: string) {
     super(message);
     this.name = 'ExecutionRejected';
   }
@@ -40,7 +40,7 @@ export class ExecutionRejected extends Error {
 
 export type ExecutionResult = ExecutionData | ExecutionRejected | Error;
 
-export interface InteractiveExecutionData {
+interface InteractiveExecutionData {
   sol: ExecutionData;
   int: ExecutionData;
   feedbackPath: string;

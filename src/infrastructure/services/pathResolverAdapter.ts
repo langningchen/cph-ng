@@ -36,7 +36,7 @@ import type { Problem } from '@/domain/entities/problem';
 
 @injectable()
 export class PathResolverAdapter implements IPathResolver {
-  constructor(
+  public constructor(
     @inject(TOKENS.extensionPath) private readonly extPath: string,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.logger) private readonly logger: ILogger,

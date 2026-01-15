@@ -30,7 +30,7 @@ export class TempStorageAdapter implements ITempStorage {
   private freePool: Set<string> = new Set();
   private monitorInterval: NodeJS.Timeout | undefined;
 
-  constructor(
+  public constructor(
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.logger) private readonly logger: ILogger,
@@ -40,7 +40,7 @@ export class TempStorageAdapter implements ITempStorage {
     this.logger = this.logger.withScope('cache');
   }
 
-  async startMonitor(): Promise<void> {
+  public async startMonitor(): Promise<void> {
     if (this.monitorInterval) {
       return;
     }
@@ -54,7 +54,7 @@ export class TempStorageAdapter implements ITempStorage {
     this.logger.info('Cache monitor started');
   }
 
-  create(description: string): string {
+  public create(description: string): string {
     let path = this.freePool.values().next().value;
     if (path) {
       this.freePool.delete(path);

@@ -40,43 +40,43 @@ export const WebviewEventName = {
   NO_PROBLEM: 'NO_PROBLEM',
 } as const;
 export type WebviewEventName = (typeof WebviewEventName)[keyof typeof WebviewEventName];
-export interface WebviewFullProblemEvent {
+interface WebviewFullProblemEvent {
   name: typeof WebviewEventName.FULL_PROBLEM;
   problemId: UUID;
   payload: IWebviewProblem;
 }
-export interface WebviewPatchMetaEvent {
+interface WebviewPatchMetaEvent {
   name: typeof WebviewEventName.PATCH_META;
   problemId: UUID;
   payload: WebviewProblemMetaPayload;
 }
-export interface WebviewPatchBfCompareEvent {
+interface WebviewPatchBfCompareEvent {
   name: typeof WebviewEventName.PATCH_BF_COMPARE;
   problemId: UUID;
   payload: Partial<IWebviewBfCompare>;
 }
-export interface WebviewPatchTcEvent {
+interface WebviewPatchTcEvent {
   name: typeof WebviewEventName.PATCH_TC;
   problemId: UUID;
   tcId: UUID;
   payload: Partial<IWebviewTc>;
 }
-export interface WebviewPatchTcResultEvent {
+interface WebviewPatchTcResultEvent {
   name: typeof WebviewEventName.PATCH_TC_RESULT;
   problemId: UUID;
   tcId: UUID;
   payload: Partial<IWebviewTcResult>;
 }
-export interface WebviewDeleteTcEvent {
+interface WebviewDeleteTcEvent {
   name: typeof WebviewEventName.DELETE_TC;
   problemId: UUID;
   tcId: UUID;
 }
-export interface WebviewBackgroundEvent {
+interface WebviewBackgroundEvent {
   name: typeof WebviewEventName.BACKGROUND;
   payload: IWebviewBackgroundProblem[];
 }
-export interface WebviewNoProblemEvent {
+interface WebviewNoProblemEvent {
   name: typeof WebviewEventName.NO_PROBLEM;
   canImport: boolean;
 }

@@ -20,9 +20,9 @@ import type { IProblemRepository } from '@/application/ports/problems/IProblemRe
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 export abstract class BaseProblemUseCase<T extends { problemId: UUID }> {
-  constructor(protected readonly repo: IProblemRepository) {}
+  public constructor(protected readonly repo: IProblemRepository) {}
 
-  async exec(msg: T): Promise<void> {
+  public async exec(msg: T): Promise<void> {
     const backgroundProblem = await this.repo.get(msg.problemId);
     if (!backgroundProblem) throw new Error('Problem not found');
     await this.performAction(backgroundProblem, msg);

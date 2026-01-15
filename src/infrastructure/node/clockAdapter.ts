@@ -18,7 +18,7 @@
 import type { IClock } from '@/application/ports/node/IClock';
 
 export class ClockAdapter implements IClock {
-  now(): number {
+  public now(): number {
     return Date.now();
   }
 }

@@ -33,7 +33,7 @@ import type { IWebviewBackgroundProblem } from '@/domain/webviewTypes';
 export class ProblemRepository implements IProblemRepository {
   private backgroundProblems: Map<UUID, BackgroundProblem> = new Map();
 
-  constructor(
+  public constructor(
     @inject(TOKENS.clock) private readonly clock: IClock,
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.logger) private readonly logger: ILogger,
@@ -59,7 +59,7 @@ export class ProblemRepository implements IProblemRepository {
     this.eventBus.background(backgroundProblems);
   }
 
-  async loadByPath(srcPath: string, allowCreate = true): Promise<UUID | null> {
+  public async loadByPath(srcPath: string, allowCreate = true): Promise<UUID | null> {
     let problem = await this.problemService.loadBySrc(srcPath);
     if (!problem) {
       if (!allowCreate) {
@@ -83,18 +83,18 @@ export class ProblemRepository implements IProblemRepository {
     return problemId;
   }
 
-  async get(problemId?: UUID): Promise<BackgroundProblem | undefined> {
+  public async get(problemId?: UUID): Promise<BackgroundProblem | undefined> {
     if (!problemId) return undefined;
     return this.backgroundProblems.get(problemId);
   }
 
-  async getIdByPath(srcPath: string): Promise<UUID | undefined> {
+  public async getIdByPath(srcPath: string): Promise<UUID | undefined> {
     for (const [problemId, fullProblem] of this.backgroundProblems.entries())
       if (fullProblem.problem.isRelated(srcPath)) return problemId;
     return undefined;
   }
 
-  async persist(problemId: UUID): Promise<boolean> {
+  public async persist(problemId: UUID): Promise<boolean> {
     const fullProblem = this.backgroundProblems.get(problemId);
     if (!fullProblem || fullProblem.ac) return false;
     fullProblem.addTimeElapsed(this.clock.now());

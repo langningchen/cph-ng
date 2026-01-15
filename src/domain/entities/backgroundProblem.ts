@@ -21,13 +21,13 @@ import type { Problem } from '@/domain/entities/problem';
 export class BackgroundProblem {
   private _ac: AbortController | null = null;
 
-  constructor(
+  public constructor(
     public readonly id: UUID,
     public problem: Problem,
     private startTime: number,
   ) {}
 
-  set ac(value: AbortController) {
+  public set ac(value: AbortController) {
     this._ac?.abort();
     this._ac = value;
   }

@@ -38,7 +38,7 @@ import type {
 
 @injectable()
 export class WebviewProblemMapper {
-  constructor(
+  public constructor(
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,

@@ -29,7 +29,7 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class CheckerRunnerAdapter implements ICheckerRunner {
-  constructor(
+  public constructor(
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,

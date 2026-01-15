@@ -32,7 +32,7 @@ export class ActiveProblemCoordinator {
   private activeProblemId: UUID | null = null;
   private lastAccessMap: Map<UUID, number> = new Map();
 
-  constructor(
+  public constructor(
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
     @inject(TOKENS.extensionContext) private readonly context: IExtensionContext,

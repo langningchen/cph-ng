@@ -27,7 +27,7 @@ import type { ActiveProblemCoordinator } from '@/infrastructure/services/activeP
 
 @injectable()
 export class EditorWatcherModule implements IExtensionModule {
-  constructor(
+  public constructor(
     @inject(TOKENS.activePathService) private readonly activePathService: IActivePathService,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     private readonly coordinator: ActiveProblemCoordinator,

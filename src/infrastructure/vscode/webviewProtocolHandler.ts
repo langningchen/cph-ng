@@ -50,7 +50,7 @@ import { UpdateTc } from '@/application/useCases/webview/UpdateTc';
 import { TOKENS } from '@/composition/tokens';
 import type { WebviewMsg } from '@/webview/src/msgs';
 
-export const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<WebviewMsg>>> = {
+const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<WebviewMsg>>> = {
   addTc: AddTc,
   chooseSrcFile: ChooseSrcFile,
   chooseTcFile: ChooseTcFile,
@@ -83,7 +83,7 @@ export const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHand
 
 @injectable()
 export class WebviewProtocolHandler {
-  constructor(
+  public constructor(
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
   ) {

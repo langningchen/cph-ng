@@ -26,7 +26,7 @@ import type { ChooseSrcFileMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class ChooseSrcFile extends BaseProblemUseCase<ChooseSrcFileMsg> {
-  constructor(
+  public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.ui) private readonly ui: IUi,
     @inject(TOKENS.translator) private readonly translator: ITranslator,

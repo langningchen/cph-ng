@@ -37,38 +37,38 @@ export interface BfCompareEvents {
 export class BfCompare {
   public readonly signals: EventEmitter<BfCompareEvents> = new EventEmitter();
 
-  constructor(
+  public constructor(
     private _generator?: IFileWithHash,
     private _bruteForce?: IFileWithHash,
     private _cnt: number = 0,
     private _state: BfCompareState = BfCompareState.inactive,
   ) {}
 
-  get generator(): IFileWithHash | undefined {
+  public get generator(): IFileWithHash | undefined {
     return this._generator;
   }
-  set generator(value: IFileWithHash | undefined) {
+  public set generator(value: IFileWithHash | undefined) {
     this._generator = value;
     this.signals.emit('change', { generator: value });
   }
-  get bruteForce(): IFileWithHash | undefined {
+  public get bruteForce(): IFileWithHash | undefined {
     return this._bruteForce;
   }
-  set bruteForce(value: IFileWithHash | undefined) {
+  public set bruteForce(value: IFileWithHash | undefined) {
     this._bruteForce = value;
     this.signals.emit('change', { bruteForce: value });
   }
-  get state(): BfCompareState {
+  public get state(): BfCompareState {
     return this._state;
   }
-  get cnt(): number {
+  public get cnt(): number {
     return this._cnt;
   }
-  set state(value: BfCompareState) {
+  public set state(value: BfCompareState) {
     this._state = value;
     this.signals.emit('change', { state: value });
   }
-  get isRunning(): boolean {
+  public get isRunning(): boolean {
     return (
       this.state === BfCompareState.compiling ||
       this.state === BfCompareState.generating ||

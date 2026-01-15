@@ -21,31 +21,31 @@ import type { IPath } from '@/application/ports/node/IPath';
 
 @injectable()
 export class PathAdapter implements IPath {
-  normalize(path: string): string {
+  public normalize(path: string): string {
     return normalize(path);
   }
 
-  join(...paths: string[]): string {
+  public join(...paths: string[]): string {
     return join(...paths);
   }
 
-  dirname(path: string): string {
+  public dirname(path: string): string {
     return dirname(path);
   }
 
-  basename(path: string, suffix?: string): string {
+  public basename(path: string, suffix?: string): string {
     return basename(path, suffix);
   }
 
-  extname(path: string): string {
+  public extname(path: string): string {
     return extname(path);
   }
 
-  resolve(...paths: string[]): string {
+  public resolve(...paths: string[]): string {
     return resolve(...paths);
   }
 
-  relative(from: string, to: string): string {
+  public relative(from: string, to: string): string {
     return relative(from, to);
   }
 }

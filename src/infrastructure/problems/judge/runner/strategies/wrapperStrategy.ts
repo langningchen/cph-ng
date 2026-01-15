@@ -31,7 +31,7 @@ interface WrapperData {
 
 @injectable()
 export class WrapperStrategy implements IExecutionStrategy {
-  constructor(
+  public constructor(
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
@@ -41,7 +41,7 @@ export class WrapperStrategy implements IExecutionStrategy {
     this.logger = this.logger.withScope('WrapperStrategy');
   }
 
-  async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
+  public async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
     const reportPath = this.tmp.create('wrapperStrategy.reportPath');
     const res = await this.executor.execute({
       cmd: ctx.cmd,

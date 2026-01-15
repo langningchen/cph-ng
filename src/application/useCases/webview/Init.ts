@@ -21,9 +21,9 @@ import type { InitMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class Init {
-  constructor(private readonly coordinator: ActiveProblemCoordinator) {}
+  public constructor(private readonly coordinator: ActiveProblemCoordinator) {}
 
-  async exec(_msg: InitMsg): Promise<void> {
+  public async exec(_msg: InitMsg): Promise<void> {
     await this.coordinator.dispatchFullData();
   }
 }

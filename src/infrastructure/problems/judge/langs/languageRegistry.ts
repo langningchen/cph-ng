@@ -7,14 +7,14 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class LanguageRegistry implements ILanguageRegistry {
-  constructor(
+  public constructor(
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @injectAll(TOKENS.languageStrategy) private readonly langs: ILanguageStrategy[],
   ) {
     this.logger = logger.withScope('LanguageRegistry');
   }
 
-  getLang(filePath: string): ILanguageStrategy | undefined {
+  public getLang(filePath: string): ILanguageStrategy | undefined {
     const ext = extname(filePath).toLowerCase().slice(1);
     const lang = this.langs.find((lang) => lang.extensions.includes(ext));
     if (lang) this.logger.debug('Detected language for', { filePath, lang: lang.name });

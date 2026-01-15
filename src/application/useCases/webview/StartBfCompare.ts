@@ -40,7 +40,7 @@ import type { StartBfCompareMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class StartBfCompare extends BaseProblemUseCase<StartBfCompareMsg> {
-  constructor(
+  public constructor(
     @inject(TOKENS.compilerService) private readonly compiler: ICompilerService,
     @inject(TOKENS.judgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,

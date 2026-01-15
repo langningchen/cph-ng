@@ -35,14 +35,14 @@ export interface ILanguageDefaultValues {
 }
 
 export class CompileError extends Error {
-  constructor(message: string) {
+  public constructor(message: string) {
     super(message);
     this.name = 'CompileError';
   }
 }
 
 export class CompileRejected extends Error {
-  constructor(message: string) {
+  public constructor(message: string) {
     super(message);
     this.name = 'CompileRejected';
   }

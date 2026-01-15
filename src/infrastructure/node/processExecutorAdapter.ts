@@ -50,7 +50,7 @@ interface LaunchResult {
 
 @injectable()
 export class ProcessExecutorAdapter implements IProcessExecutor {
-  constructor(
+  public constructor(
     @inject(TOKENS.clock) private readonly clock: IClock,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,

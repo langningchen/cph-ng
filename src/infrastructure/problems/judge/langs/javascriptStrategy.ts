@@ -34,7 +34,7 @@ export class LangJavascript extends AbstractLanguageStrategy {
   public override readonly extensions = ['js'];
   public override readonly defaultValues;
 
-  constructor(
+  public constructor(
     @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
     @inject(TOKENS.logger) protected readonly logger: ILogger,
     @inject(TOKENS.settings) protected readonly settings: ISettings,

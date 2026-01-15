@@ -20,19 +20,19 @@ import { cwd } from 'node:process';
 import type { ISystem, SystemPlatform } from '@/application/ports/node/ISystem';
 
 export class SystemAdapter implements ISystem {
-  cwd(): string {
+  public cwd(): string {
     return cwd();
   }
-  tmpdir(): string {
+  public tmpdir(): string {
     return tmpdir();
   }
-  homedir(): string {
+  public homedir(): string {
     return homedir();
   }
-  platform(): SystemPlatform {
+  public platform(): SystemPlatform {
     return platform() as SystemPlatform;
   }
-  release(): string {
+  public release(): string {
     return release();
   }
 }

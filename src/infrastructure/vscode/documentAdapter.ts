@@ -33,7 +33,7 @@ export class DocumentAdapter implements IDocument {
     });
   };
 
-  async save(path: string): Promise<void> {
+  public async save(path: string): Promise<void> {
     const editor = window.visibleTextEditors.find((editor) => editor.document.fileName === path);
     if (editor) {
       await editor.document.save();

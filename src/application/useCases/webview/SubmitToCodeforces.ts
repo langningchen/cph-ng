@@ -25,7 +25,9 @@ import type { SubmitToCodeforcesMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class SubmitToCodeforces extends BaseProblemUseCase<SubmitToCodeforcesMsg> {
-  constructor(@inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository) {
+  public constructor(
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+  ) {
     super(repo);
   }
 

@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface TestCaseVerdict {
+interface TestCaseVerdict {
   name: string;
   fullName: string;
   color: string;
 }
 
-export type TestCaseIO = { useFile: true; path: string } | { useFile: false; data: string };
+type TestCaseIO = { useFile: true; path: string } | { useFile: false; data: string };
 
-export interface TestCaseResult {
+interface TestCaseResult {
   verdict: TestCaseVerdict;
   time: number;
   stdout: TestCaseIO;
@@ -31,7 +31,7 @@ export interface TestCaseResult {
   message: string;
 }
 
-export interface TestCase {
+interface TestCase {
   stdin: TestCaseIO;
   answer: TestCaseIO;
   isExpand: boolean;

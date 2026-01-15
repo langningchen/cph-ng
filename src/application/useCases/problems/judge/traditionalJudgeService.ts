@@ -12,7 +12,7 @@ import type { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/res
 
 @injectable()
 export class TraditionalJudgeService implements IJudgeService {
-  constructor(
+  public constructor(
     @inject(TOKENS.resultEvaluator) private readonly evaluator: ResultEvaluatorAdaptor,
     @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,

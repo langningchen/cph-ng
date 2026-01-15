@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface TCVerdict {
+interface TCVerdict {
   name: string;
   fullName: string;
   color: string;
 }
 
-export type TCIO = { useFile: true; path: string } | { useFile: false; data: string };
+type TCIO = { useFile: true; path: string } | { useFile: false; data: string };
 
-export interface TCResult {
+interface TCResult {
   verdict: TCVerdict;
   memory?: number;
   time: number;
@@ -32,26 +32,26 @@ export interface TCResult {
   msg: string;
 }
 
-export interface TC {
+interface TC {
   stdin: TCIO;
   answer: TCIO;
   isExpand: boolean;
   result?: TCResult;
 }
 
-export interface FileWithHash {
+interface FileWithHash {
   path: string;
   hash?: string;
 }
 
-export interface BFCompare {
+interface BFCompare {
   generator?: FileWithHash;
   bruteForce?: FileWithHash;
   running: boolean;
   msg: string;
 }
 
-export interface CompilationSettings {
+interface CompilationSettings {
   compiler?: string;
   compilerArgs?: string;
   runner?: string;
