@@ -6,16 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": [
-      "src/application/**",
-      "src/composition/**",
-      "src/domain/**",
-      "src/infrastructure/**",
-      "src/webview/**",
-      "tests/**",
-      "scripts/**",
-      "src/types/types.backend.ts"
-    ]
+    "includes": ["src/**", "!src/ai", "!src/modules", "tests/**", "scripts/**"]
   },
   "formatter": {
     "enabled": true,

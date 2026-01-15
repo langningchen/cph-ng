@@ -42,4 +42,7 @@ export interface ISystem {
    * @returns The platform identifier.
    */
   platform(): SystemPlatform;
+
+  /** Returns the operating system as a string. */
+  release(): string;
 }

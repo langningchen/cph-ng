@@ -6,7 +6,7 @@ import { container } from 'tsyringe';
 import Io from '@/helpers/io';
 import Logger from '@/helpers/logger';
 import Settings from '@/helpers/settings';
-import UserScriptManager from '@/helpers/userScriptManager';
+import UserScriptManager from '@/modules/companion/userScriptManager';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/domain/types';
 import { mkdirIfNotExists } from '@/utils/process';

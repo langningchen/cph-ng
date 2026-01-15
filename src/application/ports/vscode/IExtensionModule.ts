@@ -15,17 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { existsSync } from 'fs';
-import { mkdir } from 'fs/promises';
+import type { ExtensionContext } from 'vscode';
 
-export const mkdirIfNotExists = async (path: string): Promise<void> => {
-  try {
-    if (!existsSync(path)) {
-      await mkdir(path, { recursive: true });
-    }
-  } catch (e) {
-    throw new Error(
-      `Failed to create directory at ${path}: ${(e as Error).message}`,
-    );
-  }
-};
+export interface IExtensionModule {
+  setup(context: ExtensionContext): Promise<void> | void;
+  dispose?(): void;
+}

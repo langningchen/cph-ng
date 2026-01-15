@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { homedir, platform, tmpdir } from 'node:os';
+import { homedir, platform, release, tmpdir } from 'node:os';
 import { cwd } from 'node:process';
 import type { ISystem, SystemPlatform } from '@/application/ports/node/ISystem';
 
@@ -31,5 +31,8 @@ export class SystemAdapter implements ISystem {
   }
   platform(): SystemPlatform {
     return platform() as SystemPlatform;
+  }
+  release(): string {
+    return release();
   }
 }

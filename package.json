@@ -725,18 +725,6 @@
         "icon": "$(stop-circle)"
       },
       {
-        "command": "cph-ng.addTestCase",
-        "title": "%cph-ng.commands.addTestCase%"
-      },
-      {
-        "command": "cph-ng.loadTestCases",
-        "title": "%cph-ng.commands.loadTestCases%"
-      },
-      {
-        "command": "cph-ng.deleteProblem",
-        "title": "%cph-ng.commands.deleteProblem%"
-      },
-      {
         "command": "cph-ng.submitToCodeforces",
         "title": "%cph-ng.commands.submitToCodeforces%"
       }

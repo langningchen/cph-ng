@@ -21,6 +21,7 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
 import type { TcScanner } from '@/domain/services/TcScanner';
@@ -35,11 +36,16 @@ export class DragDrop {
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.activePathService) private readonly activePath: IActivePathService,
     private readonly tcScanner: TcScanner,
   ) {}
 
   async exec(msg: DragDropMsg): Promise<void> {
-    const fullProblem = await this.repo.get(msg.activePath, true);
+    const activePath = this.activePath.getActivePath();
+    if (!activePath) throw new Error('Active path is required');
+    const problemId = await this.repo.loadByPath(activePath, true);
+    if (!problemId) throw new Error('Could not load or create problem');
+    const fullProblem = await this.repo.get(problemId);
     if (!fullProblem) throw new Error('Problem not found');
     const { problem } = fullProblem;
 
@@ -65,7 +71,5 @@ export class DragDrop {
         problem.addTc(this.crypto.randomUUID(), tc);
       }
     }
-
-    await this.repo.dataRefresh();
   }
 }

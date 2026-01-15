@@ -17,8 +17,18 @@
 
 import 'reflect-metadata';
 import { install } from 'source-map-support';
-import ExtensionManager from './modules/extensionManager';
+import { container } from 'tsyringe';
+import type { ExtensionContext } from 'vscode';
+import { setupContainer } from '@/composition/container';
+import { ExtensionManager } from '@/infrastructure/vscode/extensionManager';
 
 install();
-export const activate = ExtensionManager.activate;
-export const deactivate = ExtensionManager.deactivate;
+export const activate = async (context: ExtensionContext) => {
+  await setupContainer(context);
+  const extensionManager = container.resolve(ExtensionManager);
+  await extensionManager.activate(context);
+};
+export const deactivate = async () => {
+  const extensionManager = container.resolve(ExtensionManager);
+  await extensionManager.deactivate();
+};

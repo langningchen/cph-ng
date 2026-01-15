@@ -22,6 +22,7 @@ import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ILanguageDefaultValues } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import type { IOverrides } from '@/domain/types';
@@ -40,8 +41,17 @@ export class LangJavascript extends AbstractLanguageStrategy {
     @inject(TOKENS.translator) protected readonly translator: ITranslator,
     @inject(TOKENS.processExecutor) protected readonly processExecutor: IProcessExecutor,
     @inject(TOKENS.tempStorage) protected readonly tmp: ITempStorage,
+    @inject(TOKENS.telemetry) protected readonly telemetry: ITelemetry,
   ) {
-    super(fs, logger.withScope('langsJavascript'), settings, translator, processExecutor, tmp);
+    super(
+      fs,
+      logger.withScope('langsJavascript'),
+      settings,
+      translator,
+      processExecutor,
+      tmp,
+      telemetry,
+    );
     this.logger = this.logger.withScope('langsJavascript');
     this.defaultValues = {
       runner: this.settings.compilation.javascriptRunner,

@@ -31,7 +31,7 @@ import {
 import { createContext, Script } from 'vm';
 import { l10n, window } from 'vscode';
 import { renderWorkspacePath } from '@/utils/strTemplate';
-import type { CompanionProblem } from '../modules/companion';
+import type { CompanionProblem } from '.';
 import FolderChooser from './folderChooser';
 import Io from './io';
 import Logger from './logger';

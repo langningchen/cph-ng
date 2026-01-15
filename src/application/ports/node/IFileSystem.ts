@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { RmOptions } from 'node:fs';
+
 /**
  * Interface for file system operations.
  * @see {@link https://nodejs.org/api/fs.html | Node.js File System API}
@@ -55,7 +57,7 @@ export interface IFileSystem {
   stat(path: string): Promise<{ size: number; isFile(): boolean; isDirectory(): boolean }>;
 
   /** Removes a file. */
-  rm(path: string): Promise<void>;
+  rm(path: string, options?: RmOptions): Promise<void>;
 
   /** Walks through a directory. */
   walk(path: string): Promise<string[]>;

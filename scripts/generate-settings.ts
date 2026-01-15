@@ -169,7 +169,6 @@ const generateAdapter = (sections: Section[]) => {
   const imports = [
     `import { injectable, inject } from 'tsyringe';`,
     `import { ConfigurationTarget, workspace } from 'vscode';`,
-    `import { renderPath } from '@/utils/strTemplate';`,
     `import { TOKENS } from '@/composition/tokens';`,
     `import type { ILogger } from '@/application/ports/vscode/ILogger';`,
     `import type { `,
@@ -207,7 +206,7 @@ const generateAdapter = (sections: Section[]) => {
     `export class SettingsAdapter implements ISettings {`,
     sections.map((s) => `  public readonly ${s.name}: ${s.className};`).join('\n'),
     ``,
-    `  constructor(@inject(TOKENS.Logger) logger: ILogger) {`,
+    `  constructor(@inject(TOKENS.logger) logger: ILogger) {`,
     sections.map((s) => `    this.${s.name} = new ${s.className}(logger);`).join('\n'),
     `  }`,
     `}`,

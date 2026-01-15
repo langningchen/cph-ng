@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Problem } from '@/domain/types';
+import type { Problem } from '@/domain/entities/problem';
 import { Server } from './server';
 import { Submitter } from './submitter';
 

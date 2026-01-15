@@ -13,10 +13,9 @@ import {
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IFileWithHash, IOverrides } from '@/domain/types';
-import { CompilationIo } from '@/helpers/io';
-import { telemetry } from '@/utils/global';
 
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
   canUseWrapper: false,
@@ -35,6 +34,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     protected readonly translator: ITranslator,
     protected readonly processExecutor: IProcessExecutor,
     protected readonly tmp: ITempStorage,
+    protected readonly telemetry: ITelemetry,
   ) {}
 
   public async compile(
@@ -47,7 +47,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     CompilationIo.clear();
 
     try {
-      const compileEnd = telemetry.start('compile', {
+      const compileEnd = this.telemetry.start('compile', {
         lang: this.name,
         forceCompile: forceCompile ? 'auto' : String(forceCompile),
       });
@@ -60,7 +60,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     } catch (e) {
       this.logger.error('Compilation failed', e);
       CompilationIo.append((e as Error).message);
-      telemetry.error('compileError', e);
+      this.telemetry.error('compileError', e);
       return e as Error;
     }
   }

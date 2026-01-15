@@ -12,6 +12,7 @@ import type {
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import type { IFileWithHash } from '@/domain/types';
@@ -38,8 +39,9 @@ export class LangCpp extends AbstractLanguageStrategy {
     @inject(TOKENS.system) private readonly sys: ISystem,
     @inject(TOKENS.translator) protected readonly translator: ITranslator,
     @inject(TOKENS.tempStorage) protected readonly tmp: ITempStorage,
+    @inject(TOKENS.telemetry) protected readonly telemetry: ITelemetry,
   ) {
-    super(fs, logger.withScope('langsCpp'), settings, translator, processExecutor, tmp);
+    super(fs, logger.withScope('langsCpp'), settings, translator, processExecutor, tmp, telemetry);
     this.logger = this.logger.withScope('langsCpp');
     this.defaultValues = {
       compiler: this.settings.compilation.cppCompiler,

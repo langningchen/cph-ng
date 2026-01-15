@@ -15,22 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { inject, injectable } from 'tsyringe';
-import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import { injectable } from 'tsyringe';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
-import { TOKENS } from '@/composition/tokens';
-import type { CreateProblemMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class CreateProblem {
-  constructor(
-    @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
-    @inject(TOKENS.activePathService) private readonly activePath: IActivePathService,
-  ) {}
+export class ActivePathService implements IActivePathService {
+  private _activePath: string | undefined;
 
-  async exec(_msg: CreateProblemMsg): Promise<void> {
-    const activePath = this.activePath.getActivePath();
-    if (!activePath) throw new Error('Active path is required');
-    await this.repo.loadByPath(activePath, true);
+  public getActivePath(): string | undefined {
+    return this._activePath;
+  }
+
+  public setActivePath(path: string | undefined): void {
+    this._activePath = path;
   }
 }

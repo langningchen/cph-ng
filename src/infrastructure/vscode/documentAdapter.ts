@@ -17,14 +17,27 @@
 
 import { window } from 'vscode';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
-import { waitUntil } from '@/utils/global';
 
 export class DocumentAdapter implements IDocument {
+  private waitUntil = async (check: () => boolean) => {
+    return new Promise<void>((resolve, _reject) => {
+      if (check()) {
+        resolve();
+      }
+      const intervalId = setInterval(() => {
+        if (check()) {
+          clearInterval(intervalId);
+          resolve();
+        }
+      }, 50);
+    });
+  };
+
   async save(path: string): Promise<void> {
     const editor = window.visibleTextEditors.find((editor) => editor.document.fileName === path);
     if (editor) {
       await editor.document.save();
-      await waitUntil(() => !editor.document.isDirty);
+      await this.waitUntil(() => !editor.document.isDirty);
     }
   }
 }
