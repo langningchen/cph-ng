@@ -24,6 +24,8 @@ import type * as History from '@/application/ports/problems/history';
 import type { IProblemMigrationService } from '@/application/ports/problems/IProblemMigrationService';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
+import { BfCompareState } from '@/domain/entities/bfCompare';
+import type { VerdictName } from '@/domain/entities/verdict';
 
 @injectable()
 export class ProblemMigrationService implements IProblemMigrationService {
@@ -35,7 +37,60 @@ export class ProblemMigrationService implements IProblemMigrationService {
   }
 
   private readonly migrateFunctions: Record<string, (oldProblem: any) => any> = {
-    '0.4.8': (_: History.Problem_0_4_8): null => null,
+    '0.6.0': (_: History.Problem_0_6_0): null => null,
+    '0.4.8': (problem: History.Problem_0_4_8): History.Problem_0_6_0 => {
+      const tcs: History.Problem_0_6_0['tcs'] = new Map();
+      for (const id of problem.tcOrder) {
+        const tc = problem.tcs[id];
+        const migrateTcIo = (tcIo: History.TcIo_0_4_8): History.TcIo_0_6_0 => {
+          if (tcIo.useFile) return { path: tcIo.data };
+          return { data: tcIo.data };
+        };
+        if (tc)
+          tcs.set(id, {
+            stdin: migrateTcIo(tc.stdin),
+            answer: migrateTcIo(tc.answer),
+            isExpand: tc.isExpand,
+            isDisabled: tc.isDisabled,
+            result: tc.result
+              ? {
+                  verdict: tc.result.verdict.name as VerdictName,
+                  timeMs: tc.result.time,
+                  memoryMb: tc.result.memory,
+                  stdout: migrateTcIo(tc.result.stdout),
+                  stderr: migrateTcIo(tc.result.stderr),
+                  msg: tc.result.msg.join('\n'),
+                }
+              : undefined,
+          });
+      }
+
+      return {
+        version: '0.6.0',
+        name: problem.name,
+        url: problem.url,
+        tcs,
+        tcOrder: problem.tcOrder,
+        src: problem.src,
+        checker: problem.checker,
+        interactor: problem.interactor,
+        bfCompare: {
+          generator: problem.bfCompare?.generator,
+          bruteForce: problem.bfCompare?.bruteForce,
+          cnt: 0,
+          state: BfCompareState.inactive,
+        },
+        timeElapsedMs: problem.timeElapsed,
+        overrides: {
+          timeLimitMs: problem.timeLimit,
+          memoryLimitMb: problem.memoryLimit,
+          compiler: problem.compilationSettings?.compiler,
+          compilerArgs: problem.compilationSettings?.compilerArgs,
+          runner: problem.compilationSettings?.runner,
+          runnerArgs: problem.compilationSettings?.runnerArgs,
+        },
+      };
+    },
     '0.4.3': (problem: History.Problem_0_4_3): History.Problem_0_4_8 => {
       return {
         ...problem,

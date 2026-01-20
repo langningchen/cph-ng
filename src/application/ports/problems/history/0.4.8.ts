@@ -1,4 +1,4 @@
-// Copyright (C) 2026 Langning Chen
+// Copyright (C) 2025 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -16,20 +16,27 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { UUID } from 'node:crypto';
-import type { BfCompareState } from '@/domain/entities/bfCompare';
-import type { VerdictName } from '@/domain/entities/verdict';
 
-export type ITcIo = { data: string } | { path: string };
-
-export interface ITcResult {
-  verdict: VerdictName;
-  timeMs?: number;
-  memoryMb?: number;
-  stdout?: ITcIo;
-  stderr?: ITcIo;
-  msg?: string;
+interface ITcVerdict {
+  name: string;
+  fullName: string;
+  color: string;
 }
-export interface ITc {
+
+export interface ITcIo {
+  useFile: boolean;
+  data: string;
+}
+
+interface ITcResult {
+  verdict: ITcVerdict;
+  time?: number;
+  memory?: number;
+  stdout: ITcIo;
+  stderr: ITcIo;
+  msg: string[];
+}
+interface ITc {
   stdin: ITcIo;
   answer: ITcIo;
   isExpand: boolean;
@@ -37,21 +44,19 @@ export interface ITc {
   result?: ITcResult;
 }
 
-export interface IFileWithHash {
+interface IFileWithHash {
   path: string;
   hash?: string;
 }
 
-export interface IBfCompare {
+interface IBfCompare {
   generator?: IFileWithHash;
   bruteForce?: IFileWithHash;
-  cnt: number;
-  state: BfCompareState;
+  running: boolean;
+  msg: string;
 }
 
-export interface IOverrides {
-  timeLimitMs?: number;
-  memoryLimitMb?: number;
+interface ICompilationSettings {
   compiler?: string;
   compilerArgs?: string;
   runner?: string;
@@ -62,24 +67,14 @@ export interface IProblem {
   version: string;
   name: string;
   url?: string;
-  tcs: Map<UUID, ITc>;
+  tcs: Record<UUID, ITc>;
   tcOrder: UUID[];
+  timeLimit: number;
+  memoryLimit: number;
   src: IFileWithHash;
   checker?: IFileWithHash;
   interactor?: IFileWithHash;
   bfCompare?: IBfCompare;
-  timeElapsedMs: number;
-  overrides: IOverrides;
-}
-
-export interface ICphProblem {
-  name: string;
-  url: string;
-  tests: { id: number; input: string; output: string }[];
-  interactive: boolean;
-  memoryLimit: number;
-  timeLimit: number;
-  srcPath: string;
-  group: string;
-  local: boolean;
+  timeElapsed: number;
+  compilationSettings?: ICompilationSettings;
 }
