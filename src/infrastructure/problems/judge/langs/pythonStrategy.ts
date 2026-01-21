@@ -16,10 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
-import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
-import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type {
   CompileAdditionalData,
   ILanguageDefaultValues,
@@ -27,11 +24,9 @@ import type {
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
-import type { ISettings } from '@/application/ports/vscode/ISettings';
-import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
-import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import type { IFileWithHash, IOverrides } from '@/domain/types';
+import { LanguageStrategyContext } from '@/infrastructure/problems/judge/langs/languageStrategyContext';
 import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstractLanguageStrategy';
 
 @injectable()
@@ -41,26 +36,12 @@ export class LangPython extends AbstractLanguageStrategy {
   public override readonly defaultValues;
 
   public constructor(
-    @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
-    @inject(TOKENS.logger) protected readonly logger: ILogger,
-    @inject(TOKENS.path) protected readonly path: IPath,
+    @inject(LanguageStrategyContext) context: LanguageStrategyContext,
+    @inject(TOKENS.logger) logger: ILogger,
+    @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
-    @inject(TOKENS.settings) protected readonly settings: ISettings,
-    @inject(TOKENS.translator) protected readonly translator: ITranslator,
-    @inject(TOKENS.processExecutor) protected readonly processExecutor: IProcessExecutor,
-    @inject(TOKENS.tempStorage) protected readonly tmp: ITempStorage,
-    @inject(TOKENS.telemetry) protected readonly telemetry: ITelemetry,
   ) {
-    super(
-      fs,
-      logger.withScope('langsPython'),
-      settings,
-      translator,
-      processExecutor,
-      tmp,
-      telemetry,
-    );
-    this.logger = this.logger.withScope('langsPython');
+    super({ ...context, logger: logger.withScope('langsPython') });
     this.defaultValues = {
       compiler: this.settings.compilation.pythonCompiler,
       compilerArgs: this.settings.compilation.pythonArgs,

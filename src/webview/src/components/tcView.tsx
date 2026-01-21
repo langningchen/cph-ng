@@ -68,11 +68,11 @@ export const TcView = ({
         tc.isDisabled
           ? {
               [t('tcView.menu.enableTc')]: () =>
-                dispatch({ type: 'toggleDisable', problemId, id: tcId }),
+                dispatch({ type: 'updateTc', problemId, id: tcId, event: 'toggleDisable' }),
             }
           : {
               [t('tcView.menu.disableTc')]: () =>
-                dispatch({ type: 'toggleDisable', problemId, id: tcId }),
+                dispatch({ type: 'updateTc', problemId, id: tcId, event: 'toggleDisable' }),
               [t('tcView.menu.clearTcStatus')]: () =>
                 dispatch({ type: 'clearTcStatus', problemId, id: tcId }),
             }
@@ -81,9 +81,8 @@ export const TcView = ({
       <Accordion
         expanded={tc.isDisabled ? false : tc.isExpand}
         disableGutters
-        onChange={(_, expanded) => {
+        onChange={() => {
           if (tc.isDisabled) return;
-          tc.isExpand = expanded;
           dispatch({ type: 'updateTc', problemId, id: tcId, event: 'toggleExpand' });
         }}
         sx={{

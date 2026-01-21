@@ -45,7 +45,6 @@ import { StartChat } from '@/application/useCases/webview/StartChat';
 import { StopBfCompare } from '@/application/useCases/webview/StopBfCompare';
 import { StopTcs } from '@/application/useCases/webview/StopTcs';
 import { SubmitToCodeforces } from '@/application/useCases/webview/SubmitToCodeforces';
-import { ToggleDisable } from '@/application/useCases/webview/ToggleDisable';
 import { ToggleTcFile } from '@/application/useCases/webview/ToggleTcFile';
 import { UpdateTc } from '@/application/useCases/webview/UpdateTc';
 import { TOKENS } from '@/composition/tokens';
@@ -78,7 +77,6 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
   stopBfCompare: StopBfCompare,
   stopTcs: StopTcs,
   submitToCodeforces: SubmitToCodeforces,
-  toggleDisable: ToggleDisable,
   toggleTcFile: ToggleTcFile,
   updateTc: UpdateTc,
 };
@@ -89,11 +87,12 @@ export class WebviewProtocolHandler {
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
   ) {
-    this.logger = this.logger.withScope('ProtocolHandler');
+    this.logger = this.logger.withScope('WebviewProtocolHandler');
   }
 
   public async handle(msg: WebviewMsg): Promise<void> {
-    this.logger.info('Received Webview Message:', msg.type);
+    this.logger.info('Received webview message', msg.type);
+    this.logger.trace('Received webview message', { msg });
     const stopTrace = this.telemetry.start('webviewMessage', { type: msg.type });
 
     try {
@@ -101,7 +100,7 @@ export class WebviewProtocolHandler {
       const useCase = container.resolve<IMsgHandle<WebviewMsg>>(useCaseToken);
       await useCase.exec(msg);
     } catch (e) {
-      this.logger.error(`Handler error [${msg.type}]:`, e);
+      this.logger.error(`Handle message ${msg.type} failed`, e);
     } finally {
       stopTrace();
     }

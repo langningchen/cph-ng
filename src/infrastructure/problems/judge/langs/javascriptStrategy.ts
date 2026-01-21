@@ -16,16 +16,11 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type { IFileSystem } from '@/application/ports/node/IFileSystem';
-import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
-import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ILanguageDefaultValues } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
-import type { ISettings } from '@/application/ports/vscode/ISettings';
-import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
-import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import type { IOverrides } from '@/domain/types';
+import { LanguageStrategyContext } from '@/infrastructure/problems/judge/langs/languageStrategyContext';
 import { AbstractLanguageStrategy } from './abstractLanguageStrategy';
 
 @injectable()
@@ -35,24 +30,10 @@ export class LangJavascript extends AbstractLanguageStrategy {
   public override readonly defaultValues;
 
   public constructor(
-    @inject(TOKENS.fileSystem) protected readonly fs: IFileSystem,
-    @inject(TOKENS.logger) protected readonly logger: ILogger,
-    @inject(TOKENS.settings) protected readonly settings: ISettings,
-    @inject(TOKENS.translator) protected readonly translator: ITranslator,
-    @inject(TOKENS.processExecutor) protected readonly processExecutor: IProcessExecutor,
-    @inject(TOKENS.tempStorage) protected readonly tmp: ITempStorage,
-    @inject(TOKENS.telemetry) protected readonly telemetry: ITelemetry,
+    @inject(LanguageStrategyContext) context: LanguageStrategyContext,
+    @inject(TOKENS.logger) logger: ILogger,
   ) {
-    super(
-      fs,
-      logger.withScope('langsJavascript'),
-      settings,
-      translator,
-      processExecutor,
-      tmp,
-      telemetry,
-    );
-    this.logger = this.logger.withScope('langsJavascript');
+    super({ ...context, logger: logger.withScope('langsJavascript') });
     this.defaultValues = {
       runner: this.settings.compilation.javascriptRunner,
       runnerArgs: this.settings.compilation.javascriptRunArgs,

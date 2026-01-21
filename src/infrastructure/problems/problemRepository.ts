@@ -21,9 +21,7 @@ import type { IClock } from '@/application/ports/node/IClock';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
-import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
-import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@/composition/tokens';
 import { BackgroundProblem } from '@/domain/entities/backgroundProblem';
@@ -37,16 +35,10 @@ export class ProblemRepository implements IProblemRepository {
     @inject(TOKENS.clock) private readonly clock: IClock,
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.logger) private readonly logger: ILogger,
-    @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
-    @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
   ) {
     this.logger = this.logger.withScope('ProblemRepository');
-  }
-
-  public getDataPath(srcPath: string): string | null {
-    return this.resolver.renderPathWithFile(this.settings.problem.problemFilePath, srcPath, true);
   }
 
   private fireBackgroundEvent() {
@@ -104,41 +96,4 @@ export class ProblemRepository implements IProblemRepository {
     this.logger.debug('Persisted problem', problemId);
     return true;
   }
-
-  // async dataRefresh(noMsg = false): Promise<void> {
-  //   this.logger.trace('Starting data refresh');
-  //   const activePath = getActivePath();
-  // if (activePath) {
-  //   const idles: FullProblem[] = this.fullProblems.filter(
-  //     (fullProblem) =>
-  //       !fullProblem.ac && // No running task
-  //       !fullProblem.problem.isRelated(activePath), // Not the active problem
-  //   );
-  //   for (const idle of idles)
-  //     this.fullProblems.delete(idle.problem);
-  // }
-
-  //   const fullProblem = await this.getProblem(activePath);
-  //   const canImport = !!activePath && (await this.cphMigration.canMigrate(activePath));
-  //   if (!noMsg)
-  //     sidebarProvider.event.emit('problem', {
-  //       problem: fullProblem && {
-  //         problem: fullProblem.problem,
-  //         startTime: fullProblem.startTime,
-  //       },
-  //       bgProblems: this.fullProblems
-  //         .map((bgProblem) => ({
-  //           name: bgProblem.problem.name,
-  //           srcPath: bgProblem.problem.src.path,
-  //         }))
-  //         .filter((bgProblem) => bgProblem.srcPath !== fullProblem?.problem.src.path),
-  //       canImport,
-  //     });
-  //   ExtensionManager.event.emit('context', {
-  //     hasProblem: !!fullProblem,
-  //     canImport,
-  //     isRunning: !!fullProblem?.ac,
-  //   });
-  //   if (fullProblem) await this.problemFs.fireAuthorityChange(fullProblem.problem.src.path);
-  // }
 }

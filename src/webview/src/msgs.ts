@@ -64,10 +64,6 @@ export interface RunTcMsg extends ProblemBaseMsg {
   id: UUID;
   forceCompile: boolean | null;
 }
-export interface ToggleDisableMsg extends ProblemBaseMsg {
-  type: 'toggleDisable';
-  id: UUID;
-}
 export interface ClearTcStatusMsg extends ProblemBaseMsg {
   type: 'clearTcStatus';
   id?: UUID;
@@ -155,7 +151,6 @@ export type ProblemMsg =
   | AddTcMsg
   | LoadTcsMsg
   | RunTcMsg
-  | ToggleDisableMsg
   | ClearTcStatusMsg
   | ChooseTcFileMsg
   | SetTcStringMsg

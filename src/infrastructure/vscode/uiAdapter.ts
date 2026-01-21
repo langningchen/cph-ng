@@ -52,21 +52,27 @@ export class UiAdapter implements IUi {
   }
 
   public async openDialog(options: CustomOpenDialogOptions): Promise<string | undefined> {
+    this.logger.trace('Showing open dialog', { options });
     const vscodeOptions: OpenDialogOptions = { ...options };
     if (options.defaultPath) vscodeOptions.defaultUri = Uri.file(options.defaultPath);
     const uri = await window.showOpenDialog(vscodeOptions);
-    return uri && uri.length > 0 ? uri[0].fsPath : undefined;
+    const path = uri && uri.length > 0 ? uri[0].fsPath : undefined;
+    this.logger.debug('Open dialog result', { path });
+    return path;
   }
 
   public async saveDialog(options: CustomSaveDialogOptions): Promise<string | undefined> {
+    this.logger.trace('Showing save dialog', { options });
     const vscodeOptions: SaveDialogOptions = { ...options };
     if (options.defaultPath) vscodeOptions.defaultUri = Uri.file(options.defaultPath);
     const uri = await window.showSaveDialog(vscodeOptions);
-    return uri ? uri.fsPath : undefined;
+    const path = uri ? uri.fsPath : undefined;
+    this.logger.debug('Save dialog result', { path });
+    return path;
   }
 
   private async getSubfoldersRecursively(folderUri: Uri): Promise<Uri[]> {
-    this.logger.trace('getSubfoldersRecursively', { folderUri });
+    this.logger.trace('Recursing into folder', { folderUri });
     const subfolders: Uri[] = [];
     const entries = await workspace.fs.readDirectory(folderUri);
     for (const [name, type] of entries) {
@@ -81,7 +87,6 @@ export class UiAdapter implements IUi {
   }
 
   private async chooseFolderWithDialog(title: string): Promise<string | undefined> {
-    this.logger.trace('chooseFolderWithDialog', { title });
     return await this.openDialog({
       canSelectMany: false,
       title,
@@ -91,7 +96,7 @@ export class UiAdapter implements IUi {
   }
 
   private async chooseFolderWithQuickPick(title: string): Promise<string | undefined | null> {
-    this.logger.trace('chooseFolderWithQuickPick', { title });
+    // If there is no workspace opened, return null to indicate fallback
     if (!workspace.workspaceFolders) return null;
 
     const subfolders = await Promise.all(
@@ -120,36 +125,51 @@ export class UiAdapter implements IUi {
   }
 
   public async confirm(title: string): Promise<boolean> {
+    this.logger.trace('Showing confirmation dialog', { title });
     const yes = this.translator.t('Yes');
     const choice = await window.showInformationMessage(title, { modal: true }, yes);
-    return choice === yes;
+    const result = choice === yes;
+    this.logger.debug('Confirmation result', { result });
+    return result;
   }
 
   public async quickPick<T>(
     items: CustomQuickPickItem<T>[],
     options: CustomQuickPickOptions,
   ): Promise<T | undefined> {
+    this.logger.trace('Showing quick pick', { items, options });
     options.ignoreFocusOut ??= true;
     const selected = await window.showQuickPick(items, options);
-    return selected?.value;
+    const value = selected?.value;
+    this.logger.debug('Quick pick selected', { value });
+    return value;
   }
 
   public async quickPickMany<T>(
     items: CustomQuickPickItem<T>[],
     options: CustomQuickPickOptions,
   ): Promise<T[]> {
+    this.logger.trace('Showing quick pick many', { items, options });
     options.ignoreFocusOut ??= true;
     const selected = await window.showQuickPick(items, { ...options, canPickMany: true });
-    return selected?.map((s) => s.value) ?? [];
+    const values = selected?.map((s) => s.value) ?? [];
+    this.logger.debug('Quick pick many selected', { values });
+    return values;
   }
 
   public async chooseFolder(title: string): Promise<string | undefined> {
-    this.logger.trace('chooseFolder', { title });
+    this.logger.trace('Choosing folder', { title });
     if (this.settings.basic.folderOpener === 'flat') {
       const result = await this.chooseFolderWithQuickPick(title);
-      if (result !== null) return result;
+      if (result !== null) {
+        this.logger.debug('Folder chosen with quick pick', { result });
+        return result;
+      }
+      this.logger.warn('No workspace folders found, falling back to dialog folder chooser');
     }
-    return await this.chooseFolderWithDialog(title);
+    const result = await this.chooseFolderWithDialog(title);
+    this.logger.debug('Folder chosen with dialog', { result });
+    return result;
   }
 
   public async alert(
@@ -157,6 +177,7 @@ export class UiAdapter implements IUi {
     message: string,
     ...args: AlertArgs
   ): Promise<string | undefined> {
+    this.logger.trace('Showing alert', { level, message, args });
     // biome-ignore lint/suspicious/noExplicitAny: Casting to any is required to match the overloaded signature.
     const safeArgs = args as any[];
     if (level === 'warn') return await window.showWarningMessage(message, ...safeArgs);
@@ -165,10 +186,12 @@ export class UiAdapter implements IUi {
   }
 
   public openFile(uri: Uri): void {
+    this.logger.trace('Opening file', { uri });
     commands.executeCommand('vscode.open', uri, this.settings.companion.showPanel);
   }
 
   public openChat(topic: string): void {
+    this.logger.trace('Opening chat', { topic });
     commands.executeCommand('workbench.action.chat.open', {
       mode: 'agent',
       query: topic,
@@ -177,14 +200,17 @@ export class UiAdapter implements IUi {
   }
 
   public openSettings(item: string): void {
+    this.logger.trace('Opening settings', { item });
     commands.executeCommand('workbench.action.openSettings', item);
   }
 
   public compareFiles(left: Uri, right: Uri): void {
+    this.logger.trace('Comparing files', { left, right });
     commands.executeCommand('vscode.diff', left, right);
   }
 
   public showSidebar(): void {
+    this.logger.trace('Showing sidebar');
     const editor = window.activeTextEditor;
     commands.executeCommand('workbench.view.extension.cphNgContainer');
     if (editor) window.showTextDocument(editor.document);

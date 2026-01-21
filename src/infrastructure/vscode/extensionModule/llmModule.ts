@@ -15,40 +15,29 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-// src/infrastructure/vscode/modules/LlmModule.ts
-
 import { inject, injectable } from 'tsyringe';
-import { type ExtensionContext, lm } from 'vscode';
-import type LlmDataInspector from '@/ai/llmDataInspector';
-import type LlmTcRunner from '@/ai/llmTcRunner';
-import type LlmTestCaseEditor from '@/ai/llmTestCaseEditor';
-import type LlmTestCaseLister from '@/ai/llmTestCaseLister';
+import type { ExtensionContext } from 'vscode';
 import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class LlmModule implements IExtensionModule {
-  public constructor(
-    @inject(TOKENS.logger) private readonly logger: ILogger,
-    private readonly tcRunner: LlmTcRunner,
-    private readonly dataInspector: LlmDataInspector,
-    private readonly tcLister: LlmTestCaseLister,
-    private readonly tcEditor: LlmTestCaseEditor,
-  ) {
+  public constructor(@inject(TOKENS.logger) private readonly logger: ILogger) {
     this.logger = this.logger.withScope('LlmModule');
   }
 
-  public setup(context: ExtensionContext): void {
+  public setup(_context: ExtensionContext): void {
+    // TO-DO
     this.logger.info('Registering VS Code Language Model Tools');
 
-    const registrations = [
-      lm.registerTool('run_test_cases', this.tcRunner),
-      lm.registerTool('inspect_problem_data', this.dataInspector),
-      lm.registerTool('list_test_cases', this.tcLister),
-      lm.registerTool('upsert_test_case', this.tcEditor),
-    ];
+    // const registrations = [
+    //   lm.registerTool('run_test_cases', this.tcRunner),
+    //   lm.registerTool('inspect_problem_data', this.dataInspector),
+    //   lm.registerTool('list_test_cases', this.tcLister),
+    //   lm.registerTool('upsert_test_case', this.tcEditor),
+    // ];
 
-    context.subscriptions.push(...registrations);
+    // context.subscriptions.push(...registrations);
   }
 }

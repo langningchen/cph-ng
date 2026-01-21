@@ -67,11 +67,13 @@ class SettingsSectionBase {
       this.logger.warn(\`Setting \${fullKey} expected \${defaultType}, got \${type}\`);
       return defaultValue;
     }
+    this.logger.debug(\`Getting setting\`, { key: fullKey, value, defaultValue });
     return value ?? defaultValue;
   }
 
   protected set(key: string, value: unknown): Thenable<void> {
     const fullKey = \`cph-ng.\${this.section}.\${key}\`;
+    this.logger.debug(\`Setting setting\`, { key: fullKey, value });
     return workspace.getConfiguration().update(fullKey, value, ConfigurationTarget.Global);
   }
 }`;

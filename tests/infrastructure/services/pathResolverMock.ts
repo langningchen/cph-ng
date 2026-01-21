@@ -20,7 +20,6 @@ import type { IPath } from '@/application/ports/node/IPath';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import { TOKENS } from '@/composition/tokens';
-import type { Problem } from '@/domain/entities/problem';
 
 @injectable()
 export class PathResolverMock implements IPathResolver {
@@ -36,10 +35,6 @@ export class PathResolverMock implements IPathResolver {
       result = result.replaceAll(`\${${key}}`, value);
     }
     return result;
-  }
-
-  public async renderTemplate(_problem: Problem): Promise<string> {
-    throw new Error('Not implemented');
   }
 
   public renderPath(original: string): string {

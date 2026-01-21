@@ -21,16 +21,13 @@ import { existsSync } from 'node:fs';
 import { basename, dirname, extname, normalize, relative } from 'node:path';
 import { inject, injectable } from 'tsyringe';
 import { Uri, window, workspace } from 'vscode';
-import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
 import type { ISystem } from '@/application/ports/node/ISystem';
-import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
-import type { Problem } from '@/domain/entities/problem';
 
 // TO-DO: Check the refactor: workspace selection
 
@@ -38,10 +35,8 @@ import type { Problem } from '@/domain/entities/problem';
 export class PathResolverAdapter implements IPathResolver {
   public constructor(
     @inject(TOKENS.extensionPath) private readonly extPath: string,
-    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.path) private readonly path: IPath,
-    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.system) private readonly sys: ISystem,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
@@ -53,31 +48,6 @@ export class PathResolverAdapter implements IPathResolver {
       result = result.replaceAll(`\${${key}}`, value);
     }
     return result;
-  }
-
-  public async renderTemplate(problem: Problem): Promise<string> {
-    const templatePath = this.renderPathWithFile(
-      this.settings.problem.templateFile,
-      problem.src.path,
-    );
-
-    if (!templatePath || !this.fs.exists(templatePath)) {
-      return '';
-    }
-
-    try {
-      const template = await this.fs.readFile(templatePath);
-      const limits = this.problemService.getLimits(problem);
-      return this.renderString(template, [
-        ['title', problem.name],
-        ['timeLimit', limits.timeLimitMs.toString()],
-        ['memoryLimit', limits.memoryLimitMb.toString()],
-        ['url', problem.url || ''],
-      ]);
-    } catch (e) {
-      this.logger.error(`Failed to read template: ${templatePath}`, e as Error);
-      return '';
-    }
   }
 
   public renderPath(original: string): string {

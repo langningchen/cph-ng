@@ -1,4 +1,22 @@
+// Copyright (C) 2026 Langning Chen
+//
+// This file is part of cph-ng.
+//
+// cph-ng is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// cph-ng is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
+
 import { SHA256 } from 'crypto-js';
+import type { OutputChannel } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
@@ -16,6 +34,7 @@ import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IFileWithHash, IOverrides } from '@/domain/types';
+import type { LanguageStrategyContext } from '@/infrastructure/problems/judge/langs/languageStrategyContext';
 
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
   canUseWrapper: false,
@@ -27,15 +46,25 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
   public readonly enableRunner: boolean = false;
   public abstract readonly defaultValues: ILanguageDefaultValues;
 
-  public constructor(
-    protected readonly fs: IFileSystem,
-    protected readonly logger: ILogger,
-    protected readonly settings: ISettings,
-    protected readonly translator: ITranslator,
-    protected readonly processExecutor: IProcessExecutor,
-    protected readonly tmp: ITempStorage,
-    protected readonly telemetry: ITelemetry,
-  ) {}
+  protected readonly fs: IFileSystem;
+  protected readonly logger: ILogger;
+  protected readonly settings: ISettings;
+  protected readonly translator: ITranslator;
+  protected readonly processExecutor: IProcessExecutor;
+  protected readonly tmp: ITempStorage;
+  protected readonly telemetry: ITelemetry;
+  protected readonly compilation: OutputChannel;
+
+  public constructor(context: LanguageStrategyContext) {
+    this.fs = context.fs;
+    this.logger = context.logger;
+    this.settings = context.settings;
+    this.translator = context.translator;
+    this.processExecutor = context.processExecutor;
+    this.tmp = context.tmp;
+    this.telemetry = context.telemetry;
+    this.compilation = context.compilation;
+  }
 
   public async compile(
     src: IFileWithHash,
@@ -44,7 +73,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileResult> {
     // Clear previous compilation IO
-    CompilationIo.clear();
+    this.compilation.clear();
 
     try {
       const compileEnd = this.telemetry.start('compile', {
@@ -59,7 +88,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
       return result;
     } catch (e) {
       this.logger.error('Compilation failed', e);
-      CompilationIo.append((e as Error).message);
+      this.compilation.append((e as Error).message);
       this.telemetry.error('compileError', e);
       return e as Error;
     }
@@ -85,8 +114,8 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
       throw new CompileRejected(this.translator.t('Compilation aborted by user'));
     if (result.abortReason === AbortReason.Timeout)
       throw new CompileError(this.translator.t('Compilation timed out'));
-    CompilationIo.append(await this.fs.readFile(result.stdoutPath));
-    CompilationIo.append(await this.fs.readFile(result.stderrPath));
+    this.compilation.append(await this.fs.readFile(result.stdoutPath));
+    this.compilation.append(await this.fs.readFile(result.stderrPath));
     if (result.codeOrSignal)
       throw new CompileError(this.translator.t('Compilation failed with non-zero exit code'));
     this.tmp.dispose([result.stdoutPath, result.stderrPath]);

@@ -17,12 +17,15 @@
 
 import type { UUID } from 'node:crypto';
 import { EventEmitter } from 'node:stream';
+import { inject, injectable } from 'tsyringe';
 import type TypedEventEmitter from 'typed-emitter';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type {
   IWebviewEventBus,
   WebviewEvent,
   WebviewProblemMetaPayload,
 } from '@/application/ports/vscode/IWebviewEventBus';
+import { TOKENS } from '@/composition/tokens';
 import type {
   IWebviewBackgroundProblem,
   IWebviewBfCompare,
@@ -35,14 +38,20 @@ type WebviewEvents = {
   message: (payload: WebviewEvent) => void;
 };
 
+@injectable()
 export class WebviewEventBusAdapter implements IWebviewEventBus {
   private readonly emitter: TypedEventEmitter<WebviewEvents> = new EventEmitter();
+
+  public constructor(@inject(TOKENS.logger) private readonly logger: ILogger) {
+    this.logger = this.logger.withScope('WebviewEventBusAdapter');
+  }
 
   public onMessage(handler: (data: WebviewEvent) => void) {
     this.emitter.on('message', handler);
   }
 
   public fullProblem(problemId: UUID, payload: IWebviewProblem): void {
+    this.logger.debug('Emitting fullProblem event', { problemId, payload });
     this.emitter.emit('message', {
       type: 'FULL_PROBLEM',
       problemId,
@@ -50,6 +59,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
     });
   }
   public patchMeta(problemId: UUID, payload: WebviewProblemMetaPayload): void {
+    this.logger.debug('Emitting patchMeta event', { problemId, payload });
     this.emitter.emit('message', {
       type: 'PATCH_META',
       problemId,
@@ -57,6 +67,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
     });
   }
   public patchBfCompare(problemId: UUID, payload: Partial<IWebviewBfCompare>): void {
+    this.logger.debug('Emitting patchBfCompare event', { problemId, payload });
     this.emitter.emit('message', {
       type: 'PATCH_BF_COMPARE',
       problemId,
@@ -64,6 +75,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
     });
   }
   public patchTc(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTc>): void {
+    this.logger.debug('Emitting patchTc event', { problemId, tcId, payload });
     this.emitter.emit('message', {
       type: 'PATCH_TC',
       problemId,
@@ -72,6 +84,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
     });
   }
   public patchTcResult(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTcResult>): void {
+    this.logger.debug('Emitting patchTcResult event', { problemId, tcId, payload });
     this.emitter.emit('message', {
       type: 'PATCH_TC_RESULT',
       problemId,
@@ -80,6 +93,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
     });
   }
   public deleteTc(problemId: UUID, tcId: UUID): void {
+    this.logger.debug('Emitting deleteTc event', { problemId, tcId });
     this.emitter.emit('message', {
       type: 'DELETE_TC',
       problemId,
@@ -87,12 +101,14 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
     });
   }
   public background(payload: IWebviewBackgroundProblem[]): void {
+    this.logger.debug('Emitting background event', { payload });
     this.emitter.emit('message', {
       type: 'BACKGROUND',
       payload,
     });
   }
   public noProblem(canImport: boolean): void {
+    this.logger.debug('Emitting noProblem event', { canImport });
     this.emitter.emit('message', {
       type: 'NO_PROBLEM',
       canImport,

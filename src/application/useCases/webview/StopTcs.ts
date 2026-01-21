@@ -31,15 +31,12 @@ export class StopTcs extends BaseProblemUseCase<StopTcsMsg> {
     super(repo);
   }
 
-  protected async performAction(
-    { problem, abort }: BackgroundProblem,
-    msg: StopTcsMsg,
-  ): Promise<void> {
-    abort(msg.onlyOne ? 'onlyOne' : undefined);
+  protected async performAction(bgProblem: BackgroundProblem, msg: StopTcsMsg): Promise<void> {
+    bgProblem.abort(msg.onlyOne ? 'onlyOne' : undefined);
     if (!msg.onlyOne) {
-      const tcOrder = problem.getEnabledTcIds();
+      const tcOrder = bgProblem.problem.getEnabledTcIds();
       for (const tcId of tcOrder) {
-        const tc = problem.getTc(tcId);
+        const tc = bgProblem.problem.getTc(tcId);
         if (tc.verdict && Verdicts[tc.verdict].type === VerdictType.running)
           tc.updateResult(VerdictName.rejected);
       }

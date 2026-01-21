@@ -31,9 +31,9 @@ export class StopBfCompare extends BaseProblemUseCase<StopBfCompareMsg> {
   }
 
   protected async performAction(
-    { abort }: BackgroundProblem,
+    bgProblem: BackgroundProblem,
     _msg: StopBfCompareMsg,
   ): Promise<void> {
-    abort();
+    bgProblem.abort();
   }
 }

@@ -50,5 +50,7 @@
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "docthis.includeTypes": false,
   "docthis.includeMemberOfOnClassMembers": false,
-  "docthis.includeMemberOfOnInterfaceMembers": false
+  "docthis.includeMemberOfOnInterfaceMembers": false,
+  "emmet.showAbbreviationSuggestions": false,
+  "emmet.showExpandedAbbreviation": "never"
 }

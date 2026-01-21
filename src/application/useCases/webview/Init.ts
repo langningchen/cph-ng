@@ -15,13 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { injectable } from 'tsyringe';
-import type { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
+import { inject, injectable } from 'tsyringe';
 import type { InitMsg } from '@/webview/src/msgs';
+import { TOKENS } from '@/composition/tokens';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 
 @injectable()
 export class Init {
-  public constructor(private readonly coordinator: ActiveProblemCoordinator) {}
+  public constructor(
+    @inject(TOKENS.activeProblemCoordinator)
+    private readonly coordinator: IActiveProblemCoordinator,
+  ) {}
 
   public async exec(_msg: InitMsg): Promise<void> {
     await this.coordinator.dispatchFullData();

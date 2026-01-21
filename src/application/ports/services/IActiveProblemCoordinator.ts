@@ -15,19 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Problem } from '@/domain/entities/problem';
-import { Server } from './server';
-import { Submitter } from './submitter';
-
-export default class Companion {
-  public static init() {
-    Server.init();
-  }
-  public static stopServer() {
-    Server.stopServer();
-  }
-  public static async submit(problem?: Problem) {
-    return Submitter.submit(problem);
-  }
+export interface IActiveProblemCoordinator {
+  dispatchFullData(): Promise<void>;
+  onActiveEditorChanged(filePath: string | undefined): Promise<void>;
 }
-export * from './types';

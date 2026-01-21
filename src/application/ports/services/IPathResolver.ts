@@ -15,10 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Problem } from '@/domain/entities/problem';
-
 export interface IPathResolver {
-  renderTemplate(problem: Problem): Promise<string>;
   renderPath(original: string): string;
   renderWorkspacePath(original: string): Promise<string | null>;
   renderPathWithFile(original: string, filePath: string, ignoreError?: boolean): string | null;

@@ -15,22 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-// src/infrastructure/vscode/modules/EditorWatcherModule.ts
-
 import { inject, injectable } from 'tsyringe';
 import { type ExtensionContext, type TextEditor, window } from 'vscode';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
-import type { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 
 @injectable()
 export class EditorWatcherModule implements IExtensionModule {
   public constructor(
     @inject(TOKENS.activePathService) private readonly activePathService: IActivePathService,
     @inject(TOKENS.logger) private readonly logger: ILogger,
-    private readonly coordinator: ActiveProblemCoordinator,
+    @inject(TOKENS.activeProblemCoordinator)
+    private readonly coordinator: IActiveProblemCoordinator,
   ) {
     this.logger = this.logger.withScope('EditorWatcher');
   }

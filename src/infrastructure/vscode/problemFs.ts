@@ -37,7 +37,7 @@ import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/domain/entities/problem';
 import type { TcIo } from '@/domain/entities/tcIo';
-import type { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 
 type CphFsFile = {
   data: string | Uri;
@@ -59,7 +59,8 @@ export class ProblemFs implements IProblemFs {
     @inject(TOKENS.tcIoService) private readonly tcIoService: ITcIoService,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
-    private readonly coordinator: ActiveProblemCoordinator,
+    @inject(TOKENS.activeProblemCoordinator)
+    private readonly coordinator: IActiveProblemCoordinator,
   ) {
     this.logger = this.logger.withScope('ProblemFs');
   }

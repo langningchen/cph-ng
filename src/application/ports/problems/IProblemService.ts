@@ -19,6 +19,7 @@ import type { Problem } from '@/domain/entities/problem';
 import type { Tc } from '@/domain/entities/tc';
 
 export interface IProblemService {
+  getDataPath(srcPath: string): string | null;
   create(srcPath: string): Promise<Problem | null>;
   loadBySrc(srcPath: string): Promise<Problem | null>;
   loadTcs(problem: Problem): Promise<void>;

@@ -25,7 +25,7 @@ import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
-import Companion from '@/modules/companion';
+import Companion from '@/legacy/companion';
 
 @injectable()
 export class EnvironmentModule implements IExtensionModule {

@@ -38,7 +38,7 @@ export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewP
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
   const hasRunning = useMemo(() => {
-    for (const [_, tc] of problem.tcs)
+    for (const [_, tc] of Object.entries(problem.tcs))
       if (tc.result?.verdict.type === VerdictType.running) return true;
     return false;
   }, [problem.tcs]);

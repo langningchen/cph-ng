@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { TelemetryEventMeasurements, TelemetryReporter } from '@vscode/extension-telemetry';
-import { inject, injectable } from 'tsyringe';
+import { inject, singleton } from 'tsyringe';
 import { TelemetryTrustedValue as vsTelemetryTrustedValue } from 'vscode';
 import type { IClock } from '@/application/ports/node/IClock';
 import {
@@ -30,11 +30,10 @@ import {
 } from '@/application/ports/vscode/ITelemetry';
 import { TOKENS } from '@/composition/tokens';
 
-@injectable()
+@singleton()
 export class TelemetryAdapter implements ITelemetry {
   public constructor(
-    @inject(TOKENS.telemetryReporter)
-    private readonly reporter: TelemetryReporter,
+    @inject(TOKENS.telemetryReporter) private readonly reporter: TelemetryReporter,
     @inject(TOKENS.clock) private readonly clock: IClock,
   ) {}
 
@@ -57,9 +56,9 @@ export class TelemetryAdapter implements ITelemetry {
           ? new vsTelemetryTrustedValue(String(value.value))
           : String(value);
     }
-    (this.isErrorName(name)
-      ? this.reporter.sendTelemetryErrorEvent
-      : this.reporter.sendTelemetryEvent)(name, eventProps, measurements);
+    if (this.isErrorName(name))
+      this.reporter.sendTelemetryErrorEvent(name, eventProps, measurements);
+    else this.reporter.sendTelemetryEvent(name, eventProps, measurements);
   }
 
   public event(name: TelemetryEventName, props?: Record<string, string | number | boolean>): void {

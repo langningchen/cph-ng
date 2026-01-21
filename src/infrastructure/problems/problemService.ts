@@ -26,7 +26,6 @@ import type {
   IProblemMigrationService,
   OldProblem,
 } from '@/application/ports/problems/IProblemMigrationService';
-import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
@@ -37,9 +36,9 @@ import type { IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
 import { Problem } from '@/domain/entities/problem';
 import type { Tc } from '@/domain/entities/tc';
-import type { TcScanner } from '@/domain/services/TcScanner';
+import { TcScanner } from '@/domain/services/TcScanner';
 import type { IFileWithHash, IProblem, ITc, ITcIo } from '@/domain/types';
-import type { ProblemMapper } from '@/infrastructure/problems/problemMapper';
+import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 
 @injectable()
 export class ProblemService implements IProblemService {
@@ -49,21 +48,24 @@ export class ProblemService implements IProblemService {
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
-    @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
     @inject(TOKENS.problemMigrationService) private readonly migration: IProblemMigrationService,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
-    private readonly mapper: ProblemMapper,
-    private readonly tcScanner: TcScanner,
+    @inject(ProblemMapper) private readonly mapper: ProblemMapper,
+    @inject(TcScanner) private readonly tcScanner: TcScanner,
   ) {
     this.logger = this.logger.withScope('ProblemRepository');
   }
 
+  public getDataPath(srcPath: string): string | null {
+    return this.resolver.renderPathWithFile(this.settings.problem.problemFilePath, srcPath, true);
+  }
+
   public async create(srcPath: string): Promise<Problem | null> {
-    const binPath = this.repo.getDataPath(srcPath);
+    const binPath = this.getDataPath(srcPath);
     if (!binPath) return null;
     const problem = new Problem(this.path.basename(srcPath, this.path.extname(srcPath)), srcPath);
     await this.save(problem);
@@ -71,7 +73,7 @@ export class ProblemService implements IProblemService {
   }
 
   public async loadBySrc(srcPath: string): Promise<Problem | null> {
-    const binPath = this.repo.getDataPath(srcPath);
+    const binPath = this.getDataPath(srcPath);
     if (!binPath) return null;
 
     var data: Buffer<ArrayBuffer>;
@@ -133,13 +135,12 @@ export class ProblemService implements IProblemService {
   }
 
   public async save(problem: Problem): Promise<void> {
-    const binPath = this.repo.getDataPath(problem.src.path);
+    const binPath = this.getDataPath(problem.src.path);
     if (!binPath) return;
-    this.logger.trace('Saving problem data', this, 'to', binPath);
-
     this.tmp.dispose(problem.purgeUnusedTcs());
 
     const problemDto = this.mapper.toDto(problem);
+    this.logger.trace('Saving problem data', problemDto, 'to', binPath);
     try {
       await this.fs.safeWriteFile(binPath, gzipSync(Buffer.from(JSON.stringify(problemDto))));
       this.logger.info('Saved problem', problem.src.path);
@@ -152,7 +153,7 @@ export class ProblemService implements IProblemService {
   }
 
   public async delete(problem: Problem): Promise<void> {
-    const binPath = this.repo.getDataPath(problem.src.path);
+    const binPath = this.getDataPath(problem.src.path);
     if (!binPath) return;
     try {
       await this.fs.rm(binPath);

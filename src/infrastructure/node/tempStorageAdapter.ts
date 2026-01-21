@@ -23,6 +23,7 @@ import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 
 @injectable()
 export class TempStorageAdapter implements ITempStorage {
@@ -34,6 +35,7 @@ export class TempStorageAdapter implements ITempStorage {
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
     @inject(TOKENS.settings) private readonly settings: ISettings,
   ) {
@@ -64,6 +66,7 @@ export class TempStorageAdapter implements ITempStorage {
         this.resolver.renderPath(this.settings.cache.directory),
         this.crypto.randomUUID(),
       );
+      this.fs.safeWriteFile(path, '');
       this.logger.trace('Creating new cached path', path);
     }
     this.usedPool.set(path, description);

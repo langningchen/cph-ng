@@ -41,13 +41,16 @@ import { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEv
 import { ExecutionStrategyFactoryAdapter } from '@/infrastructure/problems/judge/runner/executionStrategyFactoryAdapter';
 import { SolutionRunnerAdapter } from '@/infrastructure/problems/judge/runner/solutionRunnerAdapter';
 import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
+import { ProblemMigrationService } from '@/infrastructure/problems/problemMigrationService';
 import { ProblemRepository } from '@/infrastructure/problems/problemRepository';
 import { ProblemService } from '@/infrastructure/problems/problemService';
 import { TcIoService } from '@/infrastructure/problems/tcIoService';
 import { TcService } from '@/infrastructure/problems/tcService';
 import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
 import { PathResolverAdapter } from '@/infrastructure/services/pathResolverAdapter';
+import { ActivePathService } from '@/infrastructure/vscode/activePathService';
 import { DocumentAdapter } from '@/infrastructure/vscode/documentAdapter';
+import { ExtensionContextAdapter } from '@/infrastructure/vscode/extensionContextAdapter';
 import { CommandModule } from '@/infrastructure/vscode/extensionModule/commandModule';
 import { EditorWatcherModule } from '@/infrastructure/vscode/extensionModule/editorWatcherModule';
 import { EnvironmentModule } from '@/infrastructure/vscode/extensionModule/environmentModule';
@@ -61,8 +64,11 @@ import { TranslatorAdapter } from '@/infrastructure/vscode/translatorAdapter';
 import { UiAdapter } from '@/infrastructure/vscode/uiAdapter';
 import { WebviewEventBusAdapter } from '@/infrastructure/vscode/webviewEventBus';
 import { TOKENS } from './tokens';
+import { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
 
 export async function setupContainer(context: ExtensionContext): Promise<void> {
+  container.registerSingleton(TOKENS.activePathService, ActivePathService);
+  container.registerSingleton(TOKENS.activeProblemCoordinator, ActiveProblemCoordinator);
   container.registerSingleton(TOKENS.archive, ArchiveAdapter);
   container.registerSingleton(TOKENS.buildInfo, BuildInfoAdapter);
   container.registerSingleton(TOKENS.checkerRunner, CheckerRunnerAdapter);
@@ -72,6 +78,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.crypto, CryptoAdapter);
   container.registerSingleton(TOKENS.document, DocumentAdapter);
   container.registerSingleton(TOKENS.executionStrategyFactory, ExecutionStrategyFactoryAdapter);
+  container.registerSingleton(TOKENS.extensionContext, ExtensionContextAdapter);
   container.registerSingleton(TOKENS.fileSystem, FileSystemAdapter);
   container.registerSingleton(TOKENS.judgeServiceFactory, JudgeServiceFactory);
   container.registerSingleton(TOKENS.languageRegistry, LanguageRegistry);
@@ -79,6 +86,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.path, PathAdapter);
   container.registerSingleton(TOKENS.pathResolver, PathResolverAdapter);
   container.registerSingleton(TOKENS.problemFs, ProblemFs);
+  container.registerSingleton(TOKENS.problemMigrationService, ProblemMigrationService);
   container.registerSingleton(TOKENS.problemRepository, ProblemRepository);
   container.registerSingleton(TOKENS.problemService, ProblemService);
   container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
@@ -113,6 +121,9 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
 
   const logOutputChannel = window.createOutputChannel('CPH-NG', { log: true });
   container.registerInstance(TOKENS.logOutputChannel, logOutputChannel);
+
+  const compilationOutputChannel = window.createOutputChannel('CPH-NG Compilation');
+  container.registerInstance(TOKENS.compilationOutputChannel, compilationOutputChannel);
 
   const buildInfo = container.resolve(TOKENS.buildInfo);
   if (buildInfo.load) await buildInfo.load();

@@ -67,7 +67,7 @@ export interface IWebviewOverrides {
 export interface IWebviewProblem {
   name: string;
   url?: string;
-  tcs: Map<UUID, IWebviewTc>;
+  tcs: Record<UUID, IWebviewTc>;
   tcOrder: UUID[];
   src: IWebviewFileWithHash;
   checker?: IWebviewFileWithHash;

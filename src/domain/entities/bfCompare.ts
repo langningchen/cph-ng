@@ -37,7 +37,7 @@ const RunningSet = new Set<BfCompareState>([
   BfCompareState.runningSolution,
 ]);
 export const isRunningState = (state?: BfCompareState): boolean => {
-  return state !== undefined && !RunningSet.has(state);
+  return state !== undefined && RunningSet.has(state);
 };
 
 export interface BfCompareEvents {

@@ -33,6 +33,7 @@ export class UpdateTc extends BaseProblemUseCase<UpdateTcMsg> {
   protected async performAction({ problem }: BackgroundProblem, msg: UpdateTcMsg): Promise<void> {
     const tc = problem.getTc(msg.id);
     if (msg.event === 'toggleDisable') tc.toggleDisable();
-    else if (msg.event === 'toggleExpand') tc.toggleExpand();
+    if (msg.event === 'toggleExpand') tc.toggleExpand();
+    if (msg.event === 'setAsAnswer' && tc.stdout) tc.answer = tc.stdout;
   }
 }

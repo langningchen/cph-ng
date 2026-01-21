@@ -29,10 +29,10 @@ export class ProblemMapper {
   public constructor(@inject(TOKENS.version) private readonly version: string) {}
 
   public toDto(entity: Problem): IProblem {
-    const tcs: Map<UUID, ITc> = new Map();
+    const tcs: Record<UUID, ITc> = {};
     for (const id of entity.tcOrder) {
       const tc = entity.tcs.get(id);
-      if (tc) tcs.set(id, this.tcToDto(tc));
+      if (tc) tcs[id] = this.tcToDto(tc);
     }
     return {
       version: this.version,
@@ -52,7 +52,7 @@ export class ProblemMapper {
     const problem = new Problem(dto.name, dto.src.path);
     problem.url = dto.url;
     for (const id of dto.tcOrder) {
-      const tc = dto.tcs.get(id);
+      const tc = dto.tcs[id];
       if (tc) problem.addTc(id, this.tcToEntity(tc));
     }
     problem.checker = dto.checker;

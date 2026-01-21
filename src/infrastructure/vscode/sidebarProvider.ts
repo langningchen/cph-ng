@@ -22,8 +22,8 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@/composition/tokens';
-import type { WebviewHtmlRenderer } from '@/infrastructure/vscode/webviewHtmlRenderer';
-import type { WebviewProtocolHandler } from '@/infrastructure/vscode/webviewProtocolHandler';
+import { WebviewHtmlRenderer } from '@/infrastructure/vscode/webviewHtmlRenderer';
+import { WebviewProtocolHandler } from '@/infrastructure/vscode/webviewProtocolHandler';
 
 @injectable()
 export class SidebarProvider implements WebviewViewProvider {
@@ -36,8 +36,8 @@ export class SidebarProvider implements WebviewViewProvider {
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
-    private readonly htmlRenderer: WebviewHtmlRenderer,
-    private readonly protocolHandler: WebviewProtocolHandler,
+    @inject(WebviewHtmlRenderer) private readonly htmlRenderer: WebviewHtmlRenderer,
+    @inject(WebviewProtocolHandler) private readonly protocolHandler: WebviewProtocolHandler,
   ) {
     this.logger = this.logger.withScope('SidebarProvider');
 

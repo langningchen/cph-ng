@@ -28,22 +28,27 @@ export class LoggerAdapter implements ILogger {
   ) {}
 
   public info(message: string, ...args: unknown[]): void {
+    console.info('[INFO]', `[${this.module}]`, message, ...args);
     this.logger.info(`[${this.module}]`, message, ...args);
   }
 
   public warn(message: string, ...args: unknown[]): void {
+    console.warn('[WARN]', `[${this.module}]`, message, ...args);
     this.logger.warn(`[${this.module}]`, message, ...args);
   }
 
   public error(message: string, ...args: unknown[]): void {
+    console.error('[ERROR]', `[${this.module}]`, message, ...args);
     this.logger.error(`[${this.module}]`, message, ...args);
   }
 
   public debug(message: string, ...args: unknown[]): void {
+    console.debug('[DEBUG]', `[${this.module}]`, message, ...args);
     this.logger.debug(`[${this.module}]`, message, ...args);
   }
 
   public trace(message: string, ...args: unknown[]): void {
+    console.debug('[TRACE]', `[${this.module}]`, message, ...args);
     this.logger.trace(`[${this.module}]`, message, ...args);
   }
 

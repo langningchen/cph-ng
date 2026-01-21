@@ -20,7 +20,7 @@ import type { IProblemRepository } from '@/application/ports/problems/IProblemRe
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import Companion from '@/modules/companion';
+import Companion from '@/legacy/companion';
 import type { SubmitToCodeforcesMsg } from '@/webview/src/msgs';
 
 @injectable()

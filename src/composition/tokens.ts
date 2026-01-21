@@ -17,7 +17,7 @@
 
 import type { TelemetryReporter } from '@vscode/extension-telemetry';
 import type { InjectionToken } from 'tsyringe';
-import type { LogOutputChannel } from 'vscode';
+import type { LogOutputChannel, OutputChannel } from 'vscode';
 import type { IBuildInfo } from '@/application/ports/node/IBuildInfo';
 import type { IClock } from '@/application/ports/node/IClock';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
@@ -54,6 +54,7 @@ import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 
 // Centralized DI tokens for tsyringe registrations
 // Keep these as string literals to avoid circular imports and enable tree-shaking
@@ -66,11 +67,14 @@ export const TOKENS = {
   extensionContext: 'vscode.ExtensionContext' as InjectionToken<IExtensionContext>,
   extensionPath: 'vscode.ExtensionPath' as InjectionToken<string>,
   logOutputChannel: 'vscode.LogOutputChannel' as InjectionToken<LogOutputChannel>,
+  compilationOutputChannel: 'vscode.CompilationOutputChannel' as InjectionToken<OutputChannel>,
   telemetryReporter: 'vscode.TelemetryReporter' as InjectionToken<TelemetryReporter>,
   version: 'vscode.Version' as InjectionToken<string>,
 
   // Core ports
   archive: 'ports.Archive' as InjectionToken<IArchive>,
+  activeProblemCoordinator:
+    'ports.ActiveProblemCoordinator' as InjectionToken<IActiveProblemCoordinator>,
   buildInfo: 'ports.BuildInfo' as InjectionToken<IBuildInfo>,
   checkerRunner: 'ports.CheckerRunner' as InjectionToken<ICheckerRunner>,
   clock: 'ports.Clock' as InjectionToken<IClock>,

@@ -165,14 +165,14 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
 
   private async collectResult(
     launch: LaunchResult,
-    data: number | NodeJS.Signals,
+    codeOrSignal: number | NodeJS.Signals,
   ): Promise<ProcessOutput> {
-    this.logger.trace('collectResult', { launch, data });
+    this.logger.trace('Collecting execution result', { launch, codeOrSignal });
     if (launch.timeoutId) clearTimeout(launch.timeoutId);
     await Promise.all(launch.ioPromises);
-    this.logger.debug(`Process ${launch.child.pid} close`, data);
+    this.logger.debug(`Process ${launch.child.pid} close`, { codeOrSignal });
     return {
-      codeOrSignal: data,
+      codeOrSignal,
       stdoutPath: launch.stdoutPath,
       stderrPath: launch.stderrPath,
       // A fallback for time if not set

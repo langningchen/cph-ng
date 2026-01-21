@@ -25,7 +25,7 @@ import { TOKENS } from '@/composition/tokens';
 import type { BfCompare } from '@/domain/entities/bfCompare';
 import type { ProblemMetaPayload } from '@/domain/entities/problem';
 import type { Tc, TcResult } from '@/domain/entities/tc';
-import type { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapper';
+import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapper';
 
 @injectable()
 export class ActiveProblemCoordinator {
@@ -37,7 +37,7 @@ export class ActiveProblemCoordinator {
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
     @inject(TOKENS.extensionContext) private readonly context: IExtensionContext,
     @inject(TOKENS.cphMigrationService) private readonly cph: ICphMigrationService,
-    private readonly mapper: WebviewProblemMapper,
+    @inject(WebviewProblemMapper) private readonly mapper: WebviewProblemMapper,
   ) {
     setInterval(async () => {
       const now = Date.now();
@@ -67,15 +67,39 @@ export class ActiveProblemCoordinator {
     }
     this.context.hasProblem = true;
     if (problemId !== this.activeProblemId) {
+      const onPatchMeta = async ({ checker, interactor }: ProblemMetaPayload) => {
+        if (!this.activeProblemId) return;
+        this.eventBus.patchMeta(this.activeProblemId, {
+          checker: checker ? this.mapper.fileWithHashToDto(checker) : undefined,
+          interactor: interactor ? this.mapper.fileWithHashToDto(interactor) : undefined,
+        });
+      };
+      const onPatchTc = async (id: UUID, payload: Partial<Tc>) => {
+        if (!this.activeProblemId) return;
+        this.eventBus.patchTc(this.activeProblemId, id, this.mapper.tcToDto(payload));
+      };
+      const onPatchTcResult = async (id: UUID, payload: Partial<TcResult>) => {
+        if (!this.activeProblemId) return;
+        this.eventBus.patchTcResult(this.activeProblemId, id, this.mapper.tcResultToDto(payload));
+      };
+      const onDeleteTc = async (id: UUID) => {
+        if (!this.activeProblemId) return;
+        this.eventBus.deleteTc(this.activeProblemId, id);
+      };
+      const onPatchBfCompare = async (payload: Partial<BfCompare>) => {
+        if (!this.activeProblemId) return;
+        this.eventBus.patchBfCompare(this.activeProblemId, this.mapper.bfCompareToDto(payload));
+      };
+
       if (this.activeProblemId) {
         const bgProblem = await this.repo.get(this.activeProblemId);
         const problem = bgProblem?.problem;
         if (problem) {
-          problem.signals.off('patchMeta', this.onPatchMeta);
-          problem.signals.off('patchTc', this.onPatchTc);
-          problem.signals.off('patchTcResult', this.onPatchTcResult);
-          problem.signals.off('deleteTc', this.onDeleteTc);
-          problem.signals.off('patchBfCompare', this.onPatchBfCompare);
+          problem.signals.off('patchMeta', onPatchMeta);
+          problem.signals.off('patchTc', onPatchTc);
+          problem.signals.off('patchTcResult', onPatchTcResult);
+          problem.signals.off('deleteTc', onDeleteTc);
+          problem.signals.off('patchBfCompare', onPatchBfCompare);
           await this.repo.persist(this.activeProblemId);
         }
       }
@@ -84,35 +108,11 @@ export class ActiveProblemCoordinator {
       const bgProblem = await this.repo.get(problemId);
       if (!bgProblem) return;
       this.eventBus.fullProblem(problemId, this.mapper.toDto(bgProblem.problem));
-      bgProblem.problem.signals.on('patchMeta', this.onPatchMeta);
-      bgProblem.problem.signals.on('patchTc', this.onPatchTc);
-      bgProblem.problem.signals.on('patchTcResult', this.onPatchTcResult);
-      bgProblem.problem.signals.on('deleteTc', this.onDeleteTc);
-      bgProblem.problem.signals.on('patchBfCompare', this.onPatchBfCompare);
+      bgProblem.problem.signals.on('patchMeta', onPatchMeta);
+      bgProblem.problem.signals.on('patchTc', onPatchTc);
+      bgProblem.problem.signals.on('patchTcResult', onPatchTcResult);
+      bgProblem.problem.signals.on('deleteTc', onDeleteTc);
+      bgProblem.problem.signals.on('patchBfCompare', onPatchBfCompare);
     }
-  }
-
-  private async onPatchMeta({ checker, interactor }: ProblemMetaPayload) {
-    if (!this.activeProblemId) return;
-    this.eventBus.patchMeta(this.activeProblemId, {
-      checker: checker ? this.mapper.fileWithHashToDto(checker) : undefined,
-      interactor: interactor ? this.mapper.fileWithHashToDto(interactor) : undefined,
-    });
-  }
-  private async onPatchTc(id: UUID, payload: Partial<Tc>) {
-    if (!this.activeProblemId) return;
-    this.eventBus.patchTc(this.activeProblemId, id, this.mapper.tcToDto(payload));
-  }
-  private async onPatchTcResult(id: UUID, payload: Partial<TcResult>) {
-    if (!this.activeProblemId) return;
-    this.eventBus.patchTcResult(this.activeProblemId, id, this.mapper.tcResultToDto(payload));
-  }
-  private async onDeleteTc(id: UUID) {
-    if (!this.activeProblemId) return;
-    this.eventBus.deleteTc(this.activeProblemId, id);
-  }
-  private async onPatchBfCompare(payload: Partial<BfCompare>) {
-    if (!this.activeProblemId) return;
-    this.eventBus.patchBfCompare(this.activeProblemId, this.mapper.bfCompareToDto(payload));
   }
 }

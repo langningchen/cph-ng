@@ -15,12 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
-import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+// biome-ignore-all lint: TO-DO
 
-export interface IProblemRepository {
-  loadByPath(srcPath: string, allowCreate?: boolean): Promise<UUID | null>;
-  get(problemId?: UUID): Promise<BackgroundProblem | undefined>;
-  getIdByPath(srcPath: string): Promise<UUID | undefined>;
-  persist(problemId: UUID): Promise<boolean>;
+import type { Problem } from '@/domain/entities/problem';
+
+export default class Companion {
+  public static init() {
+    // TO-DO
+  }
+  public static stopServer() {
+    // TO-DO
+  }
+  public static async submit(_problem?: Problem) {
+    // TO-DO
+  }
 }

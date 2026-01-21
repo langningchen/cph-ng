@@ -62,7 +62,7 @@ export interface IProblem {
   version: string;
   name: string;
   url?: string;
-  tcs: Map<UUID, ITc>;
+  tcs: Record<UUID, ITc>;
   tcOrder: UUID[];
   src: IFileWithHash;
   checker?: IFileWithHash;

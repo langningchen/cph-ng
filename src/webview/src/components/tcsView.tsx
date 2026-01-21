@@ -17,7 +17,7 @@
 
 import type { UUID } from 'node:crypto';
 import Box from '@mui/material/Box';
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictName } from '@/domain/entities/verdict';
 import type { IWebviewTc } from '@/domain/webviewTypes';
@@ -31,7 +31,7 @@ import { TcView } from './tcView';
 interface TcsViewProps {
   problemId: UUID;
   tcOrder: UUID[];
-  tcs: Map<UUID, IWebviewTc>;
+  tcs: Record<UUID, IWebviewTc>;
 }
 
 export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
@@ -40,21 +40,9 @@ export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
   const [expandedStates, setExpandedStates] = useState<boolean[]>([]);
-  const [prevTcOrder, setPrevTcOrder] = useState<UUID[]>(tcOrder);
-  const [focusTcId, setFocusTcId] = useState<UUID | null>(null);
-
-  useEffect(() => {
-    if (tcOrder.length > prevTcOrder.length) {
-      const newIds = tcOrder.filter((id) => !prevTcOrder.includes(id));
-      if (newIds.length === 1) {
-        setFocusTcId(newIds[0]);
-      }
-    }
-    setPrevTcOrder([...tcOrder]);
-  }, [tcOrder, prevTcOrder]);
 
   const handleDragStart = (idx: number, e: React.DragEvent) => {
-    const states = tcOrder.map((id) => tcs.get(id)?.isExpand || false);
+    const states = tcOrder.map((id) => tcs[id]?.isExpand || false);
     setExpandedStates(states);
 
     const dragImage = document.createElement('div');
@@ -88,7 +76,7 @@ export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
         reorderedStates.splice(dragOverIdx, 0, movedState);
       }
       tcOrder.forEach((id, idx) => {
-        const tc = tcs.get(id);
+        const tc = tcs[id];
         if (tc && idx < reorderedStates.length) tc.isExpand = reorderedStates[idx];
       });
     }
@@ -113,13 +101,13 @@ export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
       {tcOrder.length ? (
         <>
           {partyUri &&
-          tcOrder.every((id) => tcs.get(id)?.result?.verdict.name === VerdictName.accepted) ? (
+          tcOrder.every((id) => tcs[id]?.result?.verdict.name === VerdictName.accepted) ? (
             <AcCongrats />
           ) : null}
           <Box width='100%'>
             {displayOrder.map((originalIdx, displayIdx) => {
               const tcId = tcOrder[originalIdx];
-              const tc = tcs.get(tcId);
+              const tc = tcs[tcId];
               if (!tc || (tc.result?.verdict && hiddenStatuses.includes(tc.result?.verdict.name)))
                 return null;
 
@@ -134,7 +122,6 @@ export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
                       onDragStart={(e) => handleDragStart(originalIdx, e)}
                       onDragEnd={handleDragEnd}
                       isDragging={draggedIdx === originalIdx}
-                      autoFocus={tcId === focusTcId}
                     />
                   </ErrorBoundary>
                 </Box>

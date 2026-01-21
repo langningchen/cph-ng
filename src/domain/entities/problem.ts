@@ -26,6 +26,7 @@ export interface ProblemMetaPayload {
   checker?: IFileWithHash;
   interactor?: IFileWithHash;
 }
+// TO-DO addTc deleteTc events
 export type ProblemEvents = {
   patchMeta: (payload: ProblemMetaPayload) => void;
   patchBfCompare: (payload: Partial<BfCompare>) => void;
@@ -56,9 +57,9 @@ export class Problem {
     this._bfCompare.signals.on('change', this.bfCompareChanged);
   }
 
-  private bfCompareChanged(payload: Partial<BfCompare>) {
+  private bfCompareChanged = (payload: Partial<BfCompare>) => {
     this.signals.emit('patchBfCompare', payload);
-  }
+  };
 
   public get tcs(): Readonly<Map<UUID, Tc>> {
     return this._tcs;
@@ -103,8 +104,8 @@ export class Problem {
     this._tcs.set(uuid, tc);
     this._tcOrder.push(uuid);
     this.signals.emit('addTc', uuid, tc);
-    tc.signals.on('patchTc', this.onPatchTc.bind(this, uuid));
-    tc.signals.on('patchTcResult', this.onPatchTcResult.bind(this, uuid));
+    tc.signals.on('patchTc', (payload) => this.onPatchTc(uuid, payload));
+    tc.signals.on('patchTcResult', (payload) => this.onPatchTcResult(uuid, payload));
   }
   public getTc(uuid: UUID): Tc {
     const tc = this._tcs.get(uuid);
@@ -142,6 +143,7 @@ export class Problem {
     for (const [id, tc] of this._tcs)
       if (!activeIds.has(id)) {
         disposables.push(...tc.getDisposables());
+        tc.signals.removeAllListeners();
         this._tcs.delete(id);
       }
     return disposables;

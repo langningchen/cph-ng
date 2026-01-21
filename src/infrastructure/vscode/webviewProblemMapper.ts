@@ -21,7 +21,7 @@ import type { IPath } from '@/application/ports/node/IPath';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
-import { type BfCompare, isRunningState } from '@/domain/entities/bfCompare';
+import { type BfCompare, BfCompareState, isRunningState } from '@/domain/entities/bfCompare';
 import type { Problem } from '@/domain/entities/problem';
 import type { Tc, TcResult } from '@/domain/entities/tc';
 import type { TcIo } from '@/domain/entities/tcIo';
@@ -36,6 +36,7 @@ import type {
   IWebviewTcIo,
   IWebviewTcResult,
 } from '@/domain/webviewTypes';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 
 @injectable()
 export class WebviewProblemMapper {
@@ -43,13 +44,14 @@ export class WebviewProblemMapper {
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
   ) {}
 
   public toDto(entity: Problem): IWebviewProblem {
-    const tcs: Map<UUID, IWebviewTc> = new Map();
+    const tcs: Record<UUID, IWebviewTc> = {};
     for (const id of entity.tcOrder) {
       const tc = entity.tcs.get(id);
-      if (tc) tcs.set(id, this.tcToDto(tc));
+      if (tc) tcs[id] = this.tcToDto(tc);
     }
     return {
       name: entity.name,
@@ -104,11 +106,27 @@ export class WebviewProblemMapper {
   public bfCompareToDto(bfCompare: BfCompare): IWebviewBfCompare;
   public bfCompareToDto(bfCompare: Partial<BfCompare>): Partial<IWebviewBfCompare>;
   public bfCompareToDto(bfCompare: Partial<BfCompare>): Partial<IWebviewBfCompare> {
+    const msgs = {
+      [BfCompareState.inactive]: this.translator.t('Brute Force Compare is Idle'),
+      [BfCompareState.compiling]: this.translator.t('Compiling...'),
+      [BfCompareState.compilationError]: this.translator.t('Compilation Error'),
+      [BfCompareState.generating]: this.translator.t('Generating Data (#{cnt})...', {
+        cnt: bfCompare.cnt,
+      }),
+      [BfCompareState.runningBruteForce]: this.translator.t('Running Brute Force (#{cnt})...', {
+        cnt: bfCompare.cnt,
+      }),
+      [BfCompareState.runningSolution]: this.translator.t('Running Solution (#{cnt})...'),
+      [BfCompareState.foundDifference]: this.translator.t('Difference found at case #{cnt}', {
+        cnt: bfCompare.cnt,
+      }),
+      [BfCompareState.internalError]: this.translator.t('Internal Error'),
+    };
     return {
       generator: bfCompare.generator ? this.fileWithHashToDto(bfCompare.generator) : undefined,
       bruteForce: bfCompare.bruteForce ? this.fileWithHashToDto(bfCompare.bruteForce) : undefined,
       isRunning: isRunningState(bfCompare.state),
-      msg: 'TO-DO',
+      msg: bfCompare.state ? msgs[bfCompare.state] : undefined,
     };
   }
   public fileWithHashToDto(fileWithHash: IFileWithHash): IWebviewFileWithHash {

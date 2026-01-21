@@ -27,8 +27,8 @@ import { SidebarProvider } from '../sidebarProvider';
 export class ProviderModule implements IExtensionModule {
   public constructor(
     @inject(TOKENS.settings) private readonly settings: ISettings,
-    private readonly sidebarProvider: SidebarProvider,
-    private readonly problemFs: ProblemFs,
+    @inject(SidebarProvider) private readonly sidebarProvider: SidebarProvider,
+    @inject(ProblemFs) private readonly problemFs: ProblemFs,
   ) {}
 
   public setup(context: ExtensionContext) {

@@ -24,7 +24,7 @@ import type { IProblemService } from '@/application/ports/problems/IProblemServi
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
-import type { TcScanner } from '@/domain/services/TcScanner';
+import { TcScanner } from '@/domain/services/TcScanner';
 import type { DragDropMsg } from '@/webview/src/msgs';
 
 @injectable()
@@ -37,7 +37,7 @@ export class DragDrop {
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.activePathService) private readonly activePath: IActivePathService,
-    private readonly tcScanner: TcScanner,
+    @inject(TcScanner) private readonly tcScanner: TcScanner,
   ) {}
 
   public async exec(msg: DragDropMsg): Promise<void> {

@@ -53,7 +53,6 @@ interface ProblemContextType {
   dispatch: (msg: WebviewMsg) => void;
 }
 
-const sendMsg = window.postMessage;
 const ProblemContext = createContext<ProblemContextType | undefined>(undefined);
 
 const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State => {
@@ -71,7 +70,7 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
       }
       case 'PATCH_TC_RESULT': {
         if (draft.currentProblem.type !== 'active') return;
-        const tc = draft.currentProblem.problem.tcs.get(action.tcId);
+        const tc = draft.currentProblem.problem.tcs[action.tcId];
         if (tc)
           tc.result = {
             verdict: Verdicts[VerdictName.unknownError],
@@ -82,8 +81,8 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
       }
       case 'PATCH_TC': {
         if (draft.currentProblem.type !== 'active') return;
-        const tc = draft.currentProblem.problem.tcs.get(action.tcId);
-        if (tc) draft.currentProblem.problem.tcs.set(action.tcId, { ...tc, ...action.payload });
+        const tc = draft.currentProblem.problem.tcs[action.tcId];
+        draft.currentProblem.problem.tcs[action.tcId] = { ...tc, ...action.payload };
         break;
       }
       case 'BACKGROUND': {
@@ -96,7 +95,57 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
         break;
       }
 
-      // --- 前端乐观更新（还没写） ---
+      case 'editProblemDetails': {
+        if (draft.currentProblem.type !== 'active') return;
+        const problem = draft.currentProblem.problem;
+        problem.name = action.name;
+        problem.url = action.url;
+        if (action.overrides.timeLimitMs)
+          problem.overrides.timeLimitMs.override = action.overrides.timeLimitMs;
+        if (action.overrides.memoryLimitMb)
+          problem.overrides.memoryLimitMb.override = action.overrides.memoryLimitMb;
+        if (action.overrides.compiler && problem.overrides.compiler)
+          problem.overrides.compiler.override = action.overrides.compiler;
+        if (action.overrides.compilerArgs && problem.overrides.compilerArgs)
+          problem.overrides.compilerArgs.override = action.overrides.compilerArgs;
+        if (action.overrides.runner && problem.overrides.runner)
+          problem.overrides.runner.override = action.overrides.runner;
+        if (action.overrides.runnerArgs && problem.overrides.runnerArgs)
+          problem.overrides.runnerArgs.override = action.overrides.runnerArgs;
+        break;
+      }
+
+      case 'clearTcStatus': {
+        if (draft.currentProblem.type !== 'active') return;
+        if (action.id) delete draft.currentProblem.problem.tcs[action.id].result;
+        else for (const tc of Object.values(draft.currentProblem.problem.tcs)) delete tc.result;
+        break;
+      }
+
+      case 'setTcString': {
+        if (draft.currentProblem.type !== 'active') return;
+        const tc = draft.currentProblem.problem.tcs[action.id];
+        if (action.label === 'stdin') tc.stdin = { type: 'string', data: action.data };
+        if (action.label === 'answer') tc.answer = { type: 'string', data: action.data };
+        break;
+      }
+
+      case 'updateTc': {
+        if (draft.currentProblem.type !== 'active') return;
+        const tc = draft.currentProblem.problem.tcs[action.id];
+        if (action.event === 'toggleDisable') tc.isDisabled = !tc.isDisabled;
+        if (action.event === 'toggleExpand') tc.isExpand = !tc.isExpand;
+        if (action.event === 'setAsAnswer' && tc.result?.stdout) tc.answer = tc.result.stdout;
+        break;
+      }
+
+      case 'reorderTc': {
+        if (draft.currentProblem.type !== 'active') return;
+        const tcOrder = draft.currentProblem.problem.tcOrder;
+        const [movedTc] = tcOrder.splice(action.fromIdx, 1);
+        tcOrder.splice(action.toIdx, 0, movedTc);
+        break;
+      }
     }
   });
 };
@@ -111,7 +160,7 @@ export const ProblemProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const handleMessage = ({ data }: MessageEvent<WebviewEvent>) => reactDispatch(data);
     window.addEventListener('message', handleMessage);
-    sendMsg({ type: 'init' });
+    vscode.postMessage({ type: 'init' });
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
@@ -120,7 +169,7 @@ export const ProblemProvider = ({ children }: { children: ReactNode }) => {
       state,
       dispatch: (msg: WebviewMsg) => {
         reactDispatch(msg);
-        sendMsg(msg);
+        vscode.postMessage(msg);
       },
     }),
     [state],
