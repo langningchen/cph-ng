@@ -1,135 +1,136 @@
+// Copyright (C) 2026 Langning Chen
+//
+// This file is part of cph-ng.
+//
+// cph-ng is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// cph-ng is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
+
 import type { UUID } from 'node:crypto';
-import React, { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
-import type { IProblem } from '@/domain/types';
-import type { ActivePathEvent, ProblemEvent, ProblemEventData } from '../../../modules/sidebar';
-import type { ProblemMsgCore } from '../msgs';
-import { msg as sendMsg } from '../utils';
+import { produce } from 'immer';
+import React, {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+} from 'react';
+import type { WebviewEvent } from '@/application/ports/vscode/IWebviewEventBus';
+import { VerdictName, Verdicts } from '@/domain/entities/verdict';
+import type { IWebviewBackgroundProblem, IWebviewProblem } from '@/domain/webviewTypes';
+import type { WebviewMsg } from '../msgs';
+
+export interface CurrentProblemStateIdle {
+  type: 'idle';
+  canImport: boolean;
+}
+export interface CurrentProblemStateActive {
+  type: 'active';
+  problemId: UUID;
+  problem: IWebviewProblem;
+  startTime: number;
+}
+export type CurrentProblemState = CurrentProblemStateIdle | CurrentProblemStateActive;
+
+type State = {
+  isInitialized: boolean;
+  currentProblem: CurrentProblemState;
+  backgroundProblems: IWebviewBackgroundProblem[];
+};
 
 interface ProblemContextType {
-  problemData: ProblemEventData | undefined;
-  dispatch: (msg: ProblemMsgCore) => void;
+  state: State;
+  dispatch: (msg: WebviewMsg) => void;
 }
 
+const sendMsg = window.postMessage;
 const ProblemContext = createContext<ProblemContextType | undefined>(undefined);
 
-export const useProblemContext = () => {
-  const context = useContext(ProblemContext);
-  if (!context) {
-    throw new Error('useProblemContext must be used within a ProblemProvider');
-  }
-  return context;
+const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State => {
+  return produce(state, (draft) => {
+    switch (action.type) {
+      case 'FULL_PROBLEM': {
+        draft.isInitialized = true;
+        draft.currentProblem = {
+          type: 'active',
+          problemId: action.problemId,
+          problem: action.payload,
+          startTime: Date.now(),
+        };
+        break;
+      }
+      case 'PATCH_TC_RESULT': {
+        if (draft.currentProblem.type !== 'active') return;
+        const tc = draft.currentProblem.problem.tcs.get(action.tcId);
+        if (tc)
+          tc.result = {
+            verdict: Verdicts[VerdictName.unknownError],
+            ...(tc.result || {}),
+            ...action.payload,
+          };
+        break;
+      }
+      case 'PATCH_TC': {
+        if (draft.currentProblem.type !== 'active') return;
+        const tc = draft.currentProblem.problem.tcs.get(action.tcId);
+        if (tc) draft.currentProblem.problem.tcs.set(action.tcId, { ...tc, ...action.payload });
+        break;
+      }
+      case 'BACKGROUND': {
+        draft.backgroundProblems = action.payload;
+        break;
+      }
+      case 'NO_PROBLEM': {
+        draft.isInitialized = true;
+        draft.currentProblem = { type: 'idle', canImport: action.canImport };
+        break;
+      }
+
+      // --- 前端乐观更新（还没写） ---
+    }
+  });
 };
 
 export const ProblemProvider = ({ children }: { children: ReactNode }) => {
-  const [problemData, setProblemData] = useState<ProblemEventData | undefined>();
+  const [state, reactDispatch] = useReducer(problemReducer, {
+    currentProblem: { type: 'idle', canImport: false },
+    backgroundProblems: [],
+    isInitialized: false,
+  });
 
   useEffect(() => {
-    const handleMessage = (e: MessageEvent<ProblemEvent | ActivePathEvent>) => {
-      const msg = e.data;
-      switch (msg.type) {
-        case 'activePath':
-          window.activePath = msg.activePath;
-          break;
-        case 'problem':
-          setProblemData(msg);
-          break;
-      }
-    };
+    const handleMessage = ({ data }: MessageEvent<WebviewEvent>) => reactDispatch(data);
     window.addEventListener('message', handleMessage);
     sendMsg({ type: 'init' });
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  const dispatch = (msg: ProblemMsgCore) => {
-    sendMsg(msg);
-
-    // Optimistic updates
-    if (!problemData?.problem) return;
-
-    const problemWrapper = { ...problemData.problem };
-    const problem: IProblem = { ...problemWrapper.problem };
-    problem.tcs = { ...problem.tcs };
-    problemWrapper.problem = problem;
-
-    let changed = false;
-
-    switch (msg.type) {
-      case 'editProblemDetails':
-        problem.name = msg.name;
-        problem.url = msg.url;
-        problem.timeLimitMs = msg.timeLimitMs;
-        problem.memoryLimitMb = msg.memoryLimitMb;
-        problem.overrides = msg.overrides;
-        changed = true;
-        break;
-      case 'removeSrcFile':
-        if (msg.fileType === 'checker') {
-          problem.checker = undefined;
-        }
-        if (msg.fileType === 'interactor') {
-          problem.interactor = undefined;
-        }
-        if (msg.fileType === 'generator' && problem.bfCompare) {
-          problem.bfCompare.generator = undefined;
-        }
-        if (msg.fileType === 'bruteForce' && problem.bfCompare) {
-          problem.bfCompare.bruteForce = undefined;
-        }
-        changed = true;
-        break;
-      case 'updateTc':
-        if (problem.tcs[msg.id]) {
-          problem.tcs[msg.id] = msg.tc;
-          changed = true;
-        }
-        break;
-      case 'toggleDisable':
-        if (problem.tcs[msg.id]) {
-          problem.tcs[msg.id] = { ...problem.tcs[msg.id] };
-          problem.tcs[msg.id].isDisabled = !problem.tcs[msg.id].isDisabled;
-          changed = true;
-        }
-        break;
-      case 'clearTcStatus':
-        if (msg.id) {
-          if (problem.tcs[msg.id]) {
-            problem.tcs[msg.id] = { ...problem.tcs[msg.id] };
-            problem.tcs[msg.id].result = undefined;
-            changed = true;
-          }
-        } else {
-          (Object.keys(problem.tcs) as UUID[]).forEach((id) => {
-            problem.tcs[id] = { ...problem.tcs[id] };
-            problem.tcs[id].result = undefined;
-          });
-          changed = true;
-        }
-        break;
-      case 'delTc':
-        delete problem.tcs[msg.id];
-        problem.tcOrder = problem.tcOrder.filter((id: string) => id !== msg.id);
-        changed = true;
-        break;
-      case 'reorderTc': {
-        const { fromIdx, toIdx } = msg;
-        const tcOrder = [...problem.tcOrder];
-        const [moved] = tcOrder.splice(fromIdx, 1);
-        tcOrder.splice(toIdx, 0, moved);
-        problem.tcOrder = tcOrder;
-        changed = true;
-        break;
-      }
-    }
-
-    if (changed) {
-      setProblemData({
-        ...problemData,
-        problem: problemWrapper,
-      });
-    }
-  };
-
-  return (
-    <ProblemContext.Provider value={{ problemData, dispatch }}>{children}</ProblemContext.Provider>
+  const value = useMemo(
+    () => ({
+      state,
+      dispatch: (msg: WebviewMsg) => {
+        reactDispatch(msg);
+        sendMsg(msg);
+      },
+    }),
+    [state],
   );
+
+  return <ProblemContext.Provider value={value}>{children}</ProblemContext.Provider>;
+};
+
+export const useProblemContext = () => {
+  const context = useContext(ProblemContext);
+  if (!context) throw new Error('useProblemContext must be used within a ProblemProvider');
+  return context;
 };

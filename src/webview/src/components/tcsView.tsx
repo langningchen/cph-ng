@@ -17,9 +17,10 @@
 
 import type { UUID } from 'node:crypto';
 import Box from '@mui/material/Box';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { IProblem } from '@/domain/types';
+import { VerdictName } from '@/domain/entities/verdict';
+import type { IWebviewTc } from '@/domain/webviewTypes';
 import { useProblemContext } from '../context/ProblemContext';
 import { AcCongrats } from './acCongrats';
 import { CphFlex } from './base/cphFlex';
@@ -28,37 +29,33 @@ import { NoTcs } from './noTcs';
 import { TcView } from './tcView';
 
 interface TcsViewProps {
-  problem: IProblem;
+  problemId: UUID;
+  tcOrder: UUID[];
+  tcs: Map<UUID, IWebviewTc>;
 }
 
-export const TcsView = ({ problem }: TcsViewProps) => {
+export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
   const [expandedStates, setExpandedStates] = useState<boolean[]>([]);
-  const [prevTcOrder, setPrevTcOrder] = useState<UUID[]>(problem.tcOrder);
+  const [prevTcOrder, setPrevTcOrder] = useState<UUID[]>(tcOrder);
   const [focusTcId, setFocusTcId] = useState<UUID | null>(null);
 
   useEffect(() => {
-    if (problem.tcOrder.length > prevTcOrder.length) {
-      const newIds = problem.tcOrder.filter((id) => !prevTcOrder.includes(id));
+    if (tcOrder.length > prevTcOrder.length) {
+      const newIds = tcOrder.filter((id) => !prevTcOrder.includes(id));
       if (newIds.length === 1) {
         setFocusTcId(newIds[0]);
       }
     }
-    setPrevTcOrder([...problem.tcOrder]);
-  }, [problem.tcOrder, prevTcOrder]);
+    setPrevTcOrder([...tcOrder]);
+  }, [tcOrder, prevTcOrder]);
 
   const handleDragStart = (idx: number, e: React.DragEvent) => {
-    const states = problem.tcOrder.map((id) =>
-      problem.tcs[id] ? problem.tcs[id].isExpand : false,
-    );
+    const states = tcOrder.map((id) => tcs.get(id)?.isExpand || false);
     setExpandedStates(states);
-
-    for (const tc of Object.values(problem.tcs)) {
-      tc.isExpand = false;
-    }
 
     const dragImage = document.createElement('div');
     dragImage.style.opacity = '0';
@@ -79,9 +76,9 @@ export const TcsView = ({ problem }: TcsViewProps) => {
 
   const handleDragEnd = () => {
     if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
-      const [movedId] = problem.tcOrder.splice(draggedIdx, 1);
-      problem.tcOrder.splice(dragOverIdx, 0, movedId);
-      dispatch({ type: 'reorderTc', fromIdx: draggedIdx, toIdx: dragOverIdx });
+      const [movedId] = tcOrder.splice(draggedIdx, 1);
+      tcOrder.splice(dragOverIdx, 0, movedId);
+      dispatch({ type: 'reorderTc', problemId, fromIdx: draggedIdx, toIdx: dragOverIdx });
     }
 
     if (expandedStates.length > 0) {
@@ -90,11 +87,9 @@ export const TcsView = ({ problem }: TcsViewProps) => {
         const [movedState] = reorderedStates.splice(draggedIdx, 1);
         reorderedStates.splice(dragOverIdx, 0, movedState);
       }
-      problem.tcOrder.forEach((id, idx) => {
-        const tc = problem.tcs[id];
-        if (tc && idx < reorderedStates.length) {
-          tc.isExpand = reorderedStates[idx];
-        }
+      tcOrder.forEach((id, idx) => {
+        const tc = tcs.get(id);
+        if (tc && idx < reorderedStates.length) tc.isExpand = reorderedStates[idx];
       });
     }
 
@@ -104,10 +99,8 @@ export const TcsView = ({ problem }: TcsViewProps) => {
   };
 
   const getDisplayOrder = () => {
-    if (draggedIdx === null || dragOverIdx === null) {
-      return problem.tcOrder.map((_, idx) => idx);
-    }
-    const order = problem.tcOrder.map((_, idx) => idx);
+    if (draggedIdx === null || dragOverIdx === null) return tcOrder.map((_, idx) => idx);
+    const order = tcOrder.map((_, idx) => idx);
     const [removed] = order.splice(draggedIdx, 1);
     order.splice(dragOverIdx, 0, removed);
     return order;
@@ -117,59 +110,59 @@ export const TcsView = ({ problem }: TcsViewProps) => {
 
   return (
     <CphFlex column>
-      {problem.tcOrder.length ? (
+      {tcOrder.length ? (
         <>
           {partyUri &&
-          problem.tcOrder.every((id) => problem.tcs[id]?.result?.verdict.name === 'AC') ? (
+          tcOrder.every((id) => tcs.get(id)?.result?.verdict.name === VerdictName.accepted) ? (
             <AcCongrats />
           ) : null}
-          <Box width={'100%'}>
+          <Box width='100%'>
             {displayOrder.map((originalIdx, displayIdx) => {
-              const id = problem.tcOrder[originalIdx];
-              const tc = problem.tcs[id];
-              if (tc.result?.verdict && hiddenStatuses.includes(tc.result?.verdict.name)) {
+              const tcId = tcOrder[originalIdx];
+              const tc = tcs.get(tcId);
+              if (!tc || (tc.result?.verdict && hiddenStatuses.includes(tc.result?.verdict.name)))
                 return null;
-              }
 
               return (
-                <Box key={id} onDragOver={(e) => handleDragOver(e, displayIdx)}>
+                <Box key={tcId} onDragOver={(e) => handleDragOver(e, displayIdx)}>
                   <ErrorBoundary>
                     <TcView
+                      problemId={problemId}
+                      tcId={tcId}
                       tc={tc}
                       idx={originalIdx}
-                      id={id}
                       onDragStart={(e) => handleDragStart(originalIdx, e)}
                       onDragEnd={handleDragEnd}
                       isDragging={draggedIdx === originalIdx}
-                      autoFocus={id === focusTcId}
+                      autoFocus={tcId === focusTcId}
                     />
                   </ErrorBoundary>
                 </Box>
               );
             })}
-            <Box
-              onClick={() => dispatch({ type: 'addTc' })}
-              sx={{
-                minHeight: '40px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: 0.5,
-                '&:hover': {
-                  opacity: 1,
-                  backgroundColor: 'rgba(127, 127, 127, 0.1)',
-                },
-                transition: 'all 0.2s',
-              }}
-            >
-              {t('tcsView.addTcHint')}
-            </Box>
           </Box>
         </>
       ) : (
         <NoTcs />
       )}
+      <Box
+        onClick={() => dispatch({ type: 'addTc', problemId })}
+        sx={{
+          minHeight: '40px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: 0.5,
+          '&:hover': {
+            opacity: 1,
+            backgroundColor: 'rgba(127, 127, 127, 0.1)',
+          },
+          transition: 'all 0.2s',
+        }}
+      >
+        {t('tcsView.addTcHint')}
+      </Box>
     </CphFlex>
   );
-};
+});

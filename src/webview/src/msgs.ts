@@ -78,10 +78,16 @@ export interface ChooseTcFileMsg extends ProblemBaseMsg {
   id: UUID;
   label: WebviewTcFileTypes;
 }
+export interface SetTcStringMsg extends ProblemBaseMsg {
+  type: 'setTcString';
+  id: UUID;
+  label: WebviewTcFileTypes;
+  data: string;
+}
 export interface UpdateTcMsg extends ProblemBaseMsg {
   type: 'updateTc';
   id: UUID;
-  event: 'toggleDisable' | 'toggleExpand';
+  event: 'toggleDisable' | 'toggleExpand' | 'setAsAnswer';
 }
 export interface CompareTcMsg extends ProblemBaseMsg {
   type: 'compareTc';
@@ -128,7 +134,7 @@ export interface StopBfCompareMsg extends ProblemBaseMsg {
 export interface SubmitToCodeforcesMsg extends ProblemBaseMsg {
   type: 'submitToCodeforces';
 }
-export interface DragDropMsg extends ProblemBaseMsg {
+export interface DragDropMsg extends BaseMsg {
   type: 'dragDrop';
   items: string[];
 }
@@ -152,6 +158,7 @@ export type ProblemMsg =
   | ToggleDisableMsg
   | ClearTcStatusMsg
   | ChooseTcFileMsg
+  | SetTcStringMsg
   | UpdateTcMsg
   | CompareTcMsg
   | ToggleTcFileMsg
@@ -164,7 +171,7 @@ export type ProblemMsg =
   | SubmitToCodeforcesMsg
   | DragDropMsg;
 
-export type ProblemMsgCore = DistributiveOmit<ProblemMsg, 'activePath'>;
+export type ProblemMsgCore = DistributiveOmit<ProblemMsg, 'problemId'>;
 
 export type WebviewMsg =
   | ProblemMsg

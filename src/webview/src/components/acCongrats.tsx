@@ -25,8 +25,8 @@ export const AcCongrats = () => {
 
   return (
     <CphFlex column>
-      <img width={'30%'} src={partyUri} alt='AC congratulations gif' />
-      <CphText textAlign={'center'}>
+      <img width='30%' src={partyUri} alt='AC congratulations gif' />
+      <CphText textAlign='center'>
         {t('acCongrats.firstLine')}
         <br />
         {t('acCongrats.secondLine')}

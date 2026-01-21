@@ -111,7 +111,10 @@ export class ProblemService implements IProblemService {
     if (option === 'zip') {
       const zipFile = await this.ui.openDialog({
         title: this.translator.t('Choose a zip file containing test cases'),
-        filters: { 'Zip files': ['zip'], 'All files': ['*'] },
+        filters: {
+          [this.translator.t('Zip files')]: ['zip'],
+          [this.translator.t('All files')]: ['*'],
+        },
       });
       if (!zipFile) return;
       this.applyTcs(problem, await this.tcScanner.fromZip(problem.src.path, zipFile));

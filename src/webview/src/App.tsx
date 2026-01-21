@@ -41,7 +41,7 @@ i18n.use(initReactI18next).init({
 });
 
 const Main = () => {
-  const { problemData } = useProblemContext();
+  const { state } = useProblemContext();
 
   return (
     <>
@@ -52,20 +52,20 @@ const Main = () => {
         <CphFlex
           column
           smallGap
-          height={'100%'}
+          height='100%'
           sx={{
             boxSizing: 'border-box',
           }}
           padding={1}
         >
-          {problemData ? (
+          {state.isInitialized ? (
             <>
-              {problemData.problem ? (
-                <ProblemView {...problemData.problem} />
+              {state.currentProblem.type === 'active' ? (
+                <ProblemView {...state.currentProblem} />
               ) : (
-                <CreateProblemView canImport={problemData.canImport || false} />
+                <CreateProblemView canImport={state.currentProblem.canImport} />
               )}
-              <BgProblemView bgProblems={problemData.bgProblems || []} />
+              <BgProblemView bgProblems={state.backgroundProblems} />
             </>
           ) : (
             <InitView />

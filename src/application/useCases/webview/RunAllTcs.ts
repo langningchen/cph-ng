@@ -32,7 +32,7 @@ import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import { isExpandVerdict, VerdictName } from '@/domain/entities/verdict';
+import { VerdictName, Verdicts, VerdictType } from '@/domain/entities/verdict';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import type { RunTcsMsg } from '@/webview/src/msgs';
 
@@ -112,11 +112,11 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
           } else if (expandBehavior === 'never') {
             isExpand = false;
           } else if (expandBehavior === 'failed') {
-            isExpand = isExpandVerdict(res.verdict);
+            isExpand = Verdicts[res.verdict].type === VerdictType.failed;
           } else if (expandBehavior === 'first') {
             isExpand = !hasAnyExpanded;
           } else if (expandBehavior === 'firstFailed') {
-            isExpand = !hasAnyExpanded && isExpandVerdict(res.verdict);
+            isExpand = !hasAnyExpanded && Verdicts[res.verdict].type === VerdictType.failed;
           } else if (expandBehavior === 'same') {
             isExpand = expandMemo[tcId];
           }

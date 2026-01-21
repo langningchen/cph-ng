@@ -26,5 +26,4 @@ declare const language: string;
 declare const showTips: boolean;
 interface Window {
   easterEgg?: boolean;
-  activePath?: string;
 }

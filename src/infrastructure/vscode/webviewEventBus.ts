@@ -44,28 +44,28 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
 
   public fullProblem(problemId: UUID, payload: IWebviewProblem): void {
     this.emitter.emit('message', {
-      name: 'FULL_PROBLEM',
+      type: 'FULL_PROBLEM',
       problemId,
       payload,
     });
   }
   public patchMeta(problemId: UUID, payload: WebviewProblemMetaPayload): void {
     this.emitter.emit('message', {
-      name: 'PATCH_META',
+      type: 'PATCH_META',
       problemId,
       payload,
     });
   }
   public patchBfCompare(problemId: UUID, payload: Partial<IWebviewBfCompare>): void {
     this.emitter.emit('message', {
-      name: 'PATCH_BF_COMPARE',
+      type: 'PATCH_BF_COMPARE',
       problemId,
       payload,
     });
   }
   public patchTc(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTc>): void {
     this.emitter.emit('message', {
-      name: 'PATCH_TC',
+      type: 'PATCH_TC',
       problemId,
       tcId,
       payload,
@@ -73,7 +73,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
   }
   public patchTcResult(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTcResult>): void {
     this.emitter.emit('message', {
-      name: 'PATCH_TC_RESULT',
+      type: 'PATCH_TC_RESULT',
       problemId,
       tcId,
       payload,
@@ -81,20 +81,20 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
   }
   public deleteTc(problemId: UUID, tcId: UUID): void {
     this.emitter.emit('message', {
-      name: 'DELETE_TC',
+      type: 'DELETE_TC',
       problemId,
       tcId,
     });
   }
   public background(payload: IWebviewBackgroundProblem[]): void {
     this.emitter.emit('message', {
-      name: 'BACKGROUND',
+      type: 'BACKGROUND',
       payload,
     });
   }
   public noProblem(canImport: boolean): void {
     this.emitter.emit('message', {
-      name: 'NO_PROBLEM',
+      type: 'NO_PROBLEM',
       canImport,
     });
   }

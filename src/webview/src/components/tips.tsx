@@ -23,7 +23,7 @@ import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { msg } from '@/webview/src/utils';
+import { useProblemContext } from '@/webview/src/context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { CphText } from './base/cphText';
 import { CphButton } from './cphButton';
@@ -35,24 +35,25 @@ type TipMessage = {
 
 export const Tips = () => {
   const { t } = useTranslation();
+  const { dispatch } = useProblemContext();
   const tipMessages: TipMessage[] = [
     { msg: t('tipMessage1') },
     { msg: t('tipMessage2') },
     { msg: t('tipMessage3') },
-    { msg: t('tipMessage4'), action: () => msg({ type: 'startChat' }) },
+    { msg: t('tipMessage4'), action: () => dispatch({ type: 'startChat' }) },
     { msg: t('tipMessage5') },
     {
       msg: t('tipMessage6'),
-      action: () => msg({ type: 'openSettings', item: 'cph-ng.sidebar.showAcGif' }),
+      action: () => dispatch({ type: 'openSettings', item: 'cph-ng.sidebar.showAcGif' }),
     },
     {
       msg: t('tipMessage7'),
-      action: () => msg({ type: 'openSettings', item: 'cph-ng.sidebar.hiddenStatuses' }),
+      action: () => dispatch({ type: 'openSettings', item: 'cph-ng.sidebar.hiddenStatuses' }),
     },
     { msg: t('tipMessage8') },
     {
       msg: t('tipMessage9'),
-      action: () => msg({ type: 'openSettings', item: 'cph-ng.compilation.useWrapper' }),
+      action: () => dispatch({ type: 'openSettings', item: 'cph-ng.compilation.useWrapper' }),
     },
     { msg: t('tipMessage10') },
   ];

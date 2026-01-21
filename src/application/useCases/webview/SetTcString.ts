@@ -20,11 +20,11 @@ import type { IProblemRepository } from '@/application/ports/problems/IProblemRe
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import { VerdictName, Verdicts, VerdictType } from '@/domain/entities/verdict';
-import type { StopTcsMsg } from '@/webview/src/msgs';
+import { TcIo } from '@/domain/entities/tcIo';
+import type { SetTcStringMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class StopTcs extends BaseProblemUseCase<StopTcsMsg> {
+export class SetTcString extends BaseProblemUseCase<SetTcStringMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
   ) {
@@ -32,17 +32,11 @@ export class StopTcs extends BaseProblemUseCase<StopTcsMsg> {
   }
 
   protected async performAction(
-    { problem, abort }: BackgroundProblem,
-    msg: StopTcsMsg,
+    { problem }: BackgroundProblem,
+    msg: SetTcStringMsg,
   ): Promise<void> {
-    abort(msg.onlyOne ? 'onlyOne' : undefined);
-    if (!msg.onlyOne) {
-      const tcOrder = problem.getEnabledTcIds();
-      for (const tcId of tcOrder) {
-        const tc = problem.getTc(tcId);
-        if (tc.verdict && Verdicts[tc.verdict].type === VerdictType.running)
-          tc.updateResult(VerdictName.rejected);
-      }
-    }
+    const tc = problem.getTc(msg.id);
+    if (msg.label === 'stdin') tc.stdin = new TcIo({ data: msg.data });
+    if (msg.label === 'answer') tc.answer = new TcIo({ data: msg.data });
   }
 }

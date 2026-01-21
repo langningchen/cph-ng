@@ -39,6 +39,7 @@ import { RemoveSrcFile } from '@/application/useCases/webview/RemoveSrcFile';
 import { ReorderTc } from '@/application/useCases/webview/ReorderTc';
 import { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
 import { RunSingleTc } from '@/application/useCases/webview/RunSingleTc';
+import { SetTcString } from '@/application/useCases/webview/SetTcString';
 import { StartBfCompare } from '@/application/useCases/webview/StartBfCompare';
 import { StartChat } from '@/application/useCases/webview/StartChat';
 import { StopBfCompare } from '@/application/useCases/webview/StopBfCompare';
@@ -71,6 +72,7 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
   reorderTc: ReorderTc,
   runTc: RunSingleTc,
   runTcs: RunAllTcs,
+  setTcString: SetTcString,
   startBfCompare: StartBfCompare,
   startChat: StartChat,
   stopBfCompare: StopBfCompare,

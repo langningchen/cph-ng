@@ -825,6 +825,7 @@
     "copy-webpack-plugin": "^13.0.1",
     "crypto-js": "^4.2.0",
     "i18next": "^25.7.4",
+    "immer": "^11.1.3",
     "natural-orderby": "^5.0.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

@@ -23,9 +23,9 @@ interface CphTextProps extends TypographyProps {}
 export const CphText = (props: CphTextProps) => {
   return (
     <Typography
-      overflow={'hidden'}
-      textOverflow={'ellipsis'}
-      component={'span'}
+      overflow='hidden'
+      textOverflow='ellipsis'
+      component='span'
       sx={{
         cursor: 'default',
         userSelect: 'none',

@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { UUID } from 'node:crypto';
 import EditIcon from '@mui/icons-material/Edit';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -31,8 +32,7 @@ import Tab from '@mui/material/Tab';
 import TextField from '@mui/material/TextField';
 import React, { type SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { IProblem } from '@/domain/types';
-import { msg } from '@/webview/src/utils';
+import type { IWebviewFileWithHash, IWebviewOverrides } from '@/domain/webviewTypes';
 import { useProblemContext } from '../context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { CphLink } from './base/cphLink';
@@ -41,7 +41,13 @@ import { CphText } from './base/cphText';
 import { CphButton } from './cphButton';
 
 interface ProblemTitleProps {
-  problem: IProblem;
+  problemId: UUID;
+  name: string;
+  url?: string;
+  checker?: IWebviewFileWithHash;
+  interactor?: IWebviewFileWithHash;
+  timeElapsedMs: number;
+  overrides: IWebviewOverrides;
   startTime: number;
 }
 
@@ -57,7 +63,16 @@ const formatDuration = (ms: number) => {
   return `${hh}:${mm}:${ss}`;
 };
 
-export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
+export const ProblemTitle = ({
+  problemId,
+  name,
+  url,
+  checker,
+  interactor,
+  timeElapsedMs,
+  overrides,
+  startTime,
+}: ProblemTitleProps) => {
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
   const [isHoveringTitle, setHoveringTitle] = useState(false);
@@ -65,24 +80,24 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
   const [tabValue, setTabValue] = useState('basic');
   const [editedTitle, setEditedTitle] = useState('');
   const [editedUrl, setEditedUrl] = useState('');
-  const [editedTimeLimit, setEditedTimeLimit] = useState('');
-  const [editedMemoryLimit, setEditedMemoryLimit] = useState('');
-  const [editedCompiler, setEditedCompiler] = useState('');
-  const [editedCompilerArgs, setEditedCompilerArgs] = useState('');
-  const [editedRunner, setEditedRunner] = useState('');
-  const [editedRunnerArgs, setEditedRunnerArgs] = useState('');
+  const [editedTimeLimitMs, setEditedTimeLimitMs] = useState<string | null>();
+  const [editedMemoryLimitMb, setEditedMemoryLimitMb] = useState<string | null>();
+  const [editedCompiler, setEditedCompiler] = useState<string | null | undefined>();
+  const [editedCompilerArgs, setEditedCompilerArgs] = useState<string | null | undefined>();
+  const [editedRunner, setEditedRunner] = useState<string | null | undefined>();
+  const [editedRunnerArgs, setEditedRunnerArgs] = useState<string | null | undefined>();
   const [timeElapsed, setTimeElapsed] = useState(0);
 
   useEffect(() => {
-    setEditedTitle(problem.name);
-    setEditedUrl(problem.url || '');
-    setEditedTimeLimit(problem.timeLimitMs.toString());
-    setEditedMemoryLimit(problem.memoryLimitMb.toString());
-    setEditedCompiler(problem.overrides?.compiler || '');
-    setEditedCompilerArgs(problem.overrides?.compilerArgs || '');
-    setEditedRunner(problem.overrides?.runner || '');
-    setEditedRunnerArgs(problem.overrides?.runnerArgs || '');
-  }, [problem.name, problem.url, problem.timeLimitMs, problem.memoryLimitMb, problem.overrides]);
+    setEditedTitle(name);
+    setEditedUrl(url || '');
+    setEditedTimeLimitMs(overrides.timeLimitMs.override?.toString());
+    setEditedMemoryLimitMb(overrides.memoryLimitMb.override?.toString());
+    setEditedCompiler(overrides.compiler?.override);
+    setEditedCompilerArgs(overrides.compilerArgs?.override);
+    setEditedRunner(overrides.runner?.override);
+    setEditedRunnerArgs(overrides.runnerArgs?.override);
+  }, [name, url, overrides]);
   useEffect(() => {
     setTimeElapsed(Date.now() - startTime);
     const interval = setInterval(() => {
@@ -97,22 +112,19 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
 
   const handleEditDialogClose = () => {
     setEditDialogOpen(false);
-    const overrides =
-      editedCompiler || editedCompilerArgs || editedRunner || editedRunnerArgs
-        ? {
-            compiler: editedCompiler || undefined,
-            compilerArgs: editedCompilerArgs || undefined,
-            runner: editedRunner || undefined,
-            runnerArgs: editedRunnerArgs || undefined,
-          }
-        : undefined;
     dispatch({
       type: 'editProblemDetails',
+      problemId,
       name: editedTitle,
       url: editedUrl,
-      timeLimitMs: parseInt(editedTimeLimit, 10),
-      memoryLimitMb: parseInt(editedMemoryLimit, 10),
-      overrides,
+      overrides: {
+        timeLimitMs: editedTimeLimitMs ? parseInt(editedTimeLimitMs, 10) : undefined,
+        memoryLimitMb: editedMemoryLimitMb ? parseInt(editedMemoryLimitMb, 10) : undefined,
+        compiler: editedCompiler ?? undefined,
+        compilerArgs: editedCompilerArgs ?? undefined,
+        runner: editedRunner ?? undefined,
+        runnerArgs: editedRunnerArgs ?? undefined,
+      },
     });
   };
 
@@ -122,39 +134,39 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
         onMouseEnter={() => setHoveringTitle(true)}
         onMouseLeave={() => setHoveringTitle(false)}
       >
-        <CphFlex column alignStart flexShrink={1} width={'unset'}>
+        <CphFlex column alignStart flexShrink={1} width='unset'>
           <CphText
-            whiteSpace={'nowrap'}
-            sx={{ cursor: problem.url ? 'pointer' : 'default' }}
-            title={problem.name}
-            width={'100%'}
+            whiteSpace='nowrap'
+            sx={{ cursor: url ? 'pointer' : 'default' }}
+            title={name}
+            width='100%'
           >
-            {problem.url ? (
-              <CphLink href={problem.url} name={problem.url}>
-                {problem.name}
+            {url ? (
+              <CphLink href={url} name={url}>
+                {name}
               </CphLink>
             ) : (
-              problem.name
+              name
             )}
           </CphText>
-          <CphText fontSize={'0.8rem'} paddingRight={'4px'}>
+          <CphText fontSize='0.8rem' paddingRight='4px'>
             {t('problemTitle.timeLimit', {
-              time: problem.timeLimitMs,
+              time: overrides.timeLimitMs.override ?? overrides.timeLimitMs.defaultValue,
             })}
             &emsp;
             {t('problemTitle.memoryLimit', {
-              memory: problem.memoryLimitMb,
+              memory: overrides.memoryLimitMb.override ?? overrides.memoryLimitMb.defaultValue,
             })}
-            {problem.checker && (
+            {checker && (
               <>
                 &emsp;
                 <CphLink
-                  name={problem.checker.path}
+                  name={checker.path}
                   onClick={() => {
-                    if (problem.checker)
-                      msg({
+                    if (checker)
+                      dispatch({
                         type: 'openFile',
-                        path: problem.checker.path,
+                        path: checker.path,
                       });
                   }}
                 >
@@ -162,16 +174,16 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                 </CphLink>
               </>
             )}
-            {problem.interactor && (
+            {interactor && (
               <>
                 &emsp;
                 <CphLink
-                  name={problem.interactor.path}
+                  name={interactor.path}
                   onClick={() => {
-                    if (problem.interactor)
-                      msg({
+                    if (interactor)
+                      dispatch({
                         type: 'openFile',
-                        path: problem.interactor.path,
+                        path: interactor.path,
                       });
                   }}
                 >
@@ -181,7 +193,7 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
             )}
             &emsp;
             <span title={t('problemTitle.timeElapsed')} className='defaultBlur'>
-              {formatDuration(problem.timeElapsedMs + timeElapsed)}
+              {formatDuration(timeElapsedMs + timeElapsed)}
             </span>
           </CphText>
         </CphFlex>
@@ -189,9 +201,9 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
           <CphMenu
             menu={{
               [t('problemTitle.menu.editRaw')]: () => {
-                msg({
+                dispatch({
                   type: 'openFile',
-                  path: '/problem.cph-ng.json',
+                  path: '/cph-ng.json',
                   isVirtual: true,
                 });
               },
@@ -200,7 +212,7 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
             <CphButton
               name={t('problemTitle.editTitle')}
               icon={EditIcon}
-              color={'secondary'}
+              color='secondary'
               onClick={handleEditTitle}
             />
           </CphMenu>
@@ -223,8 +235,8 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
             </Box>
             <TabPanel value='basic' sx={{ padding: '0' }}>
               <TextField
-                variant={'outlined'}
-                margin={'normal'}
+                variant='outlined'
+                margin='normal'
                 label={t('problemTitle.dialog.field.title')}
                 value={editedTitle}
                 onChange={(e) => setEditedTitle(e.target.value)}
@@ -232,19 +244,20 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                 autoFocus
               />
               <TextField
-                variant={'outlined'}
-                margin={'normal'}
+                variant='outlined'
+                margin='normal'
                 label={t('problemTitle.dialog.field.url')}
                 value={editedUrl}
                 onChange={(e) => setEditedUrl(e.target.value)}
                 fullWidth
               />
               <TextField
-                variant={'outlined'}
-                margin={'normal'}
+                variant='outlined'
+                margin='normal'
                 label={t('problemTitle.dialog.field.time')}
-                value={editedTimeLimit}
-                onChange={(e) => setEditedTimeLimit(e.target.value)}
+                value={editedTimeLimitMs}
+                placeholder={overrides.timeLimitMs.defaultValue.toString()}
+                onChange={(e) => setEditedTimeLimitMs(e.target.value)}
                 fullWidth
                 slotProps={{
                   input: {
@@ -253,11 +266,12 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
                 }}
               />
               <TextField
-                variant={'outlined'}
-                margin={'normal'}
+                variant='outlined'
+                margin='normal'
                 label={t('problemTitle.dialog.field.memory')}
-                value={editedMemoryLimit}
-                onChange={(e) => setEditedMemoryLimit(e.target.value)}
+                value={editedMemoryLimitMb}
+                placeholder={overrides.memoryLimitMb.defaultValue.toString()}
+                onChange={(e) => setEditedMemoryLimitMb(e.target.value)}
                 fullWidth
                 slotProps={{
                   input: {
@@ -267,103 +281,120 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
               />
             </TabPanel>
             <TabPanel value='environment' sx={{ padding: '0' }}>
-              <TextField
-                variant={'outlined'}
-                margin={'normal'}
-                label={t('problemTitle.dialog.field.compiler')}
-                value={editedCompiler}
-                onChange={(e) => setEditedCompiler(e.target.value)}
-                fullWidth
-              />
-              <TextField
-                variant={'outlined'}
-                margin={'normal'}
-                label={t('problemTitle.dialog.field.compilerArgs')}
-                value={editedCompilerArgs}
-                onChange={(e) => setEditedCompilerArgs(e.target.value)}
-                fullWidth
-              />
-              <TextField
-                variant={'outlined'}
-                margin={'normal'}
-                label={t('problemTitle.dialog.field.runner')}
-                value={editedRunner}
-                onChange={(e) => setEditedRunner(e.target.value)}
-                fullWidth
-              />
-              <TextField
-                variant={'outlined'}
-                margin={'normal'}
-                label={t('problemTitle.dialog.field.runnerArgs')}
-                value={editedRunnerArgs}
-                onChange={(e) => setEditedRunnerArgs(e.target.value)}
-                fullWidth
-              />
+              {overrides.compiler && (
+                <TextField
+                  variant='outlined'
+                  margin='normal'
+                  label={t('problemTitle.dialog.field.compiler')}
+                  value={editedCompiler}
+                  placeholder={overrides.compiler.defaultValue.toString()}
+                  onChange={(e) => setEditedCompiler(e.target.value)}
+                  fullWidth
+                />
+              )}
+              {overrides.compilerArgs && (
+                <TextField
+                  variant='outlined'
+                  margin='normal'
+                  label={t('problemTitle.dialog.field.compilerArgs')}
+                  value={editedCompilerArgs}
+                  placeholder={overrides.compilerArgs.defaultValue.toString()}
+                  onChange={(e) => setEditedCompilerArgs(e.target.value)}
+                  fullWidth
+                />
+              )}
+              {overrides.runner && (
+                <TextField
+                  variant='outlined'
+                  margin='normal'
+                  label={t('problemTitle.dialog.field.runner')}
+                  value={editedRunner}
+                  placeholder={overrides.runner.defaultValue.toString()}
+                  onChange={(e) => setEditedRunner(e.target.value)}
+                  fullWidth
+                />
+              )}
+              {overrides.runnerArgs && (
+                <TextField
+                  variant='outlined'
+                  margin='normal'
+                  label={t('problemTitle.dialog.field.runnerArgs')}
+                  value={editedRunnerArgs}
+                  placeholder={overrides.runnerArgs.defaultValue.toString()}
+                  onChange={(e) => setEditedRunnerArgs(e.target.value)}
+                  fullWidth
+                />
+              )}
             </TabPanel>
             <TabPanel value='advanced' sx={{ padding: '0' }}>
-              <CphFlex flexWrap={'wrap'} py={2}>
-                {problem.checker ? (
+              <CphFlex flexWrap='wrap' py={2}>
+                {checker ? (
                   <Chip
                     label={t('problemTitle.dialog.field.specialJudge')}
                     variant='outlined'
                     onClick={() => {
-                      if (problem.checker)
-                        msg({
+                      if (checker)
+                        dispatch({
                           type: 'openFile',
-                          path: problem.checker.path,
+                          path: checker.path,
                         });
                     }}
-                    onDelete={() => {
+                    onDelete={() =>
                       dispatch({
                         type: 'removeSrcFile',
+                        problemId,
                         fileType: 'checker',
-                      });
-                    }}
+                      })
+                    }
                   />
                 ) : (
                   <Chip
                     label={t('problemTitle.dialog.field.specialJudge')}
-                    onClick={() => {
+                    onClick={() =>
                       dispatch({
                         type: 'chooseSrcFile',
+                        problemId,
                         fileType: 'checker',
-                      });
-                    }}
+                      })
+                    }
                   />
                 )}
-                {problem.interactor ? (
+                {interactor ? (
                   <Chip
                     label={t('problemTitle.dialog.field.interact')}
                     variant='outlined'
                     onClick={() => {
-                      if (problem.interactor)
-                        msg({
+                      if (interactor)
+                        dispatch({
                           type: 'openFile',
-                          path: problem.interactor.path,
+                          problemId,
+                          path: interactor.path,
                         });
                     }}
-                    onDelete={() => {
+                    onDelete={() =>
                       dispatch({
                         type: 'removeSrcFile',
+                        problemId,
                         fileType: 'interactor',
-                      });
-                    }}
+                      })
+                    }
                   />
                 ) : (
                   <Chip
                     label={t('problemTitle.dialog.field.interact')}
-                    onClick={() => {
+                    onClick={() =>
                       dispatch({
                         type: 'chooseSrcFile',
+                        problemId,
                         fileType: 'interactor',
-                      });
-                    }}
+                      })
+                    }
                   />
                 )}
                 <CphLink
                   name={t('problemTitle.dialog.testlib')}
                   onClick={() => {
-                    msg({
+                    dispatch({
                       type: 'openTestlib',
                     });
                   }}
@@ -375,10 +406,10 @@ export const ProblemTitle = ({ problem, startTime }: ProblemTitleProps) => {
           </TabContext>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)} color={'primary'}>
+          <Button onClick={() => setEditDialogOpen(false)} color='primary'>
             {t('problemTitle.dialog.cancel')}
           </Button>
-          <Button onClick={handleEditDialogClose} color={'primary'} autoFocus>
+          <Button onClick={handleEditDialogClose} color='primary' autoFocus>
             {t('problemTitle.dialog.save')}
           </Button>
         </DialogActions>

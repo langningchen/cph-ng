@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["src/**", "!src/ai", "!src/modules", "!src/webview", "tests/**", "scripts/**"]
+    "includes": ["src/**", "!src/ai", "!src/modules", "tests/**", "scripts/**"]
   },
   "formatter": {
     "enabled": true,
@@ -23,6 +23,7 @@
         "noDefaultExport": "on",
         "useConsistentObjectDefinitions": "on",
         "useConsistentArrayType": "on",
+        "useConsistentCurlyBraces": "on",
         "useNamingConvention": {
           "level": "error",
           "options": {

@@ -27,9 +27,10 @@ import Tooltip from '@mui/material/Tooltip';
 import { MD5 } from 'crypto-js';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type ITc, isRunningVerdict } from '@/domain/types';
+import { VerdictType } from '@/domain/entities/verdict';
+import type { IWebviewTc } from '@/domain/webviewTypes';
 import { useProblemContext } from '../context/ProblemContext';
-import { getCompile, msg } from '../utils';
+import { getCompile } from '../utils';
 import { CphFlex } from './base/cphFlex';
 import { CphMenu } from './base/cphMenu';
 import { CphText } from './base/cphText';
@@ -38,9 +39,10 @@ import { CphButton } from './cphButton';
 import { TcDataView } from './tcDataView';
 
 interface TcViewProp {
-  tc: ITc;
+  problemId: UUID;
+  tcId: UUID;
+  tc: IWebviewTc;
   idx: number;
-  id: UUID;
   onDragStart?: (e: React.DragEvent) => void;
   onDragEnd?: () => void;
   isDragging?: boolean;
@@ -48,9 +50,10 @@ interface TcViewProp {
 }
 
 export const TcView = ({
+  problemId,
+  tcId,
   tc,
   idx,
-  id,
   onDragStart,
   onDragEnd,
   isDragging = false,
@@ -58,38 +61,30 @@ export const TcView = ({
 }: TcViewProp) => {
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
-  const running = isRunningVerdict(tc.result?.verdict);
-
-  const emitUpdate = () => dispatch({ type: 'updateTc', id, tc });
 
   return (
     <CphMenu
       menu={
         tc.isDisabled
           ? {
-              [t('tcView.menu.enableTc')]: () => {
-                dispatch({ type: 'toggleDisable', id });
-              },
+              [t('tcView.menu.enableTc')]: () =>
+                dispatch({ type: 'toggleDisable', problemId, id: tcId }),
             }
           : {
-              [t('tcView.menu.disableTc')]: () => {
-                dispatch({ type: 'toggleDisable', id });
-              },
-              [t('tcView.menu.clearTcStatus')]: () => {
-                dispatch({ type: 'clearTcStatus', id });
-              },
+              [t('tcView.menu.disableTc')]: () =>
+                dispatch({ type: 'toggleDisable', problemId, id: tcId }),
+              [t('tcView.menu.clearTcStatus')]: () =>
+                dispatch({ type: 'clearTcStatus', problemId, id: tcId }),
             }
       }
     >
       <Accordion
         expanded={tc.isDisabled ? false : tc.isExpand}
-        disableGutters={true}
+        disableGutters
         onChange={(_, expanded) => {
-          if (tc.isDisabled) {
-            return;
-          }
+          if (tc.isDisabled) return;
           tc.isExpand = expanded;
-          emitUpdate();
+          dispatch({ type: 'updateTc', problemId, id: tcId, event: 'toggleExpand' });
         }}
         sx={{
           borderLeft: `4px solid`,
@@ -159,7 +154,7 @@ export const TcView = ({
         >
           <CphFlex smallGap>
             <CphFlex flex={1}>
-              <CphText fontWeight={'bold'}>#{idx + 1}</CphText>
+              <CphText fontWeight='bold'>#{idx + 1}</CphText>
               <Tooltip disableInteractive title={tc.result?.verdict.fullName}>
                 <CphText>{tc.result?.verdict.name}</CphText>
               </Tooltip>
@@ -169,7 +164,7 @@ export const TcView = ({
                 label={t('tcView.memory', {
                   memory: tc.result.memoryMb.toFixed(1),
                 })}
-                size={'small'}
+                size='small'
                 sx={{
                   marginLeft: 'auto',
                   fontSize: '0.8rem',
@@ -181,7 +176,7 @@ export const TcView = ({
                 label={t('tcView.time', {
                   time: tc.result.timeMs.toFixed(1),
                 })}
-                size={'small'}
+                size='small'
                 sx={{
                   marginLeft: 'auto',
                   fontSize: '0.8rem',
@@ -190,32 +185,33 @@ export const TcView = ({
             )}
             <CphMenu
               menu={{
-                [t('tcView.run.menu.forceCompile')]: () => {
+                [t('tcView.run.menu.forceCompile')]: () =>
                   dispatch({
                     type: 'runTc',
-                    id,
+                    problemId,
+                    id: tcId,
                     forceCompile: true,
-                  });
-                },
-                [t('tcView.run.menu.skipCompile')]: () => {
+                  }),
+                [t('tcView.run.menu.skipCompile')]: () =>
                   dispatch({
                     type: 'runTc',
-                    id,
+                    problemId,
+                    id: tcId,
                     forceCompile: false,
-                  });
-                },
+                  }),
               }}
             >
               <CphButton
                 name={t('tcView.run')}
                 icon={PlayArrowIcon}
-                color={'success'}
-                loading={running}
+                color='success'
+                loading={tc.result?.verdict.type === VerdictType.running}
                 onClick={(e) => {
                   e.stopPropagation();
                   dispatch({
                     type: 'runTc',
-                    id,
+                    problemId,
+                    id: tcId,
                     forceCompile: getCompile(e),
                   });
                 }}
@@ -224,10 +220,10 @@ export const TcView = ({
             <CphButton
               name={t('tcView.delete')}
               icon={DeleteIcon}
-              color={'error'}
+              color='error'
               onClick={(e) => {
                 e.stopPropagation();
-                dispatch({ type: 'delTc', id });
+                dispatch({ type: 'delTc', problemId, id: tcId });
               }}
             />
           </CphFlex>
@@ -243,32 +239,29 @@ export const TcView = ({
                 <TcDataView
                   label={t('tcView.stdin')}
                   value={tc.stdin}
-                  onChange={(value) => {
-                    tc.stdin = {
-                      useFile: false,
-                      data: value,
-                    };
-                    // Input handles its own state change, so we use sendMsg directly to avoid redundant state updates.
-                    msg({ type: 'updateTc', id, tc });
-                  }}
+                  onChange={(data) =>
+                    dispatch({ type: 'setTcString', problemId, id: tcId, label: 'stdin', data })
+                  }
                   onChooseFile={() =>
                     dispatch({
                       type: 'chooseTcFile',
+                      problemId,
                       label: 'stdin',
-                      id,
+                      id: tcId,
                     })
                   }
                   onToggleFile={() => {
                     dispatch({
                       type: 'toggleTcFile',
+                      problemId,
                       label: 'stdin',
-                      id,
+                      id: tcId,
                     });
                   }}
                   onOpenVirtual={() => {
-                    msg({
+                    dispatch({
                       type: 'openFile',
-                      path: `/tcs/${id}/stdin`,
+                      path: `/tcs/${tcId}/stdin`,
                       isVirtual: true,
                     });
                   }}
@@ -280,35 +273,32 @@ export const TcView = ({
                 <TcDataView
                   label={t('tcView.answer')}
                   value={tc.answer}
-                  onChange={(value) => {
-                    tc.answer = {
-                      useFile: false,
-                      data: value,
-                    };
-                    // Input handles its own state change, so we use sendMsg directly to avoid redundant state updates.
-                    msg({ type: 'updateTc', id, tc });
-                  }}
-                  onChooseFile={() => {
+                  onChange={(data) =>
+                    dispatch({ type: 'setTcString', problemId, id: tcId, label: 'answer', data })
+                  }
+                  onChooseFile={() =>
                     dispatch({
                       type: 'chooseTcFile',
+                      problemId,
                       label: 'answer',
-                      id,
-                    });
-                  }}
-                  onToggleFile={() => {
+                      id: tcId,
+                    })
+                  }
+                  onToggleFile={() =>
                     dispatch({
                       type: 'toggleTcFile',
+                      problemId,
                       label: 'answer',
-                      id,
-                    });
-                  }}
-                  onOpenVirtual={() => {
-                    msg({
+                      id: tcId,
+                    })
+                  }
+                  onOpenVirtual={() =>
+                    dispatch({
                       type: 'openFile',
-                      path: `/tcs/${id}/answer`,
+                      path: `/tcs/${tcId}/answer`,
                       isVirtual: true,
-                    });
-                  }}
+                    })
+                  }
                   tabIndex={idx * 2 + 2}
                 />
               </ErrorBoundary>
@@ -317,57 +307,62 @@ export const TcView = ({
               <>
                 <Divider />
                 <CphFlex smallGap column>
-                  <ErrorBoundary>
-                    <TcDataView
-                      label={t('tcView.stdout')}
-                      value={tc.result.stdout}
-                      readOnly={true}
-                      outputActions={{
-                        onSetAnswer: () => {
-                          if (tc.result) tc.answer = tc.result.stdout;
-                          tc.result = undefined;
-                          emitUpdate();
-                        },
-                        onCompare: () => {
+                  {tc.result.stdout && (
+                    <ErrorBoundary>
+                      <TcDataView
+                        label={t('tcView.stdout')}
+                        value={tc.result.stdout}
+                        readOnly
+                        outputActions={{
+                          onSetAnswer: () =>
+                            dispatch({
+                              type: 'updateTc',
+                              problemId,
+                              id: tcId,
+                              event: 'setAsAnswer',
+                            }),
+                          onCompare: () =>
+                            dispatch({
+                              type: 'compareTc',
+                              problemId,
+                              id: tcId,
+                            }),
+                        }}
+                        onOpenVirtual={() => {
                           dispatch({
-                            type: 'compareTc',
-                            id,
+                            type: 'openFile',
+                            path: `/tcs/${tcId}/stdout`,
+                            isVirtual: true,
                           });
-                        },
-                      }}
-                      onOpenVirtual={() => {
-                        msg({
-                          type: 'openFile',
-                          path: `/tcs/${id}/stdout`,
-                          isVirtual: true,
-                        });
-                      }}
-                    />
-                  </ErrorBoundary>
-                  <ErrorBoundary>
-                    <TcDataView
-                      label={t('tcView.stderr')}
-                      value={tc.result.stderr}
-                      readOnly={true}
-                      onOpenVirtual={() => {
-                        msg({
-                          type: 'openFile',
-                          path: `/tcs/${id}/stderr`,
-                          isVirtual: true,
-                        });
-                      }}
-                    />
-                  </ErrorBoundary>
-                  <ErrorBoundary>
-                    <TcDataView
-                      label={t('tcView.message')}
-                      value={{
-                        useFile: false,
-                        data: tc.result.msg.join('\n'),
-                      }}
-                      readOnly={true}
-                    />
-                  </ErrorBoundary>
+                        }}
+                      />
+                    </ErrorBoundary>
+                  )}
+                  {tc.result.stderr && (
+                    <ErrorBoundary>
+                      <TcDataView
+                        label={t('tcView.stderr')}
+                        value={tc.result.stderr}
+                        readOnly
+                        onOpenVirtual={() => {
+                          dispatch({
+                            type: 'openFile',
+                            path: `/tcs/${tcId}/stderr`,
+                            isVirtual: true,
+                          });
+                        }}
+                      />
+                    </ErrorBoundary>
+                  )}
+                  {tc.result.msg && (
+                    <ErrorBoundary>
+                      <TcDataView
+                        label={t('tcView.message')}
+                        value={{ type: 'string', data: tc.result.msg }}
+                        readOnly
+                      />
+                    </ErrorBoundary>
+                  )}
                 </CphFlex>
               </>
             )}

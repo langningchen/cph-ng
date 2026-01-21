@@ -25,7 +25,7 @@ export const NoTcs = () => {
 
   return (
     <CphFlex column>
-      <CphText textAlign={'center'}>
+      <CphText textAlign='center'>
         {t('noTcs.firstLine')}
         <br />
         {t('noTcs.secondLine')}

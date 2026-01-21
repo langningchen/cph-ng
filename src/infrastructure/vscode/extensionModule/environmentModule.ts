@@ -51,9 +51,15 @@ export class EnvironmentModule implements IExtensionModule {
 
     this.timer = setInterval(async () => {
       if (extensions.getExtension('divyanshuagrawal.competitive-programming-helper')?.isActive) {
-        await this.ui.alert('warn', this.translator.t('CPH-NG cannot run with CPH...'), {
-          modal: true,
-        });
+        await this.ui.alert(
+          'warn',
+          this.translator.t(
+            "CPH-NG cannot run with CPH, but it can load CPH problem file. Please disable CPH to use CPH-NG. You can select the 'Ignore' option to ignore this warning in this session.",
+          ),
+          {
+            modal: true,
+          },
+        );
       }
     }, 60000);
 

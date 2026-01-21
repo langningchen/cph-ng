@@ -16,13 +16,14 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { UUID } from 'node:crypto';
-import type { BfCompareState } from '@/domain/entities/bfCompare';
-import type { VerdictName } from '@/domain/entities/verdict';
+import type { Verdict } from '@/domain/entities/verdict';
 
-export type IWebviewTcIo = { data: string } | { path: string; base: string };
+export type IWebviewTcIo =
+  | { type: 'string'; data: string }
+  | { type: 'file'; path: string; base: string };
 
 export interface IWebviewTcResult {
-  verdict: VerdictName;
+  verdict: Verdict;
   timeMs?: number;
   memoryMb?: number;
   stdout?: IWebviewTcIo;
@@ -45,13 +46,13 @@ export interface IWebviewFileWithHash {
 export interface IWebviewBfCompare {
   generator?: IWebviewFileWithHash;
   bruteForce?: IWebviewFileWithHash;
-  cnt: number;
-  state: BfCompareState;
+  isRunning: boolean;
+  msg: string;
 }
 
 export interface IWebviewOverride<T> {
   defaultValue: T;
-  override?: T;
+  override: T | null;
 }
 
 export interface IWebviewOverrides {
@@ -66,12 +67,12 @@ export interface IWebviewOverrides {
 export interface IWebviewProblem {
   name: string;
   url?: string;
-  tcs: Record<UUID, IWebviewTc>;
+  tcs: Map<UUID, IWebviewTc>;
   tcOrder: UUID[];
   src: IWebviewFileWithHash;
   checker?: IWebviewFileWithHash;
   interactor?: IWebviewFileWithHash;
-  bfCompare?: IWebviewBfCompare;
+  bfCompare: IWebviewBfCompare;
   timeElapsedMs: number;
   overrides: IWebviewOverrides;
 }

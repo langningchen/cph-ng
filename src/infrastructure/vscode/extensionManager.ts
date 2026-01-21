@@ -15,33 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { inject, injectable } from 'tsyringe';
+import { inject, injectAll, injectable } from 'tsyringe';
 import type { ExtensionContext } from 'vscode';
 import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import { TOKENS } from '@/composition/tokens';
-import type { CommandModule } from '@/infrastructure/vscode/extensionModule/commandModule';
-import type { EditorWatcherModule } from '@/infrastructure/vscode/extensionModule/editorWatcherModule';
-import type { EnvironmentModule } from '@/infrastructure/vscode/extensionModule/environmentModule';
-import type { LlmModule } from '@/infrastructure/vscode/extensionModule/llmModule';
-import type { ProviderModule } from '@/infrastructure/vscode/extensionModule/providerModule';
 
 @injectable()
 export class ExtensionManager {
-  private readonly modules: IExtensionModule[];
-
   public constructor(
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
-    providerModule: ProviderModule,
-    commandModule: CommandModule,
-    envModule: EnvironmentModule,
-    editorWatcher: EditorWatcherModule,
-    llmModule: LlmModule,
+    @injectAll(TOKENS.extensionModule) private readonly modules: IExtensionModule[],
   ) {
     this.logger = this.logger.withScope('ExtensionManager');
-    this.modules = [envModule, providerModule, commandModule, editorWatcher, llmModule];
   }
 
   public async activate(context: ExtensionContext) {
@@ -59,8 +47,6 @@ export class ExtensionManager {
 
   public async deactivate() {
     this.logger.info('Deactivating CPH-NG');
-    for (const module of this.modules) {
-      module.dispose?.();
-    }
+    for (const module of this.modules) module.dispose?.();
   }
 }

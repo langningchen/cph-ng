@@ -47,16 +47,13 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
     StackTrace.fromError(error)
       .then((frames) => {
         if (!isMounted) return;
-        setStackTraceString(
-          frames
-            .map((sf) => {
-              return sf.fileName?.includes('node_modules')
-                ? null
-                : `at ${sf.functionName || '<anonymous>'} (${sf.fileName}:${sf.lineNumber}:${sf.columnNumber})`;
-            })
-            .filter(Boolean)
-            .join('\n'),
-        );
+        const filteredFrame = frames
+          .map(({ fileName, functionName, lineNumber, columnNumber }) => {
+            if (fileName?.includes('node_modules')) return null;
+            return `at ${functionName || '<anonymous>'} (${fileName}:${lineNumber}:${columnNumber})`;
+          })
+          .filter(Boolean);
+        setStackTraceString(filteredFrame.join('\n'));
       })
       .catch(() => {
         if (isMounted) setStackTraceString(error.stack || 'No stack trace available');
@@ -72,18 +69,13 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
       <CphFlex>
         <CphButton
           icon={ErrorIcon}
-          name={'Error'}
-          color={'error'}
+          name='Error'
+          color='error'
           onClick={() => {
             setOpen(true);
           }}
         />
-        <CphButton
-          icon={ReplayIcon}
-          name={'Retry'}
-          color={'warning'}
-          onClick={resetErrorBoundary}
-        />
+        <CphButton icon={ReplayIcon} name='Retry' color='warning' onClick={resetErrorBoundary} />
       </CphFlex>
       <Dialog
         fullWidth
@@ -100,9 +92,9 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
             <Accordion sx={{ width: '100%' }}>
               <AccordionSummary>{t('errorBoundary.details')}</AccordionSummary>
               <AccordionDetails>
-                <Box component='pre' overflow={'scroll'}>
+                <Box component='pre' overflow='scroll'>
                   {error.name}: {error.message}
-                  {'\n'}
+                  '\n'
                   {stackTraceString}
                 </Box>
               </AccordionDetails>
@@ -124,22 +116,18 @@ interface State {
 }
 
 export class ErrorBoundary extends React.Component<Props, State> {
-  constructor(props: Props) {
+  public constructor(props: Props) {
     super(props);
     this.state = { hasError: false, error: null };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<State> {
-    return { hasError: true, error };
-  }
-
-  resetBoundary = () => {
+  public resetBoundary = () => {
     this.setState({ hasError: false, error: null }, () => {
       this.forceUpdate();
     });
   };
 
-  render() {
+  public render() {
     if (this.state.hasError && this.state.error) {
       return <ErrorFallback error={this.state.error} resetErrorBoundary={this.resetBoundary} />;
     }

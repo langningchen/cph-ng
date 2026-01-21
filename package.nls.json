@@ -1,10 +1,7 @@
 {
-  "cph-ng.commands.addTestCase": "CPH-NG: Add Test Case",
   "cph-ng.commands.createProblem": "CPH-NG: Create Problem",
-  "cph-ng.commands.deleteProblem": "CPH-NG: Delete Problem",
   "cph-ng.commands.importFromCph": "CPH-NG: Import from CPH",
   "cph-ng.commands.importProblem": "CPH-NG: Import Problem",
-  "cph-ng.commands.loadTestCases": "CPH-NG: Load Test Cases",
   "cph-ng.commands.runTestCases": "CPH-NG: Run Test Cases",
   "cph-ng.commands.stopTestCases": "CPH-NG: Stop Test Cases",
   "cph-ng.commands.submitToCodeforces": "CPH-NG: Submit to Codeforces",

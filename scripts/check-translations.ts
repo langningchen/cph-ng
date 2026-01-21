@@ -58,7 +58,7 @@ const Configs: TranslationConfig[] = [
   },
   {
     title: 'Extension Runtime',
-    getKeys: () => extractKeys('src', ['ts', 'js', 'tsx', 'jsx'], ['webview']),
+    getKeys: () => extractKeys('src', ['ts', 'js', 'tsx', 'jsx'], ['src/webview']),
     files: ['l10n/bundle.l10n.zh-cn.json'],
   },
   {
@@ -107,6 +107,10 @@ const extractKeys = (dir: string, exts: string[], excludes: string[] = []): Set<
           const firstArg = args[0];
           if (isStringLiteral(firstArg) || isNoSubstitutionTemplateLiteral(firstArg))
             keys.add(firstArg.text);
+          else
+            console.error(
+              `Unsupported translation key expression in ${file}: ${firstArg.getText(src)}`,
+            );
         }
       }
       forEachChild(node, visit);

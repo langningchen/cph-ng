@@ -25,10 +25,10 @@ import { CphText } from './base/cphText';
 export const InitView = () => {
   const { t } = useTranslation();
   return (
-    <Box flex={1} width={'100%'}>
-      <CphFlex column height={'100%'} justifyContent={'center'} gap={2}>
+    <Box flex={1} width='100%'>
+      <CphFlex column height='100%' justifyContent='center' gap={2}>
         <CircularProgress />
-        <CphText fontWeight={'bold'} fontSize={'bigger'}>
+        <CphText fontWeight='bold' fontSize='bigger'>
           {t('initView.message')}
         </CphText>
       </CphFlex>

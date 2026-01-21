@@ -27,8 +27,8 @@ import { type AnserJsonEntry, ansiToJson } from 'anser';
 import React, { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
-import type { ITcIo } from '@/domain/types';
-import { basename, msg } from '../utils';
+import type { IWebviewTcIo } from '@/domain/webviewTypes';
+import { useProblemContext } from '@/webview/src/context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { CphLink } from './base/cphLink';
 import { CphButton } from './cphButton';
@@ -40,7 +40,7 @@ interface OutputActions {
 
 interface CodeMirrorSectionProps {
   label: string;
-  value: ITcIo;
+  value: IWebviewTcIo;
   onChange?: (value: string) => void;
   onChooseFile?: () => void;
   onToggleFile?: () => void;
@@ -55,7 +55,7 @@ const ansiToReact = (ansi: string) => {
   return (
     <Box
       contentEditable
-      suppressContentEditableWarning={true}
+      suppressContentEditableWarning
       onKeyDown={(e) => e.preventDefault()}
       onCut={(e) => e.preventDefault()}
       onPaste={(e) => e.preventDefault()}
@@ -108,6 +108,7 @@ export const TcDataView = ({
   tabIndex,
 }: CodeMirrorSectionProps) => {
   const { t } = useTranslation();
+  const { dispatch } = useProblemContext();
   const [copied, setCopied] = useState(false);
   const [internalValue, setInternalValue] = useState(value);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -117,9 +118,7 @@ export const TcDataView = ({
   }, [value]);
 
   useEffect(() => {
-    if (autoFocus && textareaRef.current) {
-      textareaRef.current.focus();
-    }
+    if (autoFocus && textareaRef.current) textareaRef.current.focus();
   }, [autoFocus]);
 
   const commonStyle: CSSProperties = {
@@ -139,32 +138,30 @@ export const TcDataView = ({
     outline: 'none',
   };
 
-  if (!value.useFile && !value.data && readOnly) {
-    return null;
-  }
+  if (value.type === 'string' && !value.data && readOnly) return null;
   return (
     <CphFlex column smallGap>
-      <CphFlex justifyContent={'space-between'}>
-        <CphFlex flex={1} flexWrap={'wrap'}>
+      <CphFlex justifyContent='space-between'>
+        <CphFlex flex={1} flexWrap='wrap'>
           <CphLink
             color='inherit'
             name={t('tcDataView.openVirtual')}
             onClick={onOpenVirtual}
-            fontSize={'larger'}
+            fontSize='larger'
           >
             {label}
           </CphLink>
-          {internalValue.useFile && !readOnly && (
+          {internalValue.type === 'file' && !readOnly && (
             <CphLink
-              name={internalValue.data}
+              name={internalValue.path}
               onClick={() => {
-                msg({
+                dispatch({
                   type: 'openFile',
-                  path: internalValue.data,
+                  path: internalValue.path,
                 });
               }}
             >
-              {basename(internalValue.data)}
+              {internalValue.base}
             </CphLink>
           )}
         </CphFlex>
@@ -182,7 +179,7 @@ export const TcDataView = ({
             onClick={onToggleFile}
           />
         )}
-        {internalValue.useFile ? (
+        {internalValue.type === 'file' ? (
           readOnly || (
             <CphButton
               name={t('tcDataView.clearFile')}
@@ -228,7 +225,7 @@ export const TcDataView = ({
           </>
         )}
       </CphFlex>
-      {internalValue.useFile ||
+      {internalValue.type === 'string' &&
         (readOnly ? (
           <div
             style={{
@@ -245,7 +242,7 @@ export const TcDataView = ({
             onChange={(e) => {
               if (onChange) onChange(e.target.value);
               setInternalValue({
-                useFile: false,
+                type: 'string',
                 data: e.target.value,
               });
             }}

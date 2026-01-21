@@ -1,10 +1,7 @@
 {
-  "cph-ng.commands.addTestCase": "CPH-NG: 添加测试样例",
   "cph-ng.commands.createProblem": "CPH-NG: 创建题目",
-  "cph-ng.commands.deleteProblem": "CPH-NG: 删除题目",
   "cph-ng.commands.importFromCph": "CPH-NG: 从 CPH 导入",
   "cph-ng.commands.importProblem": "CPH-NG: 导入题目",
-  "cph-ng.commands.loadTestCases": "CPH-NG: 加载测试样例",
   "cph-ng.commands.runTestCases": "CPH-NG: 运行所有测试样例",
   "cph-ng.commands.stopTestCases": "CPH-NG: 停止测试样例",
   "cph-ng.commands.submitToCodeforces": "CPH-NG: 提交到 Codeforces",

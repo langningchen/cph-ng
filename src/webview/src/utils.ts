@@ -15,17 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemMsgCore, WebviewMsg } from './msgs';
-
 // biome-ignore lint/suspicious/noExplicitAny: Helper type
 export type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
-
-export const basename = (path: string) => {
-  if (path.includes('/')) {
-    return path.split('/').pop();
-  }
-  return path.split('\\').pop();
-};
 
 export const delProps = (obj: object, props: string[]) => {
   return Object.fromEntries(Object.entries(obj).filter(([key]) => !props.includes(key)));
@@ -39,8 +30,4 @@ export const getCompile = (e: React.MouseEvent) => {
     return false;
   }
   return null;
-};
-
-export const msg = (msg: WebviewMsg | ProblemMsgCore) => {
-  vscode.postMessage({ ...msg, activePath: window.activePath });
 };

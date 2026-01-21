@@ -30,6 +30,16 @@ export const BfCompareState = {
 } as const;
 export type BfCompareState = (typeof BfCompareState)[keyof typeof BfCompareState];
 
+const RunningSet = new Set<BfCompareState>([
+  BfCompareState.compiling,
+  BfCompareState.generating,
+  BfCompareState.runningBruteForce,
+  BfCompareState.runningSolution,
+]);
+export const isRunningState = (state?: BfCompareState): boolean => {
+  return state !== undefined && !RunningSet.has(state);
+};
+
 export interface BfCompareEvents {
   change: [Partial<BfCompare>];
 }

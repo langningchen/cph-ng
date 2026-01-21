@@ -26,7 +26,6 @@ import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProblemContext } from '../context/ProblemContext';
-import { basename } from '../utils';
 import { CphFlex } from './base/cphFlex';
 
 export const DragOverlay = () => {
@@ -76,7 +75,7 @@ export const DragOverlay = () => {
       open={dragData !== null}
     >
       {dragData ? (
-        <CphFlex width={'100%'} height={'100%'} column paddingX={2} justifyContent={'center'}>
+        <CphFlex width='100%' height='100%' column paddingX={2} justifyContent='center'>
           <List
             sx={{
               width: '100%',
@@ -88,20 +87,13 @@ export const DragOverlay = () => {
                 <ListItemIcon>
                   <InsertDriveFileIcon />
                 </ListItemIcon>
-                <ListItemText primary={basename(path)} />
+                <ListItemText primary={path} />
               </ListItem>
             ))}
           </List>
         </CphFlex>
       ) : (
-        <CphFlex
-          width={'100%'}
-          height={'100%'}
-          column
-          gap={2}
-          color='#ffffff'
-          justifyContent={'center'}
-        >
+        <CphFlex width='100%' height='100%' column gap={2} color='#ffffff' justifyContent='center'>
           <DownloadIcon sx={{ fontSize: 80 }} />
           <Typography variant='h5'>{t('dragOverlay.description')}</Typography>
         </CphFlex>

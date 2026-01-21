@@ -46,6 +46,7 @@ import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
 import type { IExtensionContext } from '@/application/ports/vscode/IExtensionContext';
+import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
@@ -60,6 +61,7 @@ import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventB
 export const TOKENS = {
   // VS Code context and utilities
   activePathService: 'vscode.ActivePathService' as InjectionToken<IActivePathService>,
+  extensionModule: 'vscode.ExtensionModule' as InjectionToken<IExtensionModule>,
   document: 'vscode.Document' as InjectionToken<IDocument>,
   extensionContext: 'vscode.ExtensionContext' as InjectionToken<IExtensionContext>,
   extensionPath: 'vscode.ExtensionPath' as InjectionToken<string>,

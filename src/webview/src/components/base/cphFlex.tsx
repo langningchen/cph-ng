@@ -32,7 +32,7 @@ export const CphFlex = (props: CphFlexProps) => {
       alignItems={props.alignStart ? 'flex-start' : 'center'}
       flexDirection={props.column ? 'column' : 'row'}
       gap={props.smallGap ? 0.5 : 1}
-      width={'100%'}
+      width='100%'
       minWidth={0}
       {...delProps(props, ['smallGap', 'column', 'alignStart'])}
     >

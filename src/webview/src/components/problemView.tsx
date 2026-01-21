@@ -15,9 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import React from 'react';
+import type { UUID } from 'node:crypto';
+import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { IProblem } from '@/domain/types';
+import { VerdictType } from '@/domain/entities/verdict';
+import type { IWebviewProblem } from '@/domain/webviewTypes';
 import { useProblemContext } from '../context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { CphMenu } from './base/cphMenu';
@@ -27,47 +29,68 @@ import { ProblemTitle } from './problemTitle';
 import { TcsView } from './tcsView';
 
 interface ProblemViewProps {
-  problem: IProblem;
+  problemId: UUID;
+  problem: IWebviewProblem;
   startTime: number;
 }
 
-export const ProblemView = ({ problem, startTime }: ProblemViewProps) => {
+export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewProps) => {
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
+  const hasRunning = useMemo(() => {
+    for (const [_, tc] of problem.tcs)
+      if (tc.result?.verdict.type === VerdictType.running) return true;
+    return false;
+  }, [problem.tcs]);
+
   return (
     <>
       <ErrorBoundary>
-        <ProblemTitle problem={problem} startTime={startTime} />
+        <ProblemTitle
+          problemId={problemId}
+          name={problem.name}
+          url={problem.url}
+          checker={problem.checker}
+          interactor={problem.interactor}
+          timeElapsedMs={problem.timeElapsedMs}
+          overrides={problem.overrides}
+          startTime={startTime}
+        />
       </ErrorBoundary>
       <CphFlex
         column
         flex={1}
-        width={'100%'}
+        width='100%'
         sx={{
           overflowY: 'scroll',
           scrollbarWidth: 'thin',
           scrollbarGutter: 'stable',
         }}
-        bgcolor={'rgba(127, 127, 127, 0.05)'}
+        bgcolor='rgba(127, 127, 127, 0.05)'
         paddingY={2}
       >
         <ErrorBoundary>
           <CphMenu
             menu={{
               [t('problemView.menu.clearStatus')]: () => {
-                dispatch({ type: 'clearTcStatus' });
+                dispatch({ type: 'clearTcStatus', problemId });
               },
             }}
             flex={1}
-            width={'100%'}
+            width='100%'
           >
-            <TcsView problem={problem} />
+            <TcsView problemId={problemId} tcOrder={problem.tcOrder} tcs={problem.tcs} />
           </CphMenu>
         </ErrorBoundary>
       </CphFlex>
       <ErrorBoundary>
-        <ProblemActions problem={problem} />
+        <ProblemActions
+          problemId={problemId}
+          url={problem.url}
+          bfCompare={problem.bfCompare}
+          hasRunning={hasRunning}
+        />
       </ErrorBoundary>
     </>
   );
-};
+});

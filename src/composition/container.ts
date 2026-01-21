@@ -48,6 +48,11 @@ import { TcService } from '@/infrastructure/problems/tcService';
 import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
 import { PathResolverAdapter } from '@/infrastructure/services/pathResolverAdapter';
 import { DocumentAdapter } from '@/infrastructure/vscode/documentAdapter';
+import { CommandModule } from '@/infrastructure/vscode/extensionModule/commandModule';
+import { EditorWatcherModule } from '@/infrastructure/vscode/extensionModule/editorWatcherModule';
+import { EnvironmentModule } from '@/infrastructure/vscode/extensionModule/environmentModule';
+import { LlmModule } from '@/infrastructure/vscode/extensionModule/llmModule';
+import { ProviderModule } from '@/infrastructure/vscode/extensionModule/providerModule';
 import { LoggerAdapter } from '@/infrastructure/vscode/loggerAdapter';
 import { ProblemFs } from '@/infrastructure/vscode/problemFs';
 import { SettingsAdapter } from '@/infrastructure/vscode/settingsAdapter';
@@ -96,6 +101,12 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.register(TOKENS.languageStrategy, { useClass: LangJava });
   container.register(TOKENS.languageStrategy, { useClass: LangJavascript });
   container.register(TOKENS.languageStrategy, { useClass: LangPython });
+
+  container.register(TOKENS.extensionModule, { useClass: ProviderModule });
+  container.register(TOKENS.extensionModule, { useClass: CommandModule });
+  container.register(TOKENS.extensionModule, { useClass: EnvironmentModule });
+  container.register(TOKENS.extensionModule, { useClass: EditorWatcherModule });
+  container.register(TOKENS.extensionModule, { useClass: LlmModule });
 
   container.registerInstance(TOKENS.version, context.extension.packageJSON.version);
   container.registerInstance(TOKENS.extensionPath, context.extensionPath);

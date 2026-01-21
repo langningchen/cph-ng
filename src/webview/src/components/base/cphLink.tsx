@@ -28,10 +28,10 @@ export const CphLink = (props: CphLinkProps) => {
   return (
     <Tooltip disableInteractive title={props.name}>
       <Link
-        href={'#'}
-        overflow={'hidden'}
-        textOverflow={'ellipsis'}
-        underline={'hover'}
+        href='#'
+        overflow='hidden'
+        textOverflow='ellipsis'
+        underline='hover'
         {...delProps(props, ['name'])}
       >
         {props.children}

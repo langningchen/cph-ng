@@ -20,27 +20,26 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { msg } from '@/webview/src/utils';
+import type { IWebviewBackgroundProblem } from '@/domain/webviewTypes';
+import { useProblemContext } from '@/webview/src/context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { CphLink } from './base/cphLink';
 import { CphText } from './base/cphText';
 
 interface BgProblemViewProps {
-  bgProblems: {
-    name: string;
-    srcPath: string;
-  }[];
+  bgProblems: IWebviewBackgroundProblem[];
 }
 
 export const BgProblemView = ({ bgProblems }: BgProblemViewProps) => {
   const { t } = useTranslation();
+  const { dispatch } = useProblemContext();
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <CphText
         sx={{ cursor: 'pointer' }}
-        fontSize={'smaller'}
+        fontSize='smaller'
         onClick={() => {
           setOpen(true);
         }}
@@ -66,7 +65,7 @@ export const BgProblemView = ({ bgProblems }: BgProblemViewProps) => {
                   key={bgProblem.name}
                   name={bgProblem.srcPath}
                   onClick={() => {
-                    msg({
+                    dispatch({
                       type: 'openFile',
                       path: bgProblem.srcPath,
                     });

@@ -21,10 +21,11 @@ import type { IPath } from '@/application/ports/node/IPath';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
-import type { BfCompare } from '@/domain/entities/bfCompare';
+import { type BfCompare, isRunningState } from '@/domain/entities/bfCompare';
 import type { Problem } from '@/domain/entities/problem';
 import type { Tc, TcResult } from '@/domain/entities/tc';
 import type { TcIo } from '@/domain/entities/tcIo';
+import { Verdicts } from '@/domain/entities/verdict';
 import type { IFileWithHash, IOverrides } from '@/domain/types';
 import type {
   IWebviewBfCompare,
@@ -45,10 +46,10 @@ export class WebviewProblemMapper {
   ) {}
 
   public toDto(entity: Problem): IWebviewProblem {
-    const tcs: Record<UUID, IWebviewTc> = {};
+    const tcs: Map<UUID, IWebviewTc> = new Map();
     for (const id of entity.tcOrder) {
       const tc = entity.tcs.get(id);
-      if (tc) tcs[id] = this.tcToDto(tc);
+      if (tc) tcs.set(id, this.tcToDto(tc));
     }
     return {
       name: entity.name,
@@ -58,7 +59,7 @@ export class WebviewProblemMapper {
       src: this.fileWithHashToDto(entity.src),
       checker: entity.checker ? this.fileWithHashToDto(entity.checker) : undefined,
       interactor: entity.interactor ? this.fileWithHashToDto(entity.interactor) : undefined,
-      bfCompare: entity.bfCompare ? this.bfCompareToDto(entity.bfCompare) : undefined,
+      bfCompare: this.bfCompareToDto(entity.bfCompare),
       timeElapsedMs: entity.timeElapsedMs,
       overrides: this.overrideToDto(entity.src.path, entity.overrides),
     };
@@ -74,7 +75,7 @@ export class WebviewProblemMapper {
       isDisabled: tc.isDisabled,
       result: tc.verdict
         ? {
-            verdict: tc.verdict,
+            verdict: Verdicts[tc.verdict],
             timeMs: tc.timeMs,
             memoryMb: tc.memoryMb,
             stdout: tc.stdout ? this.tcIoToDto(tc.stdout) : undefined,
@@ -86,7 +87,7 @@ export class WebviewProblemMapper {
   }
   public tcResultToDto(tcResult: Partial<TcResult>): Partial<IWebviewTcResult> {
     return {
-      verdict: tcResult.verdict,
+      verdict: tcResult.verdict ? Verdicts[tcResult.verdict] : undefined,
       timeMs: tcResult.timeMs,
       memoryMb: tcResult.memoryMb,
       stdout: tcResult.stdout ? this.tcIoToDto(tcResult.stdout) : undefined,
@@ -96,8 +97,8 @@ export class WebviewProblemMapper {
   }
   private tcIoToDto(tcIo: TcIo): IWebviewTcIo {
     return tcIo.match<IWebviewTcIo>(
-      (path) => this.fileWithHashToDto({ path }),
-      (data) => ({ data }),
+      (path) => ({ ...this.fileWithHashToDto({ path }), type: 'file' }),
+      (data) => ({ type: 'string', data }),
     );
   }
   public bfCompareToDto(bfCompare: BfCompare): IWebviewBfCompare;
@@ -106,8 +107,8 @@ export class WebviewProblemMapper {
     return {
       generator: bfCompare.generator ? this.fileWithHashToDto(bfCompare.generator) : undefined,
       bruteForce: bfCompare.bruteForce ? this.fileWithHashToDto(bfCompare.bruteForce) : undefined,
-      cnt: bfCompare.cnt,
-      state: bfCompare.state,
+      isRunning: isRunningState(bfCompare.state),
+      msg: 'TO-DO',
     };
   }
   public fileWithHashToDto(fileWithHash: IFileWithHash): IWebviewFileWithHash {
@@ -127,15 +128,17 @@ export class WebviewProblemMapper {
     const defaultRunner = lang?.defaultValues.runner;
     const defaultRunnerArgs = lang?.defaultValues.runnerArgs;
     return {
-      timeLimitMs: { defaultValue: defaultTimeLimit, override: timeLimitMs },
-      memoryLimitMb: { defaultValue: defaultMemoryLimit, override: memoryLimitMb },
-      compiler: defaultCompiler ? { defaultValue: defaultCompiler, override: compiler } : undefined,
-      compilerArgs: defaultCompilerArgs
-        ? { defaultValue: defaultCompilerArgs, override: compilerArgs }
+      timeLimitMs: { defaultValue: defaultTimeLimit, override: timeLimitMs || null },
+      memoryLimitMb: { defaultValue: defaultMemoryLimit, override: memoryLimitMb || null },
+      compiler: defaultCompiler
+        ? { defaultValue: defaultCompiler, override: compiler || null }
         : undefined,
-      runner: defaultRunner ? { defaultValue: defaultRunner, override: runner } : undefined,
+      compilerArgs: defaultCompilerArgs
+        ? { defaultValue: defaultCompilerArgs, override: compilerArgs || null }
+        : undefined,
+      runner: defaultRunner ? { defaultValue: defaultRunner, override: runner || null } : undefined,
       runnerArgs: defaultRunnerArgs
-        ? { defaultValue: defaultRunnerArgs, override: runnerArgs }
+        ? { defaultValue: defaultRunnerArgs, override: runnerArgs || null }
         : undefined,
     };
   }

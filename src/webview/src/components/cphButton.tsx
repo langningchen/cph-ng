@@ -31,11 +31,11 @@ export const CphButton = (props: CphButtonProps) => {
   return (
     <Tooltip disableInteractive title={props.name}>
       <IconButton
-        color={'primary'}
+        color='primary'
         size={props.larger ? 'medium' : 'small'}
         {...delProps(props, ['icon', 'name', 'larger'])}
       >
-        <props.icon fontSize={'small'} />
+        <props.icon fontSize='small' />
       </IconButton>
     </Tooltip>
   );
