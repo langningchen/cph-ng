@@ -41,7 +41,7 @@ export class ProblemRepository implements IProblemRepository {
     this.logger = this.logger.withScope('ProblemRepository');
   }
 
-  private fireBackgroundEvent() {
+  public fireBackgroundEvent() {
     const backgroundProblems: IWebviewBackgroundProblem[] = [];
     for (const bgProblem of this.backgroundProblems.values())
       backgroundProblems.push({

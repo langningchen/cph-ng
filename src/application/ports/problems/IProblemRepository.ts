@@ -19,6 +19,7 @@ import type { UUID } from 'node:crypto';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 export interface IProblemRepository {
+  fireBackgroundEvent(): void;
   loadByPath(srcPath: string, allowCreate?: boolean): Promise<UUID | null>;
   get(problemId?: UUID): Promise<BackgroundProblem | undefined>;
   getIdByPath(srcPath: string): Promise<UUID | undefined>;

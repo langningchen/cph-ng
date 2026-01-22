@@ -20,15 +20,18 @@ import type { IActiveProblemCoordinator } from '@/application/ports/services/IAc
 import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { TOKENS } from '@/composition/tokens';
 import type { InitMsg } from '@/webview/src/msgs';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 
 @injectable()
 export class Init implements IMsgHandle<InitMsg> {
   public constructor(
+    @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.activeProblemCoordinator)
     private readonly coordinator: IActiveProblemCoordinator,
   ) {}
 
   public async exec(_msg: InitMsg): Promise<void> {
+    this.repo.fireBackgroundEvent();
     await this.coordinator.dispatchFullData();
   }
 }
