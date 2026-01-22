@@ -23,12 +23,14 @@ import { LangJava } from './java';
 import { LangJavascript } from './javascript';
 import { Lang } from './lang';
 import { LangPython } from './python';
+import { LangRust } from './rust';
 
 export default class Langs {
   private static logger = new Logger('langs');
   public static langs: Lang[] = [
     new LangCpp(),
     new LangC(),
+    new LangRust(),
     new LangJava(),
     new LangPython(),
     new LangJavascript(),

@@ -71,6 +71,8 @@
   "cph-ng.configuration.compilation.properties.pythonCompiler.markdownDescription": "指定用于编译的 **Python 解释器**（例如 `pypy3`、`python3`）。此设置决定了用于编译和验证 Python 源代码的可执行文件。建议使用 PyPy 进行竞赛编程，因为它具有 JIT 编译功能。",
   "cph-ng.configuration.compilation.properties.pythonRunArgs.markdownDescription": "定义在执行程序时传递给 Python 运行时的**命令行参数**。这些参数可以包括解释器选项和其他运行时配置。",
   "cph-ng.configuration.compilation.properties.pythonRunner.markdownDescription": "指定用于执行 Python 程序的 **Python 解释器**（例如 `pypy3`、`python3`）。此设置决定了用于运行 Python 代码的可执行文件。建议使用 PyPy 以在竞赛编程中获得更好的性能。",
+  "cph-ng.configuration.compilation.properties.rustArgs.markdownDescription": "传递给 `rustc` 的额外命令行参数，用于单文件 Rust 编译。对于 Cargo 项目，此参数不会应用。",
+  "cph-ng.configuration.compilation.properties.rustCompiler.markdownDescription": "指定用于 Rust 的编译器（或 `cargo`）。默认值为 `rustc`。如果检测到 `Cargo.toml`，扩展将优先使用 `cargo build`。",
   "cph-ng.configuration.compilation.properties.timeout.markdownDescription": "设置编译过程的最大允许时间（单位为**毫秒**），超时后将终止。设置为 `0` 可禁用超时，允许编译无限期运行。这可以防止进程挂起。",
   "cph-ng.configuration.compilation.properties.useHook.markdownDescription": "**仅在启用 `#cph-ng.compilation.useWrapper#` 时可用。** 启用后，将编译并链接一个钩子与程序，以防止文件 IO。",
   "cph-ng.configuration.compilation.properties.useWrapper.markdownDescription": "**不要与 `#cph-ng.runner.useRunner#` 选项同时使用。此选项仅适用于 Windows 或 Linux 系统与 C++ 程序。** 启用后，程序将在一个包装脚本中执行，以提供更准确的时间测量。",

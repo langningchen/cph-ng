@@ -232,6 +232,16 @@
             "default": "-O2 -std=c++14 -Wall -DCPH",
             "markdownDescription": "%cph-ng.configuration.compilation.properties.cppArgs.markdownDescription%"
           },
+          "cph-ng.compilation.rustCompiler": {
+            "type": "string",
+            "default": "rustc",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.rustCompiler.markdownDescription%"
+          },
+          "cph-ng.compilation.rustArgs": {
+            "type": "string",
+            "default": "-C opt-level=3",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.rustArgs.markdownDescription%"
+          },
           "cph-ng.compilation.javaCompiler": {
             "type": "string",
             "default": "javac",
