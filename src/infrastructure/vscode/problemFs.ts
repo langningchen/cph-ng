@@ -32,12 +32,12 @@ import {
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/domain/entities/problem';
 import type { TcIo } from '@/domain/entities/tcIo';
-import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 
 type CphFsFile = {
   data: string | Uri;

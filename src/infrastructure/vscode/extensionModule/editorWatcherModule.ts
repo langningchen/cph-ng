@@ -17,11 +17,11 @@
 
 import { inject, injectable } from 'tsyringe';
 import { type ExtensionContext, type TextEditor, window } from 'vscode';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
-import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 
 @injectable()
 export class EditorWatcherModule implements IExtensionModule {

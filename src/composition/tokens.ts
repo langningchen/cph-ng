@@ -41,6 +41,7 @@ import type { ILanguageStrategy } from '@/application/ports/problems/judge/langs
 import type { IExecutionStrategyFactory } from '@/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
 import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
 import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { IArchive } from '@/application/ports/services/IArchive';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
@@ -54,7 +55,6 @@ import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
-import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 
 // Centralized DI tokens for tsyringe registrations
 // Keep these as string literals to avoid circular imports and enable tree-shaking

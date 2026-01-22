@@ -46,6 +46,7 @@ import { ProblemRepository } from '@/infrastructure/problems/problemRepository';
 import { ProblemService } from '@/infrastructure/problems/problemService';
 import { TcIoService } from '@/infrastructure/problems/tcIoService';
 import { TcService } from '@/infrastructure/problems/tcService';
+import { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
 import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
 import { PathResolverAdapter } from '@/infrastructure/services/pathResolverAdapter';
 import { ActivePathService } from '@/infrastructure/vscode/activePathService';
@@ -64,7 +65,6 @@ import { TranslatorAdapter } from '@/infrastructure/vscode/translatorAdapter';
 import { UiAdapter } from '@/infrastructure/vscode/uiAdapter';
 import { WebviewEventBusAdapter } from '@/infrastructure/vscode/webviewEventBus';
 import { TOKENS } from './tokens';
-import { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
 
 export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.activePathService, ActivePathService);

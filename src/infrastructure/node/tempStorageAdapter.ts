@@ -17,13 +17,13 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
-import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 
 @injectable()
 export class TempStorageAdapter implements ITempStorage {

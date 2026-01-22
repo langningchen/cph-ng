@@ -20,6 +20,7 @@ import { inject, injectable } from 'tsyringe';
 import type { IPath } from '@/application/ports/node/IPath';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import { type BfCompare, BfCompareState, isRunningState } from '@/domain/entities/bfCompare';
 import type { Problem } from '@/domain/entities/problem';
@@ -36,7 +37,6 @@ import type {
   IWebviewTcIo,
   IWebviewTcResult,
 } from '@/domain/webviewTypes';
-import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 
 @injectable()
 export class WebviewProblemMapper {

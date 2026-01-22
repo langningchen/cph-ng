@@ -155,7 +155,6 @@ export default (_env, argv) => {
         type: 'module',
       },
       chunkFormat: 'module',
-      clean: { keep: /generated\.json/ },
     },
     externals: { vscode: 'vscode' },
     plugins: [
