@@ -24,6 +24,8 @@
         "useConsistentObjectDefinitions": "on",
         "useConsistentArrayType": "on",
         "useConsistentCurlyBraces": "on",
+        "useCollapsedIf": "on",
+        "useCollapsedElseIf": "on",
         "useNamingConvention": {
           "level": "error",
           "options": {

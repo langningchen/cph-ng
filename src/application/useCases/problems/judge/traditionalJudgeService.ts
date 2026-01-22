@@ -1,16 +1,16 @@
 import { inject, injectable } from 'tsyringe';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { IJudgeService, JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
+import { TcIo } from '@/domain/entities/tcIo';
 import { VerdictName } from '@/domain/entities/verdict';
 import { ExecutionRejected } from '@/domain/execution';
 import type { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
-import { TcIo } from '@/domain/entities/tcIo';
-import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
 
 @injectable()
 export class TraditionalJudgeService implements IJudgeService {

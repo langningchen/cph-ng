@@ -42,8 +42,12 @@ export class ActiveProblemCoordinator {
     setInterval(async () => {
       const now = Date.now();
       for (const [id, lastAccess] of this.lastAccessMap)
-        if (now - lastAccess > 60 * 1000 && id !== this.activeProblemId)
-          if (await this.repo.persist(id)) this.lastAccessMap.delete(id);
+        if (
+          now - lastAccess > 60 * 1000 &&
+          id !== this.activeProblemId &&
+          (await this.repo.persist(id))
+        )
+          this.lastAccessMap.delete(id);
     }, 1000);
   }
 
