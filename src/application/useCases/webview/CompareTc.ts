@@ -34,10 +34,10 @@ export class CompareTc extends BaseProblemUseCase<CompareTcMsg> {
     super(repo);
   }
 
-  protected async performAction({ problem }: BackgroundProblem, msg: CompareTcMsg): Promise<void> {
+  protected async performAction({ id }: BackgroundProblem, msg: CompareTcMsg): Promise<void> {
     this.ui.compareFiles(
-      this.problemFs.getUri(problem, `/tcs/${msg.id}/answer`),
-      this.problemFs.getUri(problem, `/tcs/${msg.id}/stdout`),
+      this.problemFs.getUri(id, `/tcs/${msg.id}/answer`),
+      this.problemFs.getUri(id, `/tcs/${msg.id}/stdout`),
     );
   }
 }

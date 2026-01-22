@@ -36,8 +36,8 @@ import type { IActiveProblemCoordinator } from '@/application/ports/services/IAc
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import { TOKENS } from '@/composition/tokens';
-import type { Problem } from '@/domain/entities/problem';
 import type { TcIo } from '@/domain/entities/tcIo';
+import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 
 type CphFsFile = {
   data: string | Uri;
@@ -55,9 +55,10 @@ export class ProblemFs implements IProblemFs {
   public onDidChangeFile: Event<FileChangeEvent[]> = this.changeEmitter.event;
 
   public constructor(
+    @inject(ProblemMapper) private readonly mapper: ProblemMapper,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.tcIoService) private readonly tcIoService: ITcIoService,
-    @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.activeProblemCoordinator)
     private readonly coordinator: IActiveProblemCoordinator,
@@ -65,12 +66,8 @@ export class ProblemFs implements IProblemFs {
     this.logger = this.logger.withScope('ProblemFs');
   }
 
-  public getUri(problem: Problem, path: string) {
-    return Uri.from({
-      scheme: ProblemFs.scheme,
-      authority: problem.src.path,
-      path,
-    });
+  public getUri(problemId: UUID, path: string) {
+    return Uri.from({ scheme: ProblemFs.scheme, authority: problemId, path });
   }
 
   public async parseUri(uri: Uri): Promise<CphFsItem> {
@@ -83,10 +80,10 @@ export class ProblemFs implements IProblemFs {
       [
         'problem.cph-ng.json',
         {
-          data: JSON.stringify(problem, null, 4),
+          data: JSON.stringify(this.mapper.toDto(problem), null, 4),
           set: async (data: string) => {
             const newProblem = JSON.parse(data);
-            Object.assign(problem, newProblem);
+            fullProblem.problem = this.mapper.toEntity(newProblem);
             await this.coordinator.dispatchFullData();
           },
         },

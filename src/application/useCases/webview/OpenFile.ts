@@ -39,7 +39,6 @@ export class OpenFile implements IMsgHandle<OpenFileMsg> {
     }
     const backgroundProblem = await this.repo.get(msg.problemId);
     if (!backgroundProblem) throw new Error('Problem not found');
-    const { problem } = backgroundProblem;
-    this.ui.openFile(this.problemFs.getUri(problem, msg.path));
+    this.ui.openFile(this.problemFs.getUri(backgroundProblem.id, msg.path));
   }
 }
