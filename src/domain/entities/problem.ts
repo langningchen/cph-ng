@@ -23,8 +23,8 @@ import type { Tc, TcResult } from '@/domain/entities/tc';
 import type { IFileWithHash, IOverrides } from '@/domain/types';
 
 export interface ProblemMetaPayload {
-  checker?: IFileWithHash;
-  interactor?: IFileWithHash;
+  checker?: IFileWithHash | null;
+  interactor?: IFileWithHash | null;
 }
 export type ProblemEvents = {
   patchMeta: (payload: ProblemMetaPayload) => void;
@@ -40,8 +40,8 @@ export class Problem {
   public url?: string;
   private _tcs: Map<UUID, Tc> = new Map();
   private _tcOrder: UUID[] = [];
-  private _checker?: IFileWithHash;
-  private _interactor?: IFileWithHash;
+  private _checker: IFileWithHash | null = null;
+  private _interactor: IFileWithHash | null = null;
   private _bfCompare: BfCompare = new BfCompare();
   private _timeElapsedMs: number = 0;
   public overrides: IOverrides = {};
@@ -69,14 +69,14 @@ export class Problem {
   public get checker() {
     return this._checker;
   }
-  public set checker(file: IFileWithHash | undefined) {
+  public set checker(file: IFileWithHash | null) {
     this._checker = file;
     this.signals.emit('patchMeta', { checker: file });
   }
   public get interactor() {
     return this._interactor;
   }
-  public set interactor(file: IFileWithHash | undefined) {
+  public set interactor(file: IFileWithHash | null) {
     this._interactor = file;
     this.signals.emit('patchMeta', { interactor: file });
   }

@@ -70,8 +70,8 @@ export interface IWebviewProblem {
   tcs: Record<UUID, IWebviewTc>;
   tcOrder: UUID[];
   src: IWebviewFileWithHash;
-  checker?: IWebviewFileWithHash;
-  interactor?: IWebviewFileWithHash;
+  checker: IWebviewFileWithHash | null;
+  interactor: IWebviewFileWithHash | null;
   bfCompare: IWebviewBfCompare;
   timeElapsedMs: number;
   overrides: IWebviewOverrides;

@@ -65,8 +65,8 @@ export interface IProblem {
   tcs: Record<UUID, ITc>;
   tcOrder: UUID[];
   src: IFileWithHash;
-  checker?: IFileWithHash;
-  interactor?: IFileWithHash;
+  checker: IFileWithHash | null;
+  interactor: IFileWithHash | null;
   bfCompare: IBfCompare;
   timeElapsedMs: number;
   overrides: IOverrides;

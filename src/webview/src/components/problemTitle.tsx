@@ -44,8 +44,8 @@ interface ProblemTitleProps {
   problemId: UUID;
   name: string;
   url?: string;
-  checker?: IWebviewFileWithHash;
-  interactor?: IWebviewFileWithHash;
+  checker: IWebviewFileWithHash | null;
+  interactor: IWebviewFileWithHash | null;
   timeElapsedMs: number;
   overrides: IWebviewOverrides;
   startTime: number;

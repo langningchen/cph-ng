@@ -26,8 +26,8 @@ import type {
 } from '@/domain/webviewTypes';
 
 export interface WebviewProblemMetaPayload {
-  checker?: IWebviewFileWithHash;
-  interactor?: IWebviewFileWithHash;
+  checker?: IWebviewFileWithHash | null;
+  interactor?: IWebviewFileWithHash | null;
 }
 const WebviewEventName = {
   FULL_PROBLEM: 'FULL_PROBLEM',

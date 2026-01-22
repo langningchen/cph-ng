@@ -1,4 +1,4 @@
-// Copyright (C) 2026 Langning ChenProblem_0_4_8
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -72,8 +72,8 @@ export class ProblemMigrationService implements IProblemMigrationService {
         tcs,
         tcOrder: problem.tcOrder,
         src: problem.src,
-        checker: problem.checker,
-        interactor: problem.interactor,
+        checker: problem.checker || null,
+        interactor: problem.interactor || null,
         bfCompare: {
           generator: problem.bfCompare?.generator || null,
           bruteForce: problem.bfCompare?.bruteForce || null,

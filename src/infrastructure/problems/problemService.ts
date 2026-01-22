@@ -76,14 +76,14 @@ export class ProblemService implements IProblemService {
     const binPath = this.getDataPath(srcPath);
     if (!binPath) return null;
 
-    var data: Buffer<ArrayBuffer>;
+    let data: Buffer<ArrayBuffer>;
     try {
       data = await this.fs.readRawFile(binPath);
     } catch {
       return null;
     }
 
-    var oldProblem: OldProblem;
+    let oldProblem: OldProblem;
     try {
       oldProblem = JSON.parse(gunzipSync(data).toString());
     } catch (e) {
@@ -92,7 +92,7 @@ export class ProblemService implements IProblemService {
     }
 
     // Migrate old problem data to the latest version
-    var problem = this.migration.migrate(oldProblem);
+    const problem = this.migration.migrate(oldProblem);
     await this.fixMovedPaths(problem, srcPath);
 
     this.logger.info('Problem', problem.src.path, 'loaded');
@@ -200,7 +200,7 @@ export class ProblemService implements IProblemService {
     const fixTcIo = async (tcIo: ITcIo) => {
       if ('path' in tcIo) tcIo.path = await fix(tcIo.path);
     };
-    const fixFileWithHash = async (fileWithHash?: IFileWithHash) => {
+    const fixFileWithHash = async (fileWithHash: IFileWithHash | null) => {
       if (fileWithHash) fileWithHash.path = await fix(fileWithHash.path);
     };
 

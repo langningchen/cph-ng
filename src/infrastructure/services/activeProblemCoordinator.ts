@@ -74,8 +74,8 @@ export class ActiveProblemCoordinator {
       const onPatchMeta = async ({ checker, interactor }: ProblemMetaPayload) => {
         if (!this.activeProblemId) return;
         this.eventBus.patchMeta(this.activeProblemId, {
-          checker: checker ? this.mapper.fileWithHashToDto(checker) : undefined,
-          interactor: interactor ? this.mapper.fileWithHashToDto(interactor) : undefined,
+          checker: checker ? this.mapper.fileWithHashToDto(checker) : checker,
+          interactor: interactor ? this.mapper.fileWithHashToDto(interactor) : interactor,
         });
       };
       const onPatchBfCompare = async (payload: Partial<BfCompare>) => {

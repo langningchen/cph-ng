@@ -34,11 +34,10 @@ export class RemoveSrcFile extends BaseProblemUseCase<RemoveSrcFileMsg> {
     { problem }: BackgroundProblem,
     msg: RemoveSrcFileMsg,
   ): Promise<void> {
-    if (msg.fileType === 'checker') problem.checker = undefined;
-    else if (msg.fileType === 'interactor') problem.interactor = undefined;
-    else if (msg.fileType === 'generator' && problem.bfCompare)
-      problem.bfCompare.generator = undefined;
+    if (msg.fileType === 'checker') problem.checker = null;
+    else if (msg.fileType === 'interactor') problem.interactor = null;
+    else if (msg.fileType === 'generator' && problem.bfCompare) problem.bfCompare.generator = null;
     else if (msg.fileType === 'bruteForce' && problem.bfCompare)
-      problem.bfCompare.bruteForce = undefined;
+      problem.bfCompare.bruteForce = null;
   }
 }

@@ -71,8 +71,9 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
       case 'PATCH_META': {
         if (draft.currentProblem.type !== 'active') return;
         const problem = draft.currentProblem.problem;
-        problem.checker = action.payload.checker;
-        problem.interactor = action.payload.interactor;
+        const { checker, interactor } = action.payload;
+        if (checker !== undefined) problem.checker = checker;
+        if (interactor !== undefined) problem.interactor = interactor;
         break;
       }
       case 'PATCH_BF_COMPARE': {
