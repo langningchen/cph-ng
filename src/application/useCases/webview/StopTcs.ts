@@ -38,7 +38,7 @@ export class StopTcs extends BaseProblemUseCase<StopTcsMsg> {
       for (const tcId of tcOrder) {
         const tc = bgProblem.problem.getTc(tcId);
         if (tc.verdict && Verdicts[tc.verdict].type === VerdictType.running)
-          tc.updateResult(VerdictName.rejected);
+          tc.updateResult({ verdict: VerdictName.rejected });
       }
     }
   }

@@ -59,40 +59,36 @@ export class RunSingleTc extends BaseProblemUseCase<RunTcMsg> {
     bgProblem.ac = ac;
 
     this.tmp.dispose(tc.clearResult());
-    tc.updateResult(VerdictName.compiling, { isExpand: false });
+    tc.updateResult({ verdict: VerdictName.compiling, isExpand: false });
 
     await this.document.save(problem.src.path);
     const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
     if (artifacts instanceof Error) {
-      tc.updateResult(
-        artifacts instanceof CompileError
-          ? VerdictName.compilationError
-          : artifacts instanceof CompileRejected
-            ? VerdictName.rejected
-            : VerdictName.systemError,
-        { msg: artifacts.message },
-      );
+      tc.updateResult({
+        verdict:
+          artifacts instanceof CompileError
+            ? VerdictName.compilationError
+            : artifacts instanceof CompileRejected
+              ? VerdictName.rejected
+              : VerdictName.systemError,
+        msg: artifacts.message,
+      });
       return;
     }
-    tc.updateResult(VerdictName.compiled);
+    tc.updateResult({ verdict: VerdictName.compiled });
 
     const judgeService = this.judgeFactory.create(problem);
     const ctx: JudgeContext = { problem, ...(await this.tcService.getPaths(tc)), artifacts };
 
     const observer: IJudgeObserver = {
-      onStatusChange: (verdict, msg) => {
-        tc.updateResult(verdict, { msg });
+      onStatusChange: (verdict) => {
+        tc.updateResult({ verdict });
       },
       onResult: (res: FinalResult) => {
-        tc.updateResult(res.verdict, {
-          isExpand: true,
-          timeMs: res.timeMs,
-          memoryMb: res.memoryMb,
-          msg: res.msg,
-        });
+        tc.updateResult({ isExpand: true, ...res });
       },
       onError: (e) => {
-        tc.updateResult(VerdictName.systemError, { msg: e.message });
+        tc.updateResult({ verdict: VerdictName.systemError, msg: e.message });
       },
     };
 

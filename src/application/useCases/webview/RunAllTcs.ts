@@ -61,7 +61,7 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
     for (const tcId of tcOrder) {
       const tc = problem.getTc(tcId);
       this.tmp.dispose(tc.clearResult());
-      tc.updateResult(VerdictName.compiling, { isExpand: false });
+      tc.updateResult({ verdict: VerdictName.compiling, isExpand: false });
       expandMemo[tcId] = tc.isExpand;
     }
 
@@ -74,10 +74,10 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
           : artifacts instanceof CompileRejected
             ? VerdictName.rejected
             : VerdictName.systemError;
-      problem.updateResult(verdict, { msg: artifacts.message });
+      problem.updateResult({ verdict, msg: artifacts.message });
       return;
     }
-    problem.updateResult(VerdictName.compiled);
+    problem.updateResult({ verdict: VerdictName.compiled });
 
     const expandBehavior = this.settings.problem.expandBehavior;
     let hasAnyExpanded = false;
@@ -90,7 +90,7 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
       if (ac.signal.aborted) {
         if (ac.signal.reason === 'onlyOne') bgProblem.ac = ac = new AbortController();
         else {
-          tc.updateResult(VerdictName.skipped);
+          tc.updateResult({ verdict: VerdictName.skipped });
           continue;
         }
       }
@@ -102,8 +102,8 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
       };
 
       const observer: IJudgeObserver = {
-        onStatusChange: (verdict, msg) => {
-          tc.updateResult(verdict, { msg });
+        onStatusChange: (verdict) => {
+          tc.updateResult({ verdict });
         },
         onResult: (res: FinalResult) => {
           let isExpand: boolean = false;
@@ -122,15 +122,10 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
           }
           hasAnyExpanded ||= isExpand;
 
-          tc.updateResult(res.verdict, {
-            isExpand,
-            timeMs: res.timeMs,
-            memoryMb: res.memoryMb,
-            msg: res.msg,
-          });
+          tc.updateResult({ isExpand, ...res });
         },
         onError: (e) => {
-          tc.updateResult(VerdictName.systemError, { msg: e.message });
+          tc.updateResult({ verdict: VerdictName.systemError, msg: e.message });
         },
       };
 

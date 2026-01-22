@@ -134,7 +134,8 @@ export class StartBfCompare extends BaseProblemUseCase<StartBfCompareMsg> {
               await this.tcIoService.tryInlining(new TcIo({ path: bfRes.stdoutPath })),
               true,
             );
-            newTc.updateResult(res.verdict, {
+            newTc.updateResult({
+              verdict: res.verdict,
               timeMs: res.timeMs,
               memoryMb: res.memoryMb,
               msg: res.msg,

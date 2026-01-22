@@ -20,13 +20,6 @@ import type TypedEventEmitter from 'typed-emitter';
 import { TcIo } from '@/domain/entities/tcIo';
 import type { VerdictName } from '@/domain/entities/verdict';
 
-export interface UpdatedResult {
-  isExpand?: boolean;
-  timeMs?: number;
-  memoryMb?: number;
-  msg?: string;
-}
-
 export interface TcResult {
   verdict: VerdictName;
   timeMs?: number;
@@ -35,6 +28,10 @@ export interface TcResult {
   stderr?: TcIo;
   msg?: string;
 }
+
+export type UpdatedResult = TcResult & {
+  isExpand?: boolean;
+};
 
 export type TcEvents = {
   patchTc: (payload: Partial<Tc>) => void;
@@ -106,15 +103,15 @@ export class Tc {
     delete this._result;
     return disposables;
   }
-  public updateResult(
-    verdict: VerdictName,
-    { isExpand, timeMs, memoryMb, msg }: UpdatedResult = {},
-  ): void {
+  public updateResult(updated: UpdatedResult): void {
+    const { verdict, timeMs, memoryMb, stdout, stderr, msg, isExpand } = updated;
     const current = this._result || { verdict };
     this._result = {
       verdict,
       timeMs: timeMs ?? current.timeMs,
       memoryMb: memoryMb ?? current.memoryMb,
+      stdout: stdout ?? current.stdout,
+      stderr: stderr ?? current.stderr,
       msg: this.formatMessage(current.msg, msg),
     };
     this.signals.emit('patchTcResult', { verdict, timeMs, memoryMb, msg });

@@ -9,6 +9,8 @@ import { TOKENS } from '@/composition/tokens';
 import { VerdictName } from '@/domain/entities/verdict';
 import { ExecutionRejected } from '@/domain/execution';
 import type { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
+import { TcIo } from '@/domain/entities/tcIo';
+import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
 
 @injectable()
 export class TraditionalJudgeService implements IJudgeService {
@@ -18,6 +20,7 @@ export class TraditionalJudgeService implements IJudgeService {
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.solutionRunner) private readonly runner: ISolutionRunner,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TOKENS.tcIoService) private readonly tcIoService: ITcIoService,
   ) {}
 
   public async judge(
@@ -60,7 +63,16 @@ export class TraditionalJudgeService implements IJudgeService {
         },
         signal,
       );
-      observer.onResult(finalResult);
+      const stdout = new TcIo({ path: executionResult.stdoutPath });
+      const stderr = new TcIo({ path: executionResult.stderrPath });
+      observer.onResult({
+        verdict: finalResult.verdict,
+        timeMs: finalResult.timeMs,
+        memoryMb: finalResult.memoryMb,
+        stdout: await this.tcIoService.tryInlining(stdout),
+        stderr: await this.tcIoService.tryInlining(stderr),
+        msg: finalResult.msg,
+      });
     } catch (e) {
       if (e instanceof ExecutionRejected)
         observer.onResult({ verdict: VerdictName.rejected, msg: e.message });

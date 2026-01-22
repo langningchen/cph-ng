@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { UpdatedResult } from '@/domain/entities/tc';
 import type { VerdictName } from '@/domain/entities/verdict';
-import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 
 export interface IJudgeObserver {
-  onStatusChange(verdict: VerdictName, message?: string): void;
-  onResult(result: FinalResult): void;
+  onStatusChange(verdict: VerdictName): void;
+  onResult(result: UpdatedResult): void;
   onError(error: Error): void;
 }
