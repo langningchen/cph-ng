@@ -93,8 +93,8 @@ export class ProblemFs implements IProblemFs {
         tcIds.map((tcId) => {
           const tc = problem.getTc(tcId);
           const tcIoToStringOrUri = (io: TcIo): string | Uri => {
-            if (io.data) return io.data;
-            if (io.path) return Uri.file(io.path);
+            if (io.data !== undefined) return io.data;
+            if (io.path !== undefined) return Uri.file(io.path);
             throw new Error('TcIo has neither data nor path');
           };
           const items: CphFsDir = [

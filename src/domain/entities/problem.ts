@@ -156,14 +156,14 @@ export class Problem {
   public isRelated(path: string): boolean {
     path = path.toLowerCase();
     if (
-      this.src.path === path ||
-      this._checker?.path === path ||
-      this._interactor?.path === path ||
-      this._bfCompare?.bruteForce?.path === path ||
-      this._bfCompare?.generator?.path === path
+      this.src.path?.toLowerCase() === path ||
+      this._checker?.path?.toLowerCase() === path ||
+      this._interactor?.path?.toLowerCase() === path ||
+      this._bfCompare?.bruteForce?.path?.toLowerCase() === path ||
+      this._bfCompare?.generator?.path?.toLowerCase() === path
     )
       return true;
-    for (const tc of Object.values(this._tcs)) if (tc.isRelated(path)) return true;
+    for (const [_, tc] of this._tcs) if (tc.isRelated(path)) return true;
     return false;
   }
   public addTimeElapsed(addMs: number) {

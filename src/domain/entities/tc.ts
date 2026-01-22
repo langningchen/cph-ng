@@ -131,10 +131,10 @@ export class Tc {
   public isRelated(path: string): boolean {
     path = path.toLowerCase();
     return (
-      this.stdin.path === path ||
-      this.answer.path === path ||
-      this._result?.stdout?.path === path ||
-      this._result?.stderr?.path === path
+      this.stdin.path?.toLowerCase() === path ||
+      this.answer.path?.toLowerCase() === path ||
+      this._result?.stdout?.path?.toLowerCase() === path ||
+      this._result?.stderr?.path?.toLowerCase() === path
     );
   }
   private formatMessage(oldMsg?: string, newMsg?: string): string | undefined {
