@@ -33,7 +33,7 @@ export class OpenFile implements IMsgHandle<OpenFileMsg> {
   ) {}
 
   public async exec(msg: OpenFileMsg): Promise<void> {
-    if (!msg.isVirtual) {
+    if (!msg.problemId) {
       this.ui.openFile(Uri.file(msg.path));
       return;
     }

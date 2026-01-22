@@ -105,7 +105,6 @@ export interface ReorderTcMsg extends ProblemBaseMsg {
 export interface OpenFileMsg extends BaseMsg {
   type: 'openFile';
   path: string;
-  isVirtual?: boolean;
 }
 export interface OpenTestlibMsg extends BaseMsg {
   type: 'openTestlib';

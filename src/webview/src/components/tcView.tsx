@@ -260,8 +260,8 @@ export const TcView = ({
                   onOpenVirtual={() => {
                     dispatch({
                       type: 'openFile',
+                      problemId,
                       path: `/tcs/${tcId}/stdin`,
-                      isVirtual: true,
                     });
                   }}
                   autoFocus={autoFocus}
@@ -294,8 +294,8 @@ export const TcView = ({
                   onOpenVirtual={() =>
                     dispatch({
                       type: 'openFile',
+                      problemId,
                       path: `/tcs/${tcId}/answer`,
-                      isVirtual: true,
                     })
                   }
                   tabIndex={idx * 2 + 2}
@@ -330,8 +330,8 @@ export const TcView = ({
                         onOpenVirtual={() => {
                           dispatch({
                             type: 'openFile',
+                            problemId,
                             path: `/tcs/${tcId}/stdout`,
-                            isVirtual: true,
                           });
                         }}
                       />
@@ -346,8 +346,8 @@ export const TcView = ({
                         onOpenVirtual={() => {
                           dispatch({
                             type: 'openFile',
+                            problemId,
                             path: `/tcs/${tcId}/stderr`,
-                            isVirtual: true,
                           });
                         }}
                       />

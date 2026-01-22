@@ -203,8 +203,8 @@ export const ProblemTitle = ({
               [t('problemTitle.menu.editRaw')]: () => {
                 dispatch({
                   type: 'openFile',
+                  problemId,
                   path: '/cph-ng.json',
-                  isVirtual: true,
                 });
               },
             }}
@@ -367,7 +367,6 @@ export const ProblemTitle = ({
                       if (interactor)
                         dispatch({
                           type: 'openFile',
-                          problemId,
                           path: interactor.path,
                         });
                     }}
