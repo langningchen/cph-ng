@@ -204,7 +204,7 @@ export const ProblemTitle = ({
                 dispatch({
                   type: 'openFile',
                   problemId,
-                  path: '/cph-ng.json',
+                  path: '/problem.cph-ng.json',
                 });
               },
             }}
