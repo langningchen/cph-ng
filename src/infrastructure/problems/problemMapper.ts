@@ -43,7 +43,7 @@ export class ProblemMapper {
       src: entity.src,
       checker: entity.checker,
       interactor: entity.interactor,
-      bfCompare: entity.bfCompare ? this.bfCompareToDto(entity.bfCompare) : undefined,
+      bfCompare: this.bfCompareToDto(entity.bfCompare),
       timeElapsedMs: entity.timeElapsedMs,
       overrides: { ...entity.overrides },
     };

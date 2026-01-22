@@ -23,12 +23,13 @@ import type { IProblemRepository } from '@/application/ports/problems/IProblemRe
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { TOKENS } from '@/composition/tokens';
 import { TcScanner } from '@/domain/services/TcScanner';
 import type { DragDropMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class DragDrop {
+export class DragDrop implements IMsgHandle<DragDropMsg> {
   public constructor(
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,

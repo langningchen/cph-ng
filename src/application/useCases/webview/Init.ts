@@ -17,11 +17,12 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
+import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { TOKENS } from '@/composition/tokens';
 import type { InitMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class Init {
+export class Init implements IMsgHandle<InitMsg> {
   public constructor(
     @inject(TOKENS.activeProblemCoordinator)
     private readonly coordinator: IActiveProblemCoordinator,

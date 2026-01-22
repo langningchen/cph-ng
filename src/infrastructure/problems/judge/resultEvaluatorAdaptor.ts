@@ -115,6 +115,4 @@ export class ResultEvaluatorAdaptor implements IResultEvaluator {
 
     return { ...executionStats, verdict };
   }
-
-  public async interactiveJudge() {}
 }

@@ -17,11 +17,12 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { IUi } from '@/application/ports/vscode/IUi';
+import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { TOKENS } from '@/composition/tokens';
 import type { StartChatMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class StartChat {
+export class StartChat implements IMsgHandle<StartChatMsg> {
   public constructor(@inject(TOKENS.ui) private readonly ui: IUi) {}
 
   public async exec(_msg: StartChatMsg): Promise<void> {

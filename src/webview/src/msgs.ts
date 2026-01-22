@@ -17,13 +17,12 @@
 
 import type { UUID } from 'node:crypto';
 import type { IOverrides } from '@/domain/types';
-import type { DistributiveOmit } from '@/webview/src/utils';
 
-export interface BaseMsg {
+interface BaseMsg {
   type: string;
   problemId?: UUID;
 }
-export interface ProblemBaseMsg extends BaseMsg {
+interface ProblemBaseMsg extends BaseMsg {
   problemId: UUID;
 }
 
@@ -165,8 +164,6 @@ export type ProblemMsg =
   | StopBfCompareMsg
   | SubmitToCodeforcesMsg
   | DragDropMsg;
-
-export type ProblemMsgCore = DistributiveOmit<ProblemMsg, 'problemId'>;
 
 export type WebviewMsg =
   | ProblemMsg

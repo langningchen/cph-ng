@@ -20,11 +20,12 @@ import { Uri } from 'vscode';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { IUi } from '@/application/ports/vscode/IUi';
+import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { TOKENS } from '@/composition/tokens';
 import type { OpenFileMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class OpenFile {
+export class OpenFile implements IMsgHandle<OpenFileMsg> {
   public constructor(
     @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,

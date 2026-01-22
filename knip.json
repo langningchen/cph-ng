@@ -2,6 +2,8 @@
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "project": ["src/**/*.{ts,tsx}!", "tests/**/*.{ts,tsx}!"],
   "entry": [
+    "src/extension.ts",
+    "src/infrastructure/vscode/extensionManager.ts", 
     "tests/**/*.test.ts!"
   ],
   "include": ["classMembers"]

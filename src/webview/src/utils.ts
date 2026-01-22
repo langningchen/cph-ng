@@ -15,9 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-// biome-ignore lint/suspicious/noExplicitAny: Helper type
-export type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
-
 export const delProps = (obj: object, props: string[]) => {
   return Object.fromEntries(Object.entries(obj).filter(([key]) => !props.includes(key)));
 };

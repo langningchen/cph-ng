@@ -61,7 +61,7 @@ export class Problem {
     this.signals.emit('patchBfCompare', payload);
   };
 
-  public get tcs(): Readonly<Map<UUID, Tc>> {
+  public get tcs(): Map<UUID, Tc> {
     return this._tcs;
   }
   public get tcOrder(): readonly UUID[] {

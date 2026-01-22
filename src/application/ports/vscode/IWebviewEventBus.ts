@@ -29,7 +29,7 @@ export interface WebviewProblemMetaPayload {
   checker?: IWebviewFileWithHash;
   interactor?: IWebviewFileWithHash;
 }
-export const WebviewEventName = {
+const WebviewEventName = {
   FULL_PROBLEM: 'FULL_PROBLEM',
   PATCH_META: 'PATCH_META',
   PATCH_BF_COMPARE: 'PATCH_BF_COMPARE',
@@ -39,7 +39,6 @@ export const WebviewEventName = {
   BACKGROUND: 'BACKGROUND',
   NO_PROBLEM: 'NO_PROBLEM',
 } as const;
-export type WebviewEventName = (typeof WebviewEventName)[keyof typeof WebviewEventName];
 interface WebviewFullProblemEvent {
   type: typeof WebviewEventName.FULL_PROBLEM;
   problemId: UUID;

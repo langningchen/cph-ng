@@ -67,7 +67,7 @@ export interface IProblem {
   src: IFileWithHash;
   checker?: IFileWithHash;
   interactor?: IFileWithHash;
-  bfCompare?: IBfCompare;
+  bfCompare: IBfCompare;
   timeElapsedMs: number;
   overrides: IOverrides;
 }

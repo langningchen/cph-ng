@@ -39,7 +39,7 @@ export class ProblemMigrationService implements IProblemMigrationService {
   private readonly migrateFunctions: Record<string, (oldProblem: any) => any> = {
     '0.6.0': (_: History.Problem_0_6_0): null => null,
     '0.4.8': (problem: History.Problem_0_4_8): History.Problem_0_6_0 => {
-      const tcs: History.Problem_0_6_0['tcs'] = new Map();
+      const tcs: History.Problem_0_6_0['tcs'] = {};
       for (const id of problem.tcOrder) {
         const tc = problem.tcs[id];
         const migrateTcIo = (tcIo: History.TcIo_0_4_8): History.TcIo_0_6_0 => {
@@ -47,7 +47,7 @@ export class ProblemMigrationService implements IProblemMigrationService {
           return { data: tcIo.data };
         };
         if (tc)
-          tcs.set(id, {
+          tcs[id] = {
             stdin: migrateTcIo(tc.stdin),
             answer: migrateTcIo(tc.answer),
             isExpand: tc.isExpand,
@@ -62,7 +62,7 @@ export class ProblemMigrationService implements IProblemMigrationService {
                   msg: tc.result.msg.join('\n'),
                 }
               : undefined,
-          });
+          };
       }
 
       return {

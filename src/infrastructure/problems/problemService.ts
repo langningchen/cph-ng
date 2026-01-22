@@ -208,8 +208,8 @@ export class ProblemService implements IProblemService {
       ...Object.values(problem.tcs).flatMap((tc: ITc) => [fixTcIo(tc.stdin), fixTcIo(tc.answer)]),
       fixFileWithHash(problem.checker),
       fixFileWithHash(problem.interactor),
-      fixFileWithHash(problem.bfCompare?.generator),
-      fixFileWithHash(problem.bfCompare?.bruteForce),
+      fixFileWithHash(problem.bfCompare.generator),
+      fixFileWithHash(problem.bfCompare.bruteForce),
     ]);
     problem.src.path = newSrcPath;
   }

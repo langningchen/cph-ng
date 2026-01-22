@@ -24,7 +24,7 @@ export class CompilerService implements ICompilerService {
 
   private async optionalCompile(
     file: IFileWithHash,
-    signal: Readonly<AbortSignal>,
+    signal: AbortSignal,
     forceCompile: boolean | null,
   ): Promise<LangCompileResult> {
     const checkerLang = this.lang.getLang(file.path);
@@ -33,9 +33,9 @@ export class CompilerService implements ICompilerService {
   }
 
   public async compileAll(
-    problem: Readonly<Problem>,
+    problem: Problem,
     forceCompile: boolean | null,
-    signal: Readonly<AbortSignal>,
+    signal: AbortSignal,
   ): Promise<CompileResult> {
     // Compile source code
     const srcLang = this.lang.getLang(problem.src.path);
@@ -73,7 +73,7 @@ export class CompilerService implements ICompilerService {
     }
 
     // Compile brute force comparison programs
-    if (problem.bfCompare?.generator && problem.bfCompare?.bruteForce) {
+    if (problem.bfCompare.generator && problem.bfCompare.bruteForce) {
       const generatorResult = await this.optionalCompile(
         problem.bfCompare.generator,
         signal,

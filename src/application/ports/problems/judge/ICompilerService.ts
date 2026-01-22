@@ -32,8 +32,8 @@ export type CompileResult = CompileData | Error;
 
 export interface ICompilerService {
   compileAll(
-    problem: Readonly<Problem>,
+    problem: Problem,
     forceCompile: boolean | null,
-    signal: Readonly<AbortSignal>,
+    signal: AbortSignal,
   ): Promise<CompileResult>;
 }

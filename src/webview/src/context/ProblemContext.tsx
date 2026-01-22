@@ -30,17 +30,17 @@ import { VerdictName, Verdicts } from '@/domain/entities/verdict';
 import type { IWebviewBackgroundProblem, IWebviewProblem } from '@/domain/webviewTypes';
 import type { WebviewMsg } from '../msgs';
 
-export interface CurrentProblemStateIdle {
+interface CurrentProblemStateIdle {
   type: 'idle';
   canImport: boolean;
 }
-export interface CurrentProblemStateActive {
+interface CurrentProblemStateActive {
   type: 'active';
   problemId: UUID;
   problem: IWebviewProblem;
   startTime: number;
 }
-export type CurrentProblemState = CurrentProblemStateIdle | CurrentProblemStateActive;
+type CurrentProblemState = CurrentProblemStateIdle | CurrentProblemStateActive;
 
 type State = {
   isInitialized: boolean;
