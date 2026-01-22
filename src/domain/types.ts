@@ -43,8 +43,8 @@ export interface IFileWithHash {
 }
 
 export interface IBfCompare {
-  generator?: IFileWithHash;
-  bruteForce?: IFileWithHash;
+  generator: IFileWithHash | null;
+  bruteForce: IFileWithHash | null;
   cnt: number;
   state: BfCompareState;
 }

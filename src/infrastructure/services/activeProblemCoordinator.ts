@@ -78,6 +78,18 @@ export class ActiveProblemCoordinator {
           interactor: interactor ? this.mapper.fileWithHashToDto(interactor) : undefined,
         });
       };
+      const onPatchBfCompare = async (payload: Partial<BfCompare>) => {
+        if (!this.activeProblemId) return;
+        this.eventBus.patchBfCompare(this.activeProblemId, this.mapper.bfCompareToDto(payload));
+      };
+      const onAddTc = async (id: UUID, payload: Tc) => {
+        if (!this.activeProblemId) return;
+        this.eventBus.addTc(this.activeProblemId, id, this.mapper.tcToDto(payload));
+      };
+      const onDeleteTc = async (id: UUID) => {
+        if (!this.activeProblemId) return;
+        this.eventBus.deleteTc(this.activeProblemId, id);
+      };
       const onPatchTc = async (id: UUID, payload: Partial<Tc>) => {
         if (!this.activeProblemId) return;
         this.eventBus.patchTc(this.activeProblemId, id, this.mapper.tcToDto(payload));
@@ -86,24 +98,17 @@ export class ActiveProblemCoordinator {
         if (!this.activeProblemId) return;
         this.eventBus.patchTcResult(this.activeProblemId, id, this.mapper.tcResultToDto(payload));
       };
-      const onDeleteTc = async (id: UUID) => {
-        if (!this.activeProblemId) return;
-        this.eventBus.deleteTc(this.activeProblemId, id);
-      };
-      const onPatchBfCompare = async (payload: Partial<BfCompare>) => {
-        if (!this.activeProblemId) return;
-        this.eventBus.patchBfCompare(this.activeProblemId, this.mapper.bfCompareToDto(payload));
-      };
 
       if (this.activeProblemId) {
         const bgProblem = await this.repo.get(this.activeProblemId);
         const problem = bgProblem?.problem;
         if (problem) {
           problem.signals.off('patchMeta', onPatchMeta);
+          problem.signals.off('patchBfCompare', onPatchBfCompare);
+          problem.signals.off('addTc', onAddTc);
+          problem.signals.off('deleteTc', onDeleteTc);
           problem.signals.off('patchTc', onPatchTc);
           problem.signals.off('patchTcResult', onPatchTcResult);
-          problem.signals.off('deleteTc', onDeleteTc);
-          problem.signals.off('patchBfCompare', onPatchBfCompare);
           await this.repo.persist(this.activeProblemId);
         }
       }
@@ -113,10 +118,11 @@ export class ActiveProblemCoordinator {
       if (!bgProblem) return;
       this.eventBus.fullProblem(problemId, this.mapper.toDto(bgProblem.problem));
       bgProblem.problem.signals.on('patchMeta', onPatchMeta);
+      bgProblem.problem.signals.on('patchBfCompare', onPatchBfCompare);
+      bgProblem.problem.signals.on('addTc', onAddTc);
+      bgProblem.problem.signals.on('deleteTc', onDeleteTc);
       bgProblem.problem.signals.on('patchTc', onPatchTc);
       bgProblem.problem.signals.on('patchTcResult', onPatchTcResult);
-      bgProblem.problem.signals.on('deleteTc', onDeleteTc);
-      bgProblem.problem.signals.on('patchBfCompare', onPatchBfCompare);
     }
   }
 }

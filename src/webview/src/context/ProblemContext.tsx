@@ -68,6 +68,40 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
         };
         break;
       }
+      case 'PATCH_META': {
+        if (draft.currentProblem.type !== 'active') return;
+        const problem = draft.currentProblem.problem;
+        problem.checker = action.payload.checker;
+        problem.interactor = action.payload.interactor;
+        break;
+      }
+      case 'PATCH_BF_COMPARE': {
+        if (draft.currentProblem.type !== 'active') return;
+        const bfCompare = draft.currentProblem.problem.bfCompare;
+        const { generator, bruteForce, isRunning, msg } = action.payload;
+        if (generator !== undefined) bfCompare.generator = generator;
+        if (bruteForce !== undefined) bfCompare.bruteForce = bruteForce;
+        if (isRunning !== undefined) bfCompare.isRunning = isRunning;
+        if (msg !== undefined) bfCompare.msg = msg;
+        return;
+      }
+      case 'ADD_TC': {
+        if (draft.currentProblem.type !== 'active') return;
+        draft.currentProblem.problem.tcs[action.tcId] = action.payload;
+        draft.currentProblem.problem.tcOrder.push(action.tcId);
+        break;
+      }
+      case 'DELETE_TC': {
+        if (draft.currentProblem.type !== 'active') return;
+        delete draft.currentProblem.problem.tcs[action.tcId];
+        break;
+      }
+      case 'PATCH_TC': {
+        if (draft.currentProblem.type !== 'active') return;
+        const tc = draft.currentProblem.problem.tcs[action.tcId];
+        draft.currentProblem.problem.tcs[action.tcId] = { ...tc, ...action.payload };
+        break;
+      }
       case 'PATCH_TC_RESULT': {
         if (draft.currentProblem.type !== 'active') return;
         const tc = draft.currentProblem.problem.tcs[action.tcId];
@@ -77,12 +111,6 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
             ...(tc.result || {}),
             ...action.payload,
           };
-        break;
-      }
-      case 'PATCH_TC': {
-        if (draft.currentProblem.type !== 'active') return;
-        const tc = draft.currentProblem.problem.tcs[action.tcId];
-        draft.currentProblem.problem.tcs[action.tcId] = { ...tc, ...action.payload };
         break;
       }
       case 'BACKGROUND': {
@@ -114,14 +142,12 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
           problem.overrides.runnerArgs.override = action.overrides.runnerArgs;
         break;
       }
-
       case 'clearTcStatus': {
         if (draft.currentProblem.type !== 'active') return;
         if (action.id) delete draft.currentProblem.problem.tcs[action.id].result;
         else for (const tc of Object.values(draft.currentProblem.problem.tcs)) delete tc.result;
         break;
       }
-
       case 'setTcString': {
         if (draft.currentProblem.type !== 'active') return;
         const tc = draft.currentProblem.problem.tcs[action.id];
@@ -129,7 +155,6 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
         if (action.label === 'answer') tc.answer = { type: 'string', data: action.data };
         break;
       }
-
       case 'updateTc': {
         if (draft.currentProblem.type !== 'active') return;
         const tc = draft.currentProblem.problem.tcs[action.id];
@@ -138,7 +163,11 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
         if (action.event === 'setAsAnswer' && tc.result?.stdout) tc.answer = tc.result.stdout;
         break;
       }
-
+      case 'delTc': {
+        if (draft.currentProblem.type !== 'active') return;
+        delete draft.currentProblem.problem.tcs[action.id];
+        break;
+      }
       case 'reorderTc': {
         if (draft.currentProblem.type !== 'active') return;
         const tcOrder = draft.currentProblem.problem.tcOrder;

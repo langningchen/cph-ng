@@ -33,9 +33,10 @@ const WebviewEventName = {
   FULL_PROBLEM: 'FULL_PROBLEM',
   PATCH_META: 'PATCH_META',
   PATCH_BF_COMPARE: 'PATCH_BF_COMPARE',
+  ADD_TC: 'ADD_TC',
+  DELETE_TC: 'DELETE_TC',
   PATCH_TC: 'PATCH_TC',
   PATCH_TC_RESULT: 'PATCH_TC_RESULT',
-  DELETE_TC: 'DELETE_TC',
   BACKGROUND: 'BACKGROUND',
   NO_PROBLEM: 'NO_PROBLEM',
 } as const;
@@ -54,6 +55,17 @@ interface WebviewPatchBfCompareEvent {
   problemId: UUID;
   payload: Partial<IWebviewBfCompare>;
 }
+interface WebviewAddTcEvent {
+  type: typeof WebviewEventName.ADD_TC;
+  problemId: UUID;
+  tcId: UUID;
+  payload: IWebviewTc;
+}
+interface WebviewDeleteTcEvent {
+  type: typeof WebviewEventName.DELETE_TC;
+  problemId: UUID;
+  tcId: UUID;
+}
 interface WebviewPatchTcEvent {
   type: typeof WebviewEventName.PATCH_TC;
   problemId: UUID;
@@ -65,11 +77,6 @@ interface WebviewPatchTcResultEvent {
   problemId: UUID;
   tcId: UUID;
   payload: Partial<IWebviewTcResult>;
-}
-interface WebviewDeleteTcEvent {
-  type: typeof WebviewEventName.DELETE_TC;
-  problemId: UUID;
-  tcId: UUID;
 }
 interface WebviewBackgroundEvent {
   type: typeof WebviewEventName.BACKGROUND;
@@ -83,9 +90,10 @@ export type WebviewEvent =
   | WebviewFullProblemEvent
   | WebviewPatchMetaEvent
   | WebviewPatchBfCompareEvent
+  | WebviewAddTcEvent
+  | WebviewDeleteTcEvent
   | WebviewPatchTcEvent
   | WebviewPatchTcResultEvent
-  | WebviewDeleteTcEvent
   | WebviewBackgroundEvent
   | WebviewNoProblemEvent;
 
@@ -94,9 +102,10 @@ export interface IWebviewEventBus {
   fullProblem(problemId: UUID, payload: IWebviewProblem): void;
   patchMeta(problemId: UUID, payload: WebviewProblemMetaPayload): void;
   patchBfCompare(problemId: UUID, payload: Partial<IWebviewBfCompare>): void;
+  addTc(problemId: UUID, tcId: UUID, payload: IWebviewTc): void;
+  deleteTc(problemId: UUID, tcId: UUID): void;
   patchTc(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTc>): void;
   patchTcResult(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTcResult>): void;
-  deleteTc(problemId: UUID, tcId: UUID): void;
   background(payload: IWebviewBackgroundProblem[]): void;
   noProblem(canImport: boolean): void;
 }

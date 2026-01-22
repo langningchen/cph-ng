@@ -74,6 +74,23 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
       payload,
     });
   }
+  public addTc(problemId: UUID, tcId: UUID, payload: IWebviewTc): void {
+    this.logger.debug('Emitting addTc event', { problemId, tcId, payload });
+    this.emitter.emit('message', {
+      type: 'ADD_TC',
+      problemId,
+      tcId,
+      payload,
+    });
+  }
+  public deleteTc(problemId: UUID, tcId: UUID): void {
+    this.logger.debug('Emitting deleteTc event', { problemId, tcId });
+    this.emitter.emit('message', {
+      type: 'DELETE_TC',
+      problemId,
+      tcId,
+    });
+  }
   public patchTc(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTc>): void {
     this.logger.debug('Emitting patchTc event', { problemId, tcId, payload });
     this.emitter.emit('message', {
@@ -90,14 +107,6 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
       problemId,
       tcId,
       payload,
-    });
-  }
-  public deleteTc(problemId: UUID, tcId: UUID): void {
-    this.logger.debug('Emitting deleteTc event', { problemId, tcId });
-    this.emitter.emit('message', {
-      type: 'DELETE_TC',
-      problemId,
-      tcId,
     });
   }
   public background(payload: IWebviewBackgroundProblem[]): void {

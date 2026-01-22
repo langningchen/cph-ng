@@ -48,23 +48,23 @@ export class BfCompare {
   public readonly signals: EventEmitter<BfCompareEvents> = new EventEmitter();
 
   public constructor(
-    private _generator?: IFileWithHash,
-    private _bruteForce?: IFileWithHash,
+    private _generator: IFileWithHash | null = null,
+    private _bruteForce: IFileWithHash | null = null,
     private _cnt: number = 0,
     private _state: BfCompareState = BfCompareState.inactive,
   ) {}
 
-  public get generator(): IFileWithHash | undefined {
+  public get generator(): IFileWithHash | null {
     return this._generator;
   }
-  public set generator(value: IFileWithHash | undefined) {
+  public set generator(value: IFileWithHash | null) {
     this._generator = value;
     this.signals.emit('change', { generator: value });
   }
-  public get bruteForce(): IFileWithHash | undefined {
+  public get bruteForce(): IFileWithHash | null {
     return this._bruteForce;
   }
-  public set bruteForce(value: IFileWithHash | undefined) {
+  public set bruteForce(value: IFileWithHash | null) {
     this._bruteForce = value;
     this.signals.emit('change', { bruteForce: value });
   }
@@ -76,7 +76,8 @@ export class BfCompare {
   }
   public set state(value: BfCompareState) {
     this._state = value;
-    this.signals.emit('change', { state: value });
+    // We need to emit both cnt and state for the translator to update the message correctly
+    this.signals.emit('change', { cnt: this._cnt, state: this._state });
   }
   public get isRunning(): boolean {
     return (
@@ -89,10 +90,10 @@ export class BfCompare {
 
   public clearCnt() {
     this._cnt = 0;
-    this.signals.emit('change', { cnt: this._cnt });
+    this.signals.emit('change', { cnt: this._cnt, state: this._state });
   }
   public count() {
     this._cnt++;
-    this.signals.emit('change', { cnt: this._cnt });
+    this.signals.emit('change', { cnt: this._cnt, state: this._state });
   }
 }

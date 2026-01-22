@@ -75,8 +75,8 @@ export class ProblemMigrationService implements IProblemMigrationService {
         checker: problem.checker,
         interactor: problem.interactor,
         bfCompare: {
-          generator: problem.bfCompare?.generator,
-          bruteForce: problem.bfCompare?.bruteForce,
+          generator: problem.bfCompare?.generator || null,
+          bruteForce: problem.bfCompare?.bruteForce || null,
           cnt: 0,
           state: BfCompareState.inactive,
         },

@@ -26,7 +26,6 @@ export interface ProblemMetaPayload {
   checker?: IFileWithHash;
   interactor?: IFileWithHash;
 }
-// TO-DO addTc deleteTc events
 export type ProblemEvents = {
   patchMeta: (payload: ProblemMetaPayload) => void;
   patchBfCompare: (payload: Partial<BfCompare>) => void;

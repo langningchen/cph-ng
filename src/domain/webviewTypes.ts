@@ -44,8 +44,8 @@ export interface IWebviewFileWithHash {
 }
 
 export interface IWebviewBfCompare {
-  generator?: IWebviewFileWithHash;
-  bruteForce?: IWebviewFileWithHash;
+  generator: IWebviewFileWithHash | null;
+  bruteForce: IWebviewFileWithHash | null;
   isRunning: boolean;
   msg: string;
 }

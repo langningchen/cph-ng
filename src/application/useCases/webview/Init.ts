@@ -16,11 +16,11 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { TOKENS } from '@/composition/tokens';
 import type { InitMsg } from '@/webview/src/msgs';
-import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 
 @injectable()
 export class Init implements IMsgHandle<InitMsg> {
