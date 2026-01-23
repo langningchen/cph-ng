@@ -54,12 +54,7 @@ export class LangRust extends AbstractLanguageStrategy {
     const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
     const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
 
-    const { skip, hash } = await this.checkHash(
-      src,
-      path,
-      compiler + args,
-      forceCompile,
-    );
+    const { skip, hash } = await this.checkHash(src, path, compiler + args, forceCompile);
     if (skip) return { path, hash };
 
     const compilerArgs = args.split(/\s+/).filter(Boolean);
