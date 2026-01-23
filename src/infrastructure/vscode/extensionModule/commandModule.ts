@@ -27,10 +27,10 @@ import type { IActivePathService } from '@/application/ports/vscode/IActivePathS
 import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
-import type { CreateProblem } from '@/application/useCases/webview/CreateProblem';
-import type { ImportProblem } from '@/application/useCases/webview/ImportProblem';
-import type { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
-import type { StopTcs } from '@/application/useCases/webview/StopTcs';
+import { CreateProblem } from '@/application/useCases/webview/CreateProblem';
+import { ImportProblem } from '@/application/useCases/webview/ImportProblem';
+import { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
+import { StopTcs } from '@/application/useCases/webview/StopTcs';
 import { TOKENS } from '@/composition/tokens';
 
 @injectable()
@@ -48,10 +48,10 @@ export class CommandModule implements IExtensionModule {
     @inject(TOKENS.version) private readonly version: string,
     @inject(TOKENS.ui) private readonly ui: IUi,
 
-    private readonly createProblem: CreateProblem,
-    private readonly importProblem: ImportProblem,
-    private readonly runAllTcs: RunAllTcs,
-    private readonly stopTcs: StopTcs,
+    @inject(CreateProblem) private readonly createProblem: CreateProblem,
+    @inject(ImportProblem) private readonly importProblem: ImportProblem,
+    @inject(RunAllTcs) private readonly runAllTcs: RunAllTcs,
+    @inject(StopTcs) private readonly stopTcs: StopTcs,
   ) {}
 
   private async getProblemId() {
