@@ -800,6 +800,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
     "@swc/core": "^1.15.10",
     "@types/adm-zip": "^0.5.7",
     "@types/crypto-js": "^4.2.2",

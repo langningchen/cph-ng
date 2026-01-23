@@ -58,7 +58,12 @@ const Configs: TranslationConfig[] = [
   },
   {
     title: 'Extension Runtime',
-    getKeys: () => extractKeys('src', ['ts', 'js', 'tsx', 'jsx'], ['src/webview']),
+    getKeys: () =>
+      extractKeys(
+        'src',
+        ['ts', 'js', 'tsx', 'jsx'],
+        ['src/webview', 'src/infrastructure/vscode/translatorAdapter.ts'],
+      ),
     files: ['l10n/bundle.l10n.zh-cn.json'],
   },
   {

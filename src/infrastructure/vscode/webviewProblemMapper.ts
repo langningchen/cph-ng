@@ -26,7 +26,7 @@ import { type BfCompare, BfCompareState, isRunningState } from '@/domain/entitie
 import type { Problem } from '@/domain/entities/problem';
 import type { Tc, TcResult } from '@/domain/entities/tc';
 import type { TcIo } from '@/domain/entities/tcIo';
-import { Verdicts } from '@/domain/entities/verdict';
+import { type Verdict, VerdictName, Verdicts } from '@/domain/entities/verdict';
 import type { IFileWithHash, IOverrides } from '@/domain/types';
 import type {
   IWebviewBfCompare,
@@ -77,7 +77,7 @@ export class WebviewProblemMapper {
       isDisabled: tc.isDisabled,
       result: tc.verdict
         ? {
-            verdict: Verdicts[tc.verdict],
+            verdict: this.getVerdict(tc.verdict),
             timeMs: tc.timeMs,
             memoryMb: tc.memoryMb,
             stdout: tc.stdout ? this.tcIoToDto(tc.stdout) : undefined,
@@ -89,7 +89,7 @@ export class WebviewProblemMapper {
   }
   public tcResultToDto(tcResult: Partial<TcResult>): Partial<IWebviewTcResult> {
     return {
-      verdict: tcResult.verdict ? Verdicts[tcResult.verdict] : undefined,
+      verdict: tcResult.verdict ? this.getVerdict(tcResult.verdict) : undefined,
       timeMs: tcResult.timeMs,
       memoryMb: tcResult.memoryMb,
       stdout: tcResult.stdout ? this.tcIoToDto(tcResult.stdout) : undefined,
@@ -159,5 +159,32 @@ export class WebviewProblemMapper {
         ? { defaultValue: defaultRunnerArgs, override: runnerArgs || null }
         : undefined,
     };
+  }
+
+  private getVerdict(verdict: VerdictName): Verdict {
+    const fullName: Record<VerdictName, string> = {
+      [VerdictName.unknownError]: this.translator.t('Unknown Error'),
+      [VerdictName.accepted]: this.translator.t('Accepted'),
+      [VerdictName.partiallyCorrect]: this.translator.t('Partially Correct'),
+      [VerdictName.presentationError]: this.translator.t('Presentation Error'),
+      [VerdictName.wrongAnswer]: this.translator.t('Wrong Answer'),
+      [VerdictName.timeLimitExceed]: this.translator.t('Time Limit Exceed'),
+      [VerdictName.memoryLimitExceed]: this.translator.t('Memory Limit Exceed'),
+      [VerdictName.outputLimitExceed]: this.translator.t('Output Limit Exceed'),
+      [VerdictName.runtimeError]: this.translator.t('Runtime Error'),
+      [VerdictName.restrictedFunction]: this.translator.t('Restricted Function'),
+      [VerdictName.compilationError]: this.translator.t('Compilation Error'),
+      [VerdictName.systemError]: this.translator.t('System Error'),
+      [VerdictName.waiting]: this.translator.t('Waiting'),
+      [VerdictName.fetched]: this.translator.t('Fetched'),
+      [VerdictName.compiling]: this.translator.t('Compiling'),
+      [VerdictName.compiled]: this.translator.t('Compiled'),
+      [VerdictName.judging]: this.translator.t('Judging'),
+      [VerdictName.judged]: this.translator.t('Judged'),
+      [VerdictName.comparing]: this.translator.t('Comparing'),
+      [VerdictName.skipped]: this.translator.t('Skipped'),
+      [VerdictName.rejected]: this.translator.t('Rejected'),
+    };
+    return { ...Verdicts[verdict], fullName: fullName[verdict] };
   }
 }

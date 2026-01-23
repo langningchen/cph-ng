@@ -19,6 +19,7 @@ import type { UUID } from 'node:crypto';
 import { inject, injectable } from 'tsyringe';
 import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IExtensionContext } from '@/application/ports/vscode/IExtensionContext';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@/composition/tokens';
@@ -26,7 +27,6 @@ import type { BfCompare } from '@/domain/entities/bfCompare';
 import type { ProblemMetaPayload } from '@/domain/entities/problem';
 import type { Tc, TcResult } from '@/domain/entities/tc';
 import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapper';
-import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 
 @injectable()
 export class ActiveProblemCoordinator {

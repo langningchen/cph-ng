@@ -49,17 +49,21 @@ export class EnvironmentModule implements IExtensionModule {
     await this.tmp.startMonitor();
     Companion.init();
 
+    let lastAlertTime = 0;
     this.timer = setInterval(async () => {
-      if (extensions.getExtension('divyanshuagrawal.competitive-programming-helper')?.isActive) {
-        await this.ui.alert(
-          'warn',
-          this.translator.t(
-            "CPH-NG cannot run with CPH, but it can load CPH problem file. Please disable CPH to use CPH-NG. You can select the 'Ignore' option to ignore this warning in this session.",
-          ),
-          {
-            modal: true,
-          },
+      const currentTime = Date.now();
+      if (
+        extensions.getExtension('divyanshuagrawal.competitive-programming-helper')?.isActive &&
+        currentTime - lastAlertTime > 5 * 1000
+      ) {
+        lastAlertTime = currentTime;
+        const msg = this.translator.t(
+          "CPH-NG cannot run with CPH, but it can load CPH problem file. Please disable CPH to use CPH-NG. You can select the 'Ignore' option to ignore this warning in this session.",
         );
+        const okOption = this.translator.t('OK');
+        const ignoreOption = this.translator.t('Ignore');
+        const result = await this.ui.alert('warn', msg, { modal: true }, okOption, ignoreOption);
+        if (result === ignoreOption) clearInterval(this.timer);
       }
     }, 60000);
 
