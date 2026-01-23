@@ -64,6 +64,9 @@ export class LangRust extends AbstractLanguageStrategy {
 
     const compilerArgs = args.split(/\s+/).filter(Boolean);
     const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
+    if (this.settings.runner.unlimitedStack && this.sys.platform() === 'win32') {
+      cmd.push('-C', 'link-args=-Wl,--stack,268435456');
+    }
 
     await this.executeCompiler(cmd, signal);
     return { path, hash };
