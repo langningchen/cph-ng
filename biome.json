@@ -19,13 +19,14 @@
       "recommended": true,
       "style": {
         "noCommonJs": "on",
-        "noUselessElse": "on",
         "noDefaultExport": "on",
-        "useConsistentObjectDefinitions": "on",
+        "noUselessElse": "on",
+        "useCollapsedElseIf": "on",
+        "useCollapsedIf": "on",
         "useConsistentArrayType": "on",
         "useConsistentCurlyBraces": "on",
-        "useCollapsedIf": "on",
-        "useCollapsedElseIf": "on",
+        "useConsistentObjectDefinitions": "on",
+        "useGroupedAccessorPairs": "on",
         "useNamingConvention": {
           "level": "error",
           "options": {

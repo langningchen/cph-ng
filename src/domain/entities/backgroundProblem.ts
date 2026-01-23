@@ -27,6 +27,9 @@ export class BackgroundProblem {
     private startTime: number,
   ) {}
 
+  public get ac(): AbortController | null {
+    return this._ac;
+  }
   public set ac(value: AbortController) {
     this._ac?.abort();
     this._ac = value;

@@ -71,13 +71,13 @@ export class BfCompare {
   public get state(): BfCompareState {
     return this._state;
   }
-  public get cnt(): number {
-    return this._cnt;
-  }
   public set state(value: BfCompareState) {
     this._state = value;
     // We need to emit both cnt and state for the translator to update the message correctly
     this.signals.emit('change', { cnt: this._cnt, state: this._state });
+  }
+  public get cnt(): number {
+    return this._cnt;
   }
   public get isRunning(): boolean {
     return (

@@ -32,20 +32,19 @@ export class ExtensionContextAdapter implements IExtensionContext {
   public get hasProblem() {
     return this._hasProblem;
   }
-  public get canImport() {
-    return this._canImport;
-  }
-  public get isRunning() {
-    return this._isRunning;
-  }
-
   public set hasProblem(value: boolean) {
     this.setContext('hasProblem', value);
     this._hasProblem = value;
   }
+  public get canImport() {
+    return this._canImport;
+  }
   public set canImport(value: boolean) {
     this.setContext('canImport', value);
     this._canImport = value;
+  }
+  public get isRunning() {
+    return this._isRunning;
   }
   public set isRunning(value: boolean) {
     this.setContext('isRunning', value);

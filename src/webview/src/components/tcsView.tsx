@@ -135,6 +135,7 @@ export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
       <Box
         onClick={() => dispatch({ type: 'addTc', problemId })}
         sx={{
+          width: '100%',
           minHeight: '40px',
           cursor: 'pointer',
           display: 'flex',
