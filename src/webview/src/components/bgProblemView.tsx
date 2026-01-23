@@ -62,7 +62,7 @@ export const BgProblemView = ({ bgProblems }: BgProblemViewProps) => {
             <CphFlex>
               {bgProblems.map((bgProblem) => (
                 <CphLink
-                  key={bgProblem.name}
+                  key={bgProblem.srcPath}
                   name={bgProblem.srcPath}
                   onClick={() => {
                     dispatch({

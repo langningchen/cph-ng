@@ -11,6 +11,46 @@ import TerserPlugin from 'terser-webpack-plugin';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const generateSchema = () => {
+  const typesPath = resolve(__dirname, 'src/domain/types.ts');
+  const outputPath = resolve(__dirname, 'dist/problem.schema.json');
+
+  return {
+    /**
+     * @param {import('webpack').Compiler} compiler
+     */
+    apply: (compiler) => {
+      const runCommand = () => {
+        try {
+          mkdirSync(dirname(outputPath), { recursive: true });
+          execSync(
+            `pnpm exec ts-json-schema-generator --path 'src/domain/types.ts' --type 'IProblem' -o dist/problem.schema.json`,
+            { stdio: 'inherit' }
+          );
+          console.log('Successfully generated schema file.');
+        } catch (error) {
+          console.error('Failed to generate schema:', error);
+        }
+      };
+
+      compiler.hooks.beforeRun.tap('Generate Schema Plugin', () => {
+        runCommand();
+      });
+
+      compiler.hooks.watchRun.tap('Generate Schema Plugin', (compiler) => {
+        const modifiedFiles = compiler.modifiedFiles;
+        if (!modifiedFiles || modifiedFiles.has(typesPath)) {
+          runCommand();
+        }
+      });
+
+      compiler.hooks.afterCompile.tap('Generate Schema Plugin', (compilation) => {
+        compilation.fileDependencies.add(typesPath);
+      });
+    },
+  };
+};
+
 const generateSettings = () => {
   const pkgPath = resolve(__dirname, 'package.json');
 
@@ -158,6 +198,7 @@ export default (_env, argv) => {
     },
     externals: { vscode: 'vscode' },
     plugins: [
+      generateSchema(),
       generateSettings(),
       generateBuildInfo(),
       new CopyPlugin({

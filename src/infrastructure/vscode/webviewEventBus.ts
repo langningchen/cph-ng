@@ -98,7 +98,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
   ): void {
     this.logger.debug('Emitting patchTestcase event', { problemId, testcaseId, payload });
     this.emitter.emit('message', {
-      type: 'PATCH_TC',
+      type: 'PATCH_TESTCASE',
       problemId,
       testcaseId,
       payload,
@@ -111,7 +111,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
   ): void {
     this.logger.debug('Emitting patchTestcaseResult event', { problemId, testcaseId, payload });
     this.emitter.emit('message', {
-      type: 'PATCH_TC_RESULT',
+      type: 'PATCH_TESTCASE_RESULT',
       problemId,
       testcaseId,
       payload,
