@@ -811,15 +811,15 @@
     "@types/semver": "^7.7.1",
     "@types/source-map-support": "^0.5.10",
     "@types/vscode": "1.95.0",
-    "@vitest/coverage-v8": "4.0.17",
-    "@vitest/ui": "^4.0.17",
+    "@vitest/coverage-v8": "4.0.18",
+    "@vitest/ui": "^4.0.18",
     "@vscode/vsce": "^3.7.1",
     "ignore": "^7.0.5",
     "swc-loader": "^0.2.7",
     "terser-webpack-plugin": "^5.3.16",
     "tsx": "^4.21.0",
     "typescript": "5.9.3",
-    "vitest": "^4.0.17",
+    "vitest": "^4.0.18",
     "vitest-mock-extended": "^3.1.0",
     "webpack": "^5.104.1",
     "webpack-cli": "^6.0.1"
@@ -848,5 +848,12 @@
     "stacktrace-js": "^2.0.2",
     "tsyringe": "^4.10.0",
     "typed-emitter": "^2.1.0"
+  },
+  "pnpm": {
+    "updateConfig": {
+      "ignoreDependencies": [
+        "@types/vscode"
+      ]
+    }
   }
 }
