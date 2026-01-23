@@ -817,6 +817,7 @@
     "ignore": "^7.0.5",
     "swc-loader": "^0.2.7",
     "terser-webpack-plugin": "^5.3.16",
+    "ts-json-schema-generator": "^2.4.0",
     "tsx": "^4.21.0",
     "typescript": "5.9.3",
     "vitest": "^4.0.18",
@@ -846,7 +847,6 @@
     "semver": "^7.7.3",
     "source-map-support": "^0.5.21",
     "stacktrace-js": "^2.0.2",
-    "ts-json-schema-generator": "^2.4.0",
     "tsyringe": "^4.10.0",
     "typed-emitter": "^2.1.0"
   },

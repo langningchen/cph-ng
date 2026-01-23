@@ -71,9 +71,6 @@ importers:
       stacktrace-js:
         specifier: ^2.0.2
         version: 2.0.2
-      ts-json-schema-generator:
-        specifier: ^2.4.0
-        version: 2.4.0
       tsyringe:
         specifier: ^4.10.0
         version: 4.10.0
@@ -135,6 +132,9 @@ importers:
       terser-webpack-plugin:
         specifier: ^5.3.16
         version: 5.3.16(@swc/core@1.15.10)(webpack@5.104.1)
+      ts-json-schema-generator:
+        specifier: ^2.4.0
+        version: 2.4.0
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
