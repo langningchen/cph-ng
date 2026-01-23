@@ -18,7 +18,7 @@
 import { EventEmitter } from 'node:stream';
 import type { IFileWithHash } from '@/domain/types';
 
-export const BfCompareState = {
+export const StressTestState = {
   inactive: 'inactive',
   compiling: 'compiling',
   compilationError: 'compilationError',
@@ -28,30 +28,30 @@ export const BfCompareState = {
   foundDifference: 'foundDifference',
   internalError: 'internalError',
 } as const;
-export type BfCompareState = (typeof BfCompareState)[keyof typeof BfCompareState];
+export type StressTestState = (typeof StressTestState)[keyof typeof StressTestState];
 
-const RunningSet = new Set<BfCompareState>([
-  BfCompareState.compiling,
-  BfCompareState.generating,
-  BfCompareState.runningBruteForce,
-  BfCompareState.runningSolution,
+const RunningSet = new Set<StressTestState>([
+  StressTestState.compiling,
+  StressTestState.generating,
+  StressTestState.runningBruteForce,
+  StressTestState.runningSolution,
 ]);
-export const isRunningState = (state?: BfCompareState): boolean => {
+export const isRunningState = (state?: StressTestState): boolean => {
   return state !== undefined && RunningSet.has(state);
 };
 
-export interface BfCompareEvents {
-  change: [Partial<BfCompare>];
+export interface StressTestEvents {
+  change: [Partial<StressTest>];
 }
 
-export class BfCompare {
-  public readonly signals: EventEmitter<BfCompareEvents> = new EventEmitter();
+export class StressTest {
+  public readonly signals: EventEmitter<StressTestEvents> = new EventEmitter();
 
   public constructor(
     private _generator: IFileWithHash | null = null,
     private _bruteForce: IFileWithHash | null = null,
     private _cnt: number = 0,
-    private _state: BfCompareState = BfCompareState.inactive,
+    private _state: StressTestState = StressTestState.inactive,
   ) {}
 
   public get generator(): IFileWithHash | null {
@@ -68,10 +68,10 @@ export class BfCompare {
     this._bruteForce = value;
     this.signals.emit('change', { bruteForce: value });
   }
-  public get state(): BfCompareState {
+  public get state(): StressTestState {
     return this._state;
   }
-  public set state(value: BfCompareState) {
+  public set state(value: StressTestState) {
     this._state = value;
     // We need to emit both cnt and state for the translator to update the message correctly
     this.signals.emit('change', { cnt: this._cnt, state: this._state });
@@ -81,10 +81,10 @@ export class BfCompare {
   }
   public get isRunning(): boolean {
     return (
-      this.state === BfCompareState.compiling ||
-      this.state === BfCompareState.generating ||
-      this.state === BfCompareState.runningBruteForce ||
-      this.state === BfCompareState.runningSolution
+      this.state === StressTestState.compiling ||
+      this.state === StressTestState.generating ||
+      this.state === StressTestState.runningBruteForce ||
+      this.state === StressTestState.runningSolution
     );
   }
 

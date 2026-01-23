@@ -43,7 +43,7 @@ export interface IWebviewFileWithHash {
   base: string;
 }
 
-export interface IWebviewBfCompare {
+export interface IWebviewStressTest {
   generator: IWebviewFileWithHash | null;
   bruteForce: IWebviewFileWithHash | null;
   isRunning: boolean;
@@ -72,7 +72,7 @@ export interface IWebviewProblem {
   src: IWebviewFileWithHash;
   checker: IWebviewFileWithHash | null;
   interactor: IWebviewFileWithHash | null;
-  bfCompare: IWebviewBfCompare;
+  stressTest: IWebviewStressTest;
   timeElapsedMs: number;
   overrides: IWebviewOverrides;
 }

@@ -76,14 +76,14 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
         if (interactor !== undefined) problem.interactor = interactor;
         break;
       }
-      case 'PATCH_BF_COMPARE': {
+      case 'PATCH_STRESS_TEST': {
         if (draft.currentProblem.type !== 'active') return;
-        const bfCompare = draft.currentProblem.problem.bfCompare;
+        const stressTest = draft.currentProblem.problem.stressTest;
         const { generator, bruteForce, isRunning, msg } = action.payload;
-        if (generator !== undefined) bfCompare.generator = generator;
-        if (bruteForce !== undefined) bfCompare.bruteForce = bruteForce;
-        if (isRunning !== undefined) bfCompare.isRunning = isRunning;
-        if (msg !== undefined) bfCompare.msg = msg;
+        if (generator !== undefined) stressTest.generator = generator;
+        if (bruteForce !== undefined) stressTest.bruteForce = bruteForce;
+        if (isRunning !== undefined) stressTest.isRunning = isRunning;
+        if (msg !== undefined) stressTest.msg = msg;
         return;
       }
       case 'ADD_TC': {

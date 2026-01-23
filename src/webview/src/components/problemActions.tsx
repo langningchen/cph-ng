@@ -36,7 +36,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { IWebviewBfCompare } from '@/domain/webviewTypes';
+import type { IWebviewStressTest } from '@/domain/webviewTypes';
 import { useProblemContext } from '../context/ProblemContext';
 import { getCompile } from '../utils';
 import { CphFlex } from './base/cphFlex';
@@ -47,17 +47,17 @@ import { CphButton } from './cphButton';
 interface ProblemActionsProps {
   problemId: UUID;
   url?: string;
-  bfCompare: IWebviewBfCompare;
+  stressTest: IWebviewStressTest;
   hasRunning: boolean;
 }
 
 export const ProblemActions = memo(
-  ({ problemId, url, bfCompare, hasRunning }: ProblemActionsProps) => {
+  ({ problemId, url, stressTest, hasRunning }: ProblemActionsProps) => {
     const { t } = useTranslation();
     const { dispatch } = useProblemContext();
     const [clickTime, setClickTime] = useState<number[]>([]);
     const [isDelDialogOpen, setDelDialogOpen] = useState(false);
-    const [isBfCompareDialogOpen, setBfCompareDialogOpen] = useState(false);
+    const [isStressTestDialogOpen, setStressTestDialogOpen] = useState(false);
 
     useEffect(() => {
       if (clickTime.length === 10 && clickTime[9] - clickTime[0] < 2000) {
@@ -132,10 +132,10 @@ export const ProblemActions = memo(
           )}
           <CphButton
             larger
-            name={t('problemActions.bfCompare')}
+            name={t('problemActions.stressTest')}
             icon={CompareArrowsIcon}
-            onClick={() => setBfCompareDialogOpen(true)}
-            sx={bfCompare.isRunning ? pulseAnimation : undefined}
+            onClick={() => setStressTestDialogOpen(true)}
+            sx={stressTest.isRunning ? pulseAnimation : undefined}
           />
           {(() => {
             if (!url) {
@@ -202,13 +202,13 @@ export const ProblemActions = memo(
         <Dialog
           fullWidth
           maxWidth={false}
-          open={isBfCompareDialogOpen}
-          onClose={() => setBfCompareDialogOpen(false)}
+          open={isStressTestDialogOpen}
+          onClose={() => setStressTestDialogOpen(false)}
         >
-          <DialogTitle>{t('problemActions.bfCompareDialog.title')}</DialogTitle>
+          <DialogTitle>{t('problemActions.stressTestDialog.title')}</DialogTitle>
           <CphButton
-            name={t('problemActions.bfCompareDialog.close')}
-            onClick={() => setBfCompareDialogOpen(false)}
+            name={t('problemActions.stressTestDialog.close')}
+            onClick={() => setStressTestDialogOpen(false)}
             sx={(theme) => ({
               position: 'absolute',
               right: 8,
@@ -220,20 +220,20 @@ export const ProblemActions = memo(
           <DialogContent>
             <CphFlex column>
               <CphFlex>
-                <Typography>{t('problemActions.bfCompareDialog.generator')}</Typography>
-                {bfCompare.generator ? (
+                <Typography>{t('problemActions.stressTestDialog.generator')}</Typography>
+                {stressTest.generator ? (
                   <>
                     <CphLink
-                      name={bfCompare.generator.path}
+                      name={stressTest.generator.path}
                       onClick={() => {
-                        if (bfCompare.generator)
+                        if (stressTest.generator)
                           dispatch({
                             type: 'openFile',
-                            path: bfCompare.generator.path,
+                            path: stressTest.generator.path,
                           });
                       }}
                     >
-                      {bfCompare.generator.base}
+                      {stressTest.generator.base}
                     </CphLink>
                     <CphButton
                       icon={CloseIcon}
@@ -244,7 +244,7 @@ export const ProblemActions = memo(
                           fileType: 'generator',
                         })
                       }
-                      name={t('problemActions.bfCompareDialog.button.removeGenerator')}
+                      name={t('problemActions.stressTestDialog.button.removeGenerator')}
                     />
                   </>
                 ) : (
@@ -257,25 +257,25 @@ export const ProblemActions = memo(
                         fileType: 'generator',
                       })
                     }
-                    name={t('problemActions.bfCompareDialog.button.chooseGenerator')}
+                    name={t('problemActions.stressTestDialog.button.chooseGenerator')}
                   />
                 )}
               </CphFlex>
               <CphFlex>
-                <Typography>{t('problemActions.bfCompareDialog.bruteForce')}</Typography>
-                {bfCompare.bruteForce ? (
+                <Typography>{t('problemActions.stressTestDialog.bruteForce')}</Typography>
+                {stressTest.bruteForce ? (
                   <>
                     <CphLink
-                      name={bfCompare.bruteForce.path}
+                      name={stressTest.bruteForce.path}
                       onClick={() => {
-                        if (bfCompare.bruteForce)
+                        if (stressTest.bruteForce)
                           dispatch({
                             type: 'openFile',
-                            path: bfCompare.bruteForce.path,
+                            path: stressTest.bruteForce.path,
                           });
                       }}
                     >
-                      {bfCompare.bruteForce.base}
+                      {stressTest.bruteForce.base}
                     </CphLink>
                     <CphButton
                       icon={CloseIcon}
@@ -286,7 +286,7 @@ export const ProblemActions = memo(
                           fileType: 'bruteForce',
                         })
                       }
-                      name={t('problemActions.bfCompareDialog.button.removeBruteForce')}
+                      name={t('problemActions.stressTestDialog.button.removeBruteForce')}
                     />
                   </>
                 ) : (
@@ -299,17 +299,17 @@ export const ProblemActions = memo(
                         fileType: 'bruteForce',
                       })
                     }
-                    name={t('problemActions.bfCompareDialog.button.chooseBruteForce')}
+                    name={t('problemActions.stressTestDialog.button.chooseBruteForce')}
                   />
                 )}
               </CphFlex>
-              <CphFlex>{bfCompare.msg}</CphFlex>
-              {bfCompare.isRunning ? (
+              <CphFlex>{stressTest.msg}</CphFlex>
+              {stressTest.isRunning ? (
                 <CphButton
-                  name={t('problemActions.bfCompareDialog.stop')}
+                  name={t('problemActions.stressTestDialog.stop')}
                   onClick={() =>
                     dispatch({
-                      type: 'stopBfCompare',
+                      type: 'stopStressTest',
                       problemId,
                     })
                   }
@@ -318,17 +318,17 @@ export const ProblemActions = memo(
                 />
               ) : (
                 <CphButton
-                  name={t('problemActions.bfCompareDialog.run')}
+                  name={t('problemActions.stressTestDialog.run')}
                   onClick={(e) => {
                     dispatch({
-                      type: 'startBfCompare',
+                      type: 'startStressTest',
                       problemId,
                       forceCompile: getCompile(e),
                     });
                   }}
                   icon={PlayCircleIcon}
                   color='success'
-                  disabled={!bfCompare.generator || !bfCompare.bruteForce}
+                  disabled={!stressTest.generator || !stressTest.bruteForce}
                 />
               )}
             </CphFlex>

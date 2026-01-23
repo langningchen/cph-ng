@@ -55,7 +55,7 @@
 - [运行所有测试样例](../features/run-all-tests.md)
 - [特殊评测](../features/special-judge.md)
 - [交互式题目](../features/interactive-problems.md)
-- [暴力对拍](../features/brute-force-compare.md)
+- [暴力对拍](../features/stress-test.md)
 - [缓存设置](cache.md)
 
 ## 高级编译部分 { #advanced }

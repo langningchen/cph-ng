@@ -22,17 +22,17 @@ import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
-import { type BfCompare, BfCompareState, isRunningState } from '@/domain/entities/bfCompare';
 import type { Problem } from '@/domain/entities/problem';
+import { isRunningState, type StressTest, StressTestState } from '@/domain/entities/stressTest';
 import type { Tc, TcResult } from '@/domain/entities/tc';
 import type { TcIo } from '@/domain/entities/tcIo';
 import { type Verdict, VerdictName, Verdicts } from '@/domain/entities/verdict';
 import type { IFileWithHash, IOverrides } from '@/domain/types';
 import type {
-  IWebviewBfCompare,
   IWebviewFileWithHash,
   IWebviewOverrides,
   IWebviewProblem,
+  IWebviewStressTest,
   IWebviewTc,
   IWebviewTcIo,
   IWebviewTcResult,
@@ -61,7 +61,7 @@ export class WebviewProblemMapper {
       src: this.fileWithHashToDto(entity.src),
       checker: entity.checker ? this.fileWithHashToDto(entity.checker) : null,
       interactor: entity.interactor ? this.fileWithHashToDto(entity.interactor) : null,
-      bfCompare: this.bfCompareToDto(entity.bfCompare),
+      stressTest: this.stressTestToDto(entity.stressTest),
       timeElapsedMs: entity.timeElapsedMs,
       overrides: this.overrideToDto(entity.src.path, entity.overrides),
     };
@@ -103,30 +103,30 @@ export class WebviewProblemMapper {
       (data) => ({ type: 'string', data }),
     );
   }
-  public bfCompareToDto(bfCompare: BfCompare): IWebviewBfCompare;
-  public bfCompareToDto(bfCompare: Partial<BfCompare>): Partial<IWebviewBfCompare>;
-  public bfCompareToDto(bfCompare: Partial<BfCompare>): Partial<IWebviewBfCompare> {
+  public stressTestToDto(stressTest: StressTest): IWebviewStressTest;
+  public stressTestToDto(stressTest: Partial<StressTest>): Partial<IWebviewStressTest>;
+  public stressTestToDto(stressTest: Partial<StressTest>): Partial<IWebviewStressTest> {
     const msgs = {
-      [BfCompareState.inactive]: this.translator.t('Brute Force Compare is Idle'),
-      [BfCompareState.compiling]: this.translator.t('Compiling...'),
-      [BfCompareState.compilationError]: this.translator.t('Compilation Error'),
-      [BfCompareState.generating]: this.translator.t('Generating Data (#{cnt})...', {
-        cnt: bfCompare.cnt,
+      [StressTestState.inactive]: this.translator.t('Brute Force Compare is Idle'),
+      [StressTestState.compiling]: this.translator.t('Compiling...'),
+      [StressTestState.compilationError]: this.translator.t('Compilation Error'),
+      [StressTestState.generating]: this.translator.t('Generating Data (#{cnt})...', {
+        cnt: stressTest.cnt,
       }),
-      [BfCompareState.runningBruteForce]: this.translator.t('Running Brute Force (#{cnt})...', {
-        cnt: bfCompare.cnt,
+      [StressTestState.runningBruteForce]: this.translator.t('Running Brute Force (#{cnt})...', {
+        cnt: stressTest.cnt,
       }),
-      [BfCompareState.runningSolution]: this.translator.t('Running Solution (#{cnt})...'),
-      [BfCompareState.foundDifference]: this.translator.t('Difference found at case #{cnt}', {
-        cnt: bfCompare.cnt,
+      [StressTestState.runningSolution]: this.translator.t('Running Solution (#{cnt})...'),
+      [StressTestState.foundDifference]: this.translator.t('Difference found at case #{cnt}', {
+        cnt: stressTest.cnt,
       }),
-      [BfCompareState.internalError]: this.translator.t('Internal Error'),
+      [StressTestState.internalError]: this.translator.t('Internal Error'),
     };
     return {
-      generator: bfCompare.generator ? this.fileWithHashToDto(bfCompare.generator) : undefined,
-      bruteForce: bfCompare.bruteForce ? this.fileWithHashToDto(bfCompare.bruteForce) : undefined,
-      isRunning: isRunningState(bfCompare.state),
-      msg: bfCompare.state ? msgs[bfCompare.state] : undefined,
+      generator: stressTest.generator ? this.fileWithHashToDto(stressTest.generator) : undefined,
+      bruteForce: stressTest.bruteForce ? this.fileWithHashToDto(stressTest.bruteForce) : undefined,
+      isRunning: isRunningState(stressTest.state),
+      msg: stressTest.state ? msgs[stressTest.state] : undefined,
     };
   }
   public fileWithHashToDto(fileWithHash: IFileWithHash): IWebviewFileWithHash {

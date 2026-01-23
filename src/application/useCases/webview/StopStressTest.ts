@@ -20,10 +20,10 @@ import type { IProblemRepository } from '@/application/ports/problems/IProblemRe
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import type { StopBfCompareMsg } from '@/webview/src/msgs';
+import type { StopStressTestMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class StopBfCompare extends BaseProblemUseCase<StopBfCompareMsg> {
+export class StopStressTest extends BaseProblemUseCase<StopStressTestMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
   ) {
@@ -32,7 +32,7 @@ export class StopBfCompare extends BaseProblemUseCase<StopBfCompareMsg> {
 
   protected async performAction(
     bgProblem: BackgroundProblem,
-    _msg: StopBfCompareMsg,
+    _msg: StopStressTestMsg,
   ): Promise<void> {
     bgProblem.abort();
   }

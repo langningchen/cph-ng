@@ -19,17 +19,18 @@ import type { UUID } from 'node:crypto';
 import { inject, injectable } from 'tsyringe';
 import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IExtensionContext } from '@/application/ports/vscode/IExtensionContext';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@/composition/tokens';
-import type { BfCompare } from '@/domain/entities/bfCompare';
 import type { ProblemMetaPayload } from '@/domain/entities/problem';
+import type { StressTest } from '@/domain/entities/stressTest';
 import type { Tc, TcResult } from '@/domain/entities/tc';
 import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapper';
 
 @injectable()
-export class ActiveProblemCoordinator {
+export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
   private activeProblemId: UUID | null = null;
   private lastAccessMap: Map<UUID, number> = new Map();
 
@@ -83,9 +84,9 @@ export class ActiveProblemCoordinator {
           interactor: interactor ? this.mapper.fileWithHashToDto(interactor) : interactor,
         });
       };
-      const onPatchBfCompare = async (payload: Partial<BfCompare>) => {
+      const onPatchStressTest = async (payload: Partial<StressTest>) => {
         if (!this.activeProblemId) return;
-        this.eventBus.patchBfCompare(this.activeProblemId, this.mapper.bfCompareToDto(payload));
+        this.eventBus.patchStressTest(this.activeProblemId, this.mapper.stressTestToDto(payload));
       };
       const onAddTc = async (id: UUID, payload: Tc) => {
         if (!this.activeProblemId) return;
@@ -109,7 +110,7 @@ export class ActiveProblemCoordinator {
         const problem = bgProblem?.problem;
         if (problem) {
           problem.signals.off('patchMeta', onPatchMeta);
-          problem.signals.off('patchBfCompare', onPatchBfCompare);
+          problem.signals.off('patchStressTest', onPatchStressTest);
           problem.signals.off('addTc', onAddTc);
           problem.signals.off('deleteTc', onDeleteTc);
           problem.signals.off('patchTc', onPatchTc);
@@ -123,7 +124,7 @@ export class ActiveProblemCoordinator {
       if (!bgProblem) return;
       this.eventBus.fullProblem(problemId, this.mapper.toDto(bgProblem.problem));
       bgProblem.problem.signals.on('patchMeta', onPatchMeta);
-      bgProblem.problem.signals.on('patchBfCompare', onPatchBfCompare);
+      bgProblem.problem.signals.on('patchStressTest', onPatchStressTest);
       bgProblem.problem.signals.on('addTc', onAddTc);
       bgProblem.problem.signals.on('deleteTc', onDeleteTc);
       bgProblem.problem.signals.on('patchTc', onPatchTc);

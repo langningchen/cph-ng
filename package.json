@@ -380,19 +380,19 @@
         }
       },
       {
-        "id": "bfCompare",
+        "id": "stressTest",
         "order": 4,
-        "title": "%cph-ng.configuration.bfCompare.title%",
+        "title": "%cph-ng.configuration.stressTest.title%",
         "properties": {
-          "cph-ng.bfCompare.generatorTimeLimit": {
+          "cph-ng.stressTest.generatorTimeLimit": {
             "type": "number",
             "default": 10000,
-            "markdownDescription": "%cph-ng.configuration.bfCompare.properties.generatorTimeLimit.markdownDescription%"
+            "markdownDescription": "%cph-ng.configuration.stressTest.properties.generatorTimeLimit.markdownDescription%"
           },
-          "cph-ng.bfCompare.bruteForceTimeLimit": {
+          "cph-ng.stressTest.bruteForceTimeLimit": {
             "type": "number",
             "default": 60000,
-            "markdownDescription": "%cph-ng.configuration.bfCompare.properties.bruteForceTimeLimit.markdownDescription%"
+            "markdownDescription": "%cph-ng.configuration.stressTest.properties.bruteForceTimeLimit.markdownDescription%"
           }
         }
       },

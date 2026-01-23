@@ -28,8 +28,8 @@ import type {
 import { TOKENS } from '@/composition/tokens';
 import type {
   IWebviewBackgroundProblem,
-  IWebviewBfCompare,
   IWebviewProblem,
+  IWebviewStressTest,
   IWebviewTc,
   IWebviewTcResult,
 } from '@/domain/webviewTypes';
@@ -66,10 +66,10 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
       payload,
     });
   }
-  public patchBfCompare(problemId: UUID, payload: Partial<IWebviewBfCompare>): void {
-    this.logger.debug('Emitting patchBfCompare event', { problemId, payload });
+  public patchStressTest(problemId: UUID, payload: Partial<IWebviewStressTest>): void {
+    this.logger.debug('Emitting patchStressTest event', { problemId, payload });
     this.emitter.emit('message', {
-      type: 'PATCH_BF_COMPARE',
+      type: 'PATCH_STRESS_TEST',
       problemId,
       payload,
     });

@@ -89,7 +89,7 @@
 此功能需要特定设置：
 
 - **时间限制**：控制生成器和暴力解法可以运行多长时间  
-  → 查看[暴力对拍设置](../configuration/brute-force.md)
+  → 查看[暴力对拍设置](../configuration/stress-test.md)
 
 - **编译**：影响所有三个程序的编译  
   → 查看[编译设置](../configuration/compilation.md)

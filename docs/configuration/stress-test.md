@@ -15,7 +15,7 @@
 
 ## 时间限制
 
-### `cph-ng.bfCompare.generatorTimeLimit`
+### `cph-ng.stressTest.generatorTimeLimit`
 
 允许测试样例生成器运行的最长时间（以毫秒为单位）。
 
@@ -27,13 +27,13 @@
 
 ```json
 {
-    "cph-ng.bfCompare.generatorTimeLimit": 5000
+    "cph-ng.stressTest.generatorTimeLimit": 5000
 }
 ```
 
 _允许生成器最多 5 秒来创建每个测试样例。_
 
-### `cph-ng.bfCompare.bruteForceTimeLimit`
+### `cph-ng.stressTest.bruteForceTimeLimit`
 
 允许暴力解法运行的最长时间（以毫秒为单位）。
 
@@ -45,7 +45,7 @@ _允许生成器最多 5 秒来创建每个测试样例。_
 
 ```json
 {
-    "cph-ng.bfCompare.bruteForceTimeLimit": 30000
+    "cph-ng.stressTest.bruteForceTimeLimit": 30000
 }
 ```
 
@@ -97,8 +97,8 @@ _允许暴力解法每个测试样例最多 30 秒。_
 
 ```json
 {
-    "cph-ng.bfCompare.generatorTimeLimit": 1000,
-    "cph-ng.bfCompare.bruteForceTimeLimit": 5000
+    "cph-ng.stressTest.generatorTimeLimit": 1000,
+    "cph-ng.stressTest.bruteForceTimeLimit": 5000
 }
 ```
 
@@ -106,13 +106,13 @@ _允许暴力解法每个测试样例最多 30 秒。_
 
 ```json
 {
-    "cph-ng.bfCompare.generatorTimeLimit": 10000,
-    "cph-ng.bfCompare.bruteForceTimeLimit": 60000
+    "cph-ng.stressTest.generatorTimeLimit": 10000,
+    "cph-ng.stressTest.bruteForceTimeLimit": 60000
 }
 ```
 
 ## 相关功能
 
-- [暴力对拍](../features/brute-force-compare.md) - 主要功能文档
+- [暴力对拍](../features/stress-test.md) - 主要功能文档
 - [添加测试样例](../features/add-test-case.md) - 找到的用例保存位置
 - [运行器设置](runner.md) - 您的解法使用标准运行器设置

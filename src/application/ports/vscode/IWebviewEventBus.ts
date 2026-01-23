@@ -18,9 +18,9 @@
 import type { UUID } from 'node:crypto';
 import type {
   IWebviewBackgroundProblem,
-  IWebviewBfCompare,
   IWebviewFileWithHash,
   IWebviewProblem,
+  IWebviewStressTest,
   IWebviewTc,
   IWebviewTcResult,
 } from '@/domain/webviewTypes';
@@ -32,7 +32,7 @@ export interface WebviewProblemMetaPayload {
 const WebviewEventName = {
   FULL_PROBLEM: 'FULL_PROBLEM',
   PATCH_META: 'PATCH_META',
-  PATCH_BF_COMPARE: 'PATCH_BF_COMPARE',
+  PATCH_STRESS_TEST: 'PATCH_STRESS_TEST',
   ADD_TC: 'ADD_TC',
   DELETE_TC: 'DELETE_TC',
   PATCH_TC: 'PATCH_TC',
@@ -50,10 +50,10 @@ interface WebviewPatchMetaEvent {
   problemId: UUID;
   payload: WebviewProblemMetaPayload;
 }
-interface WebviewPatchBfCompareEvent {
-  type: typeof WebviewEventName.PATCH_BF_COMPARE;
+interface WebviewPatchStressTestEvent {
+  type: typeof WebviewEventName.PATCH_STRESS_TEST;
   problemId: UUID;
-  payload: Partial<IWebviewBfCompare>;
+  payload: Partial<IWebviewStressTest>;
 }
 interface WebviewAddTcEvent {
   type: typeof WebviewEventName.ADD_TC;
@@ -89,7 +89,7 @@ interface WebviewNoProblemEvent {
 export type WebviewEvent =
   | WebviewFullProblemEvent
   | WebviewPatchMetaEvent
-  | WebviewPatchBfCompareEvent
+  | WebviewPatchStressTestEvent
   | WebviewAddTcEvent
   | WebviewDeleteTcEvent
   | WebviewPatchTcEvent
@@ -101,7 +101,7 @@ export interface IWebviewEventBus {
   onMessage(callback: (data: WebviewEvent) => void): void;
   fullProblem(problemId: UUID, payload: IWebviewProblem): void;
   patchMeta(problemId: UUID, payload: WebviewProblemMetaPayload): void;
-  patchBfCompare(problemId: UUID, payload: Partial<IWebviewBfCompare>): void;
+  patchStressTest(problemId: UUID, payload: Partial<IWebviewStressTest>): void;
   addTc(problemId: UUID, tcId: UUID, payload: IWebviewTc): void;
   deleteTc(problemId: UUID, tcId: UUID): void;
   patchTc(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTc>): void;

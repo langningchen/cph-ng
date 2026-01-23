@@ -18,6 +18,7 @@
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
@@ -28,6 +29,8 @@ export class DelProblem extends BaseProblemUseCase<DelProblemMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.problemService) protected readonly service: IProblemService,
+    @inject(TOKENS.activeProblemCoordinator)
+    private readonly coordinator: IActiveProblemCoordinator,
   ) {
     super(repo);
   }
@@ -36,6 +39,7 @@ export class DelProblem extends BaseProblemUseCase<DelProblemMsg> {
     { problem }: BackgroundProblem,
     _msg: DelProblemMsg,
   ): Promise<void> {
-    this.service.delete(problem);
+    await this.service.delete(problem);
+    await this.coordinator.dispatchFullData();
   }
 }

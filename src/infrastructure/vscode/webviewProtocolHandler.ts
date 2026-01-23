@@ -40,9 +40,9 @@ import { ReorderTc } from '@/application/useCases/webview/ReorderTc';
 import { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
 import { RunSingleTc } from '@/application/useCases/webview/RunSingleTc';
 import { SetTcString } from '@/application/useCases/webview/SetTcString';
-import { StartBfCompare } from '@/application/useCases/webview/StartBfCompare';
 import { StartChat } from '@/application/useCases/webview/StartChat';
-import { StopBfCompare } from '@/application/useCases/webview/StopBfCompare';
+import { StartStressTest } from '@/application/useCases/webview/StartStressTest';
+import { StopStressTest } from '@/application/useCases/webview/StopStressTest';
 import { StopTcs } from '@/application/useCases/webview/StopTcs';
 import { SubmitToCodeforces } from '@/application/useCases/webview/SubmitToCodeforces';
 import { ToggleTcFile } from '@/application/useCases/webview/ToggleTcFile';
@@ -72,9 +72,9 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
   runTc: RunSingleTc,
   runTcs: RunAllTcs,
   setTcString: SetTcString,
-  startBfCompare: StartBfCompare,
+  startStressTest: StartStressTest,
   startChat: StartChat,
-  stopBfCompare: StopBfCompare,
+  stopStressTest: StopStressTest,
   stopTcs: StopTcs,
   submitToCodeforces: SubmitToCodeforces,
   toggleTcFile: ToggleTcFile,

@@ -118,12 +118,12 @@ export interface RemoveSrcFileMsg extends ProblemBaseMsg {
   type: 'removeSrcFile';
   fileType: WebviewSrcFileTypes;
 }
-export interface StartBfCompareMsg extends ProblemBaseMsg {
-  type: 'startBfCompare';
+export interface StartStressTestMsg extends ProblemBaseMsg {
+  type: 'startStressTest';
   forceCompile: boolean | null;
 }
-export interface StopBfCompareMsg extends ProblemBaseMsg {
-  type: 'stopBfCompare';
+export interface StopStressTestMsg extends ProblemBaseMsg {
+  type: 'stopStressTest';
 }
 export interface SubmitToCodeforcesMsg extends ProblemBaseMsg {
   type: 'submitToCodeforces';
@@ -159,8 +159,8 @@ export type ProblemMsg =
   | ReorderTcMsg
   | ChooseSrcFileMsg
   | RemoveSrcFileMsg
-  | StartBfCompareMsg
-  | StopBfCompareMsg
+  | StartStressTestMsg
+  | StopStressTestMsg
   | SubmitToCodeforcesMsg
   | DragDropMsg;
 

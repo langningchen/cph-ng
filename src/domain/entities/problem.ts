@@ -18,7 +18,7 @@
 import type { UUID } from 'node:crypto';
 import EventEmitter from 'node:events';
 import type TypedEventEmitter from 'typed-emitter';
-import { BfCompare } from '@/domain/entities/bfCompare';
+import { StressTest } from '@/domain/entities/stressTest';
 import type { Tc, TcResult } from '@/domain/entities/tc';
 import type { IFileWithHash, IOverrides } from '@/domain/types';
 
@@ -28,7 +28,7 @@ export interface ProblemMetaPayload {
 }
 export type ProblemEvents = {
   patchMeta: (payload: ProblemMetaPayload) => void;
-  patchBfCompare: (payload: Partial<BfCompare>) => void;
+  patchStressTest: (payload: Partial<StressTest>) => void;
   addTc: (id: UUID, payload: Tc) => void;
   deleteTc: (id: UUID) => void;
   patchTc: (id: UUID, payload: Partial<Tc>) => void;
@@ -42,7 +42,7 @@ export class Problem {
   private _tcOrder: UUID[] = [];
   private _checker: IFileWithHash | null = null;
   private _interactor: IFileWithHash | null = null;
-  private _bfCompare: BfCompare = new BfCompare();
+  private _stressTest: StressTest = new StressTest();
   private _timeElapsedMs: number = 0;
   public overrides: IOverrides = {};
   public readonly signals: TypedEventEmitter<ProblemEvents> = new EventEmitter();
@@ -53,11 +53,11 @@ export class Problem {
   ) {
     if (typeof src === 'string') this.src = { path: src };
     else this.src = src;
-    this._bfCompare.signals.on('change', this.bfCompareChanged);
+    this._stressTest.signals.on('change', this.stressTestChanged);
   }
 
-  private bfCompareChanged = (payload: Partial<BfCompare>) => {
-    this.signals.emit('patchBfCompare', payload);
+  private stressTestChanged = (payload: Partial<StressTest>) => {
+    this.signals.emit('patchStressTest', payload);
   };
 
   public get tcs(): Map<UUID, Tc> {
@@ -80,13 +80,13 @@ export class Problem {
     this._interactor = file;
     this.signals.emit('patchMeta', { interactor: file });
   }
-  public get bfCompare(): BfCompare {
-    return this._bfCompare;
+  public get stressTest(): StressTest {
+    return this._stressTest;
   }
-  public set bfCompare(bfCompare: BfCompare) {
-    this._bfCompare.signals.off('change', this.bfCompareChanged);
-    this._bfCompare = bfCompare;
-    this._bfCompare.signals.on('change', this.bfCompareChanged);
+  public set stressTest(stressTest: StressTest) {
+    this._stressTest.signals.off('change', this.stressTestChanged);
+    this._stressTest = stressTest;
+    this._stressTest.signals.on('change', this.stressTestChanged);
   }
   public get timeElapsedMs() {
     return this._timeElapsedMs;
@@ -158,8 +158,8 @@ export class Problem {
       this.src.path?.toLowerCase() === path ||
       this._checker?.path?.toLowerCase() === path ||
       this._interactor?.path?.toLowerCase() === path ||
-      this._bfCompare?.bruteForce?.path?.toLowerCase() === path ||
-      this._bfCompare?.generator?.path?.toLowerCase() === path
+      this._stressTest?.bruteForce?.path?.toLowerCase() === path ||
+      this._stressTest?.generator?.path?.toLowerCase() === path
     )
       return true;
     for (const [_, tc] of this._tcs) if (tc.isRelated(path)) return true;

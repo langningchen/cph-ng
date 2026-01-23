@@ -73,23 +73,23 @@ export class CompilerService implements ICompilerService {
     }
 
     // Compile brute force comparison programs
-    if (problem.bfCompare.generator && problem.bfCompare.bruteForce) {
+    if (problem.stressTest.generator && problem.stressTest.bruteForce) {
       const generatorResult = await this.optionalCompile(
-        problem.bfCompare.generator,
+        problem.stressTest.generator,
         signal,
         forceCompile,
       );
       if (generatorResult instanceof Error) return generatorResult;
-      problem.bfCompare.generator.hash = generatorResult.hash;
+      problem.stressTest.generator.hash = generatorResult.hash;
 
       const bruteForceResult = await this.optionalCompile(
-        problem.bfCompare.bruteForce,
+        problem.stressTest.bruteForce,
         signal,
         forceCompile,
       );
       if (bruteForceResult instanceof Error) return bruteForceResult;
-      problem.bfCompare.bruteForce.hash = bruteForceResult.hash;
-      data.bfCompare = {
+      problem.stressTest.bruteForce.hash = bruteForceResult.hash;
+      data.stressTest = {
         generator: generatorResult,
         bruteForce: bruteForceResult,
       };

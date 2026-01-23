@@ -24,7 +24,7 @@ import type * as History from '@/application/ports/problems/history';
 import type { IProblemMigrationService } from '@/application/ports/problems/IProblemMigrationService';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
-import { BfCompareState } from '@/domain/entities/bfCompare';
+import { StressTestState } from '@/domain/entities/stressTest';
 import type { VerdictName } from '@/domain/entities/verdict';
 
 @injectable()
@@ -74,11 +74,11 @@ export class ProblemMigrationService implements IProblemMigrationService {
         src: problem.src,
         checker: problem.checker || null,
         interactor: problem.interactor || null,
-        bfCompare: {
+        stressTest: {
           generator: problem.bfCompare?.generator || null,
           bruteForce: problem.bfCompare?.bruteForce || null,
           cnt: 0,
-          state: BfCompareState.inactive,
+          state: StressTestState.inactive,
         },
         timeElapsedMs: problem.timeElapsed,
         overrides: {

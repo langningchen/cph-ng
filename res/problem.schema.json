@@ -193,7 +193,7 @@
     "interactor": {
       "$ref": "#/definitions/FileWithHash"
     },
-    "bfCompare": {
+    "stressTest": {
       "$ref": "#/definitions/BfCompare"
     },
     "timeElapsed": {

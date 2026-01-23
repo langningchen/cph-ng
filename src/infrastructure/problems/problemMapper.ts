@@ -18,11 +18,11 @@
 import type { UUID } from 'node:crypto';
 import { inject, injectable } from 'tsyringe';
 import { TOKENS } from '@/composition/tokens';
-import { BfCompare } from '@/domain/entities/bfCompare';
 import { Problem } from '@/domain/entities/problem';
+import { StressTest } from '@/domain/entities/stressTest';
 import { Tc } from '@/domain/entities/tc';
 import { TcIo } from '@/domain/entities/tcIo';
-import type { IBfCompare, IProblem, ITc, ITcIo } from '@/domain/types';
+import type { IProblem, IStressTest, ITc, ITcIo } from '@/domain/types';
 
 @injectable()
 export class ProblemMapper {
@@ -43,7 +43,7 @@ export class ProblemMapper {
       src: entity.src,
       checker: entity.checker,
       interactor: entity.interactor,
-      bfCompare: this.bfCompareToDto(entity.bfCompare),
+      stressTest: this.stressTestToDto(entity.stressTest),
       timeElapsedMs: entity.timeElapsedMs,
       overrides: { ...entity.overrides },
     };
@@ -57,7 +57,7 @@ export class ProblemMapper {
     }
     problem.checker = dto.checker;
     problem.interactor = dto.interactor;
-    if (dto.bfCompare) problem.bfCompare = this.bfCompareToEntity(dto.bfCompare);
+    if (dto.stressTest) problem.stressTest = this.stressTestToEntity(dto.stressTest);
     problem.addTimeElapsed(dto.timeElapsedMs);
     problem.overrides = dto.overrides;
     return problem;
@@ -110,15 +110,15 @@ export class ProblemMapper {
     );
   }
 
-  private bfCompareToDto(bfCompare: BfCompare): IBfCompare {
+  private stressTestToDto(stressTest: StressTest): IStressTest {
     return {
-      generator: bfCompare.generator,
-      bruteForce: bfCompare.bruteForce,
-      cnt: bfCompare.cnt,
-      state: bfCompare.state,
+      generator: stressTest.generator,
+      bruteForce: stressTest.bruteForce,
+      cnt: stressTest.cnt,
+      state: stressTest.state,
     };
   }
-  private bfCompareToEntity(dto: IBfCompare): BfCompare {
-    return new BfCompare(dto.generator, dto.bruteForce, dto.cnt, dto.state);
+  private stressTestToEntity(dto: IStressTest): StressTest {
+    return new StressTest(dto.generator, dto.bruteForce, dto.cnt, dto.state);
   }
 }

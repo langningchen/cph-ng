@@ -31,15 +31,15 @@ import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import { BfCompareState } from '@/domain/entities/bfCompare';
+import { StressTestState } from '@/domain/entities/stressTest';
 import { Tc } from '@/domain/entities/tc';
 import { TcIo } from '@/domain/entities/tcIo';
 import { VerdictName } from '@/domain/entities/verdict';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
-import type { StartBfCompareMsg } from '@/webview/src/msgs';
+import type { StartStressTestMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class StartBfCompare extends BaseProblemUseCase<StartBfCompareMsg> {
+export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
   public constructor(
     @inject(TOKENS.compilerService) private readonly compiler: ICompilerService,
     @inject(TOKENS.judgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
@@ -57,11 +57,11 @@ export class StartBfCompare extends BaseProblemUseCase<StartBfCompareMsg> {
 
   protected async performAction(
     fullProblem: BackgroundProblem,
-    msg: StartBfCompareMsg,
+    msg: StartStressTestMsg,
   ): Promise<void> {
     const { problem } = fullProblem;
-    const bf = problem.bfCompare;
-    if (!bf || !bf.generator || !bf.bruteForce) {
+    const stressTest = problem.stressTest;
+    if (!stressTest || !stressTest.generator || !stressTest.bruteForce) {
       this.ui.alert(
         'warn',
         this.translator.t('Please choose both generator and brute force files first.'),
@@ -73,44 +73,44 @@ export class StartBfCompare extends BaseProblemUseCase<StartBfCompareMsg> {
     fullProblem.ac?.abort();
     fullProblem.ac = ac;
 
-    bf.state = BfCompareState.compiling;
+    stressTest.state = StressTestState.compiling;
 
     const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
     if (artifacts instanceof Error) {
-      bf.state = BfCompareState.compilationError;
+      stressTest.state = StressTestState.compilationError;
       return;
     }
-    if (!artifacts.bfCompare) {
-      bf.state = BfCompareState.internalError;
+    if (!artifacts.stressTest) {
+      stressTest.state = StressTestState.internalError;
       return;
     }
 
     const judgeService = this.judgeFactory.create(problem);
-    bf.clearCnt();
+    stressTest.clearCnt();
 
     while (!ac.signal.aborted) {
-      bf.count();
-      bf.state = BfCompareState.generating;
+      stressTest.count();
+      stressTest.state = StressTestState.generating;
       const genRes = await this.executor.execute({
-        cmd: [artifacts.bfCompare.generator.path],
-        timeoutMs: this.settings.bfCompare.generatorTimeLimit,
+        cmd: [artifacts.stressTest.generator.path],
+        timeoutMs: this.settings.stressTest.generatorTimeLimit,
         signal: ac.signal,
       });
       if (genRes instanceof Error) {
-        bf.state = BfCompareState.internalError;
+        stressTest.state = StressTestState.internalError;
         this.ui.alert('warn', genRes.message);
         break;
       }
 
-      bf.state = BfCompareState.runningBruteForce;
+      stressTest.state = StressTestState.runningBruteForce;
       const bfRes = await this.executor.execute({
-        cmd: [artifacts.bfCompare.bruteForce.path],
-        timeoutMs: this.settings.bfCompare.bruteForceTimeLimit,
+        cmd: [artifacts.stressTest.bruteForce.path],
+        timeoutMs: this.settings.stressTest.bruteForceTimeLimit,
         signal: ac.signal,
         stdinPath: genRes.stdoutPath,
       });
       if (bfRes instanceof Error) {
-        bf.state = BfCompareState.internalError;
+        stressTest.state = StressTestState.internalError;
         this.ui.alert('warn', bfRes.message);
         break;
       }
@@ -126,9 +126,9 @@ export class StartBfCompare extends BaseProblemUseCase<StartBfCompareMsg> {
         onStatusChange: () => {},
         onResult: async (res: FinalResult) => {
           if (res.verdict === VerdictName.accepted) return;
-          if (res.verdict === VerdictName.rejected) bf.state = BfCompareState.inactive;
+          if (res.verdict === VerdictName.rejected) stressTest.state = StressTestState.inactive;
           else {
-            bf.state = BfCompareState.foundDifference;
+            stressTest.state = StressTestState.foundDifference;
             const newTc = new Tc(
               await this.tcIoService.tryInlining(new TcIo({ path: genRes.stdoutPath })),
               await this.tcIoService.tryInlining(new TcIo({ path: bfRes.stdoutPath })),
@@ -144,14 +144,14 @@ export class StartBfCompare extends BaseProblemUseCase<StartBfCompareMsg> {
           }
         },
         onError: (e) => {
-          bf.state = BfCompareState.internalError;
+          stressTest.state = StressTestState.internalError;
           this.ui.alert('warn', e.message);
         },
       };
 
-      bf.state = BfCompareState.runningSolution;
+      stressTest.state = StressTestState.runningSolution;
       await judgeService.judge(ctx, observer, ac.signal);
-      if (!bf.isRunning) break;
+      if (!stressTest.isRunning) break;
 
       this.tmp.dispose([genRes.stdoutPath, genRes.stderrPath, bfRes.stdoutPath, bfRes.stderrPath]);
     }

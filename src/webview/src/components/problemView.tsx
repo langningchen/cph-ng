@@ -87,7 +87,7 @@ export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewP
         <ProblemActions
           problemId={problemId}
           url={problem.url}
-          bfCompare={problem.bfCompare}
+          stressTest={problem.stressTest}
           hasRunning={hasRunning}
         />
       </ErrorBoundary>

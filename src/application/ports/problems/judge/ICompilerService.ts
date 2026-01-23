@@ -22,7 +22,7 @@ export type CompileData = {
   solution: LangCompileData;
   checker?: LangCompileData;
   interactor?: LangCompileData;
-  bfCompare?: {
+  stressTest?: {
     generator: LangCompileData;
     bruteForce: LangCompileData;
   };

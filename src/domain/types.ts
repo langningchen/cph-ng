@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { UUID } from 'node:crypto';
-import type { BfCompareState } from '@/domain/entities/bfCompare';
+import type { StressTestState } from '@/domain/entities/stressTest';
 import type { VerdictName } from '@/domain/entities/verdict';
 
 export type ITcIo = { data: string } | { path: string };
@@ -42,11 +42,11 @@ export interface IFileWithHash {
   hash?: string;
 }
 
-export interface IBfCompare {
+export interface IStressTest {
   generator: IFileWithHash | null;
   bruteForce: IFileWithHash | null;
   cnt: number;
-  state: BfCompareState;
+  state: StressTestState;
 }
 
 export interface IOverrides {
@@ -67,7 +67,7 @@ export interface IProblem {
   src: IFileWithHash;
   checker: IFileWithHash | null;
   interactor: IFileWithHash | null;
-  bfCompare: IBfCompare;
+  stressTest: IStressTest;
   timeElapsedMs: number;
   overrides: IOverrides;
 }

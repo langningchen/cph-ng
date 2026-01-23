@@ -4,120 +4,120 @@ site_author: Langning Chen
 site_description: A brief introduction for CPH-NG, the next generation of CPH
 copyright: ©2026 CPH-NG
 nav:
-  - 简介: index.md
-  - 快速入门: quickStart.md
-  - 功能:
-      - features/index.md
-      - 题目管理:
-          - features/create-problem.md
-          - features/import-problem.md
-          - features/edit-problem.md
-          - features/delete-problem.md
-      - 测试样例管理:
-          - features/add-test-case.md
-          - features/load-test-cases.md
-          - features/edit-test-case.md
-          - features/delete-test-case.md
-          - features/toggle-file-inline.md
-          - features/compare-output.md
-      - 运行和测试:
-          - features/run-single-test.md
-          - features/run-all-tests.md
-          - features/stop-execution.md
-          - features/clear-results.md
-          - features/wrapper-runner.md
-      - 高级功能:
-          - features/brute-force-compare.md
-          - features/special-judge.md
-          - features/interactive-problems.md
-          - features/submit-codeforces.md
-      - 集成:
-          - features/competitive-companion.md
-          - features/cph-import.md
-          - features/user-script.md
-  - 配置:
-      - configuration/index.md
-      - configuration/basic.md
-      - configuration/compilation.md
-      - configuration/runner.md
-      - configuration/comparing.md
-      - configuration/brute-force.md
-      - configuration/problem.md
-      - configuration/cache.md
-      - configuration/cph-compat.md
-      - configuration/companion.md
-      - configuration/sidebar.md
-  - 常见问题: faq.md
-  - 贡献:
-      - contributing/index.md
-      - 错误报告: contributing/reporting-a-bug.md
-      - 请求新功能: contributing/feature-request.md
-      - 文档问题: contributing/reporting-a-docs-issue.md
-      - 提交一个拉取请求: contributing/pull-request.md
-      - 询问问题: https://github.com/langningchen/cph-ng/discussions
-      - 帮助:
-          - 创建一个开发环境: contributing/setting-up-dev-env.md
-  - 关于: about.md
+    - 简介: index.md
+    - 快速入门: quickStart.md
+    - 功能:
+          - features/index.md
+          - 题目管理:
+                - features/create-problem.md
+                - features/import-problem.md
+                - features/edit-problem.md
+                - features/delete-problem.md
+          - 测试样例管理:
+                - features/add-test-case.md
+                - features/load-test-cases.md
+                - features/edit-test-case.md
+                - features/delete-test-case.md
+                - features/toggle-file-inline.md
+                - features/compare-output.md
+          - 运行和测试:
+                - features/run-single-test.md
+                - features/run-all-tests.md
+                - features/stop-execution.md
+                - features/clear-results.md
+                - features/wrapper-runner.md
+          - 高级功能:
+                - features/stress-test.md
+                - features/special-judge.md
+                - features/interactive-problems.md
+                - features/submit-codeforces.md
+          - 集成:
+                - features/competitive-companion.md
+                - features/cph-import.md
+                - features/user-script.md
+    - 配置:
+          - configuration/index.md
+          - configuration/basic.md
+          - configuration/compilation.md
+          - configuration/runner.md
+          - configuration/comparing.md
+          - configuration/stress-test.md
+          - configuration/problem.md
+          - configuration/cache.md
+          - configuration/cph-compat.md
+          - configuration/companion.md
+          - configuration/sidebar.md
+    - 常见问题: faq.md
+    - 贡献:
+          - contributing/index.md
+          - 错误报告: contributing/reporting-a-bug.md
+          - 请求新功能: contributing/feature-request.md
+          - 文档问题: contributing/reporting-a-docs-issue.md
+          - 提交一个拉取请求: contributing/pull-request.md
+          - 询问问题: https://github.com/langningchen/cph-ng/discussions
+          - 帮助:
+                - 创建一个开发环境: contributing/setting-up-dev-env.md
+    - 关于: about.md
 theme:
-  name: material
-  palette:
-    - media: "(prefers-color-scheme)"
-      toggle:
-        icon: material/brightness-auto
-        name: Switch to light mode
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      toggle:
-        icon: material/brightness-4
-        name: Switch to system preference
-  logo: assets/cph-ng.svg
-  features:
-    - content.action.edit
-    - content.code.copy
-    - content.code.annotate
-    - navigation.sections
-    - navigation.tabs
-    - navigation.top
-    - navigation.tracking
-    - navigation.indexes
-    - navigation.footer
-    - search.suggest
-    - search.highlight
-    - search.share
-    - toc.follow
+    name: material
+    palette:
+        - media: "(prefers-color-scheme)"
+          toggle:
+              icon: material/brightness-auto
+              name: Switch to light mode
+        - media: "(prefers-color-scheme: light)"
+          scheme: default
+          toggle:
+              icon: material/brightness-7
+              name: Switch to dark mode
+        - media: "(prefers-color-scheme: dark)"
+          scheme: slate
+          toggle:
+              icon: material/brightness-4
+              name: Switch to system preference
+    logo: assets/cph-ng.svg
+    features:
+        - content.action.edit
+        - content.code.copy
+        - content.code.annotate
+        - navigation.sections
+        - navigation.tabs
+        - navigation.top
+        - navigation.tracking
+        - navigation.indexes
+        - navigation.footer
+        - search.suggest
+        - search.highlight
+        - search.share
+        - toc.follow
 extra:
-  version:
-    provider: mike
-    alias: true
+    version:
+        provider: mike
+        alias: true
 repo_url: https://github.com/langningchen/cph-ng
 edit_uri: edit/main/docs/
 plugins:
-  - search
+    - search
 markdown_extensions:
-  - footnotes
-  - pymdownx.keys
-  - pymdownx.blocks.caption
-  - abbr
-  - pymdownx.emoji:
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-  - admonition
-  - pymdownx.details
-  - pymdownx.superfences
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - tables
-  - attr_list
-  - md_in_html
-  - toc:
-      permalink: true
-      toc_depth: 3
+    - footnotes
+    - pymdownx.keys
+    - pymdownx.blocks.caption
+    - abbr
+    - pymdownx.emoji:
+          emoji_generator: !!python/name:material.extensions.emoji.to_svg
+          emoji_index: !!python/name:material.extensions.emoji.twemoji
+    - admonition
+    - pymdownx.details
+    - pymdownx.superfences
+    - pymdownx.tabbed:
+          alternate_style: true
+    - pymdownx.highlight:
+          anchor_linenums: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - tables
+    - attr_list
+    - md_in_html
+    - toc:
+          permalink: true
+          toc_depth: 3
