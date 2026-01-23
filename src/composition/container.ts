@@ -37,6 +37,7 @@ import { LangJava } from '@/infrastructure/problems/judge/langs/javaStrategy';
 import { LangJavascript } from '@/infrastructure/problems/judge/langs/javascriptStrategy';
 import { LanguageRegistry } from '@/infrastructure/problems/judge/langs/languageRegistry';
 import { LangPython } from '@/infrastructure/problems/judge/langs/pythonStrategy';
+import { LangRust } from '@/infrastructure/problems/judge/langs/rustStrategy';
 import { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import { ExecutionStrategyFactoryAdapter } from '@/infrastructure/problems/judge/runner/executionStrategyFactoryAdapter';
 import { SolutionRunnerAdapter } from '@/infrastructure/problems/judge/runner/solutionRunnerAdapter';
@@ -109,6 +110,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.register(TOKENS.languageStrategy, { useClass: LangJava });
   container.register(TOKENS.languageStrategy, { useClass: LangJavascript });
   container.register(TOKENS.languageStrategy, { useClass: LangPython });
+  container.register(TOKENS.languageStrategy, { useClass: LangRust });
 
   container.register(TOKENS.extensionModule, { useClass: ProviderModule });
   container.register(TOKENS.extensionModule, { useClass: CommandModule });
