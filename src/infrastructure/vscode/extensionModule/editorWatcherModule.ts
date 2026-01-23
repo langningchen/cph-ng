@@ -41,7 +41,7 @@ export class EditorWatcherModule implements IExtensionModule {
       }),
     );
 
-    if (window.activeTextEditor) await this.handleEditorChange(window.activeTextEditor);
+    await this.handleEditorChange(window.activeTextEditor);
   }
 
   private async handleEditorChange(editor: TextEditor | undefined) {

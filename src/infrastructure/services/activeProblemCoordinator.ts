@@ -26,6 +26,7 @@ import type { BfCompare } from '@/domain/entities/bfCompare';
 import type { ProblemMetaPayload } from '@/domain/entities/problem';
 import type { Tc, TcResult } from '@/domain/entities/tc';
 import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapper';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 
 @injectable()
 export class ActiveProblemCoordinator {
@@ -37,6 +38,7 @@ export class ActiveProblemCoordinator {
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
     @inject(TOKENS.extensionContext) private readonly context: IExtensionContext,
     @inject(TOKENS.cphMigrationService) private readonly cph: ICphMigrationService,
+    @inject(TOKENS.activePathService) private readonly activePathService: IActivePathService,
     @inject(WebviewProblemMapper) private readonly mapper: WebviewProblemMapper,
   ) {
     setInterval(async () => {
@@ -54,9 +56,12 @@ export class ActiveProblemCoordinator {
   public async dispatchFullData() {
     if (this.activeProblemId) {
       const bgProblem = await this.repo.get(this.activeProblemId);
-      if (bgProblem)
+      if (bgProblem) {
         this.eventBus.fullProblem(this.activeProblemId, this.mapper.toDto(bgProblem.problem));
+        return;
+      }
     }
+    this.eventBus.noProblem(this.context.canImport);
   }
   public async onActiveEditorChanged(filePath: string | undefined) {
     if (!filePath) return;
