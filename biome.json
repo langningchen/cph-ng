@@ -48,7 +48,8 @@
       },
       "nursery": {
         "noUnusedExpressions": "on",
-        "noFloatingPromises": "on"
+        "noFloatingPromises": "on",
+        "noLeakedRender": "on"
       }
     }
   },

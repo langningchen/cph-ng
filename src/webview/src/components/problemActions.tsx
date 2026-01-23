@@ -168,7 +168,7 @@ export const ProblemActions = memo(
             color='error'
             onClick={() => setDelDialogOpen(true)}
           />
-          {window.easterEgg && <div title={t('problemActions.easterEgg')}>🐰</div>}
+          {!!window.easterEgg && <div title={t('problemActions.easterEgg')}>🐰</div>}
         </CphFlex>
         <Dialog
           fullWidth

@@ -116,7 +116,7 @@ export const ProblemTitle = ({
       type: 'editProblemDetails',
       problemId,
       name: editedTitle,
-      url: editedUrl,
+      url: editedUrl ? editedUrl : undefined,
       overrides: {
         timeLimitMs: editedTimeLimitMs ? parseInt(editedTimeLimitMs, 10) : undefined,
         memoryLimitMb: editedMemoryLimitMb ? parseInt(editedMemoryLimitMb, 10) : undefined,
@@ -157,7 +157,7 @@ export const ProblemTitle = ({
             {t('problemTitle.memoryLimit', {
               memory: overrides.memoryLimitMb.override ?? overrides.memoryLimitMb.defaultValue,
             })}
-            {checker && (
+            {!!checker && (
               <>
                 &emsp;
                 <CphLink
@@ -174,7 +174,7 @@ export const ProblemTitle = ({
                 </CphLink>
               </>
             )}
-            {interactor && (
+            {!!interactor && (
               <>
                 &emsp;
                 <CphLink
@@ -197,7 +197,7 @@ export const ProblemTitle = ({
             </span>
           </CphText>
         </CphFlex>
-        {isHoveringTitle && (
+        {!!isHoveringTitle && (
           <CphMenu
             menu={{
               [t('problemTitle.menu.editRaw')]: () => {
@@ -281,7 +281,7 @@ export const ProblemTitle = ({
               />
             </TabPanel>
             <TabPanel value='environment' sx={{ padding: '0' }}>
-              {overrides.compiler && (
+              {!!overrides.compiler && (
                 <TextField
                   variant='outlined'
                   margin='normal'
@@ -292,7 +292,7 @@ export const ProblemTitle = ({
                   fullWidth
                 />
               )}
-              {overrides.compilerArgs && (
+              {!!overrides.compilerArgs && (
                 <TextField
                   variant='outlined'
                   margin='normal'
@@ -303,7 +303,7 @@ export const ProblemTitle = ({
                   fullWidth
                 />
               )}
-              {overrides.runner && (
+              {!!overrides.runner && (
                 <TextField
                   variant='outlined'
                   margin='normal'
@@ -314,7 +314,7 @@ export const ProblemTitle = ({
                   fullWidth
                 />
               )}
-              {overrides.runnerArgs && (
+              {!!overrides.runnerArgs && (
                 <TextField
                   variant='outlined'
                   margin='normal'

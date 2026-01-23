@@ -165,14 +165,14 @@ export const TcDataView = ({
             </CphLink>
           )}
         </CphFlex>
-        {outputActions && (
+        {!!outputActions && (
           <CphButton
             name={t('tcDataView.compare')}
             icon={DifferenceIcon}
             onClick={outputActions.onCompare}
           />
         )}
-        {onToggleFile && (
+        {!!onToggleFile && (
           <CphButton
             name={t('tcDataView.toggleFile')}
             icon={ChangeCircleIcon}
@@ -198,7 +198,7 @@ export const TcDataView = ({
                 onClick={onChooseFile}
               />
             )}
-            {outputActions && (
+            {!!outputActions && (
               <CphButton
                 name={t('tcDataView.setAnswer')}
                 icon={ArrowUpwardIcon}

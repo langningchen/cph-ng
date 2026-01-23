@@ -43,7 +43,7 @@ export const CreateProblemView = ({ canImport }: CreateProblemProps) => {
           {canImport ? t('createProblemView.importAlert') : t('createProblemView.createAlert')}
         </Alert>
         <CphFlex>
-          {canImport && (
+          {!!canImport && (
             <Button
               fullWidth
               variant='contained'
@@ -67,7 +67,7 @@ export const CreateProblemView = ({ canImport }: CreateProblemProps) => {
           </Button>
         </CphFlex>
       </CphFlex>
-      {showTips && <Tips />}
+      {!!showTips && <Tips />}
     </CphFlex>
   );
 };

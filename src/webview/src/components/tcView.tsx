@@ -302,11 +302,11 @@ export const TcView = ({
                 />
               </ErrorBoundary>
             </CphFlex>
-            {tc.result && (
+            {!!tc.result && (
               <>
                 <Divider />
                 <CphFlex smallGap column>
-                  {tc.result.stdout && (
+                  {!!tc.result.stdout && (
                     <ErrorBoundary>
                       <TcDataView
                         label={t('tcView.stdout')}
@@ -337,7 +337,7 @@ export const TcView = ({
                       />
                     </ErrorBoundary>
                   )}
-                  {tc.result.stderr && (
+                  {!!tc.result.stderr && (
                     <ErrorBoundary>
                       <TcDataView
                         label={t('tcView.stderr')}
@@ -353,7 +353,7 @@ export const TcView = ({
                       />
                     </ErrorBoundary>
                   )}
-                  {tc.result.msg && (
+                  {!!tc.result.msg && (
                     <ErrorBoundary>
                       <TcDataView
                         label={t('tcView.message')}
