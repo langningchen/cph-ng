@@ -1,13 +1,13 @@
 import { inject, injectable } from 'tsyringe';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
-import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
+import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { IJudgeService, JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
-import { TcIo } from '@/domain/entities/tcIo';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import { VerdictName } from '@/domain/entities/verdict';
 import { ExecutionRejected } from '@/domain/execution';
 import type { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
@@ -20,7 +20,7 @@ export class TraditionalJudgeService implements IJudgeService {
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.solutionRunner) private readonly runner: ISolutionRunner,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
-    @inject(TOKENS.tcIoService) private readonly tcIoService: ITcIoService,
+    @inject(TOKENS.testcaseIoService) private readonly testcaseIoService: ITestcaseIoService,
   ) {}
 
   public async judge(
@@ -63,14 +63,14 @@ export class TraditionalJudgeService implements IJudgeService {
         },
         signal,
       );
-      const stdout = new TcIo({ path: executionResult.stdoutPath });
-      const stderr = new TcIo({ path: executionResult.stderrPath });
+      const stdout = new TestcaseIo({ path: executionResult.stdoutPath });
+      const stderr = new TestcaseIo({ path: executionResult.stderrPath });
       observer.onResult({
         verdict: finalResult.verdict,
         timeMs: finalResult.timeMs,
         memoryMb: finalResult.memoryMb,
-        stdout: await this.tcIoService.tryInlining(stdout),
-        stderr: await this.tcIoService.tryInlining(stderr),
+        stdout: await this.testcaseIoService.tryInlining(stdout),
+        stderr: await this.testcaseIoService.tryInlining(stderr),
         msg: finalResult.msg,
       });
     } catch (e) {

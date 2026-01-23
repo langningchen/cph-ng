@@ -18,64 +18,64 @@
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
+import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
-import { TcIo } from '@/domain/entities/tcIo';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 @injectable()
-export class TcIoService implements ITcIoService {
+export class TestcaseIoService implements ITestcaseIoService {
   public constructor(
     @inject(TOKENS.fileSystem) private fs: IFileSystem,
     @inject(TOKENS.tempStorage) private temp: ITempStorage,
     @inject(TOKENS.settings) private settings: ISettings,
   ) {}
 
-  public async readContent(io: TcIo): Promise<string> {
+  public async readContent(io: TestcaseIo): Promise<string> {
     return io.match(
       (path) => this.fs.readFile(path),
       (data) => Promise.resolve(data),
     );
   }
 
-  public async writeContent(io: TcIo, content: string): Promise<TcIo> {
+  public async writeContent(io: TestcaseIo, content: string): Promise<TestcaseIo> {
     return io.match(
       async (path) => {
         await this.fs.safeWriteFile(path, content);
-        return new TcIo({ path });
+        return new TestcaseIo({ path });
       },
       async () => {
-        return new TcIo({ data: content });
+        return new TestcaseIo({ data: content });
       },
     );
   }
 
-  public async ensureFilePath(io: TcIo): Promise<string> {
+  public async ensureFilePath(io: TestcaseIo): Promise<string> {
     return io.match(
       async (path) => path,
       async (data) => {
-        const tempPath = this.temp.create('TcIoService');
+        const tempPath = this.temp.create('TestcaseIoService');
         await this.fs.safeWriteFile(tempPath, data);
         return tempPath;
       },
     );
   }
 
-  public async tryInlining(io: TcIo): Promise<TcIo> {
+  public async tryInlining(io: TestcaseIo): Promise<TestcaseIo> {
     return io.match(
       async (path) => {
         const stats = await this.fs.stat(path);
         if (stats.size <= this.settings.problem.maxInlineDataLength) {
           const content = await this.fs.readFile(path);
-          return new TcIo({ data: content });
+          return new TestcaseIo({ data: content });
         }
-        return new TcIo({ path });
+        return new TestcaseIo({ path });
       },
-      async (data) => new TcIo({ data }),
+      async (data) => new TestcaseIo({ data }),
     );
   }
 
-  public async dispose(io: TcIo): Promise<void> {
+  public async dispose(io: TestcaseIo): Promise<void> {
     if (io.path) this.temp.dispose(io.path);
   }
 }

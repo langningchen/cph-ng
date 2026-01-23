@@ -24,12 +24,12 @@ import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { CustomQuickPickItem, IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
-import { Tc } from '@/domain/entities/tc';
-import { TcIo } from '@/domain/entities/tcIo';
-import { type FilePair, TcMatcher } from '@/domain/services/TcMatcher';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import { type FilePair, TestcaseMatcher } from '@/domain/services/TestcaseMatcher';
 
 @injectable()
-export class TcScanner {
+export class TestcaseScanner {
   public constructor(
     @inject(TOKENS.archive) private readonly archive: IArchive,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
@@ -38,10 +38,10 @@ export class TcScanner {
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
-    @inject(TcMatcher) private readonly matcher: TcMatcher,
+    @inject(TestcaseMatcher) private readonly matcher: TestcaseMatcher,
   ) {}
 
-  public async fromFile(path: string): Promise<Tc> {
+  public async fromFile(path: string): Promise<Testcase> {
     const { inputFileExtensionList: inputExts, outputFileExtensionList: outputExts } =
       this.settings.problem;
     const isInput = inputExts.includes(this.path.extname(path).toLowerCase());
@@ -49,7 +49,7 @@ export class TcScanner {
     let input = isInput ? path : undefined;
     let output = isInput ? undefined : path;
 
-    const behavior = this.settings.problem.foundMatchTestCaseBehavior;
+    const behavior = this.settings.problem.foundMatchTestcaseBehavior;
     if (behavior !== 'never') {
       const pairExts = isInput ? outputExts : inputExts;
 
@@ -78,7 +78,7 @@ export class TcScanner {
     return this.toEntity({ input, output });
   }
 
-  public async fromZip(srcPath: string, zipPath: string): Promise<Tc[]> {
+  public async fromZip(srcPath: string, zipPath: string): Promise<Testcase[]> {
     const folderPath = this.resolver.renderUnzipFolder(srcPath, zipPath);
     if (folderPath === null) return [];
     this.archive.unzip(zipPath, folderPath);
@@ -86,7 +86,7 @@ export class TcScanner {
     return await this.fromFolder(folderPath);
   }
 
-  public async fromFolder(folderPath: string): Promise<Tc[]> {
+  public async fromFolder(folderPath: string): Promise<Testcase[]> {
     const allFiles = await this.fs.walk(folderPath);
     const pairs = this.matcher.matchPairs(allFiles);
     if (pairs.length === 0) {
@@ -112,10 +112,10 @@ export class TcScanner {
     return selected.map((p) => this.toEntity(pairs[p]));
   }
 
-  private toEntity(pair: FilePair): Tc {
-    return new Tc(
-      new TcIo(pair.input ? { path: pair.input } : { data: '' }),
-      new TcIo(pair.output ? { path: pair.output } : { data: '' }),
+  private toEntity(pair: FilePair): Testcase {
+    return new Testcase(
+      new TestcaseIo(pair.input ? { path: pair.input } : { data: '' }),
+      new TestcaseIo(pair.output ? { path: pair.output } : { data: '' }),
     );
   }
 }

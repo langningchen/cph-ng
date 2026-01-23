@@ -35,9 +35,9 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
 import { Problem } from '@/domain/entities/problem';
-import type { Tc } from '@/domain/entities/tc';
-import { TcScanner } from '@/domain/services/TcScanner';
-import type { IFileWithHash, IProblem, ITc, ITcIo } from '@/domain/types';
+import type { Testcase } from '@/domain/entities/testcase';
+import { TestcaseScanner } from '@/domain/services/TestcaseScanner';
+import type { IFileWithHash, IProblem, ITestcase, ITestcaseIo } from '@/domain/types';
 import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 
 @injectable()
@@ -55,7 +55,7 @@ export class ProblemService implements IProblemService {
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
     @inject(ProblemMapper) private readonly mapper: ProblemMapper,
-    @inject(TcScanner) private readonly tcScanner: TcScanner,
+    @inject(TestcaseScanner) private readonly testcaseScanner: TestcaseScanner,
   ) {
     this.logger = this.logger.withScope('ProblemRepository');
   }
@@ -100,7 +100,7 @@ export class ProblemService implements IProblemService {
     return this.mapper.toEntity(problem);
   }
 
-  public async loadTcs(problem: Problem): Promise<void> {
+  public async loadTestcases(problem: Problem): Promise<void> {
     const option = await this.ui.quickPick(
       [
         { label: this.translator.t('Load from a zip file'), value: 'zip' },
@@ -119,25 +119,25 @@ export class ProblemService implements IProblemService {
         },
       });
       if (!zipFile) return;
-      this.applyTcs(problem, await this.tcScanner.fromZip(problem.src.path, zipFile));
+      this.applyTestcases(problem, await this.testcaseScanner.fromZip(problem.src.path, zipFile));
     } else if (option === 'folder') {
       const folderUri = await this.ui.chooseFolder(
         this.translator.t('Choose a folder containing test cases'),
       );
       if (!folderUri) return;
-      this.applyTcs(problem, await this.tcScanner.fromFolder(folderUri));
+      this.applyTestcases(problem, await this.testcaseScanner.fromFolder(folderUri));
     }
   }
 
-  public applyTcs(problem: Problem, tcs: Tc[]): void {
-    if (this.settings.problem.clearBeforeLoad) this.tmp.dispose(problem.clearTcs());
-    for (const tc of tcs) problem.addTc(this.crypto.randomUUID(), tc);
+  public applyTestcases(problem: Problem, testcases: Testcase[]): void {
+    if (this.settings.problem.clearBeforeLoad) this.tmp.dispose(problem.clearTestcases());
+    for (const testcase of testcases) problem.addTestcase(this.crypto.randomUUID(), testcase);
   }
 
   public async save(problem: Problem): Promise<void> {
     const binPath = this.getDataPath(problem.src.path);
     if (!binPath) return;
-    this.tmp.dispose(problem.purgeUnusedTcs());
+    this.tmp.dispose(problem.purgeUnusedTestcases());
 
     const problemDto = this.mapper.toDto(problem);
     this.logger.trace('Saving problem data', problemDto, 'to', binPath);
@@ -197,15 +197,18 @@ export class ProblemService implements IProblemService {
       }
       return oldPath;
     };
-    const fixTcIo = async (tcIo: ITcIo) => {
-      if ('path' in tcIo) tcIo.path = await fix(tcIo.path);
+    const fixTestcaseIo = async (testcaseIo: ITestcaseIo) => {
+      if ('path' in testcaseIo) testcaseIo.path = await fix(testcaseIo.path);
     };
     const fixFileWithHash = async (fileWithHash: IFileWithHash | null) => {
       if (fileWithHash) fileWithHash.path = await fix(fileWithHash.path);
     };
 
     await Promise.all([
-      ...Object.values(problem.tcs).flatMap((tc: ITc) => [fixTcIo(tc.stdin), fixTcIo(tc.answer)]),
+      ...Object.values(problem.testcases).flatMap((testcase: ITestcase) => [
+        fixTestcaseIo(testcase.stdin),
+        fixTestcaseIo(testcase.answer),
+      ]),
       fixFileWithHash(problem.checker),
       fixFileWithHash(problem.interactor),
       fixFileWithHash(problem.stressTest.generator),

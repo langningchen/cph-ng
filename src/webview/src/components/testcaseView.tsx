@@ -28,7 +28,7 @@ import { MD5 } from 'crypto-js';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictType } from '@/domain/entities/verdict';
-import type { IWebviewTc } from '@/domain/webviewTypes';
+import type { IWebviewTestcase } from '@/domain/webviewTypes';
 import { useProblemContext } from '../context/ProblemContext';
 import { getCompile } from '../utils';
 import { CphFlex } from './base/cphFlex';
@@ -36,12 +36,12 @@ import { CphMenu } from './base/cphMenu';
 import { CphText } from './base/cphText';
 import { ErrorBoundary } from './base/errorBoundary';
 import { CphButton } from './cphButton';
-import { TcDataView } from './tcDataView';
+import { TestcaseDataView } from './testcaseDataView';
 
-interface TcViewProp {
+interface TestcaseViewProp {
   problemId: UUID;
-  tcId: UUID;
-  tc: IWebviewTc;
+  testcaseId: UUID;
+  testcase: IWebviewTestcase;
   idx: number;
   onDragStart?: (e: React.DragEvent) => void;
   onDragEnd?: () => void;
@@ -49,50 +49,60 @@ interface TcViewProp {
   autoFocus?: boolean;
 }
 
-export const TcView = ({
+export const TestcaseView = ({
   problemId,
-  tcId,
-  tc,
+  testcaseId,
+  testcase,
   idx,
   onDragStart,
   onDragEnd,
   isDragging = false,
   autoFocus = false,
-}: TcViewProp) => {
+}: TestcaseViewProp) => {
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
 
   return (
     <CphMenu
       menu={
-        tc.isDisabled
+        testcase.isDisabled
           ? {
-              [t('tcView.menu.enableTc')]: () =>
-                dispatch({ type: 'updateTc', problemId, id: tcId, event: 'toggleDisable' }),
+              [t('testcaseView.menu.enableTestcase')]: () =>
+                dispatch({
+                  type: 'updateTestcase',
+                  problemId,
+                  id: testcaseId,
+                  event: 'toggleDisable',
+                }),
             }
           : {
-              [t('tcView.menu.disableTc')]: () =>
-                dispatch({ type: 'updateTc', problemId, id: tcId, event: 'toggleDisable' }),
-              [t('tcView.menu.clearTcStatus')]: () =>
-                dispatch({ type: 'clearTcStatus', problemId, id: tcId }),
+              [t('testcaseView.menu.disableTestcase')]: () =>
+                dispatch({
+                  type: 'updateTestcase',
+                  problemId,
+                  id: testcaseId,
+                  event: 'toggleDisable',
+                }),
+              [t('testcaseView.menu.clearTestcaseStatus')]: () =>
+                dispatch({ type: 'clearTestcaseStatus', problemId, id: testcaseId }),
             }
       }
     >
       <Accordion
-        expanded={tc.isDisabled ? false : tc.isExpand}
+        expanded={testcase.isDisabled ? false : testcase.isExpand}
         disableGutters
         onChange={() => {
-          if (tc.isDisabled) return;
-          dispatch({ type: 'updateTc', problemId, id: tcId, event: 'toggleExpand' });
+          if (testcase.isDisabled) return;
+          dispatch({ type: 'updateTestcase', problemId, id: testcaseId, event: 'toggleExpand' });
         }}
         sx={{
           borderLeft: `4px solid`,
           transition: 'all 0.2s',
-          opacity: isDragging || tc.isDisabled ? 0.5 : 1,
-          filter: tc.isDisabled ? 'grayscale(100%)' : 'none',
+          opacity: isDragging || testcase.isDisabled ? 0.5 : 1,
+          filter: testcase.isDisabled ? 'grayscale(100%)' : 'none',
           ...(window.easterEgg
             ? (() => {
-                const hash = MD5(JSON.stringify(tc)).words;
+                const hash = MD5(JSON.stringify(testcase)).words;
                 let color = 0;
                 for (let i = 0; i < hash.length; i++) {
                   color = (color << 4) + hash[i];
@@ -105,10 +115,10 @@ export const TcView = ({
                   backgroundColor: `#${colorStr}20`,
                 };
               })()
-            : tc.result?.verdict
+            : testcase.result?.verdict
               ? {
-                  borderLeftColor: tc.result.verdict.color,
-                  backgroundColor: `${tc.result.verdict.color}20`,
+                  borderLeftColor: testcase.result.verdict.color,
+                  backgroundColor: `${testcase.result.verdict.color}20`,
                 }
               : {
                   borderLeftColor: 'transparent',
@@ -116,7 +126,7 @@ export const TcView = ({
         }}
       >
         <AccordionSummary
-          disabled={tc.isDisabled}
+          disabled={testcase.isDisabled}
           draggable
           onDragStart={(e) => {
             e.stopPropagation();
@@ -131,19 +141,19 @@ export const TcView = ({
             }
           }}
           onClick={(e) => {
-            if (tc.isDisabled) {
+            if (testcase.isDisabled) {
               e.stopPropagation();
               e.preventDefault();
             }
           }}
           sx={{
             '& > span': { margin: '0 !important' },
-            cursor: isDragging ? 'grabbing' : tc.isDisabled ? 'not-allowed' : 'grab',
-            pointerEvents: tc.isDisabled ? 'none' : 'auto',
+            cursor: isDragging ? 'grabbing' : testcase.isDisabled ? 'not-allowed' : 'grab',
+            pointerEvents: testcase.isDisabled ? 'none' : 'auto',
             '&[draggable="true"]': {
               pointerEvents: 'auto',
             },
-            '& *': tc.isDisabled
+            '& *': testcase.isDisabled
               ? {
                   cursor: 'not-allowed !important',
                   pointerEvents: 'none !important',
@@ -154,14 +164,14 @@ export const TcView = ({
           <CphFlex smallGap>
             <CphFlex flex={1}>
               <CphText fontWeight='bold'>#{idx + 1}</CphText>
-              <Tooltip disableInteractive title={tc.result?.verdict.fullName}>
-                <CphText>{tc.result?.verdict.name}</CphText>
+              <Tooltip disableInteractive title={testcase.result?.verdict.fullName}>
+                <CphText>{testcase.result?.verdict.name}</CphText>
               </Tooltip>
             </CphFlex>
-            {tc.result?.memoryMb !== undefined && (
+            {testcase.result?.memoryMb !== undefined && (
               <Chip
-                label={t('tcView.memory', {
-                  memory: tc.result.memoryMb.toFixed(1),
+                label={t('testcaseView.memory', {
+                  memory: testcase.result.memoryMb.toFixed(1),
                 })}
                 size='small'
                 sx={{
@@ -170,10 +180,10 @@ export const TcView = ({
                 }}
               />
             )}
-            {tc.result?.timeMs !== undefined && (
+            {testcase.result?.timeMs !== undefined && (
               <Chip
-                label={t('tcView.time', {
-                  time: tc.result.timeMs.toFixed(1),
+                label={t('testcaseView.time', {
+                  time: testcase.result.timeMs.toFixed(1),
                 })}
                 size='small'
                 sx={{
@@ -184,45 +194,45 @@ export const TcView = ({
             )}
             <CphMenu
               menu={{
-                [t('tcView.run.menu.forceCompile')]: () =>
+                [t('testcaseView.run.menu.forceCompile')]: () =>
                   dispatch({
-                    type: 'runTc',
+                    type: 'runTestcase',
                     problemId,
-                    id: tcId,
+                    id: testcaseId,
                     forceCompile: true,
                   }),
-                [t('tcView.run.menu.skipCompile')]: () =>
+                [t('testcaseView.run.menu.skipCompile')]: () =>
                   dispatch({
-                    type: 'runTc',
+                    type: 'runTestcase',
                     problemId,
-                    id: tcId,
+                    id: testcaseId,
                     forceCompile: false,
                   }),
               }}
             >
               <CphButton
-                name={t('tcView.run')}
+                name={t('testcaseView.run')}
                 icon={PlayArrowIcon}
                 color='success'
-                loading={tc.result?.verdict.type === VerdictType.running}
+                loading={testcase.result?.verdict.type === VerdictType.running}
                 onClick={(e) => {
                   e.stopPropagation();
                   dispatch({
-                    type: 'runTc',
+                    type: 'runTestcase',
                     problemId,
-                    id: tcId,
+                    id: testcaseId,
                     forceCompile: getCompile(e),
                   });
                 }}
               />
             </CphMenu>
             <CphButton
-              name={t('tcView.delete')}
+              name={t('testcaseView.delete')}
               icon={DeleteIcon}
               color='error'
               onClick={(e) => {
                 e.stopPropagation();
-                dispatch({ type: 'delTc', problemId, id: tcId });
+                dispatch({ type: 'delTestcase', problemId, id: testcaseId });
               }}
             />
           </CphFlex>
@@ -235,33 +245,39 @@ export const TcView = ({
           <CphFlex column>
             <CphFlex smallGap column>
               <ErrorBoundary>
-                <TcDataView
-                  label={t('tcView.stdin')}
-                  value={tc.stdin}
+                <TestcaseDataView
+                  label={t('testcaseView.stdin')}
+                  value={testcase.stdin}
                   onChange={(data) =>
-                    dispatch({ type: 'setTcString', problemId, id: tcId, label: 'stdin', data })
+                    dispatch({
+                      type: 'setTestcaseString',
+                      problemId,
+                      id: testcaseId,
+                      label: 'stdin',
+                      data,
+                    })
                   }
                   onChooseFile={() =>
                     dispatch({
-                      type: 'chooseTcFile',
+                      type: 'chooseTestcaseFile',
                       problemId,
                       label: 'stdin',
-                      id: tcId,
+                      id: testcaseId,
                     })
                   }
                   onToggleFile={() => {
                     dispatch({
-                      type: 'toggleTcFile',
+                      type: 'toggleTestcaseFile',
                       problemId,
                       label: 'stdin',
-                      id: tcId,
+                      id: testcaseId,
                     });
                   }}
                   onOpenVirtual={() => {
                     dispatch({
                       type: 'openFile',
                       problemId,
-                      path: `/tcs/${tcId}/stdin`,
+                      path: `/testcases/${testcaseId}/stdin`,
                     });
                   }}
                   autoFocus={autoFocus}
@@ -269,95 +285,101 @@ export const TcView = ({
                 />
               </ErrorBoundary>
               <ErrorBoundary>
-                <TcDataView
-                  label={t('tcView.answer')}
-                  value={tc.answer}
+                <TestcaseDataView
+                  label={t('testcaseView.answer')}
+                  value={testcase.answer}
                   onChange={(data) =>
-                    dispatch({ type: 'setTcString', problemId, id: tcId, label: 'answer', data })
+                    dispatch({
+                      type: 'setTestcaseString',
+                      problemId,
+                      id: testcaseId,
+                      label: 'answer',
+                      data,
+                    })
                   }
                   onChooseFile={() =>
                     dispatch({
-                      type: 'chooseTcFile',
+                      type: 'chooseTestcaseFile',
                       problemId,
                       label: 'answer',
-                      id: tcId,
+                      id: testcaseId,
                     })
                   }
                   onToggleFile={() =>
                     dispatch({
-                      type: 'toggleTcFile',
+                      type: 'toggleTestcaseFile',
                       problemId,
                       label: 'answer',
-                      id: tcId,
+                      id: testcaseId,
                     })
                   }
                   onOpenVirtual={() =>
                     dispatch({
                       type: 'openFile',
                       problemId,
-                      path: `/tcs/${tcId}/answer`,
+                      path: `/testcases/${testcaseId}/answer`,
                     })
                   }
                   tabIndex={idx * 2 + 2}
                 />
               </ErrorBoundary>
             </CphFlex>
-            {!!tc.result && (
+            {!!testcase.result && (
               <>
                 <Divider />
                 <CphFlex smallGap column>
-                  {!!tc.result.stdout && (
+                  {!!testcase.result.stdout && (
                     <ErrorBoundary>
-                      <TcDataView
-                        label={t('tcView.stdout')}
-                        value={tc.result.stdout}
+                      <TestcaseDataView
+                        label={t('testcaseView.stdout')}
+                        value={testcase.result.stdout}
                         readOnly
                         outputActions={{
                           onSetAnswer: () =>
                             dispatch({
-                              type: 'updateTc',
+                              type: 'updateTestcase',
                               problemId,
-                              id: tcId,
+                              id: testcaseId,
                               event: 'setAsAnswer',
                             }),
                           onCompare: () =>
                             dispatch({
-                              type: 'compareTc',
+                              type: 'compareTestcase',
                               problemId,
-                              id: tcId,
+                              id: testcaseId,
                             }),
                         }}
                         onOpenVirtual={() => {
                           dispatch({
                             type: 'openFile',
                             problemId,
-                            path: `/tcs/${tcId}/stdout`,
+                            path: `/testcases/${testcaseId}/stdout`,
                           });
                         }}
                       />
                     </ErrorBoundary>
                   )}
-                  {!!tc.result.stderr && (
+                  {!!testcase.result.stderr && (
                     <ErrorBoundary>
-                      <TcDataView
-                        label={t('tcView.stderr')}
-                        value={tc.result.stderr}
+                      <TestcaseDataView
+                        label={t('testcaseView.stderr')}
+                        value={testcase.result.stderr}
                         readOnly
                         onOpenVirtual={() => {
                           dispatch({
                             type: 'openFile',
                             problemId,
-                            path: `/tcs/${tcId}/stderr`,
+                            path: `/testcases/${testcaseId}/stderr`,
                           });
                         }}
                       />
                     </ErrorBoundary>
                   )}
-                  {!!tc.result.msg && (
+                  {!!testcase.result.msg && (
                     <ErrorBoundary>
-                      <TcDataView
-                        label={t('tcView.message')}
-                        value={{ type: 'string', data: tc.result.msg }}
+                      <TestcaseDataView
+                        label={t('testcaseView.message')}
+                        value={{ type: 'string', data: testcase.result.msg }}
                         readOnly
                       />
                     </ErrorBoundary>

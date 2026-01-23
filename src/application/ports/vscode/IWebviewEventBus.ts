@@ -21,8 +21,8 @@ import type {
   IWebviewFileWithHash,
   IWebviewProblem,
   IWebviewStressTest,
-  IWebviewTc,
-  IWebviewTcResult,
+  IWebviewTestcase,
+  IWebviewTestcaseResult,
 } from '@/domain/webviewTypes';
 
 export interface WebviewProblemMetaPayload {
@@ -33,10 +33,10 @@ const WebviewEventName = {
   FULL_PROBLEM: 'FULL_PROBLEM',
   PATCH_META: 'PATCH_META',
   PATCH_STRESS_TEST: 'PATCH_STRESS_TEST',
-  ADD_TC: 'ADD_TC',
-  DELETE_TC: 'DELETE_TC',
-  PATCH_TC: 'PATCH_TC',
-  PATCH_TC_RESULT: 'PATCH_TC_RESULT',
+  ADD_TESTCASE: 'ADD_TESTCASE',
+  DELETE_TESTCASE: 'DELETE_TESTCASE',
+  PATCH_TESTCASE: 'PATCH_TESTCASE',
+  PATCH_TESTCASE_RESULT: 'PATCH_TESTCASE_RESULT',
   BACKGROUND: 'BACKGROUND',
   NO_PROBLEM: 'NO_PROBLEM',
 } as const;
@@ -55,28 +55,28 @@ interface WebviewPatchStressTestEvent {
   problemId: UUID;
   payload: Partial<IWebviewStressTest>;
 }
-interface WebviewAddTcEvent {
-  type: typeof WebviewEventName.ADD_TC;
+interface WebviewAddTestcaseEvent {
+  type: typeof WebviewEventName.ADD_TESTCASE;
   problemId: UUID;
-  tcId: UUID;
-  payload: IWebviewTc;
+  testcaseId: UUID;
+  payload: IWebviewTestcase;
 }
-interface WebviewDeleteTcEvent {
-  type: typeof WebviewEventName.DELETE_TC;
+interface WebviewDeleteTestcaseEvent {
+  type: typeof WebviewEventName.DELETE_TESTCASE;
   problemId: UUID;
-  tcId: UUID;
+  testcaseId: UUID;
 }
-interface WebviewPatchTcEvent {
-  type: typeof WebviewEventName.PATCH_TC;
+interface WebviewPatchTestcaseEvent {
+  type: typeof WebviewEventName.PATCH_TESTCASE;
   problemId: UUID;
-  tcId: UUID;
-  payload: Partial<IWebviewTc>;
+  testcaseId: UUID;
+  payload: Partial<IWebviewTestcase>;
 }
-interface WebviewPatchTcResultEvent {
-  type: typeof WebviewEventName.PATCH_TC_RESULT;
+interface WebviewPatchTestcaseResultEvent {
+  type: typeof WebviewEventName.PATCH_TESTCASE_RESULT;
   problemId: UUID;
-  tcId: UUID;
-  payload: Partial<IWebviewTcResult>;
+  testcaseId: UUID;
+  payload: Partial<IWebviewTestcaseResult>;
 }
 interface WebviewBackgroundEvent {
   type: typeof WebviewEventName.BACKGROUND;
@@ -90,10 +90,10 @@ export type WebviewEvent =
   | WebviewFullProblemEvent
   | WebviewPatchMetaEvent
   | WebviewPatchStressTestEvent
-  | WebviewAddTcEvent
-  | WebviewDeleteTcEvent
-  | WebviewPatchTcEvent
-  | WebviewPatchTcResultEvent
+  | WebviewAddTestcaseEvent
+  | WebviewDeleteTestcaseEvent
+  | WebviewPatchTestcaseEvent
+  | WebviewPatchTestcaseResultEvent
   | WebviewBackgroundEvent
   | WebviewNoProblemEvent;
 
@@ -102,10 +102,14 @@ export interface IWebviewEventBus {
   fullProblem(problemId: UUID, payload: IWebviewProblem): void;
   patchMeta(problemId: UUID, payload: WebviewProblemMetaPayload): void;
   patchStressTest(problemId: UUID, payload: Partial<IWebviewStressTest>): void;
-  addTc(problemId: UUID, tcId: UUID, payload: IWebviewTc): void;
-  deleteTc(problemId: UUID, tcId: UUID): void;
-  patchTc(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTc>): void;
-  patchTcResult(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTcResult>): void;
+  addTestcase(problemId: UUID, testcaseId: UUID, payload: IWebviewTestcase): void;
+  deleteTestcase(problemId: UUID, testcaseId: UUID): void;
+  patchTestcase(problemId: UUID, testcaseId: UUID, payload: Partial<IWebviewTestcase>): void;
+  patchTestcaseResult(
+    problemId: UUID,
+    testcaseId: UUID,
+    payload: Partial<IWebviewTestcaseResult>,
+  ): void;
   background(payload: IWebviewBackgroundProblem[]): void;
   noProblem(canImport: boolean): void;
 }

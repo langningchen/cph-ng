@@ -16,27 +16,31 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import { TcIo } from '@/domain/entities/tcIo';
-import type { SetTcStringMsg } from '@/webview/src/msgs';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import type { AddTestcaseMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class SetTcString extends BaseProblemUseCase<SetTcStringMsg> {
+export class AddTestcase extends BaseProblemUseCase<AddTestcaseMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.crypto) private readonly crypto: ICrypto,
   ) {
     super(repo);
   }
 
   protected async performAction(
     { problem }: BackgroundProblem,
-    msg: SetTcStringMsg,
+    _msg: AddTestcaseMsg,
   ): Promise<void> {
-    const tc = problem.getTc(msg.id);
-    if (msg.label === 'stdin') tc.stdin = new TcIo({ data: msg.data });
-    if (msg.label === 'answer') tc.answer = new TcIo({ data: msg.data });
+    problem.addTestcase(
+      this.crypto.randomUUID(),
+      new Testcase(new TestcaseIo({ data: '' }), new TestcaseIo({ data: '' }), true),
+    );
   }
 }

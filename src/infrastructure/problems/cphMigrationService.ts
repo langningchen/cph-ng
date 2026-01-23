@@ -23,8 +23,8 @@ import type { ICphMigrationService } from '@/application/ports/problems/ICphMigr
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
 import { Problem } from '@/domain/entities/problem';
-import { Tc } from '@/domain/entities/tc';
-import { TcIo } from '@/domain/entities/tcIo';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import type { ICphProblem } from '@/domain/types';
 
 @injectable()
@@ -77,9 +77,9 @@ export class CphMigrationService implements ICphMigrationService {
     problem.overrides.timeLimitMs = old.timeLimit;
     problem.overrides.memoryLimitMb = old.memoryLimit;
     old.tests.forEach((test) => {
-      problem.addTc(
+      problem.addTestcase(
         this.crypto.randomUUID(),
-        new Tc(new TcIo({ data: test.input }), new TcIo({ data: test.output })),
+        new Testcase(new TestcaseIo({ data: test.input }), new TestcaseIo({ data: test.output })),
       );
     });
     return problem;

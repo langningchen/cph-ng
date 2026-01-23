@@ -29,8 +29,8 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { CreateProblem } from '@/application/useCases/webview/CreateProblem';
 import { ImportProblem } from '@/application/useCases/webview/ImportProblem';
-import { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
-import { StopTcs } from '@/application/useCases/webview/StopTcs';
+import { RunAllTestcases } from '@/application/useCases/webview/RunAllTestcases';
+import { StopTestcases } from '@/application/useCases/webview/StopTestcases';
 import { TOKENS } from '@/composition/tokens';
 
 @injectable()
@@ -50,8 +50,8 @@ export class CommandModule implements IExtensionModule {
 
     @inject(CreateProblem) private readonly createProblem: CreateProblem,
     @inject(ImportProblem) private readonly importProblem: ImportProblem,
-    @inject(RunAllTcs) private readonly runAllTcs: RunAllTcs,
-    @inject(StopTcs) private readonly stopTcs: StopTcs,
+    @inject(RunAllTestcases) private readonly runAllTestcases: RunAllTestcases,
+    @inject(StopTestcases) private readonly stopTestcases: StopTestcases,
   ) {}
 
   private async getProblemId() {
@@ -74,18 +74,18 @@ export class CommandModule implements IExtensionModule {
         this.ui.showSidebar();
         this.importProblem.exec({ type: 'importProblem' });
       },
-      'cph-ng.runTestCases': async () => {
+      'cph-ng.runTestcases': async () => {
         this.ui.showSidebar();
-        this.runAllTcs.exec({
-          type: 'runTcs',
+        this.runAllTestcases.exec({
+          type: 'runTestcases',
           problemId: await this.getProblemId(),
           forceCompile: null,
         });
       },
-      'cph-ng.stopTestCases': async () => {
+      'cph-ng.stopTestcases': async () => {
         this.ui.showSidebar();
-        this.stopTcs.exec({
-          type: 'stopTcs',
+        this.stopTestcases.exec({
+          type: 'stopTestcases',
           problemId: await this.getProblemId(),
           onlyOne: false,
         });

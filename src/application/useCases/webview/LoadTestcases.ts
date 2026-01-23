@@ -16,28 +16,26 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import { Tc } from '@/domain/entities/tc';
-import { TcIo } from '@/domain/entities/tcIo';
-import type { AddTcMsg } from '@/webview/src/msgs';
+import type { LoadTestcasesMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class AddTc extends BaseProblemUseCase<AddTcMsg> {
+export class LoadTestcases extends BaseProblemUseCase<LoadTestcasesMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.crypto) private readonly crypto: ICrypto,
+    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
   ) {
     super(repo);
   }
 
-  protected async performAction({ problem }: BackgroundProblem, _msg: AddTcMsg): Promise<void> {
-    problem.addTc(
-      this.crypto.randomUUID(),
-      new Tc(new TcIo({ data: '' }), new TcIo({ data: '' }), true),
-    );
+  protected async performAction(
+    { problem }: BackgroundProblem,
+    _msg: LoadTestcasesMsg,
+  ): Promise<void> {
+    await this.problemService.loadTestcases(problem);
   }
 }

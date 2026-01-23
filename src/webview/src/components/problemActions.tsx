@@ -73,26 +73,26 @@ export const ProblemActions = memo(
         >
           <CphButton
             larger
-            name={t('problemActions.addTc')}
+            name={t('problemActions.addTestcase')}
             icon={AddIcon}
-            onClick={() => dispatch({ type: 'addTc', problemId })}
+            onClick={() => dispatch({ type: 'addTestcase', problemId })}
           />
           <CphButton
             larger
-            name={t('problemActions.loadTcs')}
+            name={t('problemActions.loadTestcases')}
             icon={FileCopyIcon}
-            onClick={() => dispatch({ type: 'loadTcs', problemId })}
+            onClick={() => dispatch({ type: 'loadTestcases', problemId })}
           />
 
           {hasRunning ? (
             <CphButton
               larger
-              name={t('problemActions.stopTcs')}
+              name={t('problemActions.stopTestcases')}
               icon={PlaylistRemoveIcon}
               color='warning'
               onClick={(e) =>
                 dispatch({
-                  type: 'stopTcs',
+                  type: 'stopTestcases',
                   problemId,
                   onlyOne: e.ctrlKey,
                 })
@@ -101,15 +101,15 @@ export const ProblemActions = memo(
           ) : (
             <CphMenu
               menu={{
-                [t('problemActions.runTcs.menu.forceCompile')]: () =>
+                [t('problemActions.runTestcases.menu.forceCompile')]: () =>
                   dispatch({
-                    type: 'runTcs',
+                    type: 'runTestcases',
                     problemId,
                     forceCompile: true,
                   }),
-                [t('problemActions.runTcs.menu.skipCompile')]: () =>
+                [t('problemActions.runTestcases.menu.skipCompile')]: () =>
                   dispatch({
-                    type: 'runTcs',
+                    type: 'runTestcases',
                     problemId,
                     forceCompile: false,
                   }),
@@ -117,12 +117,12 @@ export const ProblemActions = memo(
             >
               <CphButton
                 larger
-                name={t('problemActions.runTcs')}
+                name={t('problemActions.runTestcases')}
                 icon={PlaylistPlayIcon}
                 color='success'
                 onClick={(e) =>
                   dispatch({
-                    type: 'runTcs',
+                    type: 'runTestcases',
                     problemId,
                     forceCompile: getCompile(e),
                   })

@@ -16,14 +16,14 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Problem } from '@/domain/entities/problem';
-import type { Tc } from '@/domain/entities/tc';
+import type { Testcase } from '@/domain/entities/testcase';
 
 export interface IProblemService {
   getDataPath(srcPath: string): string | null;
   create(srcPath: string): Promise<Problem | null>;
   loadBySrc(srcPath: string): Promise<Problem | null>;
-  loadTcs(problem: Problem): Promise<void>;
-  applyTcs(problem: Problem, tcs: Tc[]): void;
+  loadTestcases(problem: Problem): Promise<void>;
+  applyTestcases(problem: Problem, testcases: Testcase[]): void;
   save(problem: Problem): Promise<void>;
   delete(problem: Problem): Promise<void>;
   isRelated(problem: Problem, path: string): boolean;

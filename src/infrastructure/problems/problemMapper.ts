@@ -20,26 +20,26 @@ import { inject, injectable } from 'tsyringe';
 import { TOKENS } from '@/composition/tokens';
 import { Problem } from '@/domain/entities/problem';
 import { StressTest } from '@/domain/entities/stressTest';
-import { Tc } from '@/domain/entities/tc';
-import { TcIo } from '@/domain/entities/tcIo';
-import type { IProblem, IStressTest, ITc, ITcIo } from '@/domain/types';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import type { IProblem, IStressTest, ITestcase, ITestcaseIo } from '@/domain/types';
 
 @injectable()
 export class ProblemMapper {
   public constructor(@inject(TOKENS.version) private readonly version: string) {}
 
   public toDto(entity: Problem): IProblem {
-    const tcs: Record<UUID, ITc> = {};
-    for (const id of entity.tcOrder) {
-      const tc = entity.tcs.get(id);
-      if (tc) tcs[id] = this.tcToDto(tc);
+    const testcases: Record<UUID, ITestcase> = {};
+    for (const id of entity.testcaseOrder) {
+      const testcase = entity.testcases.get(id);
+      if (testcase) testcases[id] = this.testcaseToDto(testcase);
     }
     return {
       version: this.version,
       name: entity.name,
       url: entity.url,
-      tcs,
-      tcOrder: [...entity.tcOrder],
+      testcases,
+      testcaseOrder: [...entity.testcaseOrder],
       src: entity.src,
       checker: entity.checker,
       interactor: entity.interactor,
@@ -51,9 +51,9 @@ export class ProblemMapper {
   public toEntity(dto: IProblem): Problem {
     const problem = new Problem(dto.name, dto.src.path);
     problem.url = dto.url;
-    for (const id of dto.tcOrder) {
-      const tc = dto.tcs[id];
-      if (tc) problem.addTc(id, this.tcToEntity(tc));
+    for (const id of dto.testcaseOrder) {
+      const testcase = dto.testcases[id];
+      if (testcase) problem.addTestcase(id, this.testcaseToEntity(testcase));
     }
     problem.checker = dto.checker;
     problem.interactor = dto.interactor;
@@ -63,38 +63,38 @@ export class ProblemMapper {
     return problem;
   }
 
-  private tcIoToDto(tcIo: TcIo): ITcIo {
-    return tcIo.match<ITcIo>(
+  private testcaseIoToDto(testcaseIo: TestcaseIo): ITestcaseIo {
+    return testcaseIo.match<ITestcaseIo>(
       (path) => ({ path }),
       (data) => ({ data }),
     );
   }
-  private tcIoToEntity(dto: ITcIo): TcIo {
-    return new TcIo(dto);
+  private testcaseIoToEntity(dto: ITestcaseIo): TestcaseIo {
+    return new TestcaseIo(dto);
   }
 
-  private tcToDto(tc: Tc): ITc {
+  private testcaseToDto(testcase: Testcase): ITestcase {
     return {
-      stdin: this.tcIoToDto(tc.stdin),
-      answer: this.tcIoToDto(tc.answer),
-      isExpand: tc.isExpand,
-      isDisabled: tc.isDisabled,
-      result: tc.verdict
+      stdin: this.testcaseIoToDto(testcase.stdin),
+      answer: this.testcaseIoToDto(testcase.answer),
+      isExpand: testcase.isExpand,
+      isDisabled: testcase.isDisabled,
+      result: testcase.verdict
         ? {
-            verdict: tc.verdict,
-            timeMs: tc.timeMs,
-            memoryMb: tc.memoryMb,
-            stdout: tc.stdout ? this.tcIoToDto(tc.stdout) : undefined,
-            stderr: tc.stderr ? this.tcIoToDto(tc.stderr) : undefined,
-            msg: tc.msg,
+            verdict: testcase.verdict,
+            timeMs: testcase.timeMs,
+            memoryMb: testcase.memoryMb,
+            stdout: testcase.stdout ? this.testcaseIoToDto(testcase.stdout) : undefined,
+            stderr: testcase.stderr ? this.testcaseIoToDto(testcase.stderr) : undefined,
+            msg: testcase.msg,
           }
         : undefined,
     };
   }
-  private tcToEntity(dto: ITc): Tc {
-    return new Tc(
-      this.tcIoToEntity(dto.stdin),
-      this.tcIoToEntity(dto.answer),
+  private testcaseToEntity(dto: ITestcase): Testcase {
+    return new Testcase(
+      this.testcaseIoToEntity(dto.stdin),
+      this.testcaseIoToEntity(dto.answer),
       dto.isExpand,
       dto.isDisabled,
       dto.result
@@ -102,8 +102,8 @@ export class ProblemMapper {
             verdict: dto.result.verdict,
             timeMs: dto.result.timeMs,
             memoryMb: dto.result.memoryMb,
-            stdout: dto.result.stdout ? this.tcIoToEntity(dto.result.stdout) : undefined,
-            stderr: dto.result.stderr ? this.tcIoToEntity(dto.result.stderr) : undefined,
+            stdout: dto.result.stdout ? this.testcaseIoToEntity(dto.result.stdout) : undefined,
+            stderr: dto.result.stderr ? this.testcaseIoToEntity(dto.result.stderr) : undefined,
             msg: dto.result.msg,
           }
         : undefined,

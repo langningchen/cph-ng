@@ -86,30 +86,32 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
         if (msg !== undefined) stressTest.msg = msg;
         return;
       }
-      case 'ADD_TC': {
+      case 'ADD_TESTCASE': {
         if (draft.currentProblem.type !== 'active') return;
-        draft.currentProblem.problem.tcs[action.tcId] = action.payload;
-        draft.currentProblem.problem.tcOrder.push(action.tcId);
+        draft.currentProblem.problem.testcases[action.testcaseId] = action.payload;
+        draft.currentProblem.problem.testcaseOrder.push(action.testcaseId);
         break;
       }
-      case 'DELETE_TC': {
+      case 'DELETE_TESTCASE': {
         if (draft.currentProblem.type !== 'active') return;
-        delete draft.currentProblem.problem.tcs[action.tcId];
+        delete draft.currentProblem.problem.testcases[action.testcaseId];
         break;
       }
-      case 'PATCH_TC': {
+      case 'PATCH_TESTCASE': {
         if (draft.currentProblem.type !== 'active') return;
-        const tc = draft.currentProblem.problem.tcs[action.tcId];
-        draft.currentProblem.problem.tcs[action.tcId] = { ...tc, ...action.payload };
+        const testcase = draft.currentProblem.problem.testcases[action.testcaseId];
+        draft.currentProblem.problem.testcases[action.testcaseId] = {
+          ...testcase,
+          ...action.payload,
+        };
         break;
       }
-      case 'PATCH_TC_RESULT': {
+      case 'PATCH_TESTCASE_RESULT': {
         if (draft.currentProblem.type !== 'active') return;
-        const tc = draft.currentProblem.problem.tcs[action.tcId];
-        if (tc)
-          tc.result = {
-            verdict: Verdicts[VerdictName.unknownError],
-            ...(tc.result || {}),
+        const testcase = draft.currentProblem.problem.testcases[action.testcaseId];
+        if (testcase)
+          testcase.result = {
+            ...(testcase.result || {}),
             ...action.payload,
           };
         break;
@@ -143,37 +145,40 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
           problem.overrides.runnerArgs.override = action.overrides.runnerArgs;
         break;
       }
-      case 'clearTcStatus': {
+      case 'clearTestcaseStatus': {
         if (draft.currentProblem.type !== 'active') return;
-        if (action.id) delete draft.currentProblem.problem.tcs[action.id].result;
-        else for (const tc of Object.values(draft.currentProblem.problem.tcs)) delete tc.result;
+        if (action.id) delete draft.currentProblem.problem.testcases[action.id].result;
+        else
+          for (const testcase of Object.values(draft.currentProblem.problem.testcases))
+            delete testcase.result;
         break;
       }
-      case 'setTcString': {
+      case 'setTestcaseString': {
         if (draft.currentProblem.type !== 'active') return;
-        const tc = draft.currentProblem.problem.tcs[action.id];
-        if (action.label === 'stdin') tc.stdin = { type: 'string', data: action.data };
-        if (action.label === 'answer') tc.answer = { type: 'string', data: action.data };
+        const testcase = draft.currentProblem.problem.testcases[action.id];
+        if (action.label === 'stdin') testcase.stdin = { type: 'string', data: action.data };
+        if (action.label === 'answer') testcase.answer = { type: 'string', data: action.data };
         break;
       }
-      case 'updateTc': {
+      case 'updateTestcase': {
         if (draft.currentProblem.type !== 'active') return;
-        const tc = draft.currentProblem.problem.tcs[action.id];
-        if (action.event === 'toggleDisable') tc.isDisabled = !tc.isDisabled;
-        if (action.event === 'toggleExpand') tc.isExpand = !tc.isExpand;
-        if (action.event === 'setAsAnswer' && tc.result?.stdout) tc.answer = tc.result.stdout;
+        const testcase = draft.currentProblem.problem.testcases[action.id];
+        if (action.event === 'toggleDisable') testcase.isDisabled = !testcase.isDisabled;
+        if (action.event === 'toggleExpand') testcase.isExpand = !testcase.isExpand;
+        if (action.event === 'setAsAnswer' && testcase.result?.stdout)
+          testcase.answer = testcase.result.stdout;
         break;
       }
-      case 'delTc': {
+      case 'delTestcase': {
         if (draft.currentProblem.type !== 'active') return;
-        delete draft.currentProblem.problem.tcs[action.id];
+        delete draft.currentProblem.problem.testcases[action.id];
         break;
       }
-      case 'reorderTc': {
+      case 'reorderTestcase': {
         if (draft.currentProblem.type !== 'active') return;
-        const tcOrder = draft.currentProblem.problem.tcOrder;
-        const [movedTc] = tcOrder.splice(action.fromIdx, 1);
-        tcOrder.splice(action.toIdx, 0, movedTc);
+        const testcaseOrder = draft.currentProblem.problem.testcaseOrder;
+        const [movedTestcase] = testcaseOrder.splice(action.fromIdx, 1);
+        testcaseOrder.splice(action.toIdx, 0, movedTestcase);
         break;
       }
     }

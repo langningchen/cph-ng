@@ -17,22 +17,23 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import type { DelTcMsg } from '@/webview/src/msgs';
+import type { ReorderTestcaseMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class DelTc extends BaseProblemUseCase<DelTcMsg> {
+export class ReorderTestcase extends BaseProblemUseCase<ReorderTestcaseMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.problemService) protected readonly problemService: IProblemService,
   ) {
     super(repo);
   }
 
-  protected async performAction({ problem }: BackgroundProblem, msg: DelTcMsg): Promise<void> {
-    problem.deleteTc(msg.id);
+  protected async performAction(
+    { problem }: BackgroundProblem,
+    msg: ReorderTestcaseMsg,
+  ): Promise<void> {
+    problem.moveTestcase(msg.fromIdx, msg.toIdx);
   }
 }

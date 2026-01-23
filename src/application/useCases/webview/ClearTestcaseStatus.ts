@@ -16,30 +16,27 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import { VerdictName, Verdicts, VerdictType } from '@/domain/entities/verdict';
-import type { StopTcsMsg } from '@/webview/src/msgs';
+import type { ClearTestcaseStatusMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class StopTcs extends BaseProblemUseCase<StopTcsMsg> {
+export class ClearTestcaseStatus extends BaseProblemUseCase<ClearTestcaseStatusMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
     super(repo);
   }
 
-  protected async performAction(bgProblem: BackgroundProblem, msg: StopTcsMsg): Promise<void> {
-    bgProblem.abort(msg.onlyOne ? 'onlyOne' : undefined);
-    if (!msg.onlyOne) {
-      const tcOrder = bgProblem.problem.getEnabledTcIds();
-      for (const tcId of tcOrder) {
-        const tc = bgProblem.problem.getTc(tcId);
-        if (tc.verdict && Verdicts[tc.verdict].type === VerdictType.running)
-          tc.updateResult({ verdict: VerdictName.rejected });
-      }
-    }
+  protected async performAction(
+    { problem }: BackgroundProblem,
+    msg: ClearTestcaseStatusMsg,
+  ): Promise<void> {
+    if (msg.id) this.tmp.dispose(problem.getTestcase(msg.id).clearResult());
+    else this.tmp.dispose(problem.clearResult());
   }
 }

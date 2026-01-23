@@ -19,18 +19,18 @@ import type * as History from '@/application/ports/problems/history';
 import type { IProblem } from '@/domain/types';
 
 export type OldProblem =
-  | History.Problem_0_4_8
-  | History.Problem_0_4_3
-  | History.Problem_0_3_7
-  | History.Problem_0_2_4
-  | History.Problem_0_2_3
-  | History.Problem_0_2_1
-  | History.Problem_0_1_1
-  | History.Problem_0_1_0
-  | History.Problem_0_0_5
-  | History.Problem_0_0_4
-  | History.Problem_0_0_3
-  | History.Problem_0_0_1;
+  | History.IProblem_0_4_8
+  | History.IProblem_0_4_3
+  | History.IProblem_0_3_7
+  | History.IProblem_0_2_4
+  | History.IProblem_0_2_3
+  | History.IProblem_0_2_1
+  | History.IProblem_0_1_1
+  | History.IProblem_0_1_0
+  | History.IProblem_0_0_5
+  | History.IProblem_0_0_4
+  | History.IProblem_0_0_3
+  | History.IProblem_0_0_1;
 
 export interface IProblemMigrationService {
   migrate(rawData: OldProblem): IProblem;

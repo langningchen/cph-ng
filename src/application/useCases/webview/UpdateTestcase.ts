@@ -17,27 +17,26 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
-import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import type { CompareTcMsg } from '@/webview/src/msgs';
+import type { UpdateTestcaseMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class CompareTc extends BaseProblemUseCase<CompareTcMsg> {
+export class UpdateTestcase extends BaseProblemUseCase<UpdateTestcaseMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
-    @inject(TOKENS.ui) private readonly ui: IUi,
   ) {
     super(repo);
   }
 
-  protected async performAction({ id }: BackgroundProblem, msg: CompareTcMsg): Promise<void> {
-    this.ui.compareFiles(
-      this.problemFs.getUri(id, `/tcs/${msg.id}/answer`),
-      this.problemFs.getUri(id, `/tcs/${msg.id}/stdout`),
-    );
+  protected async performAction(
+    { problem }: BackgroundProblem,
+    msg: UpdateTestcaseMsg,
+  ): Promise<void> {
+    const testcase = problem.getTestcase(msg.id);
+    if (msg.event === 'toggleDisable') testcase.toggleDisable();
+    if (msg.event === 'toggleExpand') testcase.toggleExpand();
+    if (msg.event === 'setAsAnswer' && testcase.stdout) testcase.answer = testcase.stdout;
   }
 }

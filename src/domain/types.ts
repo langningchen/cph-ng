@@ -19,22 +19,22 @@ import type { UUID } from 'node:crypto';
 import type { StressTestState } from '@/domain/entities/stressTest';
 import type { VerdictName } from '@/domain/entities/verdict';
 
-export type ITcIo = { data: string } | { path: string };
+export type ITestcaseIo = { data: string } | { path: string };
 
-export interface ITcResult {
+export interface ITestcaseResult {
   verdict: VerdictName;
   timeMs?: number;
   memoryMb?: number;
-  stdout?: ITcIo;
-  stderr?: ITcIo;
+  stdout?: ITestcaseIo;
+  stderr?: ITestcaseIo;
   msg?: string;
 }
-export interface ITc {
-  stdin: ITcIo;
-  answer: ITcIo;
+export interface ITestcase {
+  stdin: ITestcaseIo;
+  answer: ITestcaseIo;
   isExpand: boolean;
   isDisabled: boolean;
-  result?: ITcResult;
+  result?: ITestcaseResult;
 }
 
 export interface IFileWithHash {
@@ -62,8 +62,8 @@ export interface IProblem {
   version: string;
   name: string;
   url?: string;
-  tcs: Record<UUID, ITc>;
-  tcOrder: UUID[];
+  testcases: Record<UUID, ITestcase>;
+  testcaseOrder: UUID[];
   src: IFileWithHash;
   checker: IFileWithHash | null;
   interactor: IFileWithHash | null;

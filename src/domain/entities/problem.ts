@@ -19,7 +19,7 @@ import type { UUID } from 'node:crypto';
 import EventEmitter from 'node:events';
 import type TypedEventEmitter from 'typed-emitter';
 import { StressTest } from '@/domain/entities/stressTest';
-import type { Tc, TcResult } from '@/domain/entities/tc';
+import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
 import type { IFileWithHash, IOverrides } from '@/domain/types';
 
 export interface ProblemMetaPayload {
@@ -29,17 +29,17 @@ export interface ProblemMetaPayload {
 export type ProblemEvents = {
   patchMeta: (payload: ProblemMetaPayload) => void;
   patchStressTest: (payload: Partial<StressTest>) => void;
-  addTc: (id: UUID, payload: Tc) => void;
-  deleteTc: (id: UUID) => void;
-  patchTc: (id: UUID, payload: Partial<Tc>) => void;
-  patchTcResult: (id: UUID, payload: Partial<TcResult>) => void;
+  addTestcase: (id: UUID, payload: Testcase) => void;
+  deleteTestcase: (id: UUID) => void;
+  patchTestcase: (id: UUID, payload: Partial<Testcase>) => void;
+  patchTestcaseResult: (id: UUID, payload: Partial<TestcaseResult>) => void;
 };
 
 export class Problem {
   public readonly src: IFileWithHash;
   public url?: string;
-  private _tcs: Map<UUID, Tc> = new Map();
-  private _tcOrder: UUID[] = [];
+  private _testcases: Map<UUID, Testcase> = new Map();
+  private _testcaseOrder: UUID[] = [];
   private _checker: IFileWithHash | null = null;
   private _interactor: IFileWithHash | null = null;
   private _stressTest: StressTest = new StressTest();
@@ -60,11 +60,11 @@ export class Problem {
     this.signals.emit('patchStressTest', payload);
   };
 
-  public get tcs(): Map<UUID, Tc> {
-    return this._tcs;
+  public get testcases(): Map<UUID, Testcase> {
+    return this._testcases;
   }
-  public get tcOrder(): readonly UUID[] {
-    return this._tcOrder;
+  public get testcaseOrder(): readonly UUID[] {
+    return this._testcaseOrder;
   }
   public get checker() {
     return this._checker;
@@ -92,64 +92,66 @@ export class Problem {
     return this._timeElapsedMs;
   }
 
-  private onPatchTc(uuid: UUID, payload: Partial<Tc>) {
-    this.signals.emit('patchTc', uuid, payload);
+  private onPatchTestcase(uuid: UUID, payload: Partial<Testcase>) {
+    this.signals.emit('patchTestcase', uuid, payload);
   }
-  private onPatchTcResult(uuid: UUID, payload: Partial<TcResult>) {
-    this.signals.emit('patchTcResult', uuid, payload);
+  private onPatchTestcaseResult(uuid: UUID, payload: Partial<TestcaseResult>) {
+    this.signals.emit('patchTestcaseResult', uuid, payload);
   }
 
-  public addTc(uuid: UUID, tc: Tc) {
-    this._tcs.set(uuid, tc);
-    this._tcOrder.push(uuid);
-    this.signals.emit('addTc', uuid, tc);
-    tc.signals.on('patchTc', (payload) => this.onPatchTc(uuid, payload));
-    tc.signals.on('patchTcResult', (payload) => this.onPatchTcResult(uuid, payload));
+  public addTestcase(uuid: UUID, testcase: Testcase) {
+    this._testcases.set(uuid, testcase);
+    this._testcaseOrder.push(uuid);
+    this.signals.emit('addTestcase', uuid, testcase);
+    testcase.signals.on('patchTestcase', (payload) => this.onPatchTestcase(uuid, payload));
+    testcase.signals.on('patchTestcaseResult', (payload) =>
+      this.onPatchTestcaseResult(uuid, payload),
+    );
   }
-  public getTc(uuid: UUID): Tc {
-    const tc = this._tcs.get(uuid);
-    if (!tc) throw new Error('Test case not found');
-    return tc;
+  public getTestcase(uuid: UUID): Testcase {
+    const testcase = this._testcases.get(uuid);
+    if (!testcase) throw new Error('Test case not found');
+    return testcase;
   }
-  public deleteTc(uuid: UUID): void {
-    this._tcOrder = this._tcOrder.filter((id) => id !== uuid);
+  public deleteTestcase(uuid: UUID): void {
+    this._testcaseOrder = this._testcaseOrder.filter((id) => id !== uuid);
   }
-  public clearTcs(): string[] {
-    const disposables = this.purgeUnusedTcs();
-    this._tcOrder = [];
-    for (const [id, tc] of this._tcs) {
-      disposables.push(...tc.getDisposables());
-      this.signals.emit('deleteTc', id);
+  public clearTestcases(): string[] {
+    const disposables = this.purgeUnusedTestcases();
+    this._testcaseOrder = [];
+    for (const [id, testcase] of this._testcases) {
+      disposables.push(...testcase.getDisposables());
+      this.signals.emit('deleteTestcase', id);
     }
-    this._tcs.clear();
+    this._testcases.clear();
     return disposables;
   }
-  public moveTc(fromIdx: number, toIdx: number): void {
-    const [movedTc] = this._tcOrder.splice(fromIdx, 1);
-    this._tcOrder.splice(toIdx, 0, movedTc);
+  public moveTestcase(fromIdx: number, toIdx: number): void {
+    const [movedTestcase] = this._testcaseOrder.splice(fromIdx, 1);
+    this._testcaseOrder.splice(toIdx, 0, movedTestcase);
   }
-  public getEnabledTcIds(): UUID[] {
+  public getEnabledTestcaseIds(): UUID[] {
     const enabledIds: UUID[] = [];
-    for (const id of this._tcOrder) {
-      const tc = this._tcs.get(id);
-      if (tc && !tc.isDisabled) enabledIds.push(id);
+    for (const id of this._testcaseOrder) {
+      const testcase = this._testcases.get(id);
+      if (testcase && !testcase.isDisabled) enabledIds.push(id);
     }
     return enabledIds;
   }
-  public purgeUnusedTcs(): string[] {
-    const activeIds = new Set(this._tcOrder);
+  public purgeUnusedTestcases(): string[] {
+    const activeIds = new Set(this._testcaseOrder);
     const disposables: string[] = [];
-    for (const [id, tc] of this._tcs)
+    for (const [id, testcase] of this._testcases)
       if (!activeIds.has(id)) {
-        disposables.push(...tc.getDisposables());
-        tc.signals.removeAllListeners();
-        this._tcs.delete(id);
+        disposables.push(...testcase.getDisposables());
+        testcase.signals.removeAllListeners();
+        this._testcases.delete(id);
       }
     return disposables;
   }
   public clearResult(): string[] {
     const disposables: string[] = [];
-    for (const id of this._tcOrder) disposables.push(...this.getTc(id).clearResult());
+    for (const id of this._testcaseOrder) disposables.push(...this.getTestcase(id).clearResult());
     return disposables;
   }
   public isRelated(path: string): boolean {
@@ -162,13 +164,14 @@ export class Problem {
       this._stressTest?.generator?.path?.toLowerCase() === path
     )
       return true;
-    for (const [_, tc] of this._tcs) if (tc.isRelated(path)) return true;
+    for (const [_, testcase] of this._testcases) if (testcase.isRelated(path)) return true;
     return false;
   }
   public addTimeElapsed(addMs: number) {
     this._timeElapsedMs += addMs;
   }
-  public updateResult(...params: Parameters<Tc['updateResult']>) {
-    for (const tcId of this._tcOrder) this._tcs.get(tcId)?.updateResult(...params);
+  public updateResult(...params: Parameters<Testcase['updateResult']>) {
+    for (const testcaseId of this._testcaseOrder)
+      this._testcases.get(testcaseId)?.updateResult(...params);
   }
 }

@@ -28,7 +28,7 @@ import {
   type PreparedToolInvocation,
 } from 'vscode';
 import { container } from 'tsyringe';
-import type { TcIo } from '@/domain/types';
+import type { TestcaseIo } from '@/domain/types';
 import { TOKENS } from '@/composition/tokens';
 
 const MAX_PREVIEW_LENGTH = 1000;
@@ -46,7 +46,7 @@ const formatContent = (payload: string): string => {
   return '\n```\n' + truncated + '\n```';
 };
 
-const cloneInline = (io: TcIo | undefined): string | undefined => {
+const cloneInline = (io: TestcaseIo | undefined): string | undefined => {
   if (!io) {
     return undefined;
   }
@@ -56,7 +56,7 @@ const cloneInline = (io: TcIo | undefined): string | undefined => {
   return io.data;
 };
 
-const readFromTcIo = async (io: TcIo): Promise<string> => {
+const readFromTestcaseIo = async (io: TestcaseIo): Promise<string> => {
   if (io.useFile) {
     const content = await readFile(io.data, 'utf-8');
     return content;
@@ -132,8 +132,8 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
     }
 
     const problem = bgProblem.problem;
-    const tc = problem.tcs[id];
-    if (!tc) {
+    const testcase = problem.testcases[id];
+    if (!testcase) {
       result.content.push(
         new LanguageModelTextPart(
           l10n.t('Error: Test case {id} not found.', { id }),
@@ -147,7 +147,7 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
     };
 
     const ensureResult = () => {
-      if (!tc.result) {
+      if (!testcase.result) {
         pushText(
           l10n.t(
             'Error: Result data for test case {id} is not available yet. Please run the test case first.',
@@ -162,7 +162,7 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
     try {
       switch (dataType) {
         case 'stdin': {
-          const content = await readFromTcIo(tc.stdin);
+          const content = await readFromTestcaseIo(testcase.stdin);
           pushText(
             l10n.t('Input for test case {id}:{content}', {
               id,
@@ -172,7 +172,7 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
           break;
         }
         case 'answer': {
-          const content = await readFromTcIo(tc.answer);
+          const content = await readFromTestcaseIo(testcase.answer);
           pushText(
             l10n.t('Expected output for test case {id}:{content}', {
               id,
@@ -185,7 +185,7 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
           if (!ensureResult()) {
             break;
           }
-          const io = tc.result!.stdout;
+          const io = testcase.result!.stdout;
           const inline = cloneInline(io);
           if (inline !== undefined) {
             pushText(
@@ -195,7 +195,7 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
               }),
             );
           } else if (io.useFile) {
-            const content = await readFromTcIo(io);
+            const content = await readFromTestcaseIo(io);
             pushText(
               l10n.t('Program output for test case {id}:{content}', {
                 id,
@@ -215,7 +215,7 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
           if (!ensureResult()) {
             break;
           }
-          const io = tc.result!.stderr;
+          const io = testcase.result!.stderr;
           const inline = cloneInline(io);
           if (inline !== undefined) {
             pushText(
@@ -225,7 +225,7 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
               }),
             );
           } else if (io.useFile) {
-            const content = await readFromTcIo(io);
+            const content = await readFromTestcaseIo(io);
             pushText(
               l10n.t('Error output for test case {id}:{content}', {
                 id,
@@ -245,7 +245,7 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
           if (!ensureResult()) {
             break;
           }
-          const verdict = tc.result!.verdict;
+          const verdict = testcase.result!.verdict;
           pushText(
             l10n.t('Verdict for test case {id}: {name} ({full})', {
               id,
@@ -259,7 +259,7 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
           if (!ensureResult()) {
             break;
           }
-          const msg = tc.result!.msg;
+          const msg = testcase.result!.msg;
           pushText(
             msg
               ? l10n.t('Message for test case {id}: {msg}', {
@@ -279,7 +279,7 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
           pushText(
             l10n.t('Execution time for test case {id}: {time}ms', {
               id,
-              time: tc.result!.time,
+              time: testcase.result!.time,
             }),
           );
           break;
@@ -288,7 +288,7 @@ class LlmDataInspector implements LanguageModelTool<LlmDataInspectorParams> {
           if (!ensureResult()) {
             break;
           }
-          const mem = tc.result!.memory;
+          const mem = testcase.result!.memory;
           if (mem === undefined) {
             pushText(
               l10n.t('Memory usage for test case {id} is unavailable.', {

@@ -26,7 +26,7 @@ import { CphMenu } from './base/cphMenu';
 import { ErrorBoundary } from './base/errorBoundary';
 import { ProblemActions } from './problemActions';
 import { ProblemTitle } from './problemTitle';
-import { TcsView } from './tcsView';
+import { TestcasesView } from './testcasesView';
 
 interface ProblemViewProps {
   problemId: UUID;
@@ -38,10 +38,10 @@ export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewP
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
   const hasRunning = useMemo(() => {
-    for (const [_, tc] of Object.entries(problem.tcs))
-      if (tc.result?.verdict.type === VerdictType.running) return true;
+    for (const [_, testcase] of Object.entries(problem.testcases))
+      if (testcase.result?.verdict.type === VerdictType.running) return true;
     return false;
-  }, [problem.tcs]);
+  }, [problem.testcases]);
 
   return (
     <>
@@ -73,13 +73,17 @@ export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewP
           <CphMenu
             menu={{
               [t('problemView.menu.clearStatus')]: () => {
-                dispatch({ type: 'clearTcStatus', problemId });
+                dispatch({ type: 'clearTestcaseStatus', problemId });
               },
             }}
             flex={1}
             width='100%'
           >
-            <TcsView problemId={problemId} tcOrder={problem.tcOrder} tcs={problem.tcs} />
+            <TestcasesView
+              problemId={problemId}
+              testcaseOrder={problem.testcaseOrder}
+              testcases={problem.testcases}
+            />
           </CphMenu>
         </ErrorBoundary>
       </CphFlex>

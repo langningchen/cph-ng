@@ -24,8 +24,8 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/domain/entities/problem';
 import { isRunningState, type StressTest, StressTestState } from '@/domain/entities/stressTest';
-import type { Tc, TcResult } from '@/domain/entities/tc';
-import type { TcIo } from '@/domain/entities/tcIo';
+import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
+import type { TestcaseIo } from '@/domain/entities/testcaseIo';
 import { type Verdict, VerdictName, Verdicts } from '@/domain/entities/verdict';
 import type { IFileWithHash, IOverrides } from '@/domain/types';
 import type {
@@ -33,9 +33,9 @@ import type {
   IWebviewOverrides,
   IWebviewProblem,
   IWebviewStressTest,
-  IWebviewTc,
-  IWebviewTcIo,
-  IWebviewTcResult,
+  IWebviewTestcase,
+  IWebviewTestcaseIo,
+  IWebviewTestcaseResult,
 } from '@/domain/webviewTypes';
 
 @injectable()
@@ -48,16 +48,16 @@ export class WebviewProblemMapper {
   ) {}
 
   public toDto(entity: Problem): IWebviewProblem {
-    const tcs: Record<UUID, IWebviewTc> = {};
-    for (const id of entity.tcOrder) {
-      const tc = entity.tcs.get(id);
-      if (tc) tcs[id] = this.tcToDto(tc);
+    const testcases: Record<UUID, IWebviewTestcase> = {};
+    for (const id of entity.testcaseOrder) {
+      const testcase = entity.testcases.get(id);
+      if (testcase) testcases[id] = this.testcaseToDto(testcase);
     }
     return {
       name: entity.name,
       url: entity.url,
-      tcs,
-      tcOrder: [...entity.tcOrder],
+      testcases,
+      testcaseOrder: [...entity.testcaseOrder],
       src: this.fileWithHashToDto(entity.src),
       checker: entity.checker ? this.fileWithHashToDto(entity.checker) : null,
       interactor: entity.interactor ? this.fileWithHashToDto(entity.interactor) : null,
@@ -67,38 +67,40 @@ export class WebviewProblemMapper {
     };
   }
 
-  public tcToDto(tc: Tc): IWebviewTc;
-  public tcToDto(tc: Partial<Tc>): Partial<IWebviewTc>;
-  public tcToDto(tc: Partial<Tc>): Partial<IWebviewTc> {
+  public testcaseToDto(testcase: Testcase): IWebviewTestcase;
+  public testcaseToDto(testcase: Partial<Testcase>): Partial<IWebviewTestcase>;
+  public testcaseToDto(testcase: Partial<Testcase>): Partial<IWebviewTestcase> {
     return {
-      stdin: tc.stdin ? this.tcIoToDto(tc.stdin) : undefined,
-      answer: tc.answer ? this.tcIoToDto(tc.answer) : undefined,
-      isExpand: tc.isExpand,
-      isDisabled: tc.isDisabled,
-      result: tc.verdict
+      stdin: testcase.stdin ? this.testcaseIoToDto(testcase.stdin) : undefined,
+      answer: testcase.answer ? this.testcaseIoToDto(testcase.answer) : undefined,
+      isExpand: testcase.isExpand,
+      isDisabled: testcase.isDisabled,
+      result: testcase.verdict
         ? {
-            verdict: this.getVerdict(tc.verdict),
-            timeMs: tc.timeMs,
-            memoryMb: tc.memoryMb,
-            stdout: tc.stdout ? this.tcIoToDto(tc.stdout) : undefined,
-            stderr: tc.stderr ? this.tcIoToDto(tc.stderr) : undefined,
-            msg: tc.msg,
+            verdict: this.getVerdict(testcase.verdict),
+            timeMs: testcase.timeMs,
+            memoryMb: testcase.memoryMb,
+            stdout: testcase.stdout ? this.testcaseIoToDto(testcase.stdout) : undefined,
+            stderr: testcase.stderr ? this.testcaseIoToDto(testcase.stderr) : undefined,
+            msg: testcase.msg,
           }
         : undefined,
     };
   }
-  public tcResultToDto(tcResult: Partial<TcResult>): Partial<IWebviewTcResult> {
+  public testcaseResultToDto(
+    testcaseResult: Partial<TestcaseResult>,
+  ): Partial<IWebviewTestcaseResult> {
     return {
-      verdict: tcResult.verdict ? this.getVerdict(tcResult.verdict) : undefined,
-      timeMs: tcResult.timeMs,
-      memoryMb: tcResult.memoryMb,
-      stdout: tcResult.stdout ? this.tcIoToDto(tcResult.stdout) : undefined,
-      stderr: tcResult.stderr ? this.tcIoToDto(tcResult.stderr) : undefined,
-      msg: tcResult.msg,
+      verdict: testcaseResult.verdict ? this.getVerdict(testcaseResult.verdict) : undefined,
+      timeMs: testcaseResult.timeMs,
+      memoryMb: testcaseResult.memoryMb,
+      stdout: testcaseResult.stdout ? this.testcaseIoToDto(testcaseResult.stdout) : undefined,
+      stderr: testcaseResult.stderr ? this.testcaseIoToDto(testcaseResult.stderr) : undefined,
+      msg: testcaseResult.msg,
     };
   }
-  private tcIoToDto(tcIo: TcIo): IWebviewTcIo {
-    return tcIo.match<IWebviewTcIo>(
+  private testcaseIoToDto(testcaseIo: TestcaseIo): IWebviewTestcaseIo {
+    return testcaseIo.match<IWebviewTestcaseIo>(
       (path) => ({ ...this.fileWithHashToDto({ path }), type: 'file' }),
       (data) => ({ type: 'string', data }),
     );

@@ -25,7 +25,7 @@ import type { IActivePathService } from '@/application/ports/vscode/IActivePathS
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { TOKENS } from '@/composition/tokens';
-import { TcScanner } from '@/domain/services/TcScanner';
+import { TestcaseScanner } from '@/domain/services/TestcaseScanner';
 import type { DragDropMsg } from '@/webview/src/msgs';
 
 @injectable()
@@ -38,7 +38,7 @@ export class DragDrop implements IMsgHandle<DragDropMsg> {
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.activePathService) private readonly activePath: IActivePathService,
-    @inject(TcScanner) private readonly tcScanner: TcScanner,
+    @inject(TestcaseScanner) private readonly testcaseScanner: TestcaseScanner,
   ) {}
 
   public async exec(msg: DragDropMsg): Promise<void> {
@@ -56,20 +56,23 @@ export class DragDrop implements IMsgHandle<DragDropMsg> {
         .then((s) => s.isDirectory())
         .catch(() => false);
       if (isDir) {
-        this.problemService.applyTcs(problem, await this.tcScanner.fromFolder(item));
+        this.problemService.applyTestcases(problem, await this.testcaseScanner.fromFolder(item));
         break;
       }
       const ext = this.path.extname(item).toLowerCase();
       if (ext === '.zip') {
-        this.problemService.applyTcs(problem, await this.tcScanner.fromZip(problem.src.path, item));
+        this.problemService.applyTestcases(
+          problem,
+          await this.testcaseScanner.fromZip(problem.src.path, item),
+        );
         break;
       }
       const isIoFile =
         this.settings.problem.inputFileExtensionList.includes(ext) ||
         this.settings.problem.outputFileExtensionList.includes(ext);
       if (isIoFile) {
-        const tc = await this.tcScanner.fromFile(item);
-        problem.addTc(this.crypto.randomUUID(), tc);
+        const testcase = await this.testcaseScanner.fromFile(item);
+        problem.addTestcase(this.crypto.randomUUID(), testcase);
       }
     }
   }

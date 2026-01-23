@@ -17,51 +17,51 @@
 
 import EventEmitter from 'node:events';
 import type TypedEventEmitter from 'typed-emitter';
-import { TcIo } from '@/domain/entities/tcIo';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import type { VerdictName } from '@/domain/entities/verdict';
 
-export interface TcResult {
+export interface TestcaseResult {
   verdict: VerdictName;
   timeMs?: number;
   memoryMb?: number;
-  stdout?: TcIo;
-  stderr?: TcIo;
+  stdout?: TestcaseIo;
+  stderr?: TestcaseIo;
   msg?: string;
 }
 
-export type UpdatedResult = TcResult & {
+export type UpdatedResult = TestcaseResult & {
   isExpand?: boolean;
 };
 
-export type TcEvents = {
-  patchTc: (payload: Partial<Tc>) => void;
-  patchTcResult: (payload: Partial<TcResult>) => void;
+export type TestcaseEvents = {
+  patchTestcase: (payload: Partial<Testcase>) => void;
+  patchTestcaseResult: (payload: Partial<TestcaseResult>) => void;
 };
 
-export class Tc {
-  public readonly signals: TypedEventEmitter<TcEvents> = new EventEmitter();
+export class Testcase {
+  public readonly signals: TypedEventEmitter<TestcaseEvents> = new EventEmitter();
 
   public constructor(
-    private _stdin: TcIo = new TcIo({ data: '' }),
-    private _answer: TcIo = new TcIo({ data: '' }),
+    private _stdin: TestcaseIo = new TestcaseIo({ data: '' }),
+    private _answer: TestcaseIo = new TestcaseIo({ data: '' }),
     private _isExpand: boolean = false,
     private _isDisabled: boolean = false,
-    private _result?: TcResult,
+    private _result?: TestcaseResult,
   ) {}
 
-  public get stdin(): TcIo {
+  public get stdin(): TestcaseIo {
     return this._stdin;
   }
-  public set stdin(value: TcIo) {
+  public set stdin(value: TestcaseIo) {
     this._stdin = value;
-    this.signals.emit('patchTc', { stdin: value });
+    this.signals.emit('patchTestcase', { stdin: value });
   }
-  public get answer(): TcIo {
+  public get answer(): TestcaseIo {
     return this._answer;
   }
-  public set answer(value: TcIo) {
+  public set answer(value: TestcaseIo) {
     this._answer = value;
-    this.signals.emit('patchTc', { answer: value });
+    this.signals.emit('patchTestcase', { answer: value });
   }
   public get isExpand(): boolean {
     return this._isExpand;
@@ -78,10 +78,10 @@ export class Tc {
   public get memoryMb(): number | undefined {
     return this._result?.memoryMb;
   }
-  public get stdout(): TcIo | undefined {
+  public get stdout(): TestcaseIo | undefined {
     return this._result?.stdout;
   }
-  public get stderr(): TcIo | undefined {
+  public get stderr(): TestcaseIo | undefined {
     return this._result?.stderr;
   }
   public get msg(): string | undefined {
@@ -114,10 +114,10 @@ export class Tc {
       stderr: stderr ?? current.stderr,
       msg: this.formatMessage(current.msg, msg),
     };
-    this.signals.emit('patchTcResult', { verdict, timeMs, memoryMb, msg });
+    this.signals.emit('patchTestcaseResult', { verdict, timeMs, memoryMb, msg });
     if (isExpand !== undefined) {
       this._isExpand = isExpand;
-      this.signals.emit('patchTc', { isExpand });
+      this.signals.emit('patchTestcase', { isExpand });
     }
   }
   public getDisposables(): string[] {

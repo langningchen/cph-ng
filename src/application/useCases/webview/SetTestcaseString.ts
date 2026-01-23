@@ -20,20 +20,23 @@ import type { IProblemRepository } from '@/application/ports/problems/IProblemRe
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import type { UpdateTcMsg } from '@/webview/src/msgs';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import type { SetTestcaseStringMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class UpdateTc extends BaseProblemUseCase<UpdateTcMsg> {
+export class SetTestcaseString extends BaseProblemUseCase<SetTestcaseStringMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
   ) {
     super(repo);
   }
 
-  protected async performAction({ problem }: BackgroundProblem, msg: UpdateTcMsg): Promise<void> {
-    const tc = problem.getTc(msg.id);
-    if (msg.event === 'toggleDisable') tc.toggleDisable();
-    if (msg.event === 'toggleExpand') tc.toggleExpand();
-    if (msg.event === 'setAsAnswer' && tc.stdout) tc.answer = tc.stdout;
+  protected async performAction(
+    { problem }: BackgroundProblem,
+    msg: SetTestcaseStringMsg,
+  ): Promise<void> {
+    const testcase = problem.getTestcase(msg.id);
+    if (msg.label === 'stdin') testcase.stdin = new TestcaseIo({ data: msg.data });
+    if (msg.label === 'answer') testcase.answer = new TestcaseIo({ data: msg.data });
   }
 }

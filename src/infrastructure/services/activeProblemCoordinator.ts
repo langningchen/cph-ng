@@ -26,7 +26,7 @@ import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventB
 import { TOKENS } from '@/composition/tokens';
 import type { ProblemMetaPayload } from '@/domain/entities/problem';
 import type { StressTest } from '@/domain/entities/stressTest';
-import type { Tc, TcResult } from '@/domain/entities/tc';
+import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
 import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapper';
 
 @injectable()
@@ -88,21 +88,25 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
         if (!this.activeProblemId) return;
         this.eventBus.patchStressTest(this.activeProblemId, this.mapper.stressTestToDto(payload));
       };
-      const onAddTc = async (id: UUID, payload: Tc) => {
+      const onAddTestcase = async (id: UUID, payload: Testcase) => {
         if (!this.activeProblemId) return;
-        this.eventBus.addTc(this.activeProblemId, id, this.mapper.tcToDto(payload));
+        this.eventBus.addTestcase(this.activeProblemId, id, this.mapper.testcaseToDto(payload));
       };
-      const onDeleteTc = async (id: UUID) => {
+      const onDeleteTestcase = async (id: UUID) => {
         if (!this.activeProblemId) return;
-        this.eventBus.deleteTc(this.activeProblemId, id);
+        this.eventBus.deleteTestcase(this.activeProblemId, id);
       };
-      const onPatchTc = async (id: UUID, payload: Partial<Tc>) => {
+      const onPatchTestcase = async (id: UUID, payload: Partial<Testcase>) => {
         if (!this.activeProblemId) return;
-        this.eventBus.patchTc(this.activeProblemId, id, this.mapper.tcToDto(payload));
+        this.eventBus.patchTestcase(this.activeProblemId, id, this.mapper.testcaseToDto(payload));
       };
-      const onPatchTcResult = async (id: UUID, payload: Partial<TcResult>) => {
+      const onPatchTestcaseResult = async (id: UUID, payload: Partial<TestcaseResult>) => {
         if (!this.activeProblemId) return;
-        this.eventBus.patchTcResult(this.activeProblemId, id, this.mapper.tcResultToDto(payload));
+        this.eventBus.patchTestcaseResult(
+          this.activeProblemId,
+          id,
+          this.mapper.testcaseResultToDto(payload),
+        );
       };
 
       if (this.activeProblemId) {
@@ -111,10 +115,10 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
         if (problem) {
           problem.signals.off('patchMeta', onPatchMeta);
           problem.signals.off('patchStressTest', onPatchStressTest);
-          problem.signals.off('addTc', onAddTc);
-          problem.signals.off('deleteTc', onDeleteTc);
-          problem.signals.off('patchTc', onPatchTc);
-          problem.signals.off('patchTcResult', onPatchTcResult);
+          problem.signals.off('addTestcase', onAddTestcase);
+          problem.signals.off('deleteTestcase', onDeleteTestcase);
+          problem.signals.off('patchTestcase', onPatchTestcase);
+          problem.signals.off('patchTestcaseResult', onPatchTestcaseResult);
           await this.repo.persist(this.activeProblemId);
         }
       }
@@ -125,10 +129,10 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       this.eventBus.fullProblem(problemId, this.mapper.toDto(bgProblem.problem));
       bgProblem.problem.signals.on('patchMeta', onPatchMeta);
       bgProblem.problem.signals.on('patchStressTest', onPatchStressTest);
-      bgProblem.problem.signals.on('addTc', onAddTc);
-      bgProblem.problem.signals.on('deleteTc', onDeleteTc);
-      bgProblem.problem.signals.on('patchTc', onPatchTc);
-      bgProblem.problem.signals.on('patchTcResult', onPatchTcResult);
+      bgProblem.problem.signals.on('addTestcase', onAddTestcase);
+      bgProblem.problem.signals.on('deleteTestcase', onDeleteTestcase);
+      bgProblem.problem.signals.on('patchTestcase', onPatchTestcase);
+      bgProblem.problem.signals.on('patchTestcaseResult', onPatchTestcaseResult);
     }
   }
 }

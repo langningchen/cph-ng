@@ -26,6 +26,6 @@ export class StartChat implements IMsgHandle<StartChatMsg> {
   public constructor(@inject(TOKENS.ui) private readonly ui: IUi) {}
 
   public async exec(_msg: StartChatMsg): Promise<void> {
-    this.ui.openChat('#cphNgRunTestCases ');
+    this.ui.openChat('#cphNgRunTestcases ');
   }
 }

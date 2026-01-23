@@ -27,19 +27,19 @@ import {
   type PreparedToolInvocation,
 } from 'vscode';
 import { container } from 'tsyringe';
-import { Tc, TcIo } from '@/domain/types';
+import { Testcase, TestcaseIo } from '@/domain/types';
 import { TOKENS } from '@/composition/tokens';
 
-interface LlmTestCaseEditorParams {
+interface LlmTestcaseEditorParams {
   activePath: string;
   id?: UUID;
   stdin?: string;
   answer?: string;
 }
 
-class LlmTestCaseEditor implements LanguageModelTool<LlmTestCaseEditorParams> {
+class LlmTestcaseEditor implements LanguageModelTool<LlmTestcaseEditorParams> {
   async prepareInvocation(
-    options: LanguageModelToolInvocationPrepareOptions<LlmTestCaseEditorParams>,
+    options: LanguageModelToolInvocationPrepareOptions<LlmTestcaseEditorParams>,
     _token: CancellationToken,
   ): Promise<PreparedToolInvocation> {
     const { id, stdin, answer } = options.input;
@@ -69,7 +69,7 @@ class LlmTestCaseEditor implements LanguageModelTool<LlmTestCaseEditorParams> {
   }
 
   async invoke(
-    options: LanguageModelToolInvocationOptions<LlmTestCaseEditorParams>,
+    options: LanguageModelToolInvocationOptions<LlmTestcaseEditorParams>,
     _token: CancellationToken,
   ): Promise<LanguageModelToolResult> {
     const { id, stdin, answer } = options.input;
@@ -111,8 +111,8 @@ class LlmTestCaseEditor implements LanguageModelTool<LlmTestCaseEditorParams> {
           );
           return result;
         }
-        const tc = problem.tcs[id];
-        if (!tc) {
+        const testcase = problem.testcases[id];
+        if (!testcase) {
           result.content.push(
             new LanguageModelTextPart(
               l10n.t('Error: Test case {id} not found.', { id }),
@@ -122,18 +122,18 @@ class LlmTestCaseEditor implements LanguageModelTool<LlmTestCaseEditorParams> {
         }
 
         if (stdin !== undefined) {
-          tc.stdin = new TcIo(false, stdin);
+          testcase.stdin = new TestcaseIo(false, stdin);
         }
         if (answer !== undefined) {
-          tc.answer = new TcIo(false, answer);
+          testcase.answer = new TestcaseIo(false, answer);
         }
         // Clear previous execution result so it can be re-run
-        tc.result = undefined;
-        await problemsManager.updateTc({
-          type: 'updateTc',
+        testcase.result = undefined;
+        await problemsManager.updateTestcase({
+          type: 'updateTestcase',
           activePath,
           id,
-          tc,
+          testcase,
         });
 
         result.content.push(
@@ -144,10 +144,10 @@ class LlmTestCaseEditor implements LanguageModelTool<LlmTestCaseEditorParams> {
         return result;
       }
 
-      const newId = problem.addTc(
-        new Tc(
-          new TcIo(false, stdin ?? ''),
-          new TcIo(false, answer ?? ''),
+      const newId = problem.addTestcase(
+        new Testcase(
+          new TestcaseIo(false, stdin ?? ''),
+          new TestcaseIo(false, answer ?? ''),
           true,
         ),
       );
@@ -172,4 +172,4 @@ class LlmTestCaseEditor implements LanguageModelTool<LlmTestCaseEditorParams> {
   }
 }
 
-export default LlmTestCaseEditor;
+export default LlmTestcaseEditor;

@@ -18,24 +18,24 @@
 import type { UUID } from 'node:crypto';
 import type { Verdict } from '@/domain/entities/verdict';
 
-export type IWebviewTcIo =
+export type IWebviewTestcaseIo =
   | { type: 'string'; data: string }
   | { type: 'file'; path: string; base: string };
 
-export interface IWebviewTcResult {
+export interface IWebviewTestcaseResult {
   verdict: Verdict;
   timeMs?: number;
   memoryMb?: number;
-  stdout?: IWebviewTcIo;
-  stderr?: IWebviewTcIo;
+  stdout?: IWebviewTestcaseIo;
+  stderr?: IWebviewTestcaseIo;
   msg?: string;
 }
-export interface IWebviewTc {
-  stdin: IWebviewTcIo;
-  answer: IWebviewTcIo;
+export interface IWebviewTestcase {
+  stdin: IWebviewTestcaseIo;
+  answer: IWebviewTestcaseIo;
   isExpand: boolean;
   isDisabled: boolean;
-  result?: IWebviewTcResult;
+  result?: IWebviewTestcaseResult;
 }
 
 export interface IWebviewFileWithHash {
@@ -67,8 +67,8 @@ export interface IWebviewOverrides {
 export interface IWebviewProblem {
   name: string;
   url?: string;
-  tcs: Record<UUID, IWebviewTc>;
-  tcOrder: UUID[];
+  testcases: Record<UUID, IWebviewTestcase>;
+  testcaseOrder: UUID[];
   src: IWebviewFileWithHash;
   checker: IWebviewFileWithHash | null;
   interactor: IWebviewFileWithHash | null;

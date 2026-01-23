@@ -16,27 +16,26 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import type { ClearTcStatusMsg } from '@/webview/src/msgs';
+import type { DelTestcaseMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class ClearTcStatus extends BaseProblemUseCase<ClearTcStatusMsg> {
+export class DelTestcase extends BaseProblemUseCase<DelTestcaseMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
+    @inject(TOKENS.problemService) protected readonly problemService: IProblemService,
   ) {
     super(repo);
   }
 
   protected async performAction(
     { problem }: BackgroundProblem,
-    msg: ClearTcStatusMsg,
+    msg: DelTestcaseMsg,
   ): Promise<void> {
-    if (msg.id) this.tmp.dispose(problem.getTc(msg.id).clearResult());
-    else this.tmp.dispose(problem.clearResult());
+    problem.deleteTestcase(msg.id);
   }
 }

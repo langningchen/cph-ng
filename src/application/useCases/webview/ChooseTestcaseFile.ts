@@ -23,24 +23,24 @@ import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import { TcScanner } from '@/domain/services/TcScanner';
-import type { ChooseTcFileMsg } from '@/webview/src/msgs';
+import { TestcaseScanner } from '@/domain/services/TestcaseScanner';
+import type { ChooseTestcaseFileMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class ChooseTcFile extends BaseProblemUseCase<ChooseTcFileMsg> {
+export class ChooseTestcaseFile extends BaseProblemUseCase<ChooseTestcaseFileMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.ui) private readonly ui: IUi,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
-    @inject(TcScanner) private readonly tcScanner: TcScanner,
+    @inject(TestcaseScanner) private readonly testcaseScanner: TestcaseScanner,
   ) {
     super(repo);
   }
 
   protected async performAction(
     { problem }: BackgroundProblem,
-    msg: ChooseTcFileMsg,
+    msg: ChooseTestcaseFileMsg,
   ): Promise<void> {
     const isInput = msg.label === 'stdin';
     const mainExt = isInput
@@ -59,9 +59,9 @@ export class ChooseTcFile extends BaseProblemUseCase<ChooseTcFileMsg> {
       },
     });
     if (!fileUri?.length) return;
-    const tc = problem.getTc(msg.id);
-    const partialTc = await this.tcScanner.fromFile(fileUri);
-    if (partialTc.stdin) tc.stdin = partialTc.stdin;
-    if (partialTc.answer) tc.answer = partialTc.answer;
+    const testcase = problem.getTestcase(msg.id);
+    const partialTestcase = await this.testcaseScanner.fromFile(fileUri);
+    if (partialTestcase.stdin) testcase.stdin = partialTestcase.stdin;
+    if (partialTestcase.answer) testcase.answer = partialTestcase.answer;
   }
 }

@@ -27,7 +27,7 @@ import { type AnserJsonEntry, ansiToJson } from 'anser';
 import React, { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
-import type { IWebviewTcIo } from '@/domain/webviewTypes';
+import type { IWebviewTestcaseIo } from '@/domain/webviewTypes';
 import { useProblemContext } from '@/webview/src/context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { CphLink } from './base/cphLink';
@@ -40,7 +40,7 @@ interface OutputActions {
 
 interface CodeMirrorSectionProps {
   label: string;
-  value: IWebviewTcIo;
+  value: IWebviewTestcaseIo;
   onChange?: (value: string) => void;
   onChooseFile?: () => void;
   onToggleFile?: () => void;
@@ -95,7 +95,7 @@ const ansiToReact = (ansi: string) => {
   );
 };
 
-export const TcDataView = ({
+export const TestcaseDataView = ({
   label,
   value,
   onChange,
@@ -145,7 +145,7 @@ export const TcDataView = ({
         <CphFlex flex={1} flexWrap='wrap'>
           <CphLink
             color='inherit'
-            name={t('tcDataView.openVirtual')}
+            name={t('testcaseDataView.openVirtual')}
             onClick={onOpenVirtual}
             fontSize='larger'
           >
@@ -167,14 +167,14 @@ export const TcDataView = ({
         </CphFlex>
         {!!outputActions && (
           <CphButton
-            name={t('tcDataView.compare')}
+            name={t('testcaseDataView.compare')}
             icon={DifferenceIcon}
             onClick={outputActions.onCompare}
           />
         )}
         {!!onToggleFile && (
           <CphButton
-            name={t('tcDataView.toggleFile')}
+            name={t('testcaseDataView.toggleFile')}
             icon={ChangeCircleIcon}
             onClick={onToggleFile}
           />
@@ -182,7 +182,7 @@ export const TcDataView = ({
         {internalValue.type === 'file' ? (
           readOnly || (
             <CphButton
-              name={t('tcDataView.clearFile')}
+              name={t('testcaseDataView.clearFile')}
               icon={ClearIcon}
               onClick={() => {
                 if (onChange) onChange('');
@@ -193,20 +193,20 @@ export const TcDataView = ({
           <>
             {readOnly || (
               <CphButton
-                name={t('tcDataView.loadFile')}
+                name={t('testcaseDataView.loadFile')}
                 icon={FileOpenIcon}
                 onClick={onChooseFile}
               />
             )}
             {!!outputActions && (
               <CphButton
-                name={t('tcDataView.setAnswer')}
+                name={t('testcaseDataView.setAnswer')}
                 icon={ArrowUpwardIcon}
                 onClick={outputActions.onSetAnswer}
               />
             )}
             <CphButton
-              name={copied ? t('tcDataView.copied') : t('tcDataView.copy')}
+              name={copied ? t('testcaseDataView.copied') : t('testcaseDataView.copy')}
               icon={copied ? DoneIcon : ContentCopyIcon}
               onClick={() => {
                 navigator.clipboard

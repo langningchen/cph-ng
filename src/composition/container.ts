@@ -45,8 +45,8 @@ import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/st
 import { ProblemMigrationService } from '@/infrastructure/problems/problemMigrationService';
 import { ProblemRepository } from '@/infrastructure/problems/problemRepository';
 import { ProblemService } from '@/infrastructure/problems/problemService';
-import { TcIoService } from '@/infrastructure/problems/tcIoService';
-import { TcService } from '@/infrastructure/problems/tcService';
+import { TestcaseIoService } from '@/infrastructure/problems/testcaseIoService';
+import { TestcaseService } from '@/infrastructure/problems/testcaseService';
 import { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
 import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
 import { PathResolverAdapter } from '@/infrastructure/services/pathResolverAdapter';
@@ -97,8 +97,8 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.settings, SettingsAdapter);
   container.registerSingleton(TOKENS.solutionRunner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.system, SystemAdapter);
-  container.registerSingleton(TOKENS.tcIoService, TcIoService);
-  container.registerSingleton(TOKENS.tcService, TcService);
+  container.registerSingleton(TOKENS.testcaseIoService, TestcaseIoService);
+  container.registerSingleton(TOKENS.testcaseService, TestcaseService);
   container.registerSingleton(TOKENS.telemetry, TelemetryAdapter);
   container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
   container.registerSingleton(TOKENS.translator, TranslatorAdapter);

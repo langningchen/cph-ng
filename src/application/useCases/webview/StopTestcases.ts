@@ -20,17 +20,29 @@ import type { IProblemRepository } from '@/application/ports/problems/IProblemRe
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import type { ReorderTcMsg } from '@/webview/src/msgs';
+import { VerdictName, Verdicts, VerdictType } from '@/domain/entities/verdict';
+import type { StopTestcasesMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class ReorderTc extends BaseProblemUseCase<ReorderTcMsg> {
+export class StopTestcases extends BaseProblemUseCase<StopTestcasesMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
   ) {
     super(repo);
   }
 
-  protected async performAction({ problem }: BackgroundProblem, msg: ReorderTcMsg): Promise<void> {
-    problem.moveTc(msg.fromIdx, msg.toIdx);
+  protected async performAction(
+    bgProblem: BackgroundProblem,
+    msg: StopTestcasesMsg,
+  ): Promise<void> {
+    bgProblem.abort(msg.onlyOne ? 'onlyOne' : undefined);
+    if (!msg.onlyOne) {
+      const testcaseOrder = bgProblem.problem.getEnabledTestcaseIds();
+      for (const testcaseId of testcaseOrder) {
+        const testcase = bgProblem.problem.getTestcase(testcaseId);
+        if (testcase.verdict && Verdicts[testcase.verdict].type === VerdictType.running)
+          testcase.updateResult({ verdict: VerdictName.rejected });
+      }
+    }
   }
 }

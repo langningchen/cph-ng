@@ -18,67 +18,67 @@
 import { container, type InjectionToken, inject, injectable } from 'tsyringe';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
-import { AddTc } from '@/application/useCases/webview/AddTc';
+import { AddTestcase } from '@/application/useCases/webview/AddTestcase';
 import { ChooseSrcFile } from '@/application/useCases/webview/ChooseSrcFile';
-import { ChooseTcFile } from '@/application/useCases/webview/ChooseTcFile';
-import { ClearTcStatus } from '@/application/useCases/webview/ClearTcStatus';
-import { CompareTc } from '@/application/useCases/webview/CompareTc';
+import { ChooseTestcaseFile } from '@/application/useCases/webview/ChooseTestcaseFile';
+import { ClearTestcaseStatus } from '@/application/useCases/webview/ClearTestcaseStatus';
+import { CompareTestcase } from '@/application/useCases/webview/CompareTestcase';
 import { CreateProblem } from '@/application/useCases/webview/CreateProblem';
 import { DelProblem } from '@/application/useCases/webview/DelProblem';
-import { DelTc } from '@/application/useCases/webview/DelTc';
+import { DelTestcase } from '@/application/useCases/webview/DelTestcase';
 import { DragDrop } from '@/application/useCases/webview/DragDrop';
 import { EditProblemDetails } from '@/application/useCases/webview/EditProblemDetails';
 import { ImportProblem } from '@/application/useCases/webview/ImportProblem';
 import { Init } from '@/application/useCases/webview/Init';
-import { LoadTcs } from '@/application/useCases/webview/LoadTcs';
+import { LoadTestcases } from '@/application/useCases/webview/LoadTestcases';
 import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { OpenFile } from '@/application/useCases/webview/OpenFile';
 import { OpenSettings } from '@/application/useCases/webview/OpenSettings';
 import { OpenTestlib } from '@/application/useCases/webview/OpenTestlib';
 import { RemoveSrcFile } from '@/application/useCases/webview/RemoveSrcFile';
-import { ReorderTc } from '@/application/useCases/webview/ReorderTc';
-import { RunAllTcs } from '@/application/useCases/webview/RunAllTcs';
-import { RunSingleTc } from '@/application/useCases/webview/RunSingleTc';
-import { SetTcString } from '@/application/useCases/webview/SetTcString';
+import { ReorderTestcase } from '@/application/useCases/webview/ReorderTestcase';
+import { RunAllTestcases } from '@/application/useCases/webview/RunAllTestcases';
+import { RunSingleTestcase } from '@/application/useCases/webview/RunSingleTestcase';
+import { SetTestcaseString } from '@/application/useCases/webview/SetTestcaseString';
 import { StartChat } from '@/application/useCases/webview/StartChat';
 import { StartStressTest } from '@/application/useCases/webview/StartStressTest';
 import { StopStressTest } from '@/application/useCases/webview/StopStressTest';
-import { StopTcs } from '@/application/useCases/webview/StopTcs';
+import { StopTestcases } from '@/application/useCases/webview/StopTestcases';
 import { SubmitToCodeforces } from '@/application/useCases/webview/SubmitToCodeforces';
-import { ToggleTcFile } from '@/application/useCases/webview/ToggleTcFile';
-import { UpdateTc } from '@/application/useCases/webview/UpdateTc';
+import { ToggleTestcaseFile } from '@/application/useCases/webview/ToggleTestcaseFile';
+import { UpdateTestcase } from '@/application/useCases/webview/UpdateTestcase';
 import { TOKENS } from '@/composition/tokens';
 import type { WebviewMsg } from '@/webview/src/msgs';
 
 const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<WebviewMsg>>> = {
-  addTc: AddTc,
+  addTestcase: AddTestcase,
   chooseSrcFile: ChooseSrcFile,
-  chooseTcFile: ChooseTcFile,
-  clearTcStatus: ClearTcStatus,
-  compareTc: CompareTc,
+  chooseTestcaseFile: ChooseTestcaseFile,
+  clearTestcaseStatus: ClearTestcaseStatus,
+  compareTestcase: CompareTestcase,
   createProblem: CreateProblem,
   delProblem: DelProblem,
-  delTc: DelTc,
+  delTestcase: DelTestcase,
   dragDrop: DragDrop,
   editProblemDetails: EditProblemDetails,
   importProblem: ImportProblem,
   init: Init,
-  loadTcs: LoadTcs,
+  loadTestcases: LoadTestcases,
   openFile: OpenFile,
   openSettings: OpenSettings,
   openTestlib: OpenTestlib,
   removeSrcFile: RemoveSrcFile,
-  reorderTc: ReorderTc,
-  runTc: RunSingleTc,
-  runTcs: RunAllTcs,
-  setTcString: SetTcString,
+  reorderTestcase: ReorderTestcase,
+  runTestcase: RunSingleTestcase,
+  runTestcases: RunAllTestcases,
+  setTestcaseString: SetTestcaseString,
   startStressTest: StartStressTest,
   startChat: StartChat,
   stopStressTest: StopStressTest,
-  stopTcs: StopTcs,
+  stopTestcases: StopTestcases,
   submitToCodeforces: SubmitToCodeforces,
-  toggleTcFile: ToggleTcFile,
-  updateTc: UpdateTc,
+  toggleTestcaseFile: ToggleTestcaseFile,
+  updateTestcase: UpdateTestcase,
 };
 
 @injectable()

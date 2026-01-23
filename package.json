@@ -43,7 +43,7 @@
     "languageModelTools": [
       {
         "name": "run_test_cases",
-        "toolReferenceName": "cphNgRunTestCases",
+        "toolReferenceName": "cphNgRunTestcases",
         "displayName": "Run CPH-NG Test Cases",
         "modelDescription": "Executes one test case (identified by its stable UUID) or the entire suite for the active competitive programming problem managed by CPH-NG. Use this to validate solutions after edits or to confirm fixes against previously failing cases.",
         "userDescription": "Runs one or all test cases for the current CPH-NG problem.",
@@ -109,7 +109,7 @@
       },
       {
         "name": "list_test_cases",
-        "toolReferenceName": "cphNgListTestCases",
+        "toolReferenceName": "cphNgListTestcases",
         "displayName": "List CPH-NG Test IDs",
         "modelDescription": "Returns all test case identifiers for the active problem, along with their latest verdict/time summary. Call this before running or editing tests to work with stable IDs instead of indices.",
         "userDescription": "Lists every test case ID for the current CPH-NG problem.",
@@ -130,7 +130,7 @@
       },
       {
         "name": "upsert_test_case",
-        "toolReferenceName": "cphNgUpsertTestCase",
+        "toolReferenceName": "cphNgUpsertTestcase",
         "displayName": "Add or Update CPH-NG Test Case",
         "modelDescription": "Creates a new test case or updates an existing one for the active competitive programming problem. Accepts inline stdin/answer content and clears previous verdicts so the test can be re-run. Use this to capture newly discovered counterexamples or tweak expected answers.",
         "userDescription": "Adds a new test case or updates an existing one (stdin/answer) for the current CPH-NG problem.",
@@ -411,7 +411,7 @@
             "default": 512,
             "markdownDescription": "%cph-ng.configuration.problem.properties.defaultMemoryLimit.markdownDescription%"
           },
-          "cph-ng.problem.foundMatchTestCaseBehavior": {
+          "cph-ng.problem.foundMatchTestcaseBehavior": {
             "type": "string",
             "default": "always",
             "enum": [
@@ -419,11 +419,11 @@
               "always",
               "never"
             ],
-            "markdownDescription": "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.markdownDescription%",
+            "markdownDescription": "%cph-ng.configuration.problem.properties.foundMatchTestcaseBehavior.markdownDescription%",
             "markdownEnumDescriptions": [
-              "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.ask%",
-              "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.always%",
-              "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.never%"
+              "%cph-ng.configuration.problem.properties.foundMatchTestcaseBehavior.enumDescriptions.ask%",
+              "%cph-ng.configuration.problem.properties.foundMatchTestcaseBehavior.enumDescriptions.always%",
+              "%cph-ng.configuration.problem.properties.foundMatchTestcaseBehavior.enumDescriptions.never%"
             ]
           },
           "cph-ng.problem.expandBehavior": {
@@ -725,13 +725,13 @@
         "icon": "$(desktop-download)"
       },
       {
-        "command": "cph-ng.runTestCases",
-        "title": "%cph-ng.commands.runTestCases%",
+        "command": "cph-ng.runTestcases",
+        "title": "%cph-ng.commands.runTestcases%",
         "icon": "$(run-all)"
       },
       {
-        "command": "cph-ng.stopTestCases",
-        "title": "%cph-ng.commands.stopTestCases%",
+        "command": "cph-ng.stopTestcases",
+        "title": "%cph-ng.commands.stopTestcases%",
         "icon": "$(stop-circle)"
       },
       {
@@ -751,12 +751,12 @@
         "when": "!cph-ng.hasProblem && cph-ng.canImport"
       },
       {
-        "command": "cph-ng.runTestCases",
+        "command": "cph-ng.runTestcases",
         "key": "ctrl+alt+b",
         "when": "cph-ng.hasProblem && !cph-ng.isRunning"
       },
       {
-        "command": "cph-ng.stopTestCases",
+        "command": "cph-ng.stopTestcases",
         "key": "ctrl+alt+b",
         "when": "cph-ng.hasProblem && cph-ng.isRunning"
       }
@@ -769,12 +769,12 @@
           "group": "navigation"
         },
         {
-          "command": "cph-ng.runTestCases",
+          "command": "cph-ng.runTestcases",
           "when": "cph-ng.hasProblem && !cph-ng.isRunning",
           "group": "navigation"
         },
         {
-          "command": "cph-ng.stopTestCases",
+          "command": "cph-ng.stopTestcases",
           "when": "cph-ng.hasProblem && cph-ng.isRunning",
           "group": "navigation"
         }

@@ -15,21 +15,29 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { CphFlex } from './base/cphFlex';
-import { CphText } from './base/cphText';
+import type { ITestcaseIo } from '@/domain/types';
 
-export const NoTcs = () => {
-  const { t } = useTranslation();
+export class TestcaseIo {
+  public readonly path?: string;
+  public readonly data?: string;
 
-  return (
-    <CphFlex column>
-      <CphText textAlign='center'>
-        {t('noTcs.firstLine')}
-        <br />
-        {t('noTcs.secondLine')}
-      </CphText>
-    </CphFlex>
-  );
-};
+  public constructor(o: ITestcaseIo) {
+    if ('path' in o) {
+      this.path = o.path.toLowerCase();
+      this.data = undefined;
+    } else {
+      this.data = o.data;
+      this.path = undefined;
+    }
+  }
+
+  public match<T>(onPath: (path: string) => T, onData: (data: string) => T): T {
+    if (this.path !== undefined) return onPath(this.path);
+    if (this.data !== undefined) return onData(this.data);
+    throw new Error('TestcaseIo is empty');
+  }
+  public getDisposables(): string[] {
+    if (!this.path) return [];
+    return [this.path];
+  }
+}

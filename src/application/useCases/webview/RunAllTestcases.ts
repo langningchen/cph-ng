@@ -18,7 +18,7 @@
 import { inject, injectable } from 'tsyringe';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import type { ITcService } from '@/application/ports/problems/ITcService';
+import type { ITestcaseService } from '@/application/ports/problems/ITestcaseService';
 import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
@@ -34,35 +34,35 @@ import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { VerdictName, Verdicts, VerdictType } from '@/domain/entities/verdict';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
-import type { RunTcsMsg } from '@/webview/src/msgs';
+import type { RunTestcasesMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
+export class RunAllTestcases extends BaseProblemUseCase<RunTestcasesMsg> {
   public constructor(
     @inject(TOKENS.compilerService) private readonly compiler: ICompilerService,
     @inject(TOKENS.document) private readonly document: IDocument,
     @inject(TOKENS.judgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.settings) private readonly settings: ISettings,
-    @inject(TOKENS.tcService) private readonly tcService: ITcService,
+    @inject(TOKENS.testcaseService) private readonly testcaseService: ITestcaseService,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
     super(repo);
   }
 
-  protected async performAction(bgProblem: BackgroundProblem, msg: RunTcsMsg): Promise<void> {
+  protected async performAction(bgProblem: BackgroundProblem, msg: RunTestcasesMsg): Promise<void> {
     const { problem } = bgProblem;
     let ac = new AbortController();
     bgProblem.ac = ac;
 
-    const tcOrder = problem.getEnabledTcIds();
+    const testcaseOrder = problem.getEnabledTestcaseIds();
 
     const expandMemo: Record<string, boolean> = {};
-    for (const tcId of tcOrder) {
-      const tc = problem.getTc(tcId);
-      this.tmp.dispose(tc.clearResult());
-      tc.updateResult({ verdict: VerdictName.compiling, isExpand: false });
-      expandMemo[tcId] = tc.isExpand;
+    for (const testcaseId of testcaseOrder) {
+      const testcase = problem.getTestcase(testcaseId);
+      this.tmp.dispose(testcase.clearResult());
+      testcase.updateResult({ verdict: VerdictName.compiling, isExpand: false });
+      expandMemo[testcaseId] = testcase.isExpand;
     }
 
     await this.document.save(problem.src.path);
@@ -84,26 +84,26 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
 
     const judgeService = this.judgeFactory.create(problem);
 
-    for (const tcId of tcOrder) {
-      const tc = problem.getTc(tcId);
+    for (const testcaseId of testcaseOrder) {
+      const testcase = problem.getTestcase(testcaseId);
 
       if (ac.signal.aborted) {
         if (ac.signal.reason === 'onlyOne') bgProblem.ac = ac = new AbortController();
         else {
-          tc.updateResult({ verdict: VerdictName.skipped });
+          testcase.updateResult({ verdict: VerdictName.skipped });
           continue;
         }
       }
 
       const ctx: JudgeContext = {
         problem,
-        ...(await this.tcService.getPaths(tc)),
+        ...(await this.testcaseService.getPaths(testcase)),
         artifacts,
       };
 
       const observer: IJudgeObserver = {
         onStatusChange: (verdict) => {
-          tc.updateResult({ verdict });
+          testcase.updateResult({ verdict });
         },
         onResult: (res: FinalResult) => {
           let isExpand: boolean = false;
@@ -118,14 +118,14 @@ export class RunAllTcs extends BaseProblemUseCase<RunTcsMsg> {
           } else if (expandBehavior === 'firstFailed') {
             isExpand = !hasAnyExpanded && Verdicts[res.verdict].type === VerdictType.failed;
           } else if (expandBehavior === 'same') {
-            isExpand = expandMemo[tcId];
+            isExpand = expandMemo[testcaseId];
           }
           hasAnyExpanded ||= isExpand;
 
-          tc.updateResult({ isExpand, ...res });
+          testcase.updateResult({ isExpand, ...res });
         },
         onError: (e) => {
-          tc.updateResult({ verdict: VerdictName.systemError, msg: e.message });
+          testcase.updateResult({ verdict: VerdictName.systemError, msg: e.message });
         },
       };
 

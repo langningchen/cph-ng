@@ -17,22 +17,27 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
+import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import type { LoadTcsMsg } from '@/webview/src/msgs';
+import type { CompareTestcaseMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class LoadTcs extends BaseProblemUseCase<LoadTcsMsg> {
+export class CompareTestcase extends BaseProblemUseCase<CompareTestcaseMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
+    @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
+    @inject(TOKENS.ui) private readonly ui: IUi,
   ) {
     super(repo);
   }
 
-  protected async performAction({ problem }: BackgroundProblem, _msg: LoadTcsMsg): Promise<void> {
-    await this.problemService.loadTcs(problem);
+  protected async performAction({ id }: BackgroundProblem, msg: CompareTestcaseMsg): Promise<void> {
+    this.ui.compareFiles(
+      this.problemFs.getUri(id, `/testcases/${msg.id}/answer`),
+      this.problemFs.getUri(id, `/testcases/${msg.id}/stdout`),
+    );
   }
 }

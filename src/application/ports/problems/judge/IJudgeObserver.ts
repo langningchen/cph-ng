@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UpdatedResult } from '@/domain/entities/tc';
+import type { UpdatedResult } from '@/domain/entities/testcase';
 import type { VerdictName } from '@/domain/entities/verdict';
 
 export interface IJudgeObserver {

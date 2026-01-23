@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Tc } from '@/domain/entities/tc';
+import type { Testcase } from '@/domain/entities/testcase';
 
 export interface PathsData {
   stdinPath: string;
   answerPath: string;
 }
 
-export interface ITcService {
-  getPaths(io: Tc): Promise<PathsData>;
+export interface ITestcaseService {
+  getPaths(io: Testcase): Promise<PathsData>;
 }

@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TcIo } from '@/domain/entities/tcIo';
+import type { TestcaseIo } from '@/domain/entities/testcaseIo';
 
-export interface ITcIoService {
-  readContent(io: TcIo): Promise<string>;
-  writeContent(io: TcIo, content: string): Promise<TcIo>;
-  ensureFilePath(io: TcIo): Promise<string>;
-  tryInlining(io: TcIo): Promise<TcIo>;
-  dispose(io: TcIo): Promise<void>;
+export interface ITestcaseIoService {
+  readContent(io: TestcaseIo): Promise<string>;
+  writeContent(io: TestcaseIo, content: string): Promise<TestcaseIo>;
+  ensureFilePath(io: TestcaseIo): Promise<string>;
+  tryInlining(io: TestcaseIo): Promise<TestcaseIo>;
+  dispose(io: TestcaseIo): Promise<void>;
 }

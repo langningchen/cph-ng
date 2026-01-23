@@ -44,61 +44,61 @@ export interface EditProblemDetailsMsg extends ProblemBaseMsg {
 export interface DelProblemMsg extends ProblemBaseMsg {
   type: 'delProblem';
 }
-export interface RunTcsMsg extends ProblemBaseMsg {
-  type: 'runTcs';
+export interface RunTestcasesMsg extends ProblemBaseMsg {
+  type: 'runTestcases';
   forceCompile: boolean | null;
 }
-export interface StopTcsMsg extends ProblemBaseMsg {
-  type: 'stopTcs';
+export interface StopTestcasesMsg extends ProblemBaseMsg {
+  type: 'stopTestcases';
   onlyOne: boolean;
 }
-export interface AddTcMsg extends ProblemBaseMsg {
-  type: 'addTc';
+export interface AddTestcaseMsg extends ProblemBaseMsg {
+  type: 'addTestcase';
 }
-export interface LoadTcsMsg extends ProblemBaseMsg {
-  type: 'loadTcs';
+export interface LoadTestcasesMsg extends ProblemBaseMsg {
+  type: 'loadTestcases';
 }
-export interface RunTcMsg extends ProblemBaseMsg {
-  type: 'runTc';
+export interface RunTestcaseMsg extends ProblemBaseMsg {
+  type: 'runTestcase';
   id: UUID;
   forceCompile: boolean | null;
 }
-export interface ClearTcStatusMsg extends ProblemBaseMsg {
-  type: 'clearTcStatus';
+export interface ClearTestcaseStatusMsg extends ProblemBaseMsg {
+  type: 'clearTestcaseStatus';
   id?: UUID;
 }
-export type WebviewTcFileTypes = 'stdin' | 'answer';
-export interface ChooseTcFileMsg extends ProblemBaseMsg {
-  type: 'chooseTcFile';
+export type WebviewTestcaseFileTypes = 'stdin' | 'answer';
+export interface ChooseTestcaseFileMsg extends ProblemBaseMsg {
+  type: 'chooseTestcaseFile';
   id: UUID;
-  label: WebviewTcFileTypes;
+  label: WebviewTestcaseFileTypes;
 }
-export interface SetTcStringMsg extends ProblemBaseMsg {
-  type: 'setTcString';
+export interface SetTestcaseStringMsg extends ProblemBaseMsg {
+  type: 'setTestcaseString';
   id: UUID;
-  label: WebviewTcFileTypes;
+  label: WebviewTestcaseFileTypes;
   data: string;
 }
-export interface UpdateTcMsg extends ProblemBaseMsg {
-  type: 'updateTc';
+export interface UpdateTestcaseMsg extends ProblemBaseMsg {
+  type: 'updateTestcase';
   id: UUID;
   event: 'toggleDisable' | 'toggleExpand' | 'setAsAnswer';
 }
-export interface CompareTcMsg extends ProblemBaseMsg {
-  type: 'compareTc';
+export interface CompareTestcaseMsg extends ProblemBaseMsg {
+  type: 'compareTestcase';
   id: UUID;
 }
-export interface ToggleTcFileMsg extends ProblemBaseMsg {
-  type: 'toggleTcFile';
+export interface ToggleTestcaseFileMsg extends ProblemBaseMsg {
+  type: 'toggleTestcaseFile';
   id: UUID;
-  label: WebviewTcFileTypes;
+  label: WebviewTestcaseFileTypes;
 }
-export interface DelTcMsg extends ProblemBaseMsg {
-  type: 'delTc';
+export interface DelTestcaseMsg extends ProblemBaseMsg {
+  type: 'delTestcase';
   id: UUID;
 }
-export interface ReorderTcMsg extends ProblemBaseMsg {
-  type: 'reorderTc';
+export interface ReorderTestcaseMsg extends ProblemBaseMsg {
+  type: 'reorderTestcase';
   fromIdx: number;
   toIdx: number;
 }
@@ -144,19 +144,19 @@ export interface OpenSettingsMsg extends BaseMsg {
 export type ProblemMsg =
   | EditProblemDetailsMsg
   | DelProblemMsg
-  | RunTcsMsg
-  | StopTcsMsg
-  | AddTcMsg
-  | LoadTcsMsg
-  | RunTcMsg
-  | ClearTcStatusMsg
-  | ChooseTcFileMsg
-  | SetTcStringMsg
-  | UpdateTcMsg
-  | CompareTcMsg
-  | ToggleTcFileMsg
-  | DelTcMsg
-  | ReorderTcMsg
+  | RunTestcasesMsg
+  | StopTestcasesMsg
+  | AddTestcaseMsg
+  | LoadTestcasesMsg
+  | RunTestcaseMsg
+  | ClearTestcaseStatusMsg
+  | ChooseTestcaseFileMsg
+  | SetTestcaseStringMsg
+  | UpdateTestcaseMsg
+  | CompareTestcaseMsg
+  | ToggleTestcaseFileMsg
+  | DelTestcaseMsg
+  | ReorderTestcaseMsg
   | ChooseSrcFileMsg
   | RemoveSrcFileMsg
   | StartStressTestMsg

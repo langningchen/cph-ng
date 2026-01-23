@@ -20,21 +20,21 @@ import Box from '@mui/material/Box';
 import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictName } from '@/domain/entities/verdict';
-import type { IWebviewTc } from '@/domain/webviewTypes';
+import type { IWebviewTestcase } from '@/domain/webviewTypes';
 import { useProblemContext } from '../context/ProblemContext';
 import { AcCongrats } from './acCongrats';
 import { CphFlex } from './base/cphFlex';
 import { ErrorBoundary } from './base/errorBoundary';
-import { NoTcs } from './noTcs';
-import { TcView } from './tcView';
+import { NoTestcases } from './noTestcases';
+import { TestcaseView } from './testcaseView';
 
-interface TcsViewProps {
+interface TestcasesViewProps {
   problemId: UUID;
-  tcOrder: UUID[];
-  tcs: Record<UUID, IWebviewTc>;
+  testcaseOrder: UUID[];
+  testcases: Record<UUID, IWebviewTestcase>;
 }
 
-export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
+export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: TestcasesViewProps) => {
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
@@ -42,7 +42,7 @@ export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
   const [expandedStates, setExpandedStates] = useState<boolean[]>([]);
 
   const handleDragStart = (idx: number, e: React.DragEvent) => {
-    const states = tcOrder.map((id) => tcs[id]?.isExpand || false);
+    const states = testcaseOrder.map((id) => testcases[id]?.isExpand || false);
     setExpandedStates(states);
 
     const dragImage = document.createElement('div');
@@ -64,9 +64,9 @@ export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
 
   const handleDragEnd = () => {
     if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
-      const [movedId] = tcOrder.splice(draggedIdx, 1);
-      tcOrder.splice(dragOverIdx, 0, movedId);
-      dispatch({ type: 'reorderTc', problemId, fromIdx: draggedIdx, toIdx: dragOverIdx });
+      const [movedId] = testcaseOrder.splice(draggedIdx, 1);
+      testcaseOrder.splice(dragOverIdx, 0, movedId);
+      dispatch({ type: 'reorderTestcase', problemId, fromIdx: draggedIdx, toIdx: dragOverIdx });
     }
 
     if (expandedStates.length > 0) {
@@ -75,9 +75,9 @@ export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
         const [movedState] = reorderedStates.splice(draggedIdx, 1);
         reorderedStates.splice(dragOverIdx, 0, movedState);
       }
-      tcOrder.forEach((id, idx) => {
-        const tc = tcs[id];
-        if (tc && idx < reorderedStates.length) tc.isExpand = reorderedStates[idx];
+      testcaseOrder.forEach((id, idx) => {
+        const testcase = testcases[id];
+        if (testcase && idx < reorderedStates.length) testcase.isExpand = reorderedStates[idx];
       });
     }
 
@@ -87,8 +87,8 @@ export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
   };
 
   const getDisplayOrder = () => {
-    if (draggedIdx === null || dragOverIdx === null) return tcOrder.map((_, idx) => idx);
-    const order = tcOrder.map((_, idx) => idx);
+    if (draggedIdx === null || dragOverIdx === null) return testcaseOrder.map((_, idx) => idx);
+    const order = testcaseOrder.map((_, idx) => idx);
     const [removed] = order.splice(draggedIdx, 1);
     order.splice(dragOverIdx, 0, removed);
     return order;
@@ -98,26 +98,31 @@ export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
 
   return (
     <CphFlex column>
-      {tcOrder.length ? (
+      {testcaseOrder.length ? (
         <>
           {partyUri &&
-          tcOrder.every((id) => tcs[id]?.result?.verdict.name === VerdictName.accepted) ? (
+          testcaseOrder.every(
+            (id) => testcases[id]?.result?.verdict.name === VerdictName.accepted,
+          ) ? (
             <AcCongrats />
           ) : null}
           <Box width='100%'>
             {displayOrder.map((originalIdx, displayIdx) => {
-              const tcId = tcOrder[originalIdx];
-              const tc = tcs[tcId];
-              if (!tc || (tc.result?.verdict && hiddenStatuses.includes(tc.result?.verdict.name)))
+              const testcaseId = testcaseOrder[originalIdx];
+              const testcase = testcases[testcaseId];
+              if (
+                !testcase ||
+                (testcase.result?.verdict && hiddenStatuses.includes(testcase.result?.verdict.name))
+              )
                 return null;
 
               return (
-                <Box key={tcId} onDragOver={(e) => handleDragOver(e, displayIdx)}>
+                <Box key={testcaseId} onDragOver={(e) => handleDragOver(e, displayIdx)}>
                   <ErrorBoundary>
-                    <TcView
+                    <TestcaseView
                       problemId={problemId}
-                      tcId={tcId}
-                      tc={tc}
+                      testcaseId={testcaseId}
+                      testcase={testcase}
                       idx={originalIdx}
                       onDragStart={(e) => handleDragStart(originalIdx, e)}
                       onDragEnd={handleDragEnd}
@@ -130,10 +135,10 @@ export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
           </Box>
         </>
       ) : (
-        <NoTcs />
+        <NoTestcases />
       )}
       <Box
-        onClick={() => dispatch({ type: 'addTc', problemId })}
+        onClick={() => dispatch({ type: 'addTestcase', problemId })}
         sx={{
           width: '100%',
           minHeight: '40px',
@@ -149,7 +154,7 @@ export const TcsView = memo(({ problemId, tcOrder, tcs }: TcsViewProps) => {
           transition: 'all 0.2s',
         }}
       >
-        {t('tcsView.addTcHint')}
+        {t('testcasesView.addTestcaseHint')}
       </Box>
     </CphFlex>
   );

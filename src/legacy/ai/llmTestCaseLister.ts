@@ -28,13 +28,13 @@ import {
 import { container } from 'tsyringe';
 import { TOKENS } from '@/composition/tokens';
 
-interface LlmTestCaseListerParams {
+interface LlmTestcaseListerParams {
   activePath: string;
 }
 
-class LlmTestCaseLister implements LanguageModelTool<LlmTestCaseListerParams> {
+class LlmTestcaseLister implements LanguageModelTool<LlmTestcaseListerParams> {
   async prepareInvocation(
-    _options: LanguageModelToolInvocationPrepareOptions<LlmTestCaseListerParams>,
+    _options: LanguageModelToolInvocationPrepareOptions<LlmTestcaseListerParams>,
     _token: CancellationToken,
   ): Promise<PreparedToolInvocation> {
     return {
@@ -49,7 +49,7 @@ class LlmTestCaseLister implements LanguageModelTool<LlmTestCaseListerParams> {
   }
 
   async invoke(
-    options: LanguageModelToolInvocationOptions<LlmTestCaseListerParams>,
+    options: LanguageModelToolInvocationOptions<LlmTestcaseListerParams>,
     _token: CancellationToken,
   ): Promise<LanguageModelToolResult> {
     const result = new LanguageModelToolResult([]);
@@ -68,7 +68,7 @@ class LlmTestCaseLister implements LanguageModelTool<LlmTestCaseListerParams> {
     }
 
     const problem = bgProblem.problem;
-    if (problem.tcOrder.length === 0) {
+    if (problem.testcaseOrder.length === 0) {
       result.content.push(
         new LanguageModelTextPart(
           l10n.t('No test cases are currently defined for this problem.'),
@@ -80,21 +80,21 @@ class LlmTestCaseLister implements LanguageModelTool<LlmTestCaseListerParams> {
     const lines: string[] = [];
     lines.push(
       l10n.t('Total test cases: {count}', {
-        count: problem.tcOrder.length,
+        count: problem.testcaseOrder.length,
       }),
     );
     lines.push('');
-    problem.tcOrder.forEach((tcId) => {
-      const tc = problem.tcs[tcId];
-      const verdict = tc.result?.verdict;
+    problem.testcaseOrder.forEach((testcaseId) => {
+      const testcase = problem.testcases[testcaseId];
+      const verdict = testcase.result?.verdict;
       lines.push(
         l10n.t('- {id} - Verdict: {verdict}, Time: {time}, Memory: {memory}', {
-          id: tcId,
+          id: testcaseId,
           verdict: verdict
             ? `${verdict.name} (${verdict.fullName})`
             : l10n.t('Not run yet'),
-          time: tc.result ? `${tc.result.time}ms` : 'N/A',
-          memory: tc.result ? `${tc.result.memory}KB` : 'N/A',
+          time: testcase.result ? `${testcase.result.time}ms` : 'N/A',
+          memory: testcase.result ? `${testcase.result.memory}KB` : 'N/A',
         }),
       );
     });
@@ -104,4 +104,4 @@ class LlmTestCaseLister implements LanguageModelTool<LlmTestCaseListerParams> {
   }
 }
 
-export default LlmTestCaseLister;
+export default LlmTestcaseLister;

@@ -35,7 +35,7 @@ interface CphTestRunnerParams {
   id?: UUID;
 }
 
-class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
+class LlmTestcaseRunner implements LanguageModelTool<CphTestRunnerParams> {
   async prepareInvocation(
     options: LanguageModelToolInvocationPrepareOptions<CphTestRunnerParams>,
     _token: CancellationToken,
@@ -93,7 +93,7 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
         );
         return result;
       }
-      if (!problem.tcs[id]) {
+      if (!problem.testcases[id]) {
         result.content.push(
           new LanguageModelTextPart(
             l10n.t('Error: Test case {id} not found in the current problem.', {
@@ -107,23 +107,23 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
 
     try {
       token.onCancellationRequested(async () => {
-        await problemsManager.stopTcs({
-          type: 'stopTcs',
+        await problemsManager.stopTestcases({
+          type: 'stopTestcases',
           activePath,
           onlyOne: false,
         });
       });
 
       if (id !== undefined) {
-        await problemsManager.runTc({
-          type: 'runTc',
+        await problemsManager.runTestcase({
+          type: 'runTestcase',
           activePath,
           id,
           forceCompile: null,
         });
       } else {
-        await problemsManager.runTcs({
-          type: 'runTcs',
+        await problemsManager.runTestcases({
+          type: 'runTestcases',
           activePath,
           forceCompile: null,
         });
@@ -150,12 +150,12 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
     }
 
     const refreshedProblem = refreshedBg.problem;
-    const tcIds = id !== undefined ? [id] : refreshedProblem.tcOrder;
-    const tcs = tcIds
-      .map((tcId) => refreshedProblem.tcs[tcId])
-      .filter((tc) => tc !== undefined);
+    const testcaseIds = id !== undefined ? [id] : refreshedProblem.testcaseOrder;
+    const testcases = testcaseIds
+      .map((testcaseId) => refreshedProblem.testcases[testcaseId])
+      .filter((testcase) => testcase !== undefined);
 
-    if (tcs.length === 0) {
+    if (testcases.length === 0) {
       result.content.push(
         new LanguageModelTextPart(
           l10n.t('No test cases are available to display.'),
@@ -164,7 +164,7 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
       return result;
     }
 
-    const firstResult = tcs[0]?.result;
+    const firstResult = testcases[0]?.result;
     const outputParts: string[] = [];
 
     if (firstResult?.verdict.name === 'CE') {
@@ -186,8 +186,8 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
         string,
         { count: number; fullName: string }
       >();
-      for (const tc of tcs) {
-        const res = tc.result;
+      for (const testcase of testcases) {
+        const res = testcase.result;
         if (!res) {
           continue;
         }
@@ -213,12 +213,12 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
       }
       outputParts.push('');
 
-      tcs.forEach((tc, testCaseIndex) => {
-        const tcId = tcIds[testCaseIndex];
-        const testResult = tc.result;
+      testcases.forEach((testcase, testcaseIndex) => {
+        const testcaseId = testcaseIds[testcaseIndex];
+        const testResult = testcase.result;
         outputParts.push(
           l10n.t('--- Test Case {id} ---', {
-            id: tcId,
+            id: testcaseId,
           }),
         );
         if (!testResult) {
@@ -262,4 +262,4 @@ class LlmTcRunner implements LanguageModelTool<CphTestRunnerParams> {
   }
 }
 
-export default LlmTcRunner;
+export default LlmTestcaseRunner;

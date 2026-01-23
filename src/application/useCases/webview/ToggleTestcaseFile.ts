@@ -25,17 +25,17 @@ import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import { TcIo } from '@/domain/entities/tcIo';
-import type { TcIoService } from '@/infrastructure/problems/tcIoService';
-import type { ToggleTcFileMsg, WebviewTcFileTypes } from '@/webview/src/msgs';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import type { TestcaseIoService } from '@/infrastructure/problems/testcaseIoService';
+import type { ToggleTestcaseFileMsg, WebviewTestcaseFileTypes } from '@/webview/src/msgs';
 
 @injectable()
-export class ToggleTcFile extends BaseProblemUseCase<ToggleTcFileMsg> {
+export class ToggleTestcaseFile extends BaseProblemUseCase<ToggleTestcaseFileMsg> {
   public constructor(
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.tcIoService) protected readonly tcIoService: TcIoService,
+    @inject(TOKENS.testcaseIoService) protected readonly testcaseIoService: TestcaseIoService,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
@@ -45,17 +45,17 @@ export class ToggleTcFile extends BaseProblemUseCase<ToggleTcFileMsg> {
 
   protected async performAction(
     { problem }: BackgroundProblem,
-    msg: ToggleTcFileMsg,
+    msg: ToggleTestcaseFileMsg,
   ): Promise<void> {
-    const tc = problem.getTc(msg.id);
-    const fileIo = tc[msg.label];
+    const testcase = problem.getTestcase(msg.id);
+    const fileIo = testcase[msg.label];
     await fileIo.match(
       async (path) => {
         const stat = await this.fs.stat(path);
         if (stat.size > this.settings.problem.maxInlineDataLength)
           throw new Error('File too large to inline');
         const data = await this.fs.readFile(path);
-        tc[msg.label] = new TcIo({ data });
+        testcase[msg.label] = new TestcaseIo({ data });
       },
       async (data) => {
         const ext = this.getDefaultExt(msg.label);
@@ -69,12 +69,12 @@ export class ToggleTcFile extends BaseProblemUseCase<ToggleTcFileMsg> {
         });
         if (!path) return;
         await this.fs.safeWriteFile(path, data);
-        tc[msg.label] = new TcIo({ path });
+        testcase[msg.label] = new TestcaseIo({ path });
       },
     );
   }
 
-  private getDefaultExt(label: WebviewTcFileTypes): string {
+  private getDefaultExt(label: WebviewTestcaseFileTypes): string {
     const exts =
       label === 'stdin'
         ? this.settings.problem.inputFileExtensionList

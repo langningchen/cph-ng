@@ -20,7 +20,7 @@ import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
+import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
 import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
@@ -32,8 +32,8 @@ import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUs
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { StressTestState } from '@/domain/entities/stressTest';
-import { Tc } from '@/domain/entities/tc';
-import { TcIo } from '@/domain/entities/tcIo';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import { VerdictName } from '@/domain/entities/verdict';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import type { StartStressTestMsg } from '@/webview/src/msgs';
@@ -49,7 +49,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
     @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
     @inject(TOKENS.ui) private readonly ui: IUi,
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
-    @inject(TOKENS.tcIoService) private readonly tcIoService: ITcIoService,
+    @inject(TOKENS.testcaseIoService) private readonly testcaseIoService: ITestcaseIoService,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
   ) {
     super(repo);
@@ -129,18 +129,18 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
           if (res.verdict === VerdictName.rejected) stressTest.state = StressTestState.inactive;
           else {
             stressTest.state = StressTestState.foundDifference;
-            const newTc = new Tc(
-              await this.tcIoService.tryInlining(new TcIo({ path: genRes.stdoutPath })),
-              await this.tcIoService.tryInlining(new TcIo({ path: bfRes.stdoutPath })),
+            const newTestcase = new Testcase(
+              await this.testcaseIoService.tryInlining(new TestcaseIo({ path: genRes.stdoutPath })),
+              await this.testcaseIoService.tryInlining(new TestcaseIo({ path: bfRes.stdoutPath })),
               true,
             );
-            newTc.updateResult({
+            newTestcase.updateResult({
               verdict: res.verdict,
               timeMs: res.timeMs,
               memoryMb: res.memoryMb,
               msg: res.msg,
             });
-            problem.addTc(this.crypto.randomUUID(), newTc);
+            problem.addTestcase(this.crypto.randomUUID(), newTestcase);
           }
         },
         onError: (e) => {

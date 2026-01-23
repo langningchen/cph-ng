@@ -37,17 +37,17 @@ export class ProblemMigrationService implements IProblemMigrationService {
   }
 
   private readonly migrateFunctions: Record<string, (oldProblem: any) => any> = {
-    '0.6.0': (_: History.Problem_0_6_0): null => null,
-    '0.4.8': (problem: History.Problem_0_4_8): History.Problem_0_6_0 => {
-      const tcs: History.Problem_0_6_0['tcs'] = {};
+    '0.6.0': (_: History.IProblem_0_6_0): null => null,
+    '0.4.8': (problem: History.IProblem_0_4_8): History.IProblem_0_6_0 => {
+      const testcases: History.IProblem_0_6_0['testcases'] = {};
       for (const id of problem.tcOrder) {
         const tc = problem.tcs[id];
-        const migrateTcIo = (tcIo: History.TcIo_0_4_8): History.TcIo_0_6_0 => {
+        const migrateTcIo = (tcIo: History.ITestcaseIo_0_4_8): History.ITestcaseIo_0_6_0 => {
           if (tcIo.useFile) return { path: tcIo.data };
           return { data: tcIo.data };
         };
         if (tc)
-          tcs[id] = {
+          testcases[id] = {
             stdin: migrateTcIo(tc.stdin),
             answer: migrateTcIo(tc.answer),
             isExpand: tc.isExpand,
@@ -69,8 +69,8 @@ export class ProblemMigrationService implements IProblemMigrationService {
         version: '0.6.0',
         name: problem.name,
         url: problem.url,
-        tcs,
-        tcOrder: problem.tcOrder,
+        testcases,
+        testcaseOrder: problem.tcOrder,
         src: problem.src,
         checker: problem.checker || null,
         interactor: problem.interactor || null,
@@ -91,7 +91,7 @@ export class ProblemMigrationService implements IProblemMigrationService {
         },
       };
     },
-    '0.4.3': (problem: History.Problem_0_4_3): History.Problem_0_4_8 => {
+    '0.4.3': (problem: History.IProblem_0_4_3): History.IProblem_0_4_8 => {
       return {
         ...problem,
         tcs: Object.fromEntries(
@@ -124,7 +124,7 @@ export class ProblemMigrationService implements IProblemMigrationService {
         version: '0.4.8',
       };
     },
-    '0.3.7': (problem: History.Problem_0_3_7): History.Problem_0_4_3 =>
+    '0.3.7': (problem: History.IProblem_0_3_7): History.IProblem_0_4_3 =>
       ({
         ...problem,
         version: '0.4.3',
@@ -134,9 +134,9 @@ export class ProblemMigrationService implements IProblemMigrationService {
             { ...tc, isDisabled: false },
           ]),
         ),
-      }) satisfies History.Problem_0_4_3,
-    '0.2.4': (problem: History.Problem_0_2_4): History.Problem_0_3_7 => {
-      const newProblem: History.Problem_0_3_7 = {
+      }) satisfies History.IProblem_0_4_3,
+    '0.2.4': (problem: History.IProblem_0_2_4): History.IProblem_0_3_7 => {
+      const newProblem: History.IProblem_0_3_7 = {
         ...problem,
         version: '0.3.7',
         tcs: {},
@@ -149,29 +149,29 @@ export class ProblemMigrationService implements IProblemMigrationService {
       }
       return newProblem;
     },
-    '0.2.3': (problem: History.Problem_0_2_3): History.Problem_0_2_4 =>
+    '0.2.3': (problem: History.IProblem_0_2_3): History.IProblem_0_2_4 =>
       ({
         ...problem,
         version: '0.2.4',
-      }) satisfies History.Problem_0_2_4,
-    '0.2.1': (problem: History.Problem_0_2_1): History.Problem_0_2_3 =>
+      }) satisfies History.IProblem_0_2_4,
+    '0.2.1': (problem: History.IProblem_0_2_1): History.IProblem_0_2_3 =>
       ({
         ...problem,
         version: '0.2.3',
-      }) satisfies History.Problem_0_2_3,
-    '0.1.1': (problem: History.Problem_0_1_1): History.Problem_0_2_1 =>
+      }) satisfies History.IProblem_0_2_3,
+    '0.1.1': (problem: History.IProblem_0_1_1): History.IProblem_0_2_1 =>
       ({
         ...problem,
         memoryLimit: 1024,
         timeElapsed: 0,
         version: '0.2.1',
-      }) satisfies History.Problem_0_2_1,
-    '0.1.0': (problem: History.Problem_0_1_0): History.Problem_0_1_1 =>
+      }) satisfies History.IProblem_0_2_1,
+    '0.1.0': (problem: History.IProblem_0_1_0): History.IProblem_0_1_1 =>
       ({
         ...problem,
         version: '0.1.1',
-      }) satisfies History.Problem_0_1_1,
-    '0.0.5': (problem: History.Problem_0_0_5): History.Problem_0_1_0 =>
+      }) satisfies History.IProblem_0_1_1,
+    '0.0.5': (problem: History.IProblem_0_0_5): History.IProblem_0_1_0 =>
       ({
         ...problem,
         src: {
@@ -185,8 +185,8 @@ export class ProblemMigrationService implements IProblemMigrationService {
                 hash: problem.checkerHash,
               }
             : undefined,
-      }) satisfies History.Problem_0_1_0,
-    '0.0.4': (problem: History.Problem_0_0_4): History.Problem_0_0_5 =>
+      }) satisfies History.IProblem_0_1_0,
+    '0.0.4': (problem: History.IProblem_0_0_4): History.IProblem_0_0_5 =>
       ({
         ...problem,
         tcs: problem.testCases.map((tc: any) => ({
@@ -201,8 +201,8 @@ export class ProblemMigrationService implements IProblemMigrationService {
               }
             : undefined,
         })),
-      }) satisfies History.Problem_0_0_5,
-    '0.0.3': (problem: History.Problem_0_0_3): History.Problem_0_0_4 =>
+      }) satisfies History.IProblem_0_0_5,
+    '0.0.3': (problem: History.IProblem_0_0_3): History.IProblem_0_0_4 =>
       ({
         ...problem,
         testCases: problem.testCases.map((tc: any) => ({
@@ -227,9 +227,9 @@ export class ProblemMigrationService implements IProblemMigrationService {
               : undefined,
           isExpand: tc.isExpand,
         })),
-      }) satisfies History.Problem_0_0_4,
-    '0.0.1': (problem: History.Problem_0_0_1): History.Problem_0_0_3 =>
-      problem satisfies History.Problem_0_0_3,
+      }) satisfies History.IProblem_0_0_4,
+    '0.0.1': (problem: History.IProblem_0_0_1): History.IProblem_0_0_3 =>
+      problem satisfies History.IProblem_0_0_3,
   };
 
   public migrate(problem: any): any {

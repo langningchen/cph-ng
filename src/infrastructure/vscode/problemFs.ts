@@ -31,12 +31,12 @@ import {
 } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
+import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import { TOKENS } from '@/composition/tokens';
-import type { TcIo } from '@/domain/entities/tcIo';
+import type { TestcaseIo } from '@/domain/entities/testcaseIo';
 import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 
 type CphFsFile = {
@@ -58,7 +58,7 @@ export class ProblemFs implements IProblemFs {
     @inject(ProblemMapper) private readonly mapper: ProblemMapper,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
-    @inject(TOKENS.tcIoService) private readonly tcIoService: ITcIoService,
+    @inject(TOKENS.testcaseIoService) private readonly testcaseIoService: ITestcaseIoService,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.activeProblemCoordinator)
     private readonly coordinator: IActiveProblemCoordinator,
@@ -75,7 +75,7 @@ export class ProblemFs implements IProblemFs {
     if (!fullProblem) throw FileSystemError.FileNotFound();
     const problem = fullProblem.problem;
     const pathParts = uri.path.split('/').filter((p) => p.length > 0);
-    const tcIds = problem.getEnabledTcIds();
+    const testcaseIds = problem.getEnabledTestcaseIds();
     const root: CphFsDir = [
       [
         'problem.cph-ng.json',
@@ -89,37 +89,42 @@ export class ProblemFs implements IProblemFs {
         },
       ],
       [
-        'tcs',
-        tcIds.map((tcId) => {
-          const tc = problem.getTc(tcId);
-          const tcIoToStringOrUri = (io: TcIo): string | Uri => {
+        'testcases',
+        testcaseIds.map((testcaseId) => {
+          const testcase = problem.getTestcase(testcaseId);
+          const testcaseIoToStringOrUri = (io: TestcaseIo): string | Uri => {
             if (io.data !== undefined) return io.data;
             if (io.path !== undefined) return Uri.file(io.path);
-            throw new Error('TcIo has neither data nor path');
+            throw new Error('TestcaseIo has neither data nor path');
           };
           const items: CphFsDir = [
             [
               'stdin',
               {
-                data: tcIoToStringOrUri(tc.stdin),
+                data: testcaseIoToStringOrUri(testcase.stdin),
                 set: async (data: string) => {
-                  tc.stdin = await this.tcIoService.writeContent(tc.stdin, data);
+                  testcase.stdin = await this.testcaseIoService.writeContent(testcase.stdin, data);
                 },
               },
             ],
             [
               'answer',
               {
-                data: tcIoToStringOrUri(tc.answer),
+                data: testcaseIoToStringOrUri(testcase.answer),
                 set: async (data: string) => {
-                  tc.answer = await this.tcIoService.writeContent(tc.answer, data);
+                  testcase.answer = await this.testcaseIoService.writeContent(
+                    testcase.answer,
+                    data,
+                  );
                 },
               },
             ],
           ];
-          if (tc.stdout) items.push(['stdout', { data: tcIoToStringOrUri(tc.stdout) }]);
-          if (tc.stderr) items.push(['stderr', { data: tcIoToStringOrUri(tc.stderr) }]);
-          return [tcId, items];
+          if (testcase.stdout)
+            items.push(['stdout', { data: testcaseIoToStringOrUri(testcase.stdout) }]);
+          if (testcase.stderr)
+            items.push(['stderr', { data: testcaseIoToStringOrUri(testcase.stderr) }]);
+          return [testcaseId, items];
         }),
       ],
     ];
@@ -136,18 +141,18 @@ export class ProblemFs implements IProblemFs {
   public async fireAuthorityChange(authority: UUID): Promise<void> {
     const fullProblem = await this.repo.get(authority);
     if (!fullProblem) return;
-    const tcIds = fullProblem.problem.getEnabledTcIds();
+    const testcaseIds = fullProblem.problem.getEnabledTestcaseIds();
     const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority, path: '/' });
 
     const files: Uri[] = [];
     files.push(baseUri);
     files.push(Uri.joinPath(baseUri, 'problem.cph-ng.json'));
-    for (const tcId of tcIds) {
-      const tc = fullProblem.problem.getTc(tcId);
-      files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'stdin'));
-      files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'answer'));
-      if (tc.stdout) files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'stdout'));
-      if (tc.stderr) files.push(Uri.joinPath(baseUri, 'tcs', tcId, 'stderr'));
+    for (const testcaseId of testcaseIds) {
+      const testcase = fullProblem.problem.getTestcase(testcaseId);
+      files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'stdin'));
+      files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'answer'));
+      if (testcase.stdout) files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'stdout'));
+      if (testcase.stderr) files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'stderr'));
     }
     this.changeEmitter.fire(files.map((uri) => ({ type: FileChangeType.Changed, uri })));
   }

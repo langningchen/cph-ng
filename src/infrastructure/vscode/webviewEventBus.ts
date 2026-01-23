@@ -30,8 +30,8 @@ import type {
   IWebviewBackgroundProblem,
   IWebviewProblem,
   IWebviewStressTest,
-  IWebviewTc,
-  IWebviewTcResult,
+  IWebviewTestcase,
+  IWebviewTestcaseResult,
 } from '@/domain/webviewTypes';
 
 type WebviewEvents = {
@@ -74,38 +74,46 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
       payload,
     });
   }
-  public addTc(problemId: UUID, tcId: UUID, payload: IWebviewTc): void {
-    this.logger.debug('Emitting addTc event', { problemId, tcId, payload });
+  public addTestcase(problemId: UUID, testcaseId: UUID, payload: IWebviewTestcase): void {
+    this.logger.debug('Emitting addTestcase event', { problemId, testcaseId, payload });
     this.emitter.emit('message', {
-      type: 'ADD_TC',
+      type: 'ADD_TESTCASE',
       problemId,
-      tcId,
+      testcaseId,
       payload,
     });
   }
-  public deleteTc(problemId: UUID, tcId: UUID): void {
-    this.logger.debug('Emitting deleteTc event', { problemId, tcId });
+  public deleteTestcase(problemId: UUID, testcaseId: UUID): void {
+    this.logger.debug('Emitting deleteTestcase event', { problemId, testcaseId });
     this.emitter.emit('message', {
-      type: 'DELETE_TC',
+      type: 'DELETE_TESTCASE',
       problemId,
-      tcId,
+      testcaseId,
     });
   }
-  public patchTc(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTc>): void {
-    this.logger.debug('Emitting patchTc event', { problemId, tcId, payload });
+  public patchTestcase(
+    problemId: UUID,
+    testcaseId: UUID,
+    payload: Partial<IWebviewTestcase>,
+  ): void {
+    this.logger.debug('Emitting patchTestcase event', { problemId, testcaseId, payload });
     this.emitter.emit('message', {
       type: 'PATCH_TC',
       problemId,
-      tcId,
+      testcaseId,
       payload,
     });
   }
-  public patchTcResult(problemId: UUID, tcId: UUID, payload: Partial<IWebviewTcResult>): void {
-    this.logger.debug('Emitting patchTcResult event', { problemId, tcId, payload });
+  public patchTestcaseResult(
+    problemId: UUID,
+    testcaseId: UUID,
+    payload: Partial<IWebviewTestcaseResult>,
+  ): void {
+    this.logger.debug('Emitting patchTestcaseResult event', { problemId, testcaseId, payload });
     this.emitter.emit('message', {
       type: 'PATCH_TC_RESULT',
       problemId,
-      tcId,
+      testcaseId,
       payload,
     });
   }

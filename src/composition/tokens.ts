@@ -30,8 +30,8 @@ import type { ICphMigrationService } from '@/application/ports/problems/ICphMigr
 import type { IProblemMigrationService } from '@/application/ports/problems/IProblemMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
-import type { ITcIoService } from '@/application/ports/problems/ITcIoService';
-import type { ITcService } from '@/application/ports/problems/ITcService';
+import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
+import type { ITestcaseService } from '@/application/ports/problems/ITestcaseService';
 import type { ICheckerRunner } from '@/application/ports/problems/judge/ICheckerRunner';
 import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
@@ -96,8 +96,8 @@ export const TOKENS = {
   settings: 'ports.Settings' as InjectionToken<ISettings>,
   solutionRunner: 'ports.SolutionRunner' as InjectionToken<ISolutionRunner>,
   system: 'ports.System' as InjectionToken<ISystem>,
-  tcIoService: 'ports.TcIoService' as InjectionToken<ITcIoService>,
-  tcService: 'ports.TcService' as InjectionToken<ITcService>,
+  testcaseIoService: 'ports.TestcaseIoService' as InjectionToken<ITestcaseIoService>,
+  testcaseService: 'ports.TestcaseService' as InjectionToken<ITestcaseService>,
   telemetry: 'ports.Telemetry' as InjectionToken<ITelemetry>,
   tempStorage: 'ports.TempStorage' as InjectionToken<ITempStorage>,
   translator: 'ports.Translator' as InjectionToken<ITranslator>,
