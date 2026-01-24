@@ -19,6 +19,7 @@ import type { UUID } from 'node:crypto';
 import { inject, injectable } from 'tsyringe';
 import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { IExtensionContext } from '@/application/ports/vscode/IExtensionContext';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
@@ -35,11 +36,12 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
   private lastAccessMap: Map<UUID, number> = new Map();
 
   public constructor(
+    @inject(TOKENS.cphMigrationService) private readonly cph: ICphMigrationService,
+    @inject(TOKENS.extensionContext) private readonly context: IExtensionContext,
+    @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
-    @inject(TOKENS.extensionContext) private readonly context: IExtensionContext,
-    @inject(TOKENS.logger) private readonly logger: ILogger,
-    @inject(TOKENS.cphMigrationService) private readonly cph: ICphMigrationService,
     @inject(WebviewProblemMapper) private readonly mapper: WebviewProblemMapper,
   ) {
     setInterval(async () => {
@@ -76,10 +78,13 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       (await this.repo.getIdByPath(filePath)) || (await this.repo.loadByPath(filePath));
     this.logger.trace('Active editor changed', { filePath, problemId });
     if (!problemId) {
-      this.context.hasProblem = false;
-      const canImport = await this.cph.canMigrate(filePath);
-      this.context.canImport = canImport;
-      this.eventBus.noProblem(canImport);
+      if (this.lang.getLang(filePath)) {
+        this.context.hasProblem = false;
+        this.activeProblemId = null;
+        const canImport = await this.cph.canMigrate(filePath);
+        this.context.canImport = canImport;
+        this.eventBus.noProblem(canImport);
+      }
       return;
     }
     this.context.hasProblem = true;
