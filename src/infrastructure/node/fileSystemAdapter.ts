@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { RmOptions } from 'node:fs';
+import { mkdirSync, type RmOptions, writeFileSync } from 'node:fs';
 import { access, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
@@ -37,6 +37,11 @@ export class FileSystemAdapter implements IFileSystem {
   public async safeWriteFile(path: string, data: string | Uint8Array): Promise<void> {
     await mkdir(this.path.dirname(path), { recursive: true });
     await writeFile(path, data);
+  }
+
+  public safeCreateFile(path: string): void {
+    mkdirSync(this.path.dirname(path), { recursive: true });
+    writeFileSync(path, '');
   }
 
   public async exists(path: string): Promise<boolean> {

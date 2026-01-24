@@ -68,15 +68,15 @@ export class CommandModule implements IExtensionModule {
       'cph-ng.importFromCph': () => this.handleBatchImport(),
       'cph-ng.createProblem': async () => {
         this.ui.showSidebar();
-        this.createProblem.exec({ type: 'createProblem' });
+        await this.createProblem.exec({ type: 'createProblem' });
       },
       'cph-ng.importProblem': async () => {
         this.ui.showSidebar();
-        this.importProblem.exec({ type: 'importProblem' });
+        await this.importProblem.exec({ type: 'importProblem' });
       },
       'cph-ng.runTestcases': async () => {
         this.ui.showSidebar();
-        this.runAllTestcases.exec({
+        await this.runAllTestcases.exec({
           type: 'runTestcases',
           problemId: await this.getProblemId(),
           forceCompile: null,
@@ -84,7 +84,7 @@ export class CommandModule implements IExtensionModule {
       },
       'cph-ng.stopTestcases': async () => {
         this.ui.showSidebar();
-        this.stopTestcases.exec({
+        await this.stopTestcases.exec({
           type: 'stopTestcases',
           problemId: await this.getProblemId(),
           onlyOne: false,

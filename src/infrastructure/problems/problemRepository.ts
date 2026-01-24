@@ -51,7 +51,7 @@ export class ProblemRepository implements IProblemRepository {
     this.eventBus.background(backgroundProblems);
   }
 
-  public async loadByPath(srcPath: string, allowCreate = true): Promise<UUID | null> {
+  public async loadByPath(srcPath: string, allowCreate: boolean = false): Promise<UUID | null> {
     let problem = await this.problemService.loadBySrc(srcPath);
     if (!problem) {
       if (!allowCreate) {

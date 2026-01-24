@@ -35,6 +35,7 @@ export class CreateProblem {
     const activePath = this.activePath.getActivePath();
     if (!activePath) throw new Error('Active path is required');
     await this.repo.loadByPath(activePath, true);
+    await this.coordinator.onActiveEditorChanged(activePath);
     await this.coordinator.dispatchFullData();
   }
 }

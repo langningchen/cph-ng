@@ -26,7 +26,6 @@ import React, {
   useReducer,
 } from 'react';
 import type { WebviewEvent } from '@/application/ports/vscode/IWebviewEventBus';
-import { VerdictName, Verdicts } from '@/domain/entities/verdict';
 import type { IWebviewBackgroundProblem, IWebviewProblem } from '@/domain/webviewTypes';
 import type { WebviewMsg } from '../msgs';
 

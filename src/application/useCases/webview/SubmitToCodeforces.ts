@@ -35,6 +35,6 @@ export class SubmitToCodeforces extends BaseProblemUseCase<SubmitToCodeforcesMsg
     { problem }: BackgroundProblem,
     _msg: SubmitToCodeforcesMsg,
   ): Promise<void> {
-    Companion.submit(problem);
+    await Companion.submit(problem);
   }
 }

@@ -20,8 +20,8 @@ import { inject, injectable } from 'tsyringe';
 import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
-import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IExtensionContext } from '@/application/ports/vscode/IExtensionContext';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@/composition/tokens';
 import type { ProblemMetaPayload } from '@/domain/entities/problem';
@@ -38,8 +38,8 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
     @inject(TOKENS.extensionContext) private readonly context: IExtensionContext,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.cphMigrationService) private readonly cph: ICphMigrationService,
-    @inject(TOKENS.activePathService) private readonly activePathService: IActivePathService,
     @inject(WebviewProblemMapper) private readonly mapper: WebviewProblemMapper,
   ) {
     setInterval(async () => {
@@ -49,8 +49,10 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
           now - lastAccess > 60 * 1000 &&
           id !== this.activeProblemId &&
           (await this.repo.persist(id))
-        )
+        ) {
+          this.logger.trace('Persisted inactive problem', { id });
           this.lastAccessMap.delete(id);
+        }
     }, 1000);
   }
 
@@ -58,16 +60,21 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     if (this.activeProblemId) {
       const bgProblem = await this.repo.get(this.activeProblemId);
       if (bgProblem) {
+        this.logger.trace('Dispatching full data for active problem', { id: this.activeProblemId });
         this.eventBus.fullProblem(this.activeProblemId, this.mapper.toDto(bgProblem.problem));
         return;
       }
+      this.logger.warn('Active problem not found in repository');
     }
-    this.eventBus.noProblem(this.context.canImport);
+    const canImport = this.context.canImport;
+    this.logger.trace('No active problem to dispatch', { canImport });
+    this.eventBus.noProblem(canImport);
   }
   public async onActiveEditorChanged(filePath: string | undefined) {
     if (!filePath) return;
     const problemId =
       (await this.repo.getIdByPath(filePath)) || (await this.repo.loadByPath(filePath));
+    this.logger.trace('Active editor changed', { filePath, problemId });
     if (!problemId) {
       this.context.hasProblem = false;
       const canImport = await this.cph.canMigrate(filePath);
@@ -120,12 +127,18 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
           problem.signals.off('patchTestcase', onPatchTestcase);
           problem.signals.off('patchTestcaseResult', onPatchTestcaseResult);
           await this.repo.persist(this.activeProblemId);
-        }
+        } else
+          this.logger.warn('Previous active problem not found in repository', {
+            problemId: this.activeProblemId,
+          });
       }
       this.activeProblemId = problemId;
       this.lastAccessMap.set(problemId, Date.now());
       const bgProblem = await this.repo.get(problemId);
-      if (!bgProblem) return;
+      if (!bgProblem) {
+        this.logger.error('Active problem not found in repository after loading', { problemId });
+        return;
+      }
       this.eventBus.fullProblem(problemId, this.mapper.toDto(bgProblem.problem));
       bgProblem.problem.signals.on('patchMeta', onPatchMeta);
       bgProblem.problem.signals.on('patchStressTest', onPatchStressTest);

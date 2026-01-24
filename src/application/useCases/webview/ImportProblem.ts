@@ -42,6 +42,7 @@ export class ImportProblem {
     if (!problem) throw new Error('No migratable problem found at the specified path');
     await this.problemService.save(problem);
     await this.repo.loadByPath(activePath);
+    await this.coordinator.onActiveEditorChanged(this.activePath.getActivePath());
     await this.coordinator.dispatchFullData();
   }
 }

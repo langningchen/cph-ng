@@ -10,16 +10,15 @@
     ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ],
       "@t/*": [
-        "tests/*"
+        "./tests/*"
       ],
       "@w/*": [
-        "src/webview/src/*"
+        "./src/webview/src/*"
       ]
     },
     "sourceMap": true,

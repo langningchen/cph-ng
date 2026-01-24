@@ -81,7 +81,7 @@ export class TestcaseScanner {
   public async fromZip(srcPath: string, zipPath: string): Promise<Testcase[]> {
     const folderPath = this.resolver.renderUnzipFolder(srcPath, zipPath);
     if (folderPath === null) return [];
-    this.archive.unzip(zipPath, folderPath);
+    await this.archive.unzip(zipPath, folderPath);
     if (this.settings.problem.deleteAfterUnzip) await this.fs.rm(zipPath);
     return await this.fromFolder(folderPath);
   }

@@ -66,7 +66,7 @@ export class TempStorageAdapter implements ITempStorage {
         this.resolver.renderPath(this.settings.cache.directory),
         this.crypto.randomUUID(),
       );
-      this.fs.safeWriteFile(path, '');
+      this.fs.safeCreateFile(path);
       this.logger.trace('Creating new cached path', path);
     }
     this.usedPool.set(path, description);

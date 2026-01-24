@@ -44,6 +44,13 @@ export interface IFileSystem {
    */
   safeWriteFile(path: string, data: string | Uint8Array): Promise<void>;
 
+  /**
+   * Creates an empty file.
+   * @remarks If the directories in the path do not exist, they will be created recursively.
+   * @throws {@link Error} If the file cannot be created.
+   */
+  safeCreateFile(path: string): void;
+
   /** Checks if a file or directory exists. */
   exists(path: string): Promise<boolean>;
 
