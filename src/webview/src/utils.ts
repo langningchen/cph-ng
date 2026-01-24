@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export const delProps = (obj: object, props: string[]) => {
+export const deleteProps = (obj: object, props: string[]) => {
   return Object.fromEntries(Object.entries(obj).filter(([key]) => !props.includes(key)));
 };
 

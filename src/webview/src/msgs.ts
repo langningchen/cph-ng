@@ -41,8 +41,8 @@ export interface EditProblemDetailsMsg extends ProblemBaseMsg {
   url?: string;
   overrides: IOverrides;
 }
-export interface DelProblemMsg extends ProblemBaseMsg {
-  type: 'delProblem';
+export interface DeleteProblemMsg extends ProblemBaseMsg {
+  type: 'deleteProblem';
 }
 export interface RunTestcasesMsg extends ProblemBaseMsg {
   type: 'runTestcases';
@@ -93,8 +93,8 @@ export interface ToggleTestcaseFileMsg extends ProblemBaseMsg {
   id: UUID;
   label: WebviewTestcaseFileTypes;
 }
-export interface DelTestcaseMsg extends ProblemBaseMsg {
-  type: 'delTestcase';
+export interface DeleteTestcaseMsg extends ProblemBaseMsg {
+  type: 'deleteTestcase';
   id: UUID;
 }
 export interface ReorderTestcaseMsg extends ProblemBaseMsg {
@@ -143,7 +143,7 @@ export interface OpenSettingsMsg extends BaseMsg {
 
 export type ProblemMsg =
   | EditProblemDetailsMsg
-  | DelProblemMsg
+  | DeleteProblemMsg
   | RunTestcasesMsg
   | StopTestcasesMsg
   | AddTestcaseMsg
@@ -155,7 +155,7 @@ export type ProblemMsg =
   | UpdateTestcaseMsg
   | CompareTestcaseMsg
   | ToggleTestcaseFileMsg
-  | DelTestcaseMsg
+  | DeleteTestcaseMsg
   | ReorderTestcaseMsg
   | ChooseSrcFileMsg
   | RemoveSrcFileMsg

@@ -24,8 +24,8 @@ import { ChooseTestcaseFile } from '@/application/useCases/webview/ChooseTestcas
 import { ClearTestcaseStatus } from '@/application/useCases/webview/ClearTestcaseStatus';
 import { CompareTestcase } from '@/application/useCases/webview/CompareTestcase';
 import { CreateProblem } from '@/application/useCases/webview/CreateProblem';
-import { DelProblem } from '@/application/useCases/webview/DelProblem';
-import { DelTestcase } from '@/application/useCases/webview/DelTestcase';
+import { DeleteProblem } from '@/application/useCases/webview/DeleteProblem';
+import { DeleteTestcase } from '@/application/useCases/webview/DeleteTestcase';
 import { DragDrop } from '@/application/useCases/webview/DragDrop';
 import { EditProblemDetails } from '@/application/useCases/webview/EditProblemDetails';
 import { ImportProblem } from '@/application/useCases/webview/ImportProblem';
@@ -57,8 +57,8 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
   clearTestcaseStatus: ClearTestcaseStatus,
   compareTestcase: CompareTestcase,
   createProblem: CreateProblem,
-  delProblem: DelProblem,
-  delTestcase: DelTestcase,
+  delProblem: DeleteProblem,
+  delTestcase: DeleteTestcase,
   dragDrop: DragDrop,
   editProblemDetails: EditProblemDetails,
   importProblem: ImportProblem,

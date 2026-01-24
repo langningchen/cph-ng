@@ -20,7 +20,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import type { PopoverPosition } from '@mui/material/Popover';
 import React, { useState } from 'react';
-import { delProps } from '../../utils';
+import { deleteProps } from '../../utils';
 
 interface CphMenuProps extends BoxProps {
   children: React.ReactNode;
@@ -40,7 +40,7 @@ export const CphMenu = (props: CphMenuProps) => {
         });
       }}
       style={{ cursor: 'context-menu' }}
-      {...delProps(props, ['children', 'menu'])}
+      {...deleteProps(props, ['children', 'menu'])}
     >
       {props.children}
       <Menu

@@ -56,7 +56,7 @@ export const ProblemActions = memo(
     const { t } = useTranslation();
     const { dispatch } = useProblemContext();
     const [clickTime, setClickTime] = useState<number[]>([]);
-    const [isDelDialogOpen, setDelDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [isStressTestDialogOpen, setStressTestDialogOpen] = useState(false);
 
     useEffect(() => {
@@ -166,36 +166,36 @@ export const ProblemActions = memo(
             name={t('problemActions.deleteProblem')}
             icon={DeleteForeverIcon}
             color='error'
-            onClick={() => setDelDialogOpen(true)}
+            onClick={() => setDeleteDialogOpen(true)}
           />
           {!!window.easterEgg && <div title={t('problemActions.easterEgg')}>🐰</div>}
         </CphFlex>
         <Dialog
           fullWidth
           maxWidth={false}
-          open={isDelDialogOpen}
-          onClose={() => setDelDialogOpen(false)}
+          open={isDeleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
         >
-          <DialogTitle>{t('problemActions.delDialog.title')}</DialogTitle>
+          <DialogTitle>{t('problemActions.deleteDialog.title')}</DialogTitle>
           <DialogContent>
-            <DialogContentText>{t('problemActions.delDialog.content')}</DialogContentText>
+            <DialogContentText>{t('problemActions.deleteDialog.content')}</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDelDialogOpen(false)} color='primary'>
-              {t('problemActions.delDialog.cancel')}
+            <Button onClick={() => setDeleteDialogOpen(false)} color='primary'>
+              {t('problemActions.deleteDialog.cancel')}
             </Button>
             <Button
               onClick={() => {
                 dispatch({
-                  type: 'delProblem',
+                  type: 'deleteProblem',
                   problemId,
                 });
-                setDelDialogOpen(false);
+                setDeleteDialogOpen(false);
               }}
               color='primary'
               autoFocus
             >
-              {t('problemActions.delDialog.confirm')}
+              {t('problemActions.deleteDialog.confirm')}
             </Button>
           </DialogActions>
         </Dialog>

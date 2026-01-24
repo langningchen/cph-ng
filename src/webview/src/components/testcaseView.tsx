@@ -232,7 +232,7 @@ export const TestcaseView = ({
               color='error'
               onClick={(e) => {
                 e.stopPropagation();
-                dispatch({ type: 'delTestcase', problemId, id: testcaseId });
+                dispatch({ type: 'deleteTestcase', problemId, id: testcaseId });
               }}
             />
           </CphFlex>

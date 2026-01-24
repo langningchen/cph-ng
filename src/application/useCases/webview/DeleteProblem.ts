@@ -18,24 +18,34 @@
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import type { DelTestcaseMsg } from '@/webview/src/msgs';
+import type { DeleteProblemMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class DelTestcase extends BaseProblemUseCase<DelTestcaseMsg> {
+export class DeleteProblem extends BaseProblemUseCase<DeleteProblemMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.problemService) protected readonly problemService: IProblemService,
+    @inject(TOKENS.problemService) protected readonly service: IProblemService,
+    @inject(TOKENS.activePathService) protected readonly activePath: IActivePathService,
+    @inject(TOKENS.activeProblemCoordinator)
+    private readonly coordinator: IActiveProblemCoordinator,
   ) {
     super(repo);
   }
 
   protected async performAction(
-    { problem }: BackgroundProblem,
-    msg: DelTestcaseMsg,
+    backgroundProblem: BackgroundProblem,
+    _msg: DeleteProblemMsg,
   ): Promise<void> {
-    problem.deleteTestcase(msg.id);
+    backgroundProblem.abort();
+    const { id, problem } = backgroundProblem;
+    await this.repo.persist(id);
+    await this.service.delete(problem);
+    await this.coordinator.onActiveEditorChanged(this.activePath.getActivePath());
+    await this.coordinator.dispatchFullData();
   }
 }

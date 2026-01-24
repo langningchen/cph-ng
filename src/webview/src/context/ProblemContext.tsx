@@ -168,7 +168,7 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
           testcase.answer = testcase.result.stdout;
         break;
       }
-      case 'delTestcase': {
+      case 'deleteTestcase': {
         if (draft.currentProblem.type !== 'active') return;
         delete draft.currentProblem.problem.testcases[action.id];
         break;
