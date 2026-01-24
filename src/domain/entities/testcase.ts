@@ -114,7 +114,7 @@ export class Testcase {
       stderr: stderr ?? current.stderr,
       msg: this.formatMessage(current.msg, msg),
     };
-    this.signals.emit('patchTestcaseResult', { verdict, timeMs, memoryMb, msg });
+    this.signals.emit('patchTestcaseResult', { verdict, timeMs, memoryMb, stdout, stderr, msg });
     if (isExpand !== undefined) {
       this._isExpand = isExpand;
       this.signals.emit('patchTestcase', { isExpand });
