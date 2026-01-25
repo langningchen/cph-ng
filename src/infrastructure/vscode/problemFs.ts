@@ -16,11 +16,12 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { UUID } from 'node:crypto';
+import { EventEmitter } from 'node:stream';
 import { inject, injectable } from 'tsyringe';
+import type TypedEventEmitter from 'typed-emitter';
 import {
   Disposable,
   type Event,
-  EventEmitter,
   type FileChangeEvent,
   FileChangeType,
   FilePermission,
@@ -28,14 +29,15 @@ import {
   FileSystemError,
   FileType,
   Uri,
+  EventEmitter as vsEventEmitter,
 } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
-import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import { TOKENS } from '@/composition/tokens';
+import { Testcase, type TestcaseResult } from '@/domain/entities/testcase';
 import type { TestcaseIo } from '@/domain/entities/testcaseIo';
 import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 
@@ -47,11 +49,24 @@ type CphFsDirItem = [string, CphFsItem];
 type CphFsDir = CphFsDirItem[];
 type CphFsItem = CphFsFile | CphFsDir;
 
+export type ProblemFsEvents = {
+  problemFileChanged: () => void;
+  patchProblem: (srcPath: string) => void;
+  addTestcase: (srcPath: string, testcaseId: UUID, payload: Testcase) => void;
+  deleteTestcase: (srcPath: string, testcaseId: UUID) => void;
+  patchTestcase: (
+    srcPath: string,
+    testcaseId: UUID,
+    payload: Partial<Testcase | TestcaseResult>,
+  ) => void;
+};
+
 @injectable()
 export class ProblemFs implements IProblemFs {
   public static readonly scheme = 'cph-ng';
 
-  public changeEmitter = new EventEmitter<FileChangeEvent[]>();
+  public readonly signals: TypedEventEmitter<ProblemFsEvents> = new EventEmitter();
+  private changeEmitter = new vsEventEmitter<FileChangeEvent[]>();
   public onDidChangeFile: Event<FileChangeEvent[]> = this.changeEmitter.event;
 
   public constructor(
@@ -60,18 +75,70 @@ export class ProblemFs implements IProblemFs {
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.testcaseIoService) private readonly testcaseIoService: ITestcaseIoService,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.activeProblemCoordinator)
-    private readonly coordinator: IActiveProblemCoordinator,
   ) {
     this.logger = this.logger.withScope('ProblemFs');
+
+    this.signals.on('patchProblem', (srcPath: string) => {
+      const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
+      this.changeEmitter.fire([
+        { uri: Uri.joinPath(baseUri, 'problem.cph-ng.json'), type: FileChangeType.Changed },
+      ]);
+    });
+    this.signals.on('addTestcase', (srcPath: string, testcaseId: UUID, payload: Testcase) => {
+      const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
+      const addedFiles = ['stdin', 'answer'];
+      if (payload.stdout) addedFiles.push('stdout');
+      if (payload.stderr) addedFiles.push('stderr');
+      this.changeEmitter.fire([
+        { uri: Uri.joinPath(baseUri, 'problem.cph-ng.json'), type: FileChangeType.Changed },
+        ...addedFiles.map((type) => ({
+          uri: Uri.joinPath(baseUri, 'testcases', testcaseId, type),
+          type: FileChangeType.Created,
+        })),
+      ]);
+    });
+    this.signals.on('deleteTestcase', (srcPath: string, testcaseId: UUID) => {
+      const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
+      const deletedFiles = ['stdin', 'answer', 'stdout', 'stderr'];
+      this.changeEmitter.fire([
+        { uri: Uri.joinPath(baseUri, 'problem.cph-ng.json'), type: FileChangeType.Changed },
+        ...deletedFiles.map((type) => ({
+          uri: Uri.joinPath(baseUri, 'testcases', testcaseId, type),
+          type: FileChangeType.Deleted,
+        })),
+      ]);
+    });
+    this.signals.on(
+      'patchTestcase',
+      (srcPath: string, testcaseId: UUID, payload: Partial<Testcase | TestcaseResult>) => {
+        const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
+        const changedFiles = [];
+        if (payload instanceof Testcase) {
+          if (payload.stdin) changedFiles.push('stdin');
+          if (payload.answer) changedFiles.push('answer');
+        } else {
+          if (payload.stdout) changedFiles.push('stdout');
+          if (payload.stderr) changedFiles.push('stderr');
+        }
+        this.changeEmitter.fire([
+          { uri: Uri.joinPath(baseUri, 'problem.cph-ng.json'), type: FileChangeType.Changed },
+          ...changedFiles.map((type) => ({
+            uri: Uri.joinPath(baseUri, 'testcases', testcaseId, type),
+            type: FileChangeType.Changed,
+          })),
+        ]);
+      },
+    );
   }
 
-  public getUri(problemId: UUID, path: string) {
-    return Uri.from({ scheme: ProblemFs.scheme, authority: problemId, path });
+  public getUri(srcPath: string, path: string) {
+    return Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path });
   }
 
   public async parseUri(uri: Uri): Promise<CphFsItem> {
-    const fullProblem = await this.repo.get(uri.authority as UUID);
+    const problemId = await this.repo.loadByPath(uri.authority);
+    if (!problemId) throw FileSystemError.FileNotFound();
+    const fullProblem = await this.repo.get(problemId);
     if (!fullProblem) throw FileSystemError.FileNotFound();
     const problem = fullProblem.problem;
     const pathParts = uri.path.split('/').filter((p) => p.length > 0);
@@ -84,7 +151,7 @@ export class ProblemFs implements IProblemFs {
           set: async (data: string) => {
             const newProblem = JSON.parse(data);
             fullProblem.problem = this.mapper.toEntity(newProblem);
-            await this.coordinator.dispatchFullData();
+            this.signals.emit('problemFileChanged');
           },
         },
       ],
@@ -128,6 +195,7 @@ export class ProblemFs implements IProblemFs {
         }),
       ],
     ];
+
     let current: CphFsItem = root;
     for (const part of pathParts) {
       if (Array.isArray(current)) {
@@ -138,24 +206,24 @@ export class ProblemFs implements IProblemFs {
     }
     return current;
   }
-  public async fireAuthorityChange(authority: UUID): Promise<void> {
-    const fullProblem = await this.repo.get(authority);
-    if (!fullProblem) return;
-    const testcaseIds = fullProblem.problem.getEnabledTestcaseIds();
-    const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority, path: '/' });
+  // public async fireAuthorityChange(authority: UUID): Promise<void> {
+  //   const fullProblem = await this.repo.get(authority);
+  //   if (!fullProblem) return;
+  //   const testcaseIds = fullProblem.problem.getEnabledTestcaseIds();
+  //   const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority, path: '/' });
 
-    const files: Uri[] = [];
-    files.push(baseUri);
-    files.push(Uri.joinPath(baseUri, 'problem.cph-ng.json'));
-    for (const testcaseId of testcaseIds) {
-      const testcase = fullProblem.problem.getTestcase(testcaseId);
-      files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'stdin'));
-      files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'answer'));
-      if (testcase.stdout) files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'stdout'));
-      if (testcase.stderr) files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'stderr'));
-    }
-    this.changeEmitter.fire(files.map((uri) => ({ type: FileChangeType.Changed, uri })));
-  }
+  //   const files: Uri[] = [];
+  //   files.push(baseUri);
+  //   files.push(Uri.joinPath(baseUri, 'problem.cph-ng.json'));
+  //   for (const testcaseId of testcaseIds) {
+  //     const testcase = fullProblem.problem.getTestcase(testcaseId);
+  //     files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'stdin'));
+  //     files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'answer'));
+  //     if (testcase.stdout) files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'stdout'));
+  //     if (testcase.stderr) files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'stderr'));
+  //   }
+  //   this.changeEmitter.fire(files.map((uri) => ({ type: FileChangeType.Changed, uri })));
+  // }
 
   public async stat(uri: Uri): Promise<FileStat> {
     const item = await this.parseUri(uri);

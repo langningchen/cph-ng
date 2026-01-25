@@ -15,10 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
+import type TypedEventEmitter from 'typed-emitter';
 import type { FileSystemProvider, Uri } from 'vscode';
+import type { ProblemFsEvents } from '@/infrastructure/vscode/problemFs';
 
 export interface IProblemFs extends FileSystemProvider {
-  getUri(problemId: UUID, path: string): Uri;
-  fireAuthorityChange(authority: string): Promise<void>;
+  signals: TypedEventEmitter<ProblemFsEvents>;
+  getUri(srcPath: string, path: string): Uri;
 }

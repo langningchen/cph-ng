@@ -34,10 +34,13 @@ export class CompareTestcase extends BaseProblemUseCase<CompareTestcaseMsg> {
     super(repo);
   }
 
-  protected async performAction({ id }: BackgroundProblem, msg: CompareTestcaseMsg): Promise<void> {
+  protected async performAction(
+    { problem }: BackgroundProblem,
+    msg: CompareTestcaseMsg,
+  ): Promise<void> {
     this.ui.compareFiles(
-      this.problemFs.getUri(id, `/testcases/${msg.id}/answer`),
-      this.problemFs.getUri(id, `/testcases/${msg.id}/stdout`),
+      this.problemFs.getUri(problem.src.path, `/testcases/${msg.id}/answer`),
+      this.problemFs.getUri(problem.src.path, `/testcases/${msg.id}/stdout`),
     );
   }
 }

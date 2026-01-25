@@ -22,6 +22,5 @@ export interface IProblemRepository {
   fireBackgroundEvent(): void;
   loadByPath(srcPath: string, allowCreate?: boolean): Promise<UUID | null>;
   get(problemId?: UUID): Promise<BackgroundProblem | undefined>;
-  getIdByPath(srcPath: string): Promise<UUID | undefined>;
   persist(problemId: UUID): Promise<boolean>;
 }

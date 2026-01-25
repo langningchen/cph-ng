@@ -52,6 +52,8 @@ export class ProblemRepository implements IProblemRepository {
   }
 
   public async loadByPath(srcPath: string, allowCreate: boolean = false): Promise<UUID | null> {
+    for (const [problemId, fullProblem] of this.backgroundProblems.entries())
+      if (fullProblem.problem.isRelated(srcPath)) return problemId;
     let problem = await this.problemService.loadBySrc(srcPath);
     if (!problem) {
       if (!allowCreate) {
@@ -78,12 +80,6 @@ export class ProblemRepository implements IProblemRepository {
   public async get(problemId?: UUID): Promise<BackgroundProblem | undefined> {
     if (!problemId) return undefined;
     return this.backgroundProblems.get(problemId);
-  }
-
-  public async getIdByPath(srcPath: string): Promise<UUID | undefined> {
-    for (const [problemId, fullProblem] of this.backgroundProblems.entries())
-      if (fullProblem.problem.isRelated(srcPath)) return problemId;
-    return undefined;
   }
 
   public async persist(problemId: UUID): Promise<boolean> {
