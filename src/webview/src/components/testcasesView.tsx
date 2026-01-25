@@ -17,7 +17,7 @@
 
 import type { UUID } from 'node:crypto';
 import Box from '@mui/material/Box';
-import React, { memo, useState } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictName } from '@/domain/entities/verdict';
 import type { IWebviewTestcase } from '@/domain/webviewTypes';
@@ -39,12 +39,15 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
   const { dispatch } = useProblemContext();
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
-  const [expandedStates, setExpandedStates] = useState<boolean[]>([]);
+
+  const isAllAccepted = useMemo(() => {
+    return (
+      testcaseOrder.length > 0 &&
+      testcaseOrder.every((id) => testcases[id]?.result?.verdict.name === VerdictName.accepted)
+    );
+  }, [testcaseOrder, testcases]);
 
   const handleDragStart = (idx: number, e: React.DragEvent) => {
-    const states = testcaseOrder.map((id) => testcases[id]?.isExpand || false);
-    setExpandedStates(states);
-
     const dragImage = document.createElement('div');
     dragImage.style.opacity = '0';
     document.body.appendChild(dragImage);
@@ -55,57 +58,36 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
     setDragOverIdx(idx);
   };
 
-  const handleDragOver = (e: React.DragEvent, idx: number) => {
-    e.preventDefault();
-    if (draggedIdx !== null) {
-      setDragOverIdx(idx);
-    }
-  };
+  const handleDragOver = useCallback(
+    (e: React.DragEvent, idx: number) => {
+      e.preventDefault();
+      if (dragOverIdx !== idx) setDragOverIdx(idx);
+    },
+    [dragOverIdx],
+  );
 
   const handleDragEnd = () => {
-    if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
-      const [movedId] = testcaseOrder.splice(draggedIdx, 1);
-      testcaseOrder.splice(dragOverIdx, 0, movedId);
+    if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx)
       dispatch({ type: 'reorderTestcase', problemId, fromIdx: draggedIdx, toIdx: dragOverIdx });
-    }
-
-    if (expandedStates.length > 0) {
-      const reorderedStates = [...expandedStates];
-      if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx) {
-        const [movedState] = reorderedStates.splice(draggedIdx, 1);
-        reorderedStates.splice(dragOverIdx, 0, movedState);
-      }
-      testcaseOrder.forEach((id, idx) => {
-        const testcase = testcases[id];
-        if (testcase && idx < reorderedStates.length) testcase.isExpand = reorderedStates[idx];
-      });
-    }
 
     setDraggedIdx(null);
     setDragOverIdx(null);
-    setExpandedStates([]);
   };
 
-  const getDisplayOrder = () => {
-    if (draggedIdx === null || dragOverIdx === null) return testcaseOrder.map((_, idx) => idx);
+  const displayOrder = useMemo(() => {
     const order = testcaseOrder.map((_, idx) => idx);
+    if (draggedIdx === null || dragOverIdx === null) return order;
+
     const [removed] = order.splice(draggedIdx, 1);
     order.splice(dragOverIdx, 0, removed);
     return order;
-  };
-
-  const displayOrder = getDisplayOrder();
+  }, [testcaseOrder, draggedIdx, dragOverIdx]);
 
   return (
     <CphFlex column>
       {testcaseOrder.length ? (
         <>
-          {partyUri &&
-          testcaseOrder.every(
-            (id) => testcases[id]?.result?.verdict.name === VerdictName.accepted,
-          ) ? (
-            <AcCongrats />
-          ) : null}
+          {partyUri && isAllAccepted ? <AcCongrats /> : null}
           <Box width='100%'>
             {displayOrder.map((originalIdx, displayIdx) => {
               const testcaseId = testcaseOrder[originalIdx];
@@ -123,6 +105,7 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
                       problemId={problemId}
                       testcaseId={testcaseId}
                       testcase={testcase}
+                      isExpand={testcase.isExpand && draggedIdx === null}
                       idx={originalIdx}
                       onDragStart={(e) => handleDragStart(originalIdx, e)}
                       onDragEnd={handleDragEnd}
