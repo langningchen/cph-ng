@@ -18,7 +18,6 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: Expected curly for resolver
 
 import { existsSync } from 'node:fs';
-import { basename, dirname, extname, normalize, relative } from 'node:path';
 import { inject, injectable } from 'tsyringe';
 import { Uri, window, workspace } from 'vscode';
 import type { IPath } from '@/application/ports/node/IPath';
@@ -27,6 +26,7 @@ import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
 
 // TO-DO: Check the refactor: workspace selection
@@ -40,17 +40,19 @@ export class PathResolverAdapter implements IPathResolver {
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.system) private readonly sys: ISystem,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
-  ) {}
+    @inject(TOKENS.ui) private readonly ui: IUi,
+  ) {
+    this.logger = this.logger.withScope('pathResolver');
+  }
 
   private renderString(original: string, replacements: [string, string][]): string {
     let result = original;
-    for (const [key, value] of replacements) {
-      result = result.replaceAll(`\${${key}}`, value);
-    }
+    for (const [key, value] of replacements) result = result.replaceAll(`\${${key}}`, value);
+    this.logger.trace('Rendered string', { original, result });
     return result;
   }
 
-  public renderPath(original: string): string {
+  private _renderPath(original: string): string {
     return this.path.normalize(
       this.renderString(original, [
         ['tmp', this.sys.tmpdir()],
@@ -60,41 +62,54 @@ export class PathResolverAdapter implements IPathResolver {
     );
   }
 
+  public renderPath(original: string): string {
+    const result = this._renderPath(original);
+    this.logger.trace('Rendered path', { original, result });
+    return result;
+  }
+
   public async renderWorkspacePath(original: string): Promise<string | null> {
-    let rendered = this.renderPath(original);
+    let result = this._renderPath(original);
+    if (!result.includes('${workspace}')) return result;
 
-    if (rendered.includes('${workspace}')) {
-      const folders = workspace.workspaceFolders;
-      if (!folders || folders.length === 0) {
-        this.logger.error(
-          this.translator.t('Path uses ${workspace}, but no workspace folder is open.'),
-        );
-        return null;
-      }
-
-      const validFolders = folders
-        .map((f) => f.uri.fsPath)
-        .filter((path) => existsSync(this.renderString(rendered, [['workspace', path]])));
-
-      if (validFolders.length === 0) {
-        this.logger.error(this.translator.t('No workspace folder contains the required path.'));
-        return null;
-      }
-
-      let selectedFolder: string;
-      if (validFolders.length === 1) {
-        selectedFolder = validFolders[0];
-      } else {
-        const picked = await window.showQuickPick(validFolders, {
-          title: this.translator.t('Select workspace folder'),
-        });
-        if (!picked) return null;
-        selectedFolder = picked;
-      }
-
-      rendered = this.renderString(rendered, [['workspace', selectedFolder]]);
+    const folders = workspace.workspaceFolders;
+    if (!folders || folders.length === 0) {
+      this.ui.alert(
+        'error',
+        this.translator.t('Path uses ${workspace}, but no workspace folder is open.'),
+      );
+      this.logger.warn('No workspace folder is open for path rendering.', { original });
+      return null;
     }
-    return rendered;
+
+    const triedPaths = folders.map((f) => this.renderString(result, [['workspace', f.uri.fsPath]]));
+    this.logger.trace('Tried workspace paths for rendering', { original, triedPaths });
+
+    const validFolders = triedPaths.filter((p) => existsSync(p)).map((p) => this.path.dirname(p));
+    if (validFolders.length === 0) {
+      this.ui.alert('error', this.translator.t('No workspace folder contains the required path.'));
+      this.logger.warn('No workspace folder contains the required path.', { original });
+      return null;
+    }
+    this.logger.trace('Valid workspace folders for path', { original, validFolders });
+
+    let selectedFolder: string;
+    if (validFolders.length === 1) {
+      selectedFolder = validFolders[0];
+    } else {
+      const picked = await window.showQuickPick(validFolders, {
+        title: this.translator.t('Select workspace folder'),
+      });
+      if (!picked) {
+        this.logger.info('No workspace folder selected for path rendering.', { original });
+        return null;
+      }
+      selectedFolder = picked;
+    }
+
+    result = this.renderString(result, [['workspace', selectedFolder]]);
+    this.logger.trace('Rendered workspace path', { original, result });
+    return result;
   }
 
   public renderPathWithFile(
@@ -105,47 +120,57 @@ export class PathResolverAdapter implements IPathResolver {
     const uri = Uri.file(filePath);
     const workspaceFolder = workspace.getWorkspaceFolder(uri);
 
-    const dirnameV = dirname(filePath);
-    const extnameV = extname(filePath);
-    const basenameV = basename(filePath);
-    const basenameNoExt = basename(filePath, extnameV);
+    const dir = this.path.dirname(filePath);
+    const ext = this.path.extname(filePath);
+    const base = this.path.basename(filePath);
+    const baseNoExt = this.path.basename(filePath, ext);
 
     let result = original;
 
     if (result.includes('${workspace}') || result.includes('${relativeDirname}')) {
       if (!workspaceFolder) {
         if (!ignoreError) {
-          this.logger.error(this.translator.t('File is not in a workspace folder.'));
+          this.ui.alert('error', this.translator.t('File is not in a workspace folder.'));
         }
+        this.logger.warn('File is not in a workspace folder.', { filePath, original });
         return null;
       }
       const wsPath = workspaceFolder.uri.fsPath;
       result = this.renderString(result, [
         ['workspace', wsPath],
-        ['relativeDirname', relative(wsPath, dirnameV) || '.'],
+        ['relativeDirname', this.path.relative(wsPath, dir) || '.'],
       ]);
     }
 
-    return normalize(
-      this.renderString(this.renderPath(result), [
-        ['dirname', dirnameV],
-        ['extname', extnameV],
-        ['basename', basenameV],
-        ['basenameNoExt', basenameNoExt],
+    result = this.path.normalize(
+      this.renderString(this._renderPath(result), [
+        ['dirname', dir],
+        ['extname', ext],
+        ['basename', base],
+        ['basenameNoExt', baseNoExt],
       ]),
     );
+    this.logger.trace('Rendered path with file', { original, filePath, result });
+    return result;
   }
 
   public renderUnzipFolder(srcPath: string, zipPath: string): string | null {
     const original = this.renderPathWithFile(this.settings.problem.unzipFolder, srcPath);
     if (!original) return null;
 
-    return normalize(
+    const dir = this.path.dirname(zipPath);
+    const ext = this.path.extname(zipPath);
+    const base = this.path.basename(zipPath);
+    const baseNoExt = this.path.basename(zipPath, ext);
+
+    const result = this.path.normalize(
       this.renderString(original, [
-        ['zipDirname', dirname(zipPath)],
-        ['zipBasename', basename(zipPath)],
-        ['zipBasenameNoExt', basename(zipPath, extname(zipPath))],
+        ['zipDirname', dir],
+        ['zipBasename', base],
+        ['zipBasenameNoExt', baseNoExt],
       ]),
     );
+    this.logger.trace('Rendered unzip folder', { srcPath, zipPath, result });
+    return result;
   }
 }
