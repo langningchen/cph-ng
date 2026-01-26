@@ -140,7 +140,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
     [],
     { additionalCommonProperties: { commitHash } },
     async (url, init) => {
-      logger.trace(`Telemetry sent`, { url, init });
+      logger.trace('Telemetry sent', { url, init });
       const res = await fetch(url, init);
       return {
         status: res.status,

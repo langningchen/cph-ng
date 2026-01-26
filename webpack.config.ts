@@ -1,5 +1,21 @@
-// @ts-check
-/** @typedef {import('webpack').Configuration} WebpackConfig **/
+// Copyright (C) 2026 Langning Chen
+//
+// This file is part of cph-ng.
+//
+// cph-ng is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// cph-ng is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
+
+// biome-ignore-all lint/style/useNamingConvention: Terser API requires snake_case
 
 import { execSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -7,6 +23,8 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import CopyPlugin from 'copy-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
+import type { Compiler, Configuration } from 'webpack';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,16 +34,13 @@ const generateSchema = () => {
   const outputPath = resolve(__dirname, 'dist/problem.schema.json');
 
   return {
-    /**
-     * @param {import('webpack').Compiler} compiler
-     */
-    apply: (compiler) => {
+    apply: (compiler: Compiler) => {
       const runCommand = () => {
         try {
           mkdirSync(dirname(outputPath), { recursive: true });
           execSync(
             `pnpm exec ts-json-schema-generator --path 'src/domain/types.ts' --type 'IProblem' -o dist/problem.schema.json`,
-            { stdio: 'inherit' }
+            { stdio: 'inherit' },
           );
           console.log('Successfully generated schema file.');
         } catch (error) {
@@ -55,41 +70,23 @@ const generateSettings = () => {
   const pkgPath = resolve(__dirname, 'package.json');
 
   return {
-    /**
-     * @param {import('webpack').Compiler} compiler
-     */
-    apply: (compiler) => {
-      const runScript = () => {
-        try {
-          execSync('pnpm run generate-settings', { stdio: 'inherit' });
-        } catch (error) {
-          console.error('Failed to generate settings:', error);
-        }
+    apply: (compiler: Compiler) => {
+      const generate = () => {
+        execSync('pnpm run generate-settings', { stdio: 'inherit' });
       };
-      compiler.hooks.beforeRun.tap('Generate Settings Plugin', () => {
-        runScript();
-      });
+      compiler.hooks.beforeRun.tap('Generate Settings Plugin', generate);
       compiler.hooks.watchRun.tap('Generate Settings Plugin', (compiler) => {
-        const modifiedFiles = compiler.modifiedFiles;
-        if (!modifiedFiles || modifiedFiles.has(pkgPath)) {
-          runScript();
-        }
+        if (compiler.modifiedFiles?.has(pkgPath)) generate();
       });
-      compiler.hooks.afterCompile.tap(
-        'Generate Settings Plugin',
-        (compilation) => {
-          compilation.fileDependencies.add(pkgPath);
-        },
-      );
+      compiler.hooks.afterCompile.tap('Generate Settings Plugin', (compilation) => {
+        compilation.fileDependencies.add(pkgPath);
+      });
     },
   };
 };
 const generateBuildInfo = () => {
   return {
-    /**
-     * @param {import('webpack').Compiler} compiler
-     */
-    apply: (compiler) => {
+    apply: (compiler: Compiler) => {
       compiler.hooks.afterEmit.tap('Build Info Plugin', () => {
         try {
           const jsonPath = join(__dirname, 'dist', 'generated.json');
@@ -99,7 +96,7 @@ const generateBuildInfo = () => {
           try {
             commitHash = execSync('git rev-parse HEAD').toString().trim();
             userName = execSync('git config user.name').toString().trim();
-          } catch (_e) { }
+          } catch (_e) {}
           writeFileSync(
             jsonPath,
             JSON.stringify(
@@ -121,25 +118,20 @@ const generateBuildInfo = () => {
   };
 };
 
-/**
- * @param {any} _env
- * @param {any} argv
- * @returns {WebpackConfig[]}
- */
-export default (_env, argv) => {
+/* biome-ignore lint/style/noDefaultExport: Webpack config requires default export */
+export default (_env: Record<string, unknown>, argv: Record<string, unknown>): Configuration[] => {
   const isProd = argv.mode === 'production';
 
-  /** @type WebpackConfig */
-  const baseConfig = {
+  const baseConfig: Configuration = {
     mode: isProd ? 'production' : 'development',
     devtool: 'source-map',
     resolve: {
       extensions: ['.tsx', '.ts', '.js', '.jsx', '.json'],
-      alias: {
-        '@': resolve(__dirname, 'src'),
-        '@t': resolve(__dirname, 'tests'),
-        '@w': resolve(__dirname, 'src/webview/src'),
-      },
+      plugins: [
+        new TsconfigPathsPlugin({
+          configFile: resolve(__dirname, 'tsconfig.json'),
+        }),
+      ],
     },
     module: {
       rules: [
@@ -183,8 +175,7 @@ export default (_env, argv) => {
     },
   };
 
-  /** @type WebpackConfig */
-  const extensionConfig = {
+  const extensionConfig: Configuration = {
     ...baseConfig,
     target: 'node',
     entry: './src/extension.ts',
@@ -204,10 +195,7 @@ export default (_env, argv) => {
       new CopyPlugin({
         patterns: [
           { from: 'testlib/testlib.h', to: 'testlib/testlib.h' },
-          {
-            from: 'testlib/checkers/*.cpp',
-            to: 'testlib/[name].cpp',
-          },
+          { from: 'testlib/checkers/*.cpp', to: 'testlib/[name].cpp' },
           { from: 'res/compare.cpp', to: 'testlib/compare.cpp' },
         ],
       }),
@@ -220,8 +208,7 @@ export default (_env, argv) => {
     },
   };
 
-  /** @type WebpackConfig */
-  const webviewConfig = {
+  const webviewConfig: Configuration = {
     ...baseConfig,
     target: 'web',
     entry: './src/webview/src/App.tsx',

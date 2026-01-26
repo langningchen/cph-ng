@@ -782,9 +782,9 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "webpack --mode production",
-    "compile": "webpack --mode production",
-    "watch": "webpack --watch --mode development",
+    "vscode:prepublish": "webpack --disable-interpret --mode production",
+    "compile": "webpack --disable-interpret --mode production",
+    "watch": "webpack --disable-interpret --watch --mode development",
     "package": "vsce package --allow-star-activation --no-dependencies",
     "publish": "vsce publish --allow-star-activation --no-dependencies",
     "publish:pre": "vsce publish --allow-star-activation --no-dependencies --pre-release",
@@ -818,6 +818,7 @@
     "swc-loader": "^0.2.7",
     "terser-webpack-plugin": "^5.3.16",
     "ts-json-schema-generator": "^2.4.0",
+    "tsconfig-paths-webpack-plugin": "^4.2.0",
     "tsx": "^4.21.0",
     "typescript": "5.9.3",
     "vitest": "^4.0.18",
