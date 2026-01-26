@@ -799,7 +799,7 @@
     "coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.11",
+    "@biomejs/biome": "^2.3.12",
     "@commitlint/cli": "^20.3.1",
     "@commitlint/config-conventional": "^20.3.1",
     "@swc/core": "^1.15.10",
@@ -831,7 +831,7 @@
     "@mui/icons-material": "^7.3.7",
     "@mui/lab": "7.0.1-beta.21",
     "@mui/material": "^7.3.7",
-    "@vscode/extension-telemetry": "^1.2.0",
+    "@vscode/extension-telemetry": "^1.4.0",
     "adm-zip": "^0.5.16",
     "anser": "^2.3.5",
     "copy-webpack-plugin": "^13.0.1",
