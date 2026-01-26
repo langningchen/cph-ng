@@ -57,7 +57,7 @@ export class ProblemService implements IProblemService {
     @inject(ProblemMapper) private readonly mapper: ProblemMapper,
     @inject(TestcaseScanner) private readonly testcaseScanner: TestcaseScanner,
   ) {
-    this.logger = this.logger.withScope('ProblemRepository');
+    this.logger = this.logger.withScope('problemService');
   }
 
   public getDataPath(srcPath: string): string | null {

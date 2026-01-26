@@ -43,7 +43,7 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
     @inject(TOKENS.executionStrategyFactory)
     private readonly factory: IExecutionStrategyFactory,
   ) {
-    this.logger = this.logger.withScope('RunnerAdapter');
+    this.logger = this.logger.withScope('solutionRunner');
   }
 
   public async run(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {

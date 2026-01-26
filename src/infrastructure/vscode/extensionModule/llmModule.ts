@@ -24,7 +24,7 @@ import { TOKENS } from '@/composition/tokens';
 @injectable()
 export class LlmModule implements IExtensionModule {
   public constructor(@inject(TOKENS.logger) private readonly logger: ILogger) {
-    this.logger = this.logger.withScope('LlmModule');
+    this.logger = this.logger.withScope('llmModule');
   }
 
   public setup(_context: ExtensionContext): void {

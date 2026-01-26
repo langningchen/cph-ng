@@ -60,7 +60,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     @inject(TOKENS.runnerProvider)
     private readonly runner: IRunnerProvider,
   ) {
-    this.logger = this.logger.withScope('ExternalRunnerStrategy');
+    this.logger = this.logger.withScope('externalRunnerStrategy');
   }
 
   public async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {

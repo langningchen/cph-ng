@@ -87,7 +87,7 @@ export class WebviewProtocolHandler {
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
   ) {
-    this.logger = this.logger.withScope('WebviewProtocolHandler');
+    this.logger = this.logger.withScope('webviewProtocolHandler');
   }
 
   public async handle(msg: WebviewMsg): Promise<void> {

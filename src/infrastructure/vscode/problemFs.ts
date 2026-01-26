@@ -76,7 +76,7 @@ export class ProblemFs implements IProblemFs {
     @inject(TOKENS.testcaseIoService) private readonly testcaseIoService: ITestcaseIoService,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
   ) {
-    this.logger = this.logger.withScope('ProblemFs');
+    this.logger = this.logger.withScope('problemFs');
 
     this.signals.on('patchProblem', (srcPath: string) => {
       const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });

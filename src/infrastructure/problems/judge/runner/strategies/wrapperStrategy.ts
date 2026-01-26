@@ -38,7 +38,7 @@ export class WrapperStrategy implements IExecutionStrategy {
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
-    this.logger = this.logger.withScope('WrapperStrategy');
+    this.logger = this.logger.withScope('wrapperStrategy');
   }
 
   public async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {

@@ -31,7 +31,7 @@ export class EditorWatcherModule implements IExtensionModule {
     @inject(TOKENS.activeProblemCoordinator)
     private readonly coordinator: IActiveProblemCoordinator,
   ) {
-    this.logger = this.logger.withScope('EditorWatcher');
+    this.logger = this.logger.withScope('editorWatcher');
   }
 
   public async setup(context: ExtensionContext): Promise<void> {

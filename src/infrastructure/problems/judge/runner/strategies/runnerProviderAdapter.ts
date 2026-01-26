@@ -41,7 +41,7 @@ export class RunnerProviderAdapter implements IRunnerProvider {
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.system) private readonly sys: ISystem,
   ) {
-    this.logger = this.logger.withScope('RunnerProvider');
+    this.logger = this.logger.withScope('runnerProvider');
   }
 
   public async getRunnerPath(signal: AbortSignal): Promise<string> {

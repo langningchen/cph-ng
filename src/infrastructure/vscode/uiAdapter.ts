@@ -48,7 +48,7 @@ export class UiAdapter implements IUi {
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.settings) private readonly settings: ISettings,
   ) {
-    this.logger = this.logger.withScope('UiAdapter');
+    this.logger = this.logger.withScope('uiAdapter');
   }
 
   public async openDialog(options: CustomOpenDialogOptions): Promise<string | undefined> {

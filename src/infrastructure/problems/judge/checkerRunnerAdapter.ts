@@ -35,7 +35,7 @@ export class CheckerRunnerAdapter implements ICheckerRunner {
     @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
-    this.logger = this.logger.withScope('CheckerRunner');
+    this.logger = this.logger.withScope('checkerRunner');
   }
 
   public async run(options: CheckerOptions, signal: AbortSignal): Promise<CheckerResult> {

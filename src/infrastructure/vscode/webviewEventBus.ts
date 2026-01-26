@@ -43,7 +43,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
   private readonly emitter: TypedEventEmitter<WebviewEvents> = new EventEmitter();
 
   public constructor(@inject(TOKENS.logger) private readonly logger: ILogger) {
-    this.logger = this.logger.withScope('WebviewEventBusAdapter');
+    this.logger = this.logger.withScope('webviewEventBusAdapter');
   }
 
   public onMessage(handler: (data: WebviewEvent) => void) {

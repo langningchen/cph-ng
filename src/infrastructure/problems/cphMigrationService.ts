@@ -35,7 +35,7 @@ export class CphMigrationService implements ICphMigrationService {
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.path) private readonly path: IPath,
   ) {
-    this.logger = this.logger.withScope('CphMigration');
+    this.logger = this.logger.withScope('cphMigration');
   }
 
   public async canMigrate(srcPath: string): Promise<boolean> {

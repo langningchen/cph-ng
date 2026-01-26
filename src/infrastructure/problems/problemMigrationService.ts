@@ -33,7 +33,7 @@ export class ProblemMigrationService implements IProblemMigrationService {
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
   ) {
-    this.logger = this.logger.withScope('Migration');
+    this.logger = this.logger.withScope('migration');
   }
 
   private readonly migrateFunctions: Record<string, (oldProblem: any) => any> = {

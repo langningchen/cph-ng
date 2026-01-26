@@ -29,12 +29,12 @@ export class ExtensionManager {
     @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
     @injectAll(TOKENS.extensionModule) private readonly modules: IExtensionModule[],
   ) {
-    this.logger = this.logger.withScope('ExtensionManager');
+    this.logger = this.logger.withScope('extensionManager');
   }
 
   public async activate(context: ExtensionContext) {
     const stopTrace = this.telemetry.start('activate');
-    this.logger.info('CPH-NG activating modular architecture...');
+    this.logger.info('CPH-NG activating...');
 
     try {
       for (const module of this.modules) await module.setup(context);

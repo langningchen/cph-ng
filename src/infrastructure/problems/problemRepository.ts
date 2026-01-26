@@ -38,7 +38,7 @@ export class ProblemRepository implements IProblemRepository {
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
   ) {
-    this.logger = this.logger.withScope('ProblemRepository');
+    this.logger = this.logger.withScope('problemRepository');
   }
 
   public fireBackgroundEvent() {

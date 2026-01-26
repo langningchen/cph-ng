@@ -39,7 +39,7 @@ export class SidebarProvider implements WebviewViewProvider {
     @inject(WebviewHtmlRenderer) private readonly htmlRenderer: WebviewHtmlRenderer,
     @inject(WebviewProtocolHandler) private readonly protocolHandler: WebviewProtocolHandler,
   ) {
-    this.logger = this.logger.withScope('SidebarProvider');
+    this.logger = this.logger.withScope('sidebarProvider');
 
     this.eventBus.onMessage((data) => {
       this._view?.webview.postMessage(data);

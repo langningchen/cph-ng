@@ -18,7 +18,6 @@
 import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { container } from 'tsyringe';
 import { type ExtensionContext, window } from 'vscode';
-import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { BuildInfoAdapter } from '@/infrastructure/node/buildInfoAdapter';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
 import { CryptoAdapter } from '@/infrastructure/node/cryptoAdapter';
@@ -132,7 +131,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   if (buildInfo.load) await buildInfo.load();
   container.registerInstance(TOKENS.buildInfo, buildInfo);
 
-  const logger = container.resolve<ILogger>(TOKENS.logger).withScope('container');
+  const logger = container.resolve(TOKENS.logger).withScope('container');
   const connectionString =
     'InstrumentationKey=ee659d58-b2b5-48b3-b05b-48865365c0d1;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=6ff8b3ee-dc15-4a9b-bab8-ffaa956f1773';
   const commitHash = buildInfo.commitHash;
@@ -141,7 +140,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
     [],
     { additionalCommonProperties: { commitHash } },
     async (url, init) => {
-      logger.debug(`Telemetry sent to ${url}`);
+      logger.trace(`Telemetry sent`, { url, init });
       const res = await fetch(url, init);
       return {
         status: res.status,
@@ -151,4 +150,17 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
     },
   );
   container.registerInstance(TOKENS.telemetryReporter, telemetryReporter);
+
+  let failed = false;
+  for (const key of Object.values(TOKENS) as string[]) {
+    try {
+      container.resolve(key);
+    } catch (e) {
+      logger.error(`Resolve dependency ${key} failed`, { e });
+      failed = true;
+    }
+  }
+  const ui = container.resolve(TOKENS.ui);
+  if (failed) ui.alert('error', `One or more dependencies resolved failed`);
+  else logger.debug('Dependencies resolve test succeeded');
 }
