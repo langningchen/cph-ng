@@ -18,26 +18,28 @@
 import { type MockProxy, mock } from 'vitest-mock-extended';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 
+const LogLevels = ['info', 'warn', 'error', 'debug', 'trace'] as const;
+type LogLevel = (typeof LogLevels)[number];
+
 const createLoggerMock = (
-  scope?: string,
+  scope: string = 'base',
   rootInstance?: MockProxy<ILogger>,
 ): MockProxy<ILogger> => {
   const logger = mock<ILogger>();
 
   const root = rootInstance || logger;
-  const prefix = scope ? `[${scope}]` : '';
-
   logger.withScope.mockImplementation((name: string) => createLoggerMock(name, root));
 
   const implementLog = (
-    level: Exclude<keyof ILogger, 'withScope'>,
+    level: LogLevel,
     consoleMethod: (...args: unknown[]) => void,
     tag: string,
   ) => {
-    logger[level].mockImplementation((...args) => {
-      consoleMethod(tag, prefix, ...args);
-      if (logger !== root) root[level](...args);
-    });
+    if (rootInstance) logger[level] = rootInstance[level];
+    else
+      logger[level].mockImplementation((...args) => {
+        consoleMethod(tag, `[${scope}]`, ...args);
+      });
   };
 
   implementLog('info', console.info, '[INFO]');

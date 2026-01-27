@@ -44,16 +44,14 @@ export class TempStorageAdapter implements ITempStorage {
 
   public async startMonitor(): Promise<void> {
     if (this.monitorInterval) {
+      this.logger.warn('Already started monitoring');
       return;
     }
     this.monitorInterval = setInterval(() => {
-      this.logger.debug(`this Monitor: ${this.usedPool.size} used, ${this.freePool.size} free.`);
-      this.logger.trace(
-        'Used paths',
-        Object.entries(this.usedPool).map(([key, value]) => `${key}: ${value}`),
-      );
+      this.logger.debug(`Currently ${this.usedPool.size} used, ${this.freePool.size} free`);
+      this.logger.trace('Used paths', Object.fromEntries(this.usedPool));
     }, 10000);
-    this.logger.info('Cache monitor started');
+    this.logger.info('Monitor started');
   }
 
   public create(description: string): string {
@@ -76,19 +74,14 @@ export class TempStorageAdapter implements ITempStorage {
   }
 
   public dispose(paths: string | string[]): void {
-    if (typeof paths === 'string') {
-      paths = [paths];
-    }
+    if (typeof paths === 'string') paths = [paths];
     for (const path of paths) {
-      if (this.freePool.has(path)) {
-        this.logger.warn('Duplicate dispose path', path);
-      } else if (this.usedPool.has(path)) {
+      if (this.freePool.has(path)) this.logger.warn('Duplicate dispose path', path);
+      else if (this.usedPool.has(path)) {
         this.usedPool.delete(path);
         this.freePool.add(path);
         this.logger.trace('Disposing cached path', path);
-      } else {
-        this.logger.debug('Path', path, 'is not disposable');
-      }
+      } else this.logger.debug(`Path ${path} is not disposable`);
     }
   }
 }

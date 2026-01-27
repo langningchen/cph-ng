@@ -32,7 +32,7 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext, ExecutionData, ExecutionResult } from '@/domain/execution';
 
-type RunnerOutput =
+export type RunnerOutput =
   | {
       error: false;
       killed: boolean;
@@ -57,8 +57,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
-    @inject(TOKENS.runnerProvider)
-    private readonly runner: IRunnerProvider,
+    @inject(TOKENS.runnerProvider) private readonly runner: IRunnerProvider,
   ) {
     this.logger = this.logger.withScope('externalRunnerStrategy');
   }
@@ -66,13 +65,10 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
   public async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
     this.logger.trace('execute', ctx);
 
-    const userStdinPath = ctx.stdinPath;
-    const userStdoutPath = this.tmp.create(`externalRunner.userStdoutPath`);
-    const userStderrPath = this.tmp.create(`externalRunner.userStderrPath`);
-
     let runnerPath: string;
     try {
       runnerPath = await this.runner.getRunnerPath(signal);
+      console.log(runnerPath);
     } catch (e) {
       return new Error(
         this.translator.t('Failed to prepare runner utility: {codeOrSignal}', {
@@ -86,6 +82,10 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
         this.translator.t('External runner only supports single program without arguments'),
       );
     }
+
+    const userStdinPath = ctx.stdinPath;
+    const userStdoutPath = this.tmp.create(`externalRunner.userStdoutPath`);
+    const userStderrPath = this.tmp.create(`externalRunner.userStderrPath`);
 
     const runnerCmd = [runnerPath, ctx.cmd[0], userStdinPath, userStdoutPath, userStderrPath];
     if (this.settings.runner.unlimitedStack) runnerCmd.push('--unlimited-stack');
@@ -121,6 +121,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
 
     const runnerOutputRaw = await this.fs.readFile(runnerResult.stdoutPath);
     this.tmp.dispose([runnerResult.stdoutPath, runnerResult.stderrPath]);
+    this.logger.trace('Runner output', runnerOutputRaw);
 
     if (runnerResult.codeOrSignal) {
       this.tmp.dispose([userStdoutPath, userStderrPath]);
@@ -142,12 +143,12 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
         output: runnerOutputRaw,
       });
       this.tmp.dispose([userStdoutPath, userStderrPath]);
-      throw new Error(this.translator.t('Runner output is invalid JSON'));
+      return new Error(this.translator.t('Runner output is invalid JSON'));
     }
     this.logger.debug('Runner info', runInfo);
     if (runInfo.error) {
       this.tmp.dispose([userStdoutPath, userStderrPath]);
-      throw new Error(
+      return new Error(
         this.translator.t('Runner reported error: {type} (Code: {code})', {
           type: runInfo.errorType,
           code: runInfo.errorCode,

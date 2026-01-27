@@ -15,12 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { mock } from 'vitest-mock-extended';
+import { mock } from '@t/mock';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 
+export const getTmpStoragePath = (index: number): string => `/tmp/cph-ng/file-${index}`;
+
 export const tempStorageMock = mock<ITempStorage>();
-tempStorageMock.create.mockImplementation((_description) => {
-  return `/tmp/file-${tempStorageMock.create.mock.calls.length - 1}`;
-});
-tempStorageMock.dispose.mockImplementation((_path: string | string[]) => {});
 tempStorageMock.startMonitor.mockResolvedValue();
+tempStorageMock.create.mockImplementation((_description) => {
+  const index = tempStorageMock.create.mock.calls.length - 1;
+  return getTmpStoragePath(index);
+});
+tempStorageMock.dispose.mockReturnValue();

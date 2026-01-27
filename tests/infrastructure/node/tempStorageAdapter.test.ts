@@ -15,7 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { fileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { systemMock } from '@t/infrastructure/node/systemMock';
 import { PathResolverMock } from '@t/infrastructure/services/pathResolverMock';
+import { vol } from 'memfs';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { TOKENS } from '@/composition/tokens';
@@ -30,9 +33,11 @@ describe('TempStorageAdapter', () => {
   let adapter: TempStorageAdapter;
 
   beforeEach(() => {
-    container.registerInstance(TOKENS.logger, loggerMock);
     container.registerInstance(TOKENS.crypto, cryptoMock);
     container.registerInstance(TOKENS.extensionPath, extensionPathMock);
+    container.registerInstance(TOKENS.fileSystem, fileSystemMock);
+    container.registerInstance(TOKENS.logger, loggerMock);
+    container.registerInstance(TOKENS.system, systemMock);
     container.registerInstance(TOKENS.settings, settingsMock);
     container.registerSingleton(TOKENS.path, PathAdapter);
     container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
@@ -43,20 +48,18 @@ describe('TempStorageAdapter', () => {
   it('should create a new path using crypto and settings when pool is empty', () => {
     const path = adapter.create('test');
 
-    expect(path).contains('/u-u-i-d-0');
+    expect(path).equals('/tmp/cph-ng/u-u-i-d-0');
     expect(cryptoMock.randomUUID).toHaveBeenCalledTimes(1);
-    expect(loggerMock.trace).toHaveBeenCalledWith(expect.stringContaining('Creating new'), path);
+    expect(vol.existsSync(path)).toBe(true);
   });
 
   it('should reuse a path from the free pool after it has been disposed', () => {
     const path1 = adapter.create('test');
     adapter.dispose(path1);
-    expect(loggerMock.trace).toHaveBeenCalledWith(expect.stringContaining('Disposing'), path1);
-
     const path2 = adapter.create('test');
     expect(path2).toBe(path1);
     expect(cryptoMock.randomUUID).toHaveBeenCalledTimes(1);
-    expect(loggerMock.trace).toHaveBeenCalledWith(expect.stringContaining('Reusing cached'), path2);
+    expect(vol.existsSync(path1)).toBe(true);
   });
 
   it('should manage multiple paths in the pool correctly', () => {
@@ -74,10 +77,17 @@ describe('TempStorageAdapter', () => {
     const r2 = adapter.create('test');
     const r3 = adapter.create('test');
 
-    const reusedPaths = [r1, r2];
-    expect(reusedPaths).toContain(p1);
-    expect(reusedPaths).toContain(p2);
-    expect(r3).contains('/u-u-i-d-3');
+    expect(p1).equals('/tmp/cph-ng/u-u-i-d-0');
+    expect(p2).equals('/tmp/cph-ng/u-u-i-d-1');
+    expect(p3).equals('/tmp/cph-ng/u-u-i-d-2');
+    expect(r1).equals('/tmp/cph-ng/u-u-i-d-0');
+    expect(r2).equals('/tmp/cph-ng/u-u-i-d-1');
+    expect(r3).equals('/tmp/cph-ng/u-u-i-d-3');
+    expect(cryptoMock.randomUUID).toHaveBeenCalledTimes(4);
+    expect(vol.existsSync(r1)).toBe(true);
+    expect(vol.existsSync(r2)).toBe(true);
+    expect(vol.existsSync(r3)).toBe(true);
+    expect(vol.existsSync(p3)).toBe(true);
   });
 
   it('should warn when disposing the same path multiple times', () => {
@@ -85,22 +95,14 @@ describe('TempStorageAdapter', () => {
     adapter.dispose(path);
     adapter.dispose(path);
 
-    expect(loggerMock.warn).toHaveBeenCalledWith(
-      expect.stringContaining('Duplicate dispose'),
-      path,
-    );
+    expect(loggerMock.warn).toHaveBeenCalledWith('Duplicate dispose path', expect.anything());
   });
 
   it('should log debug message when disposing a path not managed by the adapter', () => {
     const externalPath = '/some/other/path';
-
     adapter.dispose(externalPath);
 
-    expect(loggerMock.debug).toHaveBeenCalledWith(
-      'Path',
-      externalPath,
-      expect.stringContaining('not disposable'),
-    );
+    expect(loggerMock.debug).toHaveBeenCalledWith(`Path ${externalPath} is not disposable`);
   });
 
   it('should handle array of paths in dispose method', () => {
@@ -127,40 +129,32 @@ describe('TempStorageAdapter', () => {
   it('should start monitor and log pool status periodically', () => {
     vi.useFakeTimers();
 
-    const p1 = adapter.create('test');
-    const p2 = adapter.create('test');
+    const p1 = adapter.create('test1');
+    const p2 = adapter.create('test2');
     adapter.dispose(p1);
 
-    adapter.startMonitor();
+    loggerMock.info.mockClear();
+    loggerMock.debug.mockClear();
+    loggerMock.trace.mockClear();
 
-    expect(loggerMock.info).toHaveBeenCalledWith('Cache monitor started');
+    adapter.startMonitor();
+    expect(loggerMock.info).toHaveBeenCalledWith('Monitor started');
 
     vi.advanceTimersByTime(10000);
-
-    expect(loggerMock.debug).toHaveBeenCalledWith(
-      expect.stringContaining('this Monitor: 1 used, 1 free.'),
-    );
-
-    expect(loggerMock.trace).toHaveBeenCalledWith('Used paths', [p2]);
-    expect(loggerMock.trace).toHaveBeenCalledWith('Free paths', [p1]);
+    expect(loggerMock.debug).toHaveBeenCalledWith('Currently 1 used, 1 free');
+    expect(loggerMock.trace).toHaveBeenLastCalledWith('Used paths', { [p2]: 'test2' });
 
     vi.advanceTimersByTime(10000);
     expect(loggerMock.debug).toHaveBeenCalledTimes(2);
+    expect(loggerMock.trace).toHaveBeenCalledTimes(2);
 
     vi.useRealTimers();
   });
 
   it('should not start multiple intervals if called multiple times', () => {
-    vi.useFakeTimers();
-
     adapter.startMonitor();
+    expect(loggerMock.info).toHaveBeenCalledWith('Monitor started');
     adapter.startMonitor();
-
-    expect(loggerMock.info).toHaveBeenCalledTimes(1);
-
-    vi.advanceTimersByTime(10000);
-    expect(loggerMock.debug).toHaveBeenCalledTimes(1);
-
-    vi.useRealTimers();
+    expect(loggerMock.warn).toBeCalledWith('Already started monitoring');
   });
 });

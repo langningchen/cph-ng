@@ -16,25 +16,11 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { mock } from '@t/mock';
-import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
+import type { ISystem } from '@/application/ports/node/ISystem';
 
-export const telemetryMock = mock<ITelemetry>();
-telemetryMock.start.mockImplementation((name, props) => {
-  console.log(`[Telemetry Start] ${name}`, props ?? '');
-
-  return (endProps?: Record<string, unknown>) => {
-    console.log(`[Telemetry End] ${name}`, {
-      ...props,
-      ...endProps,
-    });
-  };
-});
-telemetryMock.event.mockImplementation((name, props) => {
-  console.log(`[Telemetry Event] ${name}`, props ?? '');
-});
-telemetryMock.error.mockImplementation((name, error, props) => {
-  console.error(`[Telemetry Error] ${name}`, {
-    error,
-    ...props,
-  });
-});
+export const systemMock = mock<ISystem>();
+systemMock.cwd.mockReturnValue('/working/directory');
+systemMock.tmpdir.mockReturnValue('/tmp');
+systemMock.homedir.mockReturnValue('/home');
+systemMock.platform.mockReturnValue('linux');
+systemMock.release.mockReturnValue('cph-ng-mock');

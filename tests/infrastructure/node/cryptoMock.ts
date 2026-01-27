@@ -15,10 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { mock } from 'vitest-mock-extended';
+import { createHash } from 'node:crypto';
+import { mock } from '@t/mock';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 
 export const cryptoMock = mock<ICrypto>();
 cryptoMock.randomUUID.mockImplementation(() => {
-  return `u-u-i-d-${cryptoMock.randomUUID.mock.calls.length - 1}`;
+  const index = cryptoMock.randomUUID.mock.calls.length - 1;
+  return `u-u-i-d-${index}`;
+});
+cryptoMock.md5.mockImplementation((data) => {
+  return createHash('md5').update(data).digest('hex');
 });

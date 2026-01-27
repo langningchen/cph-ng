@@ -36,6 +36,7 @@
   },
   "include": [
     "src/**/*",
-    "tests/**/*"
+    "tests/**/*",
+    "tests/infrastructure/node/tempStorageMock/.ts"
   ]
 }

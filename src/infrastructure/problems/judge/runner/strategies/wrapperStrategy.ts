@@ -22,10 +22,11 @@ import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { IExecutionStrategy } from '@/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext, ExecutionResult } from '@/domain/execution';
 
-interface WrapperData {
+export interface WrapperData {
   time: number; // microseconds
 }
 
@@ -36,6 +37,7 @@ export class WrapperStrategy implements IExecutionStrategy {
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
     @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
     this.logger = this.logger.withScope('wrapperStrategy');
@@ -55,7 +57,10 @@ export class WrapperStrategy implements IExecutionStrategy {
     });
     if (res instanceof Error) return res;
     const data: ExecutionResult = {
-      ...res,
+      codeOrSignal: res.codeOrSignal,
+      stdoutPath: res.stdoutPath,
+      stderrPath: res.stderrPath,
+      timeMs: res.timeMs,
       isUserAborted: res.abortReason === AbortReason.UserAbort,
     };
     if (res.codeOrSignal === 0) {
@@ -71,12 +76,13 @@ export class WrapperStrategy implements IExecutionStrategy {
 
   private async readWrapperReport(path: string): Promise<WrapperData | null> {
     if (!(await this.fs.exists(path))) return null;
+    const content = await this.fs.readFile(path);
+    if (!content.trim()) return null;
     try {
-      const content = await this.fs.readFile(path);
-      if (!content.trim()) return null;
       return JSON.parse(content) as WrapperData;
     } catch (e) {
       this.logger.error('Failed to parse wrapper report', e as Error);
+      this.telemetry.error('wrapperError', e, { content });
       return null;
     }
   }

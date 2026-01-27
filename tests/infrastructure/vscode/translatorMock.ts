@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { mock } from 'vitest-mock-extended';
+import { mock } from '@t/mock';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 
 export const translatorMock = mock<ITranslator>();

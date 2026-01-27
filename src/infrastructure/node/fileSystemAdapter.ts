@@ -58,7 +58,7 @@ export class FileSystemAdapter implements IFileSystem {
   }
 
   public async readdir(path: string): Promise<string[]> {
-    return readdir(path);
+    return readdir(path, { encoding: 'utf8' });
   }
 
   public async stat(
@@ -77,13 +77,6 @@ export class FileSystemAdapter implements IFileSystem {
   }
 
   public async walk(path: string): Promise<string[]> {
-    const entries = await readdir(path, { withFileTypes: true });
-    const files = await Promise.all(
-      entries.map((entry) => {
-        const fullPath = this.path.join(path, entry.name);
-        return entry.isDirectory() ? this.walk(fullPath) : fullPath;
-      }),
-    );
-    return files.flat();
+    return await readdir(path, { encoding: 'utf8', recursive: true });
   }
 }

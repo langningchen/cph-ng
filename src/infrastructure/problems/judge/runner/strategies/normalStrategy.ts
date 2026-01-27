@@ -38,7 +38,10 @@ export class NormalStrategy implements IExecutionStrategy {
     });
     if (res instanceof Error) return res;
     return {
-      ...res,
+      codeOrSignal: res.codeOrSignal,
+      stdoutPath: res.stdoutPath,
+      stderrPath: res.stderrPath,
+      timeMs: res.timeMs,
       isUserAborted: res.abortReason === AbortReason.UserAbort,
     };
   }

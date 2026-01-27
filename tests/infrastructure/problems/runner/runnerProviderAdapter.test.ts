@@ -15,34 +15,47 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { fileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { systemMock } from '@t/infrastructure/node/systemMock';
+import {
+  signal,
+  stderrPath,
+  stdoutPath,
+} from '@t/infrastructure/problems/runner/strategies/constants';
 import { PathResolverMock } from '@t/infrastructure/services/pathResolverMock';
 import { extensionPathMock } from '@t/infrastructure/vscode/extensionPathMock';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
+import { mock } from '@t/mock';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { type MockProxy, mock } from 'vitest-mock-extended';
-import type { IFileSystem } from '@/application/ports/node/IFileSystem';
-import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
-import type { ISystem } from '@/application/ports/node/ISystem';
+import type { MockProxy } from 'vitest-mock-extended';
+import type {
+  IProcessExecutor,
+  ProcessExecuteResult,
+} from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
 import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 
 describe('RunnerProviderAdapter', () => {
   let adapter: RunnerProviderAdapter;
-  let fsMock: MockProxy<IFileSystem>;
-  let sys: MockProxy<ISystem>;
   let executorMock: MockProxy<IProcessExecutor>;
+  const mockProcessResult: ProcessExecuteResult = {
+    codeOrSignal: 0,
+    stdoutPath,
+    stderrPath,
+    timeMs: 200,
+  };
 
   beforeEach(() => {
-    fsMock = mock<IFileSystem>();
-    sys = mock<ISystem>();
     executorMock = mock<IProcessExecutor>();
+    fileSystemMock.safeCreateFile(stdoutPath);
+    fileSystemMock.safeCreateFile(stderrPath);
 
     container.registerInstance(TOKENS.extensionPath, extensionPathMock);
-    container.registerInstance(TOKENS.fileSystem, fsMock);
-    container.registerInstance(TOKENS.system, sys);
+    container.registerInstance(TOKENS.fileSystem, fileSystemMock);
+    container.registerInstance(TOKENS.system, systemMock);
     container.registerInstance(TOKENS.processExecutor, executorMock);
     container.registerInstance(TOKENS.settings, settingsMock);
     container.registerInstance(TOKENS.logger, loggerMock);
@@ -53,53 +66,45 @@ describe('RunnerProviderAdapter', () => {
   });
 
   it('should return cached path immediately if already resolved', async () => {
-    const ac = new AbortController();
+    systemMock.platform.mockReturnValue('linux');
+    executorMock.execute.mockImplementation(async (_options) => {
+      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner-linux');
+      return mockProcessResult;
+    });
 
-    sys.platform.mockReturnValue('linux');
-    fsMock.exists.mockResolvedValue(true);
-
-    const firstPath = await adapter.getRunnerPath(ac.signal);
-    const secondPath = await adapter.getRunnerPath(ac.signal);
+    const firstPath = await adapter.getRunnerPath(signal);
+    const secondPath = await adapter.getRunnerPath(signal);
 
     expect(firstPath).toBe(secondPath);
-    expect(fsMock.exists).toHaveBeenCalledTimes(1);
+    expect(executorMock.execute).toHaveBeenCalledTimes(1);
+    expect(fileSystemMock.exists).toHaveBeenCalledTimes(2);
   });
 
   it('should only trigger one compilation if multiple calls are made simultaneously', async () => {
-    const ac = new AbortController();
-    sys.platform.mockReturnValue('linux');
-
-    fsMock.exists.mockResolvedValueOnce(false).mockResolvedValue(true);
-
-    executorMock.execute.mockImplementation(async () => {
-      await new Promise((r) => setTimeout(r, 50));
-      return { codeOrSignal: 0, stdoutPath: '', stderrPath: '', timeMs: 0 };
+    systemMock.platform.mockReturnValue('linux');
+    executorMock.execute.mockImplementation(async (_options) => {
+      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner-linux');
+      return mockProcessResult;
     });
 
     const [path1, path2] = await Promise.all([
-      adapter.getRunnerPath(ac.signal),
-      adapter.getRunnerPath(ac.signal),
+      adapter.getRunnerPath(signal),
+      adapter.getRunnerPath(signal),
     ]);
 
     expect(path1).toBe(path2);
     expect(executorMock.execute).toHaveBeenCalledTimes(1);
+    expect(fileSystemMock.exists).toHaveBeenCalledTimes(2);
   });
 
   it('should use correct compiler flags and names for Windows', async () => {
-    const ac = new AbortController();
-    sys.platform.mockReturnValue('win32');
-    fsMock.exists.mockResolvedValue(false); // Does not exist
-
-    executorMock.execute.mockResolvedValue({
-      codeOrSignal: 0,
-      stdoutPath: '',
-      stderrPath: '',
-      timeMs: 0,
+    systemMock.platform.mockReturnValue('win32');
+    executorMock.execute.mockImplementation(async (_options) => {
+      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner-windows.exe');
+      return mockProcessResult;
     });
 
-    fsMock.exists.mockResolvedValueOnce(false).mockResolvedValue(true);
-
-    const path = await adapter.getRunnerPath(ac.signal);
+    const path = await adapter.getRunnerPath(signal);
 
     expect(path).toContain('runner-windows.exe');
     expect(executorMock.execute).toHaveBeenCalledWith(
@@ -110,18 +115,13 @@ describe('RunnerProviderAdapter', () => {
   });
 
   it('should use correct compiler flags and names for Linux', async () => {
-    const ac = new AbortController();
-    sys.platform.mockReturnValue('linux');
-    fsMock.exists.mockResolvedValueOnce(false).mockResolvedValue(true);
-
-    executorMock.execute.mockResolvedValue({
-      codeOrSignal: 0,
-      stdoutPath: '',
-      stderrPath: '',
-      timeMs: 0,
+    systemMock.platform.mockReturnValue('linux');
+    executorMock.execute.mockImplementation(async (_options) => {
+      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner-linux');
+      return mockProcessResult;
     });
 
-    const path = await adapter.getRunnerPath(ac.signal);
+    const path = await adapter.getRunnerPath(signal);
 
     expect(path).toContain('runner-linux');
     expect(executorMock.execute).toHaveBeenCalledWith(
@@ -132,49 +132,31 @@ describe('RunnerProviderAdapter', () => {
   });
 
   it('should throw error if compilation returns non-zero exit code', async () => {
-    const ac = new AbortController();
-    sys.platform.mockReturnValue('linux');
-    fsMock.exists.mockResolvedValue(false);
-
-    executorMock.execute.mockResolvedValue({
-      codeOrSignal: 1,
-      stdoutPath: '',
-      stderrPath: '/tmp/stderr',
-      timeMs: 0,
+    systemMock.platform.mockReturnValue('linux');
+    executorMock.execute.mockImplementation(async (_options) => {
+      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner-linux');
+      return { ...mockProcessResult, codeOrSignal: 1 };
     });
-    fsMock.readFile.mockResolvedValue('Syntax Error at line 1');
 
-    await expect(adapter.getRunnerPath(ac.signal)).rejects.toThrow(
+    await expect(adapter.getRunnerPath(signal)).rejects.toThrow(
       'Runner compilation failed with code 1',
     );
-    expect(loggerMock.error).toHaveBeenCalled();
   });
 
   it('should throw error if compilation returns an Error object', async () => {
-    const ac = new AbortController();
-    sys.platform.mockReturnValue('linux');
-    fsMock.exists.mockResolvedValue(false);
-
+    systemMock.platform.mockReturnValue('linux');
     executorMock.execute.mockResolvedValue(new Error('Compiler not found'));
 
-    await expect(adapter.getRunnerPath(ac.signal)).rejects.toThrow(
+    await expect(adapter.getRunnerPath(signal)).rejects.toThrow(
       'Failed to compile runner utility: Compiler not found',
     );
   });
 
   it('should throw error if output file is missing after successful compilation', async () => {
-    const ac = new AbortController();
-    sys.platform.mockReturnValue('linux');
+    systemMock.platform.mockReturnValue('linux');
+    executorMock.execute.mockResolvedValue(mockProcessResult);
 
-    fsMock.exists.mockResolvedValue(false);
-    executorMock.execute.mockResolvedValue({
-      codeOrSignal: 0,
-      stdoutPath: '',
-      stderrPath: '',
-      timeMs: 0,
-    });
-
-    await expect(adapter.getRunnerPath(ac.signal)).rejects.toThrow(
+    await expect(adapter.getRunnerPath(signal)).rejects.toThrow(
       'Compiler exited successfully but output file is missing',
     );
   });
