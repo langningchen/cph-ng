@@ -15,12 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import echoCode from '@t/fixtures/echo?raw';
+import helloWorldCode from '@t/fixtures/helloWorld?raw';
+import pingCode from '@t/fixtures/ping?raw';
+import pongCode from '@t/fixtures/pong?raw';
+import timeoutCode from '@t/fixtures/timeout?raw';
+import { fileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { vol } from 'memfs';
 import { container } from 'tsyringe';
-import { afterAll, beforeEach, describe, expect, it } from 'vitest';
-import { AbortReason } from '@/application/ports/node/IProcessExecutor';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { AbortReason, type ProcessOutput } from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
 import { PathAdapter } from '@/infrastructure/node/pathAdapter';
@@ -32,11 +36,8 @@ import { tempStorageMock } from './tempStorageMock';
 describe('ProcessExecutorAdapter', () => {
   let adapter: ProcessExecutorAdapter;
 
-  const realTmpDir = join(tmpdir(), `cph-test-${Date.now()}`);
-
   beforeEach(() => {
-    mkdirSync(realTmpDir, { recursive: true });
-
+    container.registerInstance(TOKENS.fileSystem, fileSystemMock);
     container.registerInstance(TOKENS.tempStorage, tempStorageMock);
     container.registerInstance(TOKENS.logger, loggerMock);
     container.registerInstance(TOKENS.telemetry, telemetryMock);
@@ -46,109 +47,99 @@ describe('ProcessExecutorAdapter', () => {
     adapter = container.resolve(ProcessExecutorAdapter);
   });
 
-  afterAll(() => {
-    rmSync(realTmpDir, { recursive: true, force: true });
-  });
+  const assertOutput = async (res: ProcessOutput, stdout: string, stderr: string) => {
+    expect(await vol.promises.readFile(res.stdoutPath, 'utf-8')).toBe(stdout);
+    expect(await vol.promises.readFile(res.stderrPath, 'utf-8')).toBe(stderr);
+  };
 
   it('should successfully execute a simple command and capture output', async () => {
-    const result = await adapter.execute({
-      cmd: ['node', '-e', `console.log('hello'); console.error('world');`],
-    });
-    expect(result).not.toBeInstanceOf(Error);
-    if (!(result instanceof Error)) {
-      expect(result.codeOrSignal).toBe(0);
-      expect(readFileSync(result.stdoutPath, 'utf-8').trim()).toBe('hello');
-      expect(readFileSync(result.stderrPath, 'utf-8').trim()).toBe('world');
-    }
+    const result = await adapter.execute({ cmd: ['node', '-e', helloWorldCode] });
+    console.log(result);
+    console.log(vol.toJSON());
+    expect(result).toStrictEqual({
+      codeOrSignal: 0,
+      stdoutPath: expect.any(String),
+      stderrPath: expect.any(String),
+      timeMs: expect.any(Number),
+      abortReason: undefined,
+    } satisfies ProcessOutput);
+    if (!(result instanceof Error)) await assertOutput(result, 'hello', 'world');
   });
 
   it('should return Timeout status when the process times out', async () => {
-    const result = await adapter.execute({
-      cmd: ['node', '-e', `setTimeout(() => {}, 2000);`],
-      timeoutMs: 100,
-    });
+    const result = await adapter.execute({ cmd: ['node', '-e', timeoutCode], timeoutMs: 100 });
     expect(result).not.toBeInstanceOf(Error);
-    if (!(result instanceof Error)) {
-      expect(result.timeMs).lessThan(2000).greaterThan(100);
-      expect(result.abortReason).toBe(AbortReason.Timeout);
-    }
+    expect(result).toStrictEqual({
+      codeOrSignal: 'SIGTERM',
+      stdoutPath: expect.any(String),
+      stderrPath: expect.any(String),
+      timeMs: expect.any(Number),
+      abortReason: AbortReason.Timeout,
+    } satisfies ProcessOutput);
+    if (!(result instanceof Error)) expect(result.timeMs).lessThan(200).greaterThan(100);
   });
 
   it('should correctly handle stdin input', async () => {
-    const inputFile = tempStorageMock.create('test');
-    writeFileSync(inputFile, 'hello_file');
-    const result = await adapter.execute({
-      cmd: ['node', '-e', `process.stdin.on('data', (d) => process.stdout.write('rec:' + d));`],
-      stdinPath: inputFile,
-    });
+    const stdinPath = tempStorageMock.create('test');
+    const data = 'hello_file';
+    await fileSystemMock.safeWriteFile(stdinPath, data);
+    const result = await adapter.execute({ cmd: ['node', '-e', echoCode], stdinPath });
     expect(result).not.toBeInstanceOf(Error);
-    if (!(result instanceof Error)) {
-      expect(readFileSync(result.stdoutPath, 'utf-8')).toBe('rec:hello_file');
-    }
+    expect(result).toStrictEqual({
+      codeOrSignal: 0,
+      stdoutPath: expect.any(String),
+      stderrPath: expect.any(String),
+      timeMs: expect.any(Number),
+      abortReason: undefined,
+    } satisfies ProcessOutput);
+    if (!(result instanceof Error)) await assertOutput(result, data, '');
   });
 
   it('should support executeWithPipe (interaction simulation)', async () => {
     const { res1, res2 } = await adapter.executeWithPipe(
-      {
-        cmd: [
-          'node',
-          '-e',
-          `
-console.log('ping');
-process.stdin.on('data', (d) => {
-    if (d.toString().trim() === 'pong') {
-        console.error('ok');
-        process.exit(0);
-    }
-});`,
-        ],
-      },
-      {
-        cmd: [
-          'node',
-          '-e',
-          `
-process.stdin.on('data', (d) => {
-    if (d.toString().trim() === 'ping') {
-        console.log('pong');
-        process.exit(0);
-    }
-});`,
-        ],
-      },
+      { cmd: ['node', '-e', pingCode] },
+      { cmd: ['node', '-e', pongCode] },
     );
-
     expect(res1).not.toBeInstanceOf(Error);
+    expect(res1).toStrictEqual({
+      codeOrSignal: 0,
+      stdoutPath: expect.any(String),
+      stderrPath: expect.any(String),
+      timeMs: expect.any(Number),
+      abortReason: undefined,
+    } satisfies ProcessOutput);
+    if (!(res1 instanceof Error)) await assertOutput(res1, 'ping', 'ok');
+
     expect(res2).not.toBeInstanceOf(Error);
-    if (!(res1 instanceof Error) && !(res2 instanceof Error)) {
-      expect(res1.codeOrSignal).toBe(0);
-      expect(res2.codeOrSignal).toBe(0);
-      expect(readFileSync(res1.stdoutPath, 'utf-8').trim()).toBe('ping');
-      expect(readFileSync(res1.stderrPath, 'utf-8').trim()).toBe('ok');
-      expect(readFileSync(res2.stdoutPath, 'utf-8').trim()).toBe('pong');
-    }
+    expect(res2).toStrictEqual({
+      codeOrSignal: 0,
+      stdoutPath: expect.any(String),
+      stderrPath: expect.any(String),
+      timeMs: expect.any(Number),
+      abortReason: undefined,
+    } satisfies ProcessOutput);
+    if (!(res2 instanceof Error)) await assertOutput(res2, 'pong', 'ok');
   });
 
   it('should stop execution when an external AbortController is aborted', async () => {
     const ac = new AbortController();
-    const promise = adapter.execute({
-      cmd: ['node', '-e', 'setInterval(() => {}, 1000);'],
-      signal: ac.signal,
-    });
-    setTimeout(() => ac.abort(), 50);
+    const promise = adapter.execute({ cmd: ['node', '-e', timeoutCode], signal: ac.signal });
+    setTimeout(() => ac.abort(), 100);
 
     const result = await promise;
     expect(result).not.toBeInstanceOf(Error);
-    if (!(result instanceof Error)) {
-      expect(result.timeMs).lessThan(1000);
-      expect(result.abortReason).toBe(AbortReason.UserAbort);
-    }
+    expect(result).toStrictEqual({
+      codeOrSignal: 'SIGTERM',
+      stdoutPath: expect.any(String),
+      stderrPath: expect.any(String),
+      timeMs: expect.any(Number),
+      abortReason: AbortReason.UserAbort,
+    } satisfies ProcessOutput);
+    if (!(result instanceof Error)) expect(result.timeMs).greaterThan(100).lessThan(200);
   });
 
   it('should allow manual process control via handle in spawn mode', async () => {
-    const handle = await adapter.spawn({
-      cmd: ['node', '-e', `process.stdin.on('data', (d) => console.log('got:' + d));`],
-    });
+    const handle = await adapter.spawn({ cmd: ['node', '-e', echoCode] });
     expect(handle.pid).toBeGreaterThan(0);
 
     handle.writeStdin('manual_input');
@@ -156,31 +147,35 @@ process.stdin.on('data', (d) => {
 
     const result = await handle.wait();
     expect(result).not.toBeInstanceOf(Error);
-    if (!(result instanceof Error)) {
-      expect(result.codeOrSignal).toBe(0);
-      expect(readFileSync(result.stdoutPath, 'utf-8').trim()).toBe('got:manual_input');
-    }
+    expect(result).toStrictEqual({
+      codeOrSignal: 0,
+      stdoutPath: expect.any(String),
+      stderrPath: expect.any(String),
+      timeMs: expect.any(Number),
+      abortReason: undefined,
+    } satisfies ProcessOutput);
+    if (!(result instanceof Error)) await assertOutput(result, 'manual_input', '');
   });
 
   it('should allow manual process control via handle in spawn mode', async () => {
-    const handle = await adapter.spawn({
-      cmd: ['node', '-e', `process.stdin.on('data', (d) => console.log('got:' + d));`],
-    });
+    const handle = await adapter.spawn({ cmd: ['node', '-e', echoCode] });
     expect(handle.pid).toBeGreaterThan(0);
 
     handle.kill();
 
     const result = await handle.wait();
     expect(result).not.toBeInstanceOf(Error);
-    if (!(result instanceof Error)) {
-      expect(result.codeOrSignal).toBe('SIGTERM');
-    }
+    expect(result).toStrictEqual({
+      codeOrSignal: 'SIGTERM',
+      stdoutPath: expect.any(String),
+      stderrPath: expect.any(String),
+      timeMs: expect.any(Number),
+      abortReason: undefined,
+    } satisfies ProcessOutput);
   });
 
   it('should return error if the program does not exists', async () => {
-    const result = await adapter.execute({
-      cmd: ['non_exists'],
-    });
+    const result = await adapter.execute({ cmd: ['non_exists'] });
     expect(result).toBeInstanceOf(Error);
   });
 });

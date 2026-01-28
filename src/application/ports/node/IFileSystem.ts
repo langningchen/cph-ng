@@ -16,6 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { RmOptions } from 'node:fs';
+import type { Readable, Writable } from 'node:stream';
 
 /**
  * Interface for file system operations.
@@ -68,4 +69,10 @@ export interface IFileSystem {
 
   /** Walks through a directory. */
   walk(path: string): Promise<string[]>;
+
+  /** Create a readable stream of a file. */
+  createReadStream(path: string): Readable;
+
+  /** Create a writeable stream of a file. */
+  safeCreateWriteStream(path: string): Writable;
 }

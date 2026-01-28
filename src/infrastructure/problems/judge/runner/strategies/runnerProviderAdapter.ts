@@ -70,10 +70,6 @@ export class RunnerProviderAdapter implements IRunnerProvider {
       binaryName,
     );
 
-    if (await this.fs.exists(outputPath)) {
-      this.logger.debug('Using existing runner binary', { outputPath });
-      return outputPath;
-    }
     this.logger.info('Compiling runner utility...', { srcPath, outputPath });
 
     const compiler = this.settings.compilation.cppCompiler;

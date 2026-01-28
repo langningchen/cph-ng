@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { constants } from 'node:os';
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import {
@@ -91,7 +92,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     if (this.settings.runner.unlimitedStack) runnerCmd.push('--unlimited-stack');
 
     // We use our own timeout handling to allow graceful exit
-    const handle = await this.executor.spawn({
+    const handle = this.executor.spawn({
       cmd: runnerCmd,
     });
 
@@ -112,7 +113,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
       unifiedAc.abort(AbortReason.Timeout);
     }, timeoutVal);
 
-    const runnerResult = await handle.wait();
+    const runnerResult = await handle.wait;
     clearTimeout(timeoutId);
     if (runnerResult instanceof Error) {
       this.tmp.dispose([handle.stdoutPath, handle.stderrPath, userStdoutPath, userStderrPath]);
@@ -157,7 +158,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     }
 
     return {
-      codeOrSignal: runInfo.signal !== 0 ? runInfo.signal : runInfo.exitCode,
+      codeOrSignal: runInfo.signal !== 0 ? this.getSignalName(runInfo.signal) : runInfo.exitCode,
       stdoutPath: userStdoutPath,
       stderrPath: userStderrPath,
       timeMs: runInfo.time,
@@ -173,5 +174,12 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     } catch (e) {
       this.logger.warn('Failed to perform soft kill', e);
     }
+  }
+
+  private getSignalName(signalNumber: number): NodeJS.Signals {
+    const signals = constants.signals;
+    const signal = Object.entries(signals).find(([_key, value]) => value === signalNumber);
+    if (!signal) throw new Error('Unknown signal number');
+    return signal[0] as NodeJS.Signals;
   }
 }

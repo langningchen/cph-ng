@@ -83,6 +83,7 @@ describe('RunnerProviderAdapter', () => {
   it('should only trigger one compilation if multiple calls are made simultaneously', async () => {
     systemMock.platform.mockReturnValue('linux');
     executorMock.execute.mockImplementation(async (_options) => {
+      await new Promise<void>((resolve, _reject) => setImmediate(resolve));
       fileSystemMock.safeCreateFile('/tmp/cph-ng/runner-linux');
       return mockProcessResult;
     });

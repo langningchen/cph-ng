@@ -22,7 +22,7 @@ export const stdinPath = '/tmp/cph-ng/stdin';
 export const stdoutPath = '/tmp/cph-ng/stdout';
 export const stderrPath = '/tmp/cph-ng/stderr';
 export const solutionPath = '/tmp/cph-ng/solution';
-export const timeLimitMs = 1000;
+export const timeLimitMs = 100;
 export const mockCtx: ExecutionContext = {
   cmd: ['echo', 'hello'],
   stdinPath,

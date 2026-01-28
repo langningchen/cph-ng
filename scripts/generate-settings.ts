@@ -161,6 +161,7 @@ const generateInterface = (sections: Section[]) => {
   const mainInterface = [
     `export interface ISettings {`,
     sections.map((s) => `  readonly ${s.name}: I${s.className};`).join('\n'),
+    `  reset(): void;`,
     `}`,
   ].join('\n');
 
@@ -211,6 +212,10 @@ const generateAdapter = (sections: Section[]) => {
     `  public constructor(@inject(TOKENS.logger) logger: ILogger) {`,
     sections.map((s) => `    this.${s.name} = new ${s.className}(logger);`).join('\n'),
     `  }`,
+    ``,
+    `  public reset(): void {`,
+    `    throw new Error('Reset settings can not be used in production');`,
+    `  }`,
     `}`,
   ].join('\n');
 
@@ -225,9 +230,19 @@ const generateMock = (sections: Section[]) => {
     return `  public readonly ${s.name}: I${s.className} = {\n${fields}\n  };`;
   });
 
-  const classDef = [`class SettingsMock implements ISettings {`, mockProps.join('\n\n'), `}`].join(
-    '\n',
+  const resetLogic = sections.flatMap((s) =>
+    s.props.map((p) => `    this.${s.name}.${p.shortKey} = ${p.defaultValue};`),
   );
+
+  const classDef = [
+    `class SettingsMock implements ISettings {`,
+    mockProps.join('\n\n'),
+    ``,
+    `  public reset(): void {`,
+    resetLogic.join('\n'),
+    `  }`,
+    `}`,
+  ].join('\n');
 
   return [header, imports, classDef, `export const settingsMock = new SettingsMock();`].join(
     '\n\n',

@@ -67,3 +67,10 @@ fileSystemMock.walk.mockImplementation(async (path) => {
   const result = await fs.promises.readdir(path, { encoding: 'utf8', recursive: true });
   return result as string[];
 });
+fileSystemMock.createReadStream.mockImplementation((path) => {
+  return fs.createReadStream(path);
+});
+fileSystemMock.safeCreateWriteStream.mockImplementation((path) => {
+  fs.mkdirSync(dirname(path), { recursive: true });
+  return fs.createWriteStream(path);
+});

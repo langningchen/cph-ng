@@ -20,6 +20,7 @@ import { readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { hasCppCompiler } from '@t/check';
+import stackTriggerCode from '@t/fixtures/stackTrigger?raw';
 import { fileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { getTmpStoragePath, tempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import {
@@ -90,7 +91,6 @@ describe('ExternalRunnerStrategy', () => {
     processHandleMock.kill.mockImplementation((signal?) => {
       loggerMock.info(`Mock kill called with signal: ${signal}`);
     });
-
     runnerProviderMock.getRunnerPath.mockResolvedValue(mockRunnerPath);
     fileSystemMock.safeCreateFile(stdoutPath);
     fileSystemMock.safeCreateFile(stderrPath);
@@ -126,7 +126,7 @@ describe('ExternalRunnerStrategy', () => {
     await vol.promises.writeFile(stdoutPath, JSON.stringify(stdoutData));
 
     executorMock.spawn.mockResolvedValue(processHandleMock);
-    processHandleMock.wait.mockResolvedValue({
+    processHandleMock.wait = Promise.resolve({
       codeOrSignal: 0,
       stdoutPath,
       stderrPath,
@@ -164,7 +164,7 @@ describe('ExternalRunnerStrategy', () => {
     const waitPromise = new Promise<ProcessExecuteResult>((resolve) => {
       resolveWait = resolve;
     });
-    processHandleMock.wait.mockReturnValue(waitPromise);
+    processHandleMock.wait = Promise.resolve(waitPromise);
     processHandleMock.writeStdin.mockImplementation((data) => {
       if (data === 'k') {
         loggerMock.info(`Received soft kill signal in mock`);
@@ -215,7 +215,7 @@ describe('ExternalRunnerStrategy', () => {
     await vol.promises.writeFile(stdoutPath, JSON.stringify(stdoutData));
 
     executorMock.spawn.mockResolvedValue(processHandleMock);
-    processHandleMock.wait.mockResolvedValue({
+    processHandleMock.wait = Promise.resolve({
       codeOrSignal: 1,
       stdoutPath,
       stderrPath,
@@ -232,7 +232,7 @@ describe('ExternalRunnerStrategy', () => {
     await vol.promises.writeFile(stdoutPath, invalidJson);
 
     executorMock.spawn.mockResolvedValue(processHandleMock);
-    processHandleMock.wait.mockResolvedValue({
+    processHandleMock.wait = Promise.resolve({
       codeOrSignal: 0,
       stdoutPath,
       stderrPath,
@@ -253,7 +253,7 @@ describe('ExternalRunnerStrategy', () => {
     await vol.promises.writeFile(stdoutPath, JSON.stringify(stdoutData));
 
     executorMock.spawn.mockResolvedValue(processHandleMock);
-    processHandleMock.wait.mockResolvedValue({
+    processHandleMock.wait = Promise.resolve({
       codeOrSignal: 0,
       stdoutPath,
       stderrPath,
@@ -279,10 +279,9 @@ describe('ExternalRunnerStrategy', () => {
     executorMock.spawn.mockResolvedValue(processHandleMock);
 
     let resolveWait: (value: ProcessExecuteResult) => void;
-    const waitPromise = new Promise<ProcessExecuteResult>((resolve) => {
+    processHandleMock.wait = new Promise((resolve) => {
       resolveWait = resolve;
     });
-    processHandleMock.wait.mockReturnValue(waitPromise);
     processHandleMock.writeStdin.mockImplementation((data) => {
       if (data === 'k') {
         resolveWait({
@@ -312,15 +311,12 @@ describe('ExternalRunnerStrategy', () => {
 
 describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => {
   const inputFile = 'input.in';
+  let mockRunnerPath: string;
   let strategy: ExternalRunnerStrategy;
   let testWorkspace: string;
+  let runnerProviderMock: MockProxy<IRunnerProvider>;
 
-  beforeEach(async () => {
-    testWorkspace = join(tmpdir(), `cph-ng-test-${Date.now()}`);
-    mkdirSync(testWorkspace, { recursive: true });
-    writeFileSync(join(testWorkspace, inputFile), '');
-    settingsMock.cache.directory = testWorkspace;
-
+  const register = () => {
     container.registerInstance(TOKENS.extensionPath, extensionPathMock);
     container.registerInstance(TOKENS.logger, loggerMock);
     container.registerInstance(TOKENS.settings, settingsMock);
@@ -336,6 +332,25 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
     container.registerSingleton(TOKENS.runnerProvider, RunnerProviderAdapter);
     container.registerSingleton(TOKENS.system, SystemAdapter);
     container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
+  };
+
+  beforeAll(async () => {
+    register();
+    const runnerProvider = container.resolve(RunnerProviderAdapter);
+    mockRunnerPath = await runnerProvider.getRunnerPath(signal);
+  });
+
+  beforeEach(async () => {
+    testWorkspace = join(tmpdir(), `cph-ng-test-${Date.now()}`);
+    mkdirSync(testWorkspace, { recursive: true });
+    writeFileSync(join(testWorkspace, inputFile), '');
+    settingsMock.cache.directory = testWorkspace;
+    settingsMock.runner.timeAddition = 100;
+    runnerProviderMock = mock<IRunnerProvider>();
+    runnerProviderMock.getRunnerPath.mockResolvedValue(mockRunnerPath);
+
+    register();
+    container.registerInstance(TOKENS.runnerProvider, runnerProviderMock);
 
     strategy = container.resolve(ExternalRunnerStrategy);
   });
@@ -345,7 +360,7 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
 
   const createExecutableScript = (content: string): string => {
     const scriptPath = join(testWorkspace, 'script.js');
-    writeFileSync(scriptPath, `#!/usr/bin/env node\n${content}`);
+    writeFileSync(scriptPath, `#!/usr/bin/env -S node --stack-size=102400\n\n${content}`);
     chmodSync(scriptPath, 0o755);
     return scriptPath;
   };
@@ -383,7 +398,7 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
-      expect(result.codeOrSignal).toBe(9);
+      expect(result.codeOrSignal).toBe('SIGKILL');
       expect(result.isUserAborted).toBe(false);
       expect(result.timeMs).toBeGreaterThanOrEqual(
         ctx.timeLimitMs + settingsMock.runner.timeAddition,
@@ -410,10 +425,37 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
-      expect(result.codeOrSignal).toBe(9);
+      expect(result.codeOrSignal).toBe('SIGKILL');
       expect(result.isUserAborted).toBe(true);
       expect(result.timeMs).toBeGreaterThan(150);
       expect(result.timeMs).toBeLessThan(300);
+    }
+  });
+
+  it('should handle unlimited stack', { timeout: 10000 }, async () => {
+    const runnerProvider = container.resolve(TOKENS.runnerProvider);
+    await runnerProvider.getRunnerPath(signal);
+
+    const scriptPath = createExecutableScript(stackTriggerCode);
+    const ctx: ExecutionContext = {
+      cmd: [scriptPath],
+      stdinPath: join(testWorkspace, inputFile),
+      timeLimitMs: 5000,
+    };
+
+    const res1 = await strategy.execute(ctx, signal);
+    expect(res1).not.toBeInstanceOf(Error);
+    if (!(res1 instanceof Error)) {
+      expect(res1.codeOrSignal).toBe('SIGSEGV');
+      expect(res1.isUserAborted).toBe(false);
+    }
+
+    settingsMock.runner.unlimitedStack = true;
+    const res2 = await strategy.execute(ctx, signal);
+    expect(res2).not.toBeInstanceOf(Error);
+    if (!(res2 instanceof Error)) {
+      expect(res2.codeOrSignal).toBe(0);
+      expect(res2.isUserAborted).toBe(false);
     }
   });
 });

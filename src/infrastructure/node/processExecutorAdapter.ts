@@ -16,10 +16,10 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
-import { createReadStream, createWriteStream } from 'node:fs';
 import { pipeline } from 'node:stream/promises';
 import { inject, injectable } from 'tsyringe';
 import type { IClock } from '@/application/ports/node/IClock';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import {
   AbortReason,
   type IProcessExecutor,
@@ -52,6 +52,7 @@ interface LaunchResult {
 export class ProcessExecutorAdapter implements IProcessExecutor {
   public constructor(
     @inject(TOKENS.clock) private readonly clock: IClock,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
@@ -73,7 +74,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
     });
   }
 
-  public async spawn(options: ProcessOptions): Promise<ProcessHandle> {
+  public spawn(options: ProcessOptions): ProcessHandle {
     this.logger.trace('spawn', options);
     const launch = this.internalLaunch(options);
 
@@ -83,32 +84,37 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
       stderrPath: launch.stderrPath,
 
       writeStdin: (input: string) => {
-        if (launch.child.stdin && !launch.child.stdin.destroyed) {
-          launch.child.stdin.write(input);
-        }
+        if (launch.child.stdin && !launch.child.stdin.destroyed) launch.child.stdin.write(input);
       },
 
       closeStdin: () => {
-        if (launch.child.stdin && !launch.child.stdin.destroyed) {
-          launch.child.stdin.end();
-        }
+        if (launch.child.stdin && !launch.child.stdin.destroyed) launch.child.stdin.end();
       },
 
       kill: (signal?: NodeJS.Signals) => {
         launch.child.kill(signal);
       },
 
-      wait: () => {
-        return new Promise((resolve) => {
-          launch.child.on('close', async (code, signal) => {
-            resolve(await this.collectResult(launch, code ?? signal ?? -1));
-          });
-          launch.child.on('error', (error) => {
-            this.tmp.dispose([launch.stderrPath, launch.stdoutPath]);
-            resolve(this.collectError(error));
-          });
-        });
-      },
+      wait: new Promise<ProcessExecuteResult>((resolve) => {
+        const onResult = async (code: number | null, signal: NodeJS.Signals | null) => {
+          cleanup();
+          resolve(await this.collectResult(launch, code ?? signal ?? -1));
+        };
+
+        const onError = (error: Error) => {
+          cleanup();
+          this.tmp.dispose([launch.stderrPath, launch.stdoutPath]);
+          resolve(this.collectError(error));
+        };
+
+        const cleanup = () => {
+          launch.child.removeListener('close', onResult);
+          launch.child.removeListener('error', onError);
+        };
+
+        launch.child.on('close', onResult);
+        launch.child.on('error', onError);
+      }),
     };
   }
 
@@ -118,9 +124,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
 
     // Use a unified AbortController to handle both external and internal aborts
     const unifiedAc = new AbortController();
-    if (signal) {
-      signal.addEventListener('abort', () => unifiedAc.abort(AbortReason.UserAbort));
-    }
+    if (signal) signal.addEventListener('abort', () => unifiedAc.abort(AbortReason.UserAbort));
 
     const child = spawn(cmd[0], cmd.slice(1), {
       signal: unifiedAc.signal,
@@ -147,16 +151,16 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
     // Process stdio
     if (stdinPath) {
       result.ioPromises.push(
-        pipeline(createReadStream(stdinPath), child.stdin).catch(
+        pipeline(this.fs.createReadStream(stdinPath), child.stdin).catch(
           this.pipeFailed(child.pid, 'stdin'),
         ),
       );
     }
     result.ioPromises.push(
-      pipeline(child.stdout, createWriteStream(result.stdoutPath)).catch(
+      pipeline(child.stdout, this.fs.safeCreateWriteStream(result.stdoutPath)).catch(
         this.pipeFailed(child.pid, 'stdout'),
       ),
-      pipeline(child.stderr, createWriteStream(result.stderrPath)).catch(
+      pipeline(child.stderr, this.fs.safeCreateWriteStream(result.stderrPath)).catch(
         this.pipeFailed(child.pid, 'stderr'),
       ),
     );

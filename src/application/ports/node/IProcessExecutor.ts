@@ -74,7 +74,7 @@ export interface ProcessHandle {
   kill(signal?: NodeJS.Signals): void;
 
   /** Waits for the process to complete and returns the execution result. */
-  wait(): Promise<ProcessExecuteResult>;
+  wait: Promise<ProcessExecuteResult>;
 }
 
 /** Output of a process execution. */
@@ -113,7 +113,7 @@ export interface IProcessExecutor {
    * Spawns a new process.
    * @returns A handle to the spawned process.
    */
-  spawn(options: ProcessOptions): Promise<ProcessHandle>;
+  spawn(options: ProcessOptions): ProcessHandle;
 
   /**
    * Executes a process and waits for it to complete.
