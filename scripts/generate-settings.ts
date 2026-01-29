@@ -161,7 +161,6 @@ const generateInterface = (sections: Section[]) => {
   const mainInterface = [
     `export interface ISettings {`,
     sections.map((s) => `  readonly ${s.name}: I${s.className};`).join('\n'),
-    `  reset(): void;`,
     `}`,
   ].join('\n');
 
@@ -211,10 +210,6 @@ const generateAdapter = (sections: Section[]) => {
     ``,
     `  public constructor(@inject(TOKENS.logger) logger: ILogger) {`,
     sections.map((s) => `    this.${s.name} = new ${s.className}(logger);`).join('\n'),
-    `  }`,
-    ``,
-    `  public reset(): void {`,
-    `    throw new Error('Reset settings can not be used in production');`,
     `  }`,
     `}`,
   ].join('\n');

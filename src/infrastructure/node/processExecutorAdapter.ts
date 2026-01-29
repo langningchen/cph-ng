@@ -68,6 +68,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
         resolve(await this.collectResult(launch, code ?? signal ?? -1));
       });
       launch.child.on('error', async (error) => {
+        if (launch.acSignal.aborted) return;
         this.tmp.dispose([launch.stdoutPath, launch.stderrPath]);
         if (error.name !== 'AbortError') resolve(this.collectError(error));
       });
@@ -103,8 +104,9 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
           };
 
           const onError = (error: Error) => {
+            if (launch.acSignal.aborted) return;
             cleanup();
-            this.tmp.dispose([launch.stderrPath, launch.stdoutPath]);
+            this.tmp.dispose([launch.stdoutPath, launch.stderrPath]);
             resolve(this.collectError(error));
           };
 
@@ -189,9 +191,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
 
   private collectError(data: Error | string): Error {
     this.logger.trace('collectError', { data });
-    if (data instanceof Error) {
-      return data;
-    }
+    if (data instanceof Error) return data;
     return new Error(data);
   }
 

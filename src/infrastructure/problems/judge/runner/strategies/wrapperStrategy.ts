@@ -65,12 +65,10 @@ export class WrapperStrategy implements IExecutionStrategy {
     };
     if (res.codeOrSignal === 0) {
       const wrapperData = await this.readWrapperReport(reportPath);
-      if (wrapperData) {
-        data.timeMs = wrapperData.time / 1000;
-      } else {
-        this.logger.warn('Wrapper exited successfully but report file is missing');
-      }
+      if (wrapperData) data.timeMs = wrapperData.time / 1000;
+      else this.logger.warn('Wrapper exited successfully but report file is missing');
     }
+    this.tmp.dispose(reportPath);
     return data;
   }
 

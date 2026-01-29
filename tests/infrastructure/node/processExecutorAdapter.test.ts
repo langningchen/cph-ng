@@ -21,6 +21,8 @@ import pingCode from '@t/fixtures/ping?raw';
 import pongCode from '@t/fixtures/pong?raw';
 import timeoutCode from '@t/fixtures/timeout?raw';
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
+import { stdinPath } from '@t/infrastructure/problems/runner/strategies/constants';
 import type { Volume } from 'memfs';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -33,24 +35,25 @@ import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
 import { loggerMock } from '../vscode/loggerMock';
 import { telemetryMock } from '../vscode/telemetryMock';
-import { tempStorageMock } from './tempStorageMock';
 
 describe('ProcessExecutorAdapter', () => {
   let adapter: ProcessExecutorAdapter;
   let fileSystemMock: MockProxy<IFileSystem>;
+  let tempStorageMock: TempStorageMock;
   let vol: Volume;
 
   beforeEach(() => {
     ({ fileSystemMock, vol } = createFileSystemMock());
 
     container.registerInstance(TOKENS.fileSystem, fileSystemMock);
-    container.registerInstance(TOKENS.tempStorage, tempStorageMock);
     container.registerInstance(TOKENS.logger, loggerMock);
     container.registerInstance(TOKENS.telemetry, telemetryMock);
     container.registerSingleton(TOKENS.clock, ClockAdapter);
     container.registerSingleton(TOKENS.path, PathAdapter);
+    container.registerSingleton(TOKENS.tempStorage, TempStorageMock);
 
     adapter = container.resolve(ProcessExecutorAdapter);
+    tempStorageMock = container.resolve(TOKENS.tempStorage) as TempStorageMock;
   });
 
   const assertOutput = async (res: ProcessOutput, stdout: string, stderr: string) => {
@@ -61,7 +64,6 @@ describe('ProcessExecutorAdapter', () => {
   it('should successfully execute a simple command and capture output', async () => {
     const result = await adapter.execute({ cmd: ['node', '-e', helloWorldCode] });
     console.log(result);
-    console.log(vol.toJSON());
     expect(result).toStrictEqual({
       codeOrSignal: 0,
       stdoutPath: expect.any(String),
@@ -69,7 +71,10 @@ describe('ProcessExecutorAdapter', () => {
       timeMs: expect.any(Number),
       abortReason: undefined,
     } satisfies ProcessOutput);
-    if (!(result instanceof Error)) await assertOutput(result, 'hello', 'world');
+    if (!(result instanceof Error)) {
+      await assertOutput(result, 'hello', 'world');
+      tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
+    }
   });
 
   it('should return Timeout status when the process times out', async () => {
@@ -82,11 +87,13 @@ describe('ProcessExecutorAdapter', () => {
       timeMs: expect.any(Number),
       abortReason: AbortReason.Timeout,
     } satisfies ProcessOutput);
-    if (!(result instanceof Error)) expect(result.timeMs).lessThan(200).greaterThan(100);
+    if (!(result instanceof Error)) {
+      expect(result.timeMs).lessThan(200).greaterThan(100);
+      tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
+    }
   });
 
   it('should correctly handle stdin input', async () => {
-    const stdinPath = tempStorageMock.create('test');
     const data = 'hello_file';
     await fileSystemMock.safeWriteFile(stdinPath, data);
     const result = await adapter.execute({ cmd: ['node', '-e', echoCode], stdinPath });
@@ -98,7 +105,10 @@ describe('ProcessExecutorAdapter', () => {
       timeMs: expect.any(Number),
       abortReason: undefined,
     } satisfies ProcessOutput);
-    if (!(result instanceof Error)) await assertOutput(result, data, '');
+    if (!(result instanceof Error)) {
+      await assertOutput(result, data, '');
+      tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
+    }
   });
 
   it('should support executeWithPipe (interaction simulation)', async () => {
@@ -125,6 +135,14 @@ describe('ProcessExecutorAdapter', () => {
       abortReason: undefined,
     } satisfies ProcessOutput);
     if (!(res2 instanceof Error)) await assertOutput(res2, 'pong', 'ok');
+
+    if (!(res1 instanceof Error) && !(res2 instanceof Error))
+      tempStorageMock.checkFile([
+        res1.stdoutPath,
+        res1.stderrPath,
+        res2.stdoutPath,
+        res2.stderrPath,
+      ]);
   });
 
   it('should stop execution when an external AbortController is aborted', async () => {
@@ -141,7 +159,10 @@ describe('ProcessExecutorAdapter', () => {
       timeMs: expect.any(Number),
       abortReason: AbortReason.UserAbort,
     } satisfies ProcessOutput);
-    if (!(result instanceof Error)) expect(result.timeMs).greaterThan(100).lessThan(200);
+    if (!(result instanceof Error)) {
+      expect(result.timeMs).greaterThan(100).lessThan(200);
+      tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
+    }
   });
 
   it('should allow manual process control via handle in spawn mode', async () => {
@@ -160,7 +181,10 @@ describe('ProcessExecutorAdapter', () => {
       timeMs: expect.any(Number),
       abortReason: undefined,
     } satisfies ProcessOutput);
-    if (!(result instanceof Error)) await assertOutput(result, 'manual_input', '');
+    if (!(result instanceof Error)) {
+      await assertOutput(result, 'manual_input', '');
+      tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
+    }
   });
 
   it('should allow manual process control via handle in spawn mode', async () => {
@@ -178,10 +202,15 @@ describe('ProcessExecutorAdapter', () => {
       timeMs: expect.any(Number),
       abortReason: undefined,
     } satisfies ProcessOutput);
+    if (!(result instanceof Error)) {
+      await assertOutput(result, '', '');
+      tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
+    }
   });
 
   it('should return error if the program does not exists', async () => {
     const result = await adapter.execute({ cmd: ['non_exists'] });
     expect(result).toBeInstanceOf(Error);
+    if (result instanceof Error) tempStorageMock.checkFile();
   });
 });

@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
-import { getTmpStoragePath, tempStorageMock } from '@t/infrastructure/node/tempStorageMock';
+import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import {
   invalidJson,
   mockCtx,
@@ -51,6 +51,7 @@ describe('WrapperStrategy', () => {
   let strategy: WrapperStrategy;
   let executorMock: MockProxy<IProcessExecutor>;
   let fileSystemMock: MockProxy<IFileSystem>;
+  let tempStorageMock: TempStorageMock;
   let vol: Volume;
 
   beforeEach(() => {
@@ -64,9 +65,10 @@ describe('WrapperStrategy', () => {
     container.registerInstance(TOKENS.processExecutor, executorMock);
     container.registerInstance(TOKENS.settings, settingsMock);
     container.registerInstance(TOKENS.telemetry, telemetryMock);
-    container.registerInstance(TOKENS.tempStorage, tempStorageMock);
+    container.registerSingleton(TOKENS.tempStorage, TempStorageMock);
 
     strategy = container.resolve(WrapperStrategy);
+    tempStorageMock = container.resolve(TOKENS.tempStorage) as TempStorageMock;
   });
 
   afterEach(() => {
@@ -75,7 +77,7 @@ describe('WrapperStrategy', () => {
 
   it('should successfully extract time from stderr and clean up stderr file', async () => {
     await vol.promises.writeFile(
-      getTmpStoragePath(0),
+      TempStorageMock.getPath(0),
       JSON.stringify({ time: 150000 } as WrapperData),
     );
     const mockProcessResult: ProcessExecuteResult = {
@@ -96,6 +98,7 @@ describe('WrapperStrategy', () => {
       timeMs: 150,
       isUserAborted: false,
     } satisfies ExecutionData);
+    if (!(result instanceof Error)) tempStorageMock.checkFile();
   });
 
   it('should fallback to executor time if CPH data is missing', async () => {
@@ -117,11 +120,12 @@ describe('WrapperStrategy', () => {
       timeMs: 200,
       isUserAborted: false,
     } satisfies ExecutionData);
+    if (!(result instanceof Error)) tempStorageMock.checkFile();
   });
 
   it('should handle UserAbort correctly', async () => {
     await vol.promises.writeFile(
-      getTmpStoragePath(0),
+      TempStorageMock.getPath(0),
       JSON.stringify({ time: 90000 } as WrapperData),
     );
     const mockProcessResult: ProcessExecuteResult = {
@@ -143,6 +147,7 @@ describe('WrapperStrategy', () => {
       timeMs: 90,
       isUserAborted: true,
     } satisfies ExecutionData);
+    if (!(result instanceof Error)) tempStorageMock.checkFile();
   });
 
   it('should return error if executor fails', async () => {
@@ -155,7 +160,7 @@ describe('WrapperStrategy', () => {
   });
 
   it('should handle malformed JSON in wrapper data gracefully', async () => {
-    await vol.promises.writeFile(getTmpStoragePath(0), invalidJson);
+    await vol.promises.writeFile(TempStorageMock.getPath(0), invalidJson);
     executorMock.execute.mockResolvedValue({
       codeOrSignal: 0,
       stdoutPath,
@@ -177,6 +182,7 @@ describe('WrapperStrategy', () => {
     expect(telemetryMock.error).toHaveBeenCalledWith('wrapperError', expect.any(SyntaxError), {
       content: invalidJson,
     });
+    if (!(result instanceof Error)) tempStorageMock.checkFile();
   });
 
   it('should call executor with correct timeout addition', async () => {
@@ -194,6 +200,7 @@ describe('WrapperStrategy', () => {
         timeoutMs: mockCtx.timeLimitMs + settingsMock.runner.timeAddition,
       }),
     );
+    tempStorageMock.checkFile();
   });
 });
 

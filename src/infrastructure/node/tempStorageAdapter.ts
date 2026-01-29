@@ -39,7 +39,7 @@ export class TempStorageAdapter implements ITempStorage {
     @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
     @inject(TOKENS.settings) private readonly settings: ISettings,
   ) {
-    this.logger = this.logger.withScope('cache');
+    this.logger = this.logger.withScope('tempStorage');
   }
 
   public async startMonitor(): Promise<void> {

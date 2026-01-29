@@ -21,8 +21,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { hasCppCompiler } from '@t/check';
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 // import stackTriggerCode from '@t/fixtures/stackTrigger?raw';
-import { getTmpStoragePath, tempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import {
   invalidJson,
   mockCtxNoArg,
@@ -73,6 +73,7 @@ describe('ExternalRunnerStrategy', () => {
   let runnerProviderMock: MockProxy<IRunnerProvider>;
   let processHandleMock: MockProxy<ProcessHandle>;
   let fileSystemMock: MockProxy<IFileSystem>;
+  let tempStorageMock: TempStorageMock;
   let vol: Volume;
 
   const mockRunnerPath = '/path/to/runner';
@@ -97,6 +98,8 @@ describe('ExternalRunnerStrategy', () => {
       loggerMock.info(`Mock kill called with signal: ${signal}`);
     });
     runnerProviderMock.getRunnerPath.mockResolvedValue(mockRunnerPath);
+    fileSystemMock.safeCreateFile(solutionPath);
+    fileSystemMock.safeCreateFile(stdinPath);
     fileSystemMock.safeCreateFile(stdoutPath);
     fileSystemMock.safeCreateFile(stderrPath);
 
@@ -107,13 +110,12 @@ describe('ExternalRunnerStrategy', () => {
     container.registerInstance(TOKENS.runnerProvider, runnerProviderMock);
     container.registerInstance(TOKENS.settings, settingsMock);
     container.registerInstance(TOKENS.telemetry, telemetryMock);
-    container.registerInstance(TOKENS.tempStorage, tempStorageMock);
     container.registerInstance(TOKENS.translator, translatorMock);
+    container.registerSingleton(TOKENS.tempStorage, TempStorageMock);
     container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
 
     strategy = container.resolve(ExternalRunnerStrategy);
-    fileSystemMock.safeCreateFile(stdinPath);
-    fileSystemMock.safeCreateFile(solutionPath);
+    tempStorageMock = container.resolve(TOKENS.tempStorage) as TempStorageMock;
   });
 
   afterEach(() => {
@@ -145,12 +147,14 @@ describe('ExternalRunnerStrategy', () => {
     expect(executorMock.spawn).toHaveBeenCalled();
     expect(result).toStrictEqual({
       codeOrSignal: 0,
-      stdoutPath: getTmpStoragePath(0),
-      stderrPath: getTmpStoragePath(1),
+      stdoutPath: TempStorageMock.getPath(0),
+      stderrPath: TempStorageMock.getPath(1),
       timeMs: 150,
       memoryMb: 10,
       isUserAborted: false,
     } satisfies ExecutionData);
+    if (!(result instanceof Error))
+      tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
   });
 
   it('should throw error when cmd has arguments', async () => {
@@ -164,6 +168,8 @@ describe('ExternalRunnerStrategy', () => {
     expect((result as Error).message).equals(
       'External runner only supports single program without arguments',
     );
+    if (!(result instanceof Error))
+      tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
   });
 
   it('should perform soft kill when time limit is exceeded', async () => {
@@ -206,12 +212,14 @@ describe('ExternalRunnerStrategy', () => {
     expect(processHandleMock.closeStdin).toHaveBeenCalled();
     expect(result).toStrictEqual({
       codeOrSignal: 0,
-      stdoutPath: getTmpStoragePath(0),
-      stderrPath: getTmpStoragePath(1),
+      stdoutPath: TempStorageMock.getPath(0),
+      stderrPath: TempStorageMock.getPath(1),
       timeMs: 1200,
       memoryMb: 10,
       isUserAborted: false,
     } satisfies ExecutionData);
+    if (!(result instanceof Error))
+      tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
   });
 
   it('should return error if runner provider fails', async () => {
@@ -223,6 +231,7 @@ describe('ExternalRunnerStrategy', () => {
     expect((result as Error).message).equals(
       'Failed to prepare runner utility: {codeOrSignal},No runner binary',
     );
+    tempStorageMock.checkFile();
   });
 
   it('should return error if runner returns non-zero exit code', async () => {
@@ -245,6 +254,7 @@ describe('ExternalRunnerStrategy', () => {
 
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).equals('Runner exited with code {codeOrSignal},1');
+    tempStorageMock.checkFile();
   });
 
   it('should return error if runner output is malformed JSON', async () => {
@@ -261,6 +271,7 @@ describe('ExternalRunnerStrategy', () => {
     const result = await strategy.execute(mockCtxNoArg, signal);
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).equals('Runner output is invalid JSON');
+    tempStorageMock.checkFile();
   });
 
   it('should return error if runner reports an internal error', async () => {
@@ -282,6 +293,7 @@ describe('ExternalRunnerStrategy', () => {
     const result = await strategy.execute(mockCtxNoArg, signal);
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).equals('Runner reported error: {type} (Code: {code}),1,101');
+    tempStorageMock.checkFile();
   });
 
   it('should handle User Abort correctly', async () => {
@@ -326,6 +338,7 @@ describe('ExternalRunnerStrategy', () => {
     if (!(result instanceof Error)) {
       expect(result.isUserAborted).toBe(true);
       expect(result.timeMs).toBe(50);
+      tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
     }
   });
 });
