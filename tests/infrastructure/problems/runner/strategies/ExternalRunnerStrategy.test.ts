@@ -153,6 +153,19 @@ describe('ExternalRunnerStrategy', () => {
     } satisfies ExecutionData);
   });
 
+  it('should throw error when cmd has arguments', async () => {
+    const invalidCtx = {
+      ...mockCtxNoArg,
+      cmd: ['program', 'arg1'],
+    };
+    const result = await strategy.execute(invalidCtx, signal);
+
+    expect(result).toBeInstanceOf(Error);
+    expect((result as Error).message).equals(
+      'External runner only supports single program without arguments',
+    );
+  });
+
   it('should perform soft kill when time limit is exceeded', async () => {
     const stdoutData = {
       error: false,
