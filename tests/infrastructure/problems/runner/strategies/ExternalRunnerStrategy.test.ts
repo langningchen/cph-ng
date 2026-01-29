@@ -234,6 +234,17 @@ describe('ExternalRunnerStrategy', () => {
     tempStorageMock.checkFile();
   });
 
+  it('should return error if runner process fails to start', async () => {
+    executorMock.spawn.mockReturnValue(processHandleMock);
+    processHandleMock.wait.mockResolvedValue(new Error('Process failed'));
+
+    const result = await strategy.execute(mockCtxNoArg, signal);
+
+    expect(result).toBeInstanceOf(Error);
+    expect((result as Error).message).equals('Process failed');
+    tempStorageMock.checkFile();
+  });
+
   it('should return error if runner returns non-zero exit code', async () => {
     const stdoutData = {
       error: true,
