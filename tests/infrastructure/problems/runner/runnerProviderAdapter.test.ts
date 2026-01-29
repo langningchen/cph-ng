@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { fileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { systemMock } from '@t/infrastructure/node/systemMock';
 import {
   signal,
@@ -27,9 +27,11 @@ import { extensionPathMock } from '@t/infrastructure/vscode/extensionPathMock';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { mock } from '@t/mock';
+import type { Volume } from 'memfs';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type {
   IProcessExecutor,
   ProcessExecuteResult,
@@ -41,6 +43,9 @@ import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/st
 describe('RunnerProviderAdapter', () => {
   let adapter: RunnerProviderAdapter;
   let executorMock: MockProxy<IProcessExecutor>;
+  let fileSystemMock: MockProxy<IFileSystem>;
+  let _vol: Volume;
+
   const mockProcessResult: ProcessExecuteResult = {
     codeOrSignal: 0,
     stdoutPath,
@@ -49,9 +54,10 @@ describe('RunnerProviderAdapter', () => {
   };
 
   beforeEach(() => {
-    executorMock = mock<IProcessExecutor>();
+    ({ fileSystemMock, vol: _vol } = createFileSystemMock());
     fileSystemMock.safeCreateFile(stdoutPath);
     fileSystemMock.safeCreateFile(stderrPath);
+    executorMock = mock<IProcessExecutor>();
 
     container.registerInstance(TOKENS.extensionPath, extensionPathMock);
     container.registerInstance(TOKENS.fileSystem, fileSystemMock);

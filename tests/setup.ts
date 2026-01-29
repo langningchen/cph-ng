@@ -8,7 +8,8 @@ beforeEach(() => {
   container.clearInstances();
   vi.clearAllMocks();
 });
-afterEach(() => {
+afterEach(async () => {
+  await new Promise((resolve) => setImmediate(resolve));
   vol.reset();
   settingsMock.reset();
 });

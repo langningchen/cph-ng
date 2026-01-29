@@ -17,7 +17,6 @@
 
 import { executorMock } from '@t/infrastructure/node/processExecutorMock';
 import {
-  createFiles,
   mockCtx,
   signal,
   stderrPath,
@@ -39,7 +38,6 @@ describe('NormalStrategy', () => {
     container.registerInstance(TOKENS.processExecutor, executorMock);
     container.registerInstance(TOKENS.settings, settingsMock);
     strategy = container.resolve(NormalStrategy);
-    createFiles();
   });
 
   it('should call executor with correct command and include time addition in timeout', async () => {

@@ -15,24 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { fileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { getTmpStoragePath, tempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import {
-  createFiles,
   invalidJson,
   mockCtx,
   signal,
+  solutionPath,
   stderrPath,
+  stdinPath,
   stdoutPath,
 } from '@t/infrastructure/problems/runner/strategies/constants';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { telemetryMock } from '@t/infrastructure/vscode/telemetryMock';
 import { mock } from '@t/mock';
-import { vol } from 'memfs';
+import type { Volume } from 'memfs';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import {
   AbortReason,
   type IProcessExecutor,
@@ -48,8 +50,13 @@ import {
 describe('WrapperStrategy', () => {
   let strategy: WrapperStrategy;
   let executorMock: MockProxy<IProcessExecutor>;
+  let fileSystemMock: MockProxy<IFileSystem>;
+  let vol: Volume;
 
   beforeEach(() => {
+    ({ fileSystemMock, vol } = createFileSystemMock());
+    fileSystemMock.safeCreateFile(stdinPath);
+    fileSystemMock.safeCreateFile(solutionPath);
     executorMock = mock<IProcessExecutor>();
 
     container.registerInstance(TOKENS.fileSystem, fileSystemMock);
@@ -60,7 +67,6 @@ describe('WrapperStrategy', () => {
     container.registerInstance(TOKENS.tempStorage, tempStorageMock);
 
     strategy = container.resolve(WrapperStrategy);
-    createFiles();
   });
 
   afterEach(() => {

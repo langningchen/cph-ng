@@ -15,12 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { fileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { systemMock } from '@t/infrastructure/node/systemMock';
 import { PathResolverMock } from '@t/infrastructure/services/pathResolverMock';
-import { vol } from 'memfs';
+import type { Volume } from 'memfs';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
+import type { MockProxy } from 'vitest-mock-extended';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { TOKENS } from '@/composition/tokens';
 import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
@@ -31,8 +33,12 @@ import { cryptoMock } from './cryptoMock';
 
 describe('TempStorageAdapter', () => {
   let adapter: TempStorageAdapter;
+  let fileSystemMock: MockProxy<IFileSystem>;
+  let vol: Volume;
 
   beforeEach(() => {
+    ({ fileSystemMock, vol } = createFileSystemMock());
+
     container.registerInstance(TOKENS.crypto, cryptoMock);
     container.registerInstance(TOKENS.extensionPath, extensionPathMock);
     container.registerInstance(TOKENS.fileSystem, fileSystemMock);

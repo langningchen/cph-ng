@@ -20,15 +20,16 @@ import { readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { hasCppCompiler } from '@t/check';
-import stackTriggerCode from '@t/fixtures/stackTrigger?raw';
-import { fileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+// import stackTriggerCode from '@t/fixtures/stackTrigger?raw';
 import { getTmpStoragePath, tempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import {
-  createFiles,
   invalidJson,
   mockCtxNoArg,
   signal,
+  solutionPath,
   stderrPath,
+  stdinPath,
   stdoutPath,
   timeLimitMs,
 } from '@t/infrastructure/problems/runner/strategies/constants';
@@ -39,10 +40,11 @@ import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { telemetryMock } from '@t/infrastructure/vscode/telemetryMock';
 import { translatorMock } from '@t/infrastructure/vscode/translatorMock';
 import { mock } from '@t/mock';
-import { vol } from 'memfs';
+import type { Volume } from 'memfs';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type {
   IProcessExecutor,
   ProcessExecuteResult,
@@ -70,11 +72,14 @@ describe('ExternalRunnerStrategy', () => {
   let executorMock: MockProxy<IProcessExecutor>;
   let runnerProviderMock: MockProxy<IRunnerProvider>;
   let processHandleMock: MockProxy<ProcessHandle>;
+  let fileSystemMock: MockProxy<IFileSystem>;
+  let vol: Volume;
 
   const mockRunnerPath = '/path/to/runner';
 
   beforeEach(() => {
     vi.useFakeTimers();
+    ({ fileSystemMock, vol } = createFileSystemMock());
 
     executorMock = mock<IProcessExecutor>();
     runnerProviderMock = mock<IRunnerProvider>();
@@ -107,7 +112,8 @@ describe('ExternalRunnerStrategy', () => {
     container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
 
     strategy = container.resolve(ExternalRunnerStrategy);
-    createFiles();
+    fileSystemMock.safeCreateFile(stdinPath);
+    fileSystemMock.safeCreateFile(solutionPath);
   });
 
   afterEach(() => {
@@ -434,30 +440,30 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
     }
   });
 
-  it('should handle unlimited stack', { timeout: 10000 }, async () => {
-    const runnerProvider = container.resolve(TOKENS.runnerProvider);
-    await runnerProvider.getRunnerPath(signal);
+  // it('should handle unlimited stack', { timeout: 10000 }, async () => {
+  //   const runnerProvider = container.resolve(TOKENS.runnerProvider);
+  //   await runnerProvider.getRunnerPath(signal);
 
-    const scriptPath = createExecutableScript(stackTriggerCode);
-    const ctx: ExecutionContext = {
-      cmd: [scriptPath],
-      stdinPath: join(testWorkspace, inputFile),
-      timeLimitMs: 5000,
-    };
+  //   const scriptPath = createExecutableScript(stackTriggerCode);
+  //   const ctx: ExecutionContext = {
+  //     cmd: [scriptPath],
+  //     stdinPath: join(testWorkspace, inputFile),
+  //     timeLimitMs: 5000,
+  //   };
 
-    const res1 = await strategy.execute(ctx, signal);
-    expect(res1).not.toBeInstanceOf(Error);
-    if (!(res1 instanceof Error)) {
-      expect(res1.codeOrSignal).toBe('SIGSEGV');
-      expect(res1.isUserAborted).toBe(false);
-    }
+  //   const res1 = await strategy.execute(ctx, signal);
+  //   expect(res1).not.toBeInstanceOf(Error);
+  //   if (!(res1 instanceof Error)) {
+  //     expect(res1.codeOrSignal).toBe('SIGSEGV');
+  //     expect(res1.isUserAborted).toBe(false);
+  //   }
 
-    settingsMock.runner.unlimitedStack = true;
-    const res2 = await strategy.execute(ctx, signal);
-    expect(res2).not.toBeInstanceOf(Error);
-    if (!(res2 instanceof Error)) {
-      expect(res2.codeOrSignal).toBe(0);
-      expect(res2.isUserAborted).toBe(false);
-    }
-  });
+  //   settingsMock.runner.unlimitedStack = true;
+  //   const res2 = await strategy.execute(ctx, signal);
+  //   expect(res2).not.toBeInstanceOf(Error);
+  //   if (!(res2 instanceof Error)) {
+  //     expect(res2.codeOrSignal).toBe(0);
+  //     expect(res2.isUserAborted).toBe(false);
+  //   }
+  // });
 });

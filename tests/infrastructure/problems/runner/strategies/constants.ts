@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { fileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import type { ExecutionContext } from '@/domain/execution';
 
 export const stdinPath = '/tmp/cph-ng/stdin';
@@ -34,8 +33,4 @@ export const mockCtxNoArg: ExecutionContext = {
   timeLimitMs,
 };
 export const invalidJson = `{ invalid json `;
-export const createFiles = () => {
-  fileSystemMock.safeCreateFile(stdinPath);
-  fileSystemMock.safeCreateFile(solutionPath);
-};
 export const signal = new AbortController().signal;

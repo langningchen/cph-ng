@@ -20,10 +20,12 @@ import helloWorldCode from '@t/fixtures/helloWorld?raw';
 import pingCode from '@t/fixtures/ping?raw';
 import pongCode from '@t/fixtures/pong?raw';
 import timeoutCode from '@t/fixtures/timeout?raw';
-import { fileSystemMock } from '@t/infrastructure/node/fileSystemMock';
-import { vol } from 'memfs';
+import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import type { Volume } from 'memfs';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
+import type { MockProxy } from 'vitest-mock-extended';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { AbortReason, type ProcessOutput } from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
@@ -35,8 +37,12 @@ import { tempStorageMock } from './tempStorageMock';
 
 describe('ProcessExecutorAdapter', () => {
   let adapter: ProcessExecutorAdapter;
+  let fileSystemMock: MockProxy<IFileSystem>;
+  let vol: Volume;
 
   beforeEach(() => {
+    ({ fileSystemMock, vol } = createFileSystemMock());
+
     container.registerInstance(TOKENS.fileSystem, fileSystemMock);
     container.registerInstance(TOKENS.tempStorage, tempStorageMock);
     container.registerInstance(TOKENS.logger, loggerMock);
