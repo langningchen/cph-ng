@@ -113,7 +113,8 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
       unifiedAc.abort(AbortReason.Timeout);
     }, timeoutVal);
 
-    const runnerResult = await handle.wait;
+    console.log(handle);
+    const runnerResult = await handle.wait();
     clearTimeout(timeoutId);
     if (runnerResult instanceof Error) {
       this.tmp.dispose([handle.stdoutPath, handle.stderrPath, userStdoutPath, userStderrPath]);

@@ -50,7 +50,7 @@ export interface PipeProcessOptions {
   signal?: AbortSignal;
 }
 
-/** Handle to a spawned process, created by {@link IProcessExecutor.spawn}. */
+/** Handle to a spawned process, created by {@link IProcessExecutor['spawn']}. */
 export interface ProcessHandle {
   /** The process ID of the spawned process. */
   pid: number;
@@ -74,7 +74,7 @@ export interface ProcessHandle {
   kill(signal?: NodeJS.Signals): void;
 
   /** Waits for the process to complete and returns the execution result. */
-  wait: Promise<ProcessExecuteResult>;
+  wait(): Promise<ProcessExecuteResult>;
 }
 
 /** Output of a process execution. */

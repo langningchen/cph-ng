@@ -57,7 +57,7 @@ export class CommandModule implements IExtensionModule {
   private async getProblemId() {
     const activePath = this.activePath.getActivePath();
     if (!activePath) throw new Error('Active path is required');
-    const problemId = await this.repo.getIdByPath(activePath);
+    const problemId = await this.repo.loadByPath(activePath);
     if (!problemId) throw new Error('No problem found');
     return problemId;
   }

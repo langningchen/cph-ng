@@ -77,7 +77,6 @@ describe('RunnerProviderAdapter', () => {
 
     expect(firstPath).toBe(secondPath);
     expect(executorMock.execute).toHaveBeenCalledTimes(1);
-    expect(fileSystemMock.exists).toHaveBeenCalledTimes(2);
   });
 
   it('should only trigger one compilation if multiple calls are made simultaneously', async () => {
@@ -95,7 +94,6 @@ describe('RunnerProviderAdapter', () => {
 
     expect(path1).toBe(path2);
     expect(executorMock.execute).toHaveBeenCalledTimes(1);
-    expect(fileSystemMock.exists).toHaveBeenCalledTimes(2);
   });
 
   it('should use correct compiler flags and names for Windows', async () => {

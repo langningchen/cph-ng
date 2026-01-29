@@ -125,8 +125,8 @@ describe('ExternalRunnerStrategy', () => {
     } satisfies RunnerOutput;
     await vol.promises.writeFile(stdoutPath, JSON.stringify(stdoutData));
 
-    executorMock.spawn.mockResolvedValue(processHandleMock);
-    processHandleMock.wait = Promise.resolve({
+    executorMock.spawn.mockReturnValue(processHandleMock);
+    processHandleMock.wait.mockResolvedValue({
       codeOrSignal: 0,
       stdoutPath,
       stderrPath,
@@ -158,13 +158,13 @@ describe('ExternalRunnerStrategy', () => {
     } satisfies RunnerOutput;
     await vol.promises.writeFile(stdoutPath, JSON.stringify(stdoutData));
 
-    executorMock.spawn.mockResolvedValue(processHandleMock);
+    executorMock.spawn.mockReturnValue(processHandleMock);
 
     let resolveWait: (value: ProcessExecuteResult) => void;
     const waitPromise = new Promise<ProcessExecuteResult>((resolve) => {
       resolveWait = resolve;
     });
-    processHandleMock.wait = Promise.resolve(waitPromise);
+    processHandleMock.wait.mockReturnValue(waitPromise);
     processHandleMock.writeStdin.mockImplementation((data) => {
       if (data === 'k') {
         loggerMock.info(`Received soft kill signal in mock`);
@@ -214,8 +214,8 @@ describe('ExternalRunnerStrategy', () => {
     } satisfies RunnerOutput;
     await vol.promises.writeFile(stdoutPath, JSON.stringify(stdoutData));
 
-    executorMock.spawn.mockResolvedValue(processHandleMock);
-    processHandleMock.wait = Promise.resolve({
+    executorMock.spawn.mockReturnValue(processHandleMock);
+    processHandleMock.wait.mockResolvedValue({
       codeOrSignal: 1,
       stdoutPath,
       stderrPath,
@@ -231,8 +231,8 @@ describe('ExternalRunnerStrategy', () => {
   it('should return error if runner output is malformed JSON', async () => {
     await vol.promises.writeFile(stdoutPath, invalidJson);
 
-    executorMock.spawn.mockResolvedValue(processHandleMock);
-    processHandleMock.wait = Promise.resolve({
+    executorMock.spawn.mockReturnValue(processHandleMock);
+    processHandleMock.wait.mockResolvedValue({
       codeOrSignal: 0,
       stdoutPath,
       stderrPath,
@@ -252,8 +252,8 @@ describe('ExternalRunnerStrategy', () => {
     } satisfies RunnerOutput;
     await vol.promises.writeFile(stdoutPath, JSON.stringify(stdoutData));
 
-    executorMock.spawn.mockResolvedValue(processHandleMock);
-    processHandleMock.wait = Promise.resolve({
+    executorMock.spawn.mockReturnValue(processHandleMock);
+    processHandleMock.wait.mockResolvedValue({
       codeOrSignal: 0,
       stdoutPath,
       stderrPath,
@@ -276,12 +276,14 @@ describe('ExternalRunnerStrategy', () => {
     } satisfies RunnerOutput;
     await vol.promises.writeFile(stdoutPath, JSON.stringify(stdoutData));
 
-    executorMock.spawn.mockResolvedValue(processHandleMock);
+    executorMock.spawn.mockReturnValue(processHandleMock);
 
     let resolveWait: (value: ProcessExecuteResult) => void;
-    processHandleMock.wait = new Promise((resolve) => {
-      resolveWait = resolve;
-    });
+    processHandleMock.wait.mockReturnValue(
+      new Promise((resolve) => {
+        resolveWait = resolve;
+      }),
+    );
     processHandleMock.writeStdin.mockImplementation((data) => {
       if (data === 'k') {
         resolveWait({

@@ -95,26 +95,28 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
         launch.child.kill(signal);
       },
 
-      wait: new Promise<ProcessExecuteResult>((resolve) => {
-        const onResult = async (code: number | null, signal: NodeJS.Signals | null) => {
-          cleanup();
-          resolve(await this.collectResult(launch, code ?? signal ?? -1));
-        };
+      wait: () => {
+        return new Promise<ProcessExecuteResult>((resolve) => {
+          const onResult = async (code: number | null, signal: NodeJS.Signals | null) => {
+            cleanup();
+            resolve(await this.collectResult(launch, code ?? signal ?? -1));
+          };
 
-        const onError = (error: Error) => {
-          cleanup();
-          this.tmp.dispose([launch.stderrPath, launch.stdoutPath]);
-          resolve(this.collectError(error));
-        };
+          const onError = (error: Error) => {
+            cleanup();
+            this.tmp.dispose([launch.stderrPath, launch.stdoutPath]);
+            resolve(this.collectError(error));
+          };
 
-        const cleanup = () => {
-          launch.child.removeListener('close', onResult);
-          launch.child.removeListener('error', onError);
-        };
+          const cleanup = () => {
+            launch.child.removeListener('close', onResult);
+            launch.child.removeListener('error', onError);
+          };
 
-        launch.child.on('close', onResult);
-        launch.child.on('error', onError);
-      }),
+          launch.child.on('close', onResult);
+          launch.child.on('error', onError);
+        });
+      },
     };
   }
 

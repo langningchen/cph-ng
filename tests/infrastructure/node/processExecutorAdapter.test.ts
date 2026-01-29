@@ -139,7 +139,7 @@ describe('ProcessExecutorAdapter', () => {
   });
 
   it('should allow manual process control via handle in spawn mode', async () => {
-    const handle = await adapter.spawn({ cmd: ['node', '-e', echoCode] });
+    const handle = adapter.spawn({ cmd: ['node', '-e', echoCode] });
     expect(handle.pid).toBeGreaterThan(0);
 
     handle.writeStdin('manual_input');
@@ -158,7 +158,7 @@ describe('ProcessExecutorAdapter', () => {
   });
 
   it('should allow manual process control via handle in spawn mode', async () => {
-    const handle = await adapter.spawn({ cmd: ['node', '-e', echoCode] });
+    const handle = adapter.spawn({ cmd: ['node', '-e', echoCode] });
     expect(handle.pid).toBeGreaterThan(0);
 
     handle.kill();
