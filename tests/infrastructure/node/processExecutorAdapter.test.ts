@@ -80,7 +80,7 @@ describe('ProcessExecutorAdapter', () => {
     const result = await adapter.execute({ cmd: ['node', '-e', timeoutCode], timeoutMs: 100 });
     expect(result).not.toBeInstanceOf(Error);
     expect(result).toStrictEqual({
-      codeOrSignal: 'SIGTERM',
+      codeOrSignal: 'SIGKILL',
       stdoutPath: expect.any(String),
       stderrPath: expect.any(String),
       timeMs: expect.any(Number),
@@ -152,7 +152,7 @@ describe('ProcessExecutorAdapter', () => {
     const result = await promise;
     expect(result).not.toBeInstanceOf(Error);
     expect(result).toStrictEqual({
-      codeOrSignal: 'SIGTERM',
+      codeOrSignal: 'SIGKILL',
       stdoutPath: expect.any(String),
       stderrPath: expect.any(String),
       timeMs: expect.any(Number),
@@ -195,7 +195,7 @@ describe('ProcessExecutorAdapter', () => {
     const result = await handle.wait();
     expect(result).not.toBeInstanceOf(Error);
     expect(result).toStrictEqual({
-      codeOrSignal: 'SIGTERM',
+      codeOrSignal: 'SIGKILL',
       stdoutPath: expect.any(String),
       stderrPath: expect.any(String),
       timeMs: expect.any(Number),

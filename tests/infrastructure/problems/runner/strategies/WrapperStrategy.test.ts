@@ -15,9 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { join } from 'node:path';
+import { hasCppCompiler } from '@t/check';
+import sleep200Code from '@t/fixtures/sleep200.cpp?raw';
+import stackCode from '@t/fixtures/stack.cpp?raw';
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { systemMock } from '@t/infrastructure/node/systemMock';
 import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import {
+  cleanupTestWorkspace,
+  createCppExecutable,
+  createTestWorkspace,
   invalidJson,
   mockCtx,
   signal,
@@ -25,23 +33,36 @@ import {
   stderrPath,
   stdinPath,
   stdoutPath,
+  timeLimitMs,
 } from '@t/infrastructure/problems/runner/strategies/constants';
+import { PathResolverMock } from '@t/infrastructure/services/pathResolverMock';
+import { compilationOutputChannelMock } from '@t/infrastructure/vscode/compilationOutputChannelMock';
+import { extensionPathMock } from '@t/infrastructure/vscode/extensionPathMock';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { telemetryMock } from '@t/infrastructure/vscode/telemetryMock';
+import { translatorMock } from '@t/infrastructure/vscode/translatorMock';
 import { mock } from '@t/mock';
 import type { Volume } from 'memfs';
 import { container } from 'tsyringe';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import {
   AbortReason,
   type IProcessExecutor,
   type ProcessExecuteResult,
+  type ProcessOutput,
 } from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
-import type { ExecutionData } from '@/domain/execution';
+import type { ExecutionContext, ExecutionData } from '@/domain/execution';
+import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
+import { CryptoAdapter } from '@/infrastructure/node/cryptoAdapter';
+import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
+import { PathAdapter } from '@/infrastructure/node/pathAdapter';
+import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
+import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
+import { LangCpp } from '@/infrastructure/problems/judge/langs/cppStrategy';
+import { LanguageRegistry } from '@/infrastructure/problems/judge/langs/languageRegistry';
 import {
   type WrapperData,
   WrapperStrategy,
@@ -69,10 +90,6 @@ describe('WrapperStrategy', () => {
 
     strategy = container.resolve(WrapperStrategy);
     tempStorageMock = container.resolve(TOKENS.tempStorage) as TempStorageMock;
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
   });
 
   it('should successfully extract time from stderr and clean up stderr file', async () => {
@@ -166,7 +183,7 @@ describe('WrapperStrategy', () => {
       stdoutPath,
       stderrPath,
       timeMs: 300,
-    });
+    } satisfies ProcessOutput);
 
     const result = await strategy.execute(mockCtx, signal);
 
@@ -191,7 +208,7 @@ describe('WrapperStrategy', () => {
       stdoutPath,
       stderrPath,
       timeMs: 100,
-    });
+    } satisfies ProcessOutput);
 
     await strategy.execute(mockCtx, signal);
 
@@ -202,6 +219,99 @@ describe('WrapperStrategy', () => {
     );
     tempStorageMock.checkFile();
   });
+
+  it('should warn and fallback if report file exists but is empty', async () => {
+    await vol.promises.writeFile(TempStorageMock.getPath(0), '');
+    executorMock.execute.mockResolvedValue({
+      codeOrSignal: 0,
+      stdoutPath,
+      stderrPath,
+      timeMs: 400,
+    } satisfies ProcessOutput);
+
+    const result = await strategy.execute(mockCtx, signal);
+
+    expect(result).not.toBeInstanceOf(Error);
+    expect((result as ExecutionData).timeMs).toBe(400);
+    expect(loggerMock.warn).toHaveBeenCalledWith(expect.stringContaining('report file is missing'));
+  });
 });
 
-// TO-DO: Real integration test
+describe.runIf(hasCppCompiler)('WrapperStrategy Real Integration', () => {
+  const inputFile = 'input.in';
+  let testWorkspace: string;
+  let strategy: WrapperStrategy;
+
+  beforeEach(() => {
+    settingsMock.cache.directory = testWorkspace = createTestWorkspace();
+    settingsMock.compilation.useWrapper = true;
+
+    container.registerInstance(TOKENS.compilationOutputChannel, compilationOutputChannelMock);
+    container.registerInstance(TOKENS.extensionPath, extensionPathMock);
+    container.registerInstance(TOKENS.logger, loggerMock);
+    container.registerInstance(TOKENS.settings, settingsMock);
+    container.registerInstance(TOKENS.system, systemMock);
+    container.registerInstance(TOKENS.telemetry, telemetryMock);
+    container.registerInstance(TOKENS.translator, translatorMock);
+
+    container.registerSingleton(TOKENS.clock, ClockAdapter);
+    container.registerSingleton(TOKENS.crypto, CryptoAdapter);
+    container.registerSingleton(TOKENS.fileSystem, FileSystemAdapter);
+    container.registerSingleton(TOKENS.languageRegistry, LanguageRegistry);
+    container.registerSingleton(TOKENS.path, PathAdapter);
+    container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
+    container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
+    container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
+
+    container.register(TOKENS.languageStrategy, { useClass: LangCpp });
+
+    strategy = container.resolve(WrapperStrategy);
+  });
+
+  afterEach(() => {
+    cleanupTestWorkspace(testWorkspace);
+  });
+
+  it('should correctly execute and measure time', async () => {
+    const path = await createCppExecutable(testWorkspace, sleep200Code);
+
+    const ctx: ExecutionContext = {
+      cmd: [path],
+      stdinPath: join(testWorkspace, inputFile),
+      timeLimitMs,
+    };
+    const result = await strategy.execute(ctx, signal);
+    expect(result).not.toBeInstanceOf(Error);
+    if (result instanceof Error) return;
+
+    expect(result.codeOrSignal).toBe(0);
+    console.log(result.timeMs);
+    expect(result.timeMs).toBeGreaterThanOrEqual(200);
+    expect(result.timeMs).toBeLessThan(201);
+  });
+
+  it('should handle unlimited stack', async () => {
+    const path = await createCppExecutable(testWorkspace, stackCode);
+
+    const ctx: ExecutionContext = {
+      cmd: [path],
+      stdinPath: join(testWorkspace, inputFile),
+      timeLimitMs,
+    };
+
+    const res1 = await strategy.execute(ctx, signal);
+    expect(res1).not.toBeInstanceOf(Error);
+    if (!(res1 instanceof Error)) {
+      expect(res1.codeOrSignal).toBe('SIGSEGV');
+      expect(res1.isUserAborted).toBe(false);
+    }
+
+    settingsMock.runner.unlimitedStack = true;
+    const res2 = await strategy.execute(ctx, signal);
+    expect(res2).not.toBeInstanceOf(Error);
+    if (!(res2 instanceof Error)) {
+      expect(res2.codeOrSignal).toBe('SIGKILL');
+      expect(res2.isUserAborted).toBe(false);
+    }
+  });
+});

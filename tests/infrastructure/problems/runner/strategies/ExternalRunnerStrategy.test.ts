@@ -15,14 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { chmodSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { hasCppCompiler } from '@t/check';
+import stackCode from '@t/fixtures/stack.cpp?raw';
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import {
+  cleanupTestWorkspace,
+  createCppExecutable,
+  createJsExecutable,
+  createTestWorkspace,
   invalidJson,
   mockCtxNoArg,
   signal,
@@ -392,11 +396,10 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
   });
 
   beforeEach(async () => {
-    testWorkspace = join(tmpdir(), `cph-ng-test-${Date.now()}`);
-    mkdirSync(testWorkspace, { recursive: true });
+    settingsMock.cache.directory = testWorkspace = createTestWorkspace();
     writeFileSync(join(testWorkspace, inputFile), '');
-    settingsMock.cache.directory = testWorkspace;
     settingsMock.runner.timeAddition = 100;
+
     runnerProviderMock = mock<IRunnerProvider>();
     runnerProviderMock.getRunnerPath.mockResolvedValue(mockRunnerPath);
 
@@ -405,19 +408,13 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
 
     strategy = container.resolve(ExternalRunnerStrategy);
   });
+
   afterEach(() => {
-    if (testWorkspace) rmSync(testWorkspace, { recursive: true, force: true });
+    cleanupTestWorkspace(testWorkspace);
   });
 
-  const createExecutableScript = (content: string): string => {
-    const scriptPath = join(testWorkspace, 'script.js');
-    writeFileSync(scriptPath, `#!/usr/bin/env -S node --stack-size=102400\n\n${content}`);
-    chmodSync(scriptPath, 0o755);
-    return scriptPath;
-  };
-
   it('should execute a real program through the real runner binary', async () => {
-    const scriptPath = createExecutableScript('console.log("hello_from_node")');
+    const scriptPath = createJsExecutable(testWorkspace, 'console.log("hello_from_node")');
     const ctx: ExecutionContext = {
       cmd: [scriptPath],
       stdinPath: join(testWorkspace, inputFile),
@@ -438,7 +435,7 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
   });
 
   it('should successfully perform a "Soft Kill" on the real runner binary', async () => {
-    const scriptPath = createExecutableScript('while (true) {}');
+    const scriptPath = createJsExecutable(testWorkspace, 'while (true) {}');
     const ctx: ExecutionContext = {
       cmd: [scriptPath],
       stdinPath: join(testWorkspace, inputFile),
@@ -458,10 +455,7 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
   });
 
   it('should handle User Abort by sending "k" to the real runner', async () => {
-    const runnerProvider = container.resolve(TOKENS.runnerProvider);
-    await runnerProvider.getRunnerPath(signal);
-
-    const scriptPath = createExecutableScript('while (true) {}');
+    const scriptPath = createJsExecutable(testWorkspace, 'while (true) {}');
     const ctx: ExecutionContext = {
       cmd: [scriptPath],
       stdinPath: join(testWorkspace, inputFile),
@@ -484,19 +478,10 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
   });
 
   it('should handle unlimited stack', async () => {
-    const runnerProvider = container.resolve(TOKENS.runnerProvider);
-    await runnerProvider.getRunnerPath(signal);
-
-    const langs = container.resolve(TOKENS.languageRegistry);
-    const path = join(testWorkspace, 'stack.cpp');
-    writeFileSync(path, `int main() { char buffer[1024 * 1024]; main(); }`);
-    const langCpp = langs.getLang(path);
-    if (!langCpp) throw new Error('Internal error: can not resolve language for cpp');
-    const res = await langCpp.compile({ path }, signal, null);
-    if (res instanceof Error) throw res;
+    const path = await createCppExecutable(testWorkspace, stackCode);
 
     const ctx: ExecutionContext = {
-      cmd: [res.path],
+      cmd: [path],
       stdinPath: join(testWorkspace, inputFile),
       timeLimitMs,
     };

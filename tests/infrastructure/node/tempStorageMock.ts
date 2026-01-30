@@ -46,7 +46,6 @@ export class TempStorageMock implements ITempStorage {
   public dispose(paths: string | string[]): void {
     if (typeof paths === 'string') paths = [paths];
     this.logger.trace('Disposing cached paths', { paths });
-    console.trace();
     for (const path of paths) this.usingPaths.delete(path);
   }
 

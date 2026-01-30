@@ -114,7 +114,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
       },
 
       kill: (signal?: NodeJS.Signals) => {
-        launch.child.kill(signal);
+        launch.child.kill(signal ?? 'SIGKILL');
       },
 
       wait: () => wait,
@@ -132,6 +132,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
     const child = spawn(cmd[0], cmd.slice(1), {
       signal: unifiedAc.signal,
       env: options.env ? { ...process.env, ...options.env } : process.env,
+      killSignal: 'SIGKILL',
     });
     this.logger.info('Running executable', options, child.pid);
     const result: LaunchResult = {

@@ -76,6 +76,7 @@ export class WrapperStrategy implements IExecutionStrategy {
     if (!(await this.fs.exists(path))) return null;
     const content = await this.fs.readFile(path);
     if (!content.trim()) return null;
+    this.logger.trace('Wrapper report content', content);
     try {
       return JSON.parse(content) as WrapperData;
     } catch (e) {

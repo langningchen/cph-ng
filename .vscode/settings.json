@@ -14,6 +14,7 @@
   "cSpell.words": [
     "atcoder",
     "Cascadia",
+    "chrono",
     "codeeditors",
     "Codeforces",
     "commitlint",
@@ -31,8 +32,8 @@
     "objcopy",
     "problemset",
     "testlib",
-    "winlibs",
-    "tsyringe"
+    "tsyringe",
+    "winlibs"
   ],
   "yaml.schemas": {
     "https://squidfunk.github.io/mkdocs-material/schema.json": "mkdocs.yml"
