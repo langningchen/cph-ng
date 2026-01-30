@@ -63,7 +63,6 @@ describe('ProcessExecutorAdapter', () => {
 
   it('should successfully execute a simple command and capture output', async () => {
     const result = await adapter.execute({ cmd: ['node', '-e', helloWorldCode] });
-    console.log(result);
     expect(result).toStrictEqual({
       codeOrSignal: 0,
       stdoutPath: expect.any(String),

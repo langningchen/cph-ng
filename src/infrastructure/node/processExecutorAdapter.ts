@@ -78,6 +78,27 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
   public spawn(options: ProcessOptions): ProcessHandle {
     this.logger.trace('spawn', options);
     const launch = this.internalLaunch(options);
+    const wait = new Promise<ProcessExecuteResult>((resolve) => {
+      const onResult = async (code: number | null, signal: NodeJS.Signals | null) => {
+        cleanup();
+        resolve(await this.collectResult(launch, code ?? signal ?? -1));
+      };
+
+      const onError = (error: Error) => {
+        if (launch.acSignal.aborted) return;
+        cleanup();
+        this.tmp.dispose([launch.stdoutPath, launch.stderrPath]);
+        resolve(this.collectError(error));
+      };
+
+      const cleanup = () => {
+        launch.child.removeListener('close', onResult);
+        launch.child.removeListener('error', onError);
+      };
+
+      launch.child.on('close', onResult);
+      launch.child.on('error', onError);
+    });
 
     return {
       pid: launch.child.pid ?? -1,
@@ -96,29 +117,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
         launch.child.kill(signal);
       },
 
-      wait: () => {
-        return new Promise<ProcessExecuteResult>((resolve) => {
-          const onResult = async (code: number | null, signal: NodeJS.Signals | null) => {
-            cleanup();
-            resolve(await this.collectResult(launch, code ?? signal ?? -1));
-          };
-
-          const onError = (error: Error) => {
-            if (launch.acSignal.aborted) return;
-            cleanup();
-            this.tmp.dispose([launch.stdoutPath, launch.stderrPath]);
-            resolve(this.collectError(error));
-          };
-
-          const cleanup = () => {
-            launch.child.removeListener('close', onResult);
-            launch.child.removeListener('error', onError);
-          };
-
-          launch.child.on('close', onResult);
-          launch.child.on('error', onError);
-        });
-      },
+      wait: () => wait,
     };
   }
 

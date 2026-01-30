@@ -22,7 +22,6 @@ import { join } from 'node:path';
 import { hasCppCompiler } from '@t/check';
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
-// import stackTriggerCode from '@t/fixtures/stackTrigger?raw';
 import {
   invalidJson,
   mockCtxNoArg,
@@ -34,6 +33,7 @@ import {
   timeLimitMs,
 } from '@t/infrastructure/problems/runner/strategies/constants';
 import { PathResolverMock } from '@t/infrastructure/services/pathResolverMock';
+import { compilationOutputChannelMock } from '@t/infrastructure/vscode/compilationOutputChannelMock';
 import { extensionPathMock } from '@t/infrastructure/vscode/extensionPathMock';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
@@ -61,6 +61,8 @@ import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
 import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
+import { LangCpp } from '@/infrastructure/problems/judge/langs/cppStrategy';
+import { LanguageRegistry } from '@/infrastructure/problems/judge/langs/languageRegistry';
 import {
   ExternalRunnerStrategy,
   type RunnerOutput,
@@ -367,6 +369,7 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
     container.registerInstance(TOKENS.settings, settingsMock);
     container.registerInstance(TOKENS.telemetry, telemetryMock);
     container.registerInstance(TOKENS.translator, translatorMock);
+    container.registerInstance(TOKENS.compilationOutputChannel, compilationOutputChannelMock);
 
     container.registerSingleton(TOKENS.clock, ClockAdapter);
     container.registerSingleton(TOKENS.crypto, CryptoAdapter);
@@ -374,9 +377,12 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
     container.registerSingleton(TOKENS.path, PathAdapter);
     container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
     container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
+    container.registerSingleton(TOKENS.languageRegistry, LanguageRegistry);
     container.registerSingleton(TOKENS.runnerProvider, RunnerProviderAdapter);
     container.registerSingleton(TOKENS.system, SystemAdapter);
     container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
+
+    container.register(TOKENS.languageStrategy, { useClass: LangCpp });
   };
 
   beforeAll(async () => {
@@ -477,30 +483,37 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
     }
   });
 
-  // it('should handle unlimited stack', { timeout: 10000 }, async () => {
-  //   const runnerProvider = container.resolve(TOKENS.runnerProvider);
-  //   await runnerProvider.getRunnerPath(signal);
+  it('should handle unlimited stack', async () => {
+    const runnerProvider = container.resolve(TOKENS.runnerProvider);
+    await runnerProvider.getRunnerPath(signal);
 
-  //   const scriptPath = createExecutableScript(stackTriggerCode);
-  //   const ctx: ExecutionContext = {
-  //     cmd: [scriptPath],
-  //     stdinPath: join(testWorkspace, inputFile),
-  //     timeLimitMs: 5000,
-  //   };
+    const langs = container.resolve(TOKENS.languageRegistry);
+    const path = join(testWorkspace, 'stack.cpp');
+    writeFileSync(path, `int main() { char buffer[1024 * 1024]; main(); }`);
+    const langCpp = langs.getLang(path);
+    if (!langCpp) throw new Error('Internal error: can not resolve language for cpp');
+    const res = await langCpp.compile({ path }, signal, null);
+    if (res instanceof Error) throw res;
 
-  //   const res1 = await strategy.execute(ctx, signal);
-  //   expect(res1).not.toBeInstanceOf(Error);
-  //   if (!(res1 instanceof Error)) {
-  //     expect(res1.codeOrSignal).toBe('SIGSEGV');
-  //     expect(res1.isUserAborted).toBe(false);
-  //   }
+    const ctx: ExecutionContext = {
+      cmd: [res.path],
+      stdinPath: join(testWorkspace, inputFile),
+      timeLimitMs,
+    };
 
-  //   settingsMock.runner.unlimitedStack = true;
-  //   const res2 = await strategy.execute(ctx, signal);
-  //   expect(res2).not.toBeInstanceOf(Error);
-  //   if (!(res2 instanceof Error)) {
-  //     expect(res2.codeOrSignal).toBe(0);
-  //     expect(res2.isUserAborted).toBe(false);
-  //   }
-  // });
+    const res1 = await strategy.execute(ctx, signal);
+    expect(res1).not.toBeInstanceOf(Error);
+    if (!(res1 instanceof Error)) {
+      expect(res1.codeOrSignal).toBe('SIGSEGV');
+      expect(res1.isUserAborted).toBe(false);
+    }
+
+    settingsMock.runner.unlimitedStack = true;
+    const res2 = await strategy.execute(ctx, signal);
+    expect(res2).not.toBeInstanceOf(Error);
+    if (!(res2 instanceof Error)) {
+      expect(res2.codeOrSignal).toBe('SIGKILL');
+      expect(res2.isUserAborted).toBe(false);
+    }
+  });
 });
