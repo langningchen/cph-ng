@@ -69,7 +69,6 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     let runnerPath: string;
     try {
       runnerPath = await this.runner.getRunnerPath(signal);
-      console.log(runnerPath);
     } catch (e) {
       return new Error(
         this.translator.t('Failed to prepare runner utility: {codeOrSignal}', {
@@ -113,7 +112,6 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
       unifiedAc.abort(AbortReason.Timeout);
     }, timeoutVal);
 
-    console.log(handle);
     const runnerResult = await handle.wait();
     clearTimeout(timeoutId);
     if (runnerResult instanceof Error) {
