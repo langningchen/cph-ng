@@ -156,8 +156,15 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
       );
     }
 
+    const codeOrSignal =
+      runInfo.signal !== 0 ? this.getSignalName(runInfo.signal) : runInfo.exitCode;
+    if (codeOrSignal instanceof Error) {
+      this.tmp.dispose([userStdoutPath, userStderrPath]);
+      return codeOrSignal;
+    }
+
     return {
-      codeOrSignal: runInfo.signal !== 0 ? this.getSignalName(runInfo.signal) : runInfo.exitCode,
+      codeOrSignal,
       stdoutPath: userStdoutPath,
       stderrPath: userStderrPath,
       timeMs: runInfo.time,
@@ -175,10 +182,15 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     }
   }
 
-  private getSignalName(signalNumber: number): NodeJS.Signals {
+  private getSignalName(signalNumber: number): NodeJS.Signals | Error {
     const signals = constants.signals;
     const signal = Object.entries(signals).find(([_key, value]) => value === signalNumber);
-    if (!signal) throw new Error('Unknown signal number');
+    if (!signal)
+      return new Error(
+        this.translator.t('Runner exited with unknown signal {signal}', {
+          signal: signalNumber,
+        }),
+      );
     return signal[0] as NodeJS.Signals;
   }
 }

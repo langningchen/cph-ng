@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["src/**", "!src/legacy", "tests/**", "scripts/**", "webpack.config.ts"]
+    "includes": ["src/**", "!src/legacy", "tests/**", "scripts/**", "webpack.config.ts", "l10n/**"]
   },
   "formatter": {
     "enabled": true,

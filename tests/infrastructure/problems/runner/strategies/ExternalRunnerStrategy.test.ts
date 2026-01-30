@@ -83,6 +83,14 @@ describe('ExternalRunnerStrategy', () => {
   let vol: Volume;
 
   const mockRunnerPath = '/path/to/runner';
+  const runnerOutput = {
+    error: false,
+    killed: true,
+    time: 100,
+    memory: 10,
+    exitCode: 0,
+    signal: 0,
+  } satisfies RunnerOutput;
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -129,15 +137,7 @@ describe('ExternalRunnerStrategy', () => {
   });
 
   it('should successfully run through external runner and parse JSON output', async () => {
-    const stdoutData = {
-      error: false,
-      killed: false,
-      time: 150,
-      memory: 10,
-      exitCode: 0,
-      signal: 0,
-    } satisfies RunnerOutput;
-    await vol.promises.writeFile(stdoutPath, JSON.stringify(stdoutData));
+    await vol.promises.writeFile(stdoutPath, JSON.stringify(runnerOutput));
 
     executorMock.spawn.mockReturnValue(processHandleMock);
     processHandleMock.wait.mockResolvedValue({
@@ -155,7 +155,7 @@ describe('ExternalRunnerStrategy', () => {
       codeOrSignal: 0,
       stdoutPath: TempStorageMock.getPath(0),
       stderrPath: TempStorageMock.getPath(1),
-      timeMs: 150,
+      timeMs: 100,
       memoryMb: 10,
       isUserAborted: false,
     } satisfies ExecutionData);
@@ -163,7 +163,7 @@ describe('ExternalRunnerStrategy', () => {
       tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
   });
 
-  it('should throw error when cmd has arguments', async () => {
+  it('should return error when cmd has arguments', async () => {
     const invalidCtx = {
       ...mockCtxNoArg,
       cmd: ['program', 'arg1'],
@@ -178,16 +178,39 @@ describe('ExternalRunnerStrategy', () => {
       tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
   });
 
+  it('should return error when signal is unknown', async () => {
+    await vol.promises.writeFile(
+      stdoutPath,
+      JSON.stringify({
+        ...runnerOutput,
+        signal: 999,
+      }),
+    );
+
+    executorMock.spawn.mockReturnValue(processHandleMock);
+    processHandleMock.wait.mockResolvedValue({
+      codeOrSignal: 0,
+      stdoutPath,
+      stderrPath,
+      timeMs: 200,
+    } satisfies ProcessOutput);
+
+    const result = await strategy.execute(mockCtxNoArg, signal);
+
+    expect(result).toBeInstanceOf(Error);
+    expect((result as Error).message).equals('Runner exited with unknown signal {signal},999');
+    if (!(result instanceof Error))
+      tempStorageMock.checkFile([result.stdoutPath, result.stderrPath]);
+  });
+
   it('should perform soft kill when time limit is exceeded', async () => {
-    const stdoutData = {
-      error: false,
-      killed: true,
-      time: 1200,
-      memory: 10,
-      exitCode: 0,
-      signal: 0,
-    } satisfies RunnerOutput;
-    await vol.promises.writeFile(stdoutPath, JSON.stringify(stdoutData));
+    await vol.promises.writeFile(
+      stdoutPath,
+      JSON.stringify({
+        ...runnerOutput,
+        killed: true,
+      }),
+    );
 
     executorMock.spawn.mockReturnValue(processHandleMock);
 
@@ -220,7 +243,7 @@ describe('ExternalRunnerStrategy', () => {
       codeOrSignal: 0,
       stdoutPath: TempStorageMock.getPath(0),
       stderrPath: TempStorageMock.getPath(1),
-      timeMs: 1200,
+      timeMs: 100,
       memoryMb: 10,
       isUserAborted: false,
     } satisfies ExecutionData);
