@@ -20,35 +20,40 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 
 const LogLevels = ['info', 'warn', 'error', 'debug', 'trace'] as const;
 type LogLevel = (typeof LogLevels)[number];
+const consoleMap: Record<LogLevel, (...args: unknown[]) => void> = {
+  info: console.info,
+  warn: console.warn,
+  error: console.error,
+  debug: console.debug,
+  trace: console.debug,
+};
 
-const createLoggerMock = (
-  scope: string = 'base',
-  rootInstance?: MockProxy<ILogger>,
-): MockProxy<ILogger> => {
+interface MockContext {
+  readonly root: MockProxy<ILogger>;
+  isTracking: boolean;
+}
+
+const createLoggerMockInternal = (scope: string, context?: MockContext): MockProxy<ILogger> => {
   const logger = mock<ILogger>();
-
-  const root = rootInstance || logger;
-  logger.withScope.mockImplementation((name: string) => createLoggerMock(name, root));
-
-  const implementLog = (
-    level: LogLevel,
-    consoleMethod: (...args: unknown[]) => void,
-    tag: string,
-  ) => {
-    if (rootInstance) logger[level] = rootInstance[level];
-    else
-      logger[level].mockImplementation((...args) => {
-        consoleMethod(tag, `[${scope}]`, ...args);
-      });
+  const currentContext: MockContext = context ?? {
+    root: logger,
+    isTracking: false,
   };
-
-  implementLog('info', console.info, '[INFO]');
-  implementLog('warn', console.warn, '[WARN]');
-  implementLog('error', console.error, '[ERROR]');
-  implementLog('debug', console.debug, '[DEBUG]');
-  implementLog('trace', console.debug, '[TRACE]');
-
+  logger.withScope.mockImplementation((name: string) =>
+    createLoggerMockInternal(name, currentContext),
+  );
+  LogLevels.forEach((level) => {
+    logger[level].mockImplementation((message: string, ...args: unknown[]) => {
+      if (currentContext.isTracking) return;
+      consoleMap[level](`[${level.toUpperCase()}]`, `[${scope}]`, message, ...args);
+      if (currentContext.root !== logger) {
+        currentContext.isTracking = true;
+        currentContext.root[level](message, ...args);
+        currentContext.isTracking = false;
+      }
+    });
+  });
   return logger;
 };
 
-export const loggerMock = createLoggerMock();
+export const loggerMock = createLoggerMockInternal('base');
