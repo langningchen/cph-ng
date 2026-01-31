@@ -63,19 +63,18 @@ export class WrapperStrategy implements IExecutionStrategy {
       timeMs: res.timeMs,
       isUserAborted: res.abortReason === AbortReason.UserAbort,
     };
-    if (res.codeOrSignal === 0) {
-      const wrapperData = await this.readWrapperReport(reportPath);
-      if (wrapperData) data.timeMs = wrapperData.time / 1000;
-      else this.logger.warn('Wrapper exited successfully but report file is missing');
-    }
+    const wrapperData = await this.readWrapperReport(reportPath);
+    if (wrapperData) data.timeMs = wrapperData.time / 1000;
     this.tmp.dispose(reportPath);
     return data;
   }
 
   private async readWrapperReport(path: string): Promise<WrapperData | null> {
-    if (!(await this.fs.exists(path))) return null;
     const content = await this.fs.readFile(path);
-    if (!content.trim()) return null;
+    if (!content.trim()) {
+      this.logger.warn('Wrapper report is empty');
+      return null;
+    }
     this.logger.trace('Wrapper report content', content);
     try {
       return JSON.parse(content) as WrapperData;
