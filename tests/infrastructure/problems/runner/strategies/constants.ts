@@ -21,6 +21,7 @@ import { join } from 'node:path';
 import { container } from 'tsyringe';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext } from '@/domain/execution';
+import { isWin } from '@t/check';
 
 export const stdinPath = '/tmp/cph-ng/stdin';
 export const stdoutPath = '/tmp/cph-ng/stdout';
@@ -57,3 +58,5 @@ export const createTestWorkspace = (): string => {
 export const cleanupTestWorkspace = (workspace: string): void => {
   rmSync(workspace, { recursive: true, force: true });
 };
+export const killed = isWin ? 1 : 'SIGTERM';
+export const stackOverflow = isWin ? 0xc00000fd : 'SIGSEGV';

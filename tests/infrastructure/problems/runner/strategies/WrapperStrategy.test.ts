@@ -26,9 +26,11 @@ import {
   createCppExecutable,
   createTestWorkspace,
   invalidJson,
+  killed,
   mockCtx,
   signal,
   solutionPath,
+  stackOverflow,
   stderrPath,
   stdinPath,
   stdoutPath,
@@ -242,7 +244,6 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
   { retry: 3 },
   () => {
     const inputFile = 'input.in';
-    const stackOverflow = isWin ? 0xc00000fd : 'SIGSEGV';
     let testWorkspace: string;
     let strategy: WrapperStrategy;
 
@@ -294,28 +295,24 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
     });
 
     it('should handle unlimited stack', async () => {
-      const path = await createCppExecutable(testWorkspace, stackCode);
-
-      const ctx: ExecutionContext = {
-        cmd: [path],
-        stdinPath: join(testWorkspace, inputFile),
-        timeLimitMs,
+      const run = async (code: number | string) => {
+        const path = await createCppExecutable(testWorkspace, stackCode);
+        const ctx: ExecutionContext = {
+          cmd: [path],
+          stdinPath: join(testWorkspace, inputFile),
+          timeLimitMs,
+        };
+        const result = await strategy.execute(ctx, signal);
+        expect(result).not.toBeInstanceOf(Error);
+        if (!(result instanceof Error)) {
+          expect(result.codeOrSignal).toBe(code);
+          expect(result.isUserAborted).toBe(false);
+        }
       };
 
-      const res1 = await strategy.execute(ctx, signal);
-      expect(res1).not.toBeInstanceOf(Error);
-      if (!(res1 instanceof Error)) {
-        expect(res1.codeOrSignal).toBe(stackOverflow);
-        expect(res1.isUserAborted).toBe(false);
-      }
-
+      await run(stackOverflow);
       settingsMock.runner.unlimitedStack = true;
-      const res2 = await strategy.execute(ctx, signal);
-      expect(res2).not.toBeInstanceOf(Error);
-      if (!(res2 instanceof Error)) {
-        expect(res2.codeOrSignal).toBe('SIGTERM');
-        expect(res2.isUserAborted).toBe(false);
-      }
+      await run(killed);
     });
   },
 );
