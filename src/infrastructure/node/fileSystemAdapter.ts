@@ -16,6 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
+  accessSync,
   createReadStream,
   createWriteStream,
   mkdirSync,
@@ -54,6 +55,15 @@ export class FileSystemAdapter implements IFileSystem {
   public async exists(path: string): Promise<boolean> {
     try {
       await access(path);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  public existsSync(path: string): boolean {
+    try {
+      accessSync(path);
       return true;
     } catch {
       return false;

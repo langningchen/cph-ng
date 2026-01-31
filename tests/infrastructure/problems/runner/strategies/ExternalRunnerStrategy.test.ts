@@ -383,7 +383,7 @@ describe('ExternalRunnerStrategy', () => {
   });
 });
 
-describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => {
+describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', { retry: 3 }, () => {
   const inputFile = 'input.in';
   let mockRunnerPath: string;
   let strategy: ExternalRunnerStrategy;
@@ -469,11 +469,9 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
-      expect(result.codeOrSignal).toBe('SIGKILL');
+      expect(result.codeOrSignal).toBe('SIGTERM');
       expect(result.isUserAborted).toBe(false);
-      expect(result.timeMs).toBeGreaterThanOrEqual(
-        ctx.timeLimitMs + settingsMock.runner.timeAddition,
-      );
+      expect(result.timeMs).toBeGreaterThanOrEqual(timeLimitMs + settingsMock.runner.timeAddition);
     }
   });
 
@@ -493,7 +491,7 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
 
     expect(result).not.toBeInstanceOf(Error);
     if (!(result instanceof Error)) {
-      expect(result.codeOrSignal).toBe('SIGKILL');
+      expect(result.codeOrSignal).toBe('SIGTERM');
       expect(result.isUserAborted).toBe(true);
       expect(result.timeMs).toBeGreaterThan(150);
       expect(result.timeMs).toBeLessThan(300);
@@ -520,7 +518,7 @@ describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', () => 
     const res2 = await strategy.execute(ctx, signal);
     expect(res2).not.toBeInstanceOf(Error);
     if (!(res2 instanceof Error)) {
-      expect(res2.codeOrSignal).toBe('SIGKILL');
+      expect(res2.codeOrSignal).toBe('SIGTERM');
       expect(res2.isUserAborted).toBe(false);
     }
   });

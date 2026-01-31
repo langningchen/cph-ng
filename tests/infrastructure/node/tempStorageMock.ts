@@ -17,6 +17,7 @@
 
 import { inject, injectable } from 'tsyringe';
 import { expect } from 'vitest';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
@@ -26,7 +27,10 @@ export class TempStorageMock implements ITempStorage {
   private cnt: number = 0;
   private usingPaths: Map<string, string> = new Map();
 
-  public constructor(@inject(TOKENS.logger) private readonly logger: ILogger) {
+  public constructor(
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+  ) {
     this.logger = this.logger.withScope('tempStorage');
   }
 
@@ -40,6 +44,7 @@ export class TempStorageMock implements ITempStorage {
     const path = TempStorageMock.getPath(this.cnt++);
     this.usingPaths.set(path, description);
     this.logger.trace('Creating new cached path', { path, description });
+    if (!this.fs.existsSync(path)) this.fs.safeCreateFile(path);
     return path;
   }
 

@@ -23,7 +23,7 @@ void kill_child(int)
 {
     killed = true;
     if (child_pid != -1)
-        kill(child_pid, SIGKILL);
+        kill(child_pid, SIGTERM);
 }
 void stdin_listener()
 {

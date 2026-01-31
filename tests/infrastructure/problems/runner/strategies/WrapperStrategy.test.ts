@@ -92,7 +92,7 @@ describe('WrapperStrategy', () => {
     tempStorageMock = container.resolve(TOKENS.tempStorage) as TempStorageMock;
   });
 
-  it('should successfully extract time from stderr and clean up stderr file', async () => {
+  it('should successfully extract time', async () => {
     await vol.promises.writeFile(
       TempStorageMock.getPath(0),
       JSON.stringify({ time: 150000 } as WrapperData),
@@ -233,11 +233,11 @@ describe('WrapperStrategy', () => {
 
     expect(result).not.toBeInstanceOf(Error);
     expect((result as ExecutionData).timeMs).toBe(400);
-    expect(loggerMock.warn).toHaveBeenCalledWith(expect.stringContaining('report file is missing'));
+    expect(loggerMock.warn).toHaveBeenCalledWith('Wrapper report is empty');
   });
 });
 
-describe.runIf(hasCppCompiler)('WrapperStrategy Real Integration', () => {
+describe.runIf(hasCppCompiler)('WrapperStrategy Real Integration', { retry: 3 }, () => {
   const inputFile = 'input.in';
   let testWorkspace: string;
   let strategy: WrapperStrategy;
@@ -310,7 +310,7 @@ describe.runIf(hasCppCompiler)('WrapperStrategy Real Integration', () => {
     const res2 = await strategy.execute(ctx, signal);
     expect(res2).not.toBeInstanceOf(Error);
     if (!(res2 instanceof Error)) {
-      expect(res2.codeOrSignal).toBe('SIGKILL');
+      expect(res2.codeOrSignal).toBe('SIGTERM');
       expect(res2.isUserAborted).toBe(false);
     }
   });

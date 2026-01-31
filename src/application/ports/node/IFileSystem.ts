@@ -55,6 +55,9 @@ export interface IFileSystem {
   /** Checks if a file or directory exists. */
   exists(path: string): Promise<boolean>;
 
+  /** Checks if a file or directory exists. */
+  existsSync(path: string): boolean;
+
   /** Recursive creates a directory. */
   mkdir(path: string): Promise<void>;
 

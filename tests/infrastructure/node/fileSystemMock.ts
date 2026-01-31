@@ -47,6 +47,14 @@ export function createFileSystemMock(vol: InstanceType<typeof Volume> = new Volu
       return false;
     }
   });
+  fileSystemMock.existsSync.mockImplementation((path) => {
+    try {
+      fs.accessSync(path);
+      return true;
+    } catch {
+      return false;
+    }
+  });
   fileSystemMock.mkdir.mockImplementation(async (path) => {
     await fs.promises.mkdir(path, { recursive: true });
   });
