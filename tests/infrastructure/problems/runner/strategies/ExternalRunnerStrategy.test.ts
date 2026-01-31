@@ -420,7 +420,7 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
       register();
       const runnerProvider = container.resolve(RunnerProviderAdapter);
       mockRunnerPath = await runnerProvider.getRunnerPath(signal);
-    });
+    }, 60000);
 
     beforeEach(async () => {
       settingsMock.cache.directory = testWorkspace = createTestWorkspace();
