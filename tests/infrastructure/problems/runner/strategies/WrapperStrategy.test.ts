@@ -239,80 +239,76 @@ describe('WrapperStrategy', () => {
   });
 });
 
-describe.runIf(hasCppCompiler && (isWin || isLinux))(
-  'WrapperStrategy Real Integration',
-  { retry: 3 },
-  () => {
-    const inputFile = 'input.in';
-    let testWorkspace: string;
-    let strategy: WrapperStrategy;
+describe.runIf(hasCppCompiler && (isWin || isLinux))('WrapperStrategy Real Integration', () => {
+  const inputFile = 'input.in';
+  let testWorkspace: string;
+  let strategy: WrapperStrategy;
 
-    beforeEach(() => {
-      settingsMock.cache.directory = testWorkspace = createTestWorkspace();
-      settingsMock.compilation.useWrapper = true;
+  beforeEach(() => {
+    settingsMock.cache.directory = testWorkspace = createTestWorkspace();
+    settingsMock.compilation.useWrapper = true;
 
-      container.registerInstance(TOKENS.compilationOutputChannel, compilationOutputChannelMock);
-      container.registerInstance(TOKENS.extensionPath, extensionPathMock);
-      container.registerInstance(TOKENS.logger, loggerMock);
-      container.registerInstance(TOKENS.settings, settingsMock);
-      container.registerInstance(TOKENS.telemetry, telemetryMock);
-      container.registerInstance(TOKENS.translator, translatorMock);
+    container.registerInstance(TOKENS.compilationOutputChannel, compilationOutputChannelMock);
+    container.registerInstance(TOKENS.extensionPath, extensionPathMock);
+    container.registerInstance(TOKENS.logger, loggerMock);
+    container.registerInstance(TOKENS.settings, settingsMock);
+    container.registerInstance(TOKENS.telemetry, telemetryMock);
+    container.registerInstance(TOKENS.translator, translatorMock);
 
-      container.registerSingleton(TOKENS.clock, ClockAdapter);
-      container.registerSingleton(TOKENS.crypto, CryptoAdapter);
-      container.registerSingleton(TOKENS.fileSystem, FileSystemAdapter);
-      container.registerSingleton(TOKENS.languageRegistry, LanguageRegistry);
-      container.registerSingleton(TOKENS.path, PathAdapter);
-      container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
-      container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
-      container.registerSingleton(TOKENS.system, SystemAdapter);
-      container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
+    container.registerSingleton(TOKENS.clock, ClockAdapter);
+    container.registerSingleton(TOKENS.crypto, CryptoAdapter);
+    container.registerSingleton(TOKENS.fileSystem, FileSystemAdapter);
+    container.registerSingleton(TOKENS.languageRegistry, LanguageRegistry);
+    container.registerSingleton(TOKENS.path, PathAdapter);
+    container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
+    container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
+    container.registerSingleton(TOKENS.system, SystemAdapter);
+    container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
 
-      container.register(TOKENS.languageStrategy, { useClass: LangCpp });
+    container.register(TOKENS.languageStrategy, { useClass: LangCpp });
 
-      strategy = container.resolve(WrapperStrategy);
-    });
+    strategy = container.resolve(WrapperStrategy);
+  });
 
-    afterEach(() => {
-      cleanupTestWorkspace(testWorkspace);
-    });
+  afterEach(() => {
+    cleanupTestWorkspace(testWorkspace);
+  });
 
-    it('should correctly execute and measure time', async () => {
-      const path = await createCppExecutable(testWorkspace, sleep300Code);
+  it('should correctly execute and measure time', async () => {
+    const path = await createCppExecutable(testWorkspace, sleep300Code);
 
+    const ctx: ExecutionContext = {
+      cmd: [path],
+      stdinPath: join(testWorkspace, inputFile),
+      timeLimitMs: timeLimitMs * 2,
+    };
+    const result = await strategy.execute(ctx, signal);
+    expect(result).not.toBeInstanceOf(Error);
+    if (result instanceof Error) return;
+
+    expect(result.codeOrSignal).toBe(0);
+    expect(result.timeMs).toBeGreaterThanOrEqual(300);
+    expect(result.timeMs).toBeLessThan(305);
+  });
+
+  it('should handle unlimited stack', async () => {
+    const run = async (code: number | string) => {
+      const path = await createCppExecutable(testWorkspace, stackCode);
       const ctx: ExecutionContext = {
         cmd: [path],
         stdinPath: join(testWorkspace, inputFile),
-        timeLimitMs: timeLimitMs * 2,
+        timeLimitMs,
       };
       const result = await strategy.execute(ctx, signal);
       expect(result).not.toBeInstanceOf(Error);
-      if (result instanceof Error) return;
+      if (!(result instanceof Error)) {
+        expect(result.codeOrSignal).toBe(code);
+        expect(result.isUserAborted).toBe(false);
+      }
+    };
 
-      expect(result.codeOrSignal).toBe(0);
-      expect(result.timeMs).toBeGreaterThanOrEqual(300);
-      expect(result.timeMs).toBeLessThan(305);
-    });
-
-    it('should handle unlimited stack', async () => {
-      const run = async (code: number | string) => {
-        const path = await createCppExecutable(testWorkspace, stackCode);
-        const ctx: ExecutionContext = {
-          cmd: [path],
-          stdinPath: join(testWorkspace, inputFile),
-          timeLimitMs,
-        };
-        const result = await strategy.execute(ctx, signal);
-        expect(result).not.toBeInstanceOf(Error);
-        if (!(result instanceof Error)) {
-          expect(result.codeOrSignal).toBe(code);
-          expect(result.isUserAborted).toBe(false);
-        }
-      };
-
-      await run(stackOverflow);
-      settingsMock.runner.unlimitedStack = true;
-      await run(killed);
-    });
-  },
-);
+    await run(stackOverflow);
+    settingsMock.runner.unlimitedStack = true;
+    await run(killed);
+  });
+});

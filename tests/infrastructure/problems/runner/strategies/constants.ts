@@ -18,10 +18,10 @@
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { isWin } from '@t/check';
 import { container } from 'tsyringe';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext } from '@/domain/execution';
-import { isWin } from '@t/check';
 
 export const stdinPath = '/tmp/cph-ng/stdin';
 export const stdoutPath = '/tmp/cph-ng/stdout';

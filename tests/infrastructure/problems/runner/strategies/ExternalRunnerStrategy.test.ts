@@ -388,7 +388,6 @@ describe('ExternalRunnerStrategy', () => {
 
 describe.runIf(hasCppCompiler && (isWin || isLinux))(
   'ExternalRunnerStrategy Real Integration',
-  { retry: 3 },
   () => {
     const inputFile = 'input.in';
     let mockRunnerPath: string;
