@@ -389,6 +389,7 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
   { retry: 3 },
   () => {
     const inputFile = 'input.in';
+    const killed = isWin ? 1 : 'SIGTERM';
     const stackOverflow = isWin ? 0xc00000fd : 'SIGSEGV';
     let mockRunnerPath: string;
     let strategy: ExternalRunnerStrategy;
@@ -454,8 +455,8 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
       if (!(result instanceof Error)) {
         expect(result.codeOrSignal).toBe(0);
         expect(result.isUserAborted).toBe(false);
-        expect(result.stdoutPath).toMatch(new RegExp(`^${testWorkspace}`));
-        expect(result.stderrPath).toMatch(new RegExp(`^${testWorkspace}`));
+        expect(result.stdoutPath.startsWith(testWorkspace)).toBe(true);
+        expect(result.stderrPath.startsWith(testWorkspace)).toBe(true);
         expect(result.timeMs).toBeGreaterThan(0);
         const output = await readFile(result.stdoutPath, 'utf-8');
         expect(output.trim()).toBe('Hello world');
@@ -474,7 +475,7 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
 
       expect(result).not.toBeInstanceOf(Error);
       if (!(result instanceof Error)) {
-        expect(result.codeOrSignal).toBe('SIGTERM');
+        expect(result.codeOrSignal).toBe(killed);
         expect(result.isUserAborted).toBe(false);
         expect(result.timeMs).toBeGreaterThanOrEqual(
           timeLimitMs + settingsMock.runner.timeAddition,
@@ -500,7 +501,7 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
 
       expect(result).not.toBeInstanceOf(Error);
       if (!(result instanceof Error)) {
-        expect(result.codeOrSignal).toBe('SIGTERM');
+        expect(result.codeOrSignal).toBe(killed);
         expect(result.isUserAborted).toBe(true);
         expect(result.timeMs).toBeGreaterThan(timeout);
         expect(result.timeMs).toBeLessThan(timeLimitMs);
@@ -508,28 +509,24 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
     });
 
     it('should handle unlimited stack', async () => {
-      const path = await createCppExecutable(testWorkspace, stackCode);
-
-      const ctx: ExecutionContext = {
-        cmd: [path],
-        stdinPath: join(testWorkspace, inputFile),
-        timeLimitMs,
+      const run = async (code: number | string) => {
+        const path = await createCppExecutable(testWorkspace, stackCode);
+        const ctx: ExecutionContext = {
+          cmd: [path],
+          stdinPath: join(testWorkspace, inputFile),
+          timeLimitMs,
+        };
+        const result = await strategy.execute(ctx, signal);
+        expect(result).not.toBeInstanceOf(Error);
+        if (!(result instanceof Error)) {
+          expect(result.codeOrSignal).toBe(code);
+          expect(result.isUserAborted).toBe(false);
+        }
       };
 
-      const res1 = await strategy.execute(ctx, signal);
-      expect(res1).not.toBeInstanceOf(Error);
-      if (!(res1 instanceof Error)) {
-        expect(res1.codeOrSignal).toBe(stackOverflow);
-        expect(res1.isUserAborted).toBe(false);
-      }
-
+      await run(stackOverflow);
       settingsMock.runner.unlimitedStack = true;
-      const res2 = await strategy.execute(ctx, signal);
-      expect(res2).not.toBeInstanceOf(Error);
-      if (!(res2 instanceof Error)) {
-        expect(res2.codeOrSignal).toBe('SIGTERM');
-        expect(res2.isUserAborted).toBe(false);
-      }
+      await run(killed);
     });
   },
 );
