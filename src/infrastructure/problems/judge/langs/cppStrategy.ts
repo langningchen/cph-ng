@@ -93,7 +93,7 @@ export class LangCpp extends AbstractLanguageStrategy {
     } else {
       const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
       if (this.settings.runner.unlimitedStack && this.sys.platform() === 'win32')
-        cmd.push('-Wl,--stack,268435456');
+        cmd.push('-Wl,--stack,2147483647');
       compileCommands.push(cmd);
     }
 

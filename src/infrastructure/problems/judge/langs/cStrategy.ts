@@ -60,7 +60,7 @@ export class LangC extends AbstractLanguageStrategy {
     const compilerArgs = args.split(/\s+/).filter(Boolean);
     const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
     if (this.settings.runner.unlimitedStack && this.sys.platform() === 'win32')
-      cmd.push('-Wl,--stack,268435456');
+      cmd.push('-Wl,--stack,2147483647');
     await this.executeCompiler(cmd, signal);
     return { path, hash };
   }

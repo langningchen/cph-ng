@@ -26,7 +26,6 @@ import {
   createCppExecutable,
   createTestWorkspace,
   invalidJson,
-  killed,
   mockCtx,
   signal,
   solutionPath,
@@ -297,7 +296,7 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))('WrapperStrategy Real Integ
       const ctx: ExecutionContext = {
         cmd: [path],
         stdinPath: join(testWorkspace, inputFile),
-        timeLimitMs,
+        timeLimitMs: 1000,
       };
       const result = await strategy.execute(ctx, signal);
       expect(result).not.toBeInstanceOf(Error);
@@ -309,6 +308,6 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))('WrapperStrategy Real Integ
 
     await run(stackOverflow);
     settingsMock.runner.unlimitedStack = true;
-    await run(killed);
+    await run(0);
   });
 });

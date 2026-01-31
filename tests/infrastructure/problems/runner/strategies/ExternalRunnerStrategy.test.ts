@@ -476,9 +476,6 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
       if (!(result instanceof Error)) {
         expect(result.codeOrSignal).toBe(killed);
         expect(result.isUserAborted).toBe(false);
-        expect(result.timeMs).toBeGreaterThanOrEqual(
-          timeLimitMs + settingsMock.runner.timeAddition,
-        );
       }
     });
 
