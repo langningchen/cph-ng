@@ -55,11 +55,12 @@ export class LangCpp extends AbstractLanguageStrategy {
     const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
     const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
     const { objcopy, useWrapper, useHook } = this.settings.compilation;
+    const { unlimitedStack } = this.settings.runner;
 
     const { skip, hash } = await this.checkHash(
       src,
       path,
-      compiler + args + useWrapper + useHook,
+      compiler + args + useWrapper + useHook + unlimitedStack,
       forceCompile,
     );
     if (skip) return { path, hash };
@@ -89,11 +90,11 @@ export class LangCpp extends AbstractLanguageStrategy {
 
       const linkCmd = [compiler, ...linkObjs, ...compilerArgs, '-o', path];
       if (this.sys.platform() === 'linux') linkCmd.push('-ldl');
+      if (unlimitedStack && this.sys.platform() === 'win32') linkCmd.push('-Wl,--stack,268435456');
       postCommands.push([objcopy, '--redefine-sym', 'main=original_main', solObj], linkCmd);
     } else {
       const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
-      if (this.settings.runner.unlimitedStack && this.sys.platform() === 'win32')
-        cmd.push('-Wl,--stack,2147483647');
+      if (unlimitedStack && this.sys.platform() === 'win32') cmd.push('-Wl,--stack,268435456');
       compileCommands.push(cmd);
     }
 

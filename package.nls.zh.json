@@ -94,7 +94,7 @@
   "cph-ng.configuration.problem.properties.unzipFolder.markdownDescription": "指定**解压文件夹**，这是存储题目文件的解压位置。你可以使用以下占位符：\n- `${workspace}`：工作区文件夹的路径。\n- `${tmp}`：临时目录的路径。\n- `${home}`：用户主目录的路径。\n- `${dirname}`：源文件的目录名。\n- `${relativeDirname}`：源文件的目录名（相对于工作区）。\n- `${basename}`：源文件的基本名称。\n- `${extname}`：源文件的扩展名。\n- `${basenameNoExt}`：源文件的基本名称（不带扩展名）。\n- `${zipDirname}`：压缩文件的目录名。\n- `${zipBasename}`：压缩文件的基本名称。\n- `${zipBasenameNoExt}`：压缩文件的基本名称（不带扩展名）。",
   "cph-ng.configuration.problem.title": "题目",
   "cph-ng.configuration.runner.properties.timeAddition.markdownDescription": "在执行期间，为每个测试样例的时间限制添加额外的时间（单位为**毫秒**）。例如，如果一个测试样例的时间限制为 `1000ms`，此值为 `1000ms`，那么你的程序将被允许运行 `2000ms`，之后才会被终止。这对于应对轻微的开销或系统差异非常有用。",
-  "cph-ng.configuration.runner.properties.unlimitedStack.markdownDescription": "**仅在启用 `#cph-ng.compilation.useWrapper#` 或 `#cph-ng.runner.useRunner#` 时可用。** 启用后，将为执行的程序设置无限栈大小。这对于需要深度递归的竞赛编程题目非常有用。在 Linux 上，使用 `setrlimit` 实现。在 Windows 上，使用 `-Wl,--stack,2147483647` 链接器标志。",
+  "cph-ng.configuration.runner.properties.unlimitedStack.markdownDescription": "**仅在启用 `#cph-ng.compilation.useWrapper#` 或 `#cph-ng.runner.useRunner#` 时可用。** 启用后，将为执行的程序设置无限栈大小。这对于需要深度递归的竞赛编程题目非常有用。在 Linux 上，使用 `setrlimit` 实现。在 Windows 上，使用 `-Wl,--stack,268435456` 链接器标志。",
   "cph-ng.configuration.runner.properties.useRunner.markdownDescription": "**不要与 `#cph-ng.compilation.useWrapper#` 选项同时使用。此选项仅适用于 Windows 或 Linux 系统与 C++ 程序。** 启用后，将使用一个运行器来执行程序，以提供更准确的时间测量与内存测量。",
   "cph-ng.configuration.runner.title": "运行器",
   "cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.auto": "自动匹配 VSCode 颜色主题。",
