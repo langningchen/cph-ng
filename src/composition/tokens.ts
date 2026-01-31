@@ -31,7 +31,6 @@ import type { IProblemMigrationService } from '@/application/ports/problems/IPro
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
-import type { ITestcaseService } from '@/application/ports/problems/ITestcaseService';
 import type { ICheckerRunner } from '@/application/ports/problems/judge/ICheckerRunner';
 import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
@@ -97,7 +96,6 @@ export const TOKENS = {
   solutionRunner: 'ports.SolutionRunner' as InjectionToken<ISolutionRunner>,
   system: 'ports.System' as InjectionToken<ISystem>,
   testcaseIoService: 'ports.TestcaseIoService' as InjectionToken<ITestcaseIoService>,
-  testcaseService: 'ports.TestcaseService' as InjectionToken<ITestcaseService>,
   telemetry: 'ports.Telemetry' as InjectionToken<ITelemetry>,
   tempStorage: 'ports.TempStorage' as InjectionToken<ITempStorage>,
   translator: 'ports.Translator' as InjectionToken<ITranslator>,

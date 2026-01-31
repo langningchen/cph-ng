@@ -45,7 +45,6 @@ import { ProblemMigrationService } from '@/infrastructure/problems/problemMigrat
 import { ProblemRepository } from '@/infrastructure/problems/problemRepository';
 import { ProblemService } from '@/infrastructure/problems/problemService';
 import { TestcaseIoService } from '@/infrastructure/problems/testcaseIoService';
-import { TestcaseService } from '@/infrastructure/problems/testcaseService';
 import { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
 import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
 import { PathResolverAdapter } from '@/infrastructure/services/pathResolverAdapter';
@@ -97,7 +96,6 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.solutionRunner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.system, SystemAdapter);
   container.registerSingleton(TOKENS.testcaseIoService, TestcaseIoService);
-  container.registerSingleton(TOKENS.testcaseService, TestcaseService);
   container.registerSingleton(TOKENS.telemetry, TelemetryAdapter);
   container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
   container.registerSingleton(TOKENS.translator, TranslatorAdapter);

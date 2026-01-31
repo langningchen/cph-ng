@@ -18,7 +18,10 @@
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
-import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
+import type {
+  FilePathResult,
+  ITestcaseIoService,
+} from '@/application/ports/problems/ITestcaseIoService';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
@@ -50,13 +53,13 @@ export class TestcaseIoService implements ITestcaseIoService {
     );
   }
 
-  public async ensureFilePath(io: TestcaseIo): Promise<string> {
-    return io.match(
-      async (path) => path,
+  public async ensureFilePath(io: TestcaseIo): Promise<FilePathResult> {
+    return io.match<Promise<FilePathResult>>(
+      async (path) => ({ path, needDispose: false }),
       async (data) => {
-        const tempPath = this.temp.create('TestcaseIoService');
-        await this.fs.safeWriteFile(tempPath, data);
-        return tempPath;
+        const path = this.temp.create('TestcaseIoService');
+        await this.fs.safeWriteFile(path, data);
+        return { path, needDispose: true };
       },
     );
   }
@@ -67,6 +70,7 @@ export class TestcaseIoService implements ITestcaseIoService {
         const stats = await this.fs.stat(path);
         if (stats.size <= this.settings.problem.maxInlineDataLength) {
           const content = await this.fs.readFile(path);
+          this.temp.dispose(path);
           return new TestcaseIo({ data: content });
         }
         return new TestcaseIo({ path });

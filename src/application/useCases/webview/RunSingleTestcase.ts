@@ -18,7 +18,7 @@
 import { inject, injectable } from 'tsyringe';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import type { ITestcaseService } from '@/application/ports/problems/ITestcaseService';
+import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
 import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
@@ -42,7 +42,7 @@ export class RunSingleTestcase extends BaseProblemUseCase<RunTestcaseMsg> {
     @inject(TOKENS.document) private readonly document: IDocument,
     @inject(TOKENS.judgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.testcaseService) private readonly testcaseService: ITestcaseService,
+    @inject(TOKENS.testcaseIoService) private readonly testcaseIoService: ITestcaseIoService,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
     super(repo);
@@ -78,9 +78,12 @@ export class RunSingleTestcase extends BaseProblemUseCase<RunTestcaseMsg> {
     testcase.updateResult({ verdict: VerdictName.compiled });
 
     const judgeService = this.judgeFactory.create(problem);
+    const stdinPathResult = await this.testcaseIoService.ensureFilePath(testcase.stdin);
+    const answerPathResult = await this.testcaseIoService.ensureFilePath(testcase.answer);
     const ctx: JudgeContext = {
       problem,
-      ...(await this.testcaseService.getPaths(testcase)),
+      stdinPath: stdinPathResult.path,
+      answerPath: answerPathResult.path,
       artifacts,
     };
 
@@ -97,6 +100,9 @@ export class RunSingleTestcase extends BaseProblemUseCase<RunTestcaseMsg> {
     };
 
     await judgeService.judge(ctx, observer, ac.signal);
+
+    if (stdinPathResult.needDispose) this.tmp.dispose(stdinPathResult.path);
+    if (answerPathResult.needDispose) this.tmp.dispose(answerPathResult.path);
     bgProblem.abort();
   }
 }

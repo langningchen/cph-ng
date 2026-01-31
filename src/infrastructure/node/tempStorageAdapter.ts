@@ -78,9 +78,10 @@ export class TempStorageAdapter implements ITempStorage {
     for (const path of paths) {
       if (this.freePool.has(path)) this.logger.warn('Duplicate dispose path', path);
       else if (this.usedPool.has(path)) {
+        const description = this.usedPool.get(path);
         this.usedPool.delete(path);
         this.freePool.add(path);
-        this.logger.trace('Disposing cached path', path);
+        this.logger.trace('Disposing cached path', { path, description });
       } else this.logger.debug(`Path ${path} is not disposable`);
     }
   }
