@@ -27,7 +27,7 @@ namespace CPHNG
         std::ofstream reportFile(reportPath);
         if (!reportFile.is_open())
             return;
-        reportFile << "{\"time\":" << duration << "}";
+        reportFile << "{\"timeMs\":" << duration / 1000.0 << "}";
         reportFile.close();
     }
 }

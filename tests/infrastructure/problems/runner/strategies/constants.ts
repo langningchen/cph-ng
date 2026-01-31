@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { chmodSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 import { container } from 'tsyringe';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext } from '@/domain/execution';
@@ -48,12 +48,6 @@ export const createCppExecutable = async (workspace: string, content: string): P
   const res = await langCpp.compile({ path }, signal, null, { canUseWrapper: true });
   if (res instanceof Error) throw res;
   return res.path;
-};
-export const createJsExecutable = (workspace: string, content: string): string => {
-  const path = resolve(workspace, 'code.js');
-  writeFileSync(path, `#!/usr/bin/env -S node --stack-size=102400\n\n${content}`);
-  chmodSync(path, 0o755);
-  return path;
 };
 export const createTestWorkspace = (): string => {
   const testWorkspace = join(tmpdir(), `cph-ng-test-${Date.now()}`);

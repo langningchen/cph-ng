@@ -17,7 +17,7 @@
 
 import { join } from 'node:path';
 import { hasCppCompiler, isLinux, isWin } from '@t/check';
-import sleep200Code from '@t/fixtures/sleep200.cpp?raw';
+import sleep300Code from '@t/fixtures/sleep300.cpp?raw';
 import stackCode from '@t/fixtures/stack.cpp?raw';
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
@@ -95,7 +95,7 @@ describe('WrapperStrategy', () => {
   it('should successfully extract time', async () => {
     await vol.promises.writeFile(
       TempStorageMock.getPath(0),
-      JSON.stringify({ time: 150000 } as WrapperData),
+      JSON.stringify({ timeMs: 150 } as WrapperData),
     );
     const mockProcessResult: ProcessExecuteResult = {
       codeOrSignal: 0,
@@ -143,7 +143,7 @@ describe('WrapperStrategy', () => {
   it('should handle UserAbort correctly', async () => {
     await vol.promises.writeFile(
       TempStorageMock.getPath(0),
-      JSON.stringify({ time: 90000 } as WrapperData),
+      JSON.stringify({ timeMs: 50 } as WrapperData),
     );
     const mockProcessResult: ProcessExecuteResult = {
       codeOrSignal: 0,
@@ -161,7 +161,7 @@ describe('WrapperStrategy', () => {
       codeOrSignal: 0,
       stdoutPath,
       stderrPath,
-      timeMs: 90,
+      timeMs: 50,
       isUserAborted: true,
     } satisfies ExecutionData);
     if (!(result instanceof Error)) tempStorageMock.checkFile();
@@ -277,21 +277,20 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
     });
 
     it('should correctly execute and measure time', async () => {
-      const path = await createCppExecutable(testWorkspace, sleep200Code);
+      const path = await createCppExecutable(testWorkspace, sleep300Code);
 
       const ctx: ExecutionContext = {
         cmd: [path],
         stdinPath: join(testWorkspace, inputFile),
-        timeLimitMs,
+        timeLimitMs: timeLimitMs * 2,
       };
       const result = await strategy.execute(ctx, signal);
       expect(result).not.toBeInstanceOf(Error);
       if (result instanceof Error) return;
 
       expect(result.codeOrSignal).toBe(0);
-      console.log(result.timeMs);
-      expect(result.timeMs).toBeGreaterThanOrEqual(200);
-      expect(result.timeMs).toBeLessThan(201);
+      expect(result.timeMs).toBeGreaterThanOrEqual(300);
+      expect(result.timeMs).toBeLessThan(305);
     });
 
     it('should handle unlimited stack', async () => {

@@ -74,7 +74,7 @@ describe('RunnerProviderAdapter', () => {
   it('should return cached path immediately if already resolved', async () => {
     systemMock.platform.mockReturnValue('linux');
     executorMock.execute.mockImplementation(async (_options) => {
-      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner-linux');
+      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner');
       return mockProcessResult;
     });
 
@@ -89,7 +89,7 @@ describe('RunnerProviderAdapter', () => {
     systemMock.platform.mockReturnValue('linux');
     executorMock.execute.mockImplementation(async (_options) => {
       await new Promise<void>((resolve, _reject) => setImmediate(resolve));
-      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner-linux');
+      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner');
       return mockProcessResult;
     });
 
@@ -105,13 +105,13 @@ describe('RunnerProviderAdapter', () => {
   it('should use correct compiler flags and names for Windows', async () => {
     systemMock.platform.mockReturnValue('win32');
     executorMock.execute.mockImplementation(async (_options) => {
-      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner-windows.exe');
+      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner.exe');
       return mockProcessResult;
     });
 
     const path = await adapter.getRunnerPath(signal);
 
-    expect(path).toContain('runner-windows.exe');
+    expect(path).toContain('runner.exe');
     expect(executorMock.execute).toHaveBeenCalledWith(
       expect.objectContaining({
         cmd: expect.arrayContaining(['-lpsapi', '-ladvapi32', '-static']),
@@ -122,13 +122,13 @@ describe('RunnerProviderAdapter', () => {
   it('should use correct compiler flags and names for Linux', async () => {
     systemMock.platform.mockReturnValue('linux');
     executorMock.execute.mockImplementation(async (_options) => {
-      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner-linux');
+      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner');
       return mockProcessResult;
     });
 
     const path = await adapter.getRunnerPath(signal);
 
-    expect(path).toContain('runner-linux');
+    expect(path).toContain('runner');
     expect(executorMock.execute).toHaveBeenCalledWith(
       expect.objectContaining({
         cmd: expect.arrayContaining(['-pthread']),
@@ -139,7 +139,7 @@ describe('RunnerProviderAdapter', () => {
   it('should throw error if compilation returns non-zero exit code', async () => {
     systemMock.platform.mockReturnValue('linux');
     executorMock.execute.mockImplementation(async (_options) => {
-      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner-linux');
+      fileSystemMock.safeCreateFile('/tmp/cph-ng/runner');
       return { ...mockProcessResult, codeOrSignal: 1 };
     });
 

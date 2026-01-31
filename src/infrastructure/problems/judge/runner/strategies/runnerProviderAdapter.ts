@@ -59,15 +59,10 @@ export class RunnerProviderAdapter implements IRunnerProvider {
   private async resolveOrCompile(signal: AbortSignal): Promise<string> {
     const isWin = this.sys.platform() === 'win32';
 
-    const srcPath = this.path.join(
-      this.extPath,
-      'res',
-      isWin ? 'runner-windows.cpp' : 'runner-linux.cpp',
-    );
-    const binaryName = isWin ? 'runner-windows.exe' : 'runner-linux';
+    const srcPath = this.path.join(this.extPath, 'res', 'runner.cpp');
     const outputPath = this.path.join(
       this.resolver.renderPath(this.settings.cache.directory),
-      binaryName,
+      `runner${isWin ? '.exe' : ''}`,
     );
 
     this.logger.info('Compiling runner utility...', { srcPath, outputPath });

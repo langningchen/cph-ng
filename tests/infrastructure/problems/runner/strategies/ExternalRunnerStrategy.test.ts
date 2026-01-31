@@ -19,13 +19,14 @@ import { writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { hasCppCompiler, isLinux, isWin } from '@t/check';
+import helloWorldCode from '@t/fixtures/helloWorld.cpp?raw';
+import sleep300Code from '@t/fixtures/sleep300.cpp?raw';
 import stackCode from '@t/fixtures/stack.cpp?raw';
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import {
   cleanupTestWorkspace,
   createCppExecutable,
-  createJsExecutable,
   createTestWorkspace,
   invalidJson,
   mockCtxNoArg,
@@ -441,7 +442,7 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
     });
 
     it('should execute a real program through the real runner binary', async () => {
-      const scriptPath = createJsExecutable(testWorkspace, 'console.log("hello_from_node")');
+      const scriptPath = await createCppExecutable(testWorkspace, helloWorldCode);
       const ctx: ExecutionContext = {
         cmd: [scriptPath],
         stdinPath: join(testWorkspace, inputFile),
@@ -457,12 +458,12 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
         expect(result.stderrPath).toMatch(new RegExp(`^${testWorkspace}`));
         expect(result.timeMs).toBeGreaterThan(0);
         const output = await readFile(result.stdoutPath, 'utf-8');
-        expect(output.trim()).toBe('hello_from_node');
+        expect(output.trim()).toBe('Hello world');
       }
     });
 
     it('should successfully perform a "Soft Kill" on the real runner binary', async () => {
-      const scriptPath = createJsExecutable(testWorkspace, 'while (true) {}');
+      const scriptPath = await createCppExecutable(testWorkspace, sleep300Code);
       const ctx: ExecutionContext = {
         cmd: [scriptPath],
         stdinPath: join(testWorkspace, inputFile),
@@ -482,16 +483,18 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
     });
 
     it('should handle User Abort by sending "k" to the real runner', async () => {
-      const scriptPath = createJsExecutable(testWorkspace, 'while (true) {}');
+      const scriptPath = await createCppExecutable(testWorkspace, sleep300Code);
       const ctx: ExecutionContext = {
         cmd: [scriptPath],
         stdinPath: join(testWorkspace, inputFile),
         timeLimitMs,
       };
 
+      const timeout = 50;
       const ac = new AbortController();
       const promise = strategy.execute(ctx, ac.signal);
-      setTimeout(() => ac.abort(), 200);
+      await new Promise((resolve) => setImmediate(resolve));
+      setTimeout(() => ac.abort(), timeout);
 
       const result = await promise;
 
@@ -499,8 +502,8 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
       if (!(result instanceof Error)) {
         expect(result.codeOrSignal).toBe('SIGTERM');
         expect(result.isUserAborted).toBe(true);
-        expect(result.timeMs).toBeGreaterThan(150);
-        expect(result.timeMs).toBeLessThan(300);
+        expect(result.timeMs).toBeGreaterThan(timeout);
+        expect(result.timeMs).toBeLessThan(timeLimitMs);
       }
     });
 

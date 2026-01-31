@@ -27,7 +27,7 @@ import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext, ExecutionResult } from '@/domain/execution';
 
 export interface WrapperData {
-  time: number; // microseconds
+  timeMs: number;
 }
 
 @injectable()
@@ -64,7 +64,7 @@ export class WrapperStrategy implements IExecutionStrategy {
       isUserAborted: res.abortReason === AbortReason.UserAbort,
     };
     const wrapperData = await this.readWrapperReport(reportPath);
-    if (wrapperData) data.timeMs = wrapperData.time / 1000;
+    if (wrapperData) data.timeMs = wrapperData.timeMs;
     this.tmp.dispose(reportPath);
     return data;
   }
