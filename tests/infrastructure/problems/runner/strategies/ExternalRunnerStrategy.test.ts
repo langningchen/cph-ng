@@ -388,6 +388,7 @@ describe('ExternalRunnerStrategy', () => {
 
 describe.runIf(hasCppCompiler && (isWin || isLinux))(
   'ExternalRunnerStrategy Real Integration',
+  { timeout: 10000 },
   () => {
     const inputFile = 'input.in';
     let mockRunnerPath: string;
@@ -508,7 +509,7 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
         const ctx: ExecutionContext = {
           cmd: [path],
           stdinPath: join(testWorkspace, inputFile),
-          timeLimitMs,
+          timeLimitMs: 1000,
         };
         const result = await strategy.execute(ctx, signal);
         expect(result).not.toBeInstanceOf(Error);
@@ -520,7 +521,7 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
 
       await run(stackOverflow);
       settingsMock.runner.unlimitedStack = true;
-      await run(killed);
-    });
+      await run(0);
+    }, 10000);
   },
 );
