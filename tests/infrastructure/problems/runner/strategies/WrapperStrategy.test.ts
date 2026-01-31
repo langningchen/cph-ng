@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { join } from 'node:path';
-import { hasCppCompiler } from '@t/check';
+import { hasCppCompiler, isLinux, isWin } from '@t/check';
 import sleep200Code from '@t/fixtures/sleep200.cpp?raw';
 import stackCode from '@t/fixtures/stack.cpp?raw';
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
@@ -237,81 +237,86 @@ describe('WrapperStrategy', () => {
   });
 });
 
-describe.runIf(hasCppCompiler)('WrapperStrategy Real Integration', { retry: 3 }, () => {
-  const inputFile = 'input.in';
-  let testWorkspace: string;
-  let strategy: WrapperStrategy;
+describe.runIf(hasCppCompiler && (isWin || isLinux))(
+  'WrapperStrategy Real Integration',
+  { retry: 3 },
+  () => {
+    const inputFile = 'input.in';
+    const stackOverflow = isWin ? 0xc00000fd : 'SIGSEGV';
+    let testWorkspace: string;
+    let strategy: WrapperStrategy;
 
-  beforeEach(() => {
-    settingsMock.cache.directory = testWorkspace = createTestWorkspace();
-    settingsMock.compilation.useWrapper = true;
+    beforeEach(() => {
+      settingsMock.cache.directory = testWorkspace = createTestWorkspace();
+      settingsMock.compilation.useWrapper = true;
 
-    container.registerInstance(TOKENS.compilationOutputChannel, compilationOutputChannelMock);
-    container.registerInstance(TOKENS.extensionPath, extensionPathMock);
-    container.registerInstance(TOKENS.logger, loggerMock);
-    container.registerInstance(TOKENS.settings, settingsMock);
-    container.registerInstance(TOKENS.telemetry, telemetryMock);
-    container.registerInstance(TOKENS.translator, translatorMock);
+      container.registerInstance(TOKENS.compilationOutputChannel, compilationOutputChannelMock);
+      container.registerInstance(TOKENS.extensionPath, extensionPathMock);
+      container.registerInstance(TOKENS.logger, loggerMock);
+      container.registerInstance(TOKENS.settings, settingsMock);
+      container.registerInstance(TOKENS.telemetry, telemetryMock);
+      container.registerInstance(TOKENS.translator, translatorMock);
 
-    container.registerSingleton(TOKENS.clock, ClockAdapter);
-    container.registerSingleton(TOKENS.crypto, CryptoAdapter);
-    container.registerSingleton(TOKENS.fileSystem, FileSystemAdapter);
-    container.registerSingleton(TOKENS.languageRegistry, LanguageRegistry);
-    container.registerSingleton(TOKENS.path, PathAdapter);
-    container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
-    container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
-    container.registerSingleton(TOKENS.system, SystemAdapter);
-    container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
+      container.registerSingleton(TOKENS.clock, ClockAdapter);
+      container.registerSingleton(TOKENS.crypto, CryptoAdapter);
+      container.registerSingleton(TOKENS.fileSystem, FileSystemAdapter);
+      container.registerSingleton(TOKENS.languageRegistry, LanguageRegistry);
+      container.registerSingleton(TOKENS.path, PathAdapter);
+      container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
+      container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
+      container.registerSingleton(TOKENS.system, SystemAdapter);
+      container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
 
-    container.register(TOKENS.languageStrategy, { useClass: LangCpp });
+      container.register(TOKENS.languageStrategy, { useClass: LangCpp });
 
-    strategy = container.resolve(WrapperStrategy);
-  });
+      strategy = container.resolve(WrapperStrategy);
+    });
 
-  afterEach(() => {
-    cleanupTestWorkspace(testWorkspace);
-  });
+    afterEach(() => {
+      cleanupTestWorkspace(testWorkspace);
+    });
 
-  it('should correctly execute and measure time', async () => {
-    const path = await createCppExecutable(testWorkspace, sleep200Code);
+    it('should correctly execute and measure time', async () => {
+      const path = await createCppExecutable(testWorkspace, sleep200Code);
 
-    const ctx: ExecutionContext = {
-      cmd: [path],
-      stdinPath: join(testWorkspace, inputFile),
-      timeLimitMs,
-    };
-    const result = await strategy.execute(ctx, signal);
-    expect(result).not.toBeInstanceOf(Error);
-    if (result instanceof Error) return;
+      const ctx: ExecutionContext = {
+        cmd: [path],
+        stdinPath: join(testWorkspace, inputFile),
+        timeLimitMs,
+      };
+      const result = await strategy.execute(ctx, signal);
+      expect(result).not.toBeInstanceOf(Error);
+      if (result instanceof Error) return;
 
-    expect(result.codeOrSignal).toBe(0);
-    console.log(result.timeMs);
-    expect(result.timeMs).toBeGreaterThanOrEqual(200);
-    expect(result.timeMs).toBeLessThan(201);
-  });
+      expect(result.codeOrSignal).toBe(0);
+      console.log(result.timeMs);
+      expect(result.timeMs).toBeGreaterThanOrEqual(200);
+      expect(result.timeMs).toBeLessThan(201);
+    });
 
-  it('should handle unlimited stack', async () => {
-    const path = await createCppExecutable(testWorkspace, stackCode);
+    it('should handle unlimited stack', async () => {
+      const path = await createCppExecutable(testWorkspace, stackCode);
 
-    const ctx: ExecutionContext = {
-      cmd: [path],
-      stdinPath: join(testWorkspace, inputFile),
-      timeLimitMs,
-    };
+      const ctx: ExecutionContext = {
+        cmd: [path],
+        stdinPath: join(testWorkspace, inputFile),
+        timeLimitMs,
+      };
 
-    const res1 = await strategy.execute(ctx, signal);
-    expect(res1).not.toBeInstanceOf(Error);
-    if (!(res1 instanceof Error)) {
-      expect(res1.codeOrSignal).toBe('SIGSEGV');
-      expect(res1.isUserAborted).toBe(false);
-    }
+      const res1 = await strategy.execute(ctx, signal);
+      expect(res1).not.toBeInstanceOf(Error);
+      if (!(res1 instanceof Error)) {
+        expect(res1.codeOrSignal).toBe(stackOverflow);
+        expect(res1.isUserAborted).toBe(false);
+      }
 
-    settingsMock.runner.unlimitedStack = true;
-    const res2 = await strategy.execute(ctx, signal);
-    expect(res2).not.toBeInstanceOf(Error);
-    if (!(res2 instanceof Error)) {
-      expect(res2.codeOrSignal).toBe('SIGTERM');
-      expect(res2.isUserAborted).toBe(false);
-    }
-  });
-});
+      settingsMock.runner.unlimitedStack = true;
+      const res2 = await strategy.execute(ctx, signal);
+      expect(res2).not.toBeInstanceOf(Error);
+      if (!(res2 instanceof Error)) {
+        expect(res2.codeOrSignal).toBe('SIGTERM');
+        expect(res2.isUserAborted).toBe(false);
+      }
+    });
+  },
+);

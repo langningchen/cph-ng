@@ -18,7 +18,7 @@
 import { writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { hasCppCompiler } from '@t/check';
+import { hasCppCompiler, isLinux, isWin } from '@t/check';
 import stackCode from '@t/fixtures/stack.cpp?raw';
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
@@ -383,143 +383,150 @@ describe('ExternalRunnerStrategy', () => {
   });
 });
 
-describe.runIf(hasCppCompiler)('ExternalRunnerStrategy Real Integration', { retry: 3 }, () => {
-  const inputFile = 'input.in';
-  let mockRunnerPath: string;
-  let strategy: ExternalRunnerStrategy;
-  let testWorkspace: string;
-  let runnerProviderMock: MockProxy<IRunnerProvider>;
+describe.runIf(hasCppCompiler && (isWin || isLinux))(
+  'ExternalRunnerStrategy Real Integration',
+  { retry: 3 },
+  () => {
+    const inputFile = 'input.in';
+    const stackOverflow = isWin ? 0xc00000fd : 'SIGSEGV';
+    let mockRunnerPath: string;
+    let strategy: ExternalRunnerStrategy;
+    let testWorkspace: string;
+    let runnerProviderMock: MockProxy<IRunnerProvider>;
 
-  const register = () => {
-    container.registerInstance(TOKENS.extensionPath, extensionPathMock);
-    container.registerInstance(TOKENS.logger, loggerMock);
-    container.registerInstance(TOKENS.settings, settingsMock);
-    container.registerInstance(TOKENS.telemetry, telemetryMock);
-    container.registerInstance(TOKENS.translator, translatorMock);
-    container.registerInstance(TOKENS.compilationOutputChannel, compilationOutputChannelMock);
+    const register = () => {
+      container.registerInstance(TOKENS.extensionPath, extensionPathMock);
+      container.registerInstance(TOKENS.logger, loggerMock);
+      container.registerInstance(TOKENS.settings, settingsMock);
+      container.registerInstance(TOKENS.telemetry, telemetryMock);
+      container.registerInstance(TOKENS.translator, translatorMock);
+      container.registerInstance(TOKENS.compilationOutputChannel, compilationOutputChannelMock);
 
-    container.registerSingleton(TOKENS.clock, ClockAdapter);
-    container.registerSingleton(TOKENS.crypto, CryptoAdapter);
-    container.registerSingleton(TOKENS.fileSystem, FileSystemAdapter);
-    container.registerSingleton(TOKENS.path, PathAdapter);
-    container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
-    container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
-    container.registerSingleton(TOKENS.languageRegistry, LanguageRegistry);
-    container.registerSingleton(TOKENS.runnerProvider, RunnerProviderAdapter);
-    container.registerSingleton(TOKENS.system, SystemAdapter);
-    container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
+      container.registerSingleton(TOKENS.clock, ClockAdapter);
+      container.registerSingleton(TOKENS.crypto, CryptoAdapter);
+      container.registerSingleton(TOKENS.fileSystem, FileSystemAdapter);
+      container.registerSingleton(TOKENS.path, PathAdapter);
+      container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
+      container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
+      container.registerSingleton(TOKENS.languageRegistry, LanguageRegistry);
+      container.registerSingleton(TOKENS.runnerProvider, RunnerProviderAdapter);
+      container.registerSingleton(TOKENS.system, SystemAdapter);
+      container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
 
-    container.register(TOKENS.languageStrategy, { useClass: LangCpp });
-  };
-
-  beforeAll(async () => {
-    register();
-    const runnerProvider = container.resolve(RunnerProviderAdapter);
-    mockRunnerPath = await runnerProvider.getRunnerPath(signal);
-  });
-
-  beforeEach(async () => {
-    settingsMock.cache.directory = testWorkspace = createTestWorkspace();
-    writeFileSync(join(testWorkspace, inputFile), '');
-    settingsMock.runner.timeAddition = 100;
-
-    runnerProviderMock = mock<IRunnerProvider>();
-    runnerProviderMock.getRunnerPath.mockResolvedValue(mockRunnerPath);
-
-    register();
-    container.registerInstance(TOKENS.runnerProvider, runnerProviderMock);
-
-    strategy = container.resolve(ExternalRunnerStrategy);
-  });
-
-  afterEach(() => {
-    cleanupTestWorkspace(testWorkspace);
-  });
-
-  it('should execute a real program through the real runner binary', async () => {
-    const scriptPath = createJsExecutable(testWorkspace, 'console.log("hello_from_node")');
-    const ctx: ExecutionContext = {
-      cmd: [scriptPath],
-      stdinPath: join(testWorkspace, inputFile),
-      timeLimitMs,
-    };
-    const result = await strategy.execute(ctx, signal);
-
-    expect(result).not.toBeInstanceOf(Error);
-    if (!(result instanceof Error)) {
-      expect(result.codeOrSignal).toBe(0);
-      expect(result.isUserAborted).toBe(false);
-      expect(result.stdoutPath).toMatch(new RegExp(`^${testWorkspace}`));
-      expect(result.stderrPath).toMatch(new RegExp(`^${testWorkspace}`));
-      expect(result.timeMs).toBeGreaterThan(0);
-      const output = await readFile(result.stdoutPath, 'utf-8');
-      expect(output.trim()).toBe('hello_from_node');
-    }
-  });
-
-  it('should successfully perform a "Soft Kill" on the real runner binary', async () => {
-    const scriptPath = createJsExecutable(testWorkspace, 'while (true) {}');
-    const ctx: ExecutionContext = {
-      cmd: [scriptPath],
-      stdinPath: join(testWorkspace, inputFile),
-      timeLimitMs,
+      container.register(TOKENS.languageStrategy, { useClass: LangCpp });
     };
 
-    const result = await strategy.execute(ctx, signal);
+    beforeAll(async () => {
+      register();
+      const runnerProvider = container.resolve(RunnerProviderAdapter);
+      mockRunnerPath = await runnerProvider.getRunnerPath(signal);
+    });
 
-    expect(result).not.toBeInstanceOf(Error);
-    if (!(result instanceof Error)) {
-      expect(result.codeOrSignal).toBe('SIGTERM');
-      expect(result.isUserAborted).toBe(false);
-      expect(result.timeMs).toBeGreaterThanOrEqual(timeLimitMs + settingsMock.runner.timeAddition);
-    }
-  });
+    beforeEach(async () => {
+      settingsMock.cache.directory = testWorkspace = createTestWorkspace();
+      writeFileSync(join(testWorkspace, inputFile), '');
+      settingsMock.runner.timeAddition = 100;
 
-  it('should handle User Abort by sending "k" to the real runner', async () => {
-    const scriptPath = createJsExecutable(testWorkspace, 'while (true) {}');
-    const ctx: ExecutionContext = {
-      cmd: [scriptPath],
-      stdinPath: join(testWorkspace, inputFile),
-      timeLimitMs,
-    };
+      runnerProviderMock = mock<IRunnerProvider>();
+      runnerProviderMock.getRunnerPath.mockResolvedValue(mockRunnerPath);
 
-    const ac = new AbortController();
-    const promise = strategy.execute(ctx, ac.signal);
-    setTimeout(() => ac.abort(), 200);
+      register();
+      container.registerInstance(TOKENS.runnerProvider, runnerProviderMock);
 
-    const result = await promise;
+      strategy = container.resolve(ExternalRunnerStrategy);
+    });
 
-    expect(result).not.toBeInstanceOf(Error);
-    if (!(result instanceof Error)) {
-      expect(result.codeOrSignal).toBe('SIGTERM');
-      expect(result.isUserAborted).toBe(true);
-      expect(result.timeMs).toBeGreaterThan(150);
-      expect(result.timeMs).toBeLessThan(300);
-    }
-  });
+    afterEach(() => {
+      cleanupTestWorkspace(testWorkspace);
+    });
 
-  it('should handle unlimited stack', async () => {
-    const path = await createCppExecutable(testWorkspace, stackCode);
+    it('should execute a real program through the real runner binary', async () => {
+      const scriptPath = createJsExecutable(testWorkspace, 'console.log("hello_from_node")');
+      const ctx: ExecutionContext = {
+        cmd: [scriptPath],
+        stdinPath: join(testWorkspace, inputFile),
+        timeLimitMs,
+      };
+      const result = await strategy.execute(ctx, signal);
 
-    const ctx: ExecutionContext = {
-      cmd: [path],
-      stdinPath: join(testWorkspace, inputFile),
-      timeLimitMs,
-    };
+      expect(result).not.toBeInstanceOf(Error);
+      if (!(result instanceof Error)) {
+        expect(result.codeOrSignal).toBe(0);
+        expect(result.isUserAborted).toBe(false);
+        expect(result.stdoutPath).toMatch(new RegExp(`^${testWorkspace}`));
+        expect(result.stderrPath).toMatch(new RegExp(`^${testWorkspace}`));
+        expect(result.timeMs).toBeGreaterThan(0);
+        const output = await readFile(result.stdoutPath, 'utf-8');
+        expect(output.trim()).toBe('hello_from_node');
+      }
+    });
 
-    const res1 = await strategy.execute(ctx, signal);
-    expect(res1).not.toBeInstanceOf(Error);
-    if (!(res1 instanceof Error)) {
-      expect(res1.codeOrSignal).toBe('SIGSEGV');
-      expect(res1.isUserAborted).toBe(false);
-    }
+    it('should successfully perform a "Soft Kill" on the real runner binary', async () => {
+      const scriptPath = createJsExecutable(testWorkspace, 'while (true) {}');
+      const ctx: ExecutionContext = {
+        cmd: [scriptPath],
+        stdinPath: join(testWorkspace, inputFile),
+        timeLimitMs,
+      };
 
-    settingsMock.runner.unlimitedStack = true;
-    const res2 = await strategy.execute(ctx, signal);
-    expect(res2).not.toBeInstanceOf(Error);
-    if (!(res2 instanceof Error)) {
-      expect(res2.codeOrSignal).toBe('SIGTERM');
-      expect(res2.isUserAborted).toBe(false);
-    }
-  });
-});
+      const result = await strategy.execute(ctx, signal);
+
+      expect(result).not.toBeInstanceOf(Error);
+      if (!(result instanceof Error)) {
+        expect(result.codeOrSignal).toBe('SIGTERM');
+        expect(result.isUserAborted).toBe(false);
+        expect(result.timeMs).toBeGreaterThanOrEqual(
+          timeLimitMs + settingsMock.runner.timeAddition,
+        );
+      }
+    });
+
+    it('should handle User Abort by sending "k" to the real runner', async () => {
+      const scriptPath = createJsExecutable(testWorkspace, 'while (true) {}');
+      const ctx: ExecutionContext = {
+        cmd: [scriptPath],
+        stdinPath: join(testWorkspace, inputFile),
+        timeLimitMs,
+      };
+
+      const ac = new AbortController();
+      const promise = strategy.execute(ctx, ac.signal);
+      setTimeout(() => ac.abort(), 200);
+
+      const result = await promise;
+
+      expect(result).not.toBeInstanceOf(Error);
+      if (!(result instanceof Error)) {
+        expect(result.codeOrSignal).toBe('SIGTERM');
+        expect(result.isUserAborted).toBe(true);
+        expect(result.timeMs).toBeGreaterThan(150);
+        expect(result.timeMs).toBeLessThan(300);
+      }
+    });
+
+    it('should handle unlimited stack', async () => {
+      const path = await createCppExecutable(testWorkspace, stackCode);
+
+      const ctx: ExecutionContext = {
+        cmd: [path],
+        stdinPath: join(testWorkspace, inputFile),
+        timeLimitMs,
+      };
+
+      const res1 = await strategy.execute(ctx, signal);
+      expect(res1).not.toBeInstanceOf(Error);
+      if (!(res1 instanceof Error)) {
+        expect(res1.codeOrSignal).toBe(stackOverflow);
+        expect(res1.isUserAborted).toBe(false);
+      }
+
+      settingsMock.runner.unlimitedStack = true;
+      const res2 = await strategy.execute(ctx, signal);
+      expect(res2).not.toBeInstanceOf(Error);
+      if (!(res2 instanceof Error)) {
+        expect(res2.codeOrSignal).toBe('SIGTERM');
+        expect(res2.isUserAborted).toBe(false);
+      }
+    });
+  },
+);

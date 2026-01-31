@@ -16,6 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { execSync } from 'node:child_process';
+import { platform } from 'node:os';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 
 export const hasCppCompiler = (() => {
@@ -28,3 +29,7 @@ export const hasCppCompiler = (() => {
     return false;
   }
 })();
+
+export const isWin = platform() === 'win32';
+export const isLinux = platform() === 'linux';
+export const isMac = platform() === 'darwin';
