@@ -21,6 +21,7 @@ import pingCode from '@t/fixtures/ping?raw';
 import pongCode from '@t/fixtures/pong?raw';
 import timeoutCode from '@t/fixtures/timeout?raw';
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { pathMock } from '@t/infrastructure/node/pathMock';
 import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import { stdinPath } from '@t/infrastructure/problems/runner/strategies/constants';
 import type { Volume } from 'memfs';
@@ -31,7 +32,6 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { AbortReason, type ProcessOutput } from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
-import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
 import { loggerMock } from '../vscode/loggerMock';
 import { telemetryMock } from '../vscode/telemetryMock';
@@ -47,9 +47,9 @@ describe('ProcessExecutorAdapter', () => {
 
     container.registerInstance(TOKENS.fileSystem, fileSystemMock);
     container.registerInstance(TOKENS.logger, loggerMock);
+    container.registerInstance(TOKENS.path, pathMock);
     container.registerInstance(TOKENS.telemetry, telemetryMock);
     container.registerSingleton(TOKENS.clock, ClockAdapter);
-    container.registerSingleton(TOKENS.path, PathAdapter);
     container.registerSingleton(TOKENS.tempStorage, TempStorageMock);
 
     adapter = container.resolve(ProcessExecutorAdapter);

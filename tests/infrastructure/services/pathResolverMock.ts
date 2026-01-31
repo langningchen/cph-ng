@@ -38,7 +38,7 @@ export class PathResolverMock implements IPathResolver {
   }
 
   public renderPath(original: string): string {
-    return this.path.normalize(
+    return this.path.resolve(
       this.renderString(original, [
         ['tmp', this.sys.tmpdir()],
         ['home', this.sys.homedir()],

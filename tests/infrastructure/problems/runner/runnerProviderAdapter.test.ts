@@ -16,6 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { pathMock } from '@t/infrastructure/node/pathMock';
 import { systemMock } from '@t/infrastructure/node/systemMock';
 import {
   signal,
@@ -37,7 +38,6 @@ import type {
   ProcessExecuteResult,
 } from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
-import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 
 describe('RunnerProviderAdapter', () => {
@@ -61,11 +61,11 @@ describe('RunnerProviderAdapter', () => {
 
     container.registerInstance(TOKENS.extensionPath, extensionPathMock);
     container.registerInstance(TOKENS.fileSystem, fileSystemMock);
-    container.registerInstance(TOKENS.system, systemMock);
+    container.registerInstance(TOKENS.logger, loggerMock);
+    container.registerInstance(TOKENS.path, pathMock);
     container.registerInstance(TOKENS.processExecutor, executorMock);
     container.registerInstance(TOKENS.settings, settingsMock);
-    container.registerInstance(TOKENS.logger, loggerMock);
-    container.registerSingleton(TOKENS.path, PathAdapter);
+    container.registerInstance(TOKENS.system, systemMock);
     container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
 
     adapter = container.resolve(RunnerProviderAdapter);

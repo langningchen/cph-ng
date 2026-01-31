@@ -16,6 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
+import { pathMock } from '@t/infrastructure/node/pathMock';
 import { systemMock } from '@t/infrastructure/node/systemMock';
 import { PathResolverMock } from '@t/infrastructure/services/pathResolverMock';
 import type { Volume } from 'memfs';
@@ -24,7 +25,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { TOKENS } from '@/composition/tokens';
-import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
 import { extensionPathMock } from '../vscode/extensionPathMock';
 import { loggerMock } from '../vscode/loggerMock';
@@ -43,9 +43,9 @@ describe('TempStorageAdapter', () => {
     container.registerInstance(TOKENS.extensionPath, extensionPathMock);
     container.registerInstance(TOKENS.fileSystem, fileSystemMock);
     container.registerInstance(TOKENS.logger, loggerMock);
-    container.registerInstance(TOKENS.system, systemMock);
+    container.registerInstance(TOKENS.path, pathMock);
     container.registerInstance(TOKENS.settings, settingsMock);
-    container.registerSingleton(TOKENS.path, PathAdapter);
+    container.registerInstance(TOKENS.system, systemMock);
     container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
 
     adapter = container.resolve(TempStorageAdapter);

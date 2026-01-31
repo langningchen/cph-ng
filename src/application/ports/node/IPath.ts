@@ -20,9 +20,6 @@
  * @see {@link https://nodejs.org/api/path.html | Node.js Path API}
  */
 export interface IPath {
-  /** Normalizes a path, resolving '..' and '.' segments. */
-  normalize(path: string): string;
-
   /** Joins all given path segments together using the platform-specific separator as a delimiter. */
   join(...paths: string[]): string;
 

@@ -53,7 +53,7 @@ export class PathResolverAdapter implements IPathResolver {
   }
 
   private _renderPath(original: string): string {
-    return this.path.normalize(
+    return this.path.resolve(
       this.renderString(original, [
         ['tmp', this.sys.tmpdir()],
         ['home', this.sys.homedir()],
@@ -142,7 +142,7 @@ export class PathResolverAdapter implements IPathResolver {
       ]);
     }
 
-    result = this.path.normalize(
+    result = this.path.resolve(
       this.renderString(this._renderPath(result), [
         ['dirname', dir],
         ['extname', ext],
@@ -163,7 +163,7 @@ export class PathResolverAdapter implements IPathResolver {
     const base = this.path.basename(zipPath);
     const baseNoExt = this.path.basename(zipPath, ext);
 
-    const result = this.path.normalize(
+    const result = this.path.resolve(
       this.renderString(original, [
         ['zipDirname', dir],
         ['zipBasename', base],
