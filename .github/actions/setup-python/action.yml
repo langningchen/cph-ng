@@ -3,7 +3,7 @@ description: Setup Python and install documentation dependencies
 inputs:
   python-version:
     description: Python version to use
-    default: '3.x'
+    default: "3.x"
     required: false
 runs:
   using: composite
@@ -12,6 +12,7 @@ runs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
+        cache: "pip"
 
     - name: Install dependencies
       shell: bash
