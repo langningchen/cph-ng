@@ -20,7 +20,6 @@ import { hasCppCompiler } from '@t/check';
 import sleep200Code from '@t/fixtures/sleep200.cpp?raw';
 import stackCode from '@t/fixtures/stack.cpp?raw';
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
-import { systemMock } from '@t/infrastructure/node/systemMock';
 import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import {
   cleanupTestWorkspace,
@@ -60,6 +59,7 @@ import { CryptoAdapter } from '@/infrastructure/node/cryptoAdapter';
 import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
 import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
+import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
 import { LangCpp } from '@/infrastructure/problems/judge/langs/cppStrategy';
 import { LanguageRegistry } from '@/infrastructure/problems/judge/langs/languageRegistry';
@@ -250,7 +250,6 @@ describe.runIf(hasCppCompiler)('WrapperStrategy Real Integration', { retry: 3 },
     container.registerInstance(TOKENS.extensionPath, extensionPathMock);
     container.registerInstance(TOKENS.logger, loggerMock);
     container.registerInstance(TOKENS.settings, settingsMock);
-    container.registerInstance(TOKENS.system, systemMock);
     container.registerInstance(TOKENS.telemetry, telemetryMock);
     container.registerInstance(TOKENS.translator, translatorMock);
 
@@ -261,6 +260,7 @@ describe.runIf(hasCppCompiler)('WrapperStrategy Real Integration', { retry: 3 },
     container.registerSingleton(TOKENS.path, PathAdapter);
     container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
     container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
+    container.registerSingleton(TOKENS.system, SystemAdapter);
     container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
 
     container.register(TOKENS.languageStrategy, { useClass: LangCpp });
