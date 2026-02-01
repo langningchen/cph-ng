@@ -3,7 +3,7 @@ description: Setup PNPM and Node.js (with pnpm cache), then install dependencies
 inputs:
   node-version:
     description: Node.js version to use
-    default: "22"
+    default: "24"
     required: false
   pnpm-version:
     description: PNPM version to use
