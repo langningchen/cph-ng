@@ -16,7 +16,7 @@ static FOPEN_T get_real_fopen()
 {
     HMODULE hMod = GetModuleHandleA("ucrtbase.dll");
     if (!hMod)
-        throw std::runtime_error("Can not load ucrtbase.dll");
+        throw std::runtime_error("Cannot load ucrtbase.dll");
     return (FOPEN_T)GetProcAddress(hMod, "fopen");
 }
 

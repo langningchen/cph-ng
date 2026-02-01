@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-type Uuid = `${string}-${string}-${string}-${string}-${string}`;
+import type { UUID } from 'node:crypto';
 
 /**
  * Interface for cryptographic operations.
@@ -26,7 +26,7 @@ export interface ICrypto {
    * Generates a random UUID.
    * @returns A randomly generated UUID string.
    */
-  randomUUID(): Uuid;
+  randomUUID(): UUID;
 
   /**
    * Hashes the input data using MD5 algorithm.

@@ -105,7 +105,4 @@ const App = () => {
 };
 
 const element = document.getElementById('root');
-if (element) {
-  const root = createRoot(element);
-  root.render(<App />);
-}
+if (element) createRoot(element).render(<App />);

@@ -225,8 +225,12 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
     // Pipe the processes
     // Use pipe() instead of pipeline() to avoid destroying the source streams
     // as they are also being piped to files in launch()
-    proc2.child.stdout.pipe(proc1.child.stdin).on('error', () => {});
-    proc1.child.stdout.pipe(proc2.child.stdin).on('error', () => {});
+    proc2.child.stdout.pipe(proc1.child.stdin).on('error', (e) => {
+      this.pipeFailed(proc1.child.pid, 'stdin')(e);
+    });
+    proc1.child.stdout.pipe(proc2.child.stdin).on('error', (e) => {
+      this.pipeFailed(proc2.child.pid, 'stdin')(e);
+    });
 
     // Wait for both processes to complete
     return new Promise((resolve) => {
