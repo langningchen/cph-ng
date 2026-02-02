@@ -52,7 +52,7 @@ export class RunSingleTestcase extends BaseProblemUseCase<RunTestcaseMsg> {
     if (!bgProblem) throw new Error('Problem not found');
     const { problem } = bgProblem;
 
-    const testcase = problem.getTestcase(msg.id);
+    const testcase = problem.getTestcase(msg.testcaseId);
     if (!testcase) throw new Error('Test case not found');
 
     const ac = new AbortController();

@@ -29,10 +29,10 @@ export interface ProblemMetaPayload {
 export type ProblemEvents = {
   patchMeta: (payload: ProblemMetaPayload) => void;
   patchStressTest: (payload: Partial<StressTest>) => void;
-  addTestcase: (id: UUID, payload: Testcase) => void;
-  deleteTestcase: (id: UUID) => void;
-  patchTestcase: (id: UUID, payload: Partial<Testcase>) => void;
-  patchTestcaseResult: (id: UUID, payload: Partial<TestcaseResult>) => void;
+  addTestcase: (testcaseId: UUID, payload: Testcase) => void;
+  deleteTestcase: (testcaseId: UUID) => void;
+  patchTestcase: (testcaseId: UUID, payload: Partial<Testcase>) => void;
+  patchTestcaseResult: (testcaseId: UUID, payload: Partial<TestcaseResult>) => void;
 };
 
 export class Problem {
@@ -92,36 +92,36 @@ export class Problem {
     return this._timeElapsedMs;
   }
 
-  private onPatchTestcase(uuid: UUID, payload: Partial<Testcase>) {
-    this.signals.emit('patchTestcase', uuid, payload);
+  private onPatchTestcase(testcaseId: UUID, payload: Partial<Testcase>) {
+    this.signals.emit('patchTestcase', testcaseId, payload);
   }
-  private onPatchTestcaseResult(uuid: UUID, payload: Partial<TestcaseResult>) {
-    this.signals.emit('patchTestcaseResult', uuid, payload);
+  private onPatchTestcaseResult(testcaseId: UUID, payload: Partial<TestcaseResult>) {
+    this.signals.emit('patchTestcaseResult', testcaseId, payload);
   }
 
-  public addTestcase(uuid: UUID, testcase: Testcase) {
-    this._testcases.set(uuid, testcase);
-    this._testcaseOrder.push(uuid);
-    this.signals.emit('addTestcase', uuid, testcase);
-    testcase.signals.on('patchTestcase', (payload) => this.onPatchTestcase(uuid, payload));
+  public addTestcase(testcaseId: UUID, testcase: Testcase) {
+    this._testcases.set(testcaseId, testcase);
+    this._testcaseOrder.push(testcaseId);
+    this.signals.emit('addTestcase', testcaseId, testcase);
+    testcase.signals.on('patchTestcase', (payload) => this.onPatchTestcase(testcaseId, payload));
     testcase.signals.on('patchTestcaseResult', (payload) =>
-      this.onPatchTestcaseResult(uuid, payload),
+      this.onPatchTestcaseResult(testcaseId, payload),
     );
   }
-  public getTestcase(uuid: UUID): Testcase {
-    const testcase = this._testcases.get(uuid);
+  public getTestcase(testcaseId: UUID): Testcase {
+    const testcase = this._testcases.get(testcaseId);
     if (!testcase) throw new Error('Test case not found');
     return testcase;
   }
-  public deleteTestcase(uuid: UUID): void {
-    this._testcaseOrder = this._testcaseOrder.filter((id) => id !== uuid);
+  public deleteTestcase(testcaseId: UUID): void {
+    this._testcaseOrder = this._testcaseOrder.filter((id) => id !== testcaseId);
   }
   public clearTestcases(): string[] {
     const disposables = this.purgeUnusedTestcases();
     this._testcaseOrder = [];
-    for (const [id, testcase] of this._testcases) {
+    for (const [testcaseId, testcase] of this._testcases) {
       disposables.push(...testcase.getDisposables());
-      this.signals.emit('deleteTestcase', id);
+      this.signals.emit('deleteTestcase', testcaseId);
     }
     this._testcases.clear();
     return disposables;
@@ -132,26 +132,27 @@ export class Problem {
   }
   public getEnabledTestcaseIds(): UUID[] {
     const enabledIds: UUID[] = [];
-    for (const id of this._testcaseOrder) {
-      const testcase = this._testcases.get(id);
-      if (testcase && !testcase.isDisabled) enabledIds.push(id);
+    for (const testcaseId of this._testcaseOrder) {
+      const testcase = this._testcases.get(testcaseId);
+      if (testcase && !testcase.isDisabled) enabledIds.push(testcaseId);
     }
     return enabledIds;
   }
   public purgeUnusedTestcases(): string[] {
     const activeIds = new Set(this._testcaseOrder);
     const disposables: string[] = [];
-    for (const [id, testcase] of this._testcases)
-      if (!activeIds.has(id)) {
+    for (const [testcaseId, testcase] of this._testcases)
+      if (!activeIds.has(testcaseId)) {
         disposables.push(...testcase.getDisposables());
         testcase.signals.removeAllListeners();
-        this._testcases.delete(id);
+        this._testcases.delete(testcaseId);
       }
     return disposables;
   }
   public clearResult(): string[] {
     const disposables: string[] = [];
-    for (const id of this._testcaseOrder) disposables.push(...this.getTestcase(id).clearResult());
+    for (const testcaseId of this._testcaseOrder)
+      disposables.push(...this.getTestcase(testcaseId).clearResult());
     return disposables;
   }
   public isRelated(path: string): boolean {

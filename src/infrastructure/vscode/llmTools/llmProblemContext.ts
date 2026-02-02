@@ -68,14 +68,14 @@ export class LlmProblemContext extends BaseLlmTool<BaseLlmToolParams> {
         checker: problem.checker?.path,
         interactor: problem.interactor?.path,
       },
-      testcases: problem.testcaseOrder.map((id) => {
-        const tc = problem.getTestcase(id);
+      testcases: problem.testcaseOrder.map((testcaseId) => {
+        const testcase = problem.getTestcase(testcaseId);
         return {
-          id,
-          verdict: tc.verdict ?? 'NOT_RUN',
-          timeMs: tc.timeMs,
-          memoryMb: tc.memoryMb,
-          isDisabled: tc.isDisabled,
+          testcaseId,
+          verdict: testcase.verdict ?? 'NOT_RUN',
+          timeMs: testcase.timeMs,
+          memoryMb: testcase.memoryMb,
+          isDisabled: testcase.isDisabled,
         };
       }),
     };

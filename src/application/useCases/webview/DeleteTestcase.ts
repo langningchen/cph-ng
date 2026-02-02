@@ -36,6 +36,6 @@ export class DeleteTestcase extends BaseProblemUseCase<DeleteTestcaseMsg> {
     { problem }: BackgroundProblem,
     msg: DeleteTestcaseMsg,
   ): Promise<void> {
-    problem.deleteTestcase(msg.id);
+    problem.deleteTestcase(msg.testcaseId);
   }
 }

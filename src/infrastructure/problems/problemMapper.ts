@@ -30,9 +30,9 @@ export class ProblemMapper {
 
   public toDto(entity: Problem): IProblem {
     const testcases: Record<UUID, ITestcase> = {};
-    for (const id of entity.testcaseOrder) {
-      const testcase = entity.testcases.get(id);
-      if (testcase) testcases[id] = this.testcaseToDto(testcase);
+    for (const testcaseId of entity.testcaseOrder) {
+      const testcase = entity.testcases.get(testcaseId);
+      if (testcase) testcases[testcaseId] = this.testcaseToDto(testcase);
     }
     return {
       version: this.version,
@@ -51,9 +51,9 @@ export class ProblemMapper {
   public toEntity(dto: IProblem): Problem {
     const problem = new Problem(dto.name, dto.src.path);
     problem.url = dto.url;
-    for (const id of dto.testcaseOrder) {
-      const testcase = dto.testcases[id];
-      if (testcase) problem.addTestcase(id, this.testcaseToEntity(testcase));
+    for (const testcaseId of dto.testcaseOrder) {
+      const testcase = dto.testcases[testcaseId];
+      if (testcase) problem.addTestcase(testcaseId, this.testcaseToEntity(testcase));
     }
     problem.checker = dto.checker;
     problem.interactor = dto.interactor;

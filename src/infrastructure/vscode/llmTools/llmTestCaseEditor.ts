@@ -98,7 +98,7 @@ export class LlmTestcaseEditor extends BaseLlmTool<LlmTestcaseEditorParams> {
       if (isDisabled !== undefined && isDisabled !== testcase.isDisabled) testcase.toggleDisable();
 
       testcase.clearResult();
-      await this.repo.persist(bgProblem.id);
+      await this.repo.persist(bgProblem.problemId);
       return this.createResult({ success: true });
     }
 
@@ -111,7 +111,7 @@ export class LlmTestcaseEditor extends BaseLlmTool<LlmTestcaseEditorParams> {
     if (isDisabled) newTestcase.toggleDisable();
 
     problem.addTestcase(newId, newTestcase);
-    await this.repo.persist(bgProblem.id);
+    await this.repo.persist(bgProblem.problemId);
     return this.createResult({ success: true });
   }
 }

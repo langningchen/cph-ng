@@ -43,7 +43,9 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
   const isAllAccepted = useMemo(() => {
     return (
       testcaseOrder.length > 0 &&
-      testcaseOrder.every((id) => testcases[id]?.result?.verdict.name === VerdictName.accepted)
+      testcaseOrder.every(
+        (testcaseId) => testcases[testcaseId]?.result?.verdict.name === VerdictName.accepted,
+      )
     );
   }, [testcaseOrder, testcases]);
 

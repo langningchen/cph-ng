@@ -95,7 +95,7 @@ export class ProblemRepository implements IProblemRepository {
     const backgroundProblem = this.backgroundProblems.get(problemId);
     if (!backgroundProblem || backgroundProblem.ac) return false;
     const activePath = this.activePath.getActivePath();
-    if (activePath && (await this.getByPath(activePath))?.id === problemId) {
+    if (activePath && (await this.getByPath(activePath))?.problemId === problemId) {
       this.logger.trace('Cannot persist active problem', problemId);
       return false;
     }

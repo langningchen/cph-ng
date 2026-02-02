@@ -146,7 +146,8 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
       }
       case 'clearTestcaseStatus': {
         if (draft.currentProblem.type !== 'active') return;
-        if (action.id) delete draft.currentProblem.problem.testcases[action.id].result;
+        if (action.testcaseId)
+          delete draft.currentProblem.problem.testcases[action.testcaseId].result;
         else
           for (const testcase of Object.values(draft.currentProblem.problem.testcases))
             delete testcase.result;
@@ -154,14 +155,14 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
       }
       case 'setTestcaseString': {
         if (draft.currentProblem.type !== 'active') return;
-        const testcase = draft.currentProblem.problem.testcases[action.id];
+        const testcase = draft.currentProblem.problem.testcases[action.testcaseId];
         if (action.label === 'stdin') testcase.stdin = { type: 'string', data: action.data };
         if (action.label === 'answer') testcase.answer = { type: 'string', data: action.data };
         break;
       }
       case 'updateTestcase': {
         if (draft.currentProblem.type !== 'active') return;
-        const testcase = draft.currentProblem.problem.testcases[action.id];
+        const testcase = draft.currentProblem.problem.testcases[action.testcaseId];
         if (action.event === 'toggleDisable') testcase.isDisabled = !testcase.isDisabled;
         if (action.event === 'toggleExpand') testcase.isExpand = !testcase.isExpand;
         if (action.event === 'setAsAnswer' && testcase.result?.stdout)
@@ -170,7 +171,7 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
       }
       case 'deleteTestcase': {
         if (draft.currentProblem.type !== 'active') return;
-        delete draft.currentProblem.problem.testcases[action.id];
+        delete draft.currentProblem.problem.testcases[action.testcaseId];
         break;
       }
       case 'reorderTestcase': {

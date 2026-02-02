@@ -22,7 +22,7 @@ export class BackgroundProblem {
   private _ac: AbortController | null = null;
 
   public constructor(
-    public readonly id: UUID,
+    public readonly problemId: UUID,
     public problem: Problem,
     private startTime: number,
   ) {}

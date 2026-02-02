@@ -47,7 +47,7 @@ export class ToggleTestcaseFile extends BaseProblemUseCase<ToggleTestcaseFileMsg
     { problem }: BackgroundProblem,
     msg: ToggleTestcaseFileMsg,
   ): Promise<void> {
-    const testcase = problem.getTestcase(msg.id);
+    const testcase = problem.getTestcase(msg.testcaseId);
     const fileIo = testcase[msg.label];
     await fileIo.match(
       async (path) => {
@@ -61,7 +61,7 @@ export class ToggleTestcaseFile extends BaseProblemUseCase<ToggleTestcaseFileMsg
         const ext = this.getDefaultExt(msg.label);
         const defaultPath = this.path.resolve(
           this.path.dirname(problem.src.path),
-          `${this.path.basename(problem.src.path, this.path.extname(problem.src.path))}-${msg.id + 1}${ext}`,
+          `${this.path.basename(problem.src.path, this.path.extname(problem.src.path))}-${msg.testcaseId + 1}${ext}`,
         );
         const path = await this.ui.saveDialog({
           defaultPath,

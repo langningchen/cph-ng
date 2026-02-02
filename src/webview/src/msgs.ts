@@ -60,42 +60,42 @@ export interface LoadTestcasesMsg extends ProblemBaseMsg {
 }
 export interface RunTestcaseMsg extends ProblemBaseMsg {
   type: 'runTestcase';
-  id: UUID;
+  testcaseId: UUID;
   forceCompile: boolean | null;
 }
 export interface ClearTestcaseStatusMsg extends ProblemBaseMsg {
   type: 'clearTestcaseStatus';
-  id?: UUID;
+  testcaseId?: UUID;
 }
 export type WebviewTestcaseFileTypes = 'stdin' | 'answer';
 export interface ChooseTestcaseFileMsg extends ProblemBaseMsg {
   type: 'chooseTestcaseFile';
-  id: UUID;
+  testcaseId: UUID;
   label: WebviewTestcaseFileTypes;
 }
 export interface SetTestcaseStringMsg extends ProblemBaseMsg {
   type: 'setTestcaseString';
-  id: UUID;
+  testcaseId: UUID;
   label: WebviewTestcaseFileTypes;
   data: string;
 }
 export interface UpdateTestcaseMsg extends ProblemBaseMsg {
   type: 'updateTestcase';
-  id: UUID;
+  testcaseId: UUID;
   event: 'toggleDisable' | 'toggleExpand' | 'setAsAnswer';
 }
 export interface CompareTestcaseMsg extends ProblemBaseMsg {
   type: 'compareTestcase';
-  id: UUID;
+  testcaseId: UUID;
 }
 export interface ToggleTestcaseFileMsg extends ProblemBaseMsg {
   type: 'toggleTestcaseFile';
-  id: UUID;
+  testcaseId: UUID;
   label: WebviewTestcaseFileTypes;
 }
 export interface DeleteTestcaseMsg extends ProblemBaseMsg {
   type: 'deleteTestcase';
-  id: UUID;
+  testcaseId: UUID;
 }
 export interface ReorderTestcaseMsg extends ProblemBaseMsg {
   type: 'reorderTestcase';

@@ -40,26 +40,28 @@ export class ProblemMigrationService implements IProblemMigrationService {
     '0.6.0': (_: History.IProblem_0_6_0): null => null,
     '0.4.8': (problem: History.IProblem_0_4_8): History.IProblem_0_6_0 => {
       const testcases: History.IProblem_0_6_0['testcases'] = {};
-      for (const id of problem.tcOrder) {
-        const tc = problem.tcs[id];
-        const migrateTcIo = (tcIo: History.ITestcaseIo_0_4_8): History.ITestcaseIo_0_6_0 => {
-          if (tcIo.useFile) return { path: tcIo.data };
-          return { data: tcIo.data };
+      for (const testcaseId of problem.tcOrder) {
+        const testcase = problem.tcs[testcaseId];
+        const migrateTestcaseIo = (
+          testcaseIo: History.ITestcaseIo_0_4_8,
+        ): History.ITestcaseIo_0_6_0 => {
+          if (testcaseIo.useFile) return { path: testcaseIo.data };
+          return { data: testcaseIo.data };
         };
-        if (tc)
-          testcases[id] = {
-            stdin: migrateTcIo(tc.stdin),
-            answer: migrateTcIo(tc.answer),
-            isExpand: tc.isExpand,
-            isDisabled: tc.isDisabled,
-            result: tc.result
+        if (testcase)
+          testcases[testcaseId] = {
+            stdin: migrateTestcaseIo(testcase.stdin),
+            answer: migrateTestcaseIo(testcase.answer),
+            isExpand: testcase.isExpand,
+            isDisabled: testcase.isDisabled,
+            result: testcase.result
               ? {
-                  verdict: tc.result.verdict.name as VerdictName,
-                  timeMs: tc.result.time,
-                  memoryMb: tc.result.memory,
-                  stdout: migrateTcIo(tc.result.stdout),
-                  stderr: migrateTcIo(tc.result.stderr),
-                  msg: tc.result.msg.join('\n'),
+                  verdict: testcase.result.verdict.name as VerdictName,
+                  timeMs: testcase.result.time,
+                  memoryMb: testcase.result.memory,
+                  stdout: migrateTestcaseIo(testcase.result.stdout),
+                  stderr: migrateTestcaseIo(testcase.result.stderr),
+                  msg: testcase.result.msg.join('\n'),
                 }
               : undefined,
           };
@@ -95,27 +97,27 @@ export class ProblemMigrationService implements IProblemMigrationService {
       return {
         ...problem,
         tcs: Object.fromEntries(
-          Object.entries(problem.tcs).map(([id, tc]: [string, any]) => [
-            id,
+          Object.entries(problem.tcs).map(([testcaseId, testcase]: [string, any]) => [
+            testcaseId,
             {
-              ...tc,
-              stdin: tc.stdin.useFile
+              ...testcase,
+              stdin: testcase.stdin.useFile
                 ? {
                     useFile: true,
-                    data: tc.stdin.path,
+                    data: testcase.stdin.path,
                   }
                 : {
                     useFile: false,
-                    data: tc.stdin.data,
+                    data: testcase.stdin.data,
                   },
-              answer: tc.answer.useFile
+              answer: testcase.answer.useFile
                 ? {
                     useFile: true,
-                    data: tc.answer.path,
+                    data: testcase.answer.path,
                   }
                 : {
                     useFile: false,
-                    data: tc.answer.data,
+                    data: testcase.answer.data,
                   },
               result: undefined,
             },
@@ -129,9 +131,9 @@ export class ProblemMigrationService implements IProblemMigrationService {
         ...problem,
         version: '0.4.3',
         tcs: Object.fromEntries(
-          Object.entries(problem.tcs).map(([id, tc]: [string, any]) => [
-            id,
-            { ...tc, isDisabled: false },
+          Object.entries(problem.tcs).map(([testcaseId, testcase]: [string, any]) => [
+            testcaseId,
+            { ...testcase, isDisabled: false },
           ]),
         ),
       }) satisfies History.IProblem_0_4_3,
@@ -142,10 +144,10 @@ export class ProblemMigrationService implements IProblemMigrationService {
         tcs: {},
         tcOrder: [],
       };
-      for (const tc of problem.tcs) {
-        const id = this.crypto.randomUUID();
-        newProblem.tcs[id] = tc;
-        newProblem.tcOrder.push(id);
+      for (const testcase of problem.tcs) {
+        const testcaseId = this.crypto.randomUUID();
+        newProblem.tcs[testcaseId] = testcase;
+        newProblem.tcOrder.push(testcaseId);
       }
       return newProblem;
     },
@@ -189,15 +191,15 @@ export class ProblemMigrationService implements IProblemMigrationService {
     '0.0.4': (problem: History.IProblem_0_0_4): History.IProblem_0_0_5 =>
       ({
         ...problem,
-        tcs: problem.testCases.map((tc: any) => ({
-          ...tc,
-          result: tc.result
+        tcs: problem.testCases.map((testcase: any) => ({
+          ...testcase,
+          result: testcase.result
             ? {
-                verdict: tc.result.verdict,
-                time: tc.result.time,
-                stdout: tc.result.stdout,
-                stderr: tc.result.stderr,
-                msg: tc.result.message,
+                verdict: testcase.result.verdict,
+                time: testcase.result.time,
+                stdout: testcase.result.stdout,
+                stderr: testcase.result.stderr,
+                msg: testcase.result.message,
               }
             : undefined,
         })),
@@ -205,27 +207,27 @@ export class ProblemMigrationService implements IProblemMigrationService {
     '0.0.3': (problem: History.IProblem_0_0_3): History.IProblem_0_0_4 =>
       ({
         ...problem,
-        testCases: problem.testCases.map((tc: any) => ({
-          stdin: tc.inputFile
-            ? { useFile: true, path: tc.input }
-            : { useFile: false, data: tc.input },
-          answer: tc.answerFile
-            ? { useFile: true, path: tc.answer }
-            : { useFile: false, data: tc.answer },
+        testCases: problem.testCases.map((testcase: any) => ({
+          stdin: testcase.inputFile
+            ? { useFile: true, path: testcase.input }
+            : { useFile: false, data: testcase.input },
+          answer: testcase.answerFile
+            ? { useFile: true, path: testcase.answer }
+            : { useFile: false, data: testcase.answer },
           result:
-            tc.status && tc.time !== undefined
+            testcase.status && testcase.time !== undefined
               ? {
-                  verdict: tc.status,
-                  time: tc.time,
+                  verdict: testcase.status,
+                  time: testcase.time,
                   stdout:
-                    tc.outputFile && tc.output
-                      ? { useFile: true, path: tc.output }
-                      : { useFile: false, data: tc.output || '' },
-                  stderr: { useFile: false, data: tc.error || '' },
-                  message: tc.message || '',
+                    testcase.outputFile && testcase.output
+                      ? { useFile: true, path: testcase.output }
+                      : { useFile: false, data: testcase.output || '' },
+                  stderr: { useFile: false, data: testcase.error || '' },
+                  message: testcase.message || '',
                 }
               : undefined,
-          isExpand: tc.isExpand,
+          isExpand: testcase.isExpand,
         })),
       }) satisfies History.IProblem_0_0_4,
     '0.0.1': (problem: History.IProblem_0_0_1): History.IProblem_0_0_3 =>

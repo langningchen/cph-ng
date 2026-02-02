@@ -49,9 +49,9 @@ export class WebviewProblemMapper {
 
   public toDto(entity: Problem): IWebviewProblem {
     const testcases: Record<UUID, IWebviewTestcase> = {};
-    for (const id of entity.testcaseOrder) {
-      const testcase = entity.testcases.get(id);
-      if (testcase) testcases[id] = this.testcaseToDto(testcase);
+    for (const testcaseId of entity.testcaseOrder) {
+      const testcase = entity.testcases.get(testcaseId);
+      if (testcase) testcases[testcaseId] = this.testcaseToDto(testcase);
     }
     return {
       name: entity.name,

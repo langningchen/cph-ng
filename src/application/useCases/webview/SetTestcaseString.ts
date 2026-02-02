@@ -35,7 +35,7 @@ export class SetTestcaseString extends BaseProblemUseCase<SetTestcaseStringMsg> 
     { problem }: BackgroundProblem,
     msg: SetTestcaseStringMsg,
   ): Promise<void> {
-    const testcase = problem.getTestcase(msg.id);
+    const testcase = problem.getTestcase(msg.testcaseId);
     if (msg.label === 'stdin') testcase.stdin = new TestcaseIo({ data: msg.data });
     if (msg.label === 'answer') testcase.answer = new TestcaseIo({ data: msg.data });
   }

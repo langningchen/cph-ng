@@ -74,7 +74,7 @@ export const TestcaseView = memo(
                   dispatch({
                     type: 'updateTestcase',
                     problemId,
-                    id: testcaseId,
+                    testcaseId: testcaseId,
                     event: 'toggleDisable',
                   }),
               }
@@ -83,11 +83,11 @@ export const TestcaseView = memo(
                   dispatch({
                     type: 'updateTestcase',
                     problemId,
-                    id: testcaseId,
+                    testcaseId: testcaseId,
                     event: 'toggleDisable',
                   }),
                 [t('testcaseView.menu.clearTestcaseStatus')]: () =>
-                  dispatch({ type: 'clearTestcaseStatus', problemId, id: testcaseId }),
+                  dispatch({ type: 'clearTestcaseStatus', problemId, testcaseId: testcaseId }),
               }
         }
       >
@@ -96,7 +96,12 @@ export const TestcaseView = memo(
           disableGutters
           onChange={() => {
             if (testcase.isDisabled) return;
-            dispatch({ type: 'updateTestcase', problemId, id: testcaseId, event: 'toggleExpand' });
+            dispatch({
+              type: 'updateTestcase',
+              problemId,
+              testcaseId: testcaseId,
+              event: 'toggleExpand',
+            });
           }}
           sx={{
             borderLeft: `4px solid`,
@@ -201,14 +206,14 @@ export const TestcaseView = memo(
                     dispatch({
                       type: 'runTestcase',
                       problemId,
-                      id: testcaseId,
+                      testcaseId: testcaseId,
                       forceCompile: true,
                     }),
                   [t('testcaseView.run.menu.skipCompile')]: () =>
                     dispatch({
                       type: 'runTestcase',
                       problemId,
-                      id: testcaseId,
+                      testcaseId: testcaseId,
                       forceCompile: false,
                     }),
                 }}
@@ -223,7 +228,7 @@ export const TestcaseView = memo(
                     dispatch({
                       type: 'runTestcase',
                       problemId,
-                      id: testcaseId,
+                      testcaseId: testcaseId,
                       forceCompile: getCompile(e),
                     });
                   }}
@@ -235,7 +240,7 @@ export const TestcaseView = memo(
                 color='error'
                 onClick={(e) => {
                   e.stopPropagation();
-                  dispatch({ type: 'deleteTestcase', problemId, id: testcaseId });
+                  dispatch({ type: 'deleteTestcase', problemId, testcaseId: testcaseId });
                 }}
               />
             </CphFlex>
@@ -255,7 +260,7 @@ export const TestcaseView = memo(
                       dispatch({
                         type: 'setTestcaseString',
                         problemId,
-                        id: testcaseId,
+                        testcaseId: testcaseId,
                         label: 'stdin',
                         data,
                       })
@@ -265,7 +270,7 @@ export const TestcaseView = memo(
                         type: 'chooseTestcaseFile',
                         problemId,
                         label: 'stdin',
-                        id: testcaseId,
+                        testcaseId: testcaseId,
                       })
                     }
                     onToggleFile={() => {
@@ -273,7 +278,7 @@ export const TestcaseView = memo(
                         type: 'toggleTestcaseFile',
                         problemId,
                         label: 'stdin',
-                        id: testcaseId,
+                        testcaseId: testcaseId,
                       });
                     }}
                     onOpenVirtual={() => {
@@ -295,7 +300,7 @@ export const TestcaseView = memo(
                       dispatch({
                         type: 'setTestcaseString',
                         problemId,
-                        id: testcaseId,
+                        testcaseId: testcaseId,
                         label: 'answer',
                         data,
                       })
@@ -305,7 +310,7 @@ export const TestcaseView = memo(
                         type: 'chooseTestcaseFile',
                         problemId,
                         label: 'answer',
-                        id: testcaseId,
+                        testcaseId: testcaseId,
                       })
                     }
                     onToggleFile={() =>
@@ -313,7 +318,7 @@ export const TestcaseView = memo(
                         type: 'toggleTestcaseFile',
                         problemId,
                         label: 'answer',
-                        id: testcaseId,
+                        testcaseId: testcaseId,
                       })
                     }
                     onOpenVirtual={() =>
@@ -342,14 +347,14 @@ export const TestcaseView = memo(
                               dispatch({
                                 type: 'updateTestcase',
                                 problemId,
-                                id: testcaseId,
+                                testcaseId: testcaseId,
                                 event: 'setAsAnswer',
                               }),
                             onCompare: () =>
                               dispatch({
                                 type: 'compareTestcase',
                                 problemId,
-                                id: testcaseId,
+                                testcaseId: testcaseId,
                               }),
                           }}
                           onOpenVirtual={() => {

@@ -39,8 +39,8 @@ export class CompareTestcase extends BaseProblemUseCase<CompareTestcaseMsg> {
     msg: CompareTestcaseMsg,
   ): Promise<void> {
     this.ui.compareFiles(
-      this.problemFs.getUri(problem.src.path, `/testcases/${msg.id}/answer`),
-      this.problemFs.getUri(problem.src.path, `/testcases/${msg.id}/stdout`),
+      this.problemFs.getUri(problem.src.path, `/testcases/${msg.testcaseId}/answer`),
+      this.problemFs.getUri(problem.src.path, `/testcases/${msg.testcaseId}/stdout`),
     );
   }
 }

@@ -34,7 +34,7 @@ export class UpdateTestcase extends BaseProblemUseCase<UpdateTestcaseMsg> {
     { problem }: BackgroundProblem,
     msg: UpdateTestcaseMsg,
   ): Promise<void> {
-    const testcase = problem.getTestcase(msg.id);
+    const testcase = problem.getTestcase(msg.testcaseId);
     if (msg.event === 'toggleDisable') testcase.toggleDisable();
     if (msg.event === 'toggleExpand') testcase.toggleExpand();
     if (msg.event === 'setAsAnswer' && testcase.stdout) testcase.answer = testcase.stdout;

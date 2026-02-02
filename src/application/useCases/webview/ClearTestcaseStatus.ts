@@ -36,7 +36,7 @@ export class ClearTestcaseStatus extends BaseProblemUseCase<ClearTestcaseStatusM
     { problem }: BackgroundProblem,
     msg: ClearTestcaseStatusMsg,
   ): Promise<void> {
-    if (msg.id) this.tmp.dispose(problem.getTestcase(msg.id).clearResult());
+    if (msg.testcaseId) this.tmp.dispose(problem.getTestcase(msg.testcaseId).clearResult());
     else this.tmp.dispose(problem.clearResult());
   }
 }

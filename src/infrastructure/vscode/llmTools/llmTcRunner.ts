@@ -72,7 +72,7 @@ export class LlmTestcaseRunner extends BaseLlmTool<LlmTestcaseRunnerParams> {
     token: CancellationToken,
   ): Promise<LanguageModelToolResult> {
     const { testcaseId } = input;
-    const problemId = bgProblem.id;
+    const problemId = bgProblem.problemId;
     const problem = bgProblem.problem;
 
     token.onCancellationRequested(() => {
@@ -83,7 +83,7 @@ export class LlmTestcaseRunner extends BaseLlmTool<LlmTestcaseRunnerParams> {
       await this.runSingleTestcase.exec({
         type: 'runTestcase',
         problemId,
-        id: testcaseId,
+        testcaseId,
         forceCompile: null,
       });
     } else {
@@ -96,14 +96,14 @@ export class LlmTestcaseRunner extends BaseLlmTool<LlmTestcaseRunnerParams> {
 
     // Collect results for a summary
     const relevantIds = testcaseId ? [testcaseId] : problem.testcaseOrder;
-    const summary = relevantIds.map((id) => {
-      const tc = problem.getTestcase(id);
-      const verdict = tc.verdict;
+    const summary = relevantIds.map((testcaseId) => {
+      const testcase = problem.getTestcase(testcaseId);
+      const verdict = testcase.verdict;
       return {
-        id,
+        testcaseId,
         verdict: verdict ? Verdicts[verdict].name : 'NOT_RUN',
-        timeMs: tc.timeMs,
-        memoryMb: tc.memoryMb,
+        timeMs: testcase.timeMs,
+        memoryMb: testcase.memoryMb,
       };
     });
 

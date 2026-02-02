@@ -59,7 +59,7 @@ export class CommandModule implements IExtensionModule {
     if (!activePath) throw new Error('Active path is required');
     const backgroundProblem = await this.repo.loadByPath(activePath);
     if (!backgroundProblem) throw new Error('No problem found');
-    return backgroundProblem.id;
+    return backgroundProblem.problemId;
   }
 
   public setup(context: ExtensionContext) {
@@ -92,8 +92,8 @@ export class CommandModule implements IExtensionModule {
       },
     };
 
-    for (const [id, func] of Object.entries(cmdMap)) {
-      context.subscriptions.push(commands.registerCommand(id, func));
+    for (const [command, func] of Object.entries(cmdMap)) {
+      context.subscriptions.push(commands.registerCommand(command, func));
     }
   }
 
