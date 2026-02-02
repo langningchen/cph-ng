@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import Accordion from '@mui/material/Accordion';
@@ -28,6 +27,7 @@ import { MD5 } from 'crypto-js';
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictType } from '@/domain/entities/verdict';
+import type { ProblemId, TestcaseId } from '@/domain/types';
 import type { IWebviewTestcase } from '@/domain/webviewTypes';
 import { useProblemContext } from '../context/ProblemContext';
 import { getCompile } from '../utils';
@@ -39,8 +39,8 @@ import { CphButton } from './cphButton';
 import { TestcaseDataView } from './testcaseDataView';
 
 interface TestcaseViewProp {
-  problemId: UUID;
-  testcaseId: UUID;
+  problemId: ProblemId;
+  testcaseId: TestcaseId;
   testcase: IWebviewTestcase;
   isExpand: boolean;
   idx: number;
@@ -74,7 +74,7 @@ export const TestcaseView = memo(
                   dispatch({
                     type: 'updateTestcase',
                     problemId,
-                    testcaseId: testcaseId,
+                    testcaseId,
                     event: 'toggleDisable',
                   }),
               }
@@ -83,11 +83,11 @@ export const TestcaseView = memo(
                   dispatch({
                     type: 'updateTestcase',
                     problemId,
-                    testcaseId: testcaseId,
+                    testcaseId,
                     event: 'toggleDisable',
                   }),
                 [t('testcaseView.menu.clearTestcaseStatus')]: () =>
-                  dispatch({ type: 'clearTestcaseStatus', problemId, testcaseId: testcaseId }),
+                  dispatch({ type: 'clearTestcaseStatus', problemId, testcaseId }),
               }
         }
       >
@@ -99,7 +99,7 @@ export const TestcaseView = memo(
             dispatch({
               type: 'updateTestcase',
               problemId,
-              testcaseId: testcaseId,
+              testcaseId,
               event: 'toggleExpand',
             });
           }}
@@ -206,14 +206,14 @@ export const TestcaseView = memo(
                     dispatch({
                       type: 'runTestcase',
                       problemId,
-                      testcaseId: testcaseId,
+                      testcaseId,
                       forceCompile: true,
                     }),
                   [t('testcaseView.run.menu.skipCompile')]: () =>
                     dispatch({
                       type: 'runTestcase',
                       problemId,
-                      testcaseId: testcaseId,
+                      testcaseId,
                       forceCompile: false,
                     }),
                 }}
@@ -228,7 +228,7 @@ export const TestcaseView = memo(
                     dispatch({
                       type: 'runTestcase',
                       problemId,
-                      testcaseId: testcaseId,
+                      testcaseId,
                       forceCompile: getCompile(e),
                     });
                   }}
@@ -240,7 +240,7 @@ export const TestcaseView = memo(
                 color='error'
                 onClick={(e) => {
                   e.stopPropagation();
-                  dispatch({ type: 'deleteTestcase', problemId, testcaseId: testcaseId });
+                  dispatch({ type: 'deleteTestcase', problemId, testcaseId });
                 }}
               />
             </CphFlex>
@@ -260,7 +260,7 @@ export const TestcaseView = memo(
                       dispatch({
                         type: 'setTestcaseString',
                         problemId,
-                        testcaseId: testcaseId,
+                        testcaseId,
                         label: 'stdin',
                         data,
                       })
@@ -270,7 +270,7 @@ export const TestcaseView = memo(
                         type: 'chooseTestcaseFile',
                         problemId,
                         label: 'stdin',
-                        testcaseId: testcaseId,
+                        testcaseId,
                       })
                     }
                     onToggleFile={() => {
@@ -278,7 +278,7 @@ export const TestcaseView = memo(
                         type: 'toggleTestcaseFile',
                         problemId,
                         label: 'stdin',
-                        testcaseId: testcaseId,
+                        testcaseId,
                       });
                     }}
                     onOpenVirtual={() => {
@@ -300,7 +300,7 @@ export const TestcaseView = memo(
                       dispatch({
                         type: 'setTestcaseString',
                         problemId,
-                        testcaseId: testcaseId,
+                        testcaseId,
                         label: 'answer',
                         data,
                       })
@@ -310,7 +310,7 @@ export const TestcaseView = memo(
                         type: 'chooseTestcaseFile',
                         problemId,
                         label: 'answer',
-                        testcaseId: testcaseId,
+                        testcaseId,
                       })
                     }
                     onToggleFile={() =>
@@ -318,7 +318,7 @@ export const TestcaseView = memo(
                         type: 'toggleTestcaseFile',
                         problemId,
                         label: 'answer',
-                        testcaseId: testcaseId,
+                        testcaseId,
                       })
                     }
                     onOpenVirtual={() =>
@@ -347,14 +347,14 @@ export const TestcaseView = memo(
                               dispatch({
                                 type: 'updateTestcase',
                                 problemId,
-                                testcaseId: testcaseId,
+                                testcaseId,
                                 event: 'setAsAnswer',
                               }),
                             onCompare: () =>
                               dispatch({
                                 type: 'compareTestcase',
                                 problemId,
-                                testcaseId: testcaseId,
+                                testcaseId,
                               }),
                           }}
                           onOpenVirtual={() => {

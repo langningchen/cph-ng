@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import { EventEmitter } from 'node:stream';
 import { inject, injectable } from 'tsyringe';
 import type TypedEventEmitter from 'typed-emitter';
@@ -26,6 +25,7 @@ import type {
   WebviewProblemMetaPayload,
 } from '@/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@/composition/tokens';
+import type { ProblemId, TestcaseId } from '@/domain/types';
 import type {
   IWebviewBackgroundProblem,
   IWebviewProblem,
@@ -50,7 +50,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
     this.emitter.on('message', handler);
   }
 
-  public fullProblem(problemId: UUID, payload: IWebviewProblem): void {
+  public fullProblem(problemId: ProblemId, payload: IWebviewProblem): void {
     this.logger.debug('Emitting fullProblem event', { problemId, payload });
     this.emitter.emit('message', {
       type: 'FULL_PROBLEM',
@@ -58,7 +58,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
       payload,
     });
   }
-  public patchMeta(problemId: UUID, payload: WebviewProblemMetaPayload): void {
+  public patchMeta(problemId: ProblemId, payload: WebviewProblemMetaPayload): void {
     this.logger.debug('Emitting patchMeta event', { problemId, payload });
     this.emitter.emit('message', {
       type: 'PATCH_META',
@@ -66,7 +66,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
       payload,
     });
   }
-  public patchStressTest(problemId: UUID, payload: Partial<IWebviewStressTest>): void {
+  public patchStressTest(problemId: ProblemId, payload: Partial<IWebviewStressTest>): void {
     this.logger.debug('Emitting patchStressTest event', { problemId, payload });
     this.emitter.emit('message', {
       type: 'PATCH_STRESS_TEST',
@@ -74,7 +74,11 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
       payload,
     });
   }
-  public addTestcase(problemId: UUID, testcaseId: UUID, payload: IWebviewTestcase): void {
+  public addTestcase(
+    problemId: ProblemId,
+    testcaseId: TestcaseId,
+    payload: IWebviewTestcase,
+  ): void {
     this.logger.debug('Emitting addTestcase event', { problemId, testcaseId, payload });
     this.emitter.emit('message', {
       type: 'ADD_TESTCASE',
@@ -83,7 +87,7 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
       payload,
     });
   }
-  public deleteTestcase(problemId: UUID, testcaseId: UUID): void {
+  public deleteTestcase(problemId: ProblemId, testcaseId: TestcaseId): void {
     this.logger.debug('Emitting deleteTestcase event', { problemId, testcaseId });
     this.emitter.emit('message', {
       type: 'DELETE_TESTCASE',
@@ -92,8 +96,8 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
     });
   }
   public patchTestcase(
-    problemId: UUID,
-    testcaseId: UUID,
+    problemId: ProblemId,
+    testcaseId: TestcaseId,
     payload: Partial<IWebviewTestcase>,
   ): void {
     this.logger.debug('Emitting patchTestcase event', { problemId, testcaseId, payload });
@@ -105,8 +109,8 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
     });
   }
   public patchTestcaseResult(
-    problemId: UUID,
-    testcaseId: UUID,
+    problemId: ProblemId,
+    testcaseId: TestcaseId,
     payload: Partial<IWebviewTestcaseResult>,
   ): void {
     this.logger.debug('Emitting patchTestcaseResult event', { problemId, testcaseId, payload });

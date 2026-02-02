@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
+import type { ProblemId, TestcaseId } from '@/domain/types';
 import type {
   IWebviewBackgroundProblem,
   IWebviewFileWithHash,
@@ -42,40 +42,40 @@ const WebviewEventName = {
 } as const;
 interface WebviewFullProblemEvent {
   type: typeof WebviewEventName.FULL_PROBLEM;
-  problemId: UUID;
+  problemId: ProblemId;
   payload: IWebviewProblem;
 }
 interface WebviewPatchMetaEvent {
   type: typeof WebviewEventName.PATCH_META;
-  problemId: UUID;
+  problemId: ProblemId;
   payload: WebviewProblemMetaPayload;
 }
 interface WebviewPatchStressTestEvent {
   type: typeof WebviewEventName.PATCH_STRESS_TEST;
-  problemId: UUID;
+  problemId: ProblemId;
   payload: Partial<IWebviewStressTest>;
 }
 interface WebviewAddTestcaseEvent {
   type: typeof WebviewEventName.ADD_TESTCASE;
-  problemId: UUID;
-  testcaseId: UUID;
+  problemId: ProblemId;
+  testcaseId: TestcaseId;
   payload: IWebviewTestcase;
 }
 interface WebviewDeleteTestcaseEvent {
   type: typeof WebviewEventName.DELETE_TESTCASE;
-  problemId: UUID;
-  testcaseId: UUID;
+  problemId: ProblemId;
+  testcaseId: TestcaseId;
 }
 interface WebviewPatchTestcaseEvent {
   type: typeof WebviewEventName.PATCH_TESTCASE;
-  problemId: UUID;
-  testcaseId: UUID;
+  problemId: ProblemId;
+  testcaseId: TestcaseId;
   payload: Partial<IWebviewTestcase>;
 }
 interface WebviewPatchTestcaseResultEvent {
   type: typeof WebviewEventName.PATCH_TESTCASE_RESULT;
-  problemId: UUID;
-  testcaseId: UUID;
+  problemId: ProblemId;
+  testcaseId: TestcaseId;
   payload: Partial<IWebviewTestcaseResult>;
 }
 interface WebviewBackgroundEvent {
@@ -99,15 +99,19 @@ export type WebviewEvent =
 
 export interface IWebviewEventBus {
   onMessage(callback: (data: WebviewEvent) => void): void;
-  fullProblem(problemId: UUID, payload: IWebviewProblem): void;
-  patchMeta(problemId: UUID, payload: WebviewProblemMetaPayload): void;
-  patchStressTest(problemId: UUID, payload: Partial<IWebviewStressTest>): void;
-  addTestcase(problemId: UUID, testcaseId: UUID, payload: IWebviewTestcase): void;
-  deleteTestcase(problemId: UUID, testcaseId: UUID): void;
-  patchTestcase(problemId: UUID, testcaseId: UUID, payload: Partial<IWebviewTestcase>): void;
+  fullProblem(problemId: ProblemId, payload: IWebviewProblem): void;
+  patchMeta(problemId: ProblemId, payload: WebviewProblemMetaPayload): void;
+  patchStressTest(problemId: ProblemId, payload: Partial<IWebviewStressTest>): void;
+  addTestcase(problemId: ProblemId, testcaseId: TestcaseId, payload: IWebviewTestcase): void;
+  deleteTestcase(problemId: ProblemId, testcaseId: TestcaseId): void;
+  patchTestcase(
+    problemId: ProblemId,
+    testcaseId: TestcaseId,
+    payload: Partial<IWebviewTestcase>,
+  ): void;
   patchTestcaseResult(
-    problemId: UUID,
-    testcaseId: UUID,
+    problemId: ProblemId,
+    testcaseId: TestcaseId,
     payload: Partial<IWebviewTestcaseResult>,
   ): void;
   background(payload: IWebviewBackgroundProblem[]): void;

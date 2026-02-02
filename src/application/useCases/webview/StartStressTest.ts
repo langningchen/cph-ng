@@ -35,6 +35,7 @@ import { StressTestState } from '@/domain/entities/stressTest';
 import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import { VerdictName } from '@/domain/entities/verdict';
+import type { TestcaseId } from '@/domain/types';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import type { StartStressTestMsg } from '@/webview/src/msgs';
 
@@ -129,18 +130,19 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
           if (res.verdict === VerdictName.rejected) stressTest.state = StressTestState.inactive;
           else {
             stressTest.state = StressTestState.foundDifference;
-            const newTestcase = new Testcase(
+            const testcaseId = this.crypto.randomUUID() as TestcaseId;
+            const testcase = new Testcase(
               await this.testcaseIoService.tryInlining(new TestcaseIo({ path: genRes.stdoutPath })),
               await this.testcaseIoService.tryInlining(new TestcaseIo({ path: bfRes.stdoutPath })),
               true,
             );
-            newTestcase.updateResult({
+            testcase.updateResult({
               verdict: res.verdict,
               timeMs: res.timeMs,
               memoryMb: res.memoryMb,
               msg: res.msg,
             });
-            problem.addTestcase(this.crypto.randomUUID(), newTestcase);
+            problem.addTestcase(testcaseId, testcase);
           }
         },
         onError: (e) => {

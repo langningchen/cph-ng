@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictType } from '@/domain/entities/verdict';
+import type { ProblemId } from '@/domain/types';
 import type { IWebviewProblem } from '@/domain/webviewTypes';
 import { useProblemContext } from '../context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
@@ -29,7 +29,7 @@ import { ProblemTitle } from './problemTitle';
 import { TestcasesView } from './testcasesView';
 
 interface ProblemViewProps {
-  problemId: UUID;
+  problemId: ProblemId;
   problem: IWebviewProblem;
   startTime: number;
 }

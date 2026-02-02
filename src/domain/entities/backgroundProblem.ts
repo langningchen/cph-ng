@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import type { Problem } from '@/domain/entities/problem';
+import type { ProblemId } from '@/domain/types';
 
 export class BackgroundProblem {
   private _ac: AbortController | null = null;
 
   public constructor(
-    public readonly problemId: UUID,
+    public readonly problemId: ProblemId,
     public problem: Problem,
     private startTime: number,
   ) {}

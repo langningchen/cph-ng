@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import EditIcon from '@mui/icons-material/Edit';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -32,6 +31,7 @@ import Tab from '@mui/material/Tab';
 import TextField from '@mui/material/TextField';
 import React, { type SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { ProblemId } from '@/domain/types';
 import type { IWebviewFileWithHash, IWebviewOverrides } from '@/domain/webviewTypes';
 import { useProblemContext } from '../context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
@@ -41,7 +41,7 @@ import { CphText } from './base/cphText';
 import { CphButton } from './cphButton';
 
 interface ProblemTitleProps {
-  problemId: UUID;
+  problemId: ProblemId;
   name: string;
   url?: string;
   checker: IWebviewFileWithHash | null;

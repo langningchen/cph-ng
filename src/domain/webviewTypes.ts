@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import type { Verdict } from '@/domain/entities/verdict';
+import type { TestcaseId } from '@/domain/types';
 
 export type IWebviewTestcaseIo =
   | { type: 'string'; data: string }
@@ -67,8 +67,8 @@ export interface IWebviewOverrides {
 export interface IWebviewProblem {
   name: string;
   url?: string;
-  testcases: Record<UUID, IWebviewTestcase>;
-  testcaseOrder: UUID[];
+  testcases: Record<TestcaseId, IWebviewTestcase>;
+  testcaseOrder: TestcaseId[];
   src: IWebviewFileWithHash;
   checker: IWebviewFileWithHash | null;
   interactor: IWebviewFileWithHash | null;

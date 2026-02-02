@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { randomUUID, type UUID } from 'node:crypto';
 import { inject, injectable } from 'tsyringe';
 import type {
   CancellationToken,
@@ -23,6 +22,7 @@ import type {
   LanguageModelToolResult,
   PreparedToolInvocation,
 } from 'vscode';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
@@ -30,10 +30,11 @@ import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import type { TestcaseId } from '@/domain/types';
 import { BaseLlmTool, type BaseLlmToolParams } from './baseLlmTool';
 
 interface LlmTestcaseEditorParams extends BaseLlmToolParams {
-  testcaseId?: UUID;
+  testcaseId?: TestcaseId;
   stdin?: string;
   answer?: string;
   isDisabled?: boolean;
@@ -45,6 +46,7 @@ export class LlmTestcaseEditor extends BaseLlmTool<LlmTestcaseEditorParams> {
     @inject(TOKENS.problemRepository) repo: IProblemRepository,
     @inject(TOKENS.activePathService) activePathService: IActivePathService,
     @inject(TOKENS.translator) public readonly translator: ITranslator,
+    @inject(TOKENS.crypto) public readonly crypto: ICrypto,
   ) {
     super(repo, activePathService);
   }
@@ -102,7 +104,7 @@ export class LlmTestcaseEditor extends BaseLlmTool<LlmTestcaseEditorParams> {
       return this.createResult({ success: true });
     }
 
-    const newId = randomUUID();
+    const newTestcaseId = this.crypto.randomUUID() as TestcaseId;
     const newTestcase = new Testcase(
       new TestcaseIo({ data: stdin ?? '' }),
       new TestcaseIo({ data: answer ?? '' }),
@@ -110,7 +112,7 @@ export class LlmTestcaseEditor extends BaseLlmTool<LlmTestcaseEditorParams> {
     );
     if (isDisabled) newTestcase.toggleDisable();
 
-    problem.addTestcase(newId, newTestcase);
+    problem.addTestcase(newTestcaseId, newTestcase);
     await this.repo.persist(bgProblem.problemId);
     return this.createResult({ success: true });
   }

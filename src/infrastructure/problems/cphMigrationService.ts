@@ -25,7 +25,7 @@ import { TOKENS } from '@/composition/tokens';
 import { Problem } from '@/domain/entities/problem';
 import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
-import type { ICphProblem } from '@/domain/types';
+import type { ICphProblem, TestcaseId } from '@/domain/types';
 
 @injectable()
 export class CphMigrationService implements ICphMigrationService {
@@ -77,10 +77,12 @@ export class CphMigrationService implements ICphMigrationService {
     problem.overrides.timeLimitMs = old.timeLimit;
     problem.overrides.memoryLimitMb = old.memoryLimit;
     old.tests.forEach((test) => {
-      problem.addTestcase(
-        this.crypto.randomUUID(),
-        new Testcase(new TestcaseIo({ data: test.input }), new TestcaseIo({ data: test.output })),
+      const testcaseId = this.crypto.randomUUID() as TestcaseId;
+      const testcase = new Testcase(
+        new TestcaseIo({ data: test.input }),
+        new TestcaseIo({ data: test.output }),
       );
+      problem.addTestcase(testcaseId, testcase);
     });
     return problem;
   }

@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import { inject, injectable } from 'tsyringe';
 import type {
   CancellationToken,
@@ -32,10 +31,11 @@ import { StopTestcases } from '@/application/useCases/webview/StopTestcases';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { Verdicts } from '@/domain/entities/verdict';
+import type { TestcaseId } from '@/domain/types';
 import { BaseLlmTool, type BaseLlmToolParams } from './baseLlmTool';
 
 interface LlmTestcaseRunnerParams extends BaseLlmToolParams {
-  testcaseId?: UUID;
+  testcaseId?: TestcaseId;
 }
 
 @injectable()

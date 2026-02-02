@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import type { ProblemId } from '@/domain/types';
 
 export interface IProblemRepository {
   fireBackgroundEvent(): void;
   loadByPath(srcPath: string, allowCreate?: boolean): Promise<BackgroundProblem | null>;
-  get(problemId?: UUID): Promise<BackgroundProblem | undefined>;
-  persist(problemId: UUID): Promise<boolean>;
-  unload(problemId: UUID): Promise<boolean>;
+  get(problemId?: ProblemId): Promise<BackgroundProblem | undefined>;
+  persist(problemId: ProblemId): Promise<boolean>;
+  unload(problemId: ProblemId): Promise<boolean>;
 }

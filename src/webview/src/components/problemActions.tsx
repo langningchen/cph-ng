@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import AddIcon from '@mui/icons-material/Add';
 import BackupIcon from '@mui/icons-material/Backup';
 import CloseIcon from '@mui/icons-material/Close';
@@ -36,6 +35,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { ProblemId } from '@/domain/types';
 import type { IWebviewStressTest } from '@/domain/webviewTypes';
 import { useProblemContext } from '../context/ProblemContext';
 import { getCompile } from '../utils';
@@ -45,7 +45,7 @@ import { CphMenu } from './base/cphMenu';
 import { CphButton } from './cphButton';
 
 interface ProblemActionsProps {
-  problemId: UUID;
+  problemId: ProblemId;
   url?: string;
   stressTest: IWebviewStressTest;
   hasRunning: boolean;

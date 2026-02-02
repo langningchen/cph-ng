@@ -15,21 +15,20 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import { inject, injectable } from 'tsyringe';
 import { TOKENS } from '@/composition/tokens';
 import { Problem } from '@/domain/entities/problem';
 import { StressTest } from '@/domain/entities/stressTest';
 import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
-import type { IProblem, IStressTest, ITestcase, ITestcaseIo } from '@/domain/types';
+import type { IProblem, IStressTest, ITestcase, ITestcaseIo, TestcaseId } from '@/domain/types';
 
 @injectable()
 export class ProblemMapper {
   public constructor(@inject(TOKENS.version) private readonly version: string) {}
 
   public toDto(entity: Problem): IProblem {
-    const testcases: Record<UUID, ITestcase> = {};
+    const testcases: Record<TestcaseId, ITestcase> = {};
     for (const testcaseId of entity.testcaseOrder) {
       const testcase = entity.testcases.get(testcaseId);
       if (testcase) testcases[testcaseId] = this.testcaseToDto(testcase);

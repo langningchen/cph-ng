@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import { inject, injectable } from 'tsyringe';
 import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
@@ -30,12 +29,13 @@ import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import type { ProblemMetaPayload } from '@/domain/entities/problem';
 import type { StressTest } from '@/domain/entities/stressTest';
 import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
+import type { ProblemId, TestcaseId } from '@/domain/types';
 import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapper';
 
 @injectable()
 export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
   private active: BackgroundProblem | null = null;
-  private lastAccessMap: Map<UUID, number> = new Map();
+  private lastAccessMap: Map<ProblemId, number> = new Map();
 
   public constructor(
     @inject(TOKENS.cphMigrationService) private readonly cph: ICphMigrationService,
@@ -107,7 +107,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
         this.eventBus.patchStressTest(this.active.problemId, this.mapper.stressTestToDto(payload));
         // this.problemFs.signals.emit('patchProblem', this.active.problem.src.path);
       };
-      const onAddTestcase = async (testcaseId: UUID, payload: Testcase) => {
+      const onAddTestcase = async (testcaseId: TestcaseId, payload: Testcase) => {
         if (!this.active) return;
         this.eventBus.addTestcase(
           this.active.problemId,
@@ -116,12 +116,12 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
         );
         // this.problemFs.signals.emit('addTestcase', this.active.problem.src.path, testcaseId, payload);
       };
-      const onDeleteTestcase = async (testcaseId: UUID) => {
+      const onDeleteTestcase = async (testcaseId: TestcaseId) => {
         if (!this.active) return;
         this.eventBus.deleteTestcase(this.active.problemId, testcaseId);
         // this.problemFs.signals.emit('deleteTestcase', this.active.problem.src.path, testcaseId);
       };
-      const onPatchTestcase = async (testcaseId: UUID, payload: Partial<Testcase>) => {
+      const onPatchTestcase = async (testcaseId: TestcaseId, payload: Partial<Testcase>) => {
         if (!this.active) return;
         this.eventBus.patchTestcase(
           this.active.problemId,
@@ -130,7 +130,10 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
         );
         // this.problemFs.signals.emit('patchTestcase', this.active.problem.src.path, testcaseId, payload);
       };
-      const onPatchTestcaseResult = async (testcaseId: UUID, payload: Partial<TestcaseResult>) => {
+      const onPatchTestcaseResult = async (
+        testcaseId: TestcaseId,
+        payload: Partial<TestcaseResult>,
+      ) => {
         if (!this.active) return;
         this.eventBus.patchTestcaseResult(
           this.active.problemId,

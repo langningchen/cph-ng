@@ -37,7 +37,7 @@ import { TOKENS } from '@/composition/tokens';
 import { Problem } from '@/domain/entities/problem';
 import type { Testcase } from '@/domain/entities/testcase';
 import { TestcaseScanner } from '@/domain/services/TestcaseScanner';
-import type { IFileWithHash, IProblem, ITestcase, ITestcaseIo } from '@/domain/types';
+import type { IFileWithHash, IProblem, ITestcase, ITestcaseIo, TestcaseId } from '@/domain/types';
 import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 
 @injectable()
@@ -131,7 +131,10 @@ export class ProblemService implements IProblemService {
 
   public applyTestcases(problem: Problem, testcases: Testcase[]): void {
     if (this.settings.problem.clearBeforeLoad) this.tmp.dispose(problem.clearTestcases());
-    for (const testcase of testcases) problem.addTestcase(this.crypto.randomUUID(), testcase);
+    for (const testcase of testcases) {
+      const testcaseId = this.crypto.randomUUID() as TestcaseId;
+      problem.addTestcase(testcaseId, testcase);
+    }
   }
 
   public async save(problem: Problem): Promise<void> {

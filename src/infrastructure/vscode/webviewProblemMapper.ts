@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import { inject, injectable } from 'tsyringe';
 import type { IPath } from '@/application/ports/node/IPath';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
@@ -27,7 +26,7 @@ import { isRunningState, type StressTest, StressTestState } from '@/domain/entit
 import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
 import type { TestcaseIo } from '@/domain/entities/testcaseIo';
 import { type Verdict, VerdictName, Verdicts } from '@/domain/entities/verdict';
-import type { IFileWithHash, IOverrides } from '@/domain/types';
+import type { IFileWithHash, IOverrides, TestcaseId } from '@/domain/types';
 import type {
   IWebviewFileWithHash,
   IWebviewOverrides,
@@ -48,7 +47,7 @@ export class WebviewProblemMapper {
   ) {}
 
   public toDto(entity: Problem): IWebviewProblem {
-    const testcases: Record<UUID, IWebviewTestcase> = {};
+    const testcases: Record<TestcaseId, IWebviewTestcase> = {};
     for (const testcaseId of entity.testcaseOrder) {
       const testcase = entity.testcases.get(testcaseId);
       if (testcase) testcases[testcaseId] = this.testcaseToDto(testcase);

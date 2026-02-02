@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import Box from '@mui/material/Box';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictName } from '@/domain/entities/verdict';
+import type { ProblemId, TestcaseId } from '@/domain/types';
 import type { IWebviewTestcase } from '@/domain/webviewTypes';
 import { useProblemContext } from '../context/ProblemContext';
 import { AcCongrats } from './acCongrats';
@@ -29,9 +29,9 @@ import { NoTestcases } from './noTestcases';
 import { TestcaseView } from './testcaseView';
 
 interface TestcasesViewProps {
-  problemId: UUID;
-  testcaseOrder: UUID[];
-  testcases: Record<UUID, IWebviewTestcase>;
+  problemId: ProblemId;
+  testcaseOrder: TestcaseId[];
+  testcases: Record<TestcaseId, IWebviewTestcase>;
 }
 
 export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: TestcasesViewProps) => {

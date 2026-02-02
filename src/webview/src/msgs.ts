@@ -15,15 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
-import type { IOverrides } from '@/domain/types';
+import type { IOverrides, ProblemId, TestcaseId } from '@/domain/types';
 
 interface BaseMsg {
   type: string;
-  problemId?: UUID;
+  problemId?: ProblemId;
 }
 interface ProblemBaseMsg extends BaseMsg {
-  problemId: UUID;
+  problemId: ProblemId;
 }
 
 export interface CreateProblemMsg extends BaseMsg {
@@ -60,42 +59,42 @@ export interface LoadTestcasesMsg extends ProblemBaseMsg {
 }
 export interface RunTestcaseMsg extends ProblemBaseMsg {
   type: 'runTestcase';
-  testcaseId: UUID;
+  testcaseId: TestcaseId;
   forceCompile: boolean | null;
 }
 export interface ClearTestcaseStatusMsg extends ProblemBaseMsg {
   type: 'clearTestcaseStatus';
-  testcaseId?: UUID;
+  testcaseId?: TestcaseId;
 }
 export type WebviewTestcaseFileTypes = 'stdin' | 'answer';
 export interface ChooseTestcaseFileMsg extends ProblemBaseMsg {
   type: 'chooseTestcaseFile';
-  testcaseId: UUID;
+  testcaseId: TestcaseId;
   label: WebviewTestcaseFileTypes;
 }
 export interface SetTestcaseStringMsg extends ProblemBaseMsg {
   type: 'setTestcaseString';
-  testcaseId: UUID;
+  testcaseId: TestcaseId;
   label: WebviewTestcaseFileTypes;
   data: string;
 }
 export interface UpdateTestcaseMsg extends ProblemBaseMsg {
   type: 'updateTestcase';
-  testcaseId: UUID;
+  testcaseId: TestcaseId;
   event: 'toggleDisable' | 'toggleExpand' | 'setAsAnswer';
 }
 export interface CompareTestcaseMsg extends ProblemBaseMsg {
   type: 'compareTestcase';
-  testcaseId: UUID;
+  testcaseId: TestcaseId;
 }
 export interface ToggleTestcaseFileMsg extends ProblemBaseMsg {
   type: 'toggleTestcaseFile';
-  testcaseId: UUID;
+  testcaseId: TestcaseId;
   label: WebviewTestcaseFileTypes;
 }
 export interface DeleteTestcaseMsg extends ProblemBaseMsg {
   type: 'deleteTestcase';
-  testcaseId: UUID;
+  testcaseId: TestcaseId;
 }
 export interface ReorderTestcaseMsg extends ProblemBaseMsg {
   type: 'reorderTestcase';

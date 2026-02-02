@@ -26,6 +26,7 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
 import { StressTestState } from '@/domain/entities/stressTest';
 import type { VerdictName } from '@/domain/entities/verdict';
+import type { TestcaseId } from '@/domain/types';
 
 @injectable()
 export class ProblemMigrationService implements IProblemMigrationService {
@@ -49,7 +50,7 @@ export class ProblemMigrationService implements IProblemMigrationService {
           return { data: testcaseIo.data };
         };
         if (testcase)
-          testcases[testcaseId] = {
+          testcases[testcaseId as TestcaseId] = {
             stdin: migrateTestcaseIo(testcase.stdin),
             answer: migrateTestcaseIo(testcase.answer),
             isExpand: testcase.isExpand,
@@ -72,7 +73,7 @@ export class ProblemMigrationService implements IProblemMigrationService {
         name: problem.name,
         url: problem.url,
         testcases,
-        testcaseOrder: problem.tcOrder,
+        testcaseOrder: problem.tcOrder as TestcaseId[],
         src: problem.src,
         checker: problem.checker || null,
         interactor: problem.interactor || null,

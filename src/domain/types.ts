@@ -19,6 +19,11 @@ import type { UUID } from 'node:crypto';
 import type { StressTestState } from '@/domain/entities/stressTest';
 import type { VerdictName } from '@/domain/entities/verdict';
 
+declare const BrandSym: unique symbol;
+type Branded<T, Label> = T & { [BrandSym]: Label };
+export type ProblemId = Branded<UUID, 'ProblemId'>;
+export type TestcaseId = Branded<UUID, 'TestcaseId'>;
+
 export type ITestcaseIo = { data: string } | { path: string };
 
 export interface ITestcaseResult {
@@ -62,8 +67,8 @@ export interface IProblem {
   version: string;
   name: string;
   url?: string;
-  testcases: Record<UUID, ITestcase>;
-  testcaseOrder: UUID[];
+  testcases: Record<TestcaseId, ITestcase>;
+  testcaseOrder: TestcaseId[];
   src: IFileWithHash;
   checker: IFileWithHash | null;
   interactor: IFileWithHash | null;

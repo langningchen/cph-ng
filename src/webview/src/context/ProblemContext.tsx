@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import { produce } from 'immer';
 import React, {
   createContext,
@@ -26,6 +25,7 @@ import React, {
   useReducer,
 } from 'react';
 import type { WebviewEvent } from '@/application/ports/vscode/IWebviewEventBus';
+import type { ProblemId } from '@/domain/types';
 import type { IWebviewBackgroundProblem, IWebviewProblem } from '@/domain/webviewTypes';
 import type { WebviewMsg } from '../msgs';
 
@@ -35,7 +35,7 @@ interface CurrentProblemStateIdle {
 }
 interface CurrentProblemStateActive {
   type: 'active';
-  problemId: UUID;
+  problemId: ProblemId;
   problem: IWebviewProblem;
   startTime: number;
 }

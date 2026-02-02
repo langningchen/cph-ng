@@ -15,12 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import EventEmitter from 'node:events';
 import type TypedEventEmitter from 'typed-emitter';
 import { StressTest } from '@/domain/entities/stressTest';
 import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
-import type { IFileWithHash, IOverrides } from '@/domain/types';
+import type { IFileWithHash, IOverrides, TestcaseId } from '@/domain/types';
 
 export interface ProblemMetaPayload {
   checker?: IFileWithHash | null;
@@ -29,17 +28,17 @@ export interface ProblemMetaPayload {
 export type ProblemEvents = {
   patchMeta: (payload: ProblemMetaPayload) => void;
   patchStressTest: (payload: Partial<StressTest>) => void;
-  addTestcase: (testcaseId: UUID, payload: Testcase) => void;
-  deleteTestcase: (testcaseId: UUID) => void;
-  patchTestcase: (testcaseId: UUID, payload: Partial<Testcase>) => void;
-  patchTestcaseResult: (testcaseId: UUID, payload: Partial<TestcaseResult>) => void;
+  addTestcase: (testcaseId: TestcaseId, payload: Testcase) => void;
+  deleteTestcase: (testcaseId: TestcaseId) => void;
+  patchTestcase: (testcaseId: TestcaseId, payload: Partial<Testcase>) => void;
+  patchTestcaseResult: (testcaseId: TestcaseId, payload: Partial<TestcaseResult>) => void;
 };
 
 export class Problem {
   public readonly src: IFileWithHash;
   public url?: string;
-  private _testcases: Map<UUID, Testcase> = new Map();
-  private _testcaseOrder: UUID[] = [];
+  private _testcases: Map<TestcaseId, Testcase> = new Map();
+  private _testcaseOrder: TestcaseId[] = [];
   private _checker: IFileWithHash | null = null;
   private _interactor: IFileWithHash | null = null;
   private _stressTest: StressTest = new StressTest();
@@ -60,10 +59,10 @@ export class Problem {
     this.signals.emit('patchStressTest', payload);
   };
 
-  public get testcases(): Map<UUID, Testcase> {
+  public get testcases(): Map<TestcaseId, Testcase> {
     return this._testcases;
   }
-  public get testcaseOrder(): readonly UUID[] {
+  public get testcaseOrder(): readonly TestcaseId[] {
     return this._testcaseOrder;
   }
   public get checker() {
@@ -92,14 +91,14 @@ export class Problem {
     return this._timeElapsedMs;
   }
 
-  private onPatchTestcase(testcaseId: UUID, payload: Partial<Testcase>) {
+  private onPatchTestcase(testcaseId: TestcaseId, payload: Partial<Testcase>) {
     this.signals.emit('patchTestcase', testcaseId, payload);
   }
-  private onPatchTestcaseResult(testcaseId: UUID, payload: Partial<TestcaseResult>) {
+  private onPatchTestcaseResult(testcaseId: TestcaseId, payload: Partial<TestcaseResult>) {
     this.signals.emit('patchTestcaseResult', testcaseId, payload);
   }
 
-  public addTestcase(testcaseId: UUID, testcase: Testcase) {
+  public addTestcase(testcaseId: TestcaseId, testcase: Testcase) {
     this._testcases.set(testcaseId, testcase);
     this._testcaseOrder.push(testcaseId);
     this.signals.emit('addTestcase', testcaseId, testcase);
@@ -108,12 +107,12 @@ export class Problem {
       this.onPatchTestcaseResult(testcaseId, payload),
     );
   }
-  public getTestcase(testcaseId: UUID): Testcase {
+  public getTestcase(testcaseId: TestcaseId): Testcase {
     const testcase = this._testcases.get(testcaseId);
     if (!testcase) throw new Error('Test case not found');
     return testcase;
   }
-  public deleteTestcase(testcaseId: UUID): void {
+  public deleteTestcase(testcaseId: TestcaseId): void {
     this._testcaseOrder = this._testcaseOrder.filter((id) => id !== testcaseId);
   }
   public clearTestcases(): string[] {
@@ -130,8 +129,8 @@ export class Problem {
     const [movedTestcase] = this._testcaseOrder.splice(fromIdx, 1);
     this._testcaseOrder.splice(toIdx, 0, movedTestcase);
   }
-  public getEnabledTestcaseIds(): UUID[] {
-    const enabledIds: UUID[] = [];
+  public getEnabledTestcaseIds(): TestcaseId[] {
+    const enabledIds: TestcaseId[] = [];
     for (const testcaseId of this._testcaseOrder) {
       const testcase = this._testcases.get(testcaseId);
       if (testcase && !testcase.isDisabled) enabledIds.push(testcaseId);

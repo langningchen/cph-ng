@@ -26,6 +26,7 @@ import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { TOKENS } from '@/composition/tokens';
 import { TestcaseScanner } from '@/domain/services/TestcaseScanner';
+import type { TestcaseId } from '@/domain/types';
 import type { DragDropMsg } from '@/webview/src/msgs';
 
 @injectable()
@@ -69,8 +70,9 @@ export class DragDrop implements IMsgHandle<DragDropMsg> {
         this.settings.problem.inputFileExtensionList.includes(ext) ||
         this.settings.problem.outputFileExtensionList.includes(ext);
       if (isIoFile) {
+        const testcaseId = this.crypto.randomUUID() as TestcaseId;
         const testcase = await this.testcaseScanner.fromFile(item);
-        problem.addTestcase(this.crypto.randomUUID(), testcase);
+        problem.addTestcase(testcaseId, testcase);
       }
     }
   }

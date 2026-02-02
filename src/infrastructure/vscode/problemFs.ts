@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import { EventEmitter } from 'node:stream';
 import { inject, injectable } from 'tsyringe';
 import type TypedEventEmitter from 'typed-emitter';
@@ -39,6 +38,7 @@ import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import { TOKENS } from '@/composition/tokens';
 import { Testcase, type TestcaseResult } from '@/domain/entities/testcase';
 import type { TestcaseIo } from '@/domain/entities/testcaseIo';
+import type { TestcaseId } from '@/domain/types';
 import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 
 type CphFsFile = {
@@ -52,11 +52,11 @@ type CphFsItem = CphFsFile | CphFsDir;
 export type ProblemFsEvents = {
   problemFileChanged: () => void;
   patchProblem: (srcPath: string) => void;
-  addTestcase: (srcPath: string, testcaseId: UUID, payload: Testcase) => void;
-  deleteTestcase: (srcPath: string, testcaseId: UUID) => void;
+  addTestcase: (srcPath: string, testcaseId: TestcaseId, payload: Testcase) => void;
+  deleteTestcase: (srcPath: string, testcaseId: TestcaseId) => void;
   patchTestcase: (
     srcPath: string,
-    testcaseId: UUID,
+    testcaseId: TestcaseId,
     payload: Partial<Testcase | TestcaseResult>,
   ) => void;
 };
@@ -84,7 +84,7 @@ export class ProblemFs implements IProblemFs {
         { uri: Uri.joinPath(baseUri, 'problem.cph-ng.json'), type: FileChangeType.Changed },
       ]);
     });
-    this.signals.on('addTestcase', (srcPath: string, testcaseId: UUID, payload: Testcase) => {
+    this.signals.on('addTestcase', (srcPath: string, testcaseId: TestcaseId, payload: Testcase) => {
       const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
       const addedFiles = ['stdin', 'answer'];
       if (payload.stdout) addedFiles.push('stdout');
@@ -97,7 +97,7 @@ export class ProblemFs implements IProblemFs {
         })),
       ]);
     });
-    this.signals.on('deleteTestcase', (srcPath: string, testcaseId: UUID) => {
+    this.signals.on('deleteTestcase', (srcPath: string, testcaseId: TestcaseId) => {
       const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
       const deletedFiles = ['stdin', 'answer', 'stdout', 'stderr'];
       this.changeEmitter.fire([
@@ -110,7 +110,7 @@ export class ProblemFs implements IProblemFs {
     });
     this.signals.on(
       'patchTestcase',
-      (srcPath: string, testcaseId: UUID, payload: Partial<Testcase | TestcaseResult>) => {
+      (srcPath: string, testcaseId: TestcaseId, payload: Partial<Testcase | TestcaseResult>) => {
         const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
         const changedFiles = [];
         if (payload instanceof Testcase) {
@@ -204,24 +204,6 @@ export class ProblemFs implements IProblemFs {
     }
     return current;
   }
-  // public async fireAuthorityChange(authority: UUID): Promise<void> {
-  //   const fullProblem = await this.repo.get(authority);
-  //   if (!fullProblem) return;
-  //   const testcaseIds = fullProblem.problem.getEnabledTestcaseIds();
-  //   const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority, path: '/' });
-
-  //   const files: Uri[] = [];
-  //   files.push(baseUri);
-  //   files.push(Uri.joinPath(baseUri, 'problem.cph-ng.json'));
-  //   for (const testcaseId of testcaseIds) {
-  //     const testcase = fullProblem.problem.getTestcase(testcaseId);
-  //     files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'stdin'));
-  //     files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'answer'));
-  //     if (testcase.stdout) files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'stdout'));
-  //     if (testcase.stderr) files.push(Uri.joinPath(baseUri, 'testcases', testcaseId, 'stderr'));
-  //   }
-  //   this.changeEmitter.fire(files.map((uri) => ({ type: FileChangeType.Changed, uri })));
-  // }
 
   public async stat(uri: Uri): Promise<FileStat> {
     const item = await this.parseUri(uri);

@@ -23,6 +23,7 @@ import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import type { TestcaseId } from '@/domain/types';
 import type { AddTestcaseMsg } from '@/webview/src/msgs';
 
 @injectable()
@@ -38,9 +39,8 @@ export class AddTestcase extends BaseProblemUseCase<AddTestcaseMsg> {
     { problem }: BackgroundProblem,
     _msg: AddTestcaseMsg,
   ): Promise<void> {
-    problem.addTestcase(
-      this.crypto.randomUUID(),
-      new Testcase(new TestcaseIo({ data: '' }), new TestcaseIo({ data: '' }), true),
-    );
+    const testcaseId = this.crypto.randomUUID() as TestcaseId;
+    const testcase = new Testcase(new TestcaseIo({ data: '' }), new TestcaseIo({ data: '' }), true);
+    problem.addTestcase(testcaseId, testcase);
   }
 }

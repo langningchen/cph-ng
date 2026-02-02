@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
 import { inject, injectable } from 'tsyringe';
 import type { IClock } from '@/application/ports/node/IClock';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
@@ -26,11 +25,12 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@/composition/tokens';
 import { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import type { ProblemId } from '@/domain/types';
 import type { IWebviewBackgroundProblem } from '@/domain/webviewTypes';
 
 @injectable()
 export class ProblemRepository implements IProblemRepository {
-  private backgroundProblems: Map<UUID, BackgroundProblem> = new Map();
+  private backgroundProblems: Map<ProblemId, BackgroundProblem> = new Map();
 
   public constructor(
     @inject(TOKENS.clock) private readonly clock: IClock,
@@ -79,19 +79,19 @@ export class ProblemRepository implements IProblemRepository {
       }
     }
     this.logger.debug('Loaded problem', problem.src.path, 'for path', srcPath);
-    const problemId = this.crypto.randomUUID();
+    const problemId = this.crypto.randomUUID() as ProblemId;
     const backgroundProblem = new BackgroundProblem(problemId, problem, this.clock.now());
     this.backgroundProblems.set(problemId, backgroundProblem);
     this.fireBackgroundEvent();
     return backgroundProblem;
   }
 
-  public async get(problemId?: UUID): Promise<BackgroundProblem | undefined> {
+  public async get(problemId?: ProblemId): Promise<BackgroundProblem | undefined> {
     if (!problemId) return undefined;
     return this.backgroundProblems.get(problemId);
   }
 
-  public async persist(problemId: UUID): Promise<boolean> {
+  public async persist(problemId: ProblemId): Promise<boolean> {
     const backgroundProblem = this.backgroundProblems.get(problemId);
     if (!backgroundProblem || backgroundProblem.ac) return false;
     const activePath = this.activePath.getActivePath();
@@ -107,7 +107,7 @@ export class ProblemRepository implements IProblemRepository {
     return true;
   }
 
-  public async unload(problemId: UUID): Promise<boolean> {
+  public async unload(problemId: ProblemId): Promise<boolean> {
     const backgroundProblem = this.backgroundProblems.get(problemId);
     if (!backgroundProblem) return false;
     backgroundProblem.abort();
