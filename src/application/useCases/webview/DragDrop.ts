@@ -44,11 +44,9 @@ export class DragDrop implements IMsgHandle<DragDropMsg> {
   public async exec(msg: DragDropMsg): Promise<void> {
     const activePath = this.activePath.getActivePath();
     if (!activePath) throw new Error('Active path is required');
-    const problemId = await this.repo.loadByPath(activePath, true);
-    if (!problemId) throw new Error('Could not load or create problem');
-    const fullProblem = await this.repo.get(problemId);
-    if (!fullProblem) throw new Error('Problem not found');
-    const { problem } = fullProblem;
+    const backgroundProblem = await this.repo.loadByPath(activePath, true);
+    if (!backgroundProblem) throw new Error('Could not load or create problem');
+    const { problem } = backgroundProblem;
 
     for (const item of msg.items) {
       const isDir = await this.fs

@@ -42,135 +42,115 @@
     ],
     "languageModelTools": [
       {
-        "name": "run_test_cases",
+        "name": "cph-ng_run_test_cases",
         "toolReferenceName": "cphNgRunTestcases",
         "displayName": "Run CPH-NG Test Cases",
-        "modelDescription": "Executes one test case (identified by its stable UUID) or the entire suite for the active competitive programming problem managed by CPH-NG. Use this to validate solutions after edits or to confirm fixes against previously failing cases.",
-        "userDescription": "Runs one or all test cases for the current CPH-NG problem.",
+        "modelDescription": "Executes test cases for the active competitive programming problem. Returns a JSON summary of verdicts, time, and memory usage for each executed case. Use this to quickly validate the current solution or specific test IDs.",
+        "userDescription": "Runs one or all test cases for the current problem.",
         "canBeReferencedInPrompt": true,
         "icon": "$(play)",
         "inputSchema": {
           "type": "object",
-          "required": [
-            "activePath"
-          ],
           "properties": {
-            "id": {
+            "testcaseId": {
               "type": "string",
-              "description": "Optional test case ID (UUID) to run. Omit to execute the full test suite."
+              "description": "Optional test case ID (UUID) to run. Omit to execute the full suite."
             },
             "activePath": {
               "type": "string",
-              "description": "File path for the target problem source code. Must be provided by LLM invocations."
+              "description": "Optional file path. Defaults to the currently active editor if omitted."
             }
           }
         }
       },
       {
-        "name": "inspect_problem_data",
-        "toolReferenceName": "cphNgInspectProblemData",
-        "displayName": "Inspect CPH-NG Test Data",
-        "modelDescription": "Retrieves a specific data slice for a CPH-NG test case - stdin, expected answer, stdout, stderr, verdict, runtime, memory usage, or diagnostic message. Use this to examine precise artifacts after executing tests.",
-        "userDescription": "Reads a chosen data field (stdin/answer/stdout/stderr/verdict/message/time/memory) for a test case by ID.",
+        "name": "cph-ng_inspect_test_case",
+        "toolReferenceName": "cphNgInspectTestCase",
+        "displayName": "Inspect CPH-NG Test Case Details",
+        "modelDescription": "Retrieves detailed diagnostic data for a specific test case (by UUID). Use 'all' to get a complete snapshot (stdin, expected, actual stdout, stderr, and meta) in one call, which is highly recommended for debugging failures to save context turns.",
+        "userDescription": "Reads full details or a specific field (stdin/stdout/etc.) for a test case.",
         "canBeReferencedInPrompt": true,
         "icon": "$(file)",
         "inputSchema": {
           "type": "object",
           "required": [
-            "dataType",
-            "id",
-            "activePath"
+            "testcaseId"
           ],
           "properties": {
             "dataType": {
               "type": "string",
               "enum": [
+                "all",
                 "stdin",
                 "answer",
                 "stdout",
                 "stderr",
-                "verdict",
-                "message",
-                "time",
-                "memory"
+                "meta"
               ],
-              "description": "Which data field to inspect for the specified test case."
+              "default": "all",
+              "description": "Data slice to fetch. 'all' provides the complete context including I/O and performance stats."
             },
-            "id": {
+            "testcaseId": {
               "type": "string",
-              "description": "The test case ID (UUID) whose data should be fetched."
+              "description": "The stable UUID of the test case."
             },
             "activePath": {
               "type": "string",
-              "description": "File path for the target problem source code. Must be provided by LLM invocations."
+              "description": "Optional file path. Defaults to the currently active editor if omitted."
             }
           }
         }
       },
       {
-        "name": "list_test_cases",
-        "toolReferenceName": "cphNgListTestcases",
-        "displayName": "List CPH-NG Test IDs",
-        "modelDescription": "Returns all test case identifiers for the active problem, along with their latest verdict/time summary. Call this before running or editing tests to work with stable IDs instead of indices.",
-        "userDescription": "Lists every test case ID for the current CPH-NG problem.",
+        "name": "cph-ng_get_problem_context",
+        "toolReferenceName": "cphNgGetProblemContext",
+        "displayName": "Get CPH-NG Problem Context",
+        "modelDescription": "Consolidated tool to fetch problem metadata (name, URL, time/memory limits) and a full list of test cases with their status and IDs. Use this once at the start of a session or after major changes to understand the problem constraints and available test points.",
+        "userDescription": "Fetches problem limits and all test case IDs/statuses.",
         "canBeReferencedInPrompt": true,
-        "icon": "$(list-unordered)",
+        "icon": "$(info)",
         "inputSchema": {
           "type": "object",
-          "required": [
-            "activePath"
-          ],
           "properties": {
             "activePath": {
               "type": "string",
-              "description": "File path for the target problem source code. Must be provided by LLM invocations."
+              "description": "Optional file path. Defaults to the currently active editor if omitted."
             }
           }
         }
       },
       {
-        "name": "upsert_test_case",
+        "name": "cph-ng_upsert_test_case",
         "toolReferenceName": "cphNgUpsertTestcase",
-        "displayName": "Add or Update CPH-NG Test Case",
-        "modelDescription": "Creates a new test case or updates an existing one for the active competitive programming problem. Accepts inline stdin/answer content and clears previous verdicts so the test can be re-run. Use this to capture newly discovered counterexamples or tweak expected answers.",
-        "userDescription": "Adds a new test case or updates an existing one (stdin/answer) for the current CPH-NG problem.",
+        "displayName": "Add/Update CPH-NG Test Case",
+        "modelDescription": "Creates a new test case or updates an existing one. Accepts inline stdin/answer content and can toggle a test's enabled status. Automatically clears previous results to allow re-running. Use this to persist edge cases or correct expected outputs.",
+        "userDescription": "Adds or updates test case content (stdin/answer) for the current problem.",
         "canBeReferencedInPrompt": true,
         "icon": "$(edit)",
         "inputSchema": {
           "type": "object",
-          "required": [
-            "activePath"
-          ],
           "properties": {
-            "id": {
+            "testcaseId": {
               "type": "string",
-              "description": "Optional test case ID to update. Omit to append a new test case."
+              "description": "Optional test case ID (UUID) to update. Omit to create a new case."
             },
             "stdin": {
               "type": "string",
-              "description": "Standard input content to store inline for the test case."
+              "description": "Standard input content."
             },
             "answer": {
               "type": "string",
-              "description": "Expected output content to store inline for the test case."
+              "description": "Expected output content."
+            },
+            "isDisabled": {
+              "type": "boolean",
+              "description": "Set testing status of this case."
             },
             "activePath": {
               "type": "string",
-              "description": "File path for the target problem source code. Must be provided by LLM invocations."
+              "description": "Optional file path. Defaults to the currently active editor if omitted."
             }
-          },
-          "anyOf": [
-            {
-              "required": [
-                "stdin"
-              ]
-            },
-            {
-              "required": [
-                "answer"
-              ]
-            }
-          ]
+          }
         }
       }
     ],
@@ -179,13 +159,13 @@
         "id": "cph-ng.analyzeFailure",
         "name": "CPH-NG: Analyze failing test",
         "description": "Diagnose a failing competitive programming attempt by running the managed test cases, inspecting the failing data, and outlining next steps.",
-        "prompt": "You are assisting with a competitive programming workspace managed by CPH-NG.\n- Call `list_test_cases` to discover available test IDs.\n- Run either the failing test (`run_test_cases` with the specific ID) or the entire suite as needed.\n- Inspect stdin/answer/stdout/stderr or other result fields via `inspect_problem_data`.\n- Summarize findings, root causes, and recommended code fixes.\n- If you discover a new regression input, persist it with `upsert_test_case` before concluding.\n\nUser request:\n{{input}}"
+        "prompt": "You are assisting with a competitive programming workspace managed by CPH-NG.\n- Call `cph-ng_get_problem_context` once to understand the problem limits and test case IDs.\n- Run the tests via `cph-ng_run_test_cases`. It returns a summary of which IDs failed.\n- For failing IDs, call `cph-ng_inspect_test_case` with `dataType: 'all'` to get full diagnostic data in one turn.\n- Summarize root causes and suggest code fixes based on the observed differences.\n\nUser request:\n{{input}}"
       },
       {
         "id": "cph-ng.designEdgeCases",
         "name": "CPH-NG: Generate edge tests",
         "description": "Brainstorm tricky inputs for the active problem and persist them as executable CPH-NG test cases.",
-        "prompt": "You are helping design stress tests for a competitive programming solution managed by CPH-NG.\n- Call `list_test_cases` to understand existing coverage.\n- For each new scenario, decide on stdin and expected answer values.\n- Save them with `upsert_test_case` (omit `id` to append a fresh case).\n- Suggest re-running with `run_test_cases` to validate the new coverage.\n\nUser request:\n{{input}}"
+        "prompt": "You are helping design stress tests for a competitive programming solution managed by CPH-NG.\n- Call `cph-ng_get_problem_context` to understand current coverage.\n- Brainstorm scenarios (e.g., max constraints, empty inputs, precision limits).\n- Save them with `cph-ng_upsert_test_case` (omit `id` for new cases).\n- Recommend running them via `cph-ng_run_test_cases` to verify compliance.\n\nUser request:\n{{input}}"
       }
     ],
     "views": {

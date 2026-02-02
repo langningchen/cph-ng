@@ -15,13 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UUID } from 'node:crypto';
-import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import type {
+  CancellationToken,
+  LanguageModelTool,
+  LanguageModelToolInvocationOptions,
+  LanguageModelToolInvocationPrepareOptions,
+  LanguageModelToolResult,
+  PreparedToolInvocation,
+  ProviderResult,
+} from 'vscode';
 
-export interface IProblemRepository {
-  fireBackgroundEvent(): void;
-  loadByPath(srcPath: string, allowCreate?: boolean): Promise<BackgroundProblem | null>;
-  get(problemId?: UUID): Promise<BackgroundProblem | undefined>;
-  persist(problemId: UUID): Promise<boolean>;
-  unload(problemId: UUID): Promise<boolean>;
+export interface LlmTool<T> extends LanguageModelTool<T> {
+  invoke(
+    options: LanguageModelToolInvocationOptions<T>,
+    token: CancellationToken,
+  ): ProviderResult<LanguageModelToolResult>;
+  prepareInvocation(
+    options: LanguageModelToolInvocationPrepareOptions<T>,
+    token: CancellationToken,
+  ): ProviderResult<PreparedToolInvocation>;
 }

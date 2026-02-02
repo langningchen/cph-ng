@@ -136,11 +136,9 @@ export class ProblemFs implements IProblemFs {
   }
 
   public async parseUri(uri: Uri): Promise<CphFsItem> {
-    const problemId = await this.repo.loadByPath(uri.authority);
-    if (!problemId) throw FileSystemError.FileNotFound();
-    const fullProblem = await this.repo.get(problemId);
-    if (!fullProblem) throw FileSystemError.FileNotFound();
-    const problem = fullProblem.problem;
+    const backgroundProblem = await this.repo.loadByPath(uri.authority);
+    if (!backgroundProblem) throw FileSystemError.FileNotFound();
+    const problem = backgroundProblem.problem;
     const pathParts = uri.path.split('/').filter((p) => p.length > 0);
     const testcaseIds = problem.getEnabledTestcaseIds();
     const root: CphFsDir = [
@@ -150,7 +148,7 @@ export class ProblemFs implements IProblemFs {
           data: JSON.stringify(this.mapper.toDto(problem), null, 4),
           set: async (data: string) => {
             const newProblem = JSON.parse(data);
-            fullProblem.problem = this.mapper.toEntity(newProblem);
+            backgroundProblem.problem = this.mapper.toEntity(newProblem);
             this.signals.emit('problemFileChanged');
           },
         },

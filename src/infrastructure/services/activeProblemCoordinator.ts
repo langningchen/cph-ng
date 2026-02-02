@@ -26,19 +26,15 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@/composition/tokens';
-import type { Problem, ProblemMetaPayload } from '@/domain/entities/problem';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import type { ProblemMetaPayload } from '@/domain/entities/problem';
 import type { StressTest } from '@/domain/entities/stressTest';
 import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
 import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapper';
 
-interface ActiveData {
-  problemId: UUID;
-  problem: Problem;
-}
-
 @injectable()
 export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
-  private active: ActiveData | null = null;
+  private active: BackgroundProblem | null = null;
   private lastAccessMap: Map<UUID, number> = new Map();
 
   public constructor(
@@ -51,12 +47,13 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
     @inject(WebviewProblemMapper) private readonly mapper: WebviewProblemMapper,
   ) {
+    this.logger = this.logger.withScope('activeProblemCoordinator');
     setInterval(async () => {
       const now = Date.now();
       for (const [id, lastAccess] of this.lastAccessMap)
         if (
           now - lastAccess > 60 * 1000 &&
-          id !== this.active?.problemId &&
+          id !== this.active?.id &&
           (await this.repo.persist(id))
         ) {
           this.logger.trace('Persisted inactive problem', { id });
@@ -72,7 +69,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
   public async dispatchFullData() {
     if (this.active) {
       this.logger.trace('Dispatching full data for active problem', { active: this.active });
-      this.eventBus.fullProblem(this.active.problemId, this.mapper.toDto(this.active.problem));
+      this.eventBus.fullProblem(this.active.id, this.mapper.toDto(this.active.problem));
       return;
     }
     const canImport = this.context.canImport;
@@ -81,9 +78,9 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
   }
   public async onActiveEditorChanged(filePath: string | undefined) {
     if (!filePath) return;
-    const problemId = await this.repo.loadByPath(filePath);
-    this.logger.trace('Active editor changed', { filePath, problemId });
-    if (!problemId) {
+    const backgroundProblem = await this.repo.loadByPath(filePath);
+    this.logger.trace('Active editor changed', { filePath, backgroundProblem });
+    if (!backgroundProblem) {
       if (this.lang.getLang(filePath)) {
         this.context.hasProblem = false;
         this.active = null;
@@ -94,11 +91,11 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       return;
     }
     this.context.hasProblem = true;
-    if (problemId !== this.active?.problemId) {
+    if (backgroundProblem.id !== this.active?.id) {
       // TO-DO: Check these events
       const onPatchMeta = async ({ checker, interactor }: ProblemMetaPayload) => {
         if (!this.active) return;
-        this.eventBus.patchMeta(this.active.problemId, {
+        this.eventBus.patchMeta(this.active.id, {
           checker: checker ? this.mapper.fileWithHashToDto(checker) : checker,
           interactor: interactor ? this.mapper.fileWithHashToDto(interactor) : interactor,
         });
@@ -106,28 +103,28 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       };
       const onPatchStressTest = async (payload: Partial<StressTest>) => {
         if (!this.active) return;
-        this.eventBus.patchStressTest(this.active.problemId, this.mapper.stressTestToDto(payload));
+        this.eventBus.patchStressTest(this.active.id, this.mapper.stressTestToDto(payload));
         // this.problemFs.signals.emit('patchProblem', this.active.problem.src.path);
       };
       const onAddTestcase = async (id: UUID, payload: Testcase) => {
         if (!this.active) return;
-        this.eventBus.addTestcase(this.active.problemId, id, this.mapper.testcaseToDto(payload));
+        this.eventBus.addTestcase(this.active.id, id, this.mapper.testcaseToDto(payload));
         // this.problemFs.signals.emit('addTestcase', this.active.problem.src.path, id, payload);
       };
       const onDeleteTestcase = async (id: UUID) => {
         if (!this.active) return;
-        this.eventBus.deleteTestcase(this.active.problemId, id);
+        this.eventBus.deleteTestcase(this.active.id, id);
         // this.problemFs.signals.emit('deleteTestcase', this.active.problem.src.path, id);
       };
       const onPatchTestcase = async (id: UUID, payload: Partial<Testcase>) => {
         if (!this.active) return;
-        this.eventBus.patchTestcase(this.active.problemId, id, this.mapper.testcaseToDto(payload));
+        this.eventBus.patchTestcase(this.active.id, id, this.mapper.testcaseToDto(payload));
         // this.problemFs.signals.emit('patchTestcase', this.active.problem.src.path, id, payload);
       };
       const onPatchTestcaseResult = async (id: UUID, payload: Partial<TestcaseResult>) => {
         if (!this.active) return;
         this.eventBus.patchTestcaseResult(
-          this.active.problemId,
+          this.active.id,
           id,
           this.mapper.testcaseResultToDto(payload),
         );
@@ -142,23 +139,28 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
         problem.signals.off('deleteTestcase', onDeleteTestcase);
         problem.signals.off('patchTestcase', onPatchTestcase);
         problem.signals.off('patchTestcaseResult', onPatchTestcaseResult);
-        await this.repo.persist(this.active.problemId);
+        await this.repo.persist(this.active.id);
+        this.logger.debug('Unload previous active problem', { id: this.active.id });
       }
-      const bgProblem = await this.repo.get(problemId);
-      const problem = bgProblem?.problem;
+      const problem = backgroundProblem.problem;
       if (!problem) {
-        this.logger.error('Active problem not found in repository after loading', { problemId });
+        this.logger.error('Active problem not found in repository after loading', {
+          id: backgroundProblem.id,
+        });
         return;
       }
-      this.active = { problemId, problem };
-      this.lastAccessMap.set(problemId, Date.now());
-      this.eventBus.fullProblem(problemId, this.mapper.toDto(problem));
+      this.active = backgroundProblem;
+      this.lastAccessMap.set(backgroundProblem.id, Date.now());
+      this.eventBus.fullProblem(backgroundProblem.id, this.mapper.toDto(problem));
       problem.signals.on('patchMeta', onPatchMeta);
       problem.signals.on('patchStressTest', onPatchStressTest);
       problem.signals.on('addTestcase', onAddTestcase);
       problem.signals.on('deleteTestcase', onDeleteTestcase);
       problem.signals.on('patchTestcase', onPatchTestcase);
       problem.signals.on('patchTestcaseResult', onPatchTestcaseResult);
+      this.logger.debug('Loaded new active problem', { id: backgroundProblem.id });
+    } else {
+      this.logger.trace('Active problem remains unchanged', { id: backgroundProblem.id });
     }
   }
 }

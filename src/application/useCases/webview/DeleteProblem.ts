@@ -43,7 +43,7 @@ export class DeleteProblem extends BaseProblemUseCase<DeleteProblemMsg> {
   ): Promise<void> {
     backgroundProblem.abort();
     const { id, problem } = backgroundProblem;
-    await this.repo.persist(id);
+    await this.repo.unload(id);
     await this.service.delete(problem);
     await this.coordinator.onActiveEditorChanged(this.activePath.getActivePath());
     await this.coordinator.dispatchFullData();

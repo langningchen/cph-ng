@@ -21,6 +21,7 @@ import type { IClock } from '@/application/ports/node/IClock';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@/composition/tokens';
@@ -36,6 +37,7 @@ export class ProblemRepository implements IProblemRepository {
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
+    @inject(TOKENS.activePathService) private readonly activePath: IActivePathService,
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
   ) {
     this.logger = this.logger.withScope('problemRepository');
@@ -51,9 +53,18 @@ export class ProblemRepository implements IProblemRepository {
     this.eventBus.background(backgroundProblems);
   }
 
-  public async loadByPath(srcPath: string, allowCreate: boolean = false): Promise<UUID | null> {
-    for (const [problemId, fullProblem] of this.backgroundProblems.entries())
-      if (fullProblem.problem.isRelated(srcPath)) return problemId;
+  public async getByPath(srcPath: string): Promise<BackgroundProblem | null> {
+    for (const fullProblem of this.backgroundProblems.values())
+      if (fullProblem.problem.isRelated(srcPath)) return fullProblem;
+    return null;
+  }
+
+  public async loadByPath(
+    srcPath: string,
+    allowCreate: boolean = false,
+  ): Promise<BackgroundProblem | null> {
+    const existingProblem = await this.getByPath(srcPath);
+    if (existingProblem) return existingProblem;
     let problem = await this.problemService.loadBySrc(srcPath);
     if (!problem) {
       if (!allowCreate) {
@@ -69,12 +80,10 @@ export class ProblemRepository implements IProblemRepository {
     }
     this.logger.debug('Loaded problem', problem.src.path, 'for path', srcPath);
     const problemId = this.crypto.randomUUID();
-    this.backgroundProblems.set(
-      problemId,
-      new BackgroundProblem(problemId, problem, this.clock.now()),
-    );
+    const backgroundProblem = new BackgroundProblem(problemId, problem, this.clock.now());
+    this.backgroundProblems.set(problemId, backgroundProblem);
     this.fireBackgroundEvent();
-    return problemId;
+    return backgroundProblem;
   }
 
   public async get(problemId?: UUID): Promise<BackgroundProblem | undefined> {
@@ -83,13 +92,30 @@ export class ProblemRepository implements IProblemRepository {
   }
 
   public async persist(problemId: UUID): Promise<boolean> {
-    const fullProblem = this.backgroundProblems.get(problemId);
-    if (!fullProblem || fullProblem.ac) return false;
-    fullProblem.addTimeElapsed(this.clock.now());
-    await this.problemService.save(fullProblem.problem);
+    const backgroundProblem = this.backgroundProblems.get(problemId);
+    if (!backgroundProblem || backgroundProblem.ac) return false;
+    const activePath = this.activePath.getActivePath();
+    if (activePath && (await this.getByPath(activePath))?.id === problemId) {
+      this.logger.trace('Cannot persist active problem', problemId);
+      return false;
+    }
+    backgroundProblem.addTimeElapsed(this.clock.now());
+    await this.problemService.save(backgroundProblem.problem);
     this.backgroundProblems.delete(problemId);
     this.fireBackgroundEvent();
     this.logger.debug('Persisted problem', problemId);
+    return true;
+  }
+
+  public async unload(problemId: UUID): Promise<boolean> {
+    const backgroundProblem = this.backgroundProblems.get(problemId);
+    if (!backgroundProblem) return false;
+    backgroundProblem.abort();
+    backgroundProblem.addTimeElapsed(this.clock.now());
+    await this.problemService.save(backgroundProblem.problem);
+    this.backgroundProblems.delete(problemId);
+    this.fireBackgroundEvent();
+    this.logger.debug('Unloaded problem', problemId);
     return true;
   }
 }

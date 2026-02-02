@@ -56,6 +56,10 @@ import { EditorWatcherModule } from '@/infrastructure/vscode/extensionModule/edi
 import { EnvironmentModule } from '@/infrastructure/vscode/extensionModule/environmentModule';
 import { LlmModule } from '@/infrastructure/vscode/extensionModule/llmModule';
 import { ProviderModule } from '@/infrastructure/vscode/extensionModule/providerModule';
+import { LlmDataInspector } from '@/infrastructure/vscode/llmTools/llmDataInspector';
+import { LlmProblemContext } from '@/infrastructure/vscode/llmTools/llmProblemContext';
+import { LlmTestcaseRunner } from '@/infrastructure/vscode/llmTools/llmTcRunner';
+import { LlmTestcaseEditor } from '@/infrastructure/vscode/llmTools/llmTestCaseEditor';
 import { LoggerAdapter } from '@/infrastructure/vscode/loggerAdapter';
 import { ProblemFs } from '@/infrastructure/vscode/problemFs';
 import { SettingsAdapter } from '@/infrastructure/vscode/settingsAdapter';
@@ -101,6 +105,11 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.translator, TranslatorAdapter);
   container.registerSingleton(TOKENS.ui, UiAdapter);
   container.registerSingleton(TOKENS.webviewEventBus, WebviewEventBusAdapter);
+
+  container.registerSingleton(LlmTestcaseRunner);
+  container.registerSingleton(LlmDataInspector);
+  container.registerSingleton(LlmTestcaseEditor);
+  container.registerSingleton(LlmProblemContext);
 
   container.register(TOKENS.languageStrategy, { useClass: LangC });
   container.register(TOKENS.languageStrategy, { useClass: LangCpp });
