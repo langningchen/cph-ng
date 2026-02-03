@@ -193,7 +193,9 @@ export class Problem {
     this._timeElapsedMs += addMs;
   }
   public updateResult(...params: Parameters<Testcase['updateResult']>) {
-    for (const testcaseId of this._testcaseOrder)
-      this._testcases.get(testcaseId)?.updateResult(...params);
+    for (const testcaseId of this._testcaseOrder) {
+      const testcase = this._testcases.get(testcaseId);
+      if (testcase && !testcase.isDisabled) testcase.updateResult(...params);
+    }
   }
 }
