@@ -115,6 +115,6 @@ export class LlmTestcaseEditor extends BaseLlmTool<LlmTestcaseEditorParams> {
 
     problem.addTestcase(newTestcaseId, newTestcase);
     await this.repo.persist(bgProblem.problemId);
-    return this.createResult({ success: true });
+    return this.createResult({ success: true, newTestcaseId });
   }
 }

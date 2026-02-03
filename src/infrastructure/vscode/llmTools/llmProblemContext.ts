@@ -80,6 +80,6 @@ export class LlmProblemContext extends BaseLlmTool<BaseLlmToolParams> {
       }),
     };
 
-    return this.createResult(JSON.stringify(context, null, 2));
+    return this.createResult(JSON.stringify(context));
   }
 }
