@@ -24,6 +24,8 @@ type Branded<T, Label> = T & { [BrandSym]: Label };
 export type ProblemId = Branded<UUID, 'ProblemId'>;
 export type TestcaseId = Branded<UUID, 'TestcaseId'>;
 
+export type WithRevision<T> = T & { revision: number };
+
 export type ITestcaseIo = { data: string } | { path: string };
 
 export interface ITestcaseResult {

@@ -26,11 +26,13 @@ import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import type { ProblemMetaPayload } from '@/domain/entities/problem';
+import type { Problem, ProblemMetaPayload } from '@/domain/entities/problem';
 import type { StressTest } from '@/domain/entities/stressTest';
 import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
-import type { ProblemId, TestcaseId } from '@/domain/types';
+import type { ProblemId, TestcaseId, WithRevision } from '@/domain/types';
 import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapper';
+
+// TO-DO: ProblemFs Emit
 
 @injectable()
 export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
@@ -76,6 +78,81 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     this.logger.trace('No active problem to dispatch', { canImport });
     this.eventBus.noProblem(canImport);
   }
+
+  private onPatchMeta = async (payload: WithRevision<ProblemMetaPayload>) => {
+    if (!this.active) return;
+    const { revision, checker, interactor } = payload;
+    this.eventBus.patchMeta(this.active.problemId, {
+      revision,
+      checker: checker ? this.mapper.fileWithHashToDto(checker) : checker,
+      interactor: interactor ? this.mapper.fileWithHashToDto(interactor) : interactor,
+    });
+  };
+
+  private onPatchStressTest = async (payload: WithRevision<Partial<StressTest>>) => {
+    if (!this.active) return;
+    const { revision, ...rest } = payload;
+    this.eventBus.patchStressTest(this.active.problemId, {
+      ...this.mapper.stressTestToDto(rest),
+      revision,
+    });
+  };
+
+  private onAddTestcase = async (testcaseId: TestcaseId, payload: Testcase, revision: number) => {
+    if (!this.active) return;
+    this.eventBus.addTestcase(this.active.problemId, testcaseId, {
+      ...this.mapper.testcaseToDto(payload),
+      revision,
+    });
+  };
+
+  private onDeleteTestcase = async (testcaseId: TestcaseId, revision: number) => {
+    if (!this.active) return;
+    this.eventBus.deleteTestcase(this.active.problemId, testcaseId, { revision });
+  };
+
+  private onPatchTestcase = async (
+    testcaseId: TestcaseId,
+    payload: Partial<Testcase>,
+    revision: number,
+  ) => {
+    if (!this.active) return;
+    this.eventBus.patchTestcase(this.active.problemId, testcaseId, {
+      ...this.mapper.testcaseToDto(payload),
+      revision,
+    });
+  };
+
+  private onPatchTestcaseResult = async (
+    testcaseId: TestcaseId,
+    payload: Partial<TestcaseResult>,
+    revision: number,
+  ) => {
+    if (!this.active) return;
+    this.eventBus.patchTestcaseResult(this.active.problemId, testcaseId, {
+      ...this.mapper.testcaseResultToDto(payload),
+      revision,
+    });
+  };
+
+  private attachListeners(problem: Problem) {
+    problem.signals.on('patchMeta', this.onPatchMeta);
+    problem.signals.on('patchStressTest', this.onPatchStressTest);
+    problem.signals.on('addTestcase', this.onAddTestcase);
+    problem.signals.on('deleteTestcase', this.onDeleteTestcase);
+    problem.signals.on('patchTestcase', this.onPatchTestcase);
+    problem.signals.on('patchTestcaseResult', this.onPatchTestcaseResult);
+  }
+
+  private detachListeners(problem: Problem) {
+    problem.signals.off('patchMeta', this.onPatchMeta);
+    problem.signals.off('patchStressTest', this.onPatchStressTest);
+    problem.signals.off('addTestcase', this.onAddTestcase);
+    problem.signals.off('deleteTestcase', this.onDeleteTestcase);
+    problem.signals.off('patchTestcase', this.onPatchTestcase);
+    problem.signals.off('patchTestcaseResult', this.onPatchTestcaseResult);
+  }
+
   public async onActiveEditorChanged(filePath: string | undefined) {
     if (!filePath) return;
     const backgroundProblem = await this.repo.loadByPath(filePath);
@@ -93,64 +170,8 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     this.context.hasProblem = true;
     const { problem, problemId } = backgroundProblem;
     if (problemId !== this.active?.problemId) {
-      // TO-DO: Check these events
-      const onPatchMeta = async ({ checker, interactor }: ProblemMetaPayload) => {
-        if (!this.active) return;
-        this.eventBus.patchMeta(this.active.problemId, {
-          checker: checker ? this.mapper.fileWithHashToDto(checker) : checker,
-          interactor: interactor ? this.mapper.fileWithHashToDto(interactor) : interactor,
-        });
-        // this.problemFs.signals.emit('patchProblem', this.active.problem.src.path);
-      };
-      const onPatchStressTest = async (payload: Partial<StressTest>) => {
-        if (!this.active) return;
-        this.eventBus.patchStressTest(this.active.problemId, this.mapper.stressTestToDto(payload));
-        // this.problemFs.signals.emit('patchProblem', this.active.problem.src.path);
-      };
-      const onAddTestcase = async (testcaseId: TestcaseId, payload: Testcase) => {
-        if (!this.active) return;
-        this.eventBus.addTestcase(
-          this.active.problemId,
-          testcaseId,
-          this.mapper.testcaseToDto(payload),
-        );
-        // this.problemFs.signals.emit('addTestcase', this.active.problem.src.path, testcaseId, payload);
-      };
-      const onDeleteTestcase = async (testcaseId: TestcaseId) => {
-        if (!this.active) return;
-        this.eventBus.deleteTestcase(this.active.problemId, testcaseId);
-        // this.problemFs.signals.emit('deleteTestcase', this.active.problem.src.path, testcaseId);
-      };
-      const onPatchTestcase = async (testcaseId: TestcaseId, payload: Partial<Testcase>) => {
-        if (!this.active) return;
-        this.eventBus.patchTestcase(
-          this.active.problemId,
-          testcaseId,
-          this.mapper.testcaseToDto(payload),
-        );
-        // this.problemFs.signals.emit('patchTestcase', this.active.problem.src.path, testcaseId, payload);
-      };
-      const onPatchTestcaseResult = async (
-        testcaseId: TestcaseId,
-        payload: Partial<TestcaseResult>,
-      ) => {
-        if (!this.active) return;
-        this.eventBus.patchTestcaseResult(
-          this.active.problemId,
-          testcaseId,
-          this.mapper.testcaseResultToDto(payload),
-        );
-        // this.problemFs.signals.emit('patchTestcase', this.active.problem.src.path, testcaseId, payload);
-      };
-
       if (this.active) {
-        const problem = this.active.problem;
-        problem.signals.off('patchMeta', onPatchMeta);
-        problem.signals.off('patchStressTest', onPatchStressTest);
-        problem.signals.off('addTestcase', onAddTestcase);
-        problem.signals.off('deleteTestcase', onDeleteTestcase);
-        problem.signals.off('patchTestcase', onPatchTestcase);
-        problem.signals.off('patchTestcaseResult', onPatchTestcaseResult);
+        this.detachListeners(this.active.problem);
         await this.repo.persist(this.active.problemId);
         this.logger.debug('Unload previous active problem', { problemId: this.active.problemId });
       }
@@ -163,12 +184,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       this.active = backgroundProblem;
       this.lastAccessMap.set(problemId, Date.now());
       this.eventBus.fullProblem(problemId, this.mapper.toDto(problem));
-      problem.signals.on('patchMeta', onPatchMeta);
-      problem.signals.on('patchStressTest', onPatchStressTest);
-      problem.signals.on('addTestcase', onAddTestcase);
-      problem.signals.on('deleteTestcase', onDeleteTestcase);
-      problem.signals.on('patchTestcase', onPatchTestcase);
-      problem.signals.on('patchTestcaseResult', onPatchTestcaseResult);
+      this.attachListeners(problem);
       this.logger.debug('Loaded new active problem', { problemId });
     } else {
       this.logger.trace('Active problem remains unchanged', { problemId });

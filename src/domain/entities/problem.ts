@@ -19,24 +19,29 @@ import EventEmitter from 'node:events';
 import type TypedEventEmitter from 'typed-emitter';
 import { StressTest } from '@/domain/entities/stressTest';
 import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
-import type { IFileWithHash, IOverrides, TestcaseId } from '@/domain/types';
+import type { IFileWithHash, IOverrides, TestcaseId, WithRevision } from '@/domain/types';
 
 export interface ProblemMetaPayload {
   checker?: IFileWithHash | null;
   interactor?: IFileWithHash | null;
 }
 export type ProblemEvents = {
-  patchMeta: (payload: ProblemMetaPayload) => void;
-  patchStressTest: (payload: Partial<StressTest>) => void;
-  addTestcase: (testcaseId: TestcaseId, payload: Testcase) => void;
-  deleteTestcase: (testcaseId: TestcaseId) => void;
-  patchTestcase: (testcaseId: TestcaseId, payload: Partial<Testcase>) => void;
-  patchTestcaseResult: (testcaseId: TestcaseId, payload: Partial<TestcaseResult>) => void;
+  patchMeta: (payload: WithRevision<ProblemMetaPayload>) => void;
+  patchStressTest: (payload: WithRevision<Partial<StressTest>>) => void;
+  addTestcase: (testcaseId: TestcaseId, payload: Testcase, revision: number) => void;
+  deleteTestcase: (testcaseId: TestcaseId, revision: number) => void;
+  patchTestcase: (testcaseId: TestcaseId, payload: Partial<Testcase>, revision: number) => void;
+  patchTestcaseResult: (
+    testcaseId: TestcaseId,
+    payload: Partial<TestcaseResult>,
+    revision: number,
+  ) => void;
 };
 
 export class Problem {
   public readonly src: IFileWithHash;
   public url?: string;
+  private _revision: number = 0;
   private _testcases: Map<TestcaseId, Testcase> = new Map();
   private _testcaseOrder: TestcaseId[] = [];
   private _checker: IFileWithHash | null = null;
@@ -44,7 +49,7 @@ export class Problem {
   private _stressTest: StressTest = new StressTest();
   private _timeElapsedMs: number = 0;
   public overrides: IOverrides = {};
-  public readonly signals: TypedEventEmitter<ProblemEvents> = new EventEmitter();
+  public readonly signals = new EventEmitter() as TypedEventEmitter<ProblemEvents>;
 
   public constructor(
     public name: string,
@@ -55,8 +60,17 @@ export class Problem {
     this._stressTest.signals.on('change', this.stressTestChanged);
   }
 
+  public get revision(): number {
+    return this._revision;
+  }
+
+  private bumpRevision() {
+    this._revision++;
+  }
+
   private stressTestChanged = (payload: Partial<StressTest>) => {
-    this.signals.emit('patchStressTest', payload);
+    this.bumpRevision();
+    this.signals.emit('patchStressTest', { ...payload, revision: this._revision });
   };
 
   public get testcases(): Map<TestcaseId, Testcase> {
@@ -70,14 +84,16 @@ export class Problem {
   }
   public set checker(file: IFileWithHash | null) {
     this._checker = file;
-    this.signals.emit('patchMeta', { checker: file });
+    this.bumpRevision();
+    this.signals.emit('patchMeta', { checker: file, revision: this._revision });
   }
   public get interactor() {
     return this._interactor;
   }
   public set interactor(file: IFileWithHash | null) {
     this._interactor = file;
-    this.signals.emit('patchMeta', { interactor: file });
+    this.bumpRevision();
+    this.signals.emit('patchMeta', { interactor: file, revision: this._revision });
   }
   public get stressTest(): StressTest {
     return this._stressTest;
@@ -92,16 +108,19 @@ export class Problem {
   }
 
   private onPatchTestcase(testcaseId: TestcaseId, payload: Partial<Testcase>) {
-    this.signals.emit('patchTestcase', testcaseId, payload);
+    this.bumpRevision();
+    this.signals.emit('patchTestcase', testcaseId, payload, this._revision);
   }
   private onPatchTestcaseResult(testcaseId: TestcaseId, payload: Partial<TestcaseResult>) {
-    this.signals.emit('patchTestcaseResult', testcaseId, payload);
+    this.bumpRevision();
+    this.signals.emit('patchTestcaseResult', testcaseId, payload, this._revision);
   }
 
   public addTestcase(testcaseId: TestcaseId, testcase: Testcase) {
     this._testcases.set(testcaseId, testcase);
     this._testcaseOrder.push(testcaseId);
-    this.signals.emit('addTestcase', testcaseId, testcase);
+    this.bumpRevision();
+    this.signals.emit('addTestcase', testcaseId, testcase, this._revision);
     testcase.signals.on('patchTestcase', (payload) => this.onPatchTestcase(testcaseId, payload));
     testcase.signals.on('patchTestcaseResult', (payload) =>
       this.onPatchTestcaseResult(testcaseId, payload),
@@ -114,13 +133,16 @@ export class Problem {
   }
   public deleteTestcase(testcaseId: TestcaseId): void {
     this._testcaseOrder = this._testcaseOrder.filter((id) => id !== testcaseId);
+    this.bumpRevision();
+    this.signals.emit('deleteTestcase', testcaseId, this._revision);
   }
   public clearTestcases(): string[] {
     const disposables = this.purgeUnusedTestcases();
     this._testcaseOrder = [];
     for (const [testcaseId, testcase] of this._testcases) {
       disposables.push(...testcase.getDisposables());
-      this.signals.emit('deleteTestcase', testcaseId);
+      this.bumpRevision();
+      this.signals.emit('deleteTestcase', testcaseId, this._revision);
     }
     this._testcases.clear();
     return disposables;

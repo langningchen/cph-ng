@@ -65,7 +65,7 @@ export type ProblemFsEvents = {
 export class ProblemFs implements IProblemFs {
   public static readonly scheme = 'cph-ng';
 
-  public readonly signals: TypedEventEmitter<ProblemFsEvents> = new EventEmitter();
+  public readonly signals = new EventEmitter() as TypedEventEmitter<ProblemFsEvents>;
   private changeEmitter = new vsEventEmitter<FileChangeEvent[]>();
   public onDidChangeFile: Event<FileChangeEvent[]> = this.changeEmitter.event;
 

@@ -55,6 +55,7 @@ export class WebviewProblemMapper {
     return {
       name: entity.name,
       url: entity.url,
+      revision: entity.revision,
       testcases,
       testcaseOrder: [...entity.testcaseOrder],
       src: this.fileWithHashToDto(entity.src),

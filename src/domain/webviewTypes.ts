@@ -67,6 +67,7 @@ export interface IWebviewOverrides {
 export interface IWebviewProblem {
   name: string;
   url?: string;
+  revision: number;
   testcases: Record<TestcaseId, IWebviewTestcase>;
   testcaseOrder: TestcaseId[];
   src: IWebviewFileWithHash;

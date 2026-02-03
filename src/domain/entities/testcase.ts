@@ -39,7 +39,7 @@ export type TestcaseEvents = {
 };
 
 export class Testcase {
-  public readonly signals: TypedEventEmitter<TestcaseEvents> = new EventEmitter();
+  public readonly signals = new EventEmitter() as TypedEventEmitter<TestcaseEvents>;
 
   public constructor(
     private _stdin: TestcaseIo = new TestcaseIo({ data: '' }),
@@ -90,9 +90,11 @@ export class Testcase {
 
   public toggleExpand() {
     this._isExpand = !this._isExpand;
+    this.signals.emit('patchTestcase', { isExpand: this._isExpand });
   }
   public toggleDisable() {
     this._isDisabled = !this._isDisabled;
+    this.signals.emit('patchTestcase', { isDisabled: this._isDisabled });
   }
 
   public clearResult(): string[] {

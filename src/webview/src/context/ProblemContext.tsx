@@ -69,50 +69,70 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
       }
       case 'PATCH_META': {
         if (draft.currentProblem.type !== 'active') return;
+        if (action.payload.revision <= draft.currentProblem.problem.revision) return;
         const problem = draft.currentProblem.problem;
         const { checker, interactor } = action.payload;
         if (checker !== undefined) problem.checker = checker;
         if (interactor !== undefined) problem.interactor = interactor;
+        problem.revision = action.payload.revision;
         break;
       }
       case 'PATCH_STRESS_TEST': {
         if (draft.currentProblem.type !== 'active') return;
-        const stressTest = draft.currentProblem.problem.stressTest;
+        if (action.payload.revision <= draft.currentProblem.problem.revision) return;
+        const problem = draft.currentProblem.problem;
+        const stressTest = problem.stressTest;
         const { generator, bruteForce, isRunning, msg } = action.payload;
         if (generator !== undefined) stressTest.generator = generator;
         if (bruteForce !== undefined) stressTest.bruteForce = bruteForce;
         if (isRunning !== undefined) stressTest.isRunning = isRunning;
         if (msg !== undefined) stressTest.msg = msg;
+        problem.revision = action.payload.revision;
         return;
       }
       case 'ADD_TESTCASE': {
         if (draft.currentProblem.type !== 'active') return;
-        draft.currentProblem.problem.testcases[action.testcaseId] = action.payload;
-        draft.currentProblem.problem.testcaseOrder.push(action.testcaseId);
+        if (action.payload.revision <= draft.currentProblem.problem.revision) return;
+        const problem = draft.currentProblem.problem;
+        problem.testcases[action.testcaseId] = action.payload;
+        problem.testcaseOrder.push(action.testcaseId);
+        problem.revision = action.payload.revision;
         break;
       }
       case 'DELETE_TESTCASE': {
         if (draft.currentProblem.type !== 'active') return;
-        delete draft.currentProblem.problem.testcases[action.testcaseId];
+        if (action.payload.revision <= draft.currentProblem.problem.revision) return;
+        const problem = draft.currentProblem.problem;
+        delete problem.testcases[action.testcaseId];
+        problem.testcaseOrder = problem.testcaseOrder.filter((id) => id !== action.testcaseId);
+        problem.revision = action.payload.revision;
         break;
       }
       case 'PATCH_TESTCASE': {
         if (draft.currentProblem.type !== 'active') return;
-        const testcase = draft.currentProblem.problem.testcases[action.testcaseId];
-        draft.currentProblem.problem.testcases[action.testcaseId] = {
-          ...testcase,
-          ...action.payload,
-        };
+        if (action.payload.revision <= draft.currentProblem.problem.revision) return;
+        const problem = draft.currentProblem.problem;
+        const testcase = problem.testcases[action.testcaseId];
+        if (testcase) {
+          problem.testcases[action.testcaseId] = {
+            ...testcase,
+            ...action.payload,
+          };
+          problem.revision = action.payload.revision;
+        }
         break;
       }
       case 'PATCH_TESTCASE_RESULT': {
         if (draft.currentProblem.type !== 'active') return;
-        const testcase = draft.currentProblem.problem.testcases[action.testcaseId];
-        if (testcase)
-          testcase.result = {
-            ...(testcase.result || {}),
-            ...action.payload,
-          };
+        if (action.payload.revision <= draft.currentProblem.problem.revision) return;
+        const problem = draft.currentProblem.problem;
+        const testcase = problem.testcases[action.testcaseId];
+        if (testcase) {
+          const { revision, ...payload } = action.payload;
+          if (testcase.result) testcase.result = { ...testcase.result, ...payload };
+          else if (payload.verdict) testcase.result = payload;
+          problem.revision = revision;
+        }
         break;
       }
       case 'BACKGROUND': {

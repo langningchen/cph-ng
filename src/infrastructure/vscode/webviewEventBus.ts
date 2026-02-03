@@ -21,18 +21,17 @@ import type TypedEventEmitter from 'typed-emitter';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type {
   IWebviewEventBus,
+  WebviewAddTestcasePayload,
+  WebviewDeleteTestcasePayload,
   WebviewEvent,
-  WebviewProblemMetaPayload,
+  WebviewPatchMetaPayload,
+  WebviewPatchStressTestPayload,
+  WebviewPatchTestcasePayload,
+  WebviewPatchTestcaseResultPayload,
 } from '@/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@/composition/tokens';
 import type { ProblemId, TestcaseId } from '@/domain/types';
-import type {
-  IWebviewBackgroundProblem,
-  IWebviewProblem,
-  IWebviewStressTest,
-  IWebviewTestcase,
-  IWebviewTestcaseResult,
-} from '@/domain/webviewTypes';
+import type { IWebviewBackgroundProblem, IWebviewProblem } from '@/domain/webviewTypes';
 
 type WebviewEvents = {
   message: (payload: WebviewEvent) => void;
@@ -40,7 +39,7 @@ type WebviewEvents = {
 
 @injectable()
 export class WebviewEventBusAdapter implements IWebviewEventBus {
-  private readonly emitter: TypedEventEmitter<WebviewEvents> = new EventEmitter();
+  private readonly emitter = new EventEmitter() as TypedEventEmitter<WebviewEvents>;
 
   public constructor(@inject(TOKENS.logger) private readonly logger: ILogger) {
     this.logger = this.logger.withScope('webviewEventBusAdapter');
@@ -52,87 +51,54 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
 
   public fullProblem(problemId: ProblemId, payload: IWebviewProblem): void {
     this.logger.debug('Emitting fullProblem event', { problemId, payload });
-    this.emitter.emit('message', {
-      type: 'FULL_PROBLEM',
-      problemId,
-      payload,
-    });
+    this.emitter.emit('message', { type: 'FULL_PROBLEM', problemId, payload });
   }
-  public patchMeta(problemId: ProblemId, payload: WebviewProblemMetaPayload): void {
+  public patchMeta(problemId: ProblemId, payload: WebviewPatchMetaPayload): void {
     this.logger.debug('Emitting patchMeta event', { problemId, payload });
-    this.emitter.emit('message', {
-      type: 'PATCH_META',
-      problemId,
-      payload,
-    });
+    this.emitter.emit('message', { type: 'PATCH_META', problemId, payload });
   }
-  public patchStressTest(problemId: ProblemId, payload: Partial<IWebviewStressTest>): void {
+  public patchStressTest(problemId: ProblemId, payload: WebviewPatchStressTestPayload): void {
     this.logger.debug('Emitting patchStressTest event', { problemId, payload });
-    this.emitter.emit('message', {
-      type: 'PATCH_STRESS_TEST',
-      problemId,
-      payload,
-    });
+    this.emitter.emit('message', { type: 'PATCH_STRESS_TEST', problemId, payload });
   }
   public addTestcase(
     problemId: ProblemId,
     testcaseId: TestcaseId,
-    payload: IWebviewTestcase,
+    payload: WebviewAddTestcasePayload,
   ): void {
     this.logger.debug('Emitting addTestcase event', { problemId, testcaseId, payload });
-    this.emitter.emit('message', {
-      type: 'ADD_TESTCASE',
-      problemId,
-      testcaseId,
-      payload,
-    });
+    this.emitter.emit('message', { type: 'ADD_TESTCASE', problemId, testcaseId, payload });
   }
-  public deleteTestcase(problemId: ProblemId, testcaseId: TestcaseId): void {
-    this.logger.debug('Emitting deleteTestcase event', { problemId, testcaseId });
-    this.emitter.emit('message', {
-      type: 'DELETE_TESTCASE',
-      problemId,
-      testcaseId,
-    });
+  public deleteTestcase(
+    problemId: ProblemId,
+    testcaseId: TestcaseId,
+    payload: WebviewDeleteTestcasePayload,
+  ): void {
+    this.logger.debug('Emitting deleteTestcase event', { problemId, testcaseId, payload });
+    this.emitter.emit('message', { type: 'DELETE_TESTCASE', problemId, testcaseId, payload });
   }
   public patchTestcase(
     problemId: ProblemId,
     testcaseId: TestcaseId,
-    payload: Partial<IWebviewTestcase>,
+    payload: WebviewPatchTestcasePayload,
   ): void {
     this.logger.debug('Emitting patchTestcase event', { problemId, testcaseId, payload });
-    this.emitter.emit('message', {
-      type: 'PATCH_TESTCASE',
-      problemId,
-      testcaseId,
-      payload,
-    });
+    this.emitter.emit('message', { type: 'PATCH_TESTCASE', problemId, testcaseId, payload });
   }
   public patchTestcaseResult(
     problemId: ProblemId,
     testcaseId: TestcaseId,
-    payload: Partial<IWebviewTestcaseResult>,
+    payload: WebviewPatchTestcaseResultPayload,
   ): void {
     this.logger.debug('Emitting patchTestcaseResult event', { problemId, testcaseId, payload });
-    this.emitter.emit('message', {
-      type: 'PATCH_TESTCASE_RESULT',
-      problemId,
-      testcaseId,
-      payload,
-    });
+    this.emitter.emit('message', { type: 'PATCH_TESTCASE_RESULT', problemId, testcaseId, payload });
   }
   public background(payload: IWebviewBackgroundProblem[]): void {
     this.logger.debug('Emitting background event', { payload });
-    this.emitter.emit('message', {
-      type: 'BACKGROUND',
-      payload,
-    });
+    this.emitter.emit('message', { type: 'BACKGROUND', payload });
   }
   public noProblem(canImport: boolean): void {
     this.logger.debug('Emitting noProblem event', { canImport });
-    this.emitter.emit('message', {
-      type: 'NO_PROBLEM',
-      canImport,
-    });
+    this.emitter.emit('message', { type: 'NO_PROBLEM', canImport });
   }
 }

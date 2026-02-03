@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemId, TestcaseId } from '@/domain/types';
+import type { ProblemId, TestcaseId, WithRevision } from '@/domain/types';
 import type {
   IWebviewBackgroundProblem,
   IWebviewFileWithHash,
@@ -25,10 +25,6 @@ import type {
   IWebviewTestcaseResult,
 } from '@/domain/webviewTypes';
 
-export interface WebviewProblemMetaPayload {
-  checker?: IWebviewFileWithHash | null;
-  interactor?: IWebviewFileWithHash | null;
-}
 const WebviewEventName = {
   FULL_PROBLEM: 'FULL_PROBLEM',
   PATCH_META: 'PATCH_META',
@@ -45,38 +41,48 @@ interface WebviewFullProblemEvent {
   problemId: ProblemId;
   payload: IWebviewProblem;
 }
+export type WebviewPatchMetaPayload = WithRevision<{
+  checker?: IWebviewFileWithHash | null;
+  interactor?: IWebviewFileWithHash | null;
+}>;
 interface WebviewPatchMetaEvent {
   type: typeof WebviewEventName.PATCH_META;
   problemId: ProblemId;
-  payload: WebviewProblemMetaPayload;
+  payload: WebviewPatchMetaPayload;
 }
+export type WebviewPatchStressTestPayload = WithRevision<Partial<IWebviewStressTest>>;
 interface WebviewPatchStressTestEvent {
   type: typeof WebviewEventName.PATCH_STRESS_TEST;
   problemId: ProblemId;
-  payload: Partial<IWebviewStressTest>;
+  payload: WebviewPatchStressTestPayload;
 }
+export type WebviewAddTestcasePayload = WithRevision<IWebviewTestcase>;
 interface WebviewAddTestcaseEvent {
   type: typeof WebviewEventName.ADD_TESTCASE;
   problemId: ProblemId;
   testcaseId: TestcaseId;
-  payload: IWebviewTestcase;
+  payload: WebviewAddTestcasePayload;
 }
+export type WebviewDeleteTestcasePayload = WithRevision<NonNullable<unknown>>;
 interface WebviewDeleteTestcaseEvent {
   type: typeof WebviewEventName.DELETE_TESTCASE;
   problemId: ProblemId;
   testcaseId: TestcaseId;
+  payload: WebviewDeleteTestcasePayload;
 }
+export type WebviewPatchTestcasePayload = WithRevision<Partial<IWebviewTestcase>>;
 interface WebviewPatchTestcaseEvent {
   type: typeof WebviewEventName.PATCH_TESTCASE;
   problemId: ProblemId;
   testcaseId: TestcaseId;
-  payload: Partial<IWebviewTestcase>;
+  payload: WebviewPatchTestcasePayload;
 }
+export type WebviewPatchTestcaseResultPayload = WithRevision<Partial<IWebviewTestcaseResult>>;
 interface WebviewPatchTestcaseResultEvent {
   type: typeof WebviewEventName.PATCH_TESTCASE_RESULT;
   problemId: ProblemId;
   testcaseId: TestcaseId;
-  payload: Partial<IWebviewTestcaseResult>;
+  payload: WebviewPatchTestcaseResultPayload;
 }
 interface WebviewBackgroundEvent {
   type: typeof WebviewEventName.BACKGROUND;
@@ -100,19 +106,27 @@ export type WebviewEvent =
 export interface IWebviewEventBus {
   onMessage(callback: (data: WebviewEvent) => void): void;
   fullProblem(problemId: ProblemId, payload: IWebviewProblem): void;
-  patchMeta(problemId: ProblemId, payload: WebviewProblemMetaPayload): void;
-  patchStressTest(problemId: ProblemId, payload: Partial<IWebviewStressTest>): void;
-  addTestcase(problemId: ProblemId, testcaseId: TestcaseId, payload: IWebviewTestcase): void;
-  deleteTestcase(problemId: ProblemId, testcaseId: TestcaseId): void;
+  patchMeta(problemId: ProblemId, payload: WebviewPatchMetaPayload): void;
+  patchStressTest(problemId: ProblemId, payload: WebviewPatchStressTestPayload): void;
+  addTestcase(
+    problemId: ProblemId,
+    testcaseId: TestcaseId,
+    payload: WebviewAddTestcasePayload,
+  ): void;
+  deleteTestcase(
+    problemId: ProblemId,
+    testcaseId: TestcaseId,
+    payload: WebviewDeleteTestcasePayload,
+  ): void;
   patchTestcase(
     problemId: ProblemId,
     testcaseId: TestcaseId,
-    payload: Partial<IWebviewTestcase>,
+    payload: WebviewPatchTestcasePayload,
   ): void;
   patchTestcaseResult(
     problemId: ProblemId,
     testcaseId: TestcaseId,
-    payload: Partial<IWebviewTestcaseResult>,
+    payload: WebviewPatchTestcaseResultPayload,
   ): void;
   background(payload: IWebviewBackgroundProblem[]): void;
   noProblem(canImport: boolean): void;
