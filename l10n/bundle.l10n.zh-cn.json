@@ -1,5 +1,4 @@
 {
-  "(no fields)": "(无字段)",
   "Accepted": "通过",
   "All files": "所有文件",
   "Brute Force": "暴力",
@@ -22,8 +21,9 @@
   "Compiling": "正在编译",
   "Compiling...": "正在编译...",
   "Copy": "复制",
-  "Create a new test case": "创建新的测试样例",
+  "Create a test case": "创建测试样例",
   "Difference found at case #{cnt}": "在样例 #{cnt} 发现差异",
+  "Disabled": "禁用",
   "Do you want to create a new test case?": "您要创建一个新的测试样例吗？",
   "Do you want to run all test cases?": "你想运行所有测试样例吗？",
   "Do you want to run test case {testcaseId}?": "你想运行测试样例 {testcaseId} 吗？",
@@ -46,6 +46,7 @@
   "Load from a folder": "从文件夹加载",
   "Load from a zip file": "从 ZIP 压缩文件加载",
   "Memory Limit Exceed": "内存超限",
+  "No": "否",
   "No CPH problem files found.": "未找到 CPH 题目文件。",
   "No test cases found.": "未找到测试样例。",
   "No workspace folder contains the required path.": "没有任何工作区文件夹包含所需路径。",
@@ -81,14 +82,13 @@
   "Text files": "文本文件",
   "Time Limit Exceed": "时间超限",
   "Unknown Error": "未知错误",
+  "Update Test Case": "更新测试样例",
   "Update test case {testcaseId}": "更新测试样例 {testcaseId}",
-  "Upsert Test Case": "新增或更新测试样例",
   "Waiting": "等待中",
   "Wrong Answer": "答案错误",
   "Yes": "是",
   "Zip files": "ZIP 文件",
   "answer": "答案",
   "not found": "未找到",
-  "stdin": "输入",
-  "{op}: {fields}": "{op}：{fields}"
+  "stdin": "输入"
 }

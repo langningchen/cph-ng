@@ -16,11 +16,12 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import type {
-  CancellationToken,
-  LanguageModelToolInvocationPrepareOptions,
-  LanguageModelToolResult,
-  PreparedToolInvocation,
+import {
+  type CancellationToken,
+  type LanguageModelToolInvocationPrepareOptions,
+  type LanguageModelToolResult,
+  MarkdownString,
+  type PreparedToolInvocation,
 } from 'vscode';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
@@ -56,24 +57,39 @@ export class LlmTestcaseEditor extends BaseLlmTool<LlmTestcaseEditorParams> {
     _token: CancellationToken,
   ): Promise<PreparedToolInvocation> {
     const { testcaseId, stdin, answer, isDisabled } = options.input;
-    const op = testcaseId
-      ? this.translator.t('Update test case {testcaseId}', { testcaseId })
-      : this.translator.t('Create a new test case');
-    const fields: string[] = [];
-    if (stdin !== undefined) fields.push('stdin');
-    if (answer !== undefined) fields.push('answer');
-    if (isDisabled !== undefined) fields.push('isDisabled');
+    const detailMessage = new MarkdownString('\n\n');
+    if (stdin !== undefined) {
+      detailMessage.appendMarkdown(this.translator.t('stdin'));
+      detailMessage.appendCodeblock(stdin.trim());
+    }
+    if (answer !== undefined) {
+      detailMessage.appendMarkdown(this.translator.t('answer'));
+      detailMessage.appendCodeblock(answer.trim());
+    }
+    if (isDisabled !== undefined) {
+      const disabledText = isDisabled ? this.translator.t('Yes') : this.translator.t('No');
+      detailMessage.appendMarkdown(`${this.translator.t('Disabled')}: ${disabledText}`);
+    }
 
+    if (!testcaseId) {
+      return {
+        invocationMessage: this.translator.t('Create a test case'),
+        confirmationMessages: {
+          title: this.translator.t('Create a test case'),
+          message: new MarkdownString(
+            this.translator.t('Do you want to create a new test case?') + detailMessage.value,
+          ),
+        },
+      };
+    }
     return {
-      invocationMessage: this.translator.t('{op}: {fields}', {
-        op,
-        fields: fields.join(', ') || this.translator.t('(no fields)'),
-      }),
+      invocationMessage: this.translator.t('Update test case {testcaseId}', { testcaseId }),
       confirmationMessages: {
-        title: this.translator.t('Upsert Test Case'),
-        message: testcaseId
-          ? this.translator.t('Do you want to update test case {testcaseId}?', { testcaseId })
-          : this.translator.t('Do you want to create a new test case?'),
+        title: this.translator.t('Update Test Case'),
+        message: new MarkdownString(
+          this.translator.t('Do you want to update test case {testcaseId}?', { testcaseId }) +
+            detailMessage.value,
+        ),
       },
     };
   }
