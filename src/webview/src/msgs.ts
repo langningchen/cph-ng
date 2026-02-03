@@ -81,7 +81,8 @@ export interface SetTestcaseStringMsg extends ProblemBaseMsg {
 export interface UpdateTestcaseMsg extends ProblemBaseMsg {
   type: 'updateTestcase';
   testcaseId: TestcaseId;
-  event: 'toggleDisable' | 'toggleExpand' | 'setAsAnswer';
+  event: 'setDisable' | 'setExpand' | 'setAsAnswer';
+  value: boolean; // ignored when set as answer
 }
 export interface CompareTestcaseMsg extends ProblemBaseMsg {
   type: 'compareTestcase';

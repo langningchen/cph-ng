@@ -66,8 +66,16 @@ export class Testcase {
   public get isExpand(): boolean {
     return this._isExpand;
   }
+  public set isExpand(value: boolean) {
+    this._isExpand = value;
+    this.signals.emit('patchTestcase', { isExpand: this._isExpand });
+  }
   public get isDisabled(): boolean {
     return this._isDisabled;
+  }
+  public set isDisabled(value: boolean) {
+    this._isDisabled = value;
+    this.signals.emit('patchTestcase', { isDisabled: this._isDisabled });
   }
   public get verdict(): VerdictName | undefined {
     return this._result?.verdict;
@@ -86,15 +94,6 @@ export class Testcase {
   }
   public get msg(): string | undefined {
     return this._result?.msg;
-  }
-
-  public toggleExpand() {
-    this._isExpand = !this._isExpand;
-    this.signals.emit('patchTestcase', { isExpand: this._isExpand });
-  }
-  public toggleDisable() {
-    this._isDisabled = !this._isDisabled;
-    this.signals.emit('patchTestcase', { isDisabled: this._isDisabled });
   }
 
   public clearResult(): string[] {

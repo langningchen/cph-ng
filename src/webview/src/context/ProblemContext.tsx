@@ -26,7 +26,11 @@ import React, {
 } from 'react';
 import type { WebviewEvent } from '@/application/ports/vscode/IWebviewEventBus';
 import type { ProblemId } from '@/domain/types';
-import type { IWebviewBackgroundProblem, IWebviewProblem } from '@/domain/webviewTypes';
+import type {
+  IWebviewBackgroundProblem,
+  IWebviewProblem,
+  IWebviewTestcaseResult,
+} from '@/domain/webviewTypes';
 import type { WebviewMsg } from '../msgs';
 
 interface CurrentProblemStateIdle {
@@ -56,151 +60,119 @@ const ProblemContext = createContext<ProblemContextType | undefined>(undefined);
 
 const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State => {
   return produce(state, (draft) => {
-    switch (action.type) {
-      case 'FULL_PROBLEM': {
-        draft.isInitialized = true;
-        draft.currentProblem = {
-          type: 'active',
-          problemId: action.problemId,
-          problem: action.payload,
-          startTime: Date.now(),
-        };
-        break;
-      }
-      case 'PATCH_META': {
-        if (draft.currentProblem.type !== 'active') return;
-        if (action.payload.revision <= draft.currentProblem.problem.revision) return;
-        const problem = draft.currentProblem.problem;
+    if (action.type === 'FULL_PROBLEM') {
+      draft.isInitialized = true;
+      draft.currentProblem = {
+        type: 'active',
+        problemId: action.problemId,
+        problem: action.payload,
+        startTime: Date.now(),
+      };
+      return;
+    }
+    if (action.type === 'BACKGROUND') {
+      draft.backgroundProblems = action.payload;
+      return;
+    }
+    if (action.type === 'NO_PROBLEM') {
+      draft.isInitialized = true;
+      draft.currentProblem = { type: 'idle', canImport: action.canImport };
+      return;
+    }
+
+    if (draft.currentProblem.type !== 'active') return;
+    const problem = draft.currentProblem.problem;
+
+    if ('payload' in action) {
+      if (action.payload.revision <= problem.revision) return;
+      problem.revision = action.payload.revision;
+      if (action.type === 'PATCH_META') {
         const { checker, interactor } = action.payload;
         if (checker !== undefined) problem.checker = checker;
         if (interactor !== undefined) problem.interactor = interactor;
-        problem.revision = action.payload.revision;
-        break;
+        return;
       }
-      case 'PATCH_STRESS_TEST': {
-        if (draft.currentProblem.type !== 'active') return;
-        if (action.payload.revision <= draft.currentProblem.problem.revision) return;
-        const problem = draft.currentProblem.problem;
+      if (action.type === 'PATCH_STRESS_TEST') {
         const stressTest = problem.stressTest;
         const { generator, bruteForce, isRunning, msg } = action.payload;
         if (generator !== undefined) stressTest.generator = generator;
         if (bruteForce !== undefined) stressTest.bruteForce = bruteForce;
         if (isRunning !== undefined) stressTest.isRunning = isRunning;
         if (msg !== undefined) stressTest.msg = msg;
-        problem.revision = action.payload.revision;
         return;
       }
-      case 'ADD_TESTCASE': {
-        if (draft.currentProblem.type !== 'active') return;
-        if (action.payload.revision <= draft.currentProblem.problem.revision) return;
-        const problem = draft.currentProblem.problem;
+      if (action.type === 'ADD_TESTCASE') {
         problem.testcases[action.testcaseId] = action.payload;
         problem.testcaseOrder.push(action.testcaseId);
-        problem.revision = action.payload.revision;
-        break;
+        return;
       }
-      case 'DELETE_TESTCASE': {
-        if (draft.currentProblem.type !== 'active') return;
-        if (action.payload.revision <= draft.currentProblem.problem.revision) return;
-        const problem = draft.currentProblem.problem;
+      if (action.type === 'DELETE_TESTCASE') {
         delete problem.testcases[action.testcaseId];
         problem.testcaseOrder = problem.testcaseOrder.filter((id) => id !== action.testcaseId);
-        problem.revision = action.payload.revision;
-        break;
+        return;
       }
-      case 'PATCH_TESTCASE': {
-        if (draft.currentProblem.type !== 'active') return;
-        if (action.payload.revision <= draft.currentProblem.problem.revision) return;
-        const problem = draft.currentProblem.problem;
+      if (action.type === 'PATCH_TESTCASE') {
         const testcase = problem.testcases[action.testcaseId];
-        if (testcase) {
+        if (testcase)
           problem.testcases[action.testcaseId] = {
             ...testcase,
             ...action.payload,
           };
-          problem.revision = action.payload.revision;
-        }
-        break;
+        return;
       }
-      case 'PATCH_TESTCASE_RESULT': {
-        if (draft.currentProblem.type !== 'active') return;
-        if (action.payload.revision <= draft.currentProblem.problem.revision) return;
-        const problem = draft.currentProblem.problem;
+      if (action.type === 'PATCH_TESTCASE_RESULT') {
         const testcase = problem.testcases[action.testcaseId];
         if (testcase) {
-          const { revision, ...payload } = action.payload;
+          const { revision: _, ...payload } = action.payload;
           if (testcase.result) testcase.result = { ...testcase.result, ...payload };
-          else if (payload.verdict) testcase.result = payload;
-          problem.revision = revision;
+          else if (payload.verdict) testcase.result = payload as IWebviewTestcaseResult;
         }
-        break;
+        return;
       }
-      case 'BACKGROUND': {
-        draft.backgroundProblems = action.payload;
-        break;
-      }
-      case 'NO_PROBLEM': {
-        draft.isInitialized = true;
-        draft.currentProblem = { type: 'idle', canImport: action.canImport };
-        break;
-      }
+    }
 
-      case 'editProblemDetails': {
-        if (draft.currentProblem.type !== 'active') return;
-        const problem = draft.currentProblem.problem;
-        problem.name = action.name;
-        problem.url = action.url;
-        if (action.overrides.timeLimitMs)
-          problem.overrides.timeLimitMs.override = action.overrides.timeLimitMs;
-        if (action.overrides.memoryLimitMb)
-          problem.overrides.memoryLimitMb.override = action.overrides.memoryLimitMb;
-        if (action.overrides.compiler && problem.overrides.compiler)
-          problem.overrides.compiler.override = action.overrides.compiler;
-        if (action.overrides.compilerArgs && problem.overrides.compilerArgs)
-          problem.overrides.compilerArgs.override = action.overrides.compilerArgs;
-        if (action.overrides.runner && problem.overrides.runner)
-          problem.overrides.runner.override = action.overrides.runner;
-        if (action.overrides.runnerArgs && problem.overrides.runnerArgs)
-          problem.overrides.runnerArgs.override = action.overrides.runnerArgs;
-        break;
+    if (action.type === 'editProblemDetails') {
+      problem.name = action.name;
+      problem.url = action.url;
+      for (const [key, val] of Object.entries(action.overrides)) {
+        const k = key as keyof IWebviewProblem['overrides'];
+        const overrideObj = problem.overrides[k];
+        if (val !== undefined && overrideObj) overrideObj.override = val;
       }
-      case 'clearTestcaseStatus': {
-        if (draft.currentProblem.type !== 'active') return;
-        if (action.testcaseId)
-          delete draft.currentProblem.problem.testcases[action.testcaseId].result;
-        else
-          for (const testcase of Object.values(draft.currentProblem.problem.testcases))
-            delete testcase.result;
-        break;
-      }
-      case 'setTestcaseString': {
-        if (draft.currentProblem.type !== 'active') return;
-        const testcase = draft.currentProblem.problem.testcases[action.testcaseId];
-        if (action.label === 'stdin') testcase.stdin = { type: 'string', data: action.data };
-        if (action.label === 'answer') testcase.answer = { type: 'string', data: action.data };
-        break;
-      }
-      case 'updateTestcase': {
-        if (draft.currentProblem.type !== 'active') return;
-        const testcase = draft.currentProblem.problem.testcases[action.testcaseId];
-        if (action.event === 'toggleDisable') testcase.isDisabled = !testcase.isDisabled;
-        if (action.event === 'toggleExpand') testcase.isExpand = !testcase.isExpand;
-        if (action.event === 'setAsAnswer' && testcase.result?.stdout)
-          testcase.answer = testcase.result.stdout;
-        break;
-      }
-      case 'deleteTestcase': {
-        if (draft.currentProblem.type !== 'active') return;
-        delete draft.currentProblem.problem.testcases[action.testcaseId];
-        break;
-      }
-      case 'reorderTestcase': {
-        if (draft.currentProblem.type !== 'active') return;
-        const testcaseOrder = draft.currentProblem.problem.testcaseOrder;
-        const [movedTestcase] = testcaseOrder.splice(action.fromIdx, 1);
-        testcaseOrder.splice(action.toIdx, 0, movedTestcase);
-        break;
-      }
+      return;
+    }
+    if (action.type === 'clearTestcaseStatus') {
+      const targets = action.testcaseId
+        ? [problem.testcases[action.testcaseId]]
+        : Object.values(problem.testcases);
+      targets.forEach((testcase) => {
+        if (testcase) delete testcase.result;
+      });
+      return;
+    }
+    if (action.type === 'setTestcaseString') {
+      const testcase = problem.testcases[action.testcaseId];
+      if (testcase) testcase[action.label] = { type: 'string', data: action.data };
+      return;
+    }
+    if (action.type === 'updateTestcase') {
+      const testcase = problem.testcases[action.testcaseId];
+      if (!testcase) return;
+      if (action.event === 'setDisable') testcase.isDisabled = action.value;
+      else if (action.event === 'setExpand') testcase.isExpand = action.value;
+      else if (action.event === 'setAsAnswer' && testcase.result?.stdout)
+        testcase.answer = testcase.result.stdout;
+      return;
+    }
+    if (action.type === 'deleteTestcase') {
+      delete problem.testcases[action.testcaseId];
+      return;
+    }
+    if (action.type === 'reorderTestcase') {
+      const testcaseOrder = problem.testcaseOrder;
+      const [movedTestcase] = testcaseOrder.splice(action.fromIdx, 1);
+      testcaseOrder.splice(action.toIdx, 0, movedTestcase);
+      return;
     }
   });
 };

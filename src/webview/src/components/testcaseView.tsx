@@ -75,7 +75,8 @@ export const TestcaseView = memo(
                     type: 'updateTestcase',
                     problemId,
                     testcaseId,
-                    event: 'toggleDisable',
+                    event: 'setDisable',
+                    value: false,
                   }),
               }
             : {
@@ -84,7 +85,8 @@ export const TestcaseView = memo(
                     type: 'updateTestcase',
                     problemId,
                     testcaseId,
-                    event: 'toggleDisable',
+                    event: 'setDisable',
+                    value: true,
                   }),
                 [t('testcaseView.menu.clearTestcaseStatus')]: () =>
                   dispatch({ type: 'clearTestcaseStatus', problemId, testcaseId }),
@@ -100,7 +102,8 @@ export const TestcaseView = memo(
               type: 'updateTestcase',
               problemId,
               testcaseId,
-              event: 'toggleExpand',
+              event: 'setExpand',
+              value: !isExpand,
             });
           }}
           sx={{
@@ -349,6 +352,7 @@ export const TestcaseView = memo(
                                 problemId,
                                 testcaseId,
                                 event: 'setAsAnswer',
+                                value: true,
                               }),
                             onCompare: () =>
                               dispatch({

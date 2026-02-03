@@ -97,7 +97,8 @@ export class LlmTestcaseEditor extends BaseLlmTool<LlmTestcaseEditorParams> {
 
       if (stdin !== undefined) testcase.stdin = new TestcaseIo({ data: stdin });
       if (answer !== undefined) testcase.answer = new TestcaseIo({ data: answer });
-      if (isDisabled !== undefined && isDisabled !== testcase.isDisabled) testcase.toggleDisable();
+      if (isDisabled !== undefined && isDisabled !== testcase.isDisabled)
+        testcase.isDisabled = isDisabled;
 
       testcase.clearResult();
       await this.repo.persist(bgProblem.problemId);
@@ -110,7 +111,7 @@ export class LlmTestcaseEditor extends BaseLlmTool<LlmTestcaseEditorParams> {
       new TestcaseIo({ data: answer ?? '' }),
       true,
     );
-    if (isDisabled) newTestcase.toggleDisable();
+    if (isDisabled) newTestcase.isDisabled = true;
 
     problem.addTestcase(newTestcaseId, newTestcase);
     await this.repo.persist(bgProblem.problemId);
