@@ -150,6 +150,7 @@ export class Problem {
   public moveTestcase(fromIdx: number, toIdx: number): void {
     const [movedTestcase] = this._testcaseOrder.splice(fromIdx, 1);
     this._testcaseOrder.splice(toIdx, 0, movedTestcase);
+    this.bumpRevision();
   }
   public getEnabledTestcaseIds(): TestcaseId[] {
     const enabledIds: TestcaseId[] = [];

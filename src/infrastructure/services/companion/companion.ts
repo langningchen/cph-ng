@@ -59,11 +59,11 @@ export class Companion implements ICompanion {
     this.abortControllers.delete(batchId);
     this.batchesToClaim.delete(batchId);
   }
-  private async updateStatusbar() {
+  private updateStatusbar = () => {
     this.statusbar.update(this.ws.getStatus(), this.batchesToClaim);
-  }
+  };
 
-  private async handleStatusBarClick() {
+  private handleStatusBarClick = async () => {
     this.logger.debug('Status bar item clicked');
     if (this.ws.getStatus() !== 'ONLINE') return this.ws.spawnRouter();
     if (this.batchesToClaim.size === 0) this.logger.info('No batches to claim');
@@ -84,9 +84,9 @@ export class Companion implements ICompanion {
       );
       if (batchId) this.ws.claimBatch(batchId);
     }
-  }
+  };
 
-  private readingBatch(batchId: BatchId, count: number, size: number) {
+  private readingBatch = (batchId: BatchId, count: number, size: number) => {
     if (!this.readingProgress.get(batchId)) {
       const progress = this.ui.progress(
         this.translator.t('Reading problems from companion...'),
@@ -101,8 +101,12 @@ export class Companion implements ICompanion {
       });
     }
     this.readingProgress.get(batchId)?.(count, size);
-  }
-  private batchAvailable(batchId: BatchId, problems: CompanionProblem[], autoImport: boolean) {
+  };
+  private batchAvailable = (
+    batchId: BatchId,
+    problems: CompanionProblem[],
+    autoImport: boolean,
+  ) => {
     const controller = new AbortController();
     this.abortControllers.set(batchId, controller);
     if (autoImport) {
@@ -115,21 +119,21 @@ export class Companion implements ICompanion {
       });
       this.updateStatusbar();
     }
-  }
-  private batchClaimed(batchId: BatchId) {
+  };
+  private batchClaimed = (batchId: BatchId) => {
     this.logger.info('Batch claimed', { batchId });
     const controller = this.abortControllers.get(batchId);
     if (controller) controller.abort();
     this.updateStatusbar();
-  }
-  private submissionConsumed(submissionId: SubmissionId) {
+  };
+  private submissionConsumed = (submissionId: SubmissionId) => {
     this.logger.info('Submission consumed', { submissionId });
     const controller = this.abortControllers.get(submissionId);
     if (controller) {
       controller.abort();
       this.abortControllers.delete(submissionId);
     }
-  }
+  };
 
   public connect() {
     this.ws.connect();

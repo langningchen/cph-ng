@@ -262,12 +262,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
         checkCompletion();
       };
 
-      const onSafeError = (
-        p: 'p1' | 'p2',
-        otherP: 'p1' | 'p2',
-        _launch: ReturnType<typeof this.internalLaunch>,
-        error: Error,
-      ) => {
+      const onSafeError = (p: 'p1' | 'p2', otherP: 'p1' | 'p2', error: Error) => {
         if (error.name === 'AbortError') return;
         results[p] ||= this.collectError(error);
         if (!results[otherP]) (p === 'p1' ? proc2 : proc1).child.kill();
@@ -277,8 +272,8 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
       // Process Listeners
       proc1.child.on('close', onSafeClose.bind(null, 'p1', proc1));
       proc2.child.on('close', onSafeClose.bind(null, 'p2', proc2));
-      proc1.child.on('error', onSafeError.bind(null, 'p1', 'p2', proc2));
-      proc2.child.on('error', onSafeError.bind(null, 'p2', 'p1', proc1));
+      proc1.child.on('error', onSafeError.bind(null, 'p1', 'p2'));
+      proc2.child.on('error', onSafeError.bind(null, 'p2', 'p1'));
     });
   }
 }

@@ -18,4 +18,5 @@
 export interface IActiveProblemCoordinator {
   dispatchFullData(): Promise<void>;
   onActiveEditorChanged(filePath: string | undefined): Promise<void>;
+  dispose(): void;
 }

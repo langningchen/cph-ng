@@ -38,6 +38,7 @@ import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapp
 export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
   private active: BackgroundProblem | null = null;
   private lastAccessMap: Map<ProblemId, number> = new Map();
+  private monitorInterval: NodeJS.Timeout;
 
   public constructor(
     @inject(TOKENS.cphMigrationService) private readonly cph: ICphMigrationService,
@@ -50,7 +51,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     @inject(WebviewProblemMapper) private readonly mapper: WebviewProblemMapper,
   ) {
     this.logger = this.logger.withScope('activeProblemCoordinator');
-    setInterval(async () => {
+    this.monitorInterval = setInterval(async () => {
       const now = Date.now();
       for (const [problemId, lastAccess] of this.lastAccessMap)
         if (
@@ -151,6 +152,10 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     problem.signals.off('deleteTestcase', this.onDeleteTestcase);
     problem.signals.off('patchTestcase', this.onPatchTestcase);
     problem.signals.off('patchTestcaseResult', this.onPatchTestcaseResult);
+  }
+
+  public dispose() {
+    clearInterval(this.monitorInterval);
   }
 
   public async onActiveEditorChanged(filePath: string | undefined) {

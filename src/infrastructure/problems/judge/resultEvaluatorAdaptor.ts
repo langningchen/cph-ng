@@ -66,6 +66,8 @@ export class ResultEvaluatorAdaptor implements IResultEvaluator {
     if (res.isUserAborted) return { ...executionStats, verdict: VerdictName.rejected };
     if (res.timeMs > req.timeLimitMs)
       return { ...executionStats, verdict: VerdictName.timeLimitExceed };
+    if (res.memoryMb && req.memoryLimitMb && res.memoryMb > req.memoryLimitMb)
+      return { ...executionStats, verdict: VerdictName.memoryLimitExceed };
     if (res.codeOrSignal)
       return {
         ...executionStats,

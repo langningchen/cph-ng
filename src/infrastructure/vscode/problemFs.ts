@@ -36,7 +36,7 @@ import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseI
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import { TOKENS } from '@/composition/tokens';
-import { Testcase, type TestcaseResult } from '@/domain/entities/testcase';
+import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
 import type { TestcaseIo } from '@/domain/entities/testcaseIo';
 import type { TestcaseId } from '@/domain/types';
 import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
@@ -113,13 +113,10 @@ export class ProblemFs implements IProblemFs {
       (srcPath: string, testcaseId: TestcaseId, payload: Partial<Testcase | TestcaseResult>) => {
         const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
         const changedFiles = [];
-        if (payload instanceof Testcase) {
-          if (payload.stdin) changedFiles.push('stdin');
-          if (payload.answer) changedFiles.push('answer');
-        } else {
-          if (payload.stdout) changedFiles.push('stdout');
-          if (payload.stderr) changedFiles.push('stderr');
-        }
+        if ('stdin' in payload && payload.stdin) changedFiles.push('stdin');
+        if ('answer' in payload && payload.answer) changedFiles.push('answer');
+        if ('stdout' in payload && payload.stdout) changedFiles.push('stdout');
+        if ('stderr' in payload && payload.stderr) changedFiles.push('stderr');
         this.changeEmitter.fire([
           { uri: Uri.joinPath(baseUri, 'problem.cph-ng.json'), type: FileChangeType.Changed },
           ...changedFiles.map((type) => ({

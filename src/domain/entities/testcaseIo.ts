@@ -23,7 +23,7 @@ export class TestcaseIo {
 
   public constructor(o: ITestcaseIo) {
     if ('path' in o) {
-      this.path = o.path.toLowerCase();
+      this.path = o.path;
       this.data = undefined;
     } else {
       this.data = o.data;

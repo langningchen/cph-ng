@@ -44,6 +44,10 @@ export class EditorWatcherModule implements IExtensionModule {
     await this.handleEditorChange(window.activeTextEditor);
   }
 
+  public dispose() {
+    this.coordinator.dispose();
+  }
+
   private async handleEditorChange(editor: TextEditor | undefined) {
     let path: string | undefined;
     if (editor && editor.document.uri.scheme === 'file') path = editor.document.uri.fsPath;
