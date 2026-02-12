@@ -83,26 +83,19 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
 
 @injectable()
 export class WebviewProtocolHandler {
-  public constructor(
-    @inject(TOKENS.logger) private readonly logger: ILogger,
-    @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
-  ) {
+  public constructor(@inject(TOKENS.logger) private readonly logger: ILogger) {
     this.logger = this.logger.withScope('webviewProtocolHandler');
   }
 
   public async handle(msg: WebviewMsg): Promise<void> {
     this.logger.info('Received webview message', msg.type);
     this.logger.trace('Received webview message', { msg });
-    const stopTrace = this.telemetry.start('webviewMessage', { type: msg.type });
-
     try {
       const useCaseToken = UseCaseRegistry[msg.type];
       const useCase = container.resolve<IMsgHandle<WebviewMsg>>(useCaseToken);
       await useCase.exec(msg);
     } catch (e) {
       this.logger.error(`Handle message ${msg.type} failed`, e);
-    } finally {
-      stopTrace();
     }
   }
 }

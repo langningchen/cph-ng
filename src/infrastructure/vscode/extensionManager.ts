@@ -39,9 +39,11 @@ export class ExtensionManager {
     try {
       for (const module of this.modules) await module.setup(context);
       this.logger.info('CPH-NG activated successfully');
-      stopTrace();
     } catch (e) {
       this.logger.error('Activation failed', e);
+      this.telemetry.error('activationError', e);
+    } finally {
+      stopTrace();
     }
   }
 
