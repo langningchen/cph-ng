@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Except } from 'type-fest';
 import type {
   MessageOptions,
   OpenDialogOptions,
@@ -24,16 +25,16 @@ import type {
   Uri,
 } from 'vscode';
 
-export type CustomOpenDialogOptions = Omit<OpenDialogOptions, 'defaultUri'> & {
+export type CustomOpenDialogOptions = Except<OpenDialogOptions, 'defaultUri'> & {
   defaultPath?: string;
 };
 
-export type CustomSaveDialogOptions = Omit<SaveDialogOptions, 'defaultUri'> & {
+export type CustomSaveDialogOptions = Except<SaveDialogOptions, 'defaultUri'> & {
   defaultPath?: string;
 };
 
-export type CustomQuickPickItem<T> = Omit<QuickPickItem, 'iconPath' | 'buttons'> & { value: T };
-export type CustomQuickPickOptions = Omit<QuickPickOptions, 'canPickMany'>;
+export type CustomQuickPickItem<T> = Except<QuickPickItem, 'iconPath' | 'buttons'> & { value: T };
+export type CustomQuickPickOptions = Except<QuickPickOptions, 'canPickMany'>;
 
 export type AlertLevel = 'error' | 'warn' | 'info';
 export type AlertArgs = [...items: string[]] | [options: MessageOptions, ...items: string[]];

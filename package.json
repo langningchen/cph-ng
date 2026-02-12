@@ -802,6 +802,7 @@
     "@types/semver": "^7.7.1",
     "@types/source-map-support": "^0.5.10",
     "@types/vscode": "1.95.0",
+    "@types/ws": "^8.18.1",
     "@vitest/coverage-v8": "4.0.18",
     "@vitest/ui": "^4.0.18",
     "@vscode/vsce": "^3.7.1",
@@ -849,6 +850,7 @@
     "source-map-support": "^0.5.21",
     "stacktrace-js": "^2.0.2",
     "tsyringe": "^4.10.0",
+    "type-fest": "^5.4.4",
     "typed-emitter": "^2.1.0",
     "yargs-parser": "^22.0.0"
   },

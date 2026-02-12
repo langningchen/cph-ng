@@ -47,7 +47,7 @@ import { ProblemService } from '@/infrastructure/problems/problemService';
 import { TestcaseIoService } from '@/infrastructure/problems/testcaseIoService';
 import { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
 import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
-import { Companion } from '@/infrastructure/services/companion';
+import { Companion } from '@/infrastructure/services/companion/companion';
 import { PathResolverAdapter } from '@/infrastructure/services/pathResolverAdapter';
 import { ActivePathService } from '@/infrastructure/vscode/activePathService';
 import { DocumentAdapter } from '@/infrastructure/vscode/documentAdapter';
