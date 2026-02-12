@@ -797,7 +797,7 @@
     "@types/adm-zip": "^0.5.7",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "~22.19.7",
-    "@types/react": "^19.2.13",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/semver": "^7.7.1",
     "@types/source-map-support": "^0.5.10",
@@ -815,7 +815,7 @@
     "typescript": "^5.9.3",
     "vitest": "^4.0.18",
     "vitest-mock-extended": "^3.1.0",
-    "webpack": "^5.105.0",
+    "webpack": "^5.105.1",
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
@@ -834,7 +834,7 @@
     "copy-webpack-plugin": "^13.0.1",
     "crypto-js": "^4.2.0",
     "hono": "^4.11.9",
-    "i18next": "^25.8.4",
+    "i18next": "^25.8.5",
     "immer": "^11.1.4",
     "memfs": "^4.56.10",
     "natural-orderby": "^5.0.0",
