@@ -19,13 +19,13 @@ import { inject, injectable } from 'tsyringe';
 import { type ExtensionContext, extensions } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { ICompanion } from '@/application/ports/services/ICompanion';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
-import Companion from '@/legacy/companion';
 
 @injectable()
 export class EnvironmentModule implements IExtensionModule {
@@ -37,6 +37,7 @@ export class EnvironmentModule implements IExtensionModule {
     @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
     @inject(TOKENS.ui) private readonly ui: IUi,
+    @inject(TOKENS.companion) private readonly companion: ICompanion,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
   ) {}
 
@@ -47,7 +48,7 @@ export class EnvironmentModule implements IExtensionModule {
     }
 
     await this.tmp.startMonitor();
-    Companion.init();
+    this.companion.connect();
 
     let lastAlertTime = 0;
     this.timer = setInterval(async () => {
@@ -72,6 +73,6 @@ export class EnvironmentModule implements IExtensionModule {
 
   public dispose() {
     if (this.timer) clearInterval(this.timer);
-    Companion.stopServer();
+    this.companion.disconnect();
   }
 }

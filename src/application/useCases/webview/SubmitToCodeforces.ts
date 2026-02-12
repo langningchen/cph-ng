@@ -17,16 +17,17 @@
 
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { ICompanion } from '@/application/ports/services/ICompanion';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import Companion from '@/legacy/companion';
 import type { SubmitToCodeforcesMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class SubmitToCodeforces extends BaseProblemUseCase<SubmitToCodeforcesMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.companion) protected readonly companion: ICompanion,
   ) {
     super(repo);
   }
@@ -35,6 +36,6 @@ export class SubmitToCodeforces extends BaseProblemUseCase<SubmitToCodeforcesMsg
     { problem }: BackgroundProblem,
     _msg: SubmitToCodeforcesMsg,
   ): Promise<void> {
-    await Companion.submit(problem);
+    await this.companion.submit(problem);
   }
 }

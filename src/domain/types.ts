@@ -20,9 +20,12 @@ import type { StressTestState } from '@/domain/entities/stressTest';
 import type { VerdictName } from '@/domain/entities/verdict';
 
 declare const BrandSym: unique symbol;
-type Branded<T, Label> = T & { [BrandSym]: Label };
+type Branded<T, Label> = T & { [BrandSym]?: Label };
 export type ProblemId = Branded<UUID, 'ProblemId'>;
 export type TestcaseId = Branded<UUID, 'TestcaseId'>;
+export type ClientId = Branded<UUID, 'ClientId'>;
+export type SubmissionId = Branded<UUID, 'SubmissionId'>;
+export type BatchId = Branded<UUID, 'BatchId'>;
 
 export type WithRevision<T> = T & { revision: number };
 

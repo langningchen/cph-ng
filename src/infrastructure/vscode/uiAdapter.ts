@@ -19,8 +19,12 @@ import { inject, injectable } from 'tsyringe';
 import {
   commands,
   FileType,
+  MarkdownString,
   type OpenDialogOptions,
+  ProgressLocation,
   type SaveDialogOptions,
+  StatusBarAlignment,
+  ThemeColor,
   Uri,
   window,
   workspace,
@@ -37,6 +41,8 @@ import type {
   CustomQuickPickOptions,
   CustomSaveDialogOptions,
   IUi,
+  ProgressController,
+  StatusBarController,
 } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
 
@@ -214,5 +220,66 @@ export class UiAdapter implements IUi {
     const editor = window.activeTextEditor;
     commands.executeCommand('workbench.view.extension.cphNgContainer');
     if (editor) window.showTextDocument(editor.document);
+  }
+
+  public progress(title: string, onCancel?: () => void): ProgressController {
+    this.logger.trace('Showing progress', { title });
+    let report: (value: { message?: string; increment?: number }) => void = () => {};
+    let done: () => void;
+    const donePromise = new Promise<void>((resolve) => {
+      done = resolve;
+    });
+    window.withProgress(
+      { location: ProgressLocation.Notification, title, cancellable: !!onCancel },
+      async (progress, token) => {
+        report = progress.report.bind(progress);
+        token.onCancellationRequested(() => {
+          this.logger.debug('Progress cancelled');
+          onCancel?.();
+          done();
+        });
+        await donePromise;
+      },
+    );
+    return {
+      report: (value) => report(value),
+      done: () => {
+        done();
+      },
+    };
+  }
+
+  public showStatusbar(id: string, onClick: () => void): StatusBarController {
+    this.logger.trace('Showing status bar', { id });
+    const statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
+    const commandId = `cphNg.statusBar.${id}`;
+    const disposable = commands.registerCommand(commandId, onClick);
+    statusBarItem.command = commandId;
+    statusBarItem.show();
+    return {
+      update: (text, tooltip, color) => {
+        this.logger.debug('Updating status bar', { text, tooltip, color });
+        statusBarItem.text = text;
+        statusBarItem.tooltip = new MarkdownString(tooltip);
+        statusBarItem.backgroundColor = {
+          error: new ThemeColor('statusBarItem.errorBackground'),
+          warn: new ThemeColor('statusBarItem.warningBackground'),
+          normal: undefined,
+        }[color];
+      },
+      show: () => {
+        this.logger.trace('Showing status bar item');
+        statusBarItem.show();
+      },
+      hide: () => {
+        this.logger.trace('Hiding status bar item');
+        statusBarItem.hide();
+      },
+      dispose: () => {
+        this.logger.trace('Hiding status bar');
+        statusBarItem.dispose();
+        disposable.dispose();
+      },
+    };
   }
 }

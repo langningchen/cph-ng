@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { EventEmitter } from 'node:stream';
+import { EventEmitter } from 'node:events';
 import type { IFileWithHash } from '@/domain/types';
 
 export const StressTestState = {

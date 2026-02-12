@@ -22,11 +22,14 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class WebviewHtmlRenderer {
-  public constructor(@inject(TOKENS.settings) private readonly settings: ISettings) {}
+  public constructor(
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.extensionPath) private readonly extPath: string,
+  ) {}
 
-  public render(webview: Webview, extensionPath: string): string {
+  public render(webview: Webview): string {
     const getUri = (filename: string) =>
-      webview.asWebviewUri(Uri.joinPath(Uri.file(extensionPath), filename));
+      webview.asWebviewUri(Uri.joinPath(Uri.file(this.extPath), filename));
 
     let isDarkMode = window.activeColorTheme.kind === ColorThemeKind.Dark;
     const themePref = this.settings.sidebar.colorTheme;

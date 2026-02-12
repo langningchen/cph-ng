@@ -25,6 +25,7 @@ import CopyPlugin from 'copy-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import type { Compiler, Configuration } from 'webpack';
+import webpack from 'webpack';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -232,5 +233,33 @@ export default (_env: Record<string, unknown>, argv: Record<string, unknown>): C
     },
   };
 
-  return [extensionConfig, webviewConfig];
+  const routerConfig: Configuration = {
+    ...baseConfig,
+    target: 'node20',
+    entry: './src/router/index.ts',
+    output: {
+      path: resolve(__dirname, 'dist'),
+      filename: 'router.cjs',
+      chunkFormat: 'module',
+    },
+    cache: {
+      type: 'filesystem',
+      buildDependencies: { config: [__filename] },
+      name: isProd ? 'prod-router' : 'dev-router',
+    },
+    externalsPresets: { node: true },
+    externals: [
+      {
+        bufferutil: false,
+        'utf-8-validate': false,
+      },
+    ],
+    plugins: [
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^(bufferutil|utf-8-validate)$/,
+      }),
+    ],
+  };
+
+  return [extensionConfig, webviewConfig, routerConfig];
 };

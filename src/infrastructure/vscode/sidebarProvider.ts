@@ -76,7 +76,6 @@ export class SidebarProvider implements WebviewViewProvider {
   }
 
   public refresh() {
-    if (this._view)
-      this._view.webview.html = this.htmlRenderer.render(this._view.webview, this.extPath);
+    if (this._view) this._view.webview.html = this.htmlRenderer.render(this._view.webview);
   }
 }

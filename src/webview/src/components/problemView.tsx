@@ -66,7 +66,6 @@ export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewP
           scrollbarWidth: 'thin',
           scrollbarGutter: 'stable',
         }}
-        bgcolor='rgba(127, 127, 127, 0.05)'
         paddingY={2}
       >
         <ErrorBoundary>

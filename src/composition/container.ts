@@ -47,6 +47,7 @@ import { ProblemService } from '@/infrastructure/problems/problemService';
 import { TestcaseIoService } from '@/infrastructure/problems/testcaseIoService';
 import { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
 import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
+import { Companion } from '@/infrastructure/services/companion';
 import { PathResolverAdapter } from '@/infrastructure/services/pathResolverAdapter';
 import { ActivePathService } from '@/infrastructure/vscode/activePathService';
 import { DocumentAdapter } from '@/infrastructure/vscode/documentAdapter';
@@ -76,6 +77,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.buildInfo, BuildInfoAdapter);
   container.registerSingleton(TOKENS.checkerRunner, CheckerRunnerAdapter);
   container.registerSingleton(TOKENS.clock, ClockAdapter);
+  container.registerSingleton(TOKENS.companion, Companion);
   container.registerSingleton(TOKENS.compilerService, CompilerService);
   container.registerSingleton(TOKENS.cphMigrationService, CphMigrationService);
   container.registerSingleton(TOKENS.crypto, CryptoAdapter);

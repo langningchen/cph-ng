@@ -12,6 +12,7 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
       '@t': resolve(__dirname, 'tests'),
       '@w': resolve(__dirname, 'src/webview/src'),
+      '@r': resolve(__dirname, 'src/router'),
     },
     coverage: {
       provider: 'v8',

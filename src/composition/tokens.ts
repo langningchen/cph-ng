@@ -42,6 +42,7 @@ import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/
 import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { IArchive } from '@/application/ports/services/IArchive';
+import type { ICompanion } from '@/application/ports/services/ICompanion';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
@@ -100,6 +101,7 @@ export const TOKENS = {
   tempStorage: 'ports.TempStorage' as InjectionToken<ITempStorage>,
   translator: 'ports.Translator' as InjectionToken<ITranslator>,
   ui: 'ports.Ui' as InjectionToken<IUi>,
+  companion: 'ports.companion' as InjectionToken<ICompanion>,
   webviewEventBus: 'ports.WebviewEventBus' as InjectionToken<IWebviewEventBus>,
   problemMigrationService:
     'ports.ProblemMigrationService' as InjectionToken<IProblemMigrationService>,

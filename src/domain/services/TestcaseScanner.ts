@@ -90,7 +90,7 @@ export class TestcaseScanner {
     const allFiles = await this.fs.walk(folderPath);
     const pairs = this.matcher.matchPairs(allFiles);
     if (pairs.length === 0) {
-      this.ui.alert('warn', this.translator.t('No test cases found.'));
+      this.ui.alert('warn', this.translator.t('No test cases found'));
       return [];
     }
 

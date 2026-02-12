@@ -19,6 +19,9 @@
       ],
       "@w/*": [
         "./src/webview/src/*"
+      ],
+      "@r/*": [
+        "./src/router/*"
       ]
     },
     "sourceMap": true,

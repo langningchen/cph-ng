@@ -38,6 +38,18 @@ export type CustomQuickPickOptions = Omit<QuickPickOptions, 'canPickMany'>;
 export type AlertLevel = 'error' | 'warn' | 'info';
 export type AlertArgs = [...items: string[]] | [options: MessageOptions, ...items: string[]];
 
+export interface ProgressController {
+  report: (data: { message?: string; increment?: number }) => void;
+  done: () => void;
+}
+
+export interface StatusBarController {
+  update(text: string, tooltip: string, color: 'normal' | 'warn' | 'error'): void;
+  show(): void;
+  hide(): void;
+  dispose(): void;
+}
+
 export interface IUi {
   openDialog(options: CustomOpenDialogOptions): Promise<string | undefined>;
   saveDialog(options: CustomSaveDialogOptions): Promise<string | undefined>;
@@ -54,4 +66,6 @@ export interface IUi {
   openSettings(item: string): void;
   compareFiles(left: Uri, right: Uri): void;
   showSidebar(): void;
+  progress(title: string, onCancel?: () => void): ProgressController;
+  showStatusbar(id: string, onClick: () => void): StatusBarController;
 }

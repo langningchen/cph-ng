@@ -15,18 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-// biome-ignore-all lint: TO-DO
-
 import type { Problem } from '@/domain/entities/problem';
 
-export default class Companion {
-  public static init() {
-    // TO-DO
-  }
-  public static stopServer() {
-    // TO-DO
-  }
-  public static async submit(_problem?: Problem) {
-    // TO-DO
-  }
+export interface ICompanion {
+  connect(): void;
+  disconnect(): void;
+  submit(problem: Problem): Promise<void>;
 }
