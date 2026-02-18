@@ -174,6 +174,12 @@ export default (_env: Record<string, unknown>, argv: Record<string, unknown>): C
       maxEntrypointSize: 2 * 1024 * 1024,
       maxAssetSize: 2 * 1024 * 1024,
     },
+    ignoreWarnings: [
+      {
+        module: /node_modules\/hono\/dist\/utils\/color\.js/,
+        message: /Critical dependency: the request of a dependency is an expression/,
+      },
+    ],
   };
 
   const extensionConfig: Configuration = {
