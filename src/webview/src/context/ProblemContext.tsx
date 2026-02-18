@@ -19,9 +19,9 @@ import { produce } from 'immer';
 import React, {
   createContext,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
-  useMemo,
   useReducer,
 } from 'react';
 import type { WebviewEvent } from '@/application/ports/vscode/IWebviewEventBus';
@@ -51,12 +51,8 @@ type State = {
   backgroundProblems: IWebviewBackgroundProblem[];
 };
 
-interface ProblemContextType {
-  state: State;
-  dispatch: (msg: WebviewMsg) => void;
-}
-
-const ProblemContext = createContext<ProblemContextType | undefined>(undefined);
+const StateContext = createContext<State | undefined>(undefined);
+const DispatchContext = createContext<((msg: WebviewMsg) => void) | undefined>(undefined);
 
 const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State => {
   return produce(state, (draft) => {
@@ -191,22 +187,26 @@ export const ProblemProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  const value = useMemo(
-    () => ({
-      state,
-      dispatch: (msg: WebviewMsg) => {
-        reactDispatch(msg);
-        vscode.postMessage(msg);
-      },
-    }),
-    [state],
-  );
+  const dispatch = useCallback((msg: WebviewMsg) => {
+    reactDispatch(msg);
+    vscode.postMessage(msg);
+  }, []);
 
-  return <ProblemContext.Provider value={value}>{children}</ProblemContext.Provider>;
+  return (
+    <DispatchContext.Provider value={dispatch}>
+      <StateContext.Provider value={state}>{children}</StateContext.Provider>
+    </DispatchContext.Provider>
+  );
 };
 
-export const useProblemContext = () => {
-  const context = useContext(ProblemContext);
-  if (!context) throw new Error('useProblemContext must be used within a ProblemProvider');
-  return context;
+export const useProblemState = () => {
+  const state = useContext(StateContext);
+  if (!state) throw new Error('useProblemState must be used within a ProblemProvider');
+  return state;
+};
+
+export const useProblemDispatch = () => {
+  const dispatch = useContext(DispatchContext);
+  if (!dispatch) throw new Error('useProblemDispatch must be used within a ProblemProvider');
+  return dispatch;
 };

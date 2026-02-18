@@ -29,7 +29,7 @@ import { CreateProblemView } from './components/createProblemView';
 import { DragOverlay } from './components/dragOverlay';
 import { InitView } from './components/initView';
 import { ProblemView } from './components/problemView';
-import { ProblemProvider, useProblemContext } from './context/ProblemContext';
+import { ProblemProvider, useProblemState } from './context/ProblemContext';
 import langEn from './l10n/en.json';
 import langZh from './l10n/zh.json';
 
@@ -43,7 +43,7 @@ i18n.use(initReactI18next).init({
 });
 
 const Main = () => {
-  const { state } = useProblemContext();
+  const state = useProblemState();
   const { t } = useTranslation();
   const theme = useTheme();
   const isNarrow = useMediaQuery(theme.breakpoints.down('xl'));

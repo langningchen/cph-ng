@@ -25,12 +25,12 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useProblemContext } from '../context/ProblemContext';
+import { useProblemDispatch } from '../context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 
 export const DragOverlay = () => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
+  const dispatch = useProblemDispatch();
   const [dragData, setDragData] = useState<string[] | null | undefined>(null);
 
   useEffect(() => {

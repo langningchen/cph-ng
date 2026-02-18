@@ -21,7 +21,7 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useProblemContext } from '@/webview/src/context/ProblemContext';
+import { useProblemDispatch } from '@/webview/src/context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { Tips } from './tips';
 
@@ -31,7 +31,7 @@ interface CreateProblemProps {
 
 export const CreateProblemView = ({ canImport }: CreateProblemProps) => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
+  const dispatch = useProblemDispatch();
   return (
     <CphFlex column gap={5} paddingY={2}>
       <CphFlex column>

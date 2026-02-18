@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { VerdictType } from '@/domain/entities/verdict';
 import type { ProblemId } from '@/domain/types';
 import type { IWebviewProblem } from '@/domain/webviewTypes';
-import { useProblemContext } from '../context/ProblemContext';
+import { useProblemDispatch } from '../context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { CphMenu } from './base/cphMenu';
 import { ErrorBoundary } from './base/errorBoundary';
@@ -37,7 +37,7 @@ interface ProblemViewProps {
 
 export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewProps) => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
+  const dispatch = useProblemDispatch();
   const hasRunning = useMemo(() => {
     for (const [_, testcase] of Object.entries(problem.testcases))
       if (testcase.result?.verdict.type === VerdictType.running) return true;

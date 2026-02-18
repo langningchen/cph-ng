@@ -23,7 +23,7 @@ import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useProblemContext } from '@/webview/src/context/ProblemContext';
+import { useProblemDispatch } from '@/webview/src/context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { CphText } from './base/cphText';
 import { CphButton } from './cphButton';
@@ -35,7 +35,7 @@ type TipMessage = {
 
 export const Tips = () => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
+  const dispatch = useProblemDispatch();
   const tipMessages: TipMessage[] = [
     { msg: t('tipMessage1') },
     { msg: t('tipMessage2') },

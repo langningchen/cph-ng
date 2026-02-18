@@ -24,11 +24,11 @@ import DoneIcon from '@mui/icons-material/Done';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import Box from '@mui/material/Box';
 import { type AnserJsonEntry, ansiToJson } from 'anser';
-import React, { type CSSProperties, useEffect, useRef, useState } from 'react';
+import React, { type CSSProperties, memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
 import type { IWebviewTestcaseIo } from '@/domain/webviewTypes';
-import { useProblemContext } from '@/webview/src/context/ProblemContext';
+import { useProblemDispatch } from '@/webview/src/context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { CphLink } from './base/cphLink';
 import { CphButton } from './cphButton';
@@ -95,170 +95,172 @@ const ansiToReact = (ansi: string) => {
   );
 };
 
-export const TestcaseDataView = ({
-  label,
-  value,
-  onChange,
-  onChooseFile,
-  onToggleFile,
-  onOpenVirtual,
-  outputActions,
-  readOnly,
-  autoFocus,
-  tabIndex,
-}: CodeMirrorSectionProps) => {
-  const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
-  const [copied, setCopied] = useState(false);
-  const [internalValue, setInternalValue] = useState(value);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+export const TestcaseDataView = memo(
+  ({
+    label,
+    value,
+    onChange,
+    onChooseFile,
+    onToggleFile,
+    onOpenVirtual,
+    outputActions,
+    readOnly,
+    autoFocus,
+    tabIndex,
+  }: CodeMirrorSectionProps) => {
+    const { t } = useTranslation();
+    const dispatch = useProblemDispatch();
+    const [copied, setCopied] = useState(false);
+    const [internalValue, setInternalValue] = useState(value);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    setInternalValue(value);
-  }, [value]);
+    useEffect(() => {
+      setInternalValue(value);
+    }, [value]);
 
-  useEffect(() => {
-    if (autoFocus && textareaRef.current) textareaRef.current.focus();
-  }, [autoFocus]);
+    useEffect(() => {
+      if (autoFocus && textareaRef.current) textareaRef.current.focus();
+    }, [autoFocus]);
 
-  const commonStyle: CSSProperties = {
-    fontFamily: 'var(--vscode-editor-font-family)',
-    fontWeight: 'var(--vscode-editor-font-weight)',
-    width: '100%',
-    overflow: 'auto',
-    scrollbarWidth: 'thin',
-    scrollbarColor: 'rgba(127, 127, 127, 0.5) transparent',
-    color: 'unset',
-    backgroundColor: 'rgba(127, 127, 127, 0.1)',
-    border: 'solid 2px rgba(127, 127, 127, 0.2)',
-    borderRadius: '4px',
-    padding: '4px',
-    boxSizing: 'border-box',
-    whiteSpace: 'pre',
-    outline: 'none',
-  };
+    const commonStyle: CSSProperties = {
+      fontFamily: 'var(--vscode-editor-font-family)',
+      fontWeight: 'var(--vscode-editor-font-weight)',
+      width: '100%',
+      overflow: 'auto',
+      scrollbarWidth: 'thin',
+      scrollbarColor: 'rgba(127, 127, 127, 0.5) transparent',
+      color: 'unset',
+      backgroundColor: 'rgba(127, 127, 127, 0.1)',
+      border: 'solid 2px rgba(127, 127, 127, 0.2)',
+      borderRadius: '4px',
+      padding: '4px',
+      boxSizing: 'border-box',
+      whiteSpace: 'pre',
+      outline: 'none',
+    };
 
-  if (value.type === 'string' && !value.data && readOnly) return null;
-  return (
-    <CphFlex column smallGap>
-      <CphFlex justifyContent='space-between'>
-        <CphFlex flex={1} flexWrap='wrap'>
-          <CphLink
-            color='inherit'
-            name={t('testcaseDataView.openVirtual')}
-            onClick={onOpenVirtual}
-            fontSize='larger'
-          >
-            {label}
-          </CphLink>
-          {internalValue.type === 'file' && !readOnly && (
+    if (value.type === 'string' && !value.data && readOnly) return null;
+    return (
+      <CphFlex column smallGap>
+        <CphFlex justifyContent='space-between'>
+          <CphFlex flex={1} flexWrap='wrap'>
             <CphLink
-              name={internalValue.path}
-              onClick={() => {
-                dispatch({
-                  type: 'openFile',
-                  path: internalValue.path,
-                });
-              }}
+              color='inherit'
+              name={t('testcaseDataView.openVirtual')}
+              onClick={onOpenVirtual}
+              fontSize='larger'
             >
-              {internalValue.base}
+              {label}
             </CphLink>
-          )}
-        </CphFlex>
-        <Box sx={{ display: { xs: 'none', md: 'contents' } }}>
-          {!!outputActions && (
-            <CphButton
-              name={t('testcaseDataView.compare')}
-              icon={DifferenceIcon}
-              onClick={outputActions.onCompare}
-            />
-          )}
-          {!!onToggleFile && (
-            <CphButton
-              name={t('testcaseDataView.toggleFile')}
-              icon={ChangeCircleIcon}
-              onClick={onToggleFile}
-            />
-          )}
-        </Box>
-        {internalValue.type === 'file' ? (
-          readOnly || (
-            <CphButton
-              name={t('testcaseDataView.clearFile')}
-              icon={ClearIcon}
-              onClick={() => {
-                if (onChange) onChange('');
-              }}
-            />
-          )
-        ) : (
-          <>
-            {readOnly || (
-              <Box sx={{ display: { xs: 'none', md: 'contents' } }}>
-                <CphButton
-                  name={t('testcaseDataView.loadFile')}
-                  icon={FileOpenIcon}
-                  onClick={onChooseFile}
-                />
-              </Box>
+            {internalValue.type === 'file' && !readOnly && (
+              <CphLink
+                name={internalValue.path}
+                onClick={() => {
+                  dispatch({
+                    type: 'openFile',
+                    path: internalValue.path,
+                  });
+                }}
+              >
+                {internalValue.base}
+              </CphLink>
             )}
+          </CphFlex>
+          <Box sx={{ display: { xs: 'none', md: 'contents' } }}>
             {!!outputActions && (
               <CphButton
-                name={t('testcaseDataView.setAnswer')}
-                icon={ArrowUpwardIcon}
-                onClick={outputActions.onSetAnswer}
+                name={t('testcaseDataView.compare')}
+                icon={DifferenceIcon}
+                onClick={outputActions.onCompare}
               />
             )}
-            <CphButton
-              name={copied ? t('testcaseDataView.copied') : t('testcaseDataView.copy')}
-              icon={copied ? DoneIcon : ContentCopyIcon}
-              onClick={() => {
-                navigator.clipboard
-                  .writeText(internalValue.data)
-                  .then(() => {
-                    setCopied(true);
-                    setTimeout(() => {
-                      setCopied(false);
-                    }, 2000);
-                  })
-                  .catch((e) => {
-                    console.error('Failed to copy code: ', e);
-                  });
+            {!!onToggleFile && (
+              <CphButton
+                name={t('testcaseDataView.toggleFile')}
+                icon={ChangeCircleIcon}
+                onClick={onToggleFile}
+              />
+            )}
+          </Box>
+          {internalValue.type === 'file' ? (
+            readOnly || (
+              <CphButton
+                name={t('testcaseDataView.clearFile')}
+                icon={ClearIcon}
+                onClick={() => {
+                  if (onChange) onChange('');
+                }}
+              />
+            )
+          ) : (
+            <>
+              {readOnly || (
+                <Box sx={{ display: { xs: 'none', md: 'contents' } }}>
+                  <CphButton
+                    name={t('testcaseDataView.loadFile')}
+                    icon={FileOpenIcon}
+                    onClick={onChooseFile}
+                  />
+                </Box>
+              )}
+              {!!outputActions && (
+                <CphButton
+                  name={t('testcaseDataView.setAnswer')}
+                  icon={ArrowUpwardIcon}
+                  onClick={outputActions.onSetAnswer}
+                />
+              )}
+              <CphButton
+                name={copied ? t('testcaseDataView.copied') : t('testcaseDataView.copy')}
+                icon={copied ? DoneIcon : ContentCopyIcon}
+                onClick={() => {
+                  navigator.clipboard
+                    .writeText(internalValue.data)
+                    .then(() => {
+                      setCopied(true);
+                      setTimeout(() => {
+                        setCopied(false);
+                      }, 2000);
+                    })
+                    .catch((e) => {
+                      console.error('Failed to copy code: ', e);
+                    });
+                }}
+              />
+            </>
+          )}
+        </CphFlex>
+        {internalValue.type === 'string' &&
+          (readOnly ? (
+            <div
+              style={{
+                ...commonStyle,
+                maxHeight: '20em',
+              }}
+            >
+              {ansiToReact(internalValue.data)}
+            </div>
+          ) : (
+            <TextareaAutosize
+              ref={textareaRef}
+              value={internalValue.data}
+              onChange={(e) => {
+                if (onChange) onChange(e.target.value);
+                setInternalValue({
+                  type: 'string',
+                  data: e.target.value,
+                });
+              }}
+              tabIndex={tabIndex}
+              maxRows={10}
+              style={{
+                ...commonStyle,
+                height: undefined,
+                resize: 'none',
               }}
             />
-          </>
-        )}
+          ))}
       </CphFlex>
-      {internalValue.type === 'string' &&
-        (readOnly ? (
-          <div
-            style={{
-              ...commonStyle,
-              maxHeight: '20em',
-            }}
-          >
-            {ansiToReact(internalValue.data)}
-          </div>
-        ) : (
-          <TextareaAutosize
-            ref={textareaRef}
-            value={internalValue.data}
-            onChange={(e) => {
-              if (onChange) onChange(e.target.value);
-              setInternalValue({
-                type: 'string',
-                data: e.target.value,
-              });
-            }}
-            tabIndex={tabIndex}
-            maxRows={10}
-            style={{
-              ...commonStyle,
-              height: undefined,
-              resize: 'none',
-            }}
-          />
-        ))}
-    </CphFlex>
-  );
-};
+    );
+  },
+);

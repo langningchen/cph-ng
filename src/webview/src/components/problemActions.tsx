@@ -37,7 +37,7 @@ import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ProblemId } from '@/domain/types';
 import type { IWebviewStressTest } from '@/domain/webviewTypes';
-import { useProblemContext } from '../context/ProblemContext';
+import { useProblemDispatch } from '../context/ProblemContext';
 import { getCompile } from '../utils';
 import { CphFlex } from './base/cphFlex';
 import { CphLink } from './base/cphLink';
@@ -54,7 +54,7 @@ interface ProblemActionsProps {
 export const ProblemActions = memo(
   ({ problemId, url, stressTest, hasRunning }: ProblemActionsProps) => {
     const { t } = useTranslation();
-    const { dispatch } = useProblemContext();
+    const dispatch = useProblemDispatch();
     const [clickTime, setClickTime] = useState<number[]>([]);
     const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [isStressTestDialogOpen, setStressTestDialogOpen] = useState(false);

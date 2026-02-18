@@ -16,12 +16,12 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import Box from '@mui/material/Box';
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictName } from '@/domain/entities/verdict';
 import type { ProblemId, TestcaseId } from '@/domain/types';
 import type { IWebviewTestcase } from '@/domain/webviewTypes';
-import { useProblemContext } from '../context/ProblemContext';
+import { useProblemDispatch } from '../context/ProblemContext';
 import { AcCongrats } from './acCongrats';
 import { CphFlex } from './base/cphFlex';
 import { ErrorBoundary } from './base/errorBoundary';
@@ -36,9 +36,11 @@ interface TestcasesViewProps {
 
 export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: TestcasesViewProps) => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
+  const dispatch = useProblemDispatch();
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+  const draggedIdxRef = useRef<number | null>(null);
+  const dragOverIdxRef = useRef<number | null>(null);
 
   const isAllAccepted = useMemo(() => {
     return (
@@ -49,32 +51,38 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
     );
   }, [testcaseOrder, testcases]);
 
-  const handleDragStart = (idx: number, e: React.DragEvent) => {
+  const handleDragStart = useCallback((idx: number, e: React.DragEvent) => {
     const dragImage = document.createElement('div');
     dragImage.style.opacity = '0';
     document.body.appendChild(dragImage);
     e.dataTransfer.setDragImage(dragImage, 0, 0);
     setTimeout(() => document.body.removeChild(dragImage), 0);
 
+    draggedIdxRef.current = idx;
+    dragOverIdxRef.current = idx;
     setDraggedIdx(idx);
     setDragOverIdx(idx);
-  };
+  }, []);
 
-  const handleDragOver = useCallback(
-    (e: React.DragEvent, idx: number) => {
-      e.preventDefault();
-      if (dragOverIdx !== idx) setDragOverIdx(idx);
-    },
-    [dragOverIdx],
-  );
+  const handleDragOver = useCallback((e: React.DragEvent, idx: number) => {
+    e.preventDefault();
+    if (dragOverIdxRef.current !== idx) {
+      dragOverIdxRef.current = idx;
+      setDragOverIdx(idx);
+    }
+  }, []);
 
-  const handleDragEnd = () => {
-    if (draggedIdx !== null && dragOverIdx !== null && draggedIdx !== dragOverIdx)
-      dispatch({ type: 'reorderTestcase', problemId, fromIdx: draggedIdx, toIdx: dragOverIdx });
+  const handleDragEnd = useCallback(() => {
+    const dragged = draggedIdxRef.current;
+    const over = dragOverIdxRef.current;
+    if (dragged !== null && over !== null && dragged !== over)
+      dispatch({ type: 'reorderTestcase', problemId, fromIdx: dragged, toIdx: over });
 
+    draggedIdxRef.current = null;
+    dragOverIdxRef.current = null;
     setDraggedIdx(null);
     setDragOverIdx(null);
-  };
+  }, [dispatch, problemId]);
 
   const displayOrder = useMemo(() => {
     const order = testcaseOrder.map((_, idx) => idx);
@@ -109,7 +117,7 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
                       testcase={testcase}
                       isExpand={testcase.isExpand && draggedIdx === null}
                       idx={originalIdx}
-                      onDragStart={(e) => handleDragStart(originalIdx, e)}
+                      onDragStart={handleDragStart}
                       onDragEnd={handleDragEnd}
                       isDragging={draggedIdx === originalIdx}
                     />

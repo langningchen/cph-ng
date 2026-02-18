@@ -18,10 +18,10 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { IWebviewBackgroundProblem } from '@/domain/webviewTypes';
-import { useProblemContext } from '@/webview/src/context/ProblemContext';
+import { useProblemDispatch } from '@/webview/src/context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { CphLink } from './base/cphLink';
 import { CphText } from './base/cphText';
@@ -30,9 +30,9 @@ interface BgProblemViewProps {
   bgProblems: IWebviewBackgroundProblem[];
 }
 
-export const BgProblemView = ({ bgProblems }: BgProblemViewProps) => {
+export const BgProblemView = memo(({ bgProblems }: BgProblemViewProps) => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
+  const dispatch = useProblemDispatch();
   const [open, setOpen] = useState(false);
 
   if (bgProblems.length === 0) return null;
@@ -85,4 +85,4 @@ export const BgProblemView = ({ bgProblems }: BgProblemViewProps) => {
       </Dialog>
     </>
   );
-};
+});

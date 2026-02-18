@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { VerdictType } from '@/domain/entities/verdict';
 import type { ProblemId, TestcaseId } from '@/domain/types';
 import type { IWebviewTestcase } from '@/domain/webviewTypes';
-import { useProblemContext } from '../context/ProblemContext';
+import { useProblemDispatch } from '../context/ProblemContext';
 import { getCompile } from '../utils';
 import { CphFlex } from './base/cphFlex';
 import { CphMenu } from './base/cphMenu';
@@ -45,7 +45,7 @@ interface TestcaseViewProp {
   testcase: IWebviewTestcase;
   isExpand: boolean;
   idx: number;
-  onDragStart?: (e: React.DragEvent) => void;
+  onDragStart?: (idx: number, e: React.DragEvent) => void;
   onDragEnd?: () => void;
   isDragging?: boolean;
   autoFocus?: boolean;
@@ -64,7 +64,7 @@ export const TestcaseView = memo(
     autoFocus = false,
   }: TestcaseViewProp) => {
     const { t } = useTranslation();
-    const { dispatch } = useProblemContext();
+    const dispatch = useProblemDispatch();
     const isRunning = testcase.result?.verdict.type === VerdictType.running;
     const expanded = testcase.isDisabled ? false : isExpand;
     const details = useMemo(
@@ -295,7 +295,7 @@ export const TestcaseView = memo(
             draggable
             onDragStart={(e) => {
               e.stopPropagation();
-              onDragStart?.(e);
+              onDragStart?.(idx, e);
             }}
             onDragEnd={(e) => {
               e.stopPropagation();
