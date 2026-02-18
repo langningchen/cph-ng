@@ -35,14 +35,13 @@ export class StopTestcases extends BaseProblemUseCase<StopTestcasesMsg> {
     bgProblem: BackgroundProblem,
     msg: StopTestcasesMsg,
   ): Promise<void> {
-    bgProblem.abort(msg.onlyOne ? 'onlyOne' : undefined);
-    if (!msg.onlyOne) {
+    if (!bgProblem.ac) {
       const testcaseOrder = bgProblem.problem.getEnabledTestcaseIds();
       for (const testcaseId of testcaseOrder) {
         const testcase = bgProblem.problem.getTestcase(testcaseId);
         if (testcase.verdict && Verdicts[testcase.verdict].type === VerdictType.running)
           testcase.updateResult({ verdict: VerdictName.rejected });
       }
-    }
+    } else bgProblem.abort(msg.testcaseId);
   }
 }

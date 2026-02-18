@@ -21,9 +21,9 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import {
+  CompileAborted,
   type CompileAdditionalData,
   CompileError,
-  CompileRejected,
   type ILanguageDefaultValues,
   type ILanguageStrategy,
   type LangCompileData,
@@ -111,7 +111,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     });
     if (result instanceof Error) throw result;
     if (result.abortReason === AbortReason.UserAbort)
-      throw new CompileRejected(this.translator.t('Compilation aborted by user'));
+      throw new CompileAborted(this.translator.t('Compilation aborted by user'));
     if (result.abortReason === AbortReason.Timeout)
       throw new CompileError(this.translator.t('Compilation timed out'));
     this.compilation.append(await this.fs.readFile(result.stdoutPath));

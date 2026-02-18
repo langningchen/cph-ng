@@ -87,7 +87,6 @@ export class CommandModule implements IExtensionModule {
         await this.stopTestcases.exec({
           type: 'stopTestcases',
           problemId: await this.getProblemId(),
-          onlyOne: false,
         });
       },
     };

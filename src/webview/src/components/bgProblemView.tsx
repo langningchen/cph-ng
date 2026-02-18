@@ -35,6 +35,8 @@ export const BgProblemView = ({ bgProblems }: BgProblemViewProps) => {
   const { dispatch } = useProblemContext();
   const [open, setOpen] = useState(false);
 
+  if (bgProblems.length === 0) return null;
+
   return (
     <>
       <CphText

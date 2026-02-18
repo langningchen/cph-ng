@@ -13,6 +13,7 @@
   "errorBoundary.details": "详细错误信息",
   "errorBoundary.title": "错误",
   "initView.message": "初始化中",
+  "narrowWidthAlert": "由于面板较窄，部分功能已隐藏。请拉宽面板以访问全部功能。",
   "noTestcases.firstLine": "当前没有测试样例。",
   "noTestcases.secondLine": "点击下方按钮添加一个吧！",
   "problemActions.addTestcase": "添加测试样例",
@@ -24,8 +25,10 @@
   "problemActions.easterEgg": "彩蛋",
   "problemActions.loadTestcases": "加载测试样例",
   "problemActions.runTestcases": "运行所有测试样例",
+  "problemActions.runTestcases.forceCompile": "强制编译",
   "problemActions.runTestcases.menu.forceCompile": "运行所有测试样例 (强制编译)",
   "problemActions.runTestcases.menu.skipCompile": "运行所有测试样例 (跳过编译)",
+  "problemActions.runTestcases.skipCompile": "跳过编译",
   "problemActions.stopTestcases": "停止运行测试样例",
   "problemActions.stressTest": "对拍",
   "problemActions.stressTestDialog.bruteForce": "暴力解法",
@@ -85,6 +88,7 @@
   "testcaseView.stderr": "错误",
   "testcaseView.stdin": "输入",
   "testcaseView.stdout": "输出",
+  "testcaseView.stop": "停止",
   "testcaseView.time": "{{time}} ms",
   "testcasesView.addTestcaseHint": "+ 点击此处添加新测试样例",
   "tipMessage1": "按下 Ctrl+Alt+B 可以快速创建、导入题目或运行所有测试样例。",
@@ -101,5 +105,9 @@
   "tips.previousTip": "上一个提示",
   "tips.randomTip": "随机提示",
   "tips.title": "你知道吗？",
-  "tips.tryNow": "立即尝试"
+  "tips.tryNow": "立即尝试",
+  "verdictSummary.failed": "未通过",
+  "verdictSummary.passed": "通过",
+  "verdictSummary.pending": "等待中",
+  "verdictSummary.running": "运行中"
 }

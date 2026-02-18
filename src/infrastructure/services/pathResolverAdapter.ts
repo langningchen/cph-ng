@@ -29,8 +29,6 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
 
-// TO-DO: Check the refactor: workspace selection
-
 @injectable()
 export class PathResolverAdapter implements IPathResolver {
   public constructor(
@@ -82,32 +80,39 @@ export class PathResolverAdapter implements IPathResolver {
       return null;
     }
 
-    const triedPaths = folders.map((f) => this.renderString(result, [['workspace', f.uri.fsPath]]));
-    this.logger.trace('Tried workspace paths for rendering', { original, triedPaths });
+    const candidates = folders
+      .map((f) => ({
+        wsPath: f.uri.fsPath,
+        rendered: this.renderString(result, [['workspace', f.uri.fsPath]]),
+      }))
+      .filter(({ rendered }) => existsSync(this.path.dirname(rendered)));
+    this.logger.trace('Tried workspace paths for rendering', {
+      original,
+      candidates: candidates.map((c) => c.rendered),
+    });
 
-    const validFolders = triedPaths.filter((p) => existsSync(p)).map((p) => this.path.dirname(p));
-    if (validFolders.length === 0) {
+    if (candidates.length === 0) {
       this.ui.alert('error', this.translator.t('No workspace folder contains the required path.'));
       this.logger.warn('No workspace folder contains the required path.', { original });
       return null;
     }
-    this.logger.trace('Valid workspace folders for path', { original, validFolders });
 
-    let selectedFolder: string;
-    if (validFolders.length === 1) {
-      selectedFolder = validFolders[0];
+    let selectedWsPath: string;
+    if (candidates.length === 1) {
+      selectedWsPath = candidates[0].wsPath;
     } else {
-      const picked = await window.showQuickPick(validFolders, {
-        title: this.translator.t('Select workspace folder'),
-      });
+      const picked = await window.showQuickPick(
+        candidates.map((c) => c.wsPath),
+        { title: this.translator.t('Select workspace folder') },
+      );
       if (!picked) {
         this.logger.info('No workspace folder selected for path rendering.', { original });
         return null;
       }
-      selectedFolder = picked;
+      selectedWsPath = picked;
     }
 
-    result = this.renderString(result, [['workspace', selectedFolder]]);
+    result = this.renderString(result, [['workspace', selectedWsPath]]);
     this.logger.trace('Rendered workspace path', { original, result });
     return result;
   }

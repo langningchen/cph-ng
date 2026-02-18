@@ -24,8 +24,8 @@ import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeOb
 import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
 import {
+  CompileAborted,
   CompileError,
-  CompileRejected,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
@@ -59,7 +59,7 @@ export class RunSingleTestcase extends BaseProblemUseCase<RunTestcaseMsg> {
     bgProblem.ac = ac;
 
     this.tmp.dispose(testcase.clearResult());
-    testcase.updateResult({ verdict: VerdictName.compiling, isExpand: false });
+    testcase.updateResult({ verdict: VerdictName.compiling });
 
     await this.document.save(problem.src.path);
     const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
@@ -68,7 +68,7 @@ export class RunSingleTestcase extends BaseProblemUseCase<RunTestcaseMsg> {
         verdict:
           artifacts instanceof CompileError
             ? VerdictName.compilationError
-            : artifacts instanceof CompileRejected
+            : artifacts instanceof CompileAborted
               ? VerdictName.rejected
               : VerdictName.systemError,
         msg: artifacts.message,
@@ -92,7 +92,7 @@ export class RunSingleTestcase extends BaseProblemUseCase<RunTestcaseMsg> {
         testcase.updateResult({ verdict });
       },
       onResult: (res: FinalResult) => {
-        testcase.updateResult({ isExpand: true, ...res });
+        testcase.updateResult(res);
       },
       onError: (e) => {
         testcase.updateResult({ verdict: VerdictName.systemError, msg: e.message });

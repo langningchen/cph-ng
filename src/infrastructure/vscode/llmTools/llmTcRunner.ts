@@ -76,7 +76,7 @@ export class LlmTestcaseRunner extends BaseLlmTool<LlmTestcaseRunnerParams> {
     const problem = bgProblem.problem;
 
     token.onCancellationRequested(() => {
-      this.stopTestcases.exec({ type: 'stopTestcases', problemId, onlyOne: false });
+      this.stopTestcases.exec({ type: 'stopTestcases', problemId });
     });
 
     if (testcaseId !== undefined) {

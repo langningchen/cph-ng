@@ -27,6 +27,7 @@ import { ErrorBoundary } from './base/errorBoundary';
 import { ProblemActions } from './problemActions';
 import { ProblemTitle } from './problemTitle';
 import { TestcasesView } from './testcasesView';
+import { VerdictSummary } from './verdictSummary';
 
 interface ProblemViewProps {
   problemId: ProblemId;
@@ -56,6 +57,9 @@ export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewP
           overrides={problem.overrides}
           startTime={startTime}
         />
+      </ErrorBoundary>
+      <ErrorBoundary>
+        <VerdictSummary testcaseOrder={problem.testcaseOrder} testcases={problem.testcases} />
       </ErrorBoundary>
       <CphFlex
         column

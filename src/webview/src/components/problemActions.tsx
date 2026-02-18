@@ -69,6 +69,8 @@ export const ProblemActions = memo(
       <>
         <CphFlex
           smallGap
+          flexWrap='wrap'
+          justifyContent='center'
           onClick={() => setClickTime((times) => [...times, Date.now()].slice(-10))}
         >
           <CphButton
@@ -90,11 +92,10 @@ export const ProblemActions = memo(
               name={t('problemActions.stopTestcases')}
               icon={PlaylistRemoveIcon}
               color='warning'
-              onClick={(e) =>
+              onClick={() =>
                 dispatch({
                   type: 'stopTestcases',
                   problemId,
-                  onlyOne: e.ctrlKey,
                 })
               }
             />
@@ -117,7 +118,7 @@ export const ProblemActions = memo(
             >
               <CphButton
                 larger
-                name={t('problemActions.runTestcases')}
+                name={`${t('problemActions.runTestcases')} (Ctrl: ${t('problemActions.runTestcases.forceCompile')}, Alt: ${t('problemActions.runTestcases.skipCompile')})`}
                 icon={PlaylistPlayIcon}
                 color='success'
                 onClick={(e) =>
@@ -135,7 +136,7 @@ export const ProblemActions = memo(
             name={t('problemActions.stressTest')}
             icon={CompareArrowsIcon}
             onClick={() => setStressTestDialogOpen(true)}
-            sx={stressTest.isRunning ? pulseAnimation : undefined}
+            sx={stressTest.isRunning ? { animation: 'pulse 1s infinite' } : undefined}
           />
           {(() => {
             if (!url) {
@@ -338,12 +339,3 @@ export const ProblemActions = memo(
     );
   },
 );
-
-const pulseAnimation = {
-  animation: 'pulse 1s infinite',
-  '@keyframes pulse': {
-    '0%': { opacity: 1 },
-    '50%': { opacity: 0.2 },
-    '100%': { opacity: 1 },
-  },
-};

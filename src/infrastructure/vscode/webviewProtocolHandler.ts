@@ -17,7 +17,6 @@
 
 import { container, type InjectionToken, inject, injectable } from 'tsyringe';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
-import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import { AddTestcase } from '@/application/useCases/webview/AddTestcase';
 import { ChooseSrcFile } from '@/application/useCases/webview/ChooseSrcFile';
 import { ChooseTestcaseFile } from '@/application/useCases/webview/ChooseTestcaseFile';

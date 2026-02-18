@@ -13,6 +13,7 @@
   "errorBoundary.details": "Detailed error information",
   "errorBoundary.title": "Error",
   "initView.message": "Initializing",
+  "narrowWidthAlert": "Some features are hidden due to narrow width. Widen the panel to access all features.",
   "noTestcases.firstLine": "There is currently no test cases now.",
   "noTestcases.secondLine": "Add one using the button bellow!",
   "problemActions.addTestcase": "Add Test Case",
@@ -24,8 +25,10 @@
   "problemActions.easterEgg": "Easter egg",
   "problemActions.loadTestcases": "Load Test Cases",
   "problemActions.runTestcases": "Run All Test Cases",
+  "problemActions.runTestcases.forceCompile": "Force Compile",
   "problemActions.runTestcases.menu.forceCompile": "Run All Test Cases (Force Compile)",
   "problemActions.runTestcases.menu.skipCompile": "Run All Test Cases (Skip Compile)",
+  "problemActions.runTestcases.skipCompile": "Skip Compile",
   "problemActions.stopTestcases": "Stop Test Case",
   "problemActions.stressTest": "Compare with Brute Force",
   "problemActions.stressTestDialog.bruteForce": "Brute Force",
@@ -85,6 +88,7 @@
   "testcaseView.stderr": "Error",
   "testcaseView.stdin": "Input",
   "testcaseView.stdout": "Output",
+  "testcaseView.stop": "Stop",
   "testcaseView.time": "{{time}} ms",
   "testcasesView.addTestcaseHint": "+ Click here to add a new test case",
   "tipMessage1": "Pressing Ctrl+Alt+B can quickly create, import a problem or run all test cases.",
@@ -101,5 +105,9 @@
   "tips.previousTip": "Previous Tip",
   "tips.randomTip": "Random Tip",
   "tips.title": "Do you know?",
-  "tips.tryNow": "Try now"
+  "tips.tryNow": "Try now",
+  "verdictSummary.failed": "Failed",
+  "verdictSummary.passed": "Passed",
+  "verdictSummary.pending": "Pending",
+  "verdictSummary.running": "Running"
 }

@@ -32,8 +32,6 @@ import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
 import type { ProblemId, TestcaseId, WithRevision } from '@/domain/types';
 import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapper';
 
-// TO-DO: ProblemFs Emit
-
 @injectable()
 export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
   private active: BackgroundProblem | null = null;
@@ -88,6 +86,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       checker: checker ? this.mapper.fileWithHashToDto(checker) : checker,
       interactor: interactor ? this.mapper.fileWithHashToDto(interactor) : interactor,
     });
+    this.problemFs.signals.emit('patchProblem', this.active.problem.src.path);
   };
 
   private onPatchStressTest = async (payload: WithRevision<Partial<StressTest>>) => {
@@ -97,6 +96,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       ...this.mapper.stressTestToDto(rest),
       revision,
     });
+    this.problemFs.signals.emit('patchProblem', this.active.problem.src.path);
   };
 
   private onAddTestcase = async (testcaseId: TestcaseId, payload: Testcase, revision: number) => {
@@ -105,11 +105,13 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       ...this.mapper.testcaseToDto(payload),
       revision,
     });
+    this.problemFs.signals.emit('addTestcase', this.active.problem.src.path, testcaseId, payload);
   };
 
   private onDeleteTestcase = async (testcaseId: TestcaseId, revision: number) => {
     if (!this.active) return;
     this.eventBus.deleteTestcase(this.active.problemId, testcaseId, { revision });
+    this.problemFs.signals.emit('deleteTestcase', this.active.problem.src.path, testcaseId);
   };
 
   private onPatchTestcase = async (
@@ -122,6 +124,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       ...this.mapper.testcaseToDto(payload),
       revision,
     });
+    this.problemFs.signals.emit('patchTestcase', this.active.problem.src.path, testcaseId, payload);
   };
 
   private onPatchTestcaseResult = async (
@@ -134,6 +137,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       ...this.mapper.testcaseResultToDto(payload),
       revision,
     });
+    this.problemFs.signals.emit('patchTestcase', this.active.problem.src.path, testcaseId, payload);
   };
 
   private attachListeners(problem: Problem) {

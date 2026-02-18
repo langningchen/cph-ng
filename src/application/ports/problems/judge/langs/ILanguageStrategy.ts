@@ -41,14 +41,14 @@ export class CompileError extends Error {
   }
 }
 
-export class CompileRejected extends Error {
+export class CompileAborted extends Error {
   public constructor(message: string) {
     super(message);
-    this.name = 'CompileRejected';
+    this.name = 'CompileAborted';
   }
 }
 
-export type LangCompileResult = LangCompileData | CompileError | CompileRejected | Error;
+export type LangCompileResult = LangCompileData | CompileError | CompileAborted | Error;
 
 export interface ILanguageStrategy {
   readonly name: string;

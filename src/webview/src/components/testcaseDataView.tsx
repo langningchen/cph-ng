@@ -165,20 +165,22 @@ export const TestcaseDataView = ({
             </CphLink>
           )}
         </CphFlex>
-        {!!outputActions && (
-          <CphButton
-            name={t('testcaseDataView.compare')}
-            icon={DifferenceIcon}
-            onClick={outputActions.onCompare}
-          />
-        )}
-        {!!onToggleFile && (
-          <CphButton
-            name={t('testcaseDataView.toggleFile')}
-            icon={ChangeCircleIcon}
-            onClick={onToggleFile}
-          />
-        )}
+        <Box sx={{ display: { xs: 'none', md: 'contents' } }}>
+          {!!outputActions && (
+            <CphButton
+              name={t('testcaseDataView.compare')}
+              icon={DifferenceIcon}
+              onClick={outputActions.onCompare}
+            />
+          )}
+          {!!onToggleFile && (
+            <CphButton
+              name={t('testcaseDataView.toggleFile')}
+              icon={ChangeCircleIcon}
+              onClick={onToggleFile}
+            />
+          )}
+        </Box>
         {internalValue.type === 'file' ? (
           readOnly || (
             <CphButton
@@ -192,11 +194,13 @@ export const TestcaseDataView = ({
         ) : (
           <>
             {readOnly || (
-              <CphButton
-                name={t('testcaseDataView.loadFile')}
-                icon={FileOpenIcon}
-                onClick={onChooseFile}
-              />
+              <Box sx={{ display: { xs: 'none', md: 'contents' } }}>
+                <CphButton
+                  name={t('testcaseDataView.loadFile')}
+                  icon={FileOpenIcon}
+                  onClick={onChooseFile}
+                />
+              </Box>
             )}
             {!!outputActions && (
               <CphButton

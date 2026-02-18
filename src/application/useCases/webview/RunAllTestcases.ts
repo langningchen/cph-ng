@@ -24,8 +24,8 @@ import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeOb
 import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
 import {
+  CompileAborted,
   CompileError,
-  CompileRejected,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
@@ -33,6 +33,7 @@ import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUs
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { VerdictName, Verdicts, VerdictType } from '@/domain/entities/verdict';
+import type { TestcaseId } from '@/domain/types';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import type { RunTestcasesMsg } from '@/webview/src/msgs';
 
@@ -53,16 +54,30 @@ export class RunAllTestcases extends BaseProblemUseCase<RunTestcasesMsg> {
   protected async performAction(bgProblem: BackgroundProblem, msg: RunTestcasesMsg): Promise<void> {
     const { problem } = bgProblem;
     let ac = new AbortController();
-    bgProblem.ac = ac;
+    let currentId: TestcaseId | null = null;
+    let skipAll: boolean = false;
+    bgProblem.ac = new AbortController();
+    bgProblem.ac.signal.addEventListener('abort', () => {
+      const testcaseId = bgProblem.ac?.signal.reason as TestcaseId | null;
+      if (typeof testcaseId !== 'string') {
+        ac.abort();
+        skipAll = true;
+      } else if (testcaseId === currentId) {
+        ac.abort();
+        ac = new AbortController();
+        bgProblem.ac = new AbortController();
+      } else {
+        problem.getTestcase(testcaseId).updateResult({ verdict: VerdictName.skipped });
+        bgProblem.ac = new AbortController();
+      }
+    });
 
     const testcaseOrder = problem.getEnabledTestcaseIds();
 
-    const expandMemo: Record<string, boolean> = {};
     for (const testcaseId of testcaseOrder) {
       const testcase = problem.getTestcase(testcaseId);
       this.tmp.dispose(testcase.clearResult());
-      testcase.updateResult({ verdict: VerdictName.compiling, isExpand: false });
-      expandMemo[testcaseId] = testcase.isExpand;
+      testcase.updateResult({ verdict: VerdictName.compiling });
     }
 
     await this.document.save(problem.src.path);
@@ -71,7 +86,7 @@ export class RunAllTestcases extends BaseProblemUseCase<RunTestcasesMsg> {
       const verdict =
         artifacts instanceof CompileError
           ? VerdictName.compilationError
-          : artifacts instanceof CompileRejected
+          : artifacts instanceof CompileAborted
             ? VerdictName.rejected
             : VerdictName.systemError;
       problem.updateResult({ verdict, msg: artifacts.message });
@@ -85,14 +100,12 @@ export class RunAllTestcases extends BaseProblemUseCase<RunTestcasesMsg> {
     const judgeService = this.judgeFactory.create(problem);
 
     for (const testcaseId of testcaseOrder) {
+      currentId = testcaseId;
       const testcase = problem.getTestcase(testcaseId);
-
-      if (ac.signal.aborted) {
-        if (ac.signal.reason === 'onlyOne') bgProblem.ac = ac = new AbortController();
-        else {
-          testcase.updateResult({ verdict: VerdictName.skipped });
-          continue;
-        }
+      if (testcase.verdict !== VerdictName.compiled) continue;
+      if (skipAll) {
+        testcase.updateResult({ verdict: VerdictName.skipped });
+        continue;
       }
 
       const stdinPathResult = await this.testcaseIoService.ensureFilePath(testcase.stdin);
@@ -121,7 +134,7 @@ export class RunAllTestcases extends BaseProblemUseCase<RunTestcasesMsg> {
           } else if (expandBehavior === 'firstFailed') {
             isExpand = !hasAnyExpanded && Verdicts[res.verdict].type === VerdictType.failed;
           } else if (expandBehavior === 'same') {
-            isExpand = expandMemo[testcaseId];
+            isExpand = testcase.isExpand;
           }
           hasAnyExpanded ||= isExpand;
 

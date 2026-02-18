@@ -49,7 +49,7 @@ export interface RunTestcasesMsg extends ProblemBaseMsg {
 }
 export interface StopTestcasesMsg extends ProblemBaseMsg {
   type: 'stopTestcases';
-  onlyOne: boolean;
+  testcaseId?: TestcaseId;
 }
 export interface AddTestcaseMsg extends ProblemBaseMsg {
   type: 'addTestcase';

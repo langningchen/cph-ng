@@ -75,7 +75,6 @@ export const ProblemTitle = ({
 }: ProblemTitleProps) => {
   const { t } = useTranslation();
   const { dispatch } = useProblemContext();
-  const [isHoveringTitle, setHoveringTitle] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [tabValue, setTabValue] = useState('basic');
   const [editedTitle, setEditedTitle] = useState('');
@@ -130,17 +129,9 @@ export const ProblemTitle = ({
 
   return (
     <>
-      <CphFlex
-        onMouseEnter={() => setHoveringTitle(true)}
-        onMouseLeave={() => setHoveringTitle(false)}
-      >
+      <CphFlex>
         <CphFlex column alignStart flexShrink={1} width='unset'>
-          <CphText
-            whiteSpace='nowrap'
-            sx={{ cursor: url ? 'pointer' : 'default' }}
-            title={name}
-            width='100%'
-          >
+          <CphText sx={{ cursor: url ? 'pointer' : 'default' }} title={name} width='100%'>
             {url ? (
               <CphLink href={url} name={url}>
                 {name}
@@ -149,7 +140,7 @@ export const ProblemTitle = ({
               name
             )}
           </CphText>
-          <CphText fontSize='0.8rem' paddingRight='4px'>
+          <CphText fontSize='0.8rem' paddingRight='4px' whiteSpace='normal'>
             {t('problemTitle.timeLimit', {
               time: overrides.timeLimitMs.override ?? overrides.timeLimitMs.defaultValue,
             })}
@@ -191,32 +182,33 @@ export const ProblemTitle = ({
                 </CphLink>
               </>
             )}
-            &emsp;
-            <span title={t('problemTitle.timeElapsed')} className='defaultBlur'>
-              {formatDuration(timeElapsedMs + timeElapsed)}
-            </span>
+            <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}>
+              &emsp;
+              <span title={t('problemTitle.timeElapsed')} className='defaultBlur'>
+                {formatDuration(timeElapsedMs + timeElapsed)}
+              </span>
+            </Box>
           </CphText>
         </CphFlex>
-        {!!isHoveringTitle && (
-          <CphMenu
-            menu={{
-              [t('problemTitle.menu.editRaw')]: () => {
-                dispatch({
-                  type: 'openFile',
-                  problemId,
-                  path: '/problem.cph-ng.json',
-                });
-              },
-            }}
-          >
-            <CphButton
-              name={t('problemTitle.editTitle')}
-              icon={EditIcon}
-              color='secondary'
-              onClick={handleEditTitle}
-            />
-          </CphMenu>
-        )}
+        <CphMenu
+          menu={{
+            [t('problemTitle.menu.editRaw')]: () => {
+              dispatch({
+                type: 'openFile',
+                problemId,
+                path: '/problem.cph-ng.json',
+              });
+            },
+          }}
+        >
+          <CphButton
+            sx={{ display: { xs: 'none', sm: 'inline' } }}
+            name={t('problemTitle.editTitle')}
+            icon={EditIcon}
+            color='secondary'
+            onClick={handleEditTitle}
+          />
+        </CphMenu>
       </CphFlex>
       <Dialog fullScreen open={isEditDialogOpen} onClose={handleEditDialogClose}>
         <DialogTitle>{t('problemTitle.dialog.title')}</DialogTitle>

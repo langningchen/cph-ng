@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Problem } from '@/domain/entities/problem';
-import type { ProblemId } from '@/domain/types';
+import type { ProblemId, TestcaseId } from '@/domain/types';
 
 export class BackgroundProblem {
   private _ac: AbortController | null = null;
@@ -34,8 +34,10 @@ export class BackgroundProblem {
     this._ac?.abort();
     this._ac = value;
   }
-  public abort(reason?: string) {
-    this._ac?.abort(reason);
+
+  public abort(target?: TestcaseId) {
+    if (target) this._ac?.abort(target);
+    else this._ac?.abort();
     this._ac = null;
   }
 
