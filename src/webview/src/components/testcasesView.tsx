@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import Box from '@mui/material/Box';
-import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictName } from '@/domain/entities/verdict';
 import type { ProblemId, TestcaseId } from '@/domain/types';
@@ -27,6 +27,46 @@ import { CphFlex } from './base/cphFlex';
 import { ErrorBoundary } from './base/errorBoundary';
 import { NoTestcases } from './noTestcases';
 import { TestcaseView } from './testcaseView';
+
+const VirtualizedItem = memo(
+  ({ children, isDragging }: { children: React.ReactNode; isDragging: boolean }) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(true);
+    const heightRef = useRef<number | undefined>(undefined);
+
+    useEffect(() => {
+      const el = containerRef.current;
+      if (!el) return;
+
+      const resizeObserver = new ResizeObserver(() => {
+        const h = el.getBoundingClientRect().height;
+        if (h > 0) heightRef.current = h;
+      });
+      resizeObserver.observe(el);
+      return () => resizeObserver.disconnect();
+    }, []);
+
+    useEffect(() => {
+      const el = containerRef.current;
+      if (!el) return;
+
+      const intersectionObserver = new IntersectionObserver(
+        ([entry]) => {
+          setIsVisible(entry.isIntersecting);
+        },
+        { rootMargin: '500px' },
+      );
+      intersectionObserver.observe(el);
+      return () => intersectionObserver.disconnect();
+    }, []);
+
+    if (!isVisible && !isDragging && heightRef.current !== undefined) {
+      return <div ref={containerRef} style={{ height: heightRef.current }} />;
+    }
+
+    return <div ref={containerRef}>{children}</div>;
+  },
+);
 
 interface TestcasesViewProps {
   problemId: ProblemId;
@@ -110,18 +150,20 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
 
               return (
                 <Box key={testcaseId} onDragOver={(e) => handleDragOver(e, displayIdx)}>
-                  <ErrorBoundary>
-                    <TestcaseView
-                      problemId={problemId}
-                      testcaseId={testcaseId}
-                      testcase={testcase}
-                      isExpand={testcase.isExpand && draggedIdx === null}
-                      idx={originalIdx}
-                      onDragStart={handleDragStart}
-                      onDragEnd={handleDragEnd}
-                      isDragging={draggedIdx === originalIdx}
-                    />
-                  </ErrorBoundary>
+                  <VirtualizedItem isDragging={draggedIdx === originalIdx}>
+                    <ErrorBoundary>
+                      <TestcaseView
+                        problemId={problemId}
+                        testcaseId={testcaseId}
+                        testcase={testcase}
+                        isExpand={testcase.isExpand && draggedIdx === null}
+                        idx={originalIdx}
+                        onDragStart={handleDragStart}
+                        onDragEnd={handleDragEnd}
+                        isDragging={draggedIdx === originalIdx}
+                      />
+                    </ErrorBoundary>
+                  </VirtualizedItem>
                 </Box>
               );
             })}
