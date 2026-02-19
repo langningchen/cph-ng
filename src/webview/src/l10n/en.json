@@ -8,6 +8,7 @@
   "createProblemView.createButton": "Create",
   "createProblemView.importAlert": "This document has a CPH problem that you can import from, but no CPH-NG problem.",
   "createProblemView.importButton": "Import",
+  "dragOverlay.cancel": "Cancel",
   "dragOverlay.description": "Drop files here",
   "errorBoundary.description": "An unexpected error occurred. We apologize for the inconvenience. You can try to reload the page or report this issue on GitHub.",
   "errorBoundary.details": "Detailed error information",

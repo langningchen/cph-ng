@@ -18,6 +18,7 @@
 import DownloadIcon from '@mui/icons-material/Download';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import Backdrop from '@mui/material/Backdrop';
+import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -96,6 +97,9 @@ export const DragOverlay = () => {
         <CphFlex width='100%' height='100%' column gap={2} color='#ffffff' justifyContent='center'>
           <DownloadIcon sx={{ fontSize: 80 }} />
           <Typography variant='h5'>{t('dragOverlay.description')}</Typography>
+          <Button variant='contained' color='primary' onClick={() => setDragData(null)}>
+            {t('dragOverlay.cancel')}
+          </Button>
         </CphFlex>
       )}
     </Backdrop>
