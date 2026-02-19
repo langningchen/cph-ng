@@ -36,6 +36,13 @@ export type CustomSaveDialogOptions = Except<SaveDialogOptions, 'defaultUri'> & 
 export type CustomQuickPickItem<T> = Except<QuickPickItem, 'iconPath' | 'buttons'> & { value: T };
 export type CustomQuickPickOptions = Except<QuickPickOptions, 'canPickMany'>;
 
+export interface InputOptions {
+  prompt?: string;
+  value?: string;
+  placeHolder?: string;
+  password?: boolean;
+}
+
 export type AlertLevel = 'error' | 'warn' | 'info';
 export type AlertArgs = [...items: string[]] | [options: MessageOptions, ...items: string[]];
 
@@ -61,6 +68,7 @@ export interface IUi {
   ): Promise<T | undefined>;
   quickPickMany<T>(items: CustomQuickPickItem<T>[], options?: CustomQuickPickOptions): Promise<T[]>;
   chooseFolder(title: string): Promise<string | undefined>;
+  input(options: InputOptions): Promise<string | undefined>;
   alert(level: AlertLevel, message: string, ...args: AlertArgs): Promise<string | undefined>;
   openFile(uri: Uri): void;
   openChat(topic: string): void;

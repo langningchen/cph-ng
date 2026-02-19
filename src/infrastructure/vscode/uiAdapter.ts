@@ -40,6 +40,7 @@ import type {
   CustomQuickPickItem,
   CustomQuickPickOptions,
   CustomSaveDialogOptions,
+  InputOptions,
   IUi,
   ProgressController,
   StatusBarController,
@@ -175,6 +176,19 @@ export class UiAdapter implements IUi {
     }
     const result = await this.chooseFolderWithDialog(title);
     this.logger.debug('Folder chosen with dialog', { result });
+    return result;
+  }
+
+  public async input(options: InputOptions): Promise<string | undefined> {
+    this.logger.trace('Showing input box', { options });
+    const result = await window.showInputBox({
+      prompt: options.prompt,
+      value: options.value,
+      placeHolder: options.placeHolder,
+      password: options.password,
+      ignoreFocusOut: true,
+    });
+    this.logger.debug('Input box result', { result });
     return result;
   }
 

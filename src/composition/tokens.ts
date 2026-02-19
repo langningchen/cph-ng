@@ -44,6 +44,8 @@ import type { IActiveProblemCoordinator } from '@/application/ports/services/IAc
 import type { IArchive } from '@/application/ports/services/IArchive';
 import type { ICompanion } from '@/application/ports/services/ICompanion';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import type { ITemplateRenderer } from '@/application/ports/services/ITemplateRenderer';
+import type { IUserScriptService } from '@/application/ports/services/IUserScriptService';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
 import type { IExtensionContext } from '@/application/ports/vscode/IExtensionContext';
@@ -55,6 +57,7 @@ import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
+import type { IWorkspace } from '@/application/ports/vscode/IWorkspace';
 
 // Centralized DI tokens for tsyringe registrations
 // Keep these as string literals to avoid circular imports and enable tree-shaking
@@ -96,13 +99,16 @@ export const TOKENS = {
   settings: 'ports.Settings' as InjectionToken<ISettings>,
   solutionRunner: 'ports.SolutionRunner' as InjectionToken<ISolutionRunner>,
   system: 'ports.System' as InjectionToken<ISystem>,
+  templateRenderer: 'ports.TemplateRenderer' as InjectionToken<ITemplateRenderer>,
   testcaseIoService: 'ports.TestcaseIoService' as InjectionToken<ITestcaseIoService>,
   telemetry: 'ports.Telemetry' as InjectionToken<ITelemetry>,
   tempStorage: 'ports.TempStorage' as InjectionToken<ITempStorage>,
   translator: 'ports.Translator' as InjectionToken<ITranslator>,
   ui: 'ports.Ui' as InjectionToken<IUi>,
+  userScriptService: 'ports.UserScriptService' as InjectionToken<IUserScriptService>,
   companion: 'ports.companion' as InjectionToken<ICompanion>,
   webviewEventBus: 'ports.WebviewEventBus' as InjectionToken<IWebviewEventBus>,
+  workspace: 'ports.Workspace' as InjectionToken<IWorkspace>,
   problemMigrationService:
     'ports.ProblemMigrationService' as InjectionToken<IProblemMigrationService>,
   executionStrategyFactory:

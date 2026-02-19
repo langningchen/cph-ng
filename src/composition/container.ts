@@ -49,6 +49,8 @@ import { ActiveProblemCoordinator } from '@/infrastructure/services/activeProble
 import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
 import { Companion } from '@/infrastructure/services/companion/companion';
 import { PathResolverAdapter } from '@/infrastructure/services/pathResolverAdapter';
+import { TemplateRenderer } from '@/infrastructure/services/templateRenderer';
+import { UserScriptService } from '@/infrastructure/services/userScriptService';
 import { ActivePathService } from '@/infrastructure/vscode/activePathService';
 import { DocumentAdapter } from '@/infrastructure/vscode/documentAdapter';
 import { ExtensionContextAdapter } from '@/infrastructure/vscode/extensionContextAdapter';
@@ -68,6 +70,7 @@ import { TelemetryAdapter } from '@/infrastructure/vscode/telemetryAdapter';
 import { TranslatorAdapter } from '@/infrastructure/vscode/translatorAdapter';
 import { UiAdapter } from '@/infrastructure/vscode/uiAdapter';
 import { WebviewEventBusAdapter } from '@/infrastructure/vscode/webviewEventBus';
+import { WorkspaceAdapter } from '@/infrastructure/vscode/workspaceAdapter';
 import { TOKENS } from './tokens';
 
 export async function setupContainer(context: ExtensionContext): Promise<void> {
@@ -101,12 +104,15 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.settings, SettingsAdapter);
   container.registerSingleton(TOKENS.solutionRunner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.system, SystemAdapter);
+  container.registerSingleton(TOKENS.templateRenderer, TemplateRenderer);
   container.registerSingleton(TOKENS.testcaseIoService, TestcaseIoService);
   container.registerSingleton(TOKENS.telemetry, TelemetryAdapter);
   container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
   container.registerSingleton(TOKENS.translator, TranslatorAdapter);
   container.registerSingleton(TOKENS.ui, UiAdapter);
+  container.registerSingleton(TOKENS.userScriptService, UserScriptService);
   container.registerSingleton(TOKENS.webviewEventBus, WebviewEventBusAdapter);
+  container.registerSingleton(TOKENS.workspace, WorkspaceAdapter);
 
   container.registerSingleton(LlmTestcaseRunner);
   container.registerSingleton(LlmDataInspector);

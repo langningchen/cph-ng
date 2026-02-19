@@ -22,6 +22,7 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
+import { ImportCompanionProblems } from '@/application/useCases/companion/ImportCompanionProblems';
 import { TOKENS } from '@/composition/tokens';
 import type { Problem } from '@/domain/entities/problem';
 import type { BatchId, SubmissionId } from '@/domain/types';
@@ -45,6 +46,7 @@ export class Companion implements ICompanion {
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(CompanionCommunicationService) private readonly ws: CompanionCommunicationService,
     @inject(CompanionStatusbarService) private readonly statusbar: CompanionStatusbarService,
+    @inject(ImportCompanionProblems) private readonly importUseCase: ImportCompanionProblems,
   ) {
     this.logger = this.logger.withScope('companion');
     this.ws.signals.on('statusChanged', this.updateStatusbar);
@@ -69,7 +71,8 @@ export class Companion implements ICompanion {
     if (this.batchesToClaim.size === 0) this.logger.info('No batches to claim');
     else if (this.batchesToClaim.size === 1) {
       const batchId = Array.from(this.batchesToClaim.keys())[0];
-      this.ws.claimBatch(batchId);
+      const problems = this.batchesToClaim.get(batchId);
+      if (problems) await this.claimAndImport(batchId, problems);
     } else {
       const batchId = await this.ui.quickPick<BatchId>(
         Array.from(this.batchesToClaim.entries()).map(([batchId, problems]) => ({
@@ -82,7 +85,10 @@ export class Companion implements ICompanion {
         })),
         { title: this.translator.t('Select a batch to claim') },
       );
-      if (batchId) this.ws.claimBatch(batchId);
+      if (batchId) {
+        const problems = this.batchesToClaim.get(batchId);
+        if (problems) await this.claimAndImport(batchId, problems);
+      }
     }
   };
 
@@ -102,7 +108,7 @@ export class Companion implements ICompanion {
     }
     this.readingProgress.get(batchId)?.(count, size);
   };
-  private batchAvailable = (
+  private batchAvailable = async (
     batchId: BatchId,
     problems: CompanionProblem[],
     autoImport: boolean,
@@ -111,7 +117,7 @@ export class Companion implements ICompanion {
     this.abortControllers.set(batchId, controller);
     if (autoImport) {
       this.logger.info('Auto-importing batch', { batchId });
-      this.ws.claimBatch(batchId);
+      await this.claimAndImport(batchId, problems);
     } else {
       this.batchesToClaim.set(batchId, problems);
       controller.signal.addEventListener('abort', () => {
@@ -120,6 +126,20 @@ export class Companion implements ICompanion {
       this.updateStatusbar();
     }
   };
+
+  private async claimAndImport(batchId: BatchId, problems: CompanionProblem[]) {
+    try {
+      this.ws.claimBatch(batchId);
+      await this.importUseCase.exec(problems);
+    } catch (e) {
+      this.logger.error('Failed to import companion problems', e);
+      this.ui.alert(
+        'error',
+        this.translator.t('Failed to import problems: {msg}', { msg: (e as Error).message }),
+      );
+    }
+  }
+
   private batchClaimed = (batchId: BatchId) => {
     this.logger.info('Batch claimed', { batchId });
     const controller = this.abortControllers.get(batchId);
