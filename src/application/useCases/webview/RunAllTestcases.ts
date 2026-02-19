@@ -56,21 +56,26 @@ export class RunAllTestcases extends BaseProblemUseCase<RunTestcasesMsg> {
     let ac = new AbortController();
     let currentId: TestcaseId | null = null;
     let skipAll: boolean = false;
+    const setupAbortListener = () => {
+      bgProblem.ac?.signal.addEventListener('abort', () => {
+        const testcaseId = bgProblem.ac?.signal.reason as TestcaseId | null;
+        if (typeof testcaseId !== 'string') {
+          ac.abort();
+          skipAll = true;
+        } else if (testcaseId === currentId) {
+          ac.abort();
+          ac = new AbortController();
+          bgProblem.ac = new AbortController();
+          setupAbortListener();
+        } else {
+          problem.getTestcase(testcaseId).updateResult({ verdict: VerdictName.skipped });
+          bgProblem.ac = new AbortController();
+          setupAbortListener();
+        }
+      });
+    };
     bgProblem.ac = new AbortController();
-    bgProblem.ac.signal.addEventListener('abort', () => {
-      const testcaseId = bgProblem.ac?.signal.reason as TestcaseId | null;
-      if (typeof testcaseId !== 'string') {
-        ac.abort();
-        skipAll = true;
-      } else if (testcaseId === currentId) {
-        ac.abort();
-        ac = new AbortController();
-        bgProblem.ac = new AbortController();
-      } else {
-        problem.getTestcase(testcaseId).updateResult({ verdict: VerdictName.skipped });
-        bgProblem.ac = new AbortController();
-      }
-    });
+    setupAbortListener();
 
     const testcaseOrder = problem.getEnabledTestcaseIds();
 

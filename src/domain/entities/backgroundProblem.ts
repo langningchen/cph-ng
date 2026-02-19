@@ -36,9 +36,12 @@ export class BackgroundProblem {
   }
 
   public abort(target?: TestcaseId) {
-    if (target) this._ac?.abort(target);
-    else this._ac?.abort();
-    this._ac = null;
+    const current = this._ac;
+    if (target) current?.abort(target);
+    else current?.abort();
+    if (this._ac === current) {
+      this._ac = null;
+    }
   }
 
   public addTimeElapsed(now: number) {
