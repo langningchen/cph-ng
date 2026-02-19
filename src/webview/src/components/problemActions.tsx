@@ -102,15 +102,15 @@ export const ProblemActions = memo(
           ) : (
             <CphMenu
               menu={{
-                [t('problemActions.runTestcases.menu.forceCompile')]: () =>
+                [t('problemActions.runAllTestcases.menu.forceCompile')]: () =>
                   dispatch({
-                    type: 'runTestcases',
+                    type: 'runAllTestcases',
                     problemId,
                     forceCompile: true,
                   }),
-                [t('problemActions.runTestcases.menu.skipCompile')]: () =>
+                [t('problemActions.runAllTestcases.menu.skipCompile')]: () =>
                   dispatch({
-                    type: 'runTestcases',
+                    type: 'runAllTestcases',
                     problemId,
                     forceCompile: false,
                   }),
@@ -118,12 +118,12 @@ export const ProblemActions = memo(
             >
               <CphButton
                 larger
-                name={`${t('problemActions.runTestcases')} (Ctrl: ${t('problemActions.runTestcases.forceCompile')}, Alt: ${t('problemActions.runTestcases.skipCompile')})`}
+                name={`${t('problemActions.runAllTestcases')} (Ctrl: ${t('problemActions.runAllTestcases.forceCompile')}, Alt: ${t('problemActions.runAllTestcases.skipCompile')})`}
                 icon={PlaylistPlayIcon}
                 color='success'
                 onClick={(e) =>
                   dispatch({
-                    type: 'runTestcases',
+                    type: 'runAllTestcases',
                     problemId,
                     forceCompile: getCompile(e),
                   })

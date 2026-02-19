@@ -43,8 +43,8 @@ export interface EditProblemDetailsMsg extends ProblemBaseMsg {
 export interface DeleteProblemMsg extends ProblemBaseMsg {
   type: 'deleteProblem';
 }
-export interface RunTestcasesMsg extends ProblemBaseMsg {
-  type: 'runTestcases';
+export interface RunAllTestcasesMsg extends ProblemBaseMsg {
+  type: 'runAllTestcases';
   forceCompile: boolean | null;
 }
 export interface StopTestcasesMsg extends ProblemBaseMsg {
@@ -57,8 +57,8 @@ export interface AddTestcaseMsg extends ProblemBaseMsg {
 export interface LoadTestcasesMsg extends ProblemBaseMsg {
   type: 'loadTestcases';
 }
-export interface RunTestcaseMsg extends ProblemBaseMsg {
-  type: 'runTestcase';
+export interface RunSingleTestcaseMsg extends ProblemBaseMsg {
+  type: 'runSingleTestcase';
   testcaseId: TestcaseId;
   forceCompile: boolean | null;
 }
@@ -144,11 +144,11 @@ export interface OpenSettingsMsg extends BaseMsg {
 export type ProblemMsg =
   | EditProblemDetailsMsg
   | DeleteProblemMsg
-  | RunTestcasesMsg
+  | RunAllTestcasesMsg
   | StopTestcasesMsg
   | AddTestcaseMsg
   | LoadTestcasesMsg
-  | RunTestcaseMsg
+  | RunSingleTestcaseMsg
   | ClearTestcaseStatusMsg
   | ChooseTestcaseFileMsg
   | SetTestcaseStringMsg

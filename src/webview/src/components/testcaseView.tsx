@@ -371,14 +371,14 @@ export const TestcaseView = memo(
                 menu={{
                   [t('testcaseView.run.menu.forceCompile')]: () =>
                     dispatch({
-                      type: 'runTestcase',
+                      type: 'runSingleTestcase',
                       problemId,
                       testcaseId,
                       forceCompile: true,
                     }),
                   [t('testcaseView.run.menu.skipCompile')]: () =>
                     dispatch({
-                      type: 'runTestcase',
+                      type: 'runSingleTestcase',
                       problemId,
                       testcaseId,
                       forceCompile: false,
@@ -399,7 +399,7 @@ export const TestcaseView = memo(
                       });
                     } else {
                       dispatch({
-                        type: 'runTestcase',
+                        type: 'runSingleTestcase',
                         problemId,
                         testcaseId,
                         forceCompile: getCompile(e),

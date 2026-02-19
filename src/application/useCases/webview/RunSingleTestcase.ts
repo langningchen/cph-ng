@@ -33,10 +33,10 @@ import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { VerdictName } from '@/domain/entities/verdict';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
-import type { RunTestcaseMsg } from '@/webview/src/msgs';
+import type { RunSingleTestcaseMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class RunSingleTestcase extends BaseProblemUseCase<RunTestcaseMsg> {
+export class RunSingleTestcase extends BaseProblemUseCase<RunSingleTestcaseMsg> {
   public constructor(
     @inject(TOKENS.compilerService) private readonly compiler: ICompilerService,
     @inject(TOKENS.document) private readonly document: IDocument,
@@ -48,7 +48,10 @@ export class RunSingleTestcase extends BaseProblemUseCase<RunTestcaseMsg> {
     super(repo);
   }
 
-  protected async performAction(bgProblem: BackgroundProblem, msg: RunTestcaseMsg): Promise<void> {
+  protected async performAction(
+    bgProblem: BackgroundProblem,
+    msg: RunSingleTestcaseMsg,
+  ): Promise<void> {
     if (!bgProblem) throw new Error('Problem not found');
     const { problem } = bgProblem;
 

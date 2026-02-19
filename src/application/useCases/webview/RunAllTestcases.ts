@@ -35,10 +35,10 @@ import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { VerdictName, Verdicts, VerdictType } from '@/domain/entities/verdict';
 import type { TestcaseId } from '@/domain/types';
 import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
-import type { RunTestcasesMsg } from '@/webview/src/msgs';
+import type { RunAllTestcasesMsg } from '@/webview/src/msgs';
 
 @injectable()
-export class RunAllTestcases extends BaseProblemUseCase<RunTestcasesMsg> {
+export class RunAllTestcases extends BaseProblemUseCase<RunAllTestcasesMsg> {
   public constructor(
     @inject(TOKENS.compilerService) private readonly compiler: ICompilerService,
     @inject(TOKENS.document) private readonly document: IDocument,
@@ -51,7 +51,10 @@ export class RunAllTestcases extends BaseProblemUseCase<RunTestcasesMsg> {
     super(repo);
   }
 
-  protected async performAction(bgProblem: BackgroundProblem, msg: RunTestcasesMsg): Promise<void> {
+  protected async performAction(
+    bgProblem: BackgroundProblem,
+    msg: RunAllTestcasesMsg,
+  ): Promise<void> {
     const { problem } = bgProblem;
     let ac = new AbortController();
     let currentId: TestcaseId | null = null;

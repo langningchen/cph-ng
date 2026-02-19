@@ -74,10 +74,10 @@ export class CommandModule implements IExtensionModule {
         this.ui.showSidebar();
         await this.importProblem.exec({ type: 'importProblem' });
       },
-      'cph-ng.runTestcases': async () => {
+      'cph-ng.runAllTestcases': async () => {
         this.ui.showSidebar();
         await this.runAllTestcases.exec({
-          type: 'runTestcases',
+          type: 'runAllTestcases',
           problemId: await this.getProblemId(),
           forceCompile: null,
         });

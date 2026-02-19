@@ -81,14 +81,14 @@ export class LlmTestcaseRunner extends BaseLlmTool<LlmTestcaseRunnerParams> {
 
     if (testcaseId !== undefined) {
       await this.runSingleTestcase.exec({
-        type: 'runTestcase',
+        type: 'runSingleTestcase',
         problemId,
         testcaseId,
         forceCompile: null,
       });
     } else {
       await this.runAllTestcases.exec({
-        type: 'runTestcases',
+        type: 'runAllTestcases',
         problemId,
         forceCompile: null,
       });
