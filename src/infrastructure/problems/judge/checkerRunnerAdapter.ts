@@ -52,9 +52,8 @@ export class CheckerRunnerAdapter implements ICheckerRunner {
 
     const message = await this.fs.readFile(result.stderrPath);
     this.tmp.dispose([result.stdoutPath, result.stderrPath]);
-    if (typeof result.codeOrSignal === 'string') {
-      return new Error('Checker run failed');
-    }
+    if (typeof result.codeOrSignal === 'string')
+      return new Error(`Checker run failed ${result.codeOrSignal}: ${message.trim()}`);
     return {
       exitCode: result.codeOrSignal,
       msg: message.trim(),

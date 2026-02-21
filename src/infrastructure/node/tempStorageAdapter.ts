@@ -50,7 +50,7 @@ export class TempStorageAdapter implements ITempStorage {
     this.monitorInterval = setInterval(() => {
       this.logger.debug(`Currently ${this.usedPool.size} used, ${this.freePool.size} free`);
       this.logger.trace('Used paths', Object.fromEntries(this.usedPool));
-    }, 10000);
+    }, 60000);
     this.logger.info('Monitor started');
   }
 

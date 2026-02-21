@@ -23,6 +23,7 @@ export class DocumentAdapter implements IDocument {
     return new Promise<void>((resolve, _reject) => {
       if (check()) {
         resolve();
+        return;
       }
       const intervalId = setInterval(() => {
         if (check()) {

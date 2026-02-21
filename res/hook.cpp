@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
-#include <stdexcept>
 
 #ifdef _WIN32
 
@@ -9,16 +8,6 @@
 #include <windows.h>
 #include <io.h>
 #include <fcntl.h>
-#include <stdarg.h>
-
-typedef FILE *(__cdecl *FOPEN_T)(const char *, const char *);
-static FOPEN_T get_real_fopen()
-{
-    HMODULE hMod = GetModuleHandleA("ucrtbase.dll");
-    if (!hMod)
-        throw std::runtime_error("Cannot load ucrtbase.dll");
-    return (FOPEN_T)GetProcAddress(hMod, "fopen");
-}
 
 #define ATTR __cdecl
 #define fdopen _fdopen
@@ -34,16 +23,29 @@ static FOPEN_T get_real_fopen()
 #include <dlfcn.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdarg.h>
-
-typedef FILE *(*FOPEN_T)(const char *, const char *);
-static FOPEN_T get_real_fopen() { return (FOPEN_T)dlsym(RTLD_NEXT, "fopen"); }
 
 #define ATTR
 
 #endif
 
-static int is_report_path(const char *path)
+typedef FILE *(ATTR *FOPEN_T)(const char *, const char *);
+
+static FOPEN_T getRealFopen()
+{
+    static FOPEN_T cache = nullptr;
+    if (cache)
+        return cache;
+
+#ifdef _WIN32
+    HMODULE hMod = GetModuleHandleA("ucrtbase.dll");
+    if (hMod)
+        cache = (FOPEN_T)GetProcAddress(hMod, "fopen");
+#else
+    cache = (FOPEN_T)dlsym(RTLD_NEXT, "fopen");
+#endif
+    return cache;
+}
+static int isReportPath(const char *path)
 {
     if (!path)
         return 0;
@@ -53,28 +55,34 @@ static int is_report_path(const char *path)
     return strcmp(path, report_path) == 0;
 }
 
-FILE *ATTR fopen(const char *path, const char *mode)
+extern "C"
 {
-    if (is_report_path(path))
-        return get_real_fopen()(path, mode);
-    if (mode && strchr(mode, 'r'))
-        return fdopen(dup(fileno(stdin)), mode);
-    else
-        return fdopen(dup(fileno(stdout)), mode);
-}
-
-FILE *ATTR freopen(const char *path, const char *mode, FILE *stream)
-{
-    if (mode && strchr(mode, 'r'))
-        return fdopen(dup(fileno(stdin)), mode);
-    else
-        return fdopen(dup(fileno(stdout)), mode);
-}
-
-int ATTR open(const char *pathname, int flags, ...)
-{
-    if ((flags & O_WRONLY) || (flags & O_RDWR) || (flags & O_APPEND))
-        return dup(fileno(stdout));
-    else
-        return dup(fileno(stdin));
+    FILE *ATTR fopen(const char *path, const char *mode)
+    {
+        if (isReportPath(path))
+        {
+            FOPEN_T real_func = getRealFopen();
+            if (!real_func)
+                return nullptr;
+            return real_func(path, mode);
+        }
+        if (mode && strchr(mode, 'r'))
+            return fdopen(dup(fileno(stdin)), mode);
+        else
+            return fdopen(dup(fileno(stdout)), mode);
+    }
+    FILE *ATTR freopen(const char *path, const char *mode, FILE *stream)
+    {
+        if (mode && strchr(mode, 'r'))
+            return fdopen(dup(fileno(stdin)), mode);
+        else
+            return fdopen(dup(fileno(stdout)), mode);
+    }
+    int ATTR open(const char *pathname, int flags, ...)
+    {
+        if ((flags & O_WRONLY) || (flags & O_RDWR) || (flags & O_APPEND))
+            return dup(fileno(stdout));
+        else
+            return dup(fileno(stdin));
+    }
 }

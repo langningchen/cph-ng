@@ -48,9 +48,19 @@ export class WebviewHtmlRenderer {
 <head><link rel="stylesheet" href="${getUri('dist/styles.css')}"></head>
 <body>
   <div id="root"></div>
+  <script type="application/json" id="cph-ng-config">
+    ${JSON.stringify(config)}
+  </script>
   <script>
     window.vscode = acquireVsCodeApi();
-    Object.assign(window, ${JSON.stringify(config)});
+    const configEl = document.getElementById('cph-ng-config');
+    if (!configEl) console.error('Config element not found');
+    try {
+      const config = JSON.parse(configEl.textContent || '{}');
+      Object.assign(window, config);
+    } catch (e) {
+      console.error('Failed to parse config', e);
+    }
   </script>
   <script src="${getUri('dist/frontend.js')}"></script>
 </body>
