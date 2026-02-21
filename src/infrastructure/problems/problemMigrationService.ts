@@ -232,7 +232,9 @@ export class ProblemMigrationService implements IProblemMigrationService {
         })),
       }) satisfies History.IProblem_0_0_4,
     '0.0.1': (problem: History.IProblem_0_0_1): History.IProblem_0_0_3 =>
-      problem satisfies History.IProblem_0_0_3,
+      ({
+        ...problem,
+      }) satisfies History.IProblem_0_0_3,
   };
 
   public migrate(problem: any): any {

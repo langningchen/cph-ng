@@ -2,6 +2,7 @@ import { cryptoMock } from '@t/infrastructure/node/cryptoMock';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
+import type * as History from '@/application/ports/problems/history';
 import { TOKENS } from '@/composition/tokens';
 import { StressTestState } from '@/domain/entities/stressTest';
 import { ProblemMigrationService } from '@/infrastructure/problems/problemMigrationService';
@@ -32,7 +33,7 @@ describe('ProblemMigrationService', () => {
       },
       timeElapsedMs: 0,
       overrides: {},
-    };
+    } satisfies History.IProblem_0_6_0;
 
     const result = migration.migrate(data);
     expect(result.version).toBe('0.6.0');
@@ -45,22 +46,21 @@ describe('ProblemMigrationService', () => {
       name: 'migrated',
       url: 'https://cf.com/1/A',
       src: { path: '/src/code.cpp' },
-      checker: null,
-      interactor: null,
       bfCompare: {
         generator: { path: '/gen.cpp' },
         bruteForce: { path: '/bf.cpp' },
+        running: false,
+        msg: '',
       },
       tcs: {
-        'tc-0': {
+        'u-u-i-d-0': {
           stdin: { useFile: false, data: 'hello' },
           answer: { useFile: true, data: '/tmp/answer.txt' },
           isExpand: false,
           isDisabled: false,
-          result: null,
         },
       },
-      tcOrder: ['tc-0'],
+      tcOrder: ['u-u-i-d-0'],
       timeElapsed: 100,
       timeLimit: 2000,
       memoryLimit: 256,
@@ -68,14 +68,14 @@ describe('ProblemMigrationService', () => {
         compiler: 'g++',
         compilerArgs: '-O2',
       },
-    };
+    } satisfies History.IProblem_0_4_8;
 
     const result = migration.migrate(data);
     expect(result.version).toBe('0.6.0');
     expect(result.name).toBe('migrated');
-    expect(result.testcaseOrder).toEqual(['tc-0']);
-    expect(result.testcases['tc-0'].stdin).toEqual({ data: 'hello' });
-    expect(result.testcases['tc-0'].answer).toEqual({ path: '/tmp/answer.txt' });
+    expect(result.testcaseOrder).toEqual(['u-u-i-d-0']);
+    expect(result.testcases['u-u-i-d-0'].stdin).toEqual({ data: 'hello' });
+    expect(result.testcases['u-u-i-d-0'].answer).toEqual({ path: '/tmp/answer.txt' });
     expect(result.stressTest.generator).toEqual({ path: '/gen.cpp' });
     expect(result.stressTest.state).toBe(StressTestState.inactive);
     expect(result.overrides.timeLimitMs).toBe(2000);
@@ -88,27 +88,25 @@ describe('ProblemMigrationService', () => {
       version: '0.4.3',
       name: 'old-io',
       src: { path: '/src/code.cpp' },
-      checker: null,
-      interactor: null,
       tcs: {
-        'tc-0': {
-          stdin: { useFile: false, data: 'input', path: '' },
-          answer: { useFile: true, data: '', path: '/tmp/ans.txt' },
+        'u-u-i-d-0': {
+          stdin: { useFile: false, data: 'input' },
+          answer: { useFile: true, path: '/tmp/ans.txt' },
           isExpand: false,
           isDisabled: true,
           result: undefined,
         },
       },
-      tcOrder: ['tc-0'],
+      tcOrder: ['u-u-i-d-0'],
       timeElapsed: 0,
       timeLimit: 1000,
       memoryLimit: 512,
-    };
+    } satisfies History.IProblem_0_4_3;
 
     const result = migration.migrate(data);
     expect(result.version).toBe('0.6.0');
-    expect(result.testcases['tc-0'].stdin).toEqual({ data: 'input' });
-    expect(result.testcases['tc-0'].answer).toEqual({ path: '/tmp/ans.txt' });
+    expect(result.testcases['u-u-i-d-0'].stdin).toEqual({ data: 'input' });
+    expect(result.testcases['u-u-i-d-0'].answer).toEqual({ path: '/tmp/ans.txt' });
   });
 
   it('should migrate from 0.3.7 (add isDisabled)', () => {
@@ -116,21 +114,19 @@ describe('ProblemMigrationService', () => {
       version: '0.3.7',
       name: 'no-disabled',
       src: { path: '/src/code.cpp' },
-      checker: null,
-      interactor: null,
       tcs: {
-        'tc-0': {
-          stdin: { useFile: false, data: 'input', path: '' },
-          answer: { useFile: false, data: 'ans', path: '' },
+        'u-u-i-d-0': {
+          stdin: { useFile: false, data: 'input' },
+          answer: { useFile: false, data: 'ans' },
           isExpand: false,
           result: undefined,
         },
       },
-      tcOrder: ['tc-0'],
+      tcOrder: ['u-u-i-d-0'],
       timeElapsed: 0,
       timeLimit: 1000,
       memoryLimit: 512,
-    };
+    } satisfies History.IProblem_0_3_7;
 
     const result = migration.migrate(data);
     expect(result.version).toBe('0.6.0');
@@ -141,12 +137,10 @@ describe('ProblemMigrationService', () => {
       version: '0.2.4',
       name: 'array-tcs',
       src: { path: '/src/code.cpp' },
-      checker: null,
-      interactor: null,
       tcs: [
         {
-          stdin: { useFile: false, data: 'in1', path: '' },
-          answer: { useFile: false, data: 'out1', path: '' },
+          stdin: { useFile: false, data: 'in1' },
+          answer: { useFile: false, data: 'out1' },
           isExpand: false,
           result: undefined,
         },
@@ -154,7 +148,7 @@ describe('ProblemMigrationService', () => {
       timeElapsed: 0,
       timeLimit: 1000,
       memoryLimit: 512,
-    };
+    } satisfies History.IProblem_0_2_4;
 
     const result = migration.migrate(data);
     expect(result.version).toBe('0.6.0');
@@ -163,7 +157,6 @@ describe('ProblemMigrationService', () => {
 
   it('should migrate from 0.0.5 (srcPath/srcHash to src)', () => {
     const data = {
-      version: '0.0.5',
       name: 'legacy',
       srcPath: '/src/code.cpp',
       srcHash: 'abc123',
@@ -171,10 +164,8 @@ describe('ProblemMigrationService', () => {
       checkerPath: '/checker.cpp',
       checkerHash: 'def456',
       tcs: [],
-      timeElapsed: 0,
       timeLimit: 1000,
-      memoryLimit: 512,
-    };
+    } satisfies History.IProblem_0_0_5;
 
     const result = migration.migrate(data);
     expect(result.version).toBe('0.6.0');
@@ -185,7 +176,8 @@ describe('ProblemMigrationService', () => {
       name: 'no-version',
       src: { path: '/src/code.cpp' },
       tcs: [],
-    };
+      timeLimit: 1000,
+    } satisfies History.IProblem_0_1_0;
 
     const result = migration.migrate(data);
     expect(result.version).toBe('0.6.0');

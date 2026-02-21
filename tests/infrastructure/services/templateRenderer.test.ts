@@ -22,6 +22,7 @@ describe('TemplateRenderer', () => {
     fsMock = mock<IFileSystem>();
     pathResolverMock = mock<IPathResolver>();
     uiMock = mock<IUi>();
+    uiMock.alert.mockResolvedValue(undefined);
 
     container.registerInstance(TOKENS.fileSystem, fsMock);
     container.registerInstance(TOKENS.logger, loggerMock);
