@@ -146,11 +146,11 @@ describe('TempStorageAdapter', () => {
     adapter.startMonitor();
     expect(loggerMock.info).toHaveBeenCalledWith('Monitor started');
 
-    vi.advanceTimersByTime(10000);
+    vi.advanceTimersByTime(60000);
     expect(loggerMock.debug).toHaveBeenCalledWith('Currently 1 used, 1 free');
     expect(loggerMock.trace).toHaveBeenLastCalledWith('Used paths', { [p2]: 'test2' });
 
-    vi.advanceTimersByTime(10000);
+    vi.advanceTimersByTime(60000);
     expect(loggerMock.debug).toHaveBeenCalledTimes(2);
     expect(loggerMock.trace).toHaveBeenCalledTimes(2);
 
