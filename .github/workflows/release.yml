@@ -4,7 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       force_release:
-        description: 'Force a normal Release instead of a Prerelease'
+        description: "Force a normal Release instead of a Prerelease"
+        required: false
+        default: false
+        type: boolean
+      force_prerelease:
+        description: "Force a Prerelease instead of a normal Release"
         required: false
         default: false
         type: boolean
@@ -39,6 +44,7 @@ jobs:
         id: version
         env:
           FORCE_RELEASE: ${{ github.event.inputs.force_release || false }}
+          FORCE_PRERELEASE: ${{ github.event.inputs.force_prerelease || false }}
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           LATEST_VERSION=$(grep -E '^## [0-9]+\.[0-9]+\.[0-9]+' CHANGELOG.md | head -1 | sed 's/^## //')
@@ -56,8 +62,15 @@ jobs:
             PRE_RELEASE=true
           fi
 
+          if [ "$FORCE_RELEASE" = "true" ] && [ "$FORCE_PRERELEASE" = "true" ]; then
+            echo "Error: Cannot force both release and prerelease at the same time."
+            exit 1
+          fi
           if [ "$FORCE_RELEASE" = "true" ]; then
             PRE_RELEASE=false
+          fi
+          if [ "$FORCE_PRERELEASE" = "true" ]; then
+            PRE_RELEASE=true
           fi
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
