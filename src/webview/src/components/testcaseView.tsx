@@ -31,12 +31,12 @@ import { VerdictType } from '@/domain/entities/verdict';
 import type { ProblemId, TestcaseId } from '@/domain/types';
 import type { IWebviewTestcase } from '@/domain/webviewTypes';
 import { useProblemDispatch } from '../context/ProblemContext';
-import { getCompile } from '../utils';
 import { CphFlex } from './base/cphFlex';
 import { CphMenu } from './base/cphMenu';
 import { CphText } from './base/cphText';
 import { ErrorBoundary } from './base/errorBoundary';
 import { CphButton } from './cphButton';
+import { RunButtonGroup } from './runButtonGroup';
 import { TestcaseDataView } from './testcaseDataView';
 
 interface TestcaseViewProp {
@@ -326,7 +326,7 @@ export const TestcaseView = memo(
               <CphFlex flex={1}>
                 <CphText fontWeight='bold'>#{idx + 1}</CphText>
                 {!!testcase.result?.verdict && (
-                  <Tooltip disableInteractive title={testcase.result.verdict.fullName}>
+                  <Tooltip disableInteractive followCursor title={testcase.result.verdict.fullName}>
                     <Chip
                       label={testcase.result.verdict.name}
                       size='small'
@@ -367,47 +367,26 @@ export const TestcaseView = memo(
                   }}
                 />
               )}
-              <CphMenu
-                menu={{
-                  [t('testcaseView.run.menu.forceCompile')]: () =>
-                    dispatch({
-                      type: 'runSingleTestcase',
-                      problemId,
-                      testcaseId,
-                      forceCompile: true,
-                    }),
-                  [t('testcaseView.run.menu.skipCompile')]: () =>
-                    dispatch({
-                      type: 'runSingleTestcase',
-                      problemId,
-                      testcaseId,
-                      forceCompile: false,
-                    }),
-                }}
-              >
+              {isRunning ? (
                 <CphButton
-                  name={isRunning ? t('testcaseView.stop') : t('testcaseView.run')}
-                  icon={isRunning ? StopIcon : PlayArrowIcon}
-                  color={isRunning ? 'warning' : 'success'}
+                  name={t('testcaseView.stop')}
+                  icon={StopIcon}
+                  color='warning'
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (isRunning) {
-                      dispatch({
-                        type: 'stopTestcases',
-                        problemId,
-                        testcaseId,
-                      });
-                    } else {
-                      dispatch({
-                        type: 'runSingleTestcase',
-                        problemId,
-                        testcaseId,
-                        forceCompile: getCompile(e),
-                      });
-                    }
+                    dispatch({ type: 'stopTestcases', problemId, testcaseId });
                   }}
                 />
-              </CphMenu>
+              ) : (
+                <RunButtonGroup
+                  icon={PlayArrowIcon}
+                  name={t('testcaseView.run')}
+                  color='success'
+                  onRun={(forceCompile) => {
+                    dispatch({ type: 'runSingleTestcase', problemId, testcaseId, forceCompile });
+                  }}
+                />
+              )}
               <CphButton
                 name={t('testcaseView.delete')}
                 icon={DeleteIcon}

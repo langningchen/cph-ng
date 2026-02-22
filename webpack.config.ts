@@ -29,7 +29,6 @@ import webpack from 'webpack';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
 const generateSchema = () => {
   const typesPath = resolve(__dirname, 'src/domain/types.ts');
   const outputPath = resolve(__dirname, 'dist/problem.schema.json');
@@ -40,7 +39,7 @@ const generateSchema = () => {
         try {
           mkdirSync(dirname(outputPath), { recursive: true });
           execSync(
-            `pnpm exec ts-json-schema-generator --path 'src/domain/types.ts' --type 'IProblem' -o dist/problem.schema.json`,
+            `pnpm exec ts-json-schema-generator --path 'src/domain/types.ts' --type 'IProblem' -o ${outputPath}`,
             { stdio: 'inherit' },
           );
           console.log('Successfully generated schema file.');
@@ -123,7 +122,7 @@ const generateBuildInfo = () => {
 export default (_env: Record<string, unknown>, argv: Record<string, unknown>): Configuration[] => {
   const isProd = argv.mode === 'production';
 
-  const baseConfig: Configuration = {
+  const makeBaseConfig = (): Configuration => ({
     mode: isProd ? 'production' : 'development',
     devtool: 'source-map',
     resolve: {
@@ -180,10 +179,10 @@ export default (_env: Record<string, unknown>, argv: Record<string, unknown>): C
         message: /Critical dependency: the request of a dependency is an expression/,
       },
     ],
-  };
+  });
 
   const extensionConfig: Configuration = {
-    ...baseConfig,
+    ...makeBaseConfig(),
     target: 'node',
     entry: './src/extension.ts',
     output: {
@@ -216,7 +215,7 @@ export default (_env: Record<string, unknown>, argv: Record<string, unknown>): C
   };
 
   const webviewConfig: Configuration = {
-    ...baseConfig,
+    ...makeBaseConfig(),
     target: 'web',
     entry: './src/webview/src/App.tsx',
     devtool: isProd ? 'source-map' : 'inline-source-map',
@@ -240,13 +239,15 @@ export default (_env: Record<string, unknown>, argv: Record<string, unknown>): C
   };
 
   const routerConfig: Configuration = {
-    ...baseConfig,
+    ...makeBaseConfig(),
     target: 'node20',
     entry: './src/router/index.ts',
     output: {
       path: resolve(__dirname, 'dist'),
       filename: 'router.cjs',
-      chunkFormat: 'module',
+      library: {
+        type: 'commonjs2',
+      },
     },
     cache: {
       type: 'filesystem',
@@ -254,12 +255,6 @@ export default (_env: Record<string, unknown>, argv: Record<string, unknown>): C
       name: isProd ? 'prod-router' : 'dev-router',
     },
     externalsPresets: { node: true },
-    externals: [
-      {
-        bufferutil: false,
-        'utf-8-validate': false,
-      },
-    ],
     plugins: [
       new webpack.IgnorePlugin({
         resourceRegExp: /^(bufferutil|utf-8-validate)$/,

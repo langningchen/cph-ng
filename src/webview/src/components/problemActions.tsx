@@ -38,11 +38,10 @@ import { useTranslation } from 'react-i18next';
 import type { ProblemId } from '@/domain/types';
 import type { IWebviewStressTest } from '@/domain/webviewTypes';
 import { useProblemDispatch } from '../context/ProblemContext';
-import { getCompile } from '../utils';
 import { CphFlex } from './base/cphFlex';
 import { CphLink } from './base/cphLink';
-import { CphMenu } from './base/cphMenu';
 import { CphButton } from './cphButton';
+import { RunButtonGroup } from './runButtonGroup';
 
 interface ProblemActionsProps {
   problemId: ProblemId;
@@ -100,36 +99,15 @@ export const ProblemActions = memo(
               }
             />
           ) : (
-            <CphMenu
-              menu={{
-                [t('problemActions.runAllTestcases.menu.forceCompile')]: () =>
-                  dispatch({
-                    type: 'runAllTestcases',
-                    problemId,
-                    forceCompile: true,
-                  }),
-                [t('problemActions.runAllTestcases.menu.skipCompile')]: () =>
-                  dispatch({
-                    type: 'runAllTestcases',
-                    problemId,
-                    forceCompile: false,
-                  }),
-              }}
-            >
-              <CphButton
-                larger
-                name={`${t('problemActions.runAllTestcases')} (Ctrl: ${t('problemActions.runAllTestcases.forceCompile')}, Alt: ${t('problemActions.runAllTestcases.skipCompile')})`}
-                icon={PlaylistPlayIcon}
-                color='success'
-                onClick={(e) =>
-                  dispatch({
-                    type: 'runAllTestcases',
-                    problemId,
-                    forceCompile: getCompile(e),
-                  })
-                }
-              />
-            </CphMenu>
+            <RunButtonGroup
+              larger
+              icon={PlaylistPlayIcon}
+              name={t('problemActions.runAllTestcases')}
+              color='success'
+              onRun={(forceCompile) =>
+                dispatch({ type: 'runAllTestcases', problemId, forceCompile })
+              }
+            />
           )}
           <CphButton
             larger
@@ -318,18 +296,14 @@ export const ProblemActions = memo(
                   color='warning'
                 />
               ) : (
-                <CphButton
-                  name={t('problemActions.stressTestDialog.run')}
-                  onClick={(e) => {
-                    dispatch({
-                      type: 'startStressTest',
-                      problemId,
-                      forceCompile: getCompile(e),
-                    });
-                  }}
+                <RunButtonGroup
                   icon={PlayCircleIcon}
+                  name={t('problemActions.stressTestDialog.run')}
                   color='success'
                   disabled={!stressTest.generator || !stressTest.bruteForce}
+                  onRun={(forceCompile) => {
+                    dispatch({ type: 'startStressTest', problemId, forceCompile });
+                  }}
                 />
               )}
             </CphFlex>

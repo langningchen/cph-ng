@@ -29,7 +29,7 @@ interface CphButtonProps extends IconButtonProps {
 
 export const CphButton = (props: CphButtonProps) => {
   return (
-    <Tooltip disableInteractive title={props.name}>
+    <Tooltip disableInteractive followCursor title={props.name}>
       <IconButton
         color='primary'
         size={props.larger ? 'medium' : 'small'}

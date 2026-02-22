@@ -23,8 +23,9 @@ import { TOKENS } from '@/composition/tokens';
 @injectable()
 export class WebviewHtmlRenderer {
   public constructor(
-    @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.extensionPath) private readonly extPath: string,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.version) private readonly version: string,
   ) {}
 
   public render(webview: Webview): string {
@@ -37,6 +38,7 @@ export class WebviewHtmlRenderer {
     if (themePref === 'dark') isDarkMode = true;
 
     const config = {
+      version: this.version,
       isDarkMode,
       hiddenStatuses: this.settings.sidebar.hiddenStatuses,
       partyUri: this.settings.sidebar.showAcGif ? getUri('res/party.gif').toString() : '',

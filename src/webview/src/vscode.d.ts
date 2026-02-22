@@ -19,6 +19,7 @@ declare const vscode: {
   postMessage<T>(msg: T): Thenable<void>;
 };
 
+declare const version: string;
 declare const isDarkMode: boolean;
 declare const partyUri: string;
 declare const hiddenStatuses: string[];

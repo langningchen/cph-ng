@@ -118,7 +118,9 @@ export class WebviewProblemMapper {
       [StressTestState.runningBruteForce]: this.translator.t('Running Brute Force (#{cnt})...', {
         cnt: stressTest.cnt,
       }),
-      [StressTestState.runningSolution]: this.translator.t('Running Solution (#{cnt})...'),
+      [StressTestState.runningSolution]: this.translator.t('Running Solution (#{cnt})...', {
+        cnt: stressTest.cnt,
+      }),
       [StressTestState.foundDifference]: this.translator.t('Difference found at case #{cnt}', {
         cnt: stressTest.cnt,
       }),

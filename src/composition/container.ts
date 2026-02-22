@@ -18,6 +18,7 @@
 import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { container } from 'tsyringe';
 import { type ExtensionContext, window } from 'vscode';
+import { BuildInfoAdapter } from '@/infrastructure/node/buildInfoAdapter';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
 import { CryptoAdapter } from '@/infrastructure/node/cryptoAdapter';
 import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
@@ -76,6 +77,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.activePathService, ActivePathService);
   container.registerSingleton(TOKENS.activeProblemCoordinator, ActiveProblemCoordinator);
   container.registerSingleton(TOKENS.archive, ArchiveAdapter);
+  container.registerSingleton(TOKENS.buildInfo, BuildInfoAdapter);
   container.registerSingleton(TOKENS.checkerRunner, CheckerRunnerAdapter);
   container.registerSingleton(TOKENS.clock, ClockAdapter);
   container.registerSingleton(TOKENS.companion, Companion);

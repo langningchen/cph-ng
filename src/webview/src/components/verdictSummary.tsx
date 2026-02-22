@@ -64,7 +64,7 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
   return (
     <CphFlex alignStart flexWrap='wrap' sx={{ display: { xs: 'none', sm: 'flex' } }}>
       {stats.passed > 0 && (
-        <Tooltip disableInteractive title={t('verdictSummary.passed')}>
+        <Tooltip disableInteractive followCursor title={t('verdictSummary.passed')}>
           <Chip
             icon={<CheckCircleIcon />}
             label={stats.passed}
@@ -75,7 +75,7 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
         </Tooltip>
       )}
       {stats.failed > 0 && (
-        <Tooltip disableInteractive title={t('verdictSummary.failed')}>
+        <Tooltip disableInteractive followCursor title={t('verdictSummary.failed')}>
           <Chip
             icon={<ErrorIcon />}
             label={stats.failed}
@@ -86,7 +86,7 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
         </Tooltip>
       )}
       {stats.running > 0 && (
-        <Tooltip disableInteractive title={t('verdictSummary.running')}>
+        <Tooltip disableInteractive followCursor title={t('verdictSummary.running')}>
           <Chip
             icon={<HourglassEmptyIcon />}
             label={stats.running}
@@ -97,7 +97,7 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
         </Tooltip>
       )}
       {stats.pending > 0 && (
-        <Tooltip disableInteractive title={t('verdictSummary.pending')}>
+        <Tooltip disableInteractive followCursor title={t('verdictSummary.pending')}>
           <Chip
             icon={<RemoveCircleOutlineIcon />}
             label={stats.pending}

@@ -29,6 +29,7 @@ import { CreateProblemView } from './components/createProblemView';
 import { DragOverlay } from './components/dragOverlay';
 import { InitView } from './components/initView';
 import { ProblemView } from './components/problemView';
+import { WelcomeDialog } from './components/welcomeDialog';
 import { ProblemProvider, useProblemState } from './context/ProblemContext';
 import langEn from './l10n/en.json';
 import langZh from './l10n/zh.json';
@@ -50,6 +51,7 @@ const Main = () => {
 
   return (
     <>
+      <WelcomeDialog />
       <ErrorBoundary>
         <DragOverlay />
       </ErrorBoundary>
@@ -77,7 +79,7 @@ const Main = () => {
           )}
           {isNarrow && (
             <Alert severity='info' sx={{ fontSize: '0.75rem', py: 0 }}>
-              {t('narrowWidthAlert')}
+              {t('main.narrowWidthAlert')}
             </Alert>
           )}
         </CphFlex>
