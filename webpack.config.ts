@@ -17,7 +17,7 @@
 
 // biome-ignore-all lint/style/useNamingConvention: Terser API requires snake_case
 
-import { execSync } from 'node:child_process';
+import { execSync, execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -38,8 +38,18 @@ const generateSchema = () => {
       const runCommand = () => {
         try {
           mkdirSync(dirname(outputPath), { recursive: true });
-          execSync(
-            `pnpm exec ts-json-schema-generator --path 'src/domain/types.ts' --type 'IProblem' -o ${outputPath}`,
+          execFileSync(
+            'pnpm',
+            [
+              'exec',
+              'ts-json-schema-generator',
+              '--path',
+              'src/domain/types.ts',
+              '--type',
+              'IProblem',
+              '-o',
+              outputPath,
+            ],
             { stdio: 'inherit' },
           );
           console.log('Successfully generated schema file.');
