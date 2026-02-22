@@ -2,7 +2,7 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
-## [Unreleased] 0.6.0
+## 0.6.0
 
 - **refactor**: use DI structure
 
