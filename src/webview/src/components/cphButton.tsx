@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import IconButton, { IconButtonProps } from '@mui/material/IconButton';
-import SvgIcon from '@mui/material/SvgIcon';
+import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
+import type SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
-import { delProps } from '../utils';
+import { deleteProps } from '../utils';
 
 interface CphButtonProps extends IconButtonProps {
   icon: typeof SvgIcon;
@@ -27,18 +27,16 @@ interface CphButtonProps extends IconButtonProps {
   larger?: boolean;
 }
 
-const CphButton = (props: CphButtonProps) => {
+export const CphButton = (props: CphButtonProps) => {
   return (
-    <Tooltip disableInteractive title={props.name}>
+    <Tooltip disableInteractive followCursor title={props.name}>
       <IconButton
-        color={'primary'}
+        color='primary'
         size={props.larger ? 'medium' : 'small'}
-        {...delProps(props, ['icon', 'name', 'larger'])}
+        {...deleteProps(props, ['icon', 'name', 'larger'])}
       >
-        <props.icon fontSize={'small'} />
+        <props.icon fontSize='small' />
       </IconButton>
     </Tooltip>
   );
 };
-
-export default CphButton;

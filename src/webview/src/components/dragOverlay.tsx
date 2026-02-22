@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -18,6 +18,7 @@
 import DownloadIcon from '@mui/icons-material/Download';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import Backdrop from '@mui/material/Backdrop';
+import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -25,44 +26,38 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useProblemContext } from '../context/ProblemContext';
-import { basename } from '../utils';
-import CphFlex from './base/cphFlex';
+import { useProblemDispatch } from '../context/ProblemContext';
+import { CphFlex } from './base/cphFlex';
 
-const DragOverlay = () => {
+export const DragOverlay = () => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
+  const dispatch = useProblemDispatch();
   const [dragData, setDragData] = useState<string[] | null | undefined>(null);
 
-  const onDragOver = (e: DragEvent) =>
-    e.dataTransfer?.types.includes('text/uri-list') && setDragData(undefined);
-  const onDrop = (e: DragEvent) => {
-    if (!e.dataTransfer?.types.includes('text/uri-list')) {
-      return;
-    }
-    const items: string[] = [];
-    for (const item of e.dataTransfer
-      .getData('text/plain')
-      .replaceAll('\r', '')
-      .split('\n') || []) {
-      items.push(item);
-    }
-    if (!items.length) {
-      setDragData(null);
-    } else {
-      setDragData(items);
-      dispatch({ type: 'dragDrop', items });
-      setTimeout(() => setDragData(null), 1000);
-    }
-  };
-  const onDragLeave = (e: DragEvent) =>
-    (e.x >= 0 &&
-      e.x <= window.innerWidth &&
-      e.y >= 0 &&
-      e.y <= window.innerHeight) ||
-    setDragData(null);
-
   useEffect(() => {
+    const onDragOver = (e: DragEvent) =>
+      e.dataTransfer?.types.includes('text/uri-list') && setDragData(undefined);
+    const onDrop = (e: DragEvent) => {
+      if (!e.dataTransfer?.types.includes('text/uri-list')) {
+        return;
+      }
+      const items: string[] = [];
+      for (const item of e.dataTransfer.getData('text/plain').replaceAll('\r', '').split('\n') ||
+        []) {
+        items.push(item);
+      }
+      if (!items.length) {
+        setDragData(null);
+      } else {
+        setDragData(items);
+        dispatch({ type: 'dragDrop', items });
+        setTimeout(() => setDragData(null), 1000);
+      }
+    };
+    const onDragLeave = (e: DragEvent) =>
+      (e.x >= 0 && e.x <= window.innerWidth && e.y >= 0 && e.y <= window.innerHeight) ||
+      setDragData(null);
+
     window.addEventListener('dragover', onDragOver);
     window.addEventListener('drop', onDrop);
     window.addEventListener('dragleave', onDragLeave);
@@ -71,7 +66,7 @@ const DragOverlay = () => {
       window.removeEventListener('drop', onDrop);
       window.removeEventListener('dragleave', onDragLeave);
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <Backdrop
@@ -81,13 +76,7 @@ const DragOverlay = () => {
       open={dragData !== null}
     >
       {dragData ? (
-        <CphFlex
-          width={'100%'}
-          height={'100%'}
-          column
-          paddingX={2}
-          justifyContent={'center'}
-        >
+        <CphFlex width='100%' height='100%' column paddingX={2} justifyContent='center'>
           <List
             sx={{
               width: '100%',
@@ -99,26 +88,20 @@ const DragOverlay = () => {
                 <ListItemIcon>
                   <InsertDriveFileIcon />
                 </ListItemIcon>
-                <ListItemText primary={basename(path)} />
+                <ListItemText primary={path} />
               </ListItem>
             ))}
           </List>
         </CphFlex>
       ) : (
-        <CphFlex
-          width={'100%'}
-          height={'100%'}
-          column
-          gap={2}
-          color='#ffffff'
-          justifyContent={'center'}
-        >
+        <CphFlex width='100%' height='100%' column gap={2} color='#ffffff' justifyContent='center'>
           <DownloadIcon sx={{ fontSize: 80 }} />
           <Typography variant='h5'>{t('dragOverlay.description')}</Typography>
+          <Button variant='contained' color='primary' onClick={() => setDragData(null)}>
+            {t('dragOverlay.cancel')}
+          </Button>
         </CphFlex>
       )}
     </Backdrop>
   );
 };
-
-export default DragOverlay;

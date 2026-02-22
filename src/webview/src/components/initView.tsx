@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -19,21 +19,19 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import CphFlex from './base/cphFlex';
-import CphText from './base/cphText';
+import { CphFlex } from './base/cphFlex';
+import { CphText } from './base/cphText';
 
-const InitView = () => {
+export const InitView = () => {
   const { t } = useTranslation();
   return (
-    <Box flex={1} width={'100%'}>
-      <CphFlex column height={'100%'} justifyContent={'center'} gap={2}>
+    <Box flex={1} width='100%'>
+      <CphFlex column height='100%' justifyContent='center' gap={2}>
         <CircularProgress />
-        <CphText fontWeight={'bold'} fontSize={'bigger'}>
+        <CphText fontWeight='bold' fontSize='bigger'>
           {t('initView.message')}
         </CphText>
       </CphFlex>
     </Box>
   );
 };
-
-export default InitView;

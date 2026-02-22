@@ -4,20 +4,42 @@
     "moduleResolution": "bundler",
     "target": "ES2022",
     "jsx": "react",
-    "lib": ["ES2022", "dom"],
-    "baseUrl": ".",
+    "lib": [
+      "ES2022",
+      "dom"
+    ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
-      "@/*": ["src/*"],
-      "@w/*": ["src/webview/src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@t/*": [
+        "./tests/*"
+      ],
+      "@w/*": [
+        "./src/webview/src/*"
+      ],
+      "@r/*": [
+        "./src/router/*"
+      ]
     },
     "sourceMap": true,
-    "rootDir": "src",
+    "rootDir": ".",
     "strict": true /* enable all strict type-checking options */,
     /* Additional Checks */
     // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
     // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
     // "noUnusedParameters": true,  /* Report errors on unused parameters. */
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": [
+      "node",
+      "vitest/globals"
+    ]
   },
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*",
+    "tests/**/*",
+    "tests/infrastructure/node/tempStorageMock/.ts"
+  ]
 }

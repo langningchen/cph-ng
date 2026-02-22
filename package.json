@@ -2,7 +2,7 @@
   "name": "cph-ng",
   "displayName": "CPH-NG",
   "description": "The next generation of CPH.",
-  "version": "0.5.6",
+  "version": "0.6.0",
   "type": "module",
   "license": "AGPL-3.0-only",
   "publisher": "langningchen",
@@ -25,134 +25,132 @@
   "engines": {
     "vscode": "^1.95.0"
   },
-  "categories": ["Other"],
-  "activationEvents": ["*"],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./dist/extension.js",
   "exports": "./dist/extension.js",
   "contributes": {
     "jsonValidation": [
       {
         "fileMatch": "problem.cph-ng.json",
-        "url": "./res/problem.schema.json"
+        "url": "./dist/problem.schema.json"
       }
     ],
     "languageModelTools": [
       {
-        "name": "run_test_cases",
-        "toolReferenceName": "cphNgRunTestCases",
+        "name": "cph-ng_run_test_cases",
+        "toolReferenceName": "cphNgRunTestcases",
         "displayName": "Run CPH-NG Test Cases",
-        "modelDescription": "Executes one test case (identified by its stable UUID) or the entire suite for the active competitive programming problem managed by CPH-NG. Use this to validate solutions after edits or to confirm fixes against previously failing cases.",
-        "userDescription": "Runs one or all test cases for the current CPH-NG problem.",
+        "modelDescription": "Executes test cases for the active competitive programming problem. Returns a JSON summary of verdicts, time, and memory usage for each executed case. Use this to quickly validate the current solution or specific test IDs.",
+        "userDescription": "Runs one or all test cases for the current problem.",
         "canBeReferencedInPrompt": true,
         "icon": "$(play)",
         "inputSchema": {
           "type": "object",
-          "required": ["activePath"],
           "properties": {
-            "id": {
+            "testcaseId": {
               "type": "string",
-              "description": "Optional test case ID (UUID) to run. Omit to execute the full test suite."
+              "description": "Optional test case ID (UUID) to run. Omit to execute the full suite."
             },
             "activePath": {
               "type": "string",
-              "description": "File path for the target problem source code. Must be provided by LLM invocations."
+              "description": "Optional file path. Defaults to the currently active editor if omitted."
             }
           }
         }
       },
       {
-        "name": "inspect_problem_data",
-        "toolReferenceName": "cphNgInspectProblemData",
-        "displayName": "Inspect CPH-NG Test Data",
-        "modelDescription": "Retrieves a specific data slice for a CPH-NG test case - stdin, expected answer, stdout, stderr, verdict, runtime, memory usage, or diagnostic message. Use this to examine precise artifacts after executing tests.",
-        "userDescription": "Reads a chosen data field (stdin/answer/stdout/stderr/verdict/message/time/memory) for a test case by ID.",
+        "name": "cph-ng_inspect_test_case",
+        "toolReferenceName": "cphNgInspectTestCase",
+        "displayName": "Inspect CPH-NG Test Case Details",
+        "modelDescription": "Retrieves detailed diagnostic data for a specific test case (by UUID). Use 'all' to get a complete snapshot (stdin, expected, actual stdout, stderr, and meta) in one call, which is highly recommended for debugging failures to save context turns.",
+        "userDescription": "Reads full details or a specific field (stdin/stdout/etc.) for a test case.",
         "canBeReferencedInPrompt": true,
         "icon": "$(file)",
         "inputSchema": {
           "type": "object",
-          "required": ["dataType", "id", "activePath"],
+          "required": [
+            "testcaseId"
+          ],
           "properties": {
             "dataType": {
               "type": "string",
               "enum": [
+                "all",
                 "stdin",
                 "answer",
                 "stdout",
                 "stderr",
-                "verdict",
-                "message",
-                "time",
-                "memory"
+                "meta"
               ],
-              "description": "Which data field to inspect for the specified test case."
+              "default": "all",
+              "description": "Data slice to fetch. 'all' provides the complete context including I/O and performance stats."
             },
-            "id": {
+            "testcaseId": {
               "type": "string",
-              "description": "The test case ID (UUID) whose data should be fetched."
+              "description": "The stable UUID of the test case."
             },
             "activePath": {
               "type": "string",
-              "description": "File path for the target problem source code. Must be provided by LLM invocations."
+              "description": "Optional file path. Defaults to the currently active editor if omitted."
             }
           }
         }
       },
       {
-        "name": "list_test_cases",
-        "toolReferenceName": "cphNgListTestCases",
-        "displayName": "List CPH-NG Test IDs",
-        "modelDescription": "Returns all test case identifiers for the active problem, along with their latest verdict/time summary. Call this before running or editing tests to work with stable IDs instead of indices.",
-        "userDescription": "Lists every test case ID for the current CPH-NG problem.",
+        "name": "cph-ng_get_problem_context",
+        "toolReferenceName": "cphNgGetProblemContext",
+        "displayName": "Get CPH-NG Problem Context",
+        "modelDescription": "Consolidated tool to fetch problem metadata (name, URL, time/memory limits) and a full list of test cases with their status and IDs. Use this once at the start of a session or after major changes to understand the problem constraints and available test points.",
+        "userDescription": "Fetches problem limits and all test case IDs/statuses.",
         "canBeReferencedInPrompt": true,
-        "icon": "$(list-unordered)",
+        "icon": "$(info)",
         "inputSchema": {
           "type": "object",
-          "required": ["activePath"],
           "properties": {
             "activePath": {
               "type": "string",
-              "description": "File path for the target problem source code. Must be provided by LLM invocations."
+              "description": "Optional file path. Defaults to the currently active editor if omitted."
             }
           }
         }
       },
       {
-        "name": "upsert_test_case",
-        "toolReferenceName": "cphNgUpsertTestCase",
-        "displayName": "Add or Update CPH-NG Test Case",
-        "modelDescription": "Creates a new test case or updates an existing one for the active competitive programming problem. Accepts inline stdin/answer content and clears previous verdicts so the test can be re-run. Use this to capture newly discovered counterexamples or tweak expected answers.",
-        "userDescription": "Adds a new test case or updates an existing one (stdin/answer) for the current CPH-NG problem.",
+        "name": "cph-ng_upsert_test_case",
+        "toolReferenceName": "cphNgUpsertTestcase",
+        "displayName": "Add/Update CPH-NG Test Case",
+        "modelDescription": "Creates a new test case or updates an existing one. Accepts inline stdin/answer content and can toggle a test's enabled status. Automatically clears previous results to allow re-running. Use this to persist edge cases or correct expected outputs.",
+        "userDescription": "Adds or updates test case content (stdin/answer) for the current problem.",
         "canBeReferencedInPrompt": true,
         "icon": "$(edit)",
         "inputSchema": {
           "type": "object",
-          "required": ["activePath"],
           "properties": {
-            "id": {
+            "testcaseId": {
               "type": "string",
-              "description": "Optional test case ID to update. Omit to append a new test case."
+              "description": "Optional test case ID (UUID) to update. Omit to create a new case."
             },
             "stdin": {
               "type": "string",
-              "description": "Standard input content to store inline for the test case."
+              "description": "Standard input content."
             },
             "answer": {
               "type": "string",
-              "description": "Expected output content to store inline for the test case."
+              "description": "Expected output content."
+            },
+            "isDisabled": {
+              "type": "boolean",
+              "description": "Set testing status of this case."
             },
             "activePath": {
               "type": "string",
-              "description": "File path for the target problem source code. Must be provided by LLM invocations."
+              "description": "Optional file path. Defaults to the currently active editor if omitted."
             }
-          },
-          "anyOf": [
-            {
-              "required": ["stdin"]
-            },
-            {
-              "required": ["answer"]
-            }
-          ]
+          }
         }
       }
     ],
@@ -161,13 +159,13 @@
         "id": "cph-ng.analyzeFailure",
         "name": "CPH-NG: Analyze failing test",
         "description": "Diagnose a failing competitive programming attempt by running the managed test cases, inspecting the failing data, and outlining next steps.",
-        "prompt": "You are assisting with a competitive programming workspace managed by CPH-NG.\n- Call `list_test_cases` to discover available test IDs.\n- Run either the failing test (`run_test_cases` with the specific ID) or the entire suite as needed.\n- Inspect stdin/answer/stdout/stderr or other result fields via `inspect_problem_data`.\n- Summarize findings, root causes, and recommended code fixes.\n- If you discover a new regression input, persist it with `upsert_test_case` before concluding.\n\nUser request:\n{{input}}"
+        "prompt": "You are assisting with a competitive programming workspace managed by CPH-NG.\n- Call `cph-ng_get_problem_context` once to understand the problem limits and test case IDs.\n- Run the tests via `cph-ng_run_test_cases`. It returns a summary of which IDs failed.\n- For failing IDs, call `cph-ng_inspect_test_case` with `dataType: 'all'` to get full diagnostic data in one turn.\n- Summarize root causes and suggest code fixes based on the observed differences.\n\nUser request:\n{{input}}"
       },
       {
         "id": "cph-ng.designEdgeCases",
         "name": "CPH-NG: Generate edge tests",
         "description": "Brainstorm tricky inputs for the active problem and persist them as executable CPH-NG test cases.",
-        "prompt": "You are helping design stress tests for a competitive programming solution managed by CPH-NG.\n- Call `list_test_cases` to understand existing coverage.\n- For each new scenario, decide on stdin and expected answer values.\n- Save them with `upsert_test_case` (omit `id` to append a fresh case).\n- Suggest re-running with `run_test_cases` to validate the new coverage.\n\nUser request:\n{{input}}"
+        "prompt": "You are helping design stress tests for a competitive programming solution managed by CPH-NG.\n- Call `cph-ng_get_problem_context` to understand current coverage.\n- Brainstorm scenarios (e.g., max constraints, empty inputs, precision limits).\n- Save them with `cph-ng_upsert_test_case` (omit `id` for new cases).\n- Recommend running them via `cph-ng_run_test_cases` to verify compliance.\n\nUser request:\n{{input}}"
       }
     ],
     "views": {
@@ -198,7 +196,10 @@
           "cph-ng.basic.folderOpener": {
             "type": "string",
             "default": "tree",
-            "enum": ["tree", "flat"],
+            "enum": [
+              "tree",
+              "flat"
+            ],
             "markdownDescription": "%cph-ng.configuration.basic.properties.folderOpener.markdownDescription%",
             "markdownEnumDescriptions": [
               "%cph-ng.configuration.basic.properties.folderOpener.enumDescriptions.tree%",
@@ -231,6 +232,16 @@
             "type": "string",
             "default": "-O2 -std=c++14 -Wall -DCPH",
             "markdownDescription": "%cph-ng.configuration.compilation.properties.cppArgs.markdownDescription%"
+          },
+          "cph-ng.compilation.rustCompiler": {
+            "type": "string",
+            "default": "rustc",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.rustCompiler.markdownDescription%"
+          },
+          "cph-ng.compilation.rustArgs": {
+            "type": "string",
+            "default": "-C opt-level=2",
+            "markdownDescription": "%cph-ng.configuration.compilation.properties.rustArgs.markdownDescription%"
           },
           "cph-ng.compilation.javaCompiler": {
             "type": "string",
@@ -349,19 +360,19 @@
         }
       },
       {
-        "id": "bfCompare",
+        "id": "stressTest",
         "order": 4,
-        "title": "%cph-ng.configuration.bfCompare.title%",
+        "title": "%cph-ng.configuration.stressTest.title%",
         "properties": {
-          "cph-ng.bfCompare.generatorTimeLimit": {
+          "cph-ng.stressTest.generatorTimeLimit": {
             "type": "number",
             "default": 10000,
-            "markdownDescription": "%cph-ng.configuration.bfCompare.properties.generatorTimeLimit.markdownDescription%"
+            "markdownDescription": "%cph-ng.configuration.stressTest.properties.generatorTimeLimit.markdownDescription%"
           },
-          "cph-ng.bfCompare.bruteForceTimeLimit": {
+          "cph-ng.stressTest.bruteForceTimeLimit": {
             "type": "number",
             "default": 60000,
-            "markdownDescription": "%cph-ng.configuration.bfCompare.properties.bruteForceTimeLimit.markdownDescription%"
+            "markdownDescription": "%cph-ng.configuration.stressTest.properties.bruteForceTimeLimit.markdownDescription%"
           }
         }
       },
@@ -380,15 +391,19 @@
             "default": 512,
             "markdownDescription": "%cph-ng.configuration.problem.properties.defaultMemoryLimit.markdownDescription%"
           },
-          "cph-ng.problem.foundMatchTestCaseBehavior": {
+          "cph-ng.problem.foundMatchTestcaseBehavior": {
             "type": "string",
             "default": "always",
-            "enum": ["ask", "always", "never"],
-            "markdownDescription": "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.markdownDescription%",
+            "enum": [
+              "ask",
+              "always",
+              "never"
+            ],
+            "markdownDescription": "%cph-ng.configuration.problem.properties.foundMatchTestcaseBehavior.markdownDescription%",
             "markdownEnumDescriptions": [
-              "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.ask%",
-              "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.always%",
-              "%cph-ng.configuration.problem.properties.foundMatchTestCaseBehavior.enumDescriptions.never%"
+              "%cph-ng.configuration.problem.properties.foundMatchTestcaseBehavior.enumDescriptions.ask%",
+              "%cph-ng.configuration.problem.properties.foundMatchTestcaseBehavior.enumDescriptions.always%",
+              "%cph-ng.configuration.problem.properties.foundMatchTestcaseBehavior.enumDescriptions.never%"
             ]
           },
           "cph-ng.problem.expandBehavior": {
@@ -444,12 +459,23 @@
           },
           "cph-ng.problem.inputFileExtensionList": {
             "type": "array",
-            "default": [".in"],
+            "default": [
+              ".in"
+            ],
+            "items": {
+              "type": "string"
+            },
             "markdownDescription": "%cph-ng.configuration.problem.properties.inputFileExtensionList.markdownDescription%"
           },
           "cph-ng.problem.outputFileExtensionList": {
             "type": "array",
-            "default": [".ans", ".out"],
+            "default": [
+              ".ans",
+              ".out"
+            ],
+            "items": {
+              "type": "string"
+            },
             "markdownDescription": "%cph-ng.configuration.problem.properties.outputFileExtensionList.markdownDescription%"
           }
         }
@@ -490,13 +516,19 @@
         "properties": {
           "cph-ng.companion.listenPort": {
             "type": "number",
+            "scope": "machine",
             "default": 27121,
             "markdownDescription": "%cph-ng.configuration.companion.properties.listenPort.markdownDescription%"
           },
-          "cph-ng.companion.wsPort": {
+          "cph-ng.companion.logFile": {
+            "type": "string",
+            "default": "${home}/.cph-ng-router.log",
+            "markdownDescription": "%cph-ng.configuration.companion.properties.logFile.markdownDescription%"
+          },
+          "cph-ng.companion.shutdownTimeout": {
             "type": "number",
-            "default": -1,
-            "markdownDescription": "%cph-ng.configuration.companion.properties.wsPort.markdownDescription%"
+            "default": 10000,
+            "markdownDescription": "%cph-ng.configuration.companion.properties.shutdownTimeout.markdownDescription%"
           },
           "cph-ng.companion.customPathScript": {
             "type": "string",
@@ -507,18 +539,18 @@
             "type": "number",
             "default": -1,
             "markdownDescription": "%cph-ng.configuration.companion.properties.submitLanguage.markdownDescription%",
-            "enum": [-1, 54, 89, 91],
+            "enum": [
+              -1,
+              54,
+              89,
+              91
+            ],
             "enumItemLabels": [
               "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.-1%",
               "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.54%",
               "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.89%",
               "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.91%"
             ]
-          },
-          "cph-ng.companion.submissionTimeout": {
-            "type": "number",
-            "default": 30000,
-            "markdownDescription": "%cph-ng.configuration.companion.properties.submissionTimeout.markdownDescription%"
           },
           "cph-ng.companion.addTimestamp": {
             "type": "boolean",
@@ -529,7 +561,19 @@
             "type": "number",
             "default": -1,
             "markdownDescription": "%cph-ng.configuration.companion.properties.showPanel.markdownDescription%",
-            "enum": [-1, -2, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            "enum": [
+              -1,
+              -2,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
             "enumItemLabels": [
               "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.-1%",
               "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.-2%",
@@ -578,7 +622,11 @@
             "type": "string",
             "default": "auto",
             "markdownDescription": "%cph-ng.configuration.sidebar.properties.colorTheme.markdownDescription%",
-            "enum": ["auto", "light", "dark"],
+            "enum": [
+              "auto",
+              "light",
+              "dark"
+            ],
             "markdownEnumDescriptions": [
               "%cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.auto%",
               "%cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.light%",
@@ -668,26 +716,14 @@
         "icon": "$(desktop-download)"
       },
       {
-        "command": "cph-ng.runTestCases",
-        "title": "%cph-ng.commands.runTestCases%",
+        "command": "cph-ng.runTestcases",
+        "title": "%cph-ng.commands.runTestcases%",
         "icon": "$(run-all)"
       },
       {
-        "command": "cph-ng.stopTestCases",
-        "title": "%cph-ng.commands.stopTestCases%",
+        "command": "cph-ng.stopTestcases",
+        "title": "%cph-ng.commands.stopTestcases%",
         "icon": "$(stop-circle)"
-      },
-      {
-        "command": "cph-ng.addTestCase",
-        "title": "%cph-ng.commands.addTestCase%"
-      },
-      {
-        "command": "cph-ng.loadTestCases",
-        "title": "%cph-ng.commands.loadTestCases%"
-      },
-      {
-        "command": "cph-ng.deleteProblem",
-        "title": "%cph-ng.commands.deleteProblem%"
       },
       {
         "command": "cph-ng.submitToCodeforces",
@@ -706,12 +742,12 @@
         "when": "!cph-ng.hasProblem && cph-ng.canImport"
       },
       {
-        "command": "cph-ng.runTestCases",
+        "command": "cph-ng.runTestcases",
         "key": "ctrl+alt+b",
         "when": "cph-ng.hasProblem && !cph-ng.isRunning"
       },
       {
-        "command": "cph-ng.stopTestCases",
+        "command": "cph-ng.stopTestcases",
         "key": "ctrl+alt+b",
         "when": "cph-ng.hasProblem && cph-ng.isRunning"
       }
@@ -724,12 +760,12 @@
           "group": "navigation"
         },
         {
-          "command": "cph-ng.runTestCases",
+          "command": "cph-ng.runTestcases",
           "when": "cph-ng.hasProblem && !cph-ng.isRunning",
           "group": "navigation"
         },
         {
-          "command": "cph-ng.stopTestCases",
+          "command": "cph-ng.stopTestcases",
           "when": "cph-ng.hasProblem && cph-ng.isRunning",
           "group": "navigation"
         }
@@ -737,87 +773,96 @@
     }
   },
   "scripts": {
-    "clean": "rimraf dist",
-    "vscode:prepublish": "pnpm run clean && webpack --mode production",
-    "compile": "pnpm run clean && webpack --mode production",
-    "watch": "pnpm run clean && webpack --watch --mode development",
+    "vscode:prepublish": "webpack --disable-interpret --mode production",
+    "compile": "webpack --disable-interpret --mode production",
+    "watch": "webpack --disable-interpret --watch --mode development",
     "package": "vsce package --allow-star-activation --no-dependencies",
     "publish": "vsce publish --allow-star-activation --no-dependencies",
     "publish:pre": "vsce publish --allow-star-activation --no-dependencies --pre-release",
-    "lint": "biome check .",
-    "format": "biome check --write .",
-    "check-translations": "node scripts/check-translations.js",
-    "generate-settings": "node scripts/generate-settings.js",
-    "install-hooks": "node scripts/install-hooks.js",
-    "postinstall": "pnpm run generate-settings && pnpm run install-hooks"
+    "lint": "biome check",
+    "format": "biome check --write",
+    "check-translations": "tsx scripts/check-translations.ts",
+    "generate-settings": "tsx scripts/generate-settings.ts",
+    "install-hooks": "tsx scripts/install-hooks.ts",
+    "postinstall": "pnpm run generate-settings && pnpm run install-hooks",
+    "test": "vitest",
+    "test:ui": "vitest --ui --coverage",
+    "coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@actions/core": "^2.0.1",
-    "@actions/github": "^6.0.1",
-    "@babel/preset-react": "^7.28.5",
-    "@biomejs/biome": "^2.3.8",
-    "@commitlint/cli": "^20.2.0",
-    "@commitlint/config-conventional": "^20.2.0",
-    "@octokit/rest": "^22.0.1",
-    "@octokit/webhooks-types": "^7.6.1",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
-    "@swc/core": "^1.15.3",
+    "@biomejs/biome": "^2.4.4",
+    "@commitlint/cli": "^20.4.2",
+    "@commitlint/config-conventional": "^20.4.2",
+    "@swc/core": "^1.15.11",
     "@types/adm-zip": "^0.5.7",
     "@types/crypto-js": "^4.2.2",
-    "@types/mocha": "^10.0.10",
-    "@types/node": "~25.0.1",
-    "@types/react": "^19.2.7",
+    "@types/node": "~22.19.7",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/semver": "^7.7.1",
     "@types/source-map-support": "^0.5.10",
-    "@types/speed-measure-webpack-plugin": "^1.3.6",
     "@types/vscode": "1.95.0",
-    "@types/webpack": "^5.28.5",
     "@types/ws": "^8.18.1",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2",
+    "@vitest/coverage-v8": "4.0.18",
+    "@vitest/ui": "^4.0.18",
     "@vscode/vsce": "^3.7.1",
-    "react-refresh": "^0.18.0",
-    "rimraf": "^6.1.2",
-    "speed-measure-webpack-plugin": "^1.5.0",
-    "swc-loader": "^0.2.6",
+    "ignore": "^7.0.5",
+    "swc-loader": "^0.2.7",
     "terser-webpack-plugin": "^5.3.16",
-    "thread-loader": "^4.0.4",
-    "ts-loader": "^9.5.4",
-    "typescript": "5.9.3",
-    "webpack": "^5.103.0",
-    "webpack-cli": "^6.0.1",
-    "webpack-merge": "^6.0.1"
+    "ts-essentials": "^10.1.1",
+    "ts-json-schema-generator": "^2.5.0",
+    "tsconfig-paths-webpack-plugin": "^4.2.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18",
+    "vitest-mock-extended": "^3.1.0",
+    "webpack": "^5.105.2",
+    "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "@base-ui-components/react": "1.0.0-rc.0",
-    "@codemirror/language": "^6.11.3",
-    "@codemirror/state": "^6.5.2",
-    "@codemirror/view": "^6.39.4",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@lezer/highlight": "^1.2.3",
-    "@mui/icons-material": "^7.3.6",
-    "@mui/lab": "7.0.1-beta.20",
-    "@mui/material": "^7.3.6",
-    "@uiw/react-codemirror": "^4.25.3",
-    "@vscode/extension-telemetry": "^1.2.0",
+    "@hono/node-server": "^1.19.9",
+    "@hono/node-ws": "^1.3.0",
+    "@mui/icons-material": "^7.3.8",
+    "@mui/lab": "7.0.1-beta.22",
+    "@mui/material": "^7.3.8",
+    "@types/proper-lockfile": "^4.1.4",
+    "@types/yargs-parser": "^21.0.3",
+    "@vscode/extension-telemetry": "^1.5.0",
     "adm-zip": "^0.5.16",
-    "anser": "^2.3.3",
-    "ansi_up": "^6.0.6",
-    "codemirror": "^6.0.2",
+    "anser": "^2.3.5",
     "copy-webpack-plugin": "^13.0.1",
     "crypto-js": "^4.2.0",
-    "i18next": "^25.7.2",
+    "hono": "^4.12.1",
+    "i18next": "^25.8.13",
+    "immer": "^11.1.4",
+    "memfs": "^4.56.10",
     "natural-orderby": "^5.0.0",
-    "p-queue": "^9.0.1",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
-    "react-i18next": "^16.5.0",
+    "partysocket": "^1.1.14",
+    "proper-lockfile": "^4.1.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-i18next": "^16.5.4",
     "react-textarea-autosize": "^8.5.9",
-    "semver": "^7.7.3",
+    "reflect-metadata": "^0.2.2",
+    "semver": "^7.7.4",
     "source-map-support": "^0.5.21",
     "stacktrace-js": "^2.0.2",
-    "ws": "^8.18.3"
+    "tsyringe": "^4.10.0",
+    "type-fest": "^5.4.4",
+    "typed-emitter": "^2.1.0",
+    "yargs-parser": "^22.0.0"
+  },
+  "pnpm": {
+    "updateConfig": {
+      "ignoreDependencies": [
+        "@types/vscode",
+        "@types/node"
+      ]
+    },
+    "patchedDependencies": {
+      "ts-json-schema-generator": "patches/ts-json-schema-generator.patch"
+    }
   }
 }

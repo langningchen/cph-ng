@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -15,17 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import Typography, { TypographyProps } from '@mui/material/Typography';
+import Typography, { type TypographyProps } from '@mui/material/Typography';
 import React from 'react';
 
 interface CphTextProps extends TypographyProps {}
 
-const CphText = (props: CphTextProps) => {
+export const CphText = (props: CphTextProps) => {
   return (
     <Typography
-      overflow={'hidden'}
-      textOverflow={'ellipsis'}
-      component={'span'}
+      overflow='hidden'
+      textOverflow='ellipsis'
+      component='span'
       sx={{
         cursor: 'default',
         userSelect: 'none',
@@ -36,5 +36,3 @@ const CphText = (props: CphTextProps) => {
     </Typography>
   );
 };
-
-export default CphText;

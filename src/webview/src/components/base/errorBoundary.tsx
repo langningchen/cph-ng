@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -28,8 +28,8 @@ import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import StackTrace from 'stacktrace-js';
-import CphButton from '../cphButton';
-import CphFlex from './cphFlex';
+import { CphButton } from '../cphButton';
+import { CphFlex } from './cphFlex';
 
 interface ErrorFallbackProps {
   error: Error;
@@ -40,36 +40,24 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
-  const [stackTraceString, setStackTraceString] = useState<string>(
-    'Loading stack trace...',
-  );
+  const [stackTraceString, setStackTraceString] = useState<string>('Loading stack trace...');
   useEffect(() => {
     let isMounted = true;
 
-    const parseStack = async () => {
-      try {
-        const frames = await StackTrace.fromError(error);
-        if (!isMounted) {
-          return;
-        }
-        setStackTraceString(
-          frames
-            .map((sf) => {
-              return sf.fileName?.includes('node_modules')
-                ? null
-                : `at ${sf.functionName || '<anonymous>'} (${sf.fileName}:${sf.lineNumber}:${sf.columnNumber})`;
-            })
-            .filter(Boolean)
-            .join('\n'),
-        );
-      } catch (e) {
-        if (isMounted) {
-          setStackTraceString(error.stack || 'No stack trace available');
-        }
-      }
-    };
-
-    parseStack();
+    StackTrace.fromError(error)
+      .then((frames) => {
+        if (!isMounted) return;
+        const filteredFrame = frames
+          .map(({ fileName, functionName, lineNumber, columnNumber }) => {
+            if (fileName?.includes('node_modules')) return null;
+            return `at ${functionName || '<anonymous>'} (${fileName}:${lineNumber}:${columnNumber})`;
+          })
+          .filter(Boolean);
+        setStackTraceString(filteredFrame.join('\n'));
+      })
+      .catch(() => {
+        if (isMounted) setStackTraceString(error.stack || 'No stack trace available');
+      });
 
     return () => {
       isMounted = false;
@@ -81,18 +69,13 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
       <CphFlex>
         <CphButton
           icon={ErrorIcon}
-          name={'Error'}
-          color={'error'}
+          name='Error'
+          color='error'
           onClick={() => {
             setOpen(true);
           }}
         />
-        <CphButton
-          icon={ReplayIcon}
-          name={'Retry'}
-          color={'warning'}
-          onClick={resetErrorBoundary}
-        />
+        <CphButton icon={ReplayIcon} name='Retry' color='warning' onClick={resetErrorBoundary} />
       </CphFlex>
       <Dialog
         fullWidth
@@ -109,9 +92,9 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
             <Accordion sx={{ width: '100%' }}>
               <AccordionSummary>{t('errorBoundary.details')}</AccordionSummary>
               <AccordionDetails>
-                <Box component='pre' overflow={'scroll'}>
+                <Box component='pre' overflow='scroll'>
                   {error.name}: {error.message}
-                  {'\n'}
+                  '\n'
                   {stackTraceString}
                 </Box>
               </AccordionDetails>
@@ -130,36 +113,24 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
-  showDialog: boolean;
 }
 
-class ErrorBoundary extends React.Component<Props, State> {
-  constructor(props: Props) {
+export class ErrorBoundary extends React.Component<Props, State> {
+  public constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null, showDialog: false };
+    this.state = { hasError: false, error: null };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<State> {
-    return { hasError: true, error };
-  }
-
-  resetBoundary = () => {
+  public resetBoundary = () => {
     this.setState({ hasError: false, error: null }, () => {
       this.forceUpdate();
     });
   };
 
-  render() {
+  public render() {
     if (this.state.hasError && this.state.error) {
-      return (
-        <ErrorFallback
-          error={this.state.error}
-          resetErrorBoundary={this.resetBoundary}
-        />
-      );
+      return <ErrorFallback error={this.state.error} resetErrorBoundary={this.resetBoundary} />;
     }
     return this.props.children;
   }
 }
-
-export default ErrorBoundary;

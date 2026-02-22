@@ -1,0 +1,280 @@
+// Copyright (C) 2026 Langning Chen
+//
+// This file is part of cph-ng.
+//
+// cph-ng is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// cph-ng is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
+
+import { type ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
+import { pipeline } from 'node:stream/promises';
+import { inject, injectable } from 'tsyringe';
+import type { IClock } from '@/application/ports/node/IClock';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import {
+  AbortReason,
+  type IProcessExecutor,
+  type PipeProcessOptions,
+  type ProcessExecuteResult,
+  type ProcessHandle,
+  type ProcessOptions,
+  type ProcessOutput,
+} from '@/application/ports/node/IProcessExecutor';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
+import { TOKENS } from '@/composition/tokens';
+
+// https://nodejs.org/docs/latest/api/child_process.html#event-close
+// "One of the two will always be non-null."
+// So we can use number | NodeJS.Signals to represent both exit code and signal.
+
+interface LaunchResult {
+  child: ChildProcessWithoutNullStreams;
+  timeoutId?: NodeJS.Timeout;
+  acSignal: AbortSignal;
+  stdoutPath: string;
+  stderrPath: string;
+  startTime: number;
+  endTime?: number;
+  ioPromises: Promise<void>[];
+}
+
+@injectable()
+export class ProcessExecutorAdapter implements IProcessExecutor {
+  public constructor(
+    @inject(TOKENS.clock) private readonly clock: IClock,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.telemetry) private readonly telemetry: ITelemetry,
+    @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
+  ) {
+    this.logger = this.logger.withScope('processExecutor');
+  }
+
+  public async execute(options: ProcessOptions): Promise<ProcessExecuteResult> {
+    this.logger.trace('execute', options);
+    const launch = this.internalLaunch(options);
+    return new Promise((resolve) => {
+      launch.child.on('close', async (code, signal) => {
+        resolve(await this.collectResult(launch, code ?? signal ?? -1));
+      });
+      launch.child.on('error', async (error) => {
+        if (launch.acSignal.aborted) return;
+        this.tmp.dispose([launch.stdoutPath, launch.stderrPath]);
+        if (error.name !== 'AbortError') resolve(this.collectError(error));
+      });
+    });
+  }
+
+  public spawn(options: ProcessOptions): ProcessHandle {
+    this.logger.trace('spawn', options);
+    const launch = this.internalLaunch(options);
+    const wait = new Promise<ProcessExecuteResult>((resolve) => {
+      const onResult = async (code: number | null, signal: NodeJS.Signals | null) => {
+        cleanup();
+        resolve(await this.collectResult(launch, code ?? signal ?? -1));
+      };
+
+      const onError = (error: Error) => {
+        if (launch.acSignal.aborted) return;
+        cleanup();
+        this.tmp.dispose([launch.stdoutPath, launch.stderrPath]);
+        resolve(this.collectError(error));
+      };
+
+      const cleanup = () => {
+        launch.child.removeListener('close', onResult);
+        launch.child.removeListener('error', onError);
+      };
+
+      launch.child.on('close', onResult);
+      launch.child.on('error', onError);
+    });
+
+    return {
+      pid: launch.child.pid ?? -1,
+      stdoutPath: launch.stdoutPath,
+      stderrPath: launch.stderrPath,
+
+      writeStdin: (input: string) => {
+        if (launch.child.stdin && !launch.child.stdin.destroyed) launch.child.stdin.write(input);
+      },
+
+      closeStdin: () => {
+        if (launch.child.stdin && !launch.child.stdin.destroyed) launch.child.stdin.end();
+      },
+
+      kill: (signal?: NodeJS.Signals) => {
+        launch.child.kill(signal ?? 'SIGTERM');
+      },
+
+      wait: () => wait,
+    };
+  }
+
+  private internalLaunch(options: ProcessOptions): LaunchResult {
+    this.logger.trace('createProcess', options);
+    const { cmd, signal, timeoutMs: timeout, stdinPath } = options;
+
+    // Use a unified AbortController to handle both external and internal aborts
+    const unifiedAc = new AbortController();
+    if (signal) signal.addEventListener('abort', () => unifiedAc.abort(AbortReason.UserAbort));
+
+    const child = spawn(cmd[0], cmd.slice(1), {
+      signal: unifiedAc.signal,
+      env: options.env ? { ...process.env, ...options.env } : process.env,
+      killSignal: 'SIGTERM',
+    });
+    this.logger.info('Running executable', options, child.pid);
+    const result: LaunchResult = {
+      child,
+      acSignal: unifiedAc.signal,
+      stdoutPath: this.tmp.create(`processExecutor.stdoutPath (${options.cmd[0]})`),
+      stderrPath: this.tmp.create(`processExecutor.stderrPath (${options.cmd[0]})`),
+      startTime: this.clock.now(),
+      ioPromises: [],
+    };
+
+    // Process timeout
+    if (timeout) {
+      result.timeoutId = setTimeout(() => {
+        this.logger.warn(`Process ${child.pid} reached timeout ${timeout}ms`);
+        unifiedAc.abort(AbortReason.Timeout);
+      }, timeout);
+    }
+
+    // Process stdio
+    if (stdinPath) {
+      result.ioPromises.push(
+        pipeline(this.fs.createReadStream(stdinPath), child.stdin).catch(
+          this.pipeFailed(child.pid, 'stdin'),
+        ),
+      );
+    }
+    result.ioPromises.push(
+      pipeline(child.stdout, this.fs.safeCreateWriteStream(result.stdoutPath)).catch(
+        this.pipeFailed(child.pid, 'stdout'),
+      ),
+      pipeline(child.stderr, this.fs.safeCreateWriteStream(result.stderrPath)).catch(
+        this.pipeFailed(child.pid, 'stderr'),
+      ),
+    );
+    return result;
+  }
+
+  private async collectResult(
+    launch: LaunchResult,
+    codeOrSignal: number | NodeJS.Signals,
+  ): Promise<ProcessOutput> {
+    this.logger.trace('Collecting execution result', { launch, codeOrSignal });
+    if (launch.timeoutId) clearTimeout(launch.timeoutId);
+    await Promise.all(launch.ioPromises);
+    this.logger.debug(`Process ${launch.child.pid} close`, { codeOrSignal });
+    return {
+      codeOrSignal,
+      stdoutPath: launch.stdoutPath,
+      stderrPath: launch.stderrPath,
+      // A fallback for time if not set
+      timeMs: (launch.endTime ?? this.clock.now()) - launch.startTime,
+      abortReason: launch.acSignal.reason as AbortReason | undefined,
+    };
+  }
+
+  private collectError(data: Error | string): Error {
+    this.logger.trace('collectError', { data });
+    if (data instanceof Error) return data;
+    return new Error(data);
+  }
+
+  private pipeFailed(pid: number | undefined, name: string) {
+    return (e: unknown) => {
+      const expectedErrors = [
+        'ENOENT',
+        'EOF',
+        'EPERM',
+        'EPIPE',
+        'ERR_STREAM_PREMATURE_CLOSE',
+        'ERR_STREAM_WRITE_AFTER_END',
+      ];
+      const code = (e as { code?: string })?.code;
+      if (code && expectedErrors.includes(code)) {
+        this.logger.trace(`Pipe ${name} of process ${pid} closed prematurely`);
+      } else {
+        this.logger.warn('Set up process', pid, name, 'failed', e);
+        this.telemetry.error('pipeFailed', e, { name });
+      }
+    };
+  }
+
+  public async executeWithPipe(
+    opt1: PipeProcessOptions,
+    opt2: PipeProcessOptions,
+  ): Promise<{ res1: ProcessExecuteResult; res2: ProcessExecuteResult }> {
+    const proc1 = this.internalLaunch(opt1);
+    const proc2 = this.internalLaunch(opt2);
+
+    // Pipe the processes
+    // Use pipe() instead of pipeline() to avoid destroying the source streams
+    // as they are also being piped to files in launch()
+    proc2.child.stdout.pipe(proc1.child.stdin).on('error', (e) => {
+      this.pipeFailed(proc1.child.pid, 'stdin')(e);
+    });
+    proc1.child.stdout.pipe(proc2.child.stdin).on('error', (e) => {
+      this.pipeFailed(proc2.child.pid, 'stdin')(e);
+    });
+
+    // Wait for both processes to complete
+    return new Promise((resolve) => {
+      const results: {
+        p1?: ProcessExecuteResult;
+        p2?: ProcessExecuteResult;
+      } = {};
+
+      const checkCompletion = () => {
+        this.logger.trace('checkCompletion', {
+          results,
+        });
+        if (results.p1 && results.p2) {
+          resolve({
+            res1: results.p1,
+            res2: results.p2,
+          });
+        }
+      };
+
+      // Handle any process exit or error
+      const onSafeClose = async (
+        p: 'p1' | 'p2',
+        launch: ReturnType<typeof this.internalLaunch>,
+        code: number | null,
+        signal: NodeJS.Signals | null,
+      ) => {
+        results[p] ||= await this.collectResult(launch, code ?? signal ?? -1);
+        checkCompletion();
+      };
+
+      const onSafeError = (p: 'p1' | 'p2', otherP: 'p1' | 'p2', error: Error) => {
+        if (error.name === 'AbortError') return;
+        results[p] ||= this.collectError(error);
+        if (!results[otherP]) (p === 'p1' ? proc2 : proc1).child.kill();
+        checkCompletion();
+      };
+
+      // Process Listeners
+      proc1.child.on('close', onSafeClose.bind(null, 'p1', proc1));
+      proc2.child.on('close', onSafeClose.bind(null, 'p2', proc2));
+      proc1.child.on('error', onSafeError.bind(null, 'p1', 'p2'));
+      proc2.child.on('error', onSafeError.bind(null, 'p2', 'p1'));
+    });
+  }
+}

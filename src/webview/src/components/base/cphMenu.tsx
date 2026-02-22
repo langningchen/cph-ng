@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -15,19 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import Box, { BoxProps } from '@mui/material/Box';
+import Box, { type BoxProps } from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { PopoverPosition } from '@mui/material/Popover';
+import type { PopoverPosition } from '@mui/material/Popover';
 import React, { useState } from 'react';
-import { delProps } from '../../utils';
+import { deleteProps } from '../../utils';
 
 interface CphMenuProps extends BoxProps {
   children: React.ReactNode;
   menu: Record<string, () => void>;
 }
 
-const CphMenu = (props: CphMenuProps) => {
+export const CphMenu = (props: CphMenuProps) => {
   const [contextMenu, setContextMenu] = useState<PopoverPosition>();
   return (
     <Box
@@ -40,7 +40,7 @@ const CphMenu = (props: CphMenuProps) => {
         });
       }}
       style={{ cursor: 'context-menu' }}
-      {...delProps(props, ['children', 'menu'])}
+      {...deleteProps(props, ['children', 'menu'])}
     >
       {props.children}
       <Menu
@@ -65,5 +65,3 @@ const CphMenu = (props: CphMenuProps) => {
     </Box>
   );
 };
-
-export default CphMenu;

@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -33,343 +33,283 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IProblem, isRunningVerdict } from '@/types/types';
-import { useProblemContext } from '../context/ProblemContext';
-import { basename, getCompile } from '../utils';
-import CphFlex from './base/cphFlex';
-import CphLink from './base/cphLink';
-import CphMenu from './base/cphMenu';
-import CphButton from './cphButton';
+import type { ProblemId } from '@/domain/types';
+import type { IWebviewStressTest } from '@/domain/webviewTypes';
+import { useProblemDispatch } from '../context/ProblemContext';
+import { CphFlex } from './base/cphFlex';
+import { CphLink } from './base/cphLink';
+import { CphButton } from './cphButton';
+import { RunButtonGroup } from './runButtonGroup';
 
 interface ProblemActionsProps {
-  problem: IProblem;
+  problemId: ProblemId;
+  url?: string;
+  stressTest: IWebviewStressTest;
+  hasRunning: boolean;
 }
 
-const ProblemActions = ({ problem }: ProblemActionsProps) => {
-  const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
-  const [clickTime, setClickTime] = useState<number[]>([]);
-  const [isDelDialogOpen, setDelDialogOpen] = useState(false);
-  const [isBfCompareDialogOpen, setBfCompareDialogOpen] = useState(false);
-  const hasRunning = Object.values(problem.tcs).some((tc) =>
-    isRunningVerdict(tc.result?.verdict),
-  );
-  useEffect(() => {
-    if (clickTime.length === 10 && clickTime.at(-1)! - clickTime[0] < 2000) {
-      window.easterEgg = !window.easterEgg;
-      setClickTime([]);
-    }
-  }, [clickTime]);
-  return (
-    <>
-      <CphFlex
-        smallGap
-        onClick={() => {
-          setClickTime((times) => {
-            const now = Date.now();
-            const newTimes = [...times, now];
-            if (newTimes.length > 10) {
-              newTimes.shift();
-            }
-            return newTimes;
-          });
-        }}
-      >
-        <CphButton
-          larger={true}
-          name={t('problemActions.addTc')}
-          icon={AddIcon}
-          onClick={() => {
-            dispatch({ type: 'addTc' });
-          }}
-        />
-        <CphButton
-          larger={true}
-          name={t('problemActions.loadTcs')}
-          icon={FileCopyIcon}
-          onClick={() => {
-            dispatch({ type: 'loadTcs' });
-          }}
-        />
+export const ProblemActions = memo(
+  ({ problemId, url, stressTest, hasRunning }: ProblemActionsProps) => {
+    const { t } = useTranslation();
+    const dispatch = useProblemDispatch();
+    const [clickTime, setClickTime] = useState<number[]>([]);
+    const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [isStressTestDialogOpen, setStressTestDialogOpen] = useState(false);
 
-        {hasRunning ? (
+    useEffect(() => {
+      if (clickTime.length === 10 && clickTime[9] - clickTime[0] < 2000) {
+        window.easterEgg = !window.easterEgg;
+        setClickTime([]);
+      }
+    }, [clickTime]);
+    return (
+      <>
+        <CphFlex
+          smallGap
+          flexWrap='wrap'
+          justifyContent='center'
+          onClick={() => setClickTime((times) => [...times, Date.now()].slice(-10))}
+        >
           <CphButton
-            larger={true}
-            name={t('problemActions.stopTcs')}
-            icon={PlaylistRemoveIcon}
-            color={'warning'}
-            onClick={(e) => {
-              dispatch({
-                type: 'stopTcs',
-                onlyOne: e.ctrlKey,
-              });
-            }}
+            larger
+            name={t('problemActions.addTestcase')}
+            icon={AddIcon}
+            onClick={() => dispatch({ type: 'addTestcase', problemId })}
           />
-        ) : (
-          <CphMenu
-            menu={{
-              [t('problemActions.runTcs.menu.forceCompile')]: () => {
-                dispatch({
-                  type: 'runTcs',
-                  compile: true,
-                });
-              },
-              [t('problemActions.runTcs.menu.skipCompile')]: () => {
-                dispatch({
-                  type: 'runTcs',
-                  compile: false,
-                });
-              },
-            }}
-          >
-            <CphButton
-              larger={true}
-              name={t('problemActions.runTcs')}
-              icon={PlaylistPlayIcon}
-              color={'success'}
-              onClick={(e) => {
-                dispatch({
-                  type: 'runTcs',
-                  compile: getCompile(e),
-                });
-              }}
-            />
-          </CphMenu>
-        )}
-        <CphButton
-          larger={true}
-          name={t('problemActions.bfCompare')}
-          icon={CompareArrowsIcon}
-          onClick={() => setBfCompareDialogOpen(true)}
-          sx={
-            problem.bfCompare?.running
-              ? {
-                  animation: 'pulse 1s infinite',
-                  '@keyframes pulse': {
-                    '0%': {
-                      opacity: 1,
-                    },
-                    '50%': {
-                      opacity: 0.2,
-                    },
-                    '100%': {
-                      opacity: 1,
-                    },
-                  },
-                }
-              : undefined
-          }
-        />
-        {(() => {
-          if (!problem.url) {
-            return null;
-          }
-          try {
-            if (new URL(problem.url).hostname === 'codeforces.com') {
-              return (
-                <CphButton
-                  larger={true}
-                  name={t('problemActions.submitToCodeforces')}
-                  icon={BackupIcon}
-                  color={'success'}
-                  onClick={() => {
-                    dispatch({
-                      type: 'submitToCodeforces',
-                    });
-                  }}
-                />
-              );
-            }
-          } catch {}
-          return null;
-        })()}
-        <CphButton
-          larger={true}
-          name={t('problemActions.deleteProblem')}
-          icon={DeleteForeverIcon}
-          color={'error'}
-          onClick={() => setDelDialogOpen(true)}
-        />
-        {window.easterEgg && (
-          <div title={t('problemActions.easterEgg')}>🐰</div>
-        )}
-      </CphFlex>
-      <Dialog
-        fullWidth
-        maxWidth={false}
-        open={isDelDialogOpen}
-        onClose={() => setDelDialogOpen(false)}
-      >
-        <DialogTitle>{t('problemActions.delDialog.title')}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {t('problemActions.delDialog.content')}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDelDialogOpen(false)} color={'primary'}>
-            {t('problemActions.delDialog.cancel')}
-          </Button>
-          <Button
-            onClick={() => {
-              dispatch({
-                type: 'delProblem',
-              });
-              setDelDialogOpen(false);
-            }}
-            color={'primary'}
-            autoFocus
-          >
-            {t('problemActions.delDialog.confirm')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        fullWidth
-        maxWidth={false}
-        open={isBfCompareDialogOpen}
-        onClose={() => setBfCompareDialogOpen(false)}
-      >
-        <DialogTitle>{t('problemActions.bfCompareDialog.title')}</DialogTitle>
-        <CphButton
-          name={t('problemActions.bfCompareDialog.close')}
-          onClick={() => setBfCompareDialogOpen(false)}
-          sx={(theme) => ({
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: theme.palette.grey[500],
-          })}
-          icon={CloseIcon}
-        />
-        <DialogContent>
-          <CphFlex column>
-            <CphFlex>
-              <Typography>
-                {t('problemActions.bfCompareDialog.generator')}
-              </Typography>
-              {problem.bfCompare?.generator ? (
-                <>
-                  <CphLink
-                    name={problem.bfCompare.generator.path}
-                    onClick={() => {
-                      dispatch({
-                        type: 'openFile',
-                        path: problem.bfCompare!.generator!.path,
-                      });
-                    }}
-                  >
-                    {basename(problem.bfCompare.generator.path)}
-                  </CphLink>
-                  <CphButton
-                    icon={CloseIcon}
-                    onClick={() => {
-                      dispatch({
-                        type: 'removeSrcFile',
-                        fileType: 'generator',
-                      });
-                    }}
-                    name={t(
-                      'problemActions.bfCompareDialog.button.removeGenerator',
-                    )}
-                  />
-                </>
-              ) : (
-                <CphButton
-                  icon={FileOpenIcon}
-                  onClick={() => {
-                    dispatch({
-                      type: 'chooseSrcFile',
-                      fileType: 'generator',
-                    });
-                  }}
-                  name={t(
-                    'problemActions.bfCompareDialog.button.chooseGenerator',
-                  )}
-                />
-              )}
-            </CphFlex>
-            <CphFlex>
-              <Typography>
-                {t('problemActions.bfCompareDialog.bruteForce')}
-              </Typography>
-              {problem.bfCompare?.bruteForce ? (
-                <>
-                  <CphLink
-                    name={problem.bfCompare.bruteForce.path}
-                    onClick={() => {
-                      dispatch({
-                        type: 'openFile',
-                        path: problem.bfCompare!.bruteForce!.path,
-                      });
-                    }}
-                  >
-                    {basename(problem.bfCompare.bruteForce.path)}
-                  </CphLink>
-                  <CphButton
-                    icon={CloseIcon}
-                    onClick={() => {
-                      dispatch({
-                        type: 'removeSrcFile',
-                        fileType: 'bruteForce',
-                      });
-                    }}
-                    name={t(
-                      'problemActions.bfCompareDialog.button.removeBruteForce',
-                    )}
-                  />
-                </>
-              ) : (
-                <CphButton
-                  icon={FileOpenIcon}
-                  onClick={() => {
-                    dispatch({
-                      type: 'chooseSrcFile',
-                      fileType: 'bruteForce',
-                    });
-                  }}
-                  name={t(
-                    'problemActions.bfCompareDialog.button.chooseBruteForce',
-                  )}
-                />
-              )}
-            </CphFlex>
-            <CphFlex>{problem.bfCompare?.msg}</CphFlex>
-            {problem.bfCompare?.running ? (
-              <CphButton
-                name={t('problemActions.bfCompareDialog.stop')}
-                onClick={() => {
-                  dispatch({
-                    type: 'stopBfCompare',
-                  });
-                }}
-                icon={StopCircleIcon}
-                color={'warning'}
-              />
-            ) : (
-              <CphButton
-                name={t('problemActions.bfCompareDialog.run')}
-                onClick={(e) => {
-                  dispatch({
-                    type: 'startBfCompare',
-                    compile: getCompile(e),
-                  });
-                }}
-                icon={PlayCircleIcon}
-                color={'success'}
-                disabled={
-                  !problem.bfCompare?.generator ||
-                  !problem.bfCompare?.bruteForce
-                }
-              />
-            )}
-          </CphFlex>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-};
+          <CphButton
+            larger
+            name={t('problemActions.loadTestcases')}
+            icon={FileCopyIcon}
+            onClick={() => dispatch({ type: 'loadTestcases', problemId })}
+          />
 
-export default ProblemActions;
+          {hasRunning ? (
+            <CphButton
+              larger
+              name={t('problemActions.stopTestcases')}
+              icon={PlaylistRemoveIcon}
+              color='warning'
+              onClick={() =>
+                dispatch({
+                  type: 'stopTestcases',
+                  problemId,
+                })
+              }
+            />
+          ) : (
+            <RunButtonGroup
+              larger
+              icon={PlaylistPlayIcon}
+              name={t('problemActions.runAllTestcases')}
+              color='success'
+              onRun={(forceCompile) =>
+                dispatch({ type: 'runAllTestcases', problemId, forceCompile })
+              }
+            />
+          )}
+          <CphButton
+            larger
+            name={t('problemActions.stressTest')}
+            icon={CompareArrowsIcon}
+            onClick={() => setStressTestDialogOpen(true)}
+            sx={stressTest.isRunning ? { animation: 'pulse 1s infinite' } : undefined}
+          />
+          {(() => {
+            if (!url) {
+              return null;
+            }
+            try {
+              if (new URL(url).hostname === 'codeforces.com') {
+                return (
+                  <CphButton
+                    larger
+                    name={t('problemActions.submitToCodeforces')}
+                    icon={BackupIcon}
+                    color='success'
+                    onClick={() =>
+                      dispatch({
+                        type: 'submitToCodeforces',
+                        problemId,
+                      })
+                    }
+                  />
+                );
+              }
+            } catch {}
+            return null;
+          })()}
+          <CphButton
+            larger
+            name={t('problemActions.deleteProblem')}
+            icon={DeleteForeverIcon}
+            color='error'
+            onClick={() => setDeleteDialogOpen(true)}
+          />
+          {!!window.easterEgg && <div title={t('problemActions.easterEgg')}>🐰</div>}
+        </CphFlex>
+        <Dialog
+          fullWidth
+          maxWidth={false}
+          open={isDeleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+        >
+          <DialogTitle>{t('problemActions.deleteDialog.title')}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>{t('problemActions.deleteDialog.content')}</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeleteDialogOpen(false)} color='primary'>
+              {t('problemActions.deleteDialog.cancel')}
+            </Button>
+            <Button
+              onClick={() => {
+                dispatch({
+                  type: 'deleteProblem',
+                  problemId,
+                });
+                setDeleteDialogOpen(false);
+              }}
+              color='primary'
+              autoFocus
+            >
+              {t('problemActions.deleteDialog.confirm')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          fullWidth
+          maxWidth={false}
+          open={isStressTestDialogOpen}
+          onClose={() => setStressTestDialogOpen(false)}
+        >
+          <DialogTitle>{t('problemActions.stressTestDialog.title')}</DialogTitle>
+          <CphButton
+            name={t('problemActions.stressTestDialog.close')}
+            onClick={() => setStressTestDialogOpen(false)}
+            sx={(theme) => ({
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: theme.palette.grey[500],
+            })}
+            icon={CloseIcon}
+          />
+          <DialogContent>
+            <CphFlex column>
+              <CphFlex>
+                <Typography>{t('problemActions.stressTestDialog.generator')}</Typography>
+                {stressTest.generator ? (
+                  <>
+                    <CphLink
+                      name={stressTest.generator.path}
+                      onClick={() => {
+                        if (stressTest.generator)
+                          dispatch({
+                            type: 'openFile',
+                            path: stressTest.generator.path,
+                          });
+                      }}
+                    >
+                      {stressTest.generator.base}
+                    </CphLink>
+                    <CphButton
+                      icon={CloseIcon}
+                      onClick={() =>
+                        dispatch({
+                          type: 'removeSrcFile',
+                          problemId,
+                          fileType: 'generator',
+                        })
+                      }
+                      name={t('problemActions.stressTestDialog.button.removeGenerator')}
+                    />
+                  </>
+                ) : (
+                  <CphButton
+                    icon={FileOpenIcon}
+                    onClick={() =>
+                      dispatch({
+                        type: 'chooseSrcFile',
+                        problemId,
+                        fileType: 'generator',
+                      })
+                    }
+                    name={t('problemActions.stressTestDialog.button.chooseGenerator')}
+                  />
+                )}
+              </CphFlex>
+              <CphFlex>
+                <Typography>{t('problemActions.stressTestDialog.bruteForce')}</Typography>
+                {stressTest.bruteForce ? (
+                  <>
+                    <CphLink
+                      name={stressTest.bruteForce.path}
+                      onClick={() => {
+                        if (stressTest.bruteForce)
+                          dispatch({
+                            type: 'openFile',
+                            path: stressTest.bruteForce.path,
+                          });
+                      }}
+                    >
+                      {stressTest.bruteForce.base}
+                    </CphLink>
+                    <CphButton
+                      icon={CloseIcon}
+                      onClick={() =>
+                        dispatch({
+                          type: 'removeSrcFile',
+                          problemId,
+                          fileType: 'bruteForce',
+                        })
+                      }
+                      name={t('problemActions.stressTestDialog.button.removeBruteForce')}
+                    />
+                  </>
+                ) : (
+                  <CphButton
+                    icon={FileOpenIcon}
+                    onClick={() =>
+                      dispatch({
+                        type: 'chooseSrcFile',
+                        problemId,
+                        fileType: 'bruteForce',
+                      })
+                    }
+                    name={t('problemActions.stressTestDialog.button.chooseBruteForce')}
+                  />
+                )}
+              </CphFlex>
+              <CphFlex>{stressTest.msg}</CphFlex>
+              {stressTest.isRunning ? (
+                <CphButton
+                  name={t('problemActions.stressTestDialog.stop')}
+                  onClick={() =>
+                    dispatch({
+                      type: 'stopStressTest',
+                      problemId,
+                    })
+                  }
+                  icon={StopCircleIcon}
+                  color='warning'
+                />
+              ) : (
+                <RunButtonGroup
+                  icon={PlayCircleIcon}
+                  name={t('problemActions.stressTestDialog.run')}
+                  color='success'
+                  disabled={!stressTest.generator || !stressTest.bruteForce}
+                  onRun={(forceCompile) => {
+                    dispatch({ type: 'startStressTest', problemId, forceCompile });
+                  }}
+                />
+              )}
+            </CphFlex>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  },
+);

@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -19,6 +19,7 @@ declare const vscode: {
   postMessage<T>(msg: T): Thenable<void>;
 };
 
+declare const version: string;
 declare const isDarkMode: boolean;
 declare const partyUri: string;
 declare const hiddenStatuses: string[];
@@ -26,5 +27,4 @@ declare const language: string;
 declare const showTips: boolean;
 interface Window {
   easterEgg?: boolean;
-  activePath?: string;
 }

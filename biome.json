@@ -1,44 +1,73 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
   },
+  "files": {
+    "includes": [
+      "src/**",
+      "!src/legacy",
+      "tests/**",
+      "scripts/**",
+      "webpack.config.ts",
+      "l10n/**",
+      "package*.json"
+    ]
+  },
   "formatter": {
     "enabled": true,
-    "formatWithErrors": false,
     "indentStyle": "space",
-    "indentWidth": 2,
-    "lineEnding": "lf",
-    "lineWidth": 80,
-    "attributePosition": "auto",
-    "bracketSameLine": false,
-    "bracketSpacing": true,
-    "expand": "auto",
-    "useEditorconfig": true,
-    "includes": ["**", "!**/testlib/"]
+    "lineWidth": 100
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false,
+      "recommended": true,
       "style": {
-        "useBlockStatements": "warn",
         "noCommonJs": "on",
+        "noDefaultExport": "on",
         "noUselessElse": "on",
-        "useConst": "on"
+        "useCollapsedElseIf": "on",
+        "useCollapsedIf": "on",
+        "useConsistentArrayType": "on",
+        "useConsistentCurlyBraces": "on",
+        "useConsistentObjectDefinitions": "on",
+        "useGroupedAccessorPairs": "on",
+        "useNamingConvention": {
+          "level": "error",
+          "options": {
+            "strictCase": false,
+            "conventions": [
+              {
+                "selector": {
+                  "kind": "objectLiteralProperty"
+                },
+                "formats": ["camelCase", "CONSTANT_CASE"]
+              }
+            ]
+          }
+        },
+        "useConsistentMemberAccessibility": {
+          "level": "on",
+          "options": {
+            "accessibility": "explicit"
+          }
+        }
+      },
+      "nursery": {
+        "noLeakedRender": "on"
       },
       "suspicious": {
-        "noDoubleEquals": "on",
-        "noImplicitAnyLet": "error"
-      },
-      "correctness": {
-        "noUnusedImports": "on"
+        "noUnusedExpressions": "on"
       }
     }
   },
   "javascript": {
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    },
     "formatter": {
       "jsxQuoteStyle": "single",
       "quoteProperties": "asNeeded",
@@ -80,6 +109,16 @@
                 "sortOrder": "lexicographic"
               }
             }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/application/ports/problems/history/*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useNamingConvention": "off"
           }
         }
       }

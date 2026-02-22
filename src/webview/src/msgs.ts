@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -15,12 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UUID } from 'crypto';
-import { ITc } from '@/types/types';
+import type { IOverrides, ProblemId, TestcaseId } from '@/domain/types';
 
-export interface BaseMsg {
+interface BaseMsg {
   type: string;
-  activePath?: string;
+  problemId?: ProblemId;
+}
+interface ProblemBaseMsg extends BaseMsg {
+  problemId: ProblemId;
 }
 
 export interface CreateProblemMsg extends BaseMsg {
@@ -32,112 +34,105 @@ export interface ImportProblemMsg extends BaseMsg {
 export interface InitMsg extends BaseMsg {
   type: 'init';
 }
-export interface EditProblemDetailsMsg extends BaseMsg {
+export interface EditProblemDetailsMsg extends ProblemBaseMsg {
   type: 'editProblemDetails';
-  title: string;
-  url: string;
-  timeLimit: number;
-  memoryLimit: number;
-  compilationSettings?: {
-    compiler?: string;
-    compilerArgs?: string;
-    runner?: string;
-    runnerArgs?: string;
-  };
+  name: string;
+  url?: string;
+  overrides: IOverrides;
 }
-export interface DelProblemMsg extends BaseMsg {
-  type: 'delProblem';
+export interface DeleteProblemMsg extends ProblemBaseMsg {
+  type: 'deleteProblem';
 }
-export interface RunTcsMsg extends BaseMsg {
-  type: 'runTcs';
-  compile: boolean | null;
+export interface RunAllTestcasesMsg extends ProblemBaseMsg {
+  type: 'runAllTestcases';
+  forceCompile: boolean | null;
 }
-export interface StopTcsMsg extends BaseMsg {
-  type: 'stopTcs';
-  onlyOne: boolean;
+export interface StopTestcasesMsg extends ProblemBaseMsg {
+  type: 'stopTestcases';
+  testcaseId?: TestcaseId;
 }
-export interface AddTcMsg extends BaseMsg {
-  type: 'addTc';
+export interface AddTestcaseMsg extends ProblemBaseMsg {
+  type: 'addTestcase';
 }
-export interface LoadTcsMsg extends BaseMsg {
-  type: 'loadTcs';
+export interface LoadTestcasesMsg extends ProblemBaseMsg {
+  type: 'loadTestcases';
 }
-export interface RunTcMsg extends BaseMsg {
-  type: 'runTc';
-  id: UUID;
-  compile: boolean | null;
+export interface RunSingleTestcaseMsg extends ProblemBaseMsg {
+  type: 'runSingleTestcase';
+  testcaseId: TestcaseId;
+  forceCompile: boolean | null;
 }
-export interface ToggleDisableMsg extends BaseMsg {
-  type: 'toggleDisable';
-  id: UUID;
+export interface ClearTestcaseStatusMsg extends ProblemBaseMsg {
+  type: 'clearTestcaseStatus';
+  testcaseId?: TestcaseId;
 }
-export interface ClearTcStatusMsg extends BaseMsg {
-  type: 'clearTcStatus';
-  id: UUID;
+export type WebviewTestcaseFileTypes = 'stdin' | 'answer';
+export interface ChooseTestcaseFileMsg extends ProblemBaseMsg {
+  type: 'chooseTestcaseFile';
+  testcaseId: TestcaseId;
+  label: WebviewTestcaseFileTypes;
 }
-export interface ClearStatusMsg extends BaseMsg {
-  type: 'clearStatus';
+export interface SetTestcaseStringMsg extends ProblemBaseMsg {
+  type: 'setTestcaseString';
+  testcaseId: TestcaseId;
+  label: WebviewTestcaseFileTypes;
+  data: string;
 }
-export type WebviewTcFileTypes = 'stdin' | 'answer';
-export interface ChooseTcFileMsg extends BaseMsg {
-  type: 'chooseTcFile';
-  id: UUID;
-  label: WebviewTcFileTypes;
+export interface UpdateTestcaseMsg extends ProblemBaseMsg {
+  type: 'updateTestcase';
+  testcaseId: TestcaseId;
+  event: 'setDisable' | 'setExpand' | 'setAsAnswer';
+  value: boolean; // ignored when set as answer
 }
-export interface UpdateTcMsg extends BaseMsg {
-  type: 'updateTc';
-  id: UUID;
-  tc: ITc;
+export interface CompareTestcaseMsg extends ProblemBaseMsg {
+  type: 'compareTestcase';
+  testcaseId: TestcaseId;
 }
-export interface CompareTcMsg extends BaseMsg {
-  type: 'compareTc';
-  id: UUID;
+export interface ToggleTestcaseFileMsg extends ProblemBaseMsg {
+  type: 'toggleTestcaseFile';
+  testcaseId: TestcaseId;
+  label: WebviewTestcaseFileTypes;
 }
-export interface ToggleTcFileMsg extends BaseMsg {
-  type: 'toggleTcFile';
-  id: UUID;
-  label: WebviewTcFileTypes;
+export interface DeleteTestcaseMsg extends ProblemBaseMsg {
+  type: 'deleteTestcase';
+  testcaseId: TestcaseId;
 }
-export interface DelTcMsg extends BaseMsg {
-  type: 'delTc';
-  id: UUID;
-}
-export interface ReorderTcMsg extends BaseMsg {
-  type: 'reorderTc';
+export interface ReorderTestcaseMsg extends ProblemBaseMsg {
+  type: 'reorderTestcase';
   fromIdx: number;
   toIdx: number;
 }
 export interface OpenFileMsg extends BaseMsg {
   type: 'openFile';
   path: string;
-  isVirtual?: boolean;
 }
 export interface OpenTestlibMsg extends BaseMsg {
   type: 'openTestlib';
 }
-export type WebviewSrcFileTypes =
-  | 'checker'
-  | 'interactor'
-  | 'generator'
-  | 'bruteForce';
-export interface ChooseSrcFileMsg extends BaseMsg {
+export type WebviewSrcFileTypes = 'checker' | 'interactor' | 'generator' | 'bruteForce';
+export interface ChooseSrcFileMsg extends ProblemBaseMsg {
   type: 'chooseSrcFile';
   fileType: WebviewSrcFileTypes;
 }
-export interface RemoveSrcFileMsg extends BaseMsg {
+export interface RemoveSrcFileMsg extends ProblemBaseMsg {
   type: 'removeSrcFile';
   fileType: WebviewSrcFileTypes;
 }
-export interface StartBfCompareMsg extends BaseMsg {
-  type: 'startBfCompare';
-  compile: boolean | null;
+export interface StartStressTestMsg extends ProblemBaseMsg {
+  type: 'startStressTest';
+  forceCompile: boolean | null;
 }
-export interface StopBfCompareMsg extends BaseMsg {
-  type: 'stopBfCompare';
+export interface StopStressTestMsg extends ProblemBaseMsg {
+  type: 'stopStressTest';
 }
-export interface SubmitToCodeforcesMsg extends BaseMsg {
+export interface SubmitToCodeforcesMsg extends ProblemBaseMsg {
   type: 'submitToCodeforces';
 }
+export interface DragDropMsg extends BaseMsg {
+  type: 'dragDrop';
+  items: string[];
+}
+
 export interface StartChatMsg extends BaseMsg {
   type: 'startChat';
 }
@@ -145,42 +140,36 @@ export interface OpenSettingsMsg extends BaseMsg {
   type: 'openSettings';
   item: string;
 }
-export interface DebugTcMsg extends BaseMsg {
-  type: 'debugTc';
-  id: UUID;
-}
-export interface DragDropMsg extends BaseMsg {
-  type: 'dragDrop';
-  items: string[];
-}
+
+export type ProblemMsg =
+  | EditProblemDetailsMsg
+  | DeleteProblemMsg
+  | RunAllTestcasesMsg
+  | StopTestcasesMsg
+  | AddTestcaseMsg
+  | LoadTestcasesMsg
+  | RunSingleTestcaseMsg
+  | ClearTestcaseStatusMsg
+  | ChooseTestcaseFileMsg
+  | SetTestcaseStringMsg
+  | UpdateTestcaseMsg
+  | CompareTestcaseMsg
+  | ToggleTestcaseFileMsg
+  | DeleteTestcaseMsg
+  | ReorderTestcaseMsg
+  | ChooseSrcFileMsg
+  | RemoveSrcFileMsg
+  | StartStressTestMsg
+  | StopStressTestMsg
+  | SubmitToCodeforcesMsg
+  | DragDropMsg;
+
 export type WebviewMsg =
+  | ProblemMsg
   | CreateProblemMsg
   | ImportProblemMsg
   | InitMsg
-  | EditProblemDetailsMsg
-  | DelProblemMsg
-  | RunTcsMsg
-  | StopTcsMsg
-  | AddTcMsg
-  | LoadTcsMsg
-  | RunTcMsg
-  | ToggleDisableMsg
-  | ClearTcStatusMsg
-  | ClearStatusMsg
-  | ChooseTcFileMsg
-  | UpdateTcMsg
-  | CompareTcMsg
-  | ToggleTcFileMsg
-  | DelTcMsg
-  | ReorderTcMsg
   | OpenFileMsg
   | OpenTestlibMsg
-  | ChooseSrcFileMsg
-  | RemoveSrcFileMsg
-  | StartBfCompareMsg
-  | StopBfCompareMsg
-  | SubmitToCodeforcesMsg
   | StartChatMsg
-  | OpenSettingsMsg
-  | DebugTcMsg
-  | DragDropMsg;
+  | OpenSettingsMsg;

@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -15,61 +15,89 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IProblem } from '@/types/types';
-import { useProblemContext } from '../context/ProblemContext';
-import CphFlex from './base/cphFlex';
-import CphMenu from './base/cphMenu';
-import ErrorBoundary from './base/errorBoundary';
-import ProblemActions from './problemActions';
-import ProblemTitle from './problemTitle';
-import TcsView from './tcsView';
+import { VerdictType } from '@/domain/entities/verdict';
+import type { ProblemId } from '@/domain/types';
+import type { IWebviewProblem } from '@/domain/webviewTypes';
+import { useProblemDispatch } from '../context/ProblemContext';
+import { CphFlex } from './base/cphFlex';
+import { CphMenu } from './base/cphMenu';
+import { ErrorBoundary } from './base/errorBoundary';
+import { ProblemActions } from './problemActions';
+import { ProblemTitle } from './problemTitle';
+import { TestcasesView } from './testcasesView';
+import { VerdictSummary } from './verdictSummary';
 
 interface ProblemViewProps {
-  problem: IProblem;
+  problemId: ProblemId;
+  problem: IWebviewProblem;
   startTime: number;
 }
 
-const ProblemView = ({ problem, startTime }: ProblemViewProps) => {
+export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewProps) => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
+  const dispatch = useProblemDispatch();
+  const hasRunning = useMemo(() => {
+    for (const [_, testcase] of Object.entries(problem.testcases))
+      if (testcase.result?.verdict.type === VerdictType.running) return true;
+    return false;
+  }, [problem.testcases]);
+
   return (
     <>
       <ErrorBoundary>
-        <ProblemTitle problem={problem} startTime={startTime} />
+        <ProblemTitle
+          problemId={problemId}
+          name={problem.name}
+          url={problem.url}
+          checker={problem.checker}
+          interactor={problem.interactor}
+          timeElapsedMs={problem.timeElapsedMs}
+          overrides={problem.overrides}
+          startTime={startTime}
+        />
+      </ErrorBoundary>
+      <ErrorBoundary>
+        <VerdictSummary testcaseOrder={problem.testcaseOrder} testcases={problem.testcases} />
       </ErrorBoundary>
       <CphFlex
         column
         flex={1}
-        width={'100%'}
+        width='100%'
         sx={{
           overflowY: 'scroll',
           scrollbarWidth: 'thin',
           scrollbarGutter: 'stable',
         }}
-        bgcolor={'rgba(127, 127, 127, 0.05)'}
         paddingY={2}
       >
         <ErrorBoundary>
           <CphMenu
             menu={{
               [t('problemView.menu.clearStatus')]: () => {
-                dispatch({ type: 'clearStatus' });
+                dispatch({ type: 'clearTestcaseStatus', problemId });
               },
             }}
             flex={1}
-            width={'100%'}
+            width='100%'
           >
-            <TcsView problem={problem} />
+            <TestcasesView
+              problemId={problemId}
+              testcaseOrder={problem.testcaseOrder}
+              testcases={problem.testcases}
+            />
           </CphMenu>
         </ErrorBoundary>
       </CphFlex>
       <ErrorBoundary>
-        <ProblemActions problem={problem} />
+        <ProblemActions
+          problemId={problemId}
+          url={problem.url}
+          stressTest={problem.stressTest}
+          hasRunning={hasRunning}
+        />
       </ErrorBoundary>
     </>
   );
-};
-
-export default ProblemView;
+});

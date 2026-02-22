@@ -1,0 +1,67 @@
+diff --git a/dist/src/NodeParser/IntersectionNodeParser.js b/dist/src/NodeParser/IntersectionNodeParser.js
+index b20953243f9e1ed0361a48f5216e2c2d4e2e3f29..bb9fcaec288ade428485d3a9144b9653d214cf60 100644
+--- a/dist/src/NodeParser/IntersectionNodeParser.js
++++ b/dist/src/NodeParser/IntersectionNodeParser.js
+@@ -8,6 +8,7 @@ const Errors_js_1 = require("../Error/Errors.js");
+ const IntersectionType_js_1 = require("../Type/IntersectionType.js");
+ const LiteralType_js_1 = require("../Type/LiteralType.js");
+ const NeverType_js_1 = require("../Type/NeverType.js");
++const DefinitionType_js_1 = require("../Type/DefinitionType.js");
+ const ObjectType_js_1 = require("../Type/ObjectType.js");
+ const PrimitiveType_js_1 = require("../Type/PrimitiveType.js");
+ const StringType_js_1 = require("../Type/StringType.js");
+@@ -32,6 +33,20 @@ class IntersectionNodeParser {
+         if (types.filter((t) => t instanceof NeverType_js_1.NeverType).length) {
+             return new NeverType_js_1.NeverType();
+         }
++
++        const getActualType = (t) => {
++            let current = t;
++            while (current instanceof DefinitionType_js_1.DefinitionType) {
++                current = current.getType();
++            }
++            return current;
++        };
++        const primitiveTypes = types.filter(t => !(getActualType(t) instanceof ObjectType_js_1.ObjectType));
++        const objectTypes = types.filter(t => getActualType(t) instanceof ObjectType_js_1.ObjectType);
++        if (primitiveTypes.length > 0 && objectTypes.length > 0) {
++            return primitiveTypes[0];
++        }
++
+         // handle autocomplete hacks like `string & {}`
+         if (types.length === 2 && types.some((t) => isEmptyObject(t))) {
+             if (types.some((t) => t instanceof StringType_js_1.StringType)) {
+diff --git a/dist/src/NodeParser/MappedTypeNodeParser.js b/dist/src/NodeParser/MappedTypeNodeParser.js
+index da11506197c635b3cdc7d4554a6325ddfcd7e235..4bd36d2c43f0998680d3882654bdf464fe41ad72 100644
+--- a/dist/src/NodeParser/MappedTypeNodeParser.js
++++ b/dist/src/NodeParser/MappedTypeNodeParser.js
+@@ -9,6 +9,7 @@ const AnnotatedType_js_1 = require("../Type/AnnotatedType.js");
+ const AnyType_js_1 = require("../Type/AnyType.js");
+ const ArrayType_js_1 = require("../Type/ArrayType.js");
+ const DefinitionType_js_1 = require("../Type/DefinitionType.js");
++const IntersectionType_js_1 = require("../Type/IntersectionType.js");
+ const EnumType_js_1 = require("../Type/EnumType.js");
+ const LiteralType_js_1 = require("../Type/LiteralType.js");
+ const NeverType_js_1 = require("../Type/NeverType.js");
+@@ -34,7 +35,20 @@ class MappedTypeNodeParser {
+     }
+     createType(node, context) {
+         const constraintType = this.childNodeParser.createType(node.typeParameter.constraint, context);
+-        const keyListType = (0, derefType_js_1.derefType)(constraintType);
++
++        let keyListType = (0, derefType_js_1.derefType)(constraintType);
++        while (
++            keyListType instanceof DefinitionType_js_1.DefinitionType || 
++            keyListType instanceof IntersectionType_js_1.IntersectionType
++        ) {
++            if (keyListType instanceof DefinitionType_js_1.DefinitionType) {
++                keyListType = (0, derefType_js_1.derefType)(keyListType.getType());
++            } else if (keyListType instanceof IntersectionType_js_1.IntersectionType) {
++                const types = keyListType.getTypes();
++                keyListType = (0, derefType_js_1.derefType)(types.find(t => !(t instanceof ObjectType_js_1.ObjectType)) || types[0]);
++            }
++        }
++
+         const id = `indexed-type-${(0, nodeKey_js_1.getKey)(node, context)}`;
+         if (keyListType instanceof UnionType_js_1.UnionType) {
+             // Key type resolves to a set of known properties

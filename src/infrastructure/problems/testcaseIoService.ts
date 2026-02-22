@@ -1,0 +1,85 @@
+// Copyright (C) 2026 Langning Chen
+//
+// This file is part of cph-ng.
+//
+// cph-ng is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// cph-ng is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
+
+import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type {
+  FilePathResult,
+  ITestcaseIoService,
+} from '@/application/ports/problems/ITestcaseIoService';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import { TOKENS } from '@/composition/tokens';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
+
+@injectable()
+export class TestcaseIoService implements ITestcaseIoService {
+  public constructor(
+    @inject(TOKENS.fileSystem) private fs: IFileSystem,
+    @inject(TOKENS.tempStorage) private temp: ITempStorage,
+    @inject(TOKENS.settings) private settings: ISettings,
+  ) {}
+
+  public async readContent(io: TestcaseIo): Promise<string> {
+    return io.match(
+      (path) => this.fs.readFile(path),
+      (data) => Promise.resolve(data),
+    );
+  }
+
+  public async writeContent(io: TestcaseIo, content: string): Promise<TestcaseIo> {
+    return io.match(
+      async (path) => {
+        await this.fs.safeWriteFile(path, content);
+        return new TestcaseIo({ path });
+      },
+      async () => {
+        return new TestcaseIo({ data: content });
+      },
+    );
+  }
+
+  public async ensureFilePath(io: TestcaseIo): Promise<FilePathResult> {
+    return io.match<Promise<FilePathResult>>(
+      async (path) => ({ path, needDispose: false }),
+      async (data) => {
+        const path = this.temp.create('TestcaseIoService');
+        await this.fs.safeWriteFile(path, data);
+        return { path, needDispose: true };
+      },
+    );
+  }
+
+  public async tryInlining(io: TestcaseIo): Promise<TestcaseIo> {
+    return io.match(
+      async (path) => {
+        const stats = await this.fs.stat(path);
+        if (stats.size <= this.settings.problem.maxInlineDataLength) {
+          const content = await this.fs.readFile(path);
+          this.temp.dispose(path);
+          return new TestcaseIo({ data: content });
+        }
+        return new TestcaseIo({ path });
+      },
+      async (data) => new TestcaseIo({ data }),
+    );
+  }
+
+  public async dispose(io: TestcaseIo): Promise<void> {
+    if (io.path) this.temp.dispose(io.path);
+  }
+}

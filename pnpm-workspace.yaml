@@ -1,0 +1,4 @@
+onlyBuiltDependencies:
+  - '@getgrit/cli'
+  - '@swc/core'
+  - esbuild

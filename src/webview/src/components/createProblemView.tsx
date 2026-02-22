@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -21,34 +21,32 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useProblemContext } from '../context/ProblemContext';
-import CphFlex from './base/cphFlex';
-import Tips from './tips';
+import { useProblemDispatch } from '@/webview/src/context/ProblemContext';
+import { CphFlex } from './base/cphFlex';
+import { Tips } from './tips';
 
 interface CreateProblemProps {
   canImport: boolean;
 }
 
-const CreateProblemView = ({ canImport }: CreateProblemProps) => {
+export const CreateProblemView = ({ canImport }: CreateProblemProps) => {
   const { t } = useTranslation();
-  const { dispatch } = useProblemContext();
+  const dispatch = useProblemDispatch();
   return (
     <CphFlex column gap={5} paddingY={2}>
       <CphFlex column>
         <Alert
           sx={{ width: '100%', boxSizing: 'border-box' }}
-          variant={'outlined'}
-          severity={'warning'}
+          variant='outlined'
+          severity='warning'
         >
-          {canImport
-            ? t('createProblemView.importAlert')
-            : t('createProblemView.createAlert')}
+          {canImport ? t('createProblemView.importAlert') : t('createProblemView.createAlert')}
         </Alert>
         <CphFlex>
-          {canImport && (
+          {!!canImport && (
             <Button
               fullWidth
-              variant={'contained'}
+              variant='contained'
               endIcon={<InputIcon />}
               onClick={() => {
                 dispatch({ type: 'importProblem' });
@@ -69,9 +67,7 @@ const CreateProblemView = ({ canImport }: CreateProblemProps) => {
           </Button>
         </CphFlex>
       </CphFlex>
-      {showTips && <Tips />}
+      {!!showTips && <Tips />}
     </CphFlex>
   );
 };
-
-export default CreateProblemView;

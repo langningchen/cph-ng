@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -15,9 +15,20 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import 'reflect-metadata';
 import { install } from 'source-map-support';
-import ExtensionManager from './modules/extensionManager';
+import { container } from 'tsyringe';
+import type { ExtensionContext } from 'vscode';
+import { setupContainer } from '@/composition/container';
+import { ExtensionManager } from '@/infrastructure/vscode/extensionManager';
 
 install();
-export const activate = ExtensionManager.activate;
-export const deactivate = ExtensionManager.deactivate;
+let extensionManager: ExtensionManager | null = null;
+export const activate = async (context: ExtensionContext) => {
+  await setupContainer(context);
+  extensionManager = container.resolve(ExtensionManager);
+  await extensionManager.activate(context);
+};
+export const deactivate = async () => {
+  await extensionManager?.deactivate();
+};

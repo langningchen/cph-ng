@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -17,16 +17,16 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import CphFlex from './base/cphFlex';
-import CphText from './base/cphText';
+import { CphFlex } from './base/cphFlex';
+import { CphText } from './base/cphText';
 
-const AcCongrats = () => {
+export const AcCongrats = () => {
   const { t } = useTranslation();
 
   return (
     <CphFlex column>
-      <img width={'30%'} src={partyUri} />
-      <CphText textAlign={'center'}>
+      <img width='30%' src={partyUri} alt='AC congratulations gif' />
+      <CphText textAlign='center'>
         {t('acCongrats.firstLine')}
         <br />
         {t('acCongrats.secondLine')}
@@ -34,5 +34,3 @@ const AcCongrats = () => {
     </CphFlex>
   );
 };
-
-export default AcCongrats;

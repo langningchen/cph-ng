@@ -112,7 +112,7 @@ CPH-NG 实现了完整的 21 种评测状态，提供精确的程序问题诊断
 - **彩色输出**：可以通过 ANSI 转义序列实现彩色输出，提升调试信息的可读性
 - **长输出自动放置文件**：对于过长的输出，自动放置在文件中
 
-### 自动化对拍功能 { #automated-bf-compare }
+### 自动化对拍功能 { #automated-stress-test }
 
 ![对拍功能演示](https://image.langningchen.com/wsxcvepxsemzhexjlbopvtzdbqdooogb){ width=800 loading=lazy }
 /// caption

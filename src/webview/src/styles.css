@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2025 Langning Chen
+ * Copyright (C) 2026 Langning Chen
  *
  * This file is part of cph-ng.
  *
@@ -20,8 +20,8 @@
 html,
 body,
 #root {
-  padding: 0 !important;
-  height: 100% !important;
+  padding: 0;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -34,6 +34,18 @@ body,
   51%,
   100% {
     opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
   }
 }
 

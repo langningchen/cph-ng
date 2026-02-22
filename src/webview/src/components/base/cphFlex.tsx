@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BoxProps } from '@mui/material/Box';
+import type { BoxProps } from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import React from 'react';
-import { delProps } from '../../utils';
+import { deleteProps } from '../../utils';
 
 interface CphFlexProps extends BoxProps {
   smallGap?: boolean;
@@ -26,19 +26,17 @@ interface CphFlexProps extends BoxProps {
   alignStart?: boolean;
 }
 
-const CphFlex = (props: CphFlexProps) => {
+export const CphFlex = (props: CphFlexProps) => {
   return (
     <Stack
       alignItems={props.alignStart ? 'flex-start' : 'center'}
       flexDirection={props.column ? 'column' : 'row'}
       gap={props.smallGap ? 0.5 : 1}
-      width={'100%'}
+      width='100%'
       minWidth={0}
-      {...delProps(props, ['smallGap', 'column', 'alignStart'])}
+      {...deleteProps(props, ['smallGap', 'column', 'alignStart'])}
     >
       {props.children}
     </Stack>
   );
 };
-
-export default CphFlex;

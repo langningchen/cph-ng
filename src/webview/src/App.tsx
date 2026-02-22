@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Langning Chen
+// Copyright (C) 2026 Langning Chen
 //
 // This file is part of cph-ng.
 //
@@ -15,19 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Alert from '@mui/material/Alert';
+import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import i18n from 'i18next';
 import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { initReactI18next } from 'react-i18next';
-import CphFlex from './components/base/cphFlex';
-import ErrorBoundary from './components/base/errorBoundary';
-import BgProblemView from './components/bgProblemView';
-import CreateProblemView from './components/createProblemView';
-import DragOverlay from './components/dragOverlay';
-import InitView from './components/initView';
-import ProblemView from './components/problemView';
-import { ProblemProvider, useProblemContext } from './context/ProblemContext';
+import { initReactI18next, useTranslation } from 'react-i18next';
+import { CphFlex } from './components/base/cphFlex';
+import { ErrorBoundary } from './components/base/errorBoundary';
+import { BgProblemView } from './components/bgProblemView';
+import { CreateProblemView } from './components/createProblemView';
+import { DragOverlay } from './components/dragOverlay';
+import { InitView } from './components/initView';
+import { ProblemView } from './components/problemView';
+import { WelcomeDialog } from './components/welcomeDialog';
+import { ProblemProvider, useProblemState } from './context/ProblemContext';
 import langEn from './l10n/en.json';
 import langZh from './l10n/zh.json';
 
@@ -41,10 +44,14 @@ i18n.use(initReactI18next).init({
 });
 
 const Main = () => {
-  const { problemData } = useProblemContext();
+  const state = useProblemState();
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const isNarrow = useMediaQuery(theme.breakpoints.down('xl'));
 
   return (
     <>
+      <WelcomeDialog />
       <ErrorBoundary>
         <DragOverlay />
       </ErrorBoundary>
@@ -52,23 +59,28 @@ const Main = () => {
         <CphFlex
           column
           smallGap
-          height={'100%'}
+          height='100%'
           sx={{
             boxSizing: 'border-box',
           }}
-          padding={1}
+          padding={{ xs: 0.5, md: 1 }}
         >
-          {problemData ? (
+          {state.isInitialized ? (
             <>
-              {problemData.problem ? (
-                <ProblemView {...problemData.problem} />
+              {state.currentProblem.type === 'active' ? (
+                <ProblemView {...state.currentProblem} />
               ) : (
-                <CreateProblemView canImport={problemData.canImport || false} />
+                <CreateProblemView canImport={state.currentProblem.canImport} />
               )}
-              <BgProblemView bgProblems={problemData.bgProblems || []} />
+              <BgProblemView bgProblems={state.backgroundProblems} />
             </>
           ) : (
             <InitView />
+          )}
+          {isNarrow && (
+            <Alert severity='info' sx={{ fontSize: '0.75rem', py: 0 }}>
+              {t('main.narrowWidthAlert')}
+            </Alert>
           )}
         </CphFlex>
       </ErrorBoundary>
@@ -87,11 +99,11 @@ const App = () => {
     },
     breakpoints: {
       values: {
-        xs: 0,
-        sm: 170,
-        md: 260,
-        lg: 360,
-        xl: 480,
+        xs: 170,
+        sm: 220,
+        md: 270,
+        lg: 320,
+        xl: 370,
       },
     },
   });
@@ -104,5 +116,5 @@ const App = () => {
   );
 };
 
-const root = createRoot(document.getElementById('root')!);
-root.render(<App />);
+const element = document.getElementById('root');
+if (element) createRoot(element).render(<App />);
