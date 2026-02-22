@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { ToggleTestcaseFileMsg, WebviewTestcaseFileTypes } from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
@@ -27,7 +28,6 @@ import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import type { TestcaseIoService } from '@/infrastructure/problems/testcaseIoService';
-import type { ToggleTestcaseFileMsg, WebviewTestcaseFileTypes } from '@/webview/src/msgs';
 
 @injectable()
 export class ToggleTestcaseFile extends BaseProblemUseCase<ToggleTestcaseFileMsg> {

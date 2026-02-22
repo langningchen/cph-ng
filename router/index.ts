@@ -17,13 +17,13 @@
 
 import { serve } from '@hono/node-server';
 import { createNodeWebSocket } from '@hono/node-ws';
+import { debug, error, info, trace, warn } from '@r/logger';
+import type { CompanionClientMsg, CompanionMsg, CompanionProblem, SubmitMsg } from '@r/types';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import type { WSContext } from 'hono/ws';
 import type { BatchId } from '@/domain/types';
-import { debug, error, info, trace, warn } from '@/router/logger';
-import type { CompanionClientMsg, CompanionMsg, CompanionProblem, SubmitMsg } from '@/router/types';
 import { config, updateConfig } from './config';
 
 export const clients = new Set<WSContext>();

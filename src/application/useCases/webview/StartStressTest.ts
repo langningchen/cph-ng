@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { StartStressTestMsg } from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
@@ -37,7 +38,6 @@ import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import { VerdictName } from '@/domain/entities/verdict';
 import type { TestcaseId } from '@/domain/types';
-import type { StartStressTestMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {

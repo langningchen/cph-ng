@@ -179,7 +179,6 @@ export default (_env: Record<string, unknown>, argv: Record<string, unknown>): C
       ],
     },
     performance: {
-      hints: false,
       maxEntrypointSize: 2 * 1024 * 1024,
       maxAssetSize: 2 * 1024 * 1024,
     },
@@ -220,14 +219,14 @@ export default (_env: Record<string, unknown>, argv: Record<string, unknown>): C
     cache: {
       type: 'filesystem',
       buildDependencies: { config: [__filename] },
-      name: isProd ? 'prod-ext' : 'dev-ext',
+      name: isProd ? 'prod-extension' : 'dev-extension',
     },
   };
 
   const webviewConfig: Configuration = {
     ...makeBaseConfig(),
     target: 'web',
-    entry: './src/webview/src/App.tsx',
+    entry: './webview/App.tsx',
     devtool: isProd ? 'source-map' : 'inline-source-map',
     output: {
       path: resolve(__dirname, 'dist'),
@@ -238,20 +237,20 @@ export default (_env: Record<string, unknown>, argv: Record<string, unknown>): C
     },
     plugins: [
       new CopyPlugin({
-        patterns: [{ from: 'src/webview/src/styles.css', to: 'styles.css' }],
+        patterns: [{ from: './webview/styles.css', to: 'styles.css' }],
       }),
     ],
     cache: {
       type: 'filesystem',
       buildDependencies: { config: [__filename] },
-      name: isProd ? 'prod-web' : 'dev-web',
+      name: isProd ? 'prod-webview' : 'dev-webview',
     },
   };
 
   const routerConfig: Configuration = {
     ...makeBaseConfig(),
     target: 'node20',
-    entry: './src/router/index.ts',
+    entry: './router/index.ts',
     output: {
       path: resolve(__dirname, 'dist'),
       filename: 'router.cjs',

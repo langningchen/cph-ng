@@ -28,6 +28,7 @@ import {
   sep,
 } from 'node:path';
 import { createContext, Script } from 'node:vm';
+import type { CompanionProblem } from '@r/types';
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
@@ -40,7 +41,6 @@ import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
-import type { CompanionProblem } from '@/router/types';
 
 @injectable()
 export class UserScriptService implements IUserScriptService {

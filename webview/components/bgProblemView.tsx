@@ -18,10 +18,10 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import { useProblemDispatch } from '@w/context/ProblemContext';
 import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { IWebviewBackgroundProblem } from '@/domain/webviewTypes';
-import { useProblemDispatch } from '@/webview/src/context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { CphLink } from './base/cphLink';
 import { CphText } from './base/cphText';

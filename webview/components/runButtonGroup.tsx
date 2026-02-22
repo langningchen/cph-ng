@@ -20,9 +20,9 @@ import FastForwardIcon from '@mui/icons-material/FastForward';
 import { type IconButtonProps, Popover } from '@mui/material';
 import Box from '@mui/material/Box';
 import type SvgIcon from '@mui/material/SvgIcon';
+import { CphFlex } from '@w/components/base/cphFlex';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CphFlex } from '@/webview/src/components/base/cphFlex';
 import { getCompile } from '../utils';
 import { CphButton } from './cphButton';
 

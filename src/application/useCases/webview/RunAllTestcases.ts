@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { RunAllTestcasesMsg } from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
@@ -35,7 +36,6 @@ import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { VerdictName, Verdicts, VerdictType } from '@/domain/entities/verdict';
 import type { TestcaseId } from '@/domain/types';
-import type { RunAllTestcasesMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class RunAllTestcases extends BaseProblemUseCase<RunAllTestcasesMsg> {

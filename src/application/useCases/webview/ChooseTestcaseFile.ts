@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { ChooseTestcaseFileMsg } from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
@@ -24,7 +25,6 @@ import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUs
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { TestcaseScanner } from '@/domain/services/TestcaseScanner';
-import type { ChooseTestcaseFileMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class ChooseTestcaseFile extends BaseProblemUseCase<ChooseTestcaseFileMsg> {

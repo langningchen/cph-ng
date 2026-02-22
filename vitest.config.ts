@@ -11,8 +11,8 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src'),
       '@t': resolve(__dirname, 'tests'),
-      '@w': resolve(__dirname, 'src/webview/src'),
-      '@r': resolve(__dirname, 'src/router'),
+      '@w': resolve(__dirname, 'webview'),
+      '@r': resolve(__dirname, 'router'),
     },
     coverage: {
       provider: 'v8',

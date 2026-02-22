@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { ImportProblemMsg } from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
 import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
@@ -22,7 +23,6 @@ import type { IProblemService } from '@/application/ports/problems/IProblemServi
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import { TOKENS } from '@/composition/tokens';
-import type { ImportProblemMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class ImportProblem {

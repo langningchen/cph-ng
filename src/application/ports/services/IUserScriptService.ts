@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { CompanionProblem } from '@/router/types';
+import type { CompanionProblem } from '@r/types';
 
 export interface WorkspaceFolderContext {
   index: number;

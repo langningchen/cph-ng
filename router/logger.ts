@@ -17,8 +17,8 @@
 
 import { appendFileSync } from 'node:fs';
 import { config } from '@r/config';
-import { broadcast } from '@/router';
-import type { LogLevel } from '@/router/types';
+import { broadcast } from '@r/index';
+import type { LogLevel } from '@r/types';
 
 export const writeLog = (level: LogLevel, message: string, ...args: unknown[]) => {
   const timeString = new Date().toISOString();

@@ -18,10 +18,10 @@
         "./tests/*"
       ],
       "@w/*": [
-        "./src/webview/src/*"
+        "./webview/*"
       ],
       "@r/*": [
-        "./src/router/*"
+        "./router/*"
       ]
     },
     "sourceMap": true,
@@ -40,6 +40,7 @@
   "include": [
     "src/**/*",
     "tests/**/*",
-    "tests/infrastructure/node/tempStorageMock/.ts"
+    "webview/**/*",
+    "router/**/*",
   ]
 }

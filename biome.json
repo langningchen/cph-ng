@@ -8,8 +8,9 @@
   "files": {
     "includes": [
       "src/**",
-      "!src/legacy",
       "tests/**",
+      "webview/**",
+      "router/**",
       "scripts/**",
       "webpack.config.ts",
       "l10n/**",

@@ -17,6 +17,13 @@
 
 import { spawn } from 'node:child_process';
 import EventEmitter from 'node:events';
+import type {
+  CompanionClientMsg,
+  CompanionMsg,
+  CompanionProblem,
+  Config,
+  CphSubmitData,
+} from '@r/types';
 import { WebSocket } from 'partysocket';
 import { inject, injectable } from 'tsyringe';
 import type { Except } from 'type-fest';
@@ -30,13 +37,6 @@ import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { TOKENS } from '@/composition/tokens';
 import type { BatchId, ClientId, SubmissionId } from '@/domain/types';
-import type {
-  CompanionClientMsg,
-  CompanionMsg,
-  CompanionProblem,
-  Config,
-  CphSubmitData,
-} from '@/router/types';
 
 export type CompanionCommunicationEvents = {
   statusChanged: () => void;

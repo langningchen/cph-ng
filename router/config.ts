@@ -17,9 +17,9 @@
 
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import type { Config } from '@r/types';
 import { lock } from 'proper-lockfile';
 import parser from 'yargs-parser';
-import type { Config } from '@/router/types';
 
 const argv = parser(process.argv.slice(2), {
   number: ['port', 'shutdownTimeout'],

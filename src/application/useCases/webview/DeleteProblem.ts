@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { DeleteProblemMsg } from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
@@ -23,7 +24,6 @@ import type { IActivePathService } from '@/application/ports/vscode/IActivePathS
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import type { DeleteProblemMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class DeleteProblem extends BaseProblemUseCase<DeleteProblemMsg> {

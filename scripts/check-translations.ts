@@ -62,14 +62,14 @@ const Configs: TranslationConfig[] = [
       extractKeys(
         'src',
         ['ts', 'js', 'tsx', 'jsx'],
-        ['src/webview', 'src/infrastructure/vscode/translatorAdapter.ts'],
+        ['src/infrastructure/vscode/translatorAdapter.ts'],
       ),
     files: ['l10n/bundle.l10n.zh-cn.json'],
   },
   {
     title: 'Webview',
-    getKeys: () => extractKeys(join('src', 'webview', 'src'), ['tsx', 'ts']),
-    files: ['src/webview/src/l10n/en.json', 'src/webview/src/l10n/zh.json'],
+    getKeys: () => extractKeys(join('webview'), ['tsx', 'ts']),
+    files: ['webview/l10n/en.json', 'webview/l10n/zh.json'],
   },
 ];
 

@@ -19,9 +19,9 @@ import InputIcon from '@mui/icons-material/Input';
 import SendIcon from '@mui/icons-material/Send';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import { useProblemDispatch } from '@w/context/ProblemContext';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useProblemDispatch } from '@/webview/src/context/ProblemContext';
 import { CphFlex } from './base/cphFlex';
 import { Tips } from './tips';
 

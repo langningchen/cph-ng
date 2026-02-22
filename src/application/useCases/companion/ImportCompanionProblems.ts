@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { CompanionProblem } from '@r/types';
 import { inject, injectable } from 'tsyringe';
 import { Uri } from 'vscode';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
@@ -34,7 +35,6 @@ import { Problem } from '@/domain/entities/problem';
 import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import type { TestcaseId } from '@/domain/types';
-import type { CompanionProblem } from '@/router/types';
 
 @injectable()
 export class ImportCompanionProblems {

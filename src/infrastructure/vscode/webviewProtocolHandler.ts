@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { WebviewMsg } from '@w/msgs';
 import { container, type InjectionToken, inject, injectable } from 'tsyringe';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { AddTestcase } from '@/application/useCases/webview/AddTestcase';
@@ -47,7 +48,6 @@ import { SubmitToCodeforces } from '@/application/useCases/webview/SubmitToCodef
 import { ToggleTestcaseFile } from '@/application/useCases/webview/ToggleTestcaseFile';
 import { UpdateTestcase } from '@/application/useCases/webview/UpdateTestcase';
 import { TOKENS } from '@/composition/tokens';
-import type { WebviewMsg } from '@/webview/src/msgs';
 
 const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<WebviewMsg>>> = {
   addTestcase: AddTestcase,

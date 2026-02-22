@@ -24,7 +24,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
-import { MD5 } from 'crypto-js';
+import MD5 from 'crypto-js/md5';
 import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictType } from '@/domain/entities/verdict';

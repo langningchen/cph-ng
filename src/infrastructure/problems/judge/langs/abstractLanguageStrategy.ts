@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SHA256 } from 'crypto-js';
+import SHA256 from 'crypto-js/sha256';
 import type { OutputChannel } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';

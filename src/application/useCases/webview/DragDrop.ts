@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { DragDropMsg } from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
@@ -27,7 +28,6 @@ import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { TOKENS } from '@/composition/tokens';
 import { TestcaseScanner } from '@/domain/services/TestcaseScanner';
 import type { TestcaseId } from '@/domain/types';
-import type { DragDropMsg } from '@/webview/src/msgs';
 
 @injectable()
 export class DragDrop implements IMsgHandle<DragDropMsg> {

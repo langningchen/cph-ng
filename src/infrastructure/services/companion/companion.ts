@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { CompanionProblem, CphSubmitData } from '@r/types';
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ICompanion } from '@/application/ports/services/ICompanion';
@@ -28,7 +29,6 @@ import type { Problem } from '@/domain/entities/problem';
 import type { BatchId, SubmissionId } from '@/domain/types';
 import { CompanionCommunicationService } from '@/infrastructure/services/companion/companionCommunicationService';
 import { CompanionStatusbarService } from '@/infrastructure/services/companion/companionStatusbarService';
-import type { CompanionProblem, CphSubmitData } from '@/router/types';
 
 export type BatchList = Map<BatchId, CompanionProblem[]>;
 
