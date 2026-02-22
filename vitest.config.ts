@@ -7,7 +7,6 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: ['./tests/setup.ts'],
-    retry: 3,
     alias: {
       '@': resolve(__dirname, 'src'),
       '@t': resolve(__dirname, 'tests'),
