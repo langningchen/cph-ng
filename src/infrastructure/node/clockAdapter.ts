@@ -15,8 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { injectable } from 'tsyringe';
 import type { IClock } from '@/application/ports/node/IClock';
 
+@injectable()
 export class ClockAdapter implements IClock {
   public now(): number {
     return Date.now();

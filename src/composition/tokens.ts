@@ -94,7 +94,6 @@ export const TOKENS = {
   problemService: 'ports.ProblemService' as InjectionToken<IProblemService>,
   processExecutor: 'ports.ProcessExecutor' as InjectionToken<IProcessExecutor>,
   resultEvaluator: 'ports.ResultEvaluator' as InjectionToken<IResultEvaluator>,
-  runner: 'ports.Runner' as InjectionToken<ISolutionRunner>,
   runnerProvider: 'ports.RunnerProvider' as InjectionToken<IRunnerProvider>,
   settings: 'ports.Settings' as InjectionToken<ISettings>,
   solutionRunner: 'ports.SolutionRunner' as InjectionToken<ISolutionRunner>,
@@ -106,7 +105,7 @@ export const TOKENS = {
   translator: 'ports.Translator' as InjectionToken<ITranslator>,
   ui: 'ports.Ui' as InjectionToken<IUi>,
   userScriptService: 'ports.UserScriptService' as InjectionToken<IUserScriptService>,
-  companion: 'ports.companion' as InjectionToken<ICompanion>,
+  companion: 'ports.Companion' as InjectionToken<ICompanion>,
   webviewEventBus: 'ports.WebviewEventBus' as InjectionToken<IWebviewEventBus>,
   workspace: 'ports.Workspace' as InjectionToken<IWorkspace>,
   problemMigrationService:

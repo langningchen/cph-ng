@@ -15,10 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type {
-  FinalResult,
-  JudgeRequest,
-} from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
+import type { VerdictName } from '@/domain/entities/verdict';
+import type { ExecutionData } from '@/domain/execution';
+
+export interface JudgeRequest {
+  executionResult: ExecutionData;
+  inputPath: string;
+  answerPath: string;
+  checkerPath?: string;
+  interactorResult?: {
+    execution: ExecutionData;
+    feedback: string;
+  };
+  timeLimitMs: number;
+  memoryLimitMb?: number;
+}
+
+export interface FinalResult {
+  verdict: VerdictName;
+  timeMs?: number;
+  memoryMb?: number;
+  msg?: string;
+}
 
 export interface IResultEvaluator {
   judge(req: JudgeRequest, signal: AbortSignal): Promise<FinalResult>;

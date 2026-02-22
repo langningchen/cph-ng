@@ -19,32 +19,15 @@ import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ICheckerRunner } from '@/application/ports/problems/judge/ICheckerRunner';
-import type { IResultEvaluator } from '@/application/ports/problems/judge/IResultEvaluator';
+import type {
+  FinalResult,
+  IResultEvaluator,
+  JudgeRequest,
+} from '@/application/ports/problems/judge/IResultEvaluator';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
 import { VerdictName } from '@/domain/entities/verdict';
-import type { ExecutionData } from '@/domain/execution';
 import { Grader } from '@/domain/services/Grader';
-
-export interface JudgeRequest {
-  executionResult: ExecutionData;
-  inputPath: string;
-  answerPath: string;
-  checkerPath?: string;
-  interactorResult?: {
-    execution: ExecutionData;
-    feedback: string;
-  };
-  timeLimitMs: number;
-  memoryLimitMb?: number;
-}
-
-export interface FinalResult {
-  verdict: VerdictName;
-  timeMs?: number;
-  memoryMb?: number;
-  msg?: string;
-}
 
 @injectable()
 export class ResultEvaluatorAdaptor implements IResultEvaluator {
@@ -98,10 +81,17 @@ export class ResultEvaluatorAdaptor implements IResultEvaluator {
         execution: { codeOrSignal, stdoutPath, stderrPath },
         feedback,
       } = req.interactorResult;
-      if (typeof codeOrSignal === 'string') throw new Error('Interactor run failed');
+      if (typeof codeOrSignal === 'string') {
+        this.tmp.dispose([stdoutPath, stderrPath, feedback]);
+        return {
+          ...executionStats,
+          verdict: VerdictName.systemError,
+          msg: 'Interactor run failed',
+        };
+      }
       const verdict = this.grader.mapTestlibExitCode(codeOrSignal);
       const msg = await this.fs.readFile(feedback);
-      this.tmp.dispose([stdoutPath, stderrPath]);
+      this.tmp.dispose([stdoutPath, stderrPath, feedback]);
       return { ...executionStats, verdict, msg };
     }
 

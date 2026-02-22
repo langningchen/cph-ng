@@ -52,8 +52,8 @@ export class CphMigrationService implements ICphMigrationService {
   public async migrateFolder(folderPath: string): Promise<Problem[]> {
     const entries = await this.fs.readdir(folderPath);
     const problems: Problem[] = [];
-    for (const [name, type] of entries)
-      if (type === 'file' && name.endsWith('.prob')) {
+    for (const name of entries)
+      if (name.endsWith('.prob')) {
         const p = await this.loadProbFile(this.path.resolve(folderPath, name));
         if (p) problems.push(p);
       }

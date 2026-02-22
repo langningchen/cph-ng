@@ -114,6 +114,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
 
     const runnerResult = await handle.wait();
     clearTimeout(timeoutId);
+    signal.removeEventListener('abort', onUserAbort);
     if (runnerResult instanceof Error) {
       this.tmp.dispose([handle.stdoutPath, handle.stderrPath, userStdoutPath, userStderrPath]);
       return runnerResult;

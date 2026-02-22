@@ -23,6 +23,7 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import {
   AbortReason,
   type IProcessExecutor,
+  type PipeProcessOptions,
   type ProcessExecuteResult,
   type ProcessHandle,
   type ProcessOptions,
@@ -140,7 +141,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
       acSignal: unifiedAc.signal,
       stdoutPath: this.tmp.create(`processExecutor.stdoutPath (${options.cmd[0]})`),
       stderrPath: this.tmp.create(`processExecutor.stderrPath (${options.cmd[0]})`),
-      startTime: Date.now(),
+      startTime: this.clock.now(),
       ioPromises: [],
     };
 
@@ -216,8 +217,8 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
   }
 
   public async executeWithPipe(
-    opt1: ProcessOptions,
-    opt2: ProcessOptions,
+    opt1: PipeProcessOptions,
+    opt2: PipeProcessOptions,
   ): Promise<{ res1: ProcessExecuteResult; res2: ProcessExecuteResult }> {
     const proc1 = this.internalLaunch(opt1);
     const proc2 = this.internalLaunch(opt2);

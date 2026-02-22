@@ -18,7 +18,6 @@
 import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { container } from 'tsyringe';
 import { type ExtensionContext, window } from 'vscode';
-import { BuildInfoAdapter } from '@/infrastructure/node/buildInfoAdapter';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
 import { CryptoAdapter } from '@/infrastructure/node/cryptoAdapter';
 import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
@@ -77,7 +76,6 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.activePathService, ActivePathService);
   container.registerSingleton(TOKENS.activeProblemCoordinator, ActiveProblemCoordinator);
   container.registerSingleton(TOKENS.archive, ArchiveAdapter);
-  container.registerSingleton(TOKENS.buildInfo, BuildInfoAdapter);
   container.registerSingleton(TOKENS.checkerRunner, CheckerRunnerAdapter);
   container.registerSingleton(TOKENS.clock, ClockAdapter);
   container.registerSingleton(TOKENS.companion, Companion);
@@ -99,7 +97,6 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.problemService, ProblemService);
   container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
   container.registerSingleton(TOKENS.resultEvaluator, ResultEvaluatorAdaptor);
-  container.registerSingleton(TOKENS.runner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.runnerProvider, RunnerProviderAdapter);
   container.registerSingleton(TOKENS.settings, SettingsAdapter);
   container.registerSingleton(TOKENS.solutionRunner, SolutionRunnerAdapter);
@@ -167,9 +164,14 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerInstance(TOKENS.telemetryReporter, telemetryReporter);
 
   let failed = false;
+  const multiInstanceTokens = new Set<string>([
+    TOKENS.extensionModule as string,
+    TOKENS.languageStrategy as string,
+  ]);
   for (const key of Object.values(TOKENS) as string[]) {
     try {
-      container.resolve(key);
+      if (multiInstanceTokens.has(key)) container.resolveAll(key);
+      else container.resolve(key);
     } catch (e) {
       logger.error(`Resolve dependency ${key} failed`, { e });
       failed = true;

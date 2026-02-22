@@ -22,10 +22,14 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class LoggerAdapter implements ILogger {
+  private readonly module: string;
+
   public constructor(
     @inject(TOKENS.logOutputChannel) private readonly logger: LogOutputChannel,
-    private readonly module = 'base',
-  ) {}
+    module?: string,
+  ) {
+    this.module = module ?? 'base';
+  }
 
   public info(message: string, ...args: unknown[]): void {
     console.info('[INFO]', `[${this.module}]`, message, ...args);

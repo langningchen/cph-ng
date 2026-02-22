@@ -23,12 +23,12 @@ import { setupContainer } from '@/composition/container';
 import { ExtensionManager } from '@/infrastructure/vscode/extensionManager';
 
 install();
+let extensionManager: ExtensionManager | null = null;
 export const activate = async (context: ExtensionContext) => {
   await setupContainer(context);
-  const extensionManager = container.resolve(ExtensionManager);
+  extensionManager = container.resolve(ExtensionManager);
   await extensionManager.activate(context);
 };
 export const deactivate = async () => {
-  const extensionManager = container.resolve(ExtensionManager);
-  await extensionManager.deactivate();
+  await extensionManager?.deactivate();
 };

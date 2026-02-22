@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { TelemetryEventMeasurements, TelemetryReporter } from '@vscode/extension-telemetry';
-import { inject, singleton } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import { TelemetryTrustedValue as vsTelemetryTrustedValue } from 'vscode';
 import type { IClock } from '@/application/ports/node/IClock';
 import {
@@ -30,7 +30,7 @@ import {
 } from '@/application/ports/vscode/ITelemetry';
 import { TOKENS } from '@/composition/tokens';
 
-@singleton()
+@injectable()
 export class TelemetryAdapter implements ITelemetry {
   public constructor(
     @inject(TOKENS.telemetryReporter) private readonly reporter: TelemetryReporter,
@@ -61,14 +61,8 @@ export class TelemetryAdapter implements ITelemetry {
     else this.reporter.sendTelemetryEvent(name, eventProps, measurements);
   }
 
-  public event(name: TelemetryEventName, props?: Record<string, string | number | boolean>): void {
-    const stringProps: Record<string, string> = {};
-    if (props) {
-      for (const [key, value] of Object.entries(props)) {
-        stringProps[key] = String(value);
-      }
-    }
-    this.reporter.sendTelemetryEvent(name, stringProps);
+  public event(name: TelemetryEventName, props?: TelemetryEventProps): void {
+    this.send(name, props ?? {});
   }
 
   public error(name: TelemetryErrorName, e: unknown, props?: TelemetryEventProps): void {
@@ -82,7 +76,10 @@ export class TelemetryAdapter implements ITelemetry {
     });
   }
 
-  public start(name: TelemetryEventName, props?: TelemetryEventProps): () => void {
+  public start(
+    name: TelemetryEventName,
+    props?: TelemetryEventProps,
+  ): (endProps?: TelemetryEventProps) => void {
     const startTime = this.clock.now();
     return (endProps?: TelemetryEventProps) => {
       const duration = this.clock.now() - startTime;

@@ -25,6 +25,7 @@ import type { ICompilerService } from '@/application/ports/problems/judge/ICompi
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
+import type { FinalResult } from '@/application/ports/problems/judge/IResultEvaluator';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
@@ -36,7 +37,6 @@ import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import { VerdictName } from '@/domain/entities/verdict';
 import type { TestcaseId } from '@/domain/types';
-import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import type { StartStressTestMsg } from '@/webview/src/msgs';
 
 @injectable()

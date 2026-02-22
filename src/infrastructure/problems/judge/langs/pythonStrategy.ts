@@ -76,9 +76,9 @@ export class LangPython extends AbstractLanguageStrategy {
     await this.executeCompiler(
       [
         compiler,
+        ...compilerArgs,
         '-c',
         `import py_compile; py_compile.compile(r'${src.path}', cfile=r'${path}', doraise=True)`,
-        ...compilerArgs,
       ],
       signal,
     );

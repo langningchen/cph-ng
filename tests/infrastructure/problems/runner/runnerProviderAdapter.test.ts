@@ -37,6 +37,7 @@ import type {
   IProcessExecutor,
   ProcessExecuteResult,
 } from '@/application/ports/node/IProcessExecutor';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import { TOKENS } from '@/composition/tokens';
 import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 
@@ -44,6 +45,7 @@ describe('RunnerProviderAdapter', () => {
   let adapter: RunnerProviderAdapter;
   let executorMock: MockProxy<IProcessExecutor>;
   let fileSystemMock: MockProxy<IFileSystem>;
+  let tempStorageMock: MockProxy<ITempStorage>;
   let _vol: Volume;
 
   const mockProcessResult: ProcessExecuteResult = {
@@ -58,6 +60,8 @@ describe('RunnerProviderAdapter', () => {
     fileSystemMock.safeCreateFile(stdoutPath);
     fileSystemMock.safeCreateFile(stderrPath);
     executorMock = mock<IProcessExecutor>();
+    tempStorageMock = mock<ITempStorage>();
+    tempStorageMock.dispose.mockImplementation(() => {});
 
     container.registerInstance(TOKENS.extensionPath, extensionPathMock);
     container.registerInstance(TOKENS.fileSystem, fileSystemMock);
@@ -66,6 +70,7 @@ describe('RunnerProviderAdapter', () => {
     container.registerInstance(TOKENS.processExecutor, executorMock);
     container.registerInstance(TOKENS.settings, settingsMock);
     container.registerInstance(TOKENS.system, systemMock);
+    container.registerInstance(TOKENS.tempStorage, tempStorageMock);
     container.registerSingleton(TOKENS.pathResolver, PathResolverMock);
 
     adapter = container.resolve(RunnerProviderAdapter);

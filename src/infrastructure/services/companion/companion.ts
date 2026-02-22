@@ -118,6 +118,7 @@ export class Companion implements ICompanion {
     if (autoImport) {
       this.logger.info('Auto-importing batch', { batchId });
       await this.claimAndImport(batchId, problems);
+      this.abortControllers.delete(batchId);
     } else {
       this.batchesToClaim.set(batchId, problems);
       controller.signal.addEventListener('abort', () => {
@@ -187,6 +188,7 @@ export class Companion implements ICompanion {
       controller.signal.addEventListener('abort', () => {
         progress.done();
         this.abortControllers.delete(submissionId);
+        resolve();
       });
     });
   }

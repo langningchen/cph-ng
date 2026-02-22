@@ -106,13 +106,7 @@ describe('CphMigrationService', () => {
       );
       await fileSystemMock.safeWriteFile('/folder/readme.txt', 'not a prob');
 
-      // Mock readdir to return entries with type info
-      fileSystemMock.readdir.mockResolvedValueOnce([
-        ['a.prob', 'file'],
-        ['b.prob', 'file'],
-        ['readme.txt', 'file'],
-        // biome-ignore lint/suspicious/noExplicitAny: mock return type mismatch
-      ] as any);
+      fileSystemMock.readdir.mockResolvedValueOnce(['a.prob', 'b.prob', 'readme.txt']);
 
       const results = await service.migrateFolder('/folder');
       expect(results).toHaveLength(2);

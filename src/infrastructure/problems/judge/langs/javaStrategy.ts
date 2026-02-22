@@ -83,8 +83,8 @@ export class LangJava extends AbstractLanguageStrategy {
 
   public override async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner = overrides?.runner ?? this.settings.compilation.javaRunner;
-    const runArgs = overrides?.runnerArgs ?? this.settings.compilation.javaRunArgs;
+    const runner = overrides?.runner ?? this.defaultValues.runner;
+    const runArgs = overrides?.runnerArgs ?? this.defaultValues.runnerArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

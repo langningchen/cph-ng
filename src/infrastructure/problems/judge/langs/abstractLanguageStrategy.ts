@@ -78,7 +78,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     try {
       const compileEnd = this.telemetry.start('compile', {
         lang: this.name,
-        forceCompile: forceCompile ? 'auto' : String(forceCompile),
+        forceCompile: forceCompile === null ? 'auto' : String(forceCompile),
       });
       const result = await this.internalCompile(src, signal, forceCompile, additionalData);
       compileEnd({ ...result });

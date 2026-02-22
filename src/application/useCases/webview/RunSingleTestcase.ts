@@ -23,6 +23,7 @@ import type { ICompilerService } from '@/application/ports/problems/judge/ICompi
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
+import type { FinalResult } from '@/application/ports/problems/judge/IResultEvaluator';
 import {
   CompileAborted,
   CompileError,
@@ -32,7 +33,6 @@ import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUs
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { VerdictName } from '@/domain/entities/verdict';
-import type { FinalResult } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import type { RunSingleTestcaseMsg } from '@/webview/src/msgs';
 
 @injectable()

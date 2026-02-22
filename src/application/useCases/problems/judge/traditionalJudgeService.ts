@@ -20,6 +20,7 @@ import type { IProblemService } from '@/application/ports/problems/IProblemServi
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { IJudgeService, JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
+import type { IResultEvaluator } from '@/application/ports/problems/judge/IResultEvaluator';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
@@ -27,12 +28,11 @@ import { TOKENS } from '@/composition/tokens';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import { VerdictName } from '@/domain/entities/verdict';
 import { ExecutionRejected } from '@/domain/execution';
-import type { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 
 @injectable()
 export class TraditionalJudgeService implements IJudgeService {
   public constructor(
-    @inject(TOKENS.resultEvaluator) private readonly evaluator: ResultEvaluatorAdaptor,
+    @inject(TOKENS.resultEvaluator) private readonly evaluator: IResultEvaluator,
     @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.solutionRunner) private readonly runner: ISolutionRunner,

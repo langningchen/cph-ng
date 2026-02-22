@@ -55,7 +55,10 @@ export class WrapperStrategy implements IExecutionStrategy {
         CPH_NG_UNLIMITED_STACK: this.settings.runner.unlimitedStack ? '1' : '0',
       },
     });
-    if (res instanceof Error) return res;
+    if (res instanceof Error) {
+      this.tmp.dispose(reportPath);
+      return res;
+    }
     const data: ExecutionResult = {
       codeOrSignal: res.codeOrSignal,
       stdoutPath: res.stdoutPath,

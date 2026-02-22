@@ -169,6 +169,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     if (!backgroundProblem) {
       if (this.lang.getLang(filePath)) {
         this.context.hasProblem = false;
+        if (this.active) this.detachListeners(this.active.problem);
         this.active = null;
         const canImport = await this.cph.canMigrate(filePath);
         this.context.canImport = canImport;

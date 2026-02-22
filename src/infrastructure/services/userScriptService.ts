@@ -62,11 +62,11 @@ export class UserScriptService implements IUserScriptService {
     problems: CompanionProblem[],
     workspaceFolders: WorkspaceFolderContext[],
   ): Promise<(string | null)[] | undefined> {
-    const scriptFile = this.pathResolver.renderPath(this.settings.companion.customPathScript);
-    if (!scriptFile) {
+    if (!this.settings.companion.customPathScript) {
       this.logger.debug('No user script configured');
       return undefined;
     }
+    const scriptFile = this.pathResolver.renderPath(this.settings.companion.customPathScript);
 
     let code: string;
     try {

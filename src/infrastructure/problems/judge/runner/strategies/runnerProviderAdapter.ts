@@ -20,6 +20,7 @@ import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
 import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ISystem } from '@/application/ports/node/ISystem';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
@@ -40,6 +41,7 @@ export class RunnerProviderAdapter implements IRunnerProvider {
     @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.system) private readonly sys: ISystem,
+    @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
   ) {
     this.logger = this.logger.withScope('runnerProvider');
   }
@@ -80,13 +82,16 @@ export class RunnerProviderAdapter implements IRunnerProvider {
     if (result.codeOrSignal !== 0) {
       const stderr = await this.fs.readFile(result.stderrPath);
       this.logger.error('Runner compilation failed', { stderr });
+      this.tmp.dispose([result.stdoutPath, result.stderrPath]);
       throw new Error(`Runner compilation failed with code ${result.codeOrSignal}`);
     }
 
     if (!(await this.fs.exists(outputPath))) {
+      this.tmp.dispose([result.stdoutPath, result.stderrPath]);
       throw new Error('Compiler exited successfully but output file is missing');
     }
 
+    this.tmp.dispose([result.stdoutPath, result.stderrPath]);
     return outputPath;
   }
 }
