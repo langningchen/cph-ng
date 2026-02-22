@@ -17,7 +17,7 @@
 
 // biome-ignore-all lint/style/useNamingConvention: Terser API requires snake_case
 
-import { execSync, execFileSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
