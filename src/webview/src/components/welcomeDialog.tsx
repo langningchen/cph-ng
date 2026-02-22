@@ -62,7 +62,7 @@ export const WelcomeDialog = () => {
       <DialogTitle>
         <CphFlex alignItems='center' gap={1}>
           <CelebrationIcon color='primary' fontSize='small' />
-          {t('welcomeDialog.title')}
+          {t('welcomeDialog.title', { version })}
         </CphFlex>
       </DialogTitle>
       <DialogContent>

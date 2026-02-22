@@ -113,5 +113,5 @@
   "welcomeDialog.feedbackLink": "Report an issue on GitHub \u2192",
   "welcomeDialog.refactorWarning": "This version has undergone a complete refactoring. All features may have issues.",
   "welcomeDialog.subtitle": "Preparing for CPH-NG 1.0.0 Stable",
-  "welcomeDialog.title": "Welcome to CPH-NG"
+  "welcomeDialog.title": "Welcome to CPH-NG v{{version}}!"
 }

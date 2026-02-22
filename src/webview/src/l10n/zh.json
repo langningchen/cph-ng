@@ -113,5 +113,5 @@
   "welcomeDialog.feedbackLink": "在 GitHub 上报告问题 \u2192",
   "welcomeDialog.refactorWarning": "此版本进行了完整的重构，所有功能可能存在问题。",
   "welcomeDialog.subtitle": "正在为 1.0.0 稳定版做准备",
-  "welcomeDialog.title": "欢迎使用 CPH-NG"
+  "welcomeDialog.title": "欢迎使用 CPH-NG v{{version}}！"
 }
