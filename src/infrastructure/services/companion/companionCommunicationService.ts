@@ -87,6 +87,25 @@ export class CompanionCommunicationService {
       shutdownTimeout,
       env,
     });
+
+    {
+      const isWin = process.platform === 'win32';
+
+      const envPrefix = Object.entries(env)
+        .map(([key, value]) => {
+          const safeValue = (value || '').replace(/"/g, '\\"');
+          return isWin ? `set ${key}="${safeValue}"&&` : `${key}="${safeValue}"`;
+        })
+        .join(' ');
+
+      const baseCmd = `"${node}" "${routerPath}" -p ${port} -l "${logFile}" -s ${shutdownTimeout}`;
+      const cmd = envPrefix ? `${envPrefix} ${baseCmd}` : baseCmd;
+      this.logger.debug(
+        'To reproduce the router process, run the following command in your terminal:',
+      );
+      this.logger.debug(cmd);
+    }
+
     const childProcess = spawn(
       node,
       [routerPath, '-p', port, '-l', logFile, '-s', shutdownTimeout],
@@ -131,7 +150,10 @@ export class CompanionCommunicationService {
     if (!this.ws) return;
     const events = ['open', 'close', 'error'];
     events.forEach((evt) => {
-      this.ws?.addEventListener(evt, () => this.signals.emit('statusChanged'));
+      this.ws?.addEventListener(evt, () => {
+        this.signals.emit('statusChanged');
+        this.logger.info(`WebSocket event: ${evt}`);
+      });
     });
     this.ws.addEventListener('message', (event) => {
       try {
