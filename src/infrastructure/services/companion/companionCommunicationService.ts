@@ -77,6 +77,7 @@ export class CompanionCommunicationService {
     const port = this.settings.companion.listenPort.toString();
     const logFile = this.pathResolver.renderPath(this.settings.companion.logFile);
     const shutdownTimeout = this.settings.companion.shutdownTimeout.toString();
+    const env = process.env;
 
     this.logger.debug('Router spawn parameters', {
       node,
@@ -84,11 +85,12 @@ export class CompanionCommunicationService {
       port,
       logFile,
       shutdownTimeout,
+      env,
     });
     const childProcess = spawn(
       node,
       [routerPath, '-p', port, '-l', logFile, '-s', shutdownTimeout],
-      { detached: true, stdio: 'ignore' },
+      { detached: true, stdio: 'ignore', env },
     );
     childProcess.unref();
     this.logger.info(`Router process spawned on port ${port}`);
