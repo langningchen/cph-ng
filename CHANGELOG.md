@@ -2,7 +2,7 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
-## [Unreleased] 0.6.1
+## 0.6.1
 
 - **fix**: use full path when walk [#161](https://github.com/langningchen/cph-ng/issues/161)
 - **fix**: remove virtualized test case [#164](https://github.com/langningchen/cph-ng/issues/164)
