@@ -88,7 +88,7 @@ export class CompanionCommunicationService {
     const childProcess = spawn(
       node,
       [routerPath, '-p', port, '-l', logFile, '-s', shutdownTimeout],
-      { detached: true, stdio: 'ignore' },
+      { detached: true, stdio: 'ignore', env: process.env },
     );
     childProcess.unref();
     this.logger.info(`Router process spawned on port ${port}`);

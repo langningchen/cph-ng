@@ -829,10 +829,10 @@
     "@mui/lab": "7.0.1-beta.22",
     "@mui/material": "^7.3.8",
     "@types/proper-lockfile": "^4.1.4",
-    "@types/yargs-parser": "^21.0.3",
     "@vscode/extension-telemetry": "^1.5.0",
     "adm-zip": "^0.5.16",
     "anser": "^2.3.5",
+    "commander": "^14.0.3",
     "copy-webpack-plugin": "^13.0.1",
     "crypto-js": "^4.2.0",
     "hono": "^4.12.2",
@@ -853,8 +853,7 @@
     "stacktrace-js": "^2.0.2",
     "tsyringe": "^4.10.0",
     "type-fest": "^5.4.4",
-    "typed-emitter": "^2.1.0",
-    "yargs-parser": "^22.0.0"
+    "typed-emitter": "^2.1.0"
   },
   "pnpm": {
     "updateConfig": {
