@@ -72,9 +72,9 @@ export class LlmProblemContext extends BaseLlmTool<BaseLlmToolParams> {
         const testcase = problem.getTestcase(testcaseId);
         return {
           testcaseId,
-          verdict: testcase.verdict ?? 'NOT_RUN',
-          timeMs: testcase.timeMs,
-          memoryMb: testcase.memoryMb,
+          verdict: testcase.result?.verdict ?? 'NOT_RUN',
+          timeMs: testcase.result?.timeMs,
+          memoryMb: testcase.result?.memoryMb,
           isDisabled: testcase.isDisabled,
         };
       }),

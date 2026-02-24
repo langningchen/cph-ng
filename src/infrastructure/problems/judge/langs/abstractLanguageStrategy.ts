@@ -100,7 +100,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     _forceCompile: boolean | null,
     _additionalData: CompileAdditionalData,
   ): Promise<LangCompileData> {
-    return { path: src.path };
+    return { path: src.path, hash: null };
   }
 
   protected async executeCompiler(cmd: string[], signal: AbortSignal): Promise<void> {

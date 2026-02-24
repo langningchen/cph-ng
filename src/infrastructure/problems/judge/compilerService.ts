@@ -29,7 +29,7 @@ export class CompilerService implements ICompilerService {
   ): Promise<LangCompileResult> {
     const checkerLang = this.lang.getLang(file.path);
     if (checkerLang) return await checkerLang.compile(file, signal, forceCompile);
-    return { path: file.path };
+    return { path: file.path, hash: null };
   }
 
   public async compileAll(

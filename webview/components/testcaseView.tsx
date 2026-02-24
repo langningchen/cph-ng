@@ -25,6 +25,7 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
 import MD5 from 'crypto-js/md5';
+import { isNil } from 'lodash';
 import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictType } from '@/domain/entities/verdict';
@@ -341,7 +342,7 @@ export const TestcaseView = memo(
                   </Tooltip>
                 )}
               </CphFlex>
-              {testcase.result?.memoryMb !== undefined && (
+              {!isNil(testcase.result?.memoryMb) && (
                 <Chip
                   label={t('testcaseView.memory', {
                     memory: testcase.result.memoryMb.toFixed(1),
@@ -354,7 +355,7 @@ export const TestcaseView = memo(
                   }}
                 />
               )}
-              {testcase.result?.timeMs !== undefined && (
+              {!isNil(testcase.result?.timeMs) && (
                 <Chip
                   label={t('testcaseView.time', {
                     time: testcase.result.timeMs.toFixed(1),

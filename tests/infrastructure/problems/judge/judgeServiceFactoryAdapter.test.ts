@@ -23,7 +23,7 @@ describe('JudgeServiceFactory', () => {
 
   it('should return interactive judge when interactor is set', () => {
     const problem = new Problem('test', '/src/main.cpp');
-    problem.interactor = { path: '/interactor.cpp' };
+    problem.interactor = { path: '/interactor.cpp', hash: null };
     expect(factory.create(problem)).toBe(interactiveMock);
   });
 });

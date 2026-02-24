@@ -110,7 +110,7 @@ export class RunAllTestcases extends BaseProblemUseCase<RunAllTestcasesMsg> {
     for (const testcaseId of testcaseOrder) {
       currentId = testcaseId;
       const testcase = problem.getTestcase(testcaseId);
-      if (testcase.verdict !== VerdictName.compiled) continue;
+      if (testcase.result?.verdict !== VerdictName.compiled) continue;
       if (skipAll) {
         testcase.updateResult({ verdict: VerdictName.skipped });
         continue;
@@ -130,6 +130,8 @@ export class RunAllTestcases extends BaseProblemUseCase<RunAllTestcasesMsg> {
           testcase.updateResult({ verdict });
         },
         onResult: (res: FinalResult) => {
+          testcase.updateResult(res);
+
           let isExpand: boolean = false;
           if (expandBehavior === 'always') {
             isExpand = true;
@@ -145,8 +147,7 @@ export class RunAllTestcases extends BaseProblemUseCase<RunAllTestcasesMsg> {
             isExpand = testcase.isExpand;
           }
           hasAnyExpanded ||= isExpand;
-
-          testcase.updateResult({ isExpand, ...res });
+          testcase.isExpand = isExpand;
         },
         onError: (e) => {
           testcase.updateResult({ verdict: VerdictName.systemError, msg: e.message });

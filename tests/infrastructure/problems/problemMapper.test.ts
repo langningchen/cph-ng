@@ -24,7 +24,7 @@ describe('ProblemMapper', () => {
 
       expect(dto.version).toBe('1.0.0');
       expect(dto.name).toBe('test-problem');
-      expect(dto.src).toEqual({ path: '/src/main.cpp' });
+      expect(dto.src).toEqual({ path: '/src/main.cpp', hash: null });
       expect(dto.testcaseOrder).toEqual([]);
 
       const restored = mapper.toEntity(dto);
@@ -74,8 +74,8 @@ describe('ProblemMapper', () => {
 
       const restored = mapper.toEntity(dto);
       const restoredTc = restored.getTestcase('tc-1' as TestcaseId);
-      expect(restoredTc.verdict).toBe(VerdictName.accepted);
-      expect(restoredTc.timeMs).toBe(42);
+      expect(restoredTc.result?.verdict).toBe(VerdictName.accepted);
+      expect(restoredTc.result?.timeMs).toBe(42);
     });
 
     it('should round-trip checker and interactor', () => {
@@ -95,32 +95,53 @@ describe('ProblemMapper', () => {
     it('should round-trip stressTest configuration', () => {
       const problem = new Problem('with-stress', '/src/main.cpp');
       problem.stressTest = new StressTest(
-        { path: '/gen.cpp' },
-        { path: '/bf.cpp' },
+        { path: '/gen.cpp', hash: null },
+        { path: '/bf.cpp', hash: null },
         5,
         StressTestState.generating,
       );
 
       const dto = mapper.toDto(problem);
-      expect(dto.stressTest.generator).toEqual({ path: '/gen.cpp' });
-      expect(dto.stressTest.bruteForce).toEqual({ path: '/bf.cpp' });
+      expect(dto.stressTest.generator).toEqual({ path: '/gen.cpp', hash: null });
+      expect(dto.stressTest.bruteForce).toEqual({ path: '/bf.cpp', hash: null });
       expect(dto.stressTest.cnt).toBe(5);
       expect(dto.stressTest.state).toBe(StressTestState.generating);
 
       const restored = mapper.toEntity(dto);
-      expect(restored.stressTest.generator).toEqual({ path: '/gen.cpp' });
+      expect(restored.stressTest.generator).toEqual({ path: '/gen.cpp', hash: null });
       expect(restored.stressTest.cnt).toBe(5);
     });
 
     it('should round-trip overrides', () => {
       const problem = new Problem('with-overrides', '/src/main.cpp');
-      problem.overrides = { timeLimitMs: 2000, memoryLimitMb: 256 };
+      problem.overrides = {
+        timeLimitMs: 2000,
+        memoryLimitMb: 256,
+        compiler: null,
+        compilerArgs: null,
+        runner: null,
+        runnerArgs: null,
+      };
 
       const dto = mapper.toDto(problem);
-      expect(dto.overrides).toEqual({ timeLimitMs: 2000, memoryLimitMb: 256 });
+      expect(dto.overrides).toEqual({
+        timeLimitMs: 2000,
+        memoryLimitMb: 256,
+        compiler: null,
+        compilerArgs: null,
+        runner: null,
+        runnerArgs: null,
+      });
 
       const restored = mapper.toEntity(dto);
-      expect(restored.overrides).toEqual({ timeLimitMs: 2000, memoryLimitMb: 256 });
+      expect(restored.overrides).toEqual({
+        timeLimitMs: 2000,
+        memoryLimitMb: 256,
+        compiler: null,
+        compilerArgs: null,
+        runner: null,
+        runnerArgs: null,
+      });
     });
 
     it('should round-trip url', () => {

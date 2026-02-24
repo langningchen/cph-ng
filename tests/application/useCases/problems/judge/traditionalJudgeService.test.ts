@@ -6,6 +6,7 @@ import type { MockProxy } from 'vitest-mock-extended';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
+import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
 import type { IResultEvaluator } from '@/application/ports/problems/judge/IResultEvaluator';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { ILanguageStrategy } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
@@ -54,14 +55,15 @@ describe('TraditionalJudgeService', () => {
     return problem;
   };
 
-  const makeCtx = () => ({
-    problem: makeProblem(),
-    stdinPath: '/tmp/stdin',
-    answerPath: '/tmp/answer',
-    artifacts: {
-      solution: { path: '/tmp/solution' },
-    },
-  });
+  const makeCtx = () =>
+    ({
+      problem: makeProblem(),
+      stdinPath: '/tmp/stdin',
+      answerPath: '/tmp/answer',
+      artifacts: {
+        solution: { path: '/tmp/solution', hash: null },
+      },
+    }) satisfies JudgeContext;
 
   it('should judge successfully and call observer callbacks', async () => {
     const langMock = mock<ILanguageStrategy>();

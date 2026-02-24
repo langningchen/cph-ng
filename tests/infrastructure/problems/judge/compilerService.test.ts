@@ -70,7 +70,7 @@ describe('CompilerService', () => {
     });
 
     const problem = makeProblem();
-    problem.checker = { path: '/checker.cpp' };
+    problem.checker = { path: '/checker.cpp', hash: null };
     const result = await service.compileAll(problem, null, signal);
 
     expect(result).not.toBeInstanceOf(Error);
@@ -89,7 +89,7 @@ describe('CompilerService', () => {
     });
 
     const problem = makeProblem();
-    problem.interactor = { path: '/interactor.cpp' };
+    problem.interactor = { path: '/interactor.cpp', hash: null };
     const result = await service.compileAll(problem, null, signal);
 
     expect(result).not.toBeInstanceOf(Error);
@@ -109,8 +109,8 @@ describe('CompilerService', () => {
     });
 
     const problem = makeProblem();
-    problem.stressTest.generator = { path: '/gen.cpp' };
-    problem.stressTest.bruteForce = { path: '/bf.cpp' };
+    problem.stressTest.generator = { path: '/gen.cpp', hash: null };
+    problem.stressTest.bruteForce = { path: '/bf.cpp', hash: null };
     const result = await service.compileAll(problem, null, signal);
 
     expect(result).not.toBeInstanceOf(Error);
@@ -142,7 +142,7 @@ describe('CompilerService', () => {
     });
 
     const problem = makeProblem();
-    problem.checker = { path: '/checker.cpp' };
+    problem.checker = { path: '/checker.cpp', hash: null };
     const result = await service.compileAll(problem, null, signal);
 
     expect(result).toBeInstanceOf(Error);
@@ -156,11 +156,11 @@ describe('CompilerService', () => {
     });
 
     const problem = makeProblem();
-    problem.checker = { path: '/checker.py' };
+    problem.checker = { path: '/checker.py', hash: null };
     const result = await service.compileAll(problem, null, signal);
 
     expect(result).not.toBeInstanceOf(Error);
     const data = result as CompileData;
-    expect(data.checker).toEqual({ path: '/checker.py' });
+    expect(data.checker).toEqual({ path: '/checker.py', hash: null });
   });
 });

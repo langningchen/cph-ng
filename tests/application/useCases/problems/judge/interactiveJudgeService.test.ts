@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
+import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
 import type { IResultEvaluator } from '@/application/ports/problems/judge/IResultEvaluator';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { ILanguageStrategy } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
@@ -46,16 +47,16 @@ describe('InteractiveJudgeService', () => {
 
   const makeCtx = () => {
     const problem = new Problem('test', '/src/main.cpp');
-    problem.interactor = { path: '/interactor.cpp' };
+    problem.interactor = { path: '/interactor.cpp', hash: null };
     return {
       problem,
       stdinPath: '/tmp/stdin',
       answerPath: '/tmp/answer',
       artifacts: {
-        solution: { path: '/tmp/solution' },
-        interactor: { path: '/tmp/interactor-bin' },
+        solution: { path: '/tmp/solution', hash: null },
+        interactor: { path: '/tmp/interactor-bin', hash: null },
       },
-    };
+    } satisfies JudgeContext;
   };
 
   it('should judge interactively and call observer', async () => {

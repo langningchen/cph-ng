@@ -45,7 +45,7 @@ import { RunButtonGroup } from './runButtonGroup';
 
 interface ProblemActionsProps {
   problemId: ProblemId;
-  url?: string;
+  url: string | null;
   stressTest: IWebviewStressTest;
   hasRunning: boolean;
 }

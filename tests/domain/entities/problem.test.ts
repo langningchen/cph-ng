@@ -14,7 +14,7 @@ describe('Problem', () => {
     it('should create from string src path', () => {
       const p = new Problem('test', '/src/main.cpp');
       expect(p.name).toBe('test');
-      expect(p.src).toEqual({ path: '/src/main.cpp' });
+      expect(p.src).toEqual({ path: '/src/main.cpp', hash: null });
       expect(p.revision).toBe(0);
     });
 
@@ -40,13 +40,13 @@ describe('Problem', () => {
 
     it('should increment revision on checker set', () => {
       const p = new Problem('test', '/src/main.cpp');
-      p.checker = { path: '/checker.cpp' };
+      p.checker = { path: '/checker.cpp', hash: null };
       expect(p.revision).toBe(1);
     });
 
     it('should increment revision on interactor set', () => {
       const p = new Problem('test', '/src/main.cpp');
-      p.interactor = { path: '/interactor.cpp' };
+      p.interactor = { path: '/interactor.cpp', hash: null };
       expect(p.revision).toBe(1);
     });
   });
@@ -141,10 +141,10 @@ describe('Problem', () => {
       const handler = vi.fn();
       p.signals.on('patchMeta', handler);
 
-      p.checker = { path: '/checker.cpp' };
+      p.checker = { path: '/checker.cpp', hash: null };
 
       expect(handler).toHaveBeenCalledWith({
-        checker: { path: '/checker.cpp' },
+        checker: { path: '/checker.cpp', hash: null },
         revision: 1,
       });
     });
@@ -182,7 +182,12 @@ describe('Problem', () => {
       p.signals.on('patchStressTest', handler);
 
       const oldSt = p.stressTest;
-      const newSt = new StressTest({ path: '/gen.cpp' }, null, 0, StressTestState.inactive);
+      const newSt = new StressTest(
+        { path: '/gen.cpp', hash: null },
+        null,
+        0,
+        StressTestState.inactive,
+      );
       p.stressTest = newSt;
 
       // Old should no longer trigger
@@ -219,19 +224,19 @@ describe('Problem', () => {
 
     it('should match checker path', () => {
       const p = new Problem('test', '/src/main.cpp');
-      p.checker = { path: '/checker.cpp' };
+      p.checker = { path: '/checker.cpp', hash: null };
       expect(p.isRelated('/Checker.cpp')).toBe(true);
     });
 
     it('should match interactor path', () => {
       const p = new Problem('test', '/src/main.cpp');
-      p.interactor = { path: '/interactor.cpp' };
+      p.interactor = { path: '/interactor.cpp', hash: null };
       expect(p.isRelated('/Interactor.cpp')).toBe(true);
     });
 
     it('should match stressTest paths', () => {
       const p = new Problem('test', '/src/main.cpp');
-      p.stressTest.generator = { path: '/gen.cpp' };
+      p.stressTest.generator = { path: '/gen.cpp', hash: null };
       expect(p.isRelated('/Gen.cpp')).toBe(true);
     });
 
@@ -285,9 +290,9 @@ describe('Problem', () => {
 
       p.updateResult({ verdict: VerdictName.waiting });
 
-      expect(tc1.verdict).toBe(VerdictName.waiting);
-      expect(tc2.verdict).toBeUndefined();
-      expect(tc3.verdict).toBe(VerdictName.waiting);
+      expect(tc1.result?.verdict).toBe(VerdictName.waiting);
+      expect(tc2.result?.verdict).toBeUndefined();
+      expect(tc3.result?.verdict).toBe(VerdictName.waiting);
     });
   });
 });

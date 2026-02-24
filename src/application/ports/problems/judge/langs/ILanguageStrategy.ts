@@ -24,7 +24,7 @@ export interface CompileAdditionalData {
 
 export interface LangCompileData {
   path: string;
-  hash?: string;
+  hash: string | null;
 }
 
 export interface ILanguageDefaultValues {

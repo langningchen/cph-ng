@@ -52,9 +52,9 @@ export class ChooseSrcFile extends BaseProblemUseCase<ChooseSrcFileMsg> {
       }),
     });
     if (!path) return;
-    if (msg.fileType === 'checker') problem.checker = { path };
-    else if (msg.fileType === 'interactor') problem.interactor = { path };
-    else if (msg.fileType === 'generator') problem.stressTest.generator = { path };
-    else problem.stressTest.bruteForce = { path };
+    if (msg.fileType === 'checker') problem.checker = { path, hash: null };
+    else if (msg.fileType === 'interactor') problem.interactor = { path, hash: null };
+    else if (msg.fileType === 'generator') problem.stressTest.generator = { path, hash: null };
+    else problem.stressTest.bruteForce = { path, hash: null };
   }
 }

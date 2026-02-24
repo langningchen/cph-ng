@@ -98,12 +98,12 @@ export class LlmTestcaseRunner extends BaseLlmTool<LlmTestcaseRunnerParams> {
     const relevantIds = testcaseId ? [testcaseId] : problem.testcaseOrder;
     const summary = relevantIds.map((testcaseId) => {
       const testcase = problem.getTestcase(testcaseId);
-      const verdict = testcase.verdict;
+      const verdict = testcase.result?.verdict;
       return {
         testcaseId,
         verdict: verdict ? Verdicts[verdict].name : 'NOT_RUN',
-        timeMs: testcase.timeMs,
-        memoryMb: testcase.memoryMb,
+        timeMs: testcase.result?.timeMs,
+        memoryMb: testcase.result?.memoryMb,
       };
     });
 
