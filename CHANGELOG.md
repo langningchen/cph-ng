@@ -2,6 +2,11 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.6.2
+
+- **fix**: remove waiting
+- **fix**: include env in router spawn parameters [#162](https://github.com/langningchen/cph-ng/issues/162) [#166](https://github.com/langningchen/cph-ng/issues/166)
+
 ## 0.6.1
 
 - **fix**: use full path when walk [#161](https://github.com/langningchen/cph-ng/issues/161)
