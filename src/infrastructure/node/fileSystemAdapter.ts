@@ -94,7 +94,9 @@ export class FileSystemAdapter implements IFileSystem {
   }
 
   public async walk(path: string): Promise<string[]> {
-    return await readdir(path, { encoding: 'utf8', recursive: true });
+    return readdir(path, { encoding: 'utf8', recursive: true }).then((files) =>
+      files.map((file) => this.path.resolve(path, file)),
+    );
   }
 
   public createReadStream(path: string): Readable {

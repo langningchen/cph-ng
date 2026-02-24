@@ -77,16 +77,20 @@ export class LlmDataInspector extends BaseLlmTool<LlmDataInspectorParams> {
     const notRunMsg = '(Test case not run yet)';
 
     if (dataType === 'all') {
-      const info = testcase.verdict ? Verdicts[testcase.verdict] : undefined;
+      const info = testcase.result?.verdict ? Verdicts[testcase.result?.verdict] : undefined;
       return this.createResult({
         verdict: info ? info.name : 'NOT_RUN',
-        timeMs: testcase.timeMs,
-        memoryMb: testcase.memoryMb,
-        message: testcase.msg,
+        timeMs: testcase.result?.timeMs,
+        memoryMb: testcase.result?.memoryMb,
+        message: testcase.result?.msg,
         stdin: await this.testcaseIoService.readContent(testcase.stdin),
         answer: await this.testcaseIoService.readContent(testcase.answer),
-        stdout: testcase.stdout ? await this.testcaseIoService.readContent(testcase.stdout) : null,
-        stderr: testcase.stderr ? await this.testcaseIoService.readContent(testcase.stderr) : null,
+        stdout: testcase.result?.stdout
+          ? await this.testcaseIoService.readContent(testcase.result?.stdout)
+          : null,
+        stderr: testcase.result?.stderr
+          ? await this.testcaseIoService.readContent(testcase.result?.stderr)
+          : null,
       });
     }
 
@@ -94,18 +98,22 @@ export class LlmDataInspector extends BaseLlmTool<LlmDataInspectorParams> {
       stdin: () => this.testcaseIoService.readContent(testcase.stdin),
       answer: () => this.testcaseIoService.readContent(testcase.answer),
       stdout: () =>
-        testcase.stdout ? this.testcaseIoService.readContent(testcase.stdout) : notRunMsg,
+        testcase.result?.stdout
+          ? this.testcaseIoService.readContent(testcase.result?.stdout)
+          : notRunMsg,
       stderr: () =>
-        testcase.stderr ? this.testcaseIoService.readContent(testcase.stderr) : notRunMsg,
+        testcase.result?.stderr
+          ? this.testcaseIoService.readContent(testcase.result?.stderr)
+          : notRunMsg,
       meta: () => {
-        const verdict = testcase.verdict;
+        const verdict = testcase.result?.verdict;
         if (!verdict) return notRunMsg;
         const info = Verdicts[verdict];
         return {
           verdict: info.name,
-          timeMs: testcase.timeMs,
-          memoryMb: testcase.memoryMb,
-          message: testcase.msg,
+          timeMs: testcase.result?.timeMs,
+          memoryMb: testcase.result?.memoryMb,
+          message: testcase.result?.msg,
         };
       },
     };

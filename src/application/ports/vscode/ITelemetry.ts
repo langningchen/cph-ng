@@ -22,7 +22,7 @@ export class TelemetryTrustedValue<T = string> {
 export type TelemetryEventProp<T> = T | TelemetryTrustedValue<T>;
 
 export interface TelemetryEventProps {
-  readonly [key: string]: TelemetryEventProp<string | number | boolean>;
+  readonly [key: string]: TelemetryEventProp<string | number | boolean | null | undefined>;
 }
 
 const TELEMETRY_EVENT_NAMES = ['activate', 'compile'] as const;

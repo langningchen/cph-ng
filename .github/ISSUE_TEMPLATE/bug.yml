@@ -2,12 +2,11 @@ name: Bug Report
 description: Something isn't working as expected
 labels: bug
 assignees: langningchen
-title: 'bug: '
+title: "bug: "
 body:
   - type: markdown
     attributes:
-      value:
-        Thanks for taking the time to report a bug! Please fill in the
+      value: Thanks for taking the time to report a bug! Please fill in the
         information below to help us reproduce and fix the issue. Before
         submitting, please search the existing issues to see if someone else has
         already reported the same bug.
@@ -15,14 +14,15 @@ body:
     attributes:
       label: Extension Version
       description:
-        'The version of the extension you are using, you can find it in the
-        command palette by searching for `CPH-NG: Version Info`.'
+        "The version of the extension you are using, you can find it in the
+        command palette by searching for `CPH-NG: Version Info`."
       placeholder: |
-        Version: 0.1.8
-        Commit: 93c8d63f88ff6a8ce1bf389107ea060b6933f80f
-        Date: 2025-09-06T07:08:04.961Z
+        Version: 0.6.1
+        Commit: 0ed418d6bcd6731257cc2e4b0f6a25af7a5041e5
+        Date: 2026-02-24T07:47:11.679Z
         Build By: Langning Chen
-        OS: 6.6.87.1-microsoft-standard-WSL2
+        Build Type: Manual
+        OS: 6.6.87.2-microsoft-standard-WSL2
     validations:
       required: true
   - type: textarea
@@ -32,14 +32,14 @@ body:
         The version of VSCode you are using, you can find it in the Help > About
         menu.
       placeholder: |
-        Version: 1.104.0-insider (user setup) 
-        Commit: 4a31639f5f6e1ba6f2521ca73430f3d59eb97524
-        Date: 2025-08-27T07:48:03.836Z
-        Electron: 37.2.3
-        ElectronBuildId: 12035395
-        Chromium: 138.0.7204.100
-        Node.js: 22.17.0
-        V8: 13.8.500258-electron.0
+        Version: 1.110.0-insider (user setup)
+        Commit: 62028559c1ca63edaa7fd32d3845ea502af07ab2
+        Date: 2026-02-23T17:04:00.460Z
+        Electron: 39.6.0
+        ElectronBuildId: 13330601
+        Chromium: 142.0.7444.265
+        Node.js: 22.22.0
+        V8: 14.2.231.22-electron.0
         OS: Windows_NT x64 10.0.19045
     validations:
       required: true

@@ -37,7 +37,7 @@ export interface InitMsg extends BaseMsg {
 export interface EditProblemDetailsMsg extends ProblemBaseMsg {
   type: 'editProblemDetails';
   name: string;
-  url?: string;
+  url: string | null;
   overrides: IOverrides;
 }
 export interface DeleteProblemMsg extends ProblemBaseMsg {

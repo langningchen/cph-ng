@@ -87,8 +87,8 @@ export class ProblemFs implements IProblemFs {
     this.signals.on('addTestcase', (srcPath: string, testcaseId: TestcaseId, payload: Testcase) => {
       const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
       const addedFiles = ['stdin', 'answer'];
-      if (payload.stdout) addedFiles.push('stdout');
-      if (payload.stderr) addedFiles.push('stderr');
+      if (payload.result?.stdout) addedFiles.push('stdout');
+      if (payload.result?.stderr) addedFiles.push('stderr');
       this.changeEmitter.fire([
         { uri: Uri.joinPath(baseUri, 'problem.cph-ng.json'), type: FileChangeType.Changed },
         ...addedFiles.map((type) => ({
@@ -182,10 +182,10 @@ export class ProblemFs implements IProblemFs {
               },
             ],
           ];
-          if (testcase.stdout)
-            items.push(['stdout', { data: testcaseIoToStringOrUri(testcase.stdout) }]);
-          if (testcase.stderr)
-            items.push(['stderr', { data: testcaseIoToStringOrUri(testcase.stderr) }]);
+          if (testcase.result?.stdout)
+            items.push(['stdout', { data: testcaseIoToStringOrUri(testcase.result?.stdout) }]);
+          if (testcase.result?.stderr)
+            items.push(['stderr', { data: testcaseIoToStringOrUri(testcase.result?.stderr) }]);
           return [testcaseId, items];
         }),
       ],

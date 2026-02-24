@@ -12,8 +12,8 @@ describe('StressTest', () => {
     });
 
     it('should initialize with provided values', () => {
-      const gen = { path: '/gen.cpp' };
-      const bf = { path: '/bf.cpp' };
+      const gen = { path: '/gen.cpp', hash: null };
+      const bf = { path: '/bf.cpp', hash: null };
       const st = new StressTest(gen, bf, 5, StressTestState.generating);
       expect(st.generator).toBe(gen);
       expect(st.bruteForce).toBe(bf);
@@ -28,7 +28,7 @@ describe('StressTest', () => {
       const handler = vi.fn();
       st.signals.on('change', handler);
 
-      const gen = { path: '/gen.cpp' };
+      const gen = { path: '/gen.cpp', hash: null };
       st.generator = gen;
 
       expect(st.generator).toBe(gen);
@@ -42,7 +42,7 @@ describe('StressTest', () => {
       const handler = vi.fn();
       st.signals.on('change', handler);
 
-      const bf = { path: '/bf.cpp' };
+      const bf = { path: '/bf.cpp', hash: null };
       st.bruteForce = bf;
 
       expect(st.bruteForce).toBe(bf);

@@ -17,6 +17,7 @@
 
 // biome-ignore-all lint/suspicious/noExplicitAny: Legacy data migration requires any type.
 
+import mapValues from 'lodash/mapValues';
 import { compare, lte } from 'semver';
 import { inject, injectable } from 'tsyringe';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
@@ -38,7 +39,53 @@ export class ProblemMigrationService implements IProblemMigrationService {
   }
 
   private readonly migrateFunctions: Record<string, (oldProblem: any) => any> = {
-    '0.6.0': (_: History.IProblem_0_6_0): null => null,
+    '0.6.1': (_: History.IProblem_0_6_1): null => null,
+    '0.6.0': (problem: History.IProblem_0_6_0): History.IProblem_0_6_1 => {
+      const migrateFileWithHash = (
+        file: History.IFileWithHash_0_6_0,
+      ): History.IFileWithHash_0_6_1 => ({ path: file.path, hash: file.hash || null });
+      const migrateNullableFileWithHash = (
+        file: History.IFileWithHash_0_6_0 | null,
+      ): History.IFileWithHash_0_6_1 | null =>
+        file ? { path: file.path, hash: file.hash || null } : null;
+      return {
+        version: '0.6.1',
+        name: problem.name,
+        url: problem.url || null,
+        testcases: mapValues(problem.testcases, (testcase) => ({
+          ...testcase,
+          result: testcase.result
+            ? {
+                verdict: testcase.result.verdict,
+                timeMs: testcase.result.timeMs ?? null,
+                memoryMb: testcase.result.memoryMb ?? null,
+                stdout: testcase.result.stdout ?? null,
+                stderr: testcase.result.stderr ?? null,
+                msg: testcase.result.msg ?? null,
+              }
+            : null,
+        })),
+        testcaseOrder: problem.testcaseOrder,
+        src: migrateFileWithHash(problem.src),
+        checker: migrateNullableFileWithHash(problem.checker),
+        interactor: migrateNullableFileWithHash(problem.interactor),
+        stressTest: {
+          generator: migrateNullableFileWithHash(problem.stressTest.generator),
+          bruteForce: migrateNullableFileWithHash(problem.stressTest.bruteForce),
+          cnt: problem.stressTest.cnt,
+          state: problem.stressTest.state,
+        },
+        timeElapsedMs: problem.timeElapsedMs,
+        overrides: {
+          timeLimitMs: problem.overrides.timeLimitMs || null,
+          memoryLimitMb: problem.overrides.memoryLimitMb || null,
+          compiler: problem.overrides.compiler || null,
+          compilerArgs: problem.overrides.compilerArgs || null,
+          runner: problem.overrides.runner || null,
+          runnerArgs: problem.overrides.runnerArgs || null,
+        },
+      } satisfies History.IProblem_0_6_1;
+    },
     '0.4.8': (problem: History.IProblem_0_4_8): History.IProblem_0_6_0 => {
       const testcases: History.IProblem_0_6_0['testcases'] = {};
       for (const testcaseId of problem.tcOrder) {

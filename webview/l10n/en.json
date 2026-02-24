@@ -109,7 +109,6 @@
   "verdictSummary.running": "Running",
   "welcomeDialog.close": "Got it!",
   "welcomeDialog.content": "We are currently preparing for CPH-NG 1.0.0 Stable. During this preparation phase, the extension has been completely rewritten from the ground up. While we have done our best to ensure everything works correctly, some features may not behave as expected. Please report any issues you encounter so we can fix them before the stable release.",
-  "welcomeDialog.countdown": "Please wait ({{seconds}}s)",
   "welcomeDialog.feedbackLink": "Report an issue on GitHub \u2192",
   "welcomeDialog.refactorWarning": "This version has undergone a complete refactoring. All features may have issues.",
   "welcomeDialog.subtitle": "Preparing for CPH-NG 1.0.0 Stable",

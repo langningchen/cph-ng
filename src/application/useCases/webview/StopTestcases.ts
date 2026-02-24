@@ -39,7 +39,10 @@ export class StopTestcases extends BaseProblemUseCase<StopTestcasesMsg> {
       const testcaseOrder = bgProblem.problem.getEnabledTestcaseIds();
       for (const testcaseId of testcaseOrder) {
         const testcase = bgProblem.problem.getTestcase(testcaseId);
-        if (testcase.verdict && Verdicts[testcase.verdict].type === VerdictType.running)
+        if (
+          testcase.result?.verdict &&
+          Verdicts[testcase.result?.verdict].type === VerdictType.running
+        )
           testcase.updateResult({ verdict: VerdictName.rejected });
       }
     } else bgProblem.abort(msg.testcaseId);

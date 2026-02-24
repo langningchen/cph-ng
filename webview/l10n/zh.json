@@ -109,7 +109,6 @@
   "verdictSummary.running": "运行中",
   "welcomeDialog.close": "知道了！",
   "welcomeDialog.content": "我们正在为 CPH-NG 1.0.0 稳定版做准备。在此准备阶段，插件进行了完整的重构。尽管我们已尽力确保一切正常运行，但某些功能可能不会按预期工作。请及时反馈您遇到的任何问题，以便我们在稳定版发布前修复它们。",
-  "welcomeDialog.countdown": "请稍候（{{seconds}}秒）",
   "welcomeDialog.feedbackLink": "在 GitHub 上报告问题 \u2192",
   "welcomeDialog.refactorWarning": "此版本进行了完整的重构，所有功能可能存在问题。",
   "welcomeDialog.subtitle": "正在为 1.0.0 稳定版做准备",

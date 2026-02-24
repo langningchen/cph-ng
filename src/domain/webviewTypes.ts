@@ -24,18 +24,18 @@ export type IWebviewTestcaseIo =
 
 export interface IWebviewTestcaseResult {
   verdict: Verdict;
-  timeMs?: number;
-  memoryMb?: number;
-  stdout?: IWebviewTestcaseIo;
-  stderr?: IWebviewTestcaseIo;
-  msg?: string;
+  timeMs: number | null;
+  memoryMb: number | null;
+  stdout: IWebviewTestcaseIo | null;
+  stderr: IWebviewTestcaseIo | null;
+  msg: string | null;
 }
 export interface IWebviewTestcase {
   stdin: IWebviewTestcaseIo;
   answer: IWebviewTestcaseIo;
   isExpand: boolean;
   isDisabled: boolean;
-  result?: IWebviewTestcaseResult;
+  result: IWebviewTestcaseResult | null;
 }
 
 export interface IWebviewFileWithHash {
@@ -66,7 +66,7 @@ export interface IWebviewOverrides {
 
 export interface IWebviewProblem {
   name: string;
-  url?: string;
+  url: string | null;
   revision: number;
   testcases: Record<TestcaseId, IWebviewTestcase>;
   testcaseOrder: TestcaseId[];

@@ -40,7 +40,7 @@ export type ProblemEvents = {
 
 export class Problem {
   public readonly src: IFileWithHash;
-  public url?: string;
+  public url: string | null = null;
   private _revision: number = 0;
   private _testcases: Map<TestcaseId, Testcase> = new Map();
   private _testcaseOrder: TestcaseId[] = [];
@@ -48,14 +48,21 @@ export class Problem {
   private _interactor: IFileWithHash | null = null;
   private _stressTest: StressTest = new StressTest();
   private _timeElapsedMs: number = 0;
-  public overrides: IOverrides = {};
+  public overrides: IOverrides = {
+    timeLimitMs: null,
+    memoryLimitMb: null,
+    compiler: null,
+    compilerArgs: null,
+    runner: null,
+    runnerArgs: null,
+  };
   public readonly signals = new EventEmitter() as TypedEventEmitter<ProblemEvents>;
 
   public constructor(
     public name: string,
     src: string | IFileWithHash,
   ) {
-    if (typeof src === 'string') this.src = { path: src };
+    if (typeof src === 'string') this.src = { path: src, hash: null };
     else this.src = src;
     this._stressTest.signals.on('change', this.stressTestChanged);
   }

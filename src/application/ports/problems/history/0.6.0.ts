@@ -33,23 +33,23 @@ export type ITestcaseIo = { data: string } | { path: string };
 
 export interface ITestcaseResult {
   verdict: VerdictName;
-  timeMs: number | null;
-  memoryMb: number | null;
-  stdout: ITestcaseIo | null;
-  stderr: ITestcaseIo | null;
-  msg: string | null;
+  timeMs?: number;
+  memoryMb?: number;
+  stdout?: ITestcaseIo;
+  stderr?: ITestcaseIo;
+  msg?: string;
 }
 export interface ITestcase {
   stdin: ITestcaseIo;
   answer: ITestcaseIo;
   isExpand: boolean;
   isDisabled: boolean;
-  result: ITestcaseResult | null;
+  result?: ITestcaseResult;
 }
 
 export interface IFileWithHash {
   path: string;
-  hash: string | null;
+  hash?: string;
 }
 
 export interface IStressTest {
@@ -60,18 +60,18 @@ export interface IStressTest {
 }
 
 export interface IOverrides {
-  timeLimitMs: number | null;
-  memoryLimitMb: number | null;
-  compiler: string | null;
-  compilerArgs: string | null;
-  runner: string | null;
-  runnerArgs: string | null;
+  timeLimitMs?: number;
+  memoryLimitMb?: number;
+  compiler?: string;
+  compilerArgs?: string;
+  runner?: string;
+  runnerArgs?: string;
 }
 
 export interface IProblem {
   version: string;
   name: string;
-  url: string | null;
+  url?: string;
   testcases: Record<TestcaseId, ITestcase>;
   testcaseOrder: TestcaseId[];
   src: IFileWithHash;

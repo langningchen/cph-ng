@@ -46,7 +46,7 @@ export const createCppExecutable = async (workspace: string, content: string): P
   writeFileSync(path, content);
   const langCpp = langs.getLang(path);
   if (!langCpp) throw new Error('Internal error: can not resolve language for cpp');
-  const res = await langCpp.compile({ path }, signal, null, { canUseWrapper: true });
+  const res = await langCpp.compile({ path, hash: null }, signal, null, { canUseWrapper: true });
   if (res instanceof Error) throw res;
   return res.path;
 };

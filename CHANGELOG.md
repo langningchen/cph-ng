@@ -2,6 +2,14 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.6.1
+
+- **fix**: use full path when walk [#161](https://github.com/langningchen/cph-ng/issues/161)
+- **fix**: remove virtualized test case [#164](https://github.com/langningchen/cph-ng/issues/164)
+- **fix**: use null instead of undefined [#165](https://github.com/langningchen/cph-ng/issues/165)
+- **docs**: update issue templates
+- **chore**: upgrade packages
+
 ## 0.6.0
 
 - **refactor**: use DI structure

@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { dirname } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { mock } from '@t/mock';
 import { createFsFromVolume, Volume } from 'memfs';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
@@ -74,8 +74,8 @@ export function createFileSystemMock(vol: InstanceType<typeof Volume> = new Volu
     await fs.promises.rm(path, options);
   });
   fileSystemMock.walk.mockImplementation(async (path) => {
-    const result = await fs.promises.readdir(path, { encoding: 'utf8', recursive: true });
-    return result as string[];
+    const result = fs.promises.readdir(path, { encoding: 'utf8', recursive: true });
+    return (result as Promise<string[]>).then((files) => files.map((file) => resolve(path, file)));
   });
   fileSystemMock.createReadStream.mockImplementation((path) => {
     return fs.createReadStream(path);

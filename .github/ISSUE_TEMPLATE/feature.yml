@@ -2,7 +2,7 @@ name: Feature Request
 description: A new feature or enhancement
 labels: enhancement
 assignees: langningchen
-title: 'feat: '
+title: "feat: "
 body:
   - type: markdown
     attributes:
@@ -23,8 +23,7 @@ body:
       description:
         Describe a possible implementation, API changes, or how the feature
         might work.
-      placeholder:
-        Describe the proposed approach, examples, or expected behavior.
+      placeholder: Describe the proposed approach, examples, or expected behavior.
   - type: dropdown
     attributes:
       label: Priority
@@ -43,6 +42,5 @@ body:
   - type: textarea
     attributes:
       label: Additional Context / Screenshots
-      description:
-        Add any other context, design mockups, or screenshots that would help.
+      description: Add any other context, design mockups, or screenshots that would help.
       placeholder: Links or screenshots here

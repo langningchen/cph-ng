@@ -99,6 +99,10 @@ export class ImportCompanionProblems {
         problem.overrides = {
           timeLimitMs: companionProblem.timeLimit,
           memoryLimitMb: companionProblem.memoryLimit,
+          compiler: null,
+          compilerArgs: null,
+          runner: null,
+          runnerArgs: null,
         };
 
         // Add testcases

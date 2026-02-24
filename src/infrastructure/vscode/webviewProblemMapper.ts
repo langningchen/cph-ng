@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { isNil } from 'lodash';
 import { inject, injectable } from 'tsyringe';
 import type { IPath } from '@/application/ports/node/IPath';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
@@ -71,20 +72,20 @@ export class WebviewProblemMapper {
   public testcaseToDto(testcase: Partial<Testcase>): Partial<IWebviewTestcase>;
   public testcaseToDto(testcase: Partial<Testcase>): Partial<IWebviewTestcase> {
     return {
-      stdin: testcase.stdin ? this.testcaseIoToDto(testcase.stdin) : undefined,
-      answer: testcase.answer ? this.testcaseIoToDto(testcase.answer) : undefined,
+      stdin: this.testcaseIoToDto(testcase.stdin),
+      answer: this.testcaseIoToDto(testcase.answer),
       isExpand: testcase.isExpand,
       isDisabled: testcase.isDisabled,
-      result: testcase.verdict
-        ? {
-            verdict: this.getVerdict(testcase.verdict),
-            timeMs: testcase.timeMs,
-            memoryMb: testcase.memoryMb,
-            stdout: testcase.stdout ? this.testcaseIoToDto(testcase.stdout) : undefined,
-            stderr: testcase.stderr ? this.testcaseIoToDto(testcase.stderr) : undefined,
-            msg: testcase.msg,
-          }
-        : undefined,
+      result: isNil(testcase.result)
+        ? testcase.result
+        : {
+            verdict: this.getVerdict(testcase.result.verdict),
+            timeMs: testcase.result.timeMs,
+            memoryMb: testcase.result.memoryMb,
+            stdout: this.testcaseIoToDto(testcase.result.stdout) ?? null,
+            stderr: this.testcaseIoToDto(testcase.result.stderr) ?? null,
+            msg: testcase.result.msg,
+          },
     };
   }
   public testcaseResultToDto(
@@ -94,17 +95,26 @@ export class WebviewProblemMapper {
       verdict: testcaseResult.verdict ? this.getVerdict(testcaseResult.verdict) : undefined,
       timeMs: testcaseResult.timeMs,
       memoryMb: testcaseResult.memoryMb,
-      stdout: testcaseResult.stdout ? this.testcaseIoToDto(testcaseResult.stdout) : undefined,
-      stderr: testcaseResult.stderr ? this.testcaseIoToDto(testcaseResult.stderr) : undefined,
+      stdout: this.testcaseIoToDto(testcaseResult.stdout),
+      stderr: this.testcaseIoToDto(testcaseResult.stderr),
       msg: testcaseResult.msg,
     };
   }
-  private testcaseIoToDto(testcaseIo: TestcaseIo): IWebviewTestcaseIo {
+
+  private testcaseIoToDto(testcaseIo: TestcaseIo | undefined): IWebviewTestcaseIo | undefined;
+  private testcaseIoToDto(
+    testcaseIo: TestcaseIo | undefined | null,
+  ): IWebviewTestcaseIo | undefined | null;
+  private testcaseIoToDto(
+    testcaseIo: TestcaseIo | undefined | null,
+  ): IWebviewTestcaseIo | undefined | null {
+    if (isNil(testcaseIo)) return testcaseIo;
     return testcaseIo.match<IWebviewTestcaseIo>(
-      (path) => ({ ...this.fileWithHashToDto({ path }), type: 'file' }),
+      (path) => ({ ...this.fileWithHashToDto({ path, hash: null }), type: 'file' }),
       (data) => ({ type: 'string', data }),
     );
   }
+
   public stressTestToDto(stressTest: StressTest): IWebviewStressTest;
   public stressTestToDto(stressTest: Partial<StressTest>): Partial<IWebviewStressTest>;
   public stressTestToDto(stressTest: Partial<StressTest>): Partial<IWebviewStressTest> {
@@ -133,6 +143,7 @@ export class WebviewProblemMapper {
       msg: stressTest.state ? msgs[stressTest.state] : undefined,
     };
   }
+
   public fileWithHashToDto(fileWithHash: IFileWithHash): IWebviewFileWithHash {
     return {
       path: fileWithHash.path,
@@ -150,17 +161,15 @@ export class WebviewProblemMapper {
     const defaultRunner = lang?.defaultValues.runner;
     const defaultRunnerArgs = lang?.defaultValues.runnerArgs;
     return {
-      timeLimitMs: { defaultValue: defaultTimeLimit, override: timeLimitMs || null },
-      memoryLimitMb: { defaultValue: defaultMemoryLimit, override: memoryLimitMb || null },
-      compiler: defaultCompiler
-        ? { defaultValue: defaultCompiler, override: compiler || null }
-        : undefined,
+      timeLimitMs: { defaultValue: defaultTimeLimit, override: timeLimitMs },
+      memoryLimitMb: { defaultValue: defaultMemoryLimit, override: memoryLimitMb },
+      compiler: defaultCompiler ? { defaultValue: defaultCompiler, override: compiler } : undefined,
       compilerArgs: defaultCompilerArgs
-        ? { defaultValue: defaultCompilerArgs, override: compilerArgs || null }
+        ? { defaultValue: defaultCompilerArgs, override: compilerArgs }
         : undefined,
-      runner: defaultRunner ? { defaultValue: defaultRunner, override: runner || null } : undefined,
+      runner: defaultRunner ? { defaultValue: defaultRunner, override: runner } : undefined,
       runnerArgs: defaultRunnerArgs
-        ? { defaultValue: defaultRunnerArgs, override: runnerArgs || null }
+        ? { defaultValue: defaultRunnerArgs, override: runnerArgs }
         : undefined,
     };
   }

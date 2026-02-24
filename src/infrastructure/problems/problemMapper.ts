@@ -78,16 +78,16 @@ export class ProblemMapper {
       answer: this.testcaseIoToDto(testcase.answer),
       isExpand: testcase.isExpand,
       isDisabled: testcase.isDisabled,
-      result: testcase.verdict
+      result: testcase.result?.verdict
         ? {
-            verdict: testcase.verdict,
-            timeMs: testcase.timeMs,
-            memoryMb: testcase.memoryMb,
-            stdout: testcase.stdout ? this.testcaseIoToDto(testcase.stdout) : undefined,
-            stderr: testcase.stderr ? this.testcaseIoToDto(testcase.stderr) : undefined,
-            msg: testcase.msg,
+            verdict: testcase.result.verdict,
+            timeMs: testcase.result.timeMs,
+            memoryMb: testcase.result.memoryMb,
+            stdout: testcase.result.stdout ? this.testcaseIoToDto(testcase.result.stdout) : null,
+            stderr: testcase.result.stderr ? this.testcaseIoToDto(testcase.result.stderr) : null,
+            msg: testcase.result.msg,
           }
-        : undefined,
+        : null,
     };
   }
   private testcaseToEntity(dto: ITestcase): Testcase {
@@ -101,11 +101,11 @@ export class ProblemMapper {
             verdict: dto.result.verdict,
             timeMs: dto.result.timeMs,
             memoryMb: dto.result.memoryMb,
-            stdout: dto.result.stdout ? this.testcaseIoToEntity(dto.result.stdout) : undefined,
-            stderr: dto.result.stderr ? this.testcaseIoToEntity(dto.result.stderr) : undefined,
+            stdout: dto.result.stdout ? this.testcaseIoToEntity(dto.result.stdout) : null,
+            stderr: dto.result.stderr ? this.testcaseIoToEntity(dto.result.stderr) : null,
             msg: dto.result.msg,
           }
-        : undefined,
+        : null,
     );
   }
 

@@ -37,7 +37,14 @@ describe('TemplateRenderer', () => {
   const makeProblem = () => {
     const p = new Problem('A + B', '/src/main.cpp');
     p.url = 'https://codeforces.com/contest/1/problem/A';
-    p.overrides = { timeLimitMs: 2000, memoryLimitMb: 256 };
+    p.overrides = {
+      timeLimitMs: 2000,
+      memoryLimitMb: 256,
+      compiler: null,
+      compilerArgs: null,
+      runner: null,
+      runnerArgs: null,
+    };
     return p;
   };
 

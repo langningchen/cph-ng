@@ -121,7 +121,7 @@ export class CommandModule implements IExtensionModule {
       return;
     }
     const chosen = await this.ui.quickPickMany(
-      problems.map((p, idx) => ({ label: p.name, detail: p.url, value: idx })),
+      problems.map((p, idx) => ({ label: p.name, detail: p.url ?? undefined, value: idx })),
       { title: this.translator.t('Select problems') },
     );
     await Promise.all(chosen.map((item) => this.problemService.save(problems[item])));

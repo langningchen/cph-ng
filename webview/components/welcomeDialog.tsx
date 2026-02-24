@@ -23,42 +23,20 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import LinearProgress from '@mui/material/LinearProgress';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CphFlex } from './base/cphFlex';
 
 const STORAGE_KEY = 'cph-ng-welcomed-version';
-const COUNTDOWN_TOTAL = 10;
 
 export const WelcomeDialog = () => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(() => localStorage.getItem(STORAGE_KEY) !== version);
-  const [countdown, setCountdown] = useState(COUNTDOWN_TOTAL);
-
-  useEffect(() => {
-    if (!open || countdown <= 0) return;
-    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [open, countdown]);
-
-  const canClose = countdown <= 0;
-
-  const dismiss = () => {
-    localStorage.setItem(STORAGE_KEY, version);
-    setOpen(false);
-  };
 
   return (
     <Dialog fullWidth maxWidth={false} open={open} disableEscapeKeyDown>
-      {!canClose && (
-        <LinearProgress
-          variant='determinate'
-          value={((COUNTDOWN_TOTAL - countdown) / COUNTDOWN_TOTAL) * 100}
-        />
-      )}
       <DialogTitle>
         <CphFlex alignItems='center' gap={1}>
           <CelebrationIcon color='primary' fontSize='small' />
@@ -87,10 +65,15 @@ export const WelcomeDialog = () => {
         </CphFlex>
       </DialogContent>
       <DialogActions>
-        <Button onClick={dismiss} disabled={!canClose} variant='contained' size='small'>
-          {canClose
-            ? t('welcomeDialog.close')
-            : t('welcomeDialog.countdown', { seconds: countdown })}
+        <Button
+          onClick={() => {
+            localStorage.setItem(STORAGE_KEY, version);
+            setOpen(false);
+          }}
+          variant='contained'
+          size='small'
+        >
+          {t('welcomeDialog.close')}
         </Button>
       </DialogActions>
     </Dialog>

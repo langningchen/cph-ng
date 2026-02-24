@@ -18,25 +18,24 @@
 import EventEmitter from 'node:events';
 import type TypedEventEmitter from 'typed-emitter';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
-import type { VerdictName } from '@/domain/entities/verdict';
+import { VerdictName } from '@/domain/entities/verdict';
 
 export interface TestcaseResult {
   verdict: VerdictName;
-  timeMs?: number;
-  memoryMb?: number;
-  stdout?: TestcaseIo;
-  stderr?: TestcaseIo;
-  msg?: string;
+  timeMs: number | null;
+  memoryMb: number | null;
+  stdout: TestcaseIo | null;
+  stderr: TestcaseIo | null;
+  msg: string | null;
 }
-
-export type UpdatedResult = TestcaseResult & {
-  isExpand?: boolean;
-};
 
 export type TestcaseEvents = {
   patchTestcase: (payload: Partial<Testcase>) => void;
   patchTestcaseResult: (payload: Partial<TestcaseResult>) => void;
 };
+
+const pick = <T>(next: T | null | undefined, fallback: T | null): T | null =>
+  next === undefined ? fallback : next;
 
 export class Testcase {
   public readonly signals = new EventEmitter() as TypedEventEmitter<TestcaseEvents>;
@@ -46,20 +45,20 @@ export class Testcase {
     private _answer: TestcaseIo = new TestcaseIo({ data: '' }),
     private _isExpand: boolean = false,
     private _isDisabled: boolean = false,
-    private _result?: TestcaseResult,
+    private _result: TestcaseResult | null = null,
   ) {}
 
   public get stdin(): TestcaseIo {
     return this._stdin;
   }
-  public set stdin(value: TestcaseIo) {
+  public set stdin(value: Readonly<TestcaseIo>) {
     this._stdin = value;
     this.signals.emit('patchTestcase', { stdin: value });
   }
   public get answer(): TestcaseIo {
     return this._answer;
   }
-  public set answer(value: TestcaseIo) {
+  public set answer(value: Readonly<TestcaseIo>) {
     this._answer = value;
     this.signals.emit('patchTestcase', { answer: value });
   }
@@ -77,56 +76,44 @@ export class Testcase {
     this._isDisabled = value;
     this.signals.emit('patchTestcase', { isDisabled: this._isDisabled });
   }
-  public get verdict(): VerdictName | undefined {
-    return this._result?.verdict;
-  }
-  public get timeMs(): number | undefined {
-    return this._result?.timeMs;
-  }
-  public get memoryMb(): number | undefined {
-    return this._result?.memoryMb;
-  }
-  public get stdout(): TestcaseIo | undefined {
-    return this._result?.stdout;
-  }
-  public get stderr(): TestcaseIo | undefined {
-    return this._result?.stderr;
-  }
-  public get msg(): string | undefined {
-    return this._result?.msg;
+  public get result(): Readonly<TestcaseResult> | null {
+    return this._result;
   }
 
   public clearResult(): string[] {
     const disposables: string[] = [
-      ...(this._result?.stdout?.getDisposables() || []),
-      ...(this._result?.stderr?.getDisposables() || []),
+      ...(this._result?.stdout?.getDisposables() ?? []),
+      ...(this._result?.stderr?.getDisposables() ?? []),
     ];
-    delete this._result;
+    this._result = null;
+    this.signals.emit('patchTestcase', { result: null });
     return disposables;
   }
-  public updateResult(updated: UpdatedResult): void {
-    const { verdict, timeMs, memoryMb, stdout, stderr, msg, isExpand } = updated;
-    const current = this._result || { verdict };
-    this._result = {
-      verdict,
-      timeMs: timeMs ?? current.timeMs,
-      memoryMb: memoryMb ?? current.memoryMb,
-      stdout: stdout ?? current.stdout,
-      stderr: stderr ?? current.stderr,
-      msg: this.formatMessage(current.msg, msg),
+  public updateResult(updated: Readonly<Partial<TestcaseResult>>): void {
+    const base: TestcaseResult = this._result ?? {
+      verdict: VerdictName.unknownError,
+      timeMs: null,
+      memoryMb: null,
+      stdout: null,
+      stderr: null,
+      msg: null,
     };
-    this.signals.emit('patchTestcaseResult', { verdict, timeMs, memoryMb, stdout, stderr, msg });
-    if (isExpand !== undefined) {
-      this._isExpand = isExpand;
-      this.signals.emit('patchTestcase', { isExpand });
-    }
+    this._result = {
+      verdict: updated.verdict ?? base.verdict,
+      timeMs: pick(updated.timeMs, base.timeMs),
+      memoryMb: pick(updated.memoryMb, base.memoryMb),
+      stdout: pick(updated.stdout, base.stdout),
+      stderr: pick(updated.stderr, base.stderr),
+      msg: this.formatMessage(base.msg, updated.msg),
+    };
+    this.signals.emit('patchTestcaseResult', updated);
   }
   public getDisposables(): string[] {
     return [
       ...this.stdin.getDisposables(),
       ...this.answer.getDisposables(),
-      ...(this._result?.stdout?.getDisposables() || []),
-      ...(this._result?.stderr?.getDisposables() || []),
+      ...(this._result?.stdout?.getDisposables() ?? []),
+      ...(this._result?.stderr?.getDisposables() ?? []),
     ];
   }
   public isRelated(path: string): boolean {
@@ -138,7 +125,7 @@ export class Testcase {
       this._result?.stderr?.path?.toLowerCase() === path
     );
   }
-  private formatMessage(oldMsg?: string, newMsg?: string): string | undefined {
+  private formatMessage(oldMsg: string | null, newMsg?: string | null): string | null {
     if (!newMsg) return oldMsg;
     const trimmed = newMsg.trim();
     if (!oldMsg) return `${trimmed}\n`;

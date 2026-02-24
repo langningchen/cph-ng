@@ -43,7 +43,7 @@ import { CphButton } from './cphButton';
 interface ProblemTitleProps {
   problemId: ProblemId;
   name: string;
-  url?: string;
+  url: string | null;
   checker: IWebviewFileWithHash | null;
   interactor: IWebviewFileWithHash | null;
   timeElapsedMs: number;
@@ -116,14 +116,14 @@ export const ProblemTitle = memo(
         type: 'editProblemDetails',
         problemId,
         name: editedTitle,
-        url: editedUrl ? editedUrl : undefined,
+        url: editedUrl ? editedUrl : null,
         overrides: {
-          timeLimitMs: editedTimeLimitMs ? parseInt(editedTimeLimitMs, 10) : undefined,
-          memoryLimitMb: editedMemoryLimitMb ? parseInt(editedMemoryLimitMb, 10) : undefined,
-          compiler: editedCompiler ?? undefined,
-          compilerArgs: editedCompilerArgs ?? undefined,
-          runner: editedRunner ?? undefined,
-          runnerArgs: editedRunnerArgs ?? undefined,
+          timeLimitMs: editedTimeLimitMs ? parseInt(editedTimeLimitMs, 10) : null,
+          memoryLimitMb: editedMemoryLimitMb ? parseInt(editedMemoryLimitMb, 10) : null,
+          compiler: editedCompiler ?? null,
+          compilerArgs: editedCompilerArgs ?? null,
+          runner: editedRunner ?? null,
+          runnerArgs: editedRunnerArgs ?? null,
         },
       });
     };

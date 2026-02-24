@@ -142,7 +142,7 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
         ? [problem.testcases[action.testcaseId]]
         : Object.values(problem.testcases);
       targets.forEach((testcase) => {
-        if (testcase) delete testcase.result;
+        testcase.result = null;
       });
       return;
     }
