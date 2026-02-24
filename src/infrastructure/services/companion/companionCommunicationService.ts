@@ -85,7 +85,6 @@ export class CompanionCommunicationService {
       logFile,
       shutdownTimeout,
     });
-
     const childProcess = spawn(
       node,
       [routerPath, '-p', port, '-l', logFile, '-s', shutdownTimeout],
@@ -130,10 +129,7 @@ export class CompanionCommunicationService {
     if (!this.ws) return;
     const events = ['open', 'close', 'error'];
     events.forEach((evt) => {
-      this.ws?.addEventListener(evt, () => {
-        this.signals.emit('statusChanged');
-        this.logger.info(`WebSocket event: ${evt}`);
-      });
+      this.ws?.addEventListener(evt, () => this.signals.emit('statusChanged'));
     });
     this.ws.addEventListener('message', (event) => {
       try {
