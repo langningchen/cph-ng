@@ -77,7 +77,6 @@ export class CompanionCommunicationService {
     const port = this.settings.companion.listenPort.toString();
     const logFile = this.pathResolver.renderPath(this.settings.companion.logFile);
     const shutdownTimeout = this.settings.companion.shutdownTimeout.toString();
-    const env = process.env;
 
     this.logger.debug('Router spawn parameters', {
       node,
@@ -85,31 +84,12 @@ export class CompanionCommunicationService {
       port,
       logFile,
       shutdownTimeout,
-      env,
     });
-
-    {
-      const isWin = process.platform === 'win32';
-
-      const envPrefix = Object.entries(env)
-        .map(([key, value]) => {
-          const safeValue = (value || '').replace(/"/g, '\\"');
-          return isWin ? `set ${key}="${safeValue}"&&` : `${key}="${safeValue}"`;
-        })
-        .join(' ');
-
-      const baseCmd = `"${node}" "${routerPath}" -p ${port} -l "${logFile}" -s ${shutdownTimeout}`;
-      const cmd = envPrefix ? `${envPrefix} ${baseCmd}` : baseCmd;
-      this.logger.debug(
-        'To reproduce the router process, run the following command in your terminal:',
-      );
-      this.logger.debug(cmd);
-    }
 
     const childProcess = spawn(
       node,
       [routerPath, '-p', port, '-l', logFile, '-s', shutdownTimeout],
-      { detached: true, stdio: 'ignore', env },
+      { detached: true, stdio: 'ignore', env: process.env },
     );
     childProcess.unref();
     this.logger.info(`Router process spawned on port ${port}`);

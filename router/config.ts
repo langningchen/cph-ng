@@ -18,30 +18,31 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import type { Config } from '@r/types';
+import { Command } from 'commander';
 import { lock } from 'proper-lockfile';
-import parser from 'yargs-parser';
 
-const argv = parser(process.argv.slice(2), {
-  number: ['port', 'shutdownTimeout'],
-  string: ['logFile'],
-  alias: { p: 'port', l: 'logFile', s: 'shutdownTimeout' },
-});
-if (
-  !argv.port ||
-  argv.port <= 0 ||
-  argv.port > 65535 ||
-  !argv.logFile ||
-  !argv.shutdownTimeout ||
-  argv.shutdownTimeout <= 0
-) {
-  console.error('Invalid arguments');
-  process.exit(1);
-}
+const program = new Command();
+
+program
+  .requiredOption('-p, --port <number>', 'Port number (1-65535)', (val) => {
+    const p = parseInt(val, 10);
+    if (Number.isNaN(p) || p <= 0 || p > 65535) throw new Error('Invalid port');
+    return p;
+  })
+  .requiredOption('-l, --log-file <path>', 'Path to the log file')
+  .requiredOption('-s, --shutdown-timeout <number>', 'Shutdown timeout in ms', (val) => {
+    const t = parseInt(val, 10);
+    if (Number.isNaN(t) || t <= 0) throw new Error('Invalid timeout');
+    return t;
+  })
+  .parse(process.argv);
+
+const options = program.opts();
 
 export const config: Config = {
-  port: argv.port,
-  logFile: resolve(argv.logFile),
-  shutdownTimeout: argv.shutdownTimeout,
+  port: options.port,
+  logFile: resolve(options.logFile),
+  shutdownTimeout: options.shutdownTimeout,
 };
 
 const logFile = config.logFile;
