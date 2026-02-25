@@ -1,7 +1,5 @@
 # CPH-NG
 
-[简体中文](https://github.com/langningchen/cph-ng/blob/main/README.zh-CN.md) | English
-
 > Quickly compile, run and judge competitive programming problems in VSCode.
 > Automatically download testcases, or write & test your own problems.
 
@@ -164,5 +162,4 @@ See [GitHub Issues](https://github.com/langningchen/cph-ng/issues).
 
 ## Change Log
 
-See
-[CHANGELOG.md](https://github.com/langningchen/cph-ng/blob/main/CHANGELOG.md)
+See [CHANGELOG.md](https://github.com/langningchen/cph-ng/blob/main/CHANGELOG.md)

@@ -151,26 +151,6 @@ jobs:
         with:
           subject-path: ./*.vsix
 
-      - name: Setup Python
-        uses: ./.github/actions/setup-python
-      - name: Deploy Docs
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          PRE_RELEASE="${{ steps.version.outputs.pre_release }}"
-
-          MIKE_VERSION=$(echo $VERSION | sed -E 's/^([0-9]+\.[0-9]+)\..*$/\1/')
-
-          git fetch origin gh-pages --depth=1
-          if [ "$PRE_RELEASE" = "false" ]; then
-            mike deploy --push --update-aliases "$MIKE_VERSION" "latest"
-            echo "Deployed version $MIKE_VERSION and alias latest"
-          else
-            mike deploy --push "$MIKE_VERSION"
-            echo "Deployed version $MIKE_VERSION only"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Move cards in project
         if: success()
         env:
@@ -208,28 +188,3 @@ jobs:
             echo "Pre-release only: moving Done -> Pre-release"
             move_cards "Done" 300944f4
           fi
-
-  deploy-docs:
-    runs-on: ubuntu-latest
-    needs: release
-    if: success()
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Checkout gh-pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
