@@ -66,6 +66,7 @@ import { LlmTestcaseEditor } from '@/infrastructure/vscode/llmTools/llmTestCaseE
 import { LoggerAdapter } from '@/infrastructure/vscode/loggerAdapter';
 import { ProblemFs } from '@/infrastructure/vscode/problemFs';
 import { SettingsAdapter } from '@/infrastructure/vscode/settingsAdapter';
+import { SidebarProvider } from '@/infrastructure/vscode/sidebarProvider';
 import { TelemetryAdapter } from '@/infrastructure/vscode/telemetryAdapter';
 import { TranslatorAdapter } from '@/infrastructure/vscode/translatorAdapter';
 import { UiAdapter } from '@/infrastructure/vscode/uiAdapter';
@@ -101,12 +102,13 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.resultEvaluator, ResultEvaluatorAdaptor);
   container.registerSingleton(TOKENS.runnerProvider, RunnerProviderAdapter);
   container.registerSingleton(TOKENS.settings, SettingsAdapter);
+  container.registerSingleton(TOKENS.sidebarProvider, SidebarProvider);
   container.registerSingleton(TOKENS.solutionRunner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.system, SystemAdapter);
-  container.registerSingleton(TOKENS.templateRenderer, TemplateRenderer);
-  container.registerSingleton(TOKENS.testcaseIoService, TestcaseIoService);
   container.registerSingleton(TOKENS.telemetry, TelemetryAdapter);
+  container.registerSingleton(TOKENS.templateRenderer, TemplateRenderer);
   container.registerSingleton(TOKENS.tempStorage, TempStorageAdapter);
+  container.registerSingleton(TOKENS.testcaseIoService, TestcaseIoService);
   container.registerSingleton(TOKENS.translator, TranslatorAdapter);
   container.registerSingleton(TOKENS.ui, UiAdapter);
   container.registerSingleton(TOKENS.userScriptService, UserScriptService);

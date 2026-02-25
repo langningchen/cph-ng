@@ -16,8 +16,9 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { inject, injectable } from 'tsyringe';
-import { Uri, type WebviewView, type WebviewViewProvider, workspace } from 'vscode';
+import { Uri, type WebviewView, workspace } from 'vscode';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvider';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
@@ -26,8 +27,8 @@ import { WebviewHtmlRenderer } from '@/infrastructure/vscode/webviewHtmlRenderer
 import { WebviewProtocolHandler } from '@/infrastructure/vscode/webviewProtocolHandler';
 
 @injectable()
-export class SidebarProvider implements WebviewViewProvider {
-  public static readonly viewType = 'cphNgSidebar';
+export class SidebarProvider implements ISidebarProvider {
+  public readonly viewType = 'cphNgSidebar';
   private _view?: WebviewView;
 
   public constructor(

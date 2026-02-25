@@ -2,6 +2,11 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## [Unreleased]
+
+- **feat**(core): use base32 in problem fs
+- **fix**(core): problem fs refresh
+
 ## 0.6.3
 
 - **fix**: validate wrapper report format and handle errors

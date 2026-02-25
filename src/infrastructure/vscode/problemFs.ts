@@ -65,7 +65,7 @@ export type ProblemFsEvents = {
 
 @injectable()
 export class ProblemFs implements IProblemFs {
-  public static readonly scheme = 'cph-ng';
+  public readonly scheme = 'cph-ng';
 
   public readonly signals = new EventEmitter() as TypedEventEmitter<ProblemFsEvents>;
   private changeEmitter = new vsEventEmitter<FileChangeEvent[]>();
@@ -134,7 +134,7 @@ export class ProblemFs implements IProblemFs {
 
   public getUri(srcPath: string, path: string) {
     const authority = encode(srcPath).replaceAll('=', '');
-    const base = Uri.from({ scheme: ProblemFs.scheme, authority, path: '/' });
+    const base = Uri.from({ scheme: this.scheme, authority, path: '/' });
     return Uri.joinPath(base, this.path.basename(srcPath), path);
   }
   private parseUri(uri: Uri): { srcPath: string; path: string } {

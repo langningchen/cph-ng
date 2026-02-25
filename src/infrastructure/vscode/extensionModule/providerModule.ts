@@ -18,25 +18,25 @@
 import { inject, injectable } from 'tsyringe';
 import { type ExtensionContext, window, workspace } from 'vscode';
 import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
+import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvider';
 import { TOKENS } from '@/composition/tokens';
-import { ProblemFs } from '../problemFs';
-import { SidebarProvider } from '../sidebarProvider';
 
 @injectable()
 export class ProviderModule implements IExtensionModule {
   public constructor(
     @inject(TOKENS.settings) private readonly settings: ISettings,
-    @inject(SidebarProvider) private readonly sidebarProvider: SidebarProvider,
-    @inject(ProblemFs) private readonly problemFs: ProblemFs,
+    @inject(TOKENS.sidebarProvider) private readonly sidebarProvider: ISidebarProvider,
+    @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
   ) {}
 
   public setup(context: ExtensionContext) {
     context.subscriptions.push(
-      window.registerWebviewViewProvider(SidebarProvider.viewType, this.sidebarProvider, {
+      window.registerWebviewViewProvider(this.sidebarProvider.viewType, this.sidebarProvider, {
         webviewOptions: { retainContextWhenHidden: this.settings.sidebar.retainWhenHidden },
       }),
-      workspace.registerFileSystemProvider(ProblemFs.scheme, this.problemFs, {
+      workspace.registerFileSystemProvider(this.problemFs.scheme, this.problemFs, {
         isCaseSensitive: true,
       }),
     );

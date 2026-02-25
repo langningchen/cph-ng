@@ -53,6 +53,7 @@ import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModu
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvider';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
@@ -115,5 +116,6 @@ export const TOKENS = {
 
   // Repositories
   problemRepository: 'repositories.ProblemRepository' as InjectionToken<IProblemRepository>,
-  problemFs: 'repositories.ProblemFs' as InjectionToken<IProblemFs>,
+  sidebarProvider: 'ports.SidebarProvider' as InjectionToken<ISidebarProvider>,
+  problemFs: 'ports.ProblemFs' as InjectionToken<IProblemFs>,
 };
