@@ -23,7 +23,15 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
-import { CphTooltip } from '@w/components/base/cphTooltip';
+import { CphNgButton } from '@w/components/base/cphNgButton';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { CphNgMenu } from '@w/components/base/cphNgMenu';
+import { CphNgText } from '@w/components/base/cphNgText';
+import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
+import { ErrorBoundary } from '@w/components/base/errorBoundary';
+import { RunButtonGroup } from '@w/components/runButtonGroup';
+import { TestcaseDataView } from '@w/components/testcaseDataView';
+import { useProblemDispatch } from '@w/context/ProblemContext';
 import MD5 from 'crypto-js/md5';
 import { isNil } from 'lodash';
 import React, { memo, useMemo } from 'react';
@@ -31,14 +39,6 @@ import { useTranslation } from 'react-i18next';
 import { VerdictType } from '@/domain/entities/verdict';
 import type { ProblemId, TestcaseId } from '@/domain/types';
 import type { IWebviewTestcase } from '@/domain/webviewTypes';
-import { useProblemDispatch } from '../context/ProblemContext';
-import { CphFlex } from './base/cphFlex';
-import { CphMenu } from './base/cphMenu';
-import { CphText } from './base/cphText';
-import { ErrorBoundary } from './base/errorBoundary';
-import { CphButton } from './cphButton';
-import { RunButtonGroup } from './runButtonGroup';
-import { TestcaseDataView } from './testcaseDataView';
 
 interface TestcaseViewProp {
   problemId: ProblemId;
@@ -70,8 +70,8 @@ export const TestcaseView = memo(
     const expanded = testcase.isDisabled ? false : isExpand;
     const details = useMemo(
       () => (
-        <CphFlex column>
-          <CphFlex smallGap column>
+        <CphNgFlex column>
+          <CphNgFlex smallGap column>
             <ErrorBoundary>
               <TestcaseDataView
                 label={t('testcaseView.stdin')}
@@ -151,9 +151,9 @@ export const TestcaseView = memo(
                 tabIndex={idx * 2 + 2}
               />
             </ErrorBoundary>
-          </CphFlex>
+          </CphNgFlex>
           <Divider />
-          <CphFlex smallGap column>
+          <CphNgFlex smallGap column>
             {!!testcase.result?.stdout && (
               <ErrorBoundary>
                 <TestcaseDataView
@@ -211,8 +211,8 @@ export const TestcaseView = memo(
                 />
               </ErrorBoundary>
             )}
-          </CphFlex>
-        </CphFlex>
+          </CphNgFlex>
+        </CphNgFlex>
       ),
       [
         autoFocus,
@@ -242,7 +242,7 @@ export const TestcaseView = memo(
       : testcase.result?.verdict?.color;
 
     return (
-      <CphMenu
+      <CphNgMenu
         menu={
           testcase.isDisabled
             ? {
@@ -323,11 +323,11 @@ export const TestcaseView = memo(
                 : {},
             }}
           >
-            <CphFlex smallGap>
-              <CphFlex flex={1}>
-                <CphText fontWeight='bold'>#{idx + 1}</CphText>
+            <CphNgFlex smallGap>
+              <CphNgFlex flex={1}>
+                <CphNgText fontWeight='bold'>#{idx + 1}</CphNgText>
                 {!!testcase.result?.verdict && (
-                  <CphTooltip title={testcase.result.verdict.fullName}>
+                  <CphNgTooltip title={testcase.result.verdict.fullName}>
                     <Chip
                       label={testcase.result.verdict.name}
                       size='small'
@@ -339,9 +339,9 @@ export const TestcaseView = memo(
                         fontSize: '0.75rem',
                       }}
                     />
-                  </CphTooltip>
+                  </CphNgTooltip>
                 )}
-              </CphFlex>
+              </CphNgFlex>
               {!isNil(testcase.result?.memoryMb) && (
                 <Chip
                   label={t('testcaseView.memory', {
@@ -369,7 +369,7 @@ export const TestcaseView = memo(
                 />
               )}
               {isRunning ? (
-                <CphButton
+                <CphNgButton
                   name={t('testcaseView.stop')}
                   icon={StopIcon}
                   color='warning'
@@ -388,7 +388,7 @@ export const TestcaseView = memo(
                   }}
                 />
               )}
-              <CphButton
+              <CphNgButton
                 name={t('testcaseView.delete')}
                 icon={DeleteIcon}
                 color='error'
@@ -398,7 +398,7 @@ export const TestcaseView = memo(
                 }}
                 sx={{ display: { xs: 'none', md: 'flex' } }}
               />
-            </CphFlex>
+            </CphNgFlex>
           </AccordionSummary>
           <AccordionDetails
             sx={{
@@ -408,7 +408,7 @@ export const TestcaseView = memo(
             {details}
           </AccordionDetails>
         </Accordion>
-      </CphMenu>
+      </CphNgMenu>
     );
   },
 );

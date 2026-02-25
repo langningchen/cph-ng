@@ -23,15 +23,15 @@ import DifferenceIcon from '@mui/icons-material/Difference';
 import DoneIcon from '@mui/icons-material/Done';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import Box from '@mui/material/Box';
+import { CphNgButton } from '@w/components/base/cphNgButton';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { CphNgLink } from '@w/components/base/cphNgLink';
 import { useProblemDispatch } from '@w/context/ProblemContext';
 import { type AnserJsonEntry, ansiToJson } from 'anser';
 import React, { type CSSProperties, memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
 import type { IWebviewTestcaseIo } from '@/domain/webviewTypes';
-import { CphFlex } from './base/cphFlex';
-import { CphLink } from './base/cphLink';
-import { CphButton } from './cphButton';
 
 interface OutputActions {
   onSetAnswer: () => void;
@@ -141,19 +141,19 @@ export const TestcaseDataView = memo(
 
     if (value.type === 'string' && !value.data && readOnly) return null;
     return (
-      <CphFlex column smallGap>
-        <CphFlex justifyContent='space-between'>
-          <CphFlex flex={1} flexWrap='wrap'>
-            <CphLink
+      <CphNgFlex column smallGap>
+        <CphNgFlex justifyContent='space-between'>
+          <CphNgFlex flex={1} flexWrap='wrap'>
+            <CphNgLink
               color='inherit'
               name={t('testcaseDataView.openVirtual')}
               onClick={onOpenVirtual}
               fontSize='larger'
             >
               {label}
-            </CphLink>
+            </CphNgLink>
             {internalValue.type === 'file' && !readOnly && (
-              <CphLink
+              <CphNgLink
                 name={internalValue.path}
                 onClick={() => {
                   dispatch({
@@ -163,19 +163,19 @@ export const TestcaseDataView = memo(
                 }}
               >
                 {internalValue.base}
-              </CphLink>
+              </CphNgLink>
             )}
-          </CphFlex>
+          </CphNgFlex>
           <Box sx={{ display: { xs: 'none', md: 'contents' } }}>
             {!!outputActions && (
-              <CphButton
+              <CphNgButton
                 name={t('testcaseDataView.compare')}
                 icon={DifferenceIcon}
                 onClick={outputActions.onCompare}
               />
             )}
             {!!onToggleFile && (
-              <CphButton
+              <CphNgButton
                 name={t('testcaseDataView.toggleFile')}
                 icon={ChangeCircleIcon}
                 onClick={onToggleFile}
@@ -184,7 +184,7 @@ export const TestcaseDataView = memo(
           </Box>
           {internalValue.type === 'file' ? (
             readOnly || (
-              <CphButton
+              <CphNgButton
                 name={t('testcaseDataView.clearFile')}
                 icon={ClearIcon}
                 onClick={() => {
@@ -196,7 +196,7 @@ export const TestcaseDataView = memo(
             <>
               {readOnly || (
                 <Box sx={{ display: { xs: 'none', md: 'contents' } }}>
-                  <CphButton
+                  <CphNgButton
                     name={t('testcaseDataView.loadFile')}
                     icon={FileOpenIcon}
                     onClick={onChooseFile}
@@ -204,13 +204,13 @@ export const TestcaseDataView = memo(
                 </Box>
               )}
               {!!outputActions && (
-                <CphButton
+                <CphNgButton
                   name={t('testcaseDataView.setAnswer')}
                   icon={ArrowUpwardIcon}
                   onClick={outputActions.onSetAnswer}
                 />
               )}
-              <CphButton
+              <CphNgButton
                 name={copied ? t('testcaseDataView.copied') : t('testcaseDataView.copy')}
                 icon={copied ? DoneIcon : ContentCopyIcon}
                 onClick={() => {
@@ -229,7 +229,7 @@ export const TestcaseDataView = memo(
               />
             </>
           )}
-        </CphFlex>
+        </CphNgFlex>
         {internalValue.type === 'string' &&
           (readOnly ? (
             <div
@@ -260,7 +260,7 @@ export const TestcaseDataView = memo(
               }}
             />
           ))}
-      </CphFlex>
+      </CphNgFlex>
     );
   },
 );

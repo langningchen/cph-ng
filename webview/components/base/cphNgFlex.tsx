@@ -15,24 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import Typography, { type TypographyProps } from '@mui/material/Typography';
+import type { BoxProps } from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import { deleteProps } from '@w/utils';
 import React from 'react';
 
-interface CphTextProps extends TypographyProps {}
+interface CphNgFlexProps extends BoxProps {
+  smallGap?: boolean;
+  column?: boolean;
+  alignStart?: boolean;
+}
 
-export const CphText = (props: CphTextProps) => {
+export const CphNgFlex = (props: CphNgFlexProps) => {
   return (
-    <Typography
-      overflow='hidden'
-      textOverflow='ellipsis'
-      component='span'
-      sx={{
-        cursor: 'default',
-        userSelect: 'none',
-      }}
-      {...props}
+    <Stack
+      alignItems={props.alignStart ? 'flex-start' : 'center'}
+      flexDirection={props.column ? 'column' : 'row'}
+      gap={props.smallGap ? 0.5 : 1}
+      width='100%'
+      minWidth={0}
+      {...deleteProps(props, ['smallGap', 'column', 'alignStart'])}
     >
       {props.children}
-    </Typography>
+    </Stack>
   );
 };

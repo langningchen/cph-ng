@@ -15,19 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { CphNgMenu } from '@w/components/base/cphNgMenu';
+import { ErrorBoundary } from '@w/components/base/errorBoundary';
+import { ProblemActions } from '@w/components/problemActions';
+import { ProblemTitle } from '@w/components/problemTitle';
+import { TestcasesView } from '@w/components/testcasesView';
+import { VerdictSummary } from '@w/components/verdictSummary';
+import { useProblemDispatch } from '@w/context/ProblemContext';
 import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictType } from '@/domain/entities/verdict';
 import type { ProblemId } from '@/domain/types';
 import type { IWebviewProblem } from '@/domain/webviewTypes';
-import { useProblemDispatch } from '../context/ProblemContext';
-import { CphFlex } from './base/cphFlex';
-import { CphMenu } from './base/cphMenu';
-import { ErrorBoundary } from './base/errorBoundary';
-import { ProblemActions } from './problemActions';
-import { ProblemTitle } from './problemTitle';
-import { TestcasesView } from './testcasesView';
-import { VerdictSummary } from './verdictSummary';
 
 interface ProblemViewProps {
   problemId: ProblemId;
@@ -61,7 +61,7 @@ export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewP
       <ErrorBoundary>
         <VerdictSummary testcaseOrder={problem.testcaseOrder} testcases={problem.testcases} />
       </ErrorBoundary>
-      <CphFlex
+      <CphNgFlex
         column
         flex={1}
         width='100%'
@@ -73,7 +73,7 @@ export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewP
         paddingY={2}
       >
         <ErrorBoundary>
-          <CphMenu
+          <CphNgMenu
             menu={{
               [t('problemView.menu.clearStatus')]: () => {
                 dispatch({ type: 'clearTestcaseStatus', problemId });
@@ -87,9 +87,9 @@ export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewP
               testcaseOrder={problem.testcaseOrder}
               testcases={problem.testcases}
             />
-          </CphMenu>
+          </CphNgMenu>
         </ErrorBoundary>
-      </CphFlex>
+      </CphNgFlex>
       <ErrorBoundary>
         <ProblemActions
           problemId={problemId}

@@ -25,11 +25,11 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
+import { CphNgButton } from '@w/components/base/cphNgButton';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import StackTrace from 'stacktrace-js';
-import { CphButton } from '../cphButton';
-import { CphFlex } from './cphFlex';
 
 interface ErrorFallbackProps {
   error: Error;
@@ -66,8 +66,8 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
 
   return (
     <>
-      <CphFlex>
-        <CphButton
+      <CphNgFlex>
+        <CphNgButton
           icon={ErrorIcon}
           name='Error'
           color='error'
@@ -75,8 +75,8 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
             setOpen(true);
           }}
         />
-        <CphButton icon={ReplayIcon} name='Retry' color='warning' onClick={resetErrorBoundary} />
-      </CphFlex>
+        <CphNgButton icon={ReplayIcon} name='Retry' color='warning' onClick={resetErrorBoundary} />
+      </CphNgFlex>
       <Dialog
         fullWidth
         maxWidth={false}
@@ -87,7 +87,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
       >
         <DialogTitle>{t('errorBoundary.title')}</DialogTitle>
         <DialogContent>
-          <CphFlex column>
+          <CphNgFlex column>
             <Typography>{t('errorBoundary.description')}</Typography>
             <Accordion sx={{ width: '100%' }}>
               <AccordionSummary>{t('errorBoundary.details')}</AccordionSummary>
@@ -99,7 +99,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
                 </Box>
               </AccordionDetails>
             </Accordion>
-          </CphFlex>
+          </CphNgFlex>
         </DialogContent>
       </Dialog>
     </>

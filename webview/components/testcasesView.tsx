@@ -16,17 +16,17 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import Box from '@mui/material/Box';
+import { AcCongrats } from '@w/components/acCongrats';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { ErrorBoundary } from '@w/components/base/errorBoundary';
+import { NoTestcases } from '@w/components/noTestcases';
+import { TestcaseView } from '@w/components/testcaseView';
+import { useProblemDispatch } from '@w/context/ProblemContext';
 import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictName } from '@/domain/entities/verdict';
 import type { ProblemId, TestcaseId } from '@/domain/types';
 import type { IWebviewTestcase } from '@/domain/webviewTypes';
-import { useProblemDispatch } from '../context/ProblemContext';
-import { AcCongrats } from './acCongrats';
-import { CphFlex } from './base/cphFlex';
-import { ErrorBoundary } from './base/errorBoundary';
-import { NoTestcases } from './noTestcases';
-import { TestcaseView } from './testcaseView';
 
 interface TestcasesViewProps {
   problemId: ProblemId;
@@ -94,7 +94,7 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
   }, [testcaseOrder, draggedIdx, dragOverIdx]);
 
   return (
-    <CphFlex column>
+    <CphNgFlex column>
       {testcaseOrder.length ? (
         <>
           {partyUri && isAllAccepted ? <AcCongrats /> : null}
@@ -149,6 +149,6 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
       >
         {t('testcasesView.addTestcaseHint')}
       </Box>
-    </CphFlex>
+    </CphNgFlex>
   );
 });

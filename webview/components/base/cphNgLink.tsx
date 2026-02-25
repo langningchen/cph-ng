@@ -15,15 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import Tooltip, { type TooltipProps } from '@mui/material/Tooltip';
+import Link, { type LinkProps } from '@mui/material/Link';
+import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
+import { deleteProps } from '@w/utils';
 import React from 'react';
 
-interface CphTooltipProps extends TooltipProps {}
+interface CphNgLinkProps extends LinkProps {
+  name: string;
+}
 
-export const CphTooltip = (props: CphTooltipProps) => {
+export const CphNgLink = (props: CphNgLinkProps) => {
   return (
-    <Tooltip disableInteractive followCursor {...props}>
-      {props.children}
-    </Tooltip>
+    <CphNgTooltip title={props.name}>
+      <Link
+        href='#'
+        overflow='hidden'
+        textOverflow='ellipsis'
+        underline='hover'
+        {...deleteProps(props, ['name'])}
+      >
+        {props.children}
+      </Link>
+    </CphNgTooltip>
   );
 };

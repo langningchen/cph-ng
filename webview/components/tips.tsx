@@ -21,12 +21,12 @@ import ShuffleIcon from '@mui/icons-material/Shuffle';
 import TryIcon from '@mui/icons-material/Try';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
+import { CphNgButton } from '@w/components/base/cphNgButton';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { CphNgText } from '@w/components/base/cphNgText';
 import { useProblemDispatch } from '@w/context/ProblemContext';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CphFlex } from './base/cphFlex';
-import { CphText } from './base/cphText';
-import { CphButton } from './cphButton';
 
 type TipMessage = {
   msg: string;
@@ -68,34 +68,34 @@ export const Tips = () => {
       severity='info'
     >
       <AlertTitle>
-        <CphFlex>
-          <CphText flex={1}>{t('tips.title')}</CphText>
-          <CphButton
+        <CphNgFlex>
+          <CphNgText flex={1}>{t('tips.title')}</CphNgText>
+          <CphNgButton
             icon={TryIcon}
             name={t('tips.tryNow')}
             disabled={!tipMessages[idx].action}
             onClick={tipMessages[idx].action}
           />
-          <CphButton
+          <CphNgButton
             icon={NavigateBeforeIcon}
             name={t('tips.previousTip')}
             onClick={() => setIdx((idx - 1 + tipMessages.length) % tipMessages.length)}
           />
-          <CphButton
+          <CphNgButton
             icon={ShuffleIcon}
             name={t('tips.randomTip')}
             onClick={() => setIdx(Math.floor(Math.random() * tipMessages.length))}
           />
-          <CphButton
+          <CphNgButton
             icon={NavigateNextIcon}
             name={t('tips.nextTip')}
             onClick={() => setIdx((idx + 1) % tipMessages.length)}
           />
-        </CphFlex>
+        </CphNgFlex>
       </AlertTitle>
-      <CphText>
+      <CphNgText>
         #{idx + 1}. {tipMessages[idx].msg}
-      </CphText>
+      </CphNgText>
     </Alert>
   );
 };

@@ -24,10 +24,10 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { useProblemDispatch } from '@w/context/ProblemContext';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useProblemDispatch } from '../context/ProblemContext';
-import { CphFlex } from './base/cphFlex';
 
 export const DragOverlay = () => {
   const { t } = useTranslation();
@@ -76,7 +76,7 @@ export const DragOverlay = () => {
       open={dragData !== null}
     >
       {dragData ? (
-        <CphFlex width='100%' height='100%' column paddingX={2} justifyContent='center'>
+        <CphNgFlex width='100%' height='100%' column paddingX={2} justifyContent='center'>
           <List
             sx={{
               width: '100%',
@@ -92,15 +92,22 @@ export const DragOverlay = () => {
               </ListItem>
             ))}
           </List>
-        </CphFlex>
+        </CphNgFlex>
       ) : (
-        <CphFlex width='100%' height='100%' column gap={2} color='#ffffff' justifyContent='center'>
+        <CphNgFlex
+          width='100%'
+          height='100%'
+          column
+          gap={2}
+          color='#ffffff'
+          justifyContent='center'
+        >
           <DownloadIcon sx={{ fontSize: 80 }} />
           <Typography variant='h5'>{t('dragOverlay.description')}</Typography>
           <Button variant='contained' color='primary' onClick={() => setDragData(null)}>
             {t('dragOverlay.cancel')}
           </Button>
-        </CphFlex>
+        </CphNgFlex>
       )}
     </Backdrop>
   );

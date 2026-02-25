@@ -33,15 +33,15 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
+import { CphNgButton } from '@w/components/base/cphNgButton';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { CphNgLink } from '@w/components/base/cphNgLink';
+import { RunButtonGroup } from '@w/components/runButtonGroup';
+import { useProblemDispatch } from '@w/context/ProblemContext';
 import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ProblemId } from '@/domain/types';
 import type { IWebviewStressTest } from '@/domain/webviewTypes';
-import { useProblemDispatch } from '../context/ProblemContext';
-import { CphFlex } from './base/cphFlex';
-import { CphLink } from './base/cphLink';
-import { CphButton } from './cphButton';
-import { RunButtonGroup } from './runButtonGroup';
 
 interface ProblemActionsProps {
   problemId: ProblemId;
@@ -66,19 +66,19 @@ export const ProblemActions = memo(
     }, [clickTime]);
     return (
       <>
-        <CphFlex
+        <CphNgFlex
           smallGap
           flexWrap='wrap'
           justifyContent='center'
           onClick={() => setClickTime((times) => [...times, Date.now()].slice(-10))}
         >
-          <CphButton
+          <CphNgButton
             larger
             name={t('problemActions.addTestcase')}
             icon={AddIcon}
             onClick={() => dispatch({ type: 'addTestcase', problemId })}
           />
-          <CphButton
+          <CphNgButton
             larger
             name={t('problemActions.loadTestcases')}
             icon={FileCopyIcon}
@@ -86,7 +86,7 @@ export const ProblemActions = memo(
           />
 
           {hasRunning ? (
-            <CphButton
+            <CphNgButton
               larger
               name={t('problemActions.stopTestcases')}
               icon={PlaylistRemoveIcon}
@@ -109,7 +109,7 @@ export const ProblemActions = memo(
               }
             />
           )}
-          <CphButton
+          <CphNgButton
             larger
             name={t('problemActions.stressTest')}
             icon={CompareArrowsIcon}
@@ -123,7 +123,7 @@ export const ProblemActions = memo(
             try {
               if (new URL(url).hostname === 'codeforces.com') {
                 return (
-                  <CphButton
+                  <CphNgButton
                     larger
                     name={t('problemActions.submitToCodeforces')}
                     icon={BackupIcon}
@@ -140,7 +140,7 @@ export const ProblemActions = memo(
             } catch {}
             return null;
           })()}
-          <CphButton
+          <CphNgButton
             larger
             name={t('problemActions.deleteProblem')}
             icon={DeleteForeverIcon}
@@ -148,7 +148,7 @@ export const ProblemActions = memo(
             onClick={() => setDeleteDialogOpen(true)}
           />
           {!!window.easterEgg && <div title={t('problemActions.easterEgg')}>🐰</div>}
-        </CphFlex>
+        </CphNgFlex>
         <Dialog
           fullWidth
           maxWidth={false}
@@ -185,7 +185,7 @@ export const ProblemActions = memo(
           onClose={() => setStressTestDialogOpen(false)}
         >
           <DialogTitle>{t('problemActions.stressTestDialog.title')}</DialogTitle>
-          <CphButton
+          <CphNgButton
             name={t('problemActions.stressTestDialog.close')}
             onClick={() => setStressTestDialogOpen(false)}
             sx={(theme) => ({
@@ -197,12 +197,12 @@ export const ProblemActions = memo(
             icon={CloseIcon}
           />
           <DialogContent>
-            <CphFlex column>
-              <CphFlex>
+            <CphNgFlex column>
+              <CphNgFlex>
                 <Typography>{t('problemActions.stressTestDialog.generator')}</Typography>
                 {stressTest.generator ? (
                   <>
-                    <CphLink
+                    <CphNgLink
                       name={stressTest.generator.path}
                       onClick={() => {
                         if (stressTest.generator)
@@ -213,8 +213,8 @@ export const ProblemActions = memo(
                       }}
                     >
                       {stressTest.generator.base}
-                    </CphLink>
-                    <CphButton
+                    </CphNgLink>
+                    <CphNgButton
                       icon={CloseIcon}
                       onClick={() =>
                         dispatch({
@@ -227,7 +227,7 @@ export const ProblemActions = memo(
                     />
                   </>
                 ) : (
-                  <CphButton
+                  <CphNgButton
                     icon={FileOpenIcon}
                     onClick={() =>
                       dispatch({
@@ -239,12 +239,12 @@ export const ProblemActions = memo(
                     name={t('problemActions.stressTestDialog.button.chooseGenerator')}
                   />
                 )}
-              </CphFlex>
-              <CphFlex>
+              </CphNgFlex>
+              <CphNgFlex>
                 <Typography>{t('problemActions.stressTestDialog.bruteForce')}</Typography>
                 {stressTest.bruteForce ? (
                   <>
-                    <CphLink
+                    <CphNgLink
                       name={stressTest.bruteForce.path}
                       onClick={() => {
                         if (stressTest.bruteForce)
@@ -255,8 +255,8 @@ export const ProblemActions = memo(
                       }}
                     >
                       {stressTest.bruteForce.base}
-                    </CphLink>
-                    <CphButton
+                    </CphNgLink>
+                    <CphNgButton
                       icon={CloseIcon}
                       onClick={() =>
                         dispatch({
@@ -269,7 +269,7 @@ export const ProblemActions = memo(
                     />
                   </>
                 ) : (
-                  <CphButton
+                  <CphNgButton
                     icon={FileOpenIcon}
                     onClick={() =>
                       dispatch({
@@ -281,10 +281,10 @@ export const ProblemActions = memo(
                     name={t('problemActions.stressTestDialog.button.chooseBruteForce')}
                   />
                 )}
-              </CphFlex>
-              <CphFlex>{stressTest.msg}</CphFlex>
+              </CphNgFlex>
+              <CphNgFlex>{stressTest.msg}</CphNgFlex>
               {stressTest.isRunning ? (
-                <CphButton
+                <CphNgButton
                   name={t('problemActions.stressTestDialog.stop')}
                   onClick={() =>
                     dispatch({
@@ -306,7 +306,7 @@ export const ProblemActions = memo(
                   }}
                 />
               )}
-            </CphFlex>
+            </CphNgFlex>
           </DialogContent>
         </Dialog>
       </>

@@ -20,13 +20,13 @@ import ErrorIcon from '@mui/icons-material/Error';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Chip from '@mui/material/Chip';
-import { CphTooltip } from '@w/components/base/cphTooltip';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
 import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictType } from '@/domain/entities/verdict';
 import type { TestcaseId } from '@/domain/types';
 import type { IWebviewTestcase } from '@/domain/webviewTypes';
-import { CphFlex } from './base/cphFlex';
 
 interface VerdictSummaryProps {
   testcaseOrder: TestcaseId[];
@@ -62,9 +62,9 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
   if (stats.total === 0) return null;
 
   return (
-    <CphFlex alignStart flexWrap='wrap' sx={{ display: { xs: 'none', sm: 'flex' } }}>
+    <CphNgFlex alignStart flexWrap='wrap' sx={{ display: { xs: 'none', sm: 'flex' } }}>
       {stats.passed > 0 && (
-        <CphTooltip title={t('verdictSummary.passed')}>
+        <CphNgTooltip title={t('verdictSummary.passed')}>
           <Chip
             icon={<CheckCircleIcon />}
             label={stats.passed}
@@ -72,10 +72,10 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
             color='success'
             variant='outlined'
           />
-        </CphTooltip>
+        </CphNgTooltip>
       )}
       {stats.failed > 0 && (
-        <CphTooltip title={t('verdictSummary.failed')}>
+        <CphNgTooltip title={t('verdictSummary.failed')}>
           <Chip
             icon={<ErrorIcon />}
             label={stats.failed}
@@ -83,10 +83,10 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
             color='error'
             variant='outlined'
           />
-        </CphTooltip>
+        </CphNgTooltip>
       )}
       {stats.running > 0 && (
-        <CphTooltip title={t('verdictSummary.running')}>
+        <CphNgTooltip title={t('verdictSummary.running')}>
           <Chip
             icon={<HourglassEmptyIcon />}
             label={stats.running}
@@ -94,18 +94,18 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
             color='info'
             variant='outlined'
           />
-        </CphTooltip>
+        </CphNgTooltip>
       )}
       {stats.pending > 0 && (
-        <CphTooltip title={t('verdictSummary.pending')}>
+        <CphNgTooltip title={t('verdictSummary.pending')}>
           <Chip
             icon={<RemoveCircleOutlineIcon />}
             label={stats.pending}
             size='small'
             variant='outlined'
           />
-        </CphTooltip>
+        </CphNgTooltip>
       )}
-    </CphFlex>
+    </CphNgFlex>
   );
 });

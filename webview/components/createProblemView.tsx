@@ -19,11 +19,11 @@ import InputIcon from '@mui/icons-material/Input';
 import SendIcon from '@mui/icons-material/Send';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { Tips } from '@w/components/tips';
 import { useProblemDispatch } from '@w/context/ProblemContext';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { CphFlex } from './base/cphFlex';
-import { Tips } from './tips';
 
 interface CreateProblemProps {
   canImport: boolean;
@@ -33,8 +33,8 @@ export const CreateProblemView = ({ canImport }: CreateProblemProps) => {
   const { t } = useTranslation();
   const dispatch = useProblemDispatch();
   return (
-    <CphFlex column gap={5} paddingY={2}>
-      <CphFlex column>
+    <CphNgFlex column gap={5} paddingY={2}>
+      <CphNgFlex column>
         <Alert
           sx={{ width: '100%', boxSizing: 'border-box' }}
           variant='outlined'
@@ -42,7 +42,7 @@ export const CreateProblemView = ({ canImport }: CreateProblemProps) => {
         >
           {canImport ? t('createProblemView.importAlert') : t('createProblemView.createAlert')}
         </Alert>
-        <CphFlex>
+        <CphNgFlex>
           {!!canImport && (
             <Button
               fullWidth
@@ -65,9 +65,9 @@ export const CreateProblemView = ({ canImport }: CreateProblemProps) => {
           >
             {t('createProblemView.createButton')}
           </Button>
-        </CphFlex>
-      </CphFlex>
+        </CphNgFlex>
+      </CphNgFlex>
       {!!showTips && <Tips />}
-    </CphFlex>
+    </CphNgFlex>
   );
 };

@@ -15,28 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { BoxProps } from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
+import Tooltip, { type TooltipProps } from '@mui/material/Tooltip';
 import React from 'react';
-import { deleteProps } from '../../utils';
 
-interface CphFlexProps extends BoxProps {
-  smallGap?: boolean;
-  column?: boolean;
-  alignStart?: boolean;
-}
+interface CphNgTooltipProps extends TooltipProps {}
 
-export const CphFlex = (props: CphFlexProps) => {
+export const CphNgTooltip = (props: CphNgTooltipProps) => {
   return (
-    <Stack
-      alignItems={props.alignStart ? 'flex-start' : 'center'}
-      flexDirection={props.column ? 'column' : 'row'}
-      gap={props.smallGap ? 0.5 : 1}
-      width='100%'
-      minWidth={0}
-      {...deleteProps(props, ['smallGap', 'column', 'alignStart'])}
-    >
+    <Tooltip disableInteractive followCursor {...props}>
       {props.children}
-    </Stack>
+    </Tooltip>
   );
 };

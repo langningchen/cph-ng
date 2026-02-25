@@ -20,11 +20,11 @@ import FastForwardIcon from '@mui/icons-material/FastForward';
 import { type IconButtonProps, Popover } from '@mui/material';
 import Box from '@mui/material/Box';
 import type SvgIcon from '@mui/material/SvgIcon';
-import { CphFlex } from '@w/components/base/cphFlex';
+import { CphNgButton } from '@w/components/base/cphNgButton';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { getCompile } from '@w/utils';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getCompile } from '../utils';
-import { CphButton } from './cphButton';
 
 interface RunButtonGroupProps {
   icon: typeof SvgIcon;
@@ -73,7 +73,7 @@ export const RunButtonGroup = ({
       onMouseLeave={() => setOpen(false)}
       sx={{ display: 'inline-flex' }}
     >
-      <CphButton
+      <CphNgButton
         icon={icon}
         name={name}
         larger={larger}
@@ -99,9 +99,9 @@ export const RunButtonGroup = ({
         sx={{ pointerEvents: 'none' }}
         slotProps={{ paper: { sx: { pointerEvents: 'auto' } } }}
       >
-        <CphFlex>
+        <CphNgFlex>
           {actions.map((action) => (
-            <CphButton
+            <CphNgButton
               key={action.label}
               icon={action.icon}
               name={action.label}
@@ -113,7 +113,7 @@ export const RunButtonGroup = ({
               }}
             />
           ))}
-        </CphFlex>
+        </CphNgFlex>
       </Popover>
     </Box>
   );

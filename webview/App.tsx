@@ -18,21 +18,21 @@
 import Alert from '@mui/material/Alert';
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { ErrorBoundary } from '@w/components/base/errorBoundary';
+import { BgProblemView } from '@w/components/bgProblemView';
+import { CreateProblemView } from '@w/components/createProblemView';
+import { DragOverlay } from '@w/components/dragOverlay';
+import { InitView } from '@w/components/initView';
+import { ProblemView } from '@w/components/problemView';
+import { WelcomeDialog } from '@w/components/welcomeDialog';
+import { ProblemProvider, useProblemState } from '@w/context/ProblemContext';
+import langEn from '@w/l10n/en.json';
+import langZh from '@w/l10n/zh.json';
 import i18n from 'i18next';
 import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initReactI18next, useTranslation } from 'react-i18next';
-import { CphFlex } from './components/base/cphFlex';
-import { ErrorBoundary } from './components/base/errorBoundary';
-import { BgProblemView } from './components/bgProblemView';
-import { CreateProblemView } from './components/createProblemView';
-import { DragOverlay } from './components/dragOverlay';
-import { InitView } from './components/initView';
-import { ProblemView } from './components/problemView';
-import { WelcomeDialog } from './components/welcomeDialog';
-import { ProblemProvider, useProblemState } from './context/ProblemContext';
-import langEn from './l10n/en.json';
-import langZh from './l10n/zh.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -56,7 +56,7 @@ const Main = () => {
         <DragOverlay />
       </ErrorBoundary>
       <ErrorBoundary>
-        <CphFlex
+        <CphNgFlex
           column
           smallGap
           height='100%'
@@ -82,7 +82,7 @@ const Main = () => {
               {t('main.narrowWidthAlert')}
             </Alert>
           )}
-        </CphFlex>
+        </CphNgFlex>
       </ErrorBoundary>
     </>
   );

@@ -15,22 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { CphNgText } from '@w/components/base/cphNgText';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { CphFlex } from './base/cphFlex';
-import { CphText } from './base/cphText';
 
 export const AcCongrats = () => {
   const { t } = useTranslation();
 
   return (
-    <CphFlex column>
+    <CphNgFlex column>
       <img width='30%' src={partyUri} alt='AC congratulations gif' />
-      <CphText textAlign='center'>
+      <CphNgText textAlign='center'>
         {t('acCongrats.firstLine')}
         <br />
         {t('acCongrats.secondLine')}
-      </CphText>
-    </CphFlex>
+      </CphNgText>
+    </CphNgFlex>
   );
 };

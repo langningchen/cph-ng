@@ -18,13 +18,13 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { CphNgLink } from '@w/components/base/cphNgLink';
+import { CphNgText } from '@w/components/base/cphNgText';
 import { useProblemDispatch } from '@w/context/ProblemContext';
 import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { IWebviewBackgroundProblem } from '@/domain/webviewTypes';
-import { CphFlex } from './base/cphFlex';
-import { CphLink } from './base/cphLink';
-import { CphText } from './base/cphText';
 
 interface BgProblemViewProps {
   bgProblems: IWebviewBackgroundProblem[];
@@ -39,7 +39,7 @@ export const BgProblemView = memo(({ bgProblems }: BgProblemViewProps) => {
 
   return (
     <>
-      <CphText
+      <CphNgText
         sx={{ cursor: 'pointer' }}
         fontSize='smaller'
         onClick={() => {
@@ -49,7 +49,7 @@ export const BgProblemView = memo(({ bgProblems }: BgProblemViewProps) => {
         {t('bgProblemView.message', {
           cnt: bgProblems.length,
         })}
-      </CphText>
+      </CphNgText>
       <Dialog
         fullWidth
         maxWidth={false}
@@ -61,9 +61,9 @@ export const BgProblemView = memo(({ bgProblems }: BgProblemViewProps) => {
         <DialogTitle>{t('bgProblemView.title')}</DialogTitle>
         <DialogContent>
           {bgProblems.length ? (
-            <CphFlex>
+            <CphNgFlex>
               {bgProblems.map((bgProblem) => (
-                <CphLink
+                <CphNgLink
                   key={bgProblem.srcPath}
                   name={bgProblem.srcPath}
                   onClick={() => {
@@ -75,11 +75,11 @@ export const BgProblemView = memo(({ bgProblems }: BgProblemViewProps) => {
                   }}
                 >
                   {bgProblem.name}
-                </CphLink>
+                </CphNgLink>
               ))}
-            </CphFlex>
+            </CphNgFlex>
           ) : (
-            <CphText>{t('bgProblemView.empty')}</CphText>
+            <CphNgText>{t('bgProblemView.empty')}</CphNgText>
           )}
         </DialogContent>
       </Dialog>

@@ -15,21 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { CphNgText } from '@w/components/base/cphNgText';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { CphFlex } from './base/cphFlex';
-import { CphText } from './base/cphText';
 
 export const NoTestcases = () => {
   const { t } = useTranslation();
 
   return (
-    <CphFlex column>
-      <CphText textAlign='center'>
+    <CphNgFlex column>
+      <CphNgText textAlign='center'>
         {t('noTestcases.firstLine')}
         <br />
         {t('noTestcases.secondLine')}
-      </CphText>
-    </CphFlex>
+      </CphNgText>
+    </CphNgFlex>
   );
 };

@@ -17,19 +17,19 @@
 
 import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
 import type SvgIcon from '@mui/material/SvgIcon';
-import { CphTooltip } from '@w/components/base/cphTooltip';
+import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
+import { deleteProps } from '@w/utils';
 import React from 'react';
-import { deleteProps } from '../utils';
 
-interface CphButtonProps extends IconButtonProps {
+interface CphNgButtonProps extends IconButtonProps {
   icon: typeof SvgIcon;
   name: string;
   larger?: boolean;
 }
 
-export const CphButton = (props: CphButtonProps) => {
+export const CphNgButton = (props: CphNgButtonProps) => {
   return (
-    <CphTooltip title={props.name}>
+    <CphNgTooltip title={props.name}>
       <IconButton
         color='primary'
         size={props.larger ? 'medium' : 'small'}
@@ -37,6 +37,6 @@ export const CphButton = (props: CphButtonProps) => {
       >
         <props.icon fontSize='small' />
       </IconButton>
-    </CphTooltip>
+    </CphNgTooltip>
   );
 };

@@ -17,21 +17,21 @@
 
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { CphNgText } from '@w/components/base/cphNgText';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { CphFlex } from './base/cphFlex';
-import { CphText } from './base/cphText';
 
 export const InitView = () => {
   const { t } = useTranslation();
   return (
     <Box flex={1} width='100%'>
-      <CphFlex column height='100%' justifyContent='center' gap={2}>
+      <CphNgFlex column height='100%' justifyContent='center' gap={2}>
         <CircularProgress />
-        <CphText fontWeight='bold' fontSize='bigger'>
+        <CphNgText fontWeight='bold' fontSize='bigger'>
           {t('initView.message')}
-        </CphText>
-      </CphFlex>
+        </CphNgText>
+      </CphNgFlex>
     </Box>
   );
 };

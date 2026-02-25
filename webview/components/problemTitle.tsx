@@ -30,17 +30,17 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Tab from '@mui/material/Tab';
 import TextField from '@mui/material/TextField';
 import type { TypographyProps } from '@mui/material/Typography';
-import { CphTooltip } from '@w/components/base/cphTooltip';
+import { CphNgButton } from '@w/components/base/cphNgButton';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
+import { CphNgLink } from '@w/components/base/cphNgLink';
+import { CphNgMenu } from '@w/components/base/cphNgMenu';
+import { CphNgText } from '@w/components/base/cphNgText';
+import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
+import { useProblemDispatch } from '@w/context/ProblemContext';
 import React, { memo, type SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ProblemId } from '@/domain/types';
 import type { IWebviewFileWithHash, IWebviewOverrides } from '@/domain/webviewTypes';
-import { useProblemDispatch } from '../context/ProblemContext';
-import { CphFlex } from './base/cphFlex';
-import { CphLink } from './base/cphLink';
-import { CphMenu } from './base/cphMenu';
-import { CphText } from './base/cphText';
-import { CphButton } from './cphButton';
 
 interface ProblemTitleProps {
   problemId: ProblemId;
@@ -67,9 +67,9 @@ const formatDuration = (ms: number) => {
 
 const Subtitle = memo<TypographyProps>((props) => {
   return (
-    <CphText fontSize='0.8rem' paddingRight='4px' whiteSpace='normal' {...props}>
+    <CphNgText fontSize='0.8rem' paddingRight='4px' whiteSpace='normal' {...props}>
       {props.children}
-    </CphText>
+    </CphNgText>
   );
 });
 
@@ -140,18 +140,18 @@ export const ProblemTitle = memo(
 
     return (
       <>
-        <CphFlex>
-          <CphFlex column alignStart flexShrink={1} width='unset'>
-            <CphText sx={{ cursor: url ? 'pointer' : 'default' }} title={name} width='100%'>
+        <CphNgFlex>
+          <CphNgFlex column alignStart flexShrink={1} width='unset'>
+            <CphNgText sx={{ cursor: url ? 'pointer' : 'default' }} title={name} width='100%'>
               {url ? (
-                <CphLink href={url} name={url}>
+                <CphNgLink href={url} name={url}>
                   {name}
-                </CphLink>
+                </CphNgLink>
               ) : (
                 name
               )}
-            </CphText>
-            <CphFlex>
+            </CphNgText>
+            <CphNgFlex>
               <Subtitle>
                 {t('problemTitle.timeLimit', {
                   time: overrides.timeLimitMs.override ?? overrides.timeLimitMs.defaultValue,
@@ -164,7 +164,7 @@ export const ProblemTitle = memo(
               </Subtitle>
               {!!checker && (
                 <Subtitle>
-                  <CphLink
+                  <CphNgLink
                     name={checker.path}
                     onClick={() => {
                       if (checker)
@@ -175,12 +175,12 @@ export const ProblemTitle = memo(
                     }}
                   >
                     {t('problemTitle.specialJudge')}
-                  </CphLink>
+                  </CphNgLink>
                 </Subtitle>
               )}
               {!!interactor && (
                 <Subtitle>
-                  <CphLink
+                  <CphNgLink
                     name={interactor.path}
                     onClick={() => {
                       if (interactor)
@@ -191,17 +191,17 @@ export const ProblemTitle = memo(
                     }}
                   >
                     {t('problemTitle.interact')}
-                  </CphLink>
+                  </CphNgLink>
                 </Subtitle>
               )}
-              <CphTooltip title={t('problemTitle.timeElapsed')}>
+              <CphNgTooltip title={t('problemTitle.timeElapsed')}>
                 <Subtitle className='defaultBlur' sx={{ display: { xs: 'none', md: 'inline' } }}>
                   {formatDuration(timeElapsedMs + timeElapsed)}
                 </Subtitle>
-              </CphTooltip>
-            </CphFlex>
-          </CphFlex>
-          <CphMenu
+              </CphNgTooltip>
+            </CphNgFlex>
+          </CphNgFlex>
+          <CphNgMenu
             menu={{
               [t('problemTitle.menu.editRaw')]: () => {
                 dispatch({
@@ -212,15 +212,15 @@ export const ProblemTitle = memo(
               },
             }}
           >
-            <CphButton
+            <CphNgButton
               sx={{ display: { xs: 'none', sm: 'inline' } }}
               name={t('problemTitle.editTitle')}
               icon={EditIcon}
               color='secondary'
               onClick={handleEditTitle}
             />
-          </CphMenu>
-        </CphFlex>
+          </CphNgMenu>
+        </CphNgFlex>
         <Dialog fullScreen open={isEditDialogOpen} onClose={handleEditDialogClose}>
           <DialogTitle>{t('problemTitle.dialog.title')}</DialogTitle>
           <DialogContent>
@@ -330,7 +330,7 @@ export const ProblemTitle = memo(
                 )}
               </TabPanel>
               <TabPanel value='advanced' sx={{ padding: '0' }}>
-                <CphFlex flexWrap='wrap' py={2}>
+                <CphNgFlex flexWrap='wrap' py={2}>
                   {checker ? (
                     <Chip
                       label={t('problemTitle.dialog.field.specialJudge')}
@@ -393,7 +393,7 @@ export const ProblemTitle = memo(
                       }
                     />
                   )}
-                  <CphLink
+                  <CphNgLink
                     name={t('problemTitle.dialog.testlib')}
                     onClick={() => {
                       dispatch({
@@ -402,8 +402,8 @@ export const ProblemTitle = memo(
                     }}
                   >
                     {t('problemTitle.dialog.testlib')}
-                  </CphLink>
-                </CphFlex>
+                  </CphNgLink>
+                </CphNgFlex>
               </TabPanel>
             </TabContext>
           </DialogContent>

@@ -25,9 +25,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CphFlex } from './base/cphFlex';
 
 const STORAGE_KEY = 'cph-ng-welcomed-version';
 
@@ -38,13 +38,13 @@ export const WelcomeDialog = () => {
   return (
     <Dialog fullWidth maxWidth={false} open={open} disableEscapeKeyDown>
       <DialogTitle>
-        <CphFlex alignItems='center' gap={1}>
+        <CphNgFlex alignItems='center' gap={1}>
           <CelebrationIcon color='primary' fontSize='small' />
           {t('welcomeDialog.title', { version })}
-        </CphFlex>
+        </CphNgFlex>
       </DialogTitle>
       <DialogContent>
-        <CphFlex column>
+        <CphNgFlex column>
           <Typography variant='body2' color='primary' fontWeight='bold'>
             {t('welcomeDialog.subtitle')}
           </Typography>
@@ -62,7 +62,7 @@ export const WelcomeDialog = () => {
               {t('welcomeDialog.feedbackLink')}
             </Link>
           </Box>
-        </CphFlex>
+        </CphNgFlex>
       </DialogContent>
       <DialogActions>
         <Button

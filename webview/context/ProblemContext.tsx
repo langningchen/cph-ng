@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { WebviewMsg } from '@w/msgs';
 import { produce } from 'immer';
 import React, {
   createContext,
@@ -31,7 +32,6 @@ import type {
   IWebviewProblem,
   IWebviewTestcaseResult,
 } from '@/domain/webviewTypes';
-import type { WebviewMsg } from '../msgs';
 
 interface CurrentProblemStateIdle {
   type: 'idle';
