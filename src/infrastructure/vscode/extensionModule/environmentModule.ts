@@ -19,6 +19,7 @@ import { inject, injectable } from 'tsyringe';
 import { type ExtensionContext, extensions } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ICompanion } from '@/application/ports/services/ICompanion';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
@@ -39,6 +40,7 @@ export class EnvironmentModule implements IExtensionModule {
     @inject(TOKENS.ui) private readonly ui: IUi,
     @inject(TOKENS.companion) private readonly companion: ICompanion,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
   ) {}
 
   public async setup(context: ExtensionContext) {
@@ -71,8 +73,9 @@ export class EnvironmentModule implements IExtensionModule {
     context.subscriptions.push({ dispose: () => this.dispose() });
   }
 
-  public dispose() {
+  public async dispose() {
     if (this.timer) clearInterval(this.timer);
     this.companion.disconnect();
+    await this.repo.dispose();
   }
 }

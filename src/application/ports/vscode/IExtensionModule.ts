@@ -15,9 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Promisable } from 'type-fest';
 import type { ExtensionContext } from 'vscode';
 
 export interface IExtensionModule {
-  setup(context: ExtensionContext): Promise<void> | void;
-  dispose?(): void;
+  setup(context: ExtensionContext): Promisable<void>;
+  dispose?(): Promisable<void>;
 }

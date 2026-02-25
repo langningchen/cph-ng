@@ -49,6 +49,6 @@ export class ExtensionManager {
 
   public async deactivate() {
     this.logger.info('Deactivating CPH-NG');
-    for (const module of this.modules) module.dispose?.();
+    for (const module of this.modules) await module.dispose?.();
   }
 }

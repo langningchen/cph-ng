@@ -118,4 +118,9 @@ export class ProblemRepository implements IProblemRepository {
     this.logger.debug('Unloaded problem', problemId);
     return true;
   }
+
+  public async dispose(): Promise<void> {
+    this.logger.debug('Disposing problem repository, unloading all problems');
+    for (const problemId of this.backgroundProblems.keys()) await this.unload(problemId);
+  }
 }

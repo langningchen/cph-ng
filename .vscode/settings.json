@@ -32,6 +32,7 @@
     "objcopy",
     "partysocket",
     "problemset",
+    "Promisable",
     "testlib",
     "tsyringe",
     "ucrtbase",

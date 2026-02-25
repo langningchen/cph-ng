@@ -24,4 +24,5 @@ export interface IProblemRepository {
   get(problemId?: ProblemId): Promise<BackgroundProblem | undefined>;
   persist(problemId: ProblemId): Promise<boolean>;
   unload(problemId: ProblemId): Promise<boolean>;
+  dispose(): Promise<void>;
 }
