@@ -6,6 +6,8 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 
 - **fix**: validate wrapper report format and handle errors
 - **fix**: save problems before reload
+- **feat**: add commitlint scope
+- **chore**: upgrade settings file
 
 ## 0.6.2
 

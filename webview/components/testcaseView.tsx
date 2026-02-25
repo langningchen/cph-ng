@@ -23,7 +23,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
-import Tooltip from '@mui/material/Tooltip';
+import { CphTooltip } from '@w/components/base/cphTooltip';
 import MD5 from 'crypto-js/md5';
 import { isNil } from 'lodash';
 import React, { memo, useMemo } from 'react';
@@ -327,7 +327,7 @@ export const TestcaseView = memo(
               <CphFlex flex={1}>
                 <CphText fontWeight='bold'>#{idx + 1}</CphText>
                 {!!testcase.result?.verdict && (
-                  <Tooltip disableInteractive followCursor title={testcase.result.verdict.fullName}>
+                  <CphTooltip title={testcase.result.verdict.fullName}>
                     <Chip
                       label={testcase.result.verdict.name}
                       size='small'
@@ -339,7 +339,7 @@ export const TestcaseView = memo(
                         fontSize: '0.75rem',
                       }}
                     />
-                  </Tooltip>
+                  </CphTooltip>
                 )}
               </CphFlex>
               {!isNil(testcase.result?.memoryMb) && (

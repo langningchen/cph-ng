@@ -29,6 +29,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import InputAdornment from '@mui/material/InputAdornment';
 import Tab from '@mui/material/Tab';
 import TextField from '@mui/material/TextField';
+import type { TypographyProps } from '@mui/material/Typography';
+import { CphTooltip } from '@w/components/base/cphTooltip';
 import React, { memo, type SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ProblemId } from '@/domain/types';
@@ -62,6 +64,14 @@ const formatDuration = (ms: number) => {
   const ss = (totalSec % 60).toString().padStart(2, '0');
   return `${hh}:${mm}:${ss}`;
 };
+
+const Subtitle = memo<TypographyProps>((props) => {
+  return (
+    <CphText fontSize='0.8rem' paddingRight='4px' whiteSpace='normal' {...props}>
+      {props.children}
+    </CphText>
+  );
+});
 
 export const ProblemTitle = memo(
   ({
@@ -141,17 +151,19 @@ export const ProblemTitle = memo(
                 name
               )}
             </CphText>
-            <CphText fontSize='0.8rem' paddingRight='4px' whiteSpace='normal'>
-              {t('problemTitle.timeLimit', {
-                time: overrides.timeLimitMs.override ?? overrides.timeLimitMs.defaultValue,
-              })}
-              &emsp;
-              {t('problemTitle.memoryLimit', {
-                memory: overrides.memoryLimitMb.override ?? overrides.memoryLimitMb.defaultValue,
-              })}
+            <CphFlex>
+              <Subtitle>
+                {t('problemTitle.timeLimit', {
+                  time: overrides.timeLimitMs.override ?? overrides.timeLimitMs.defaultValue,
+                })}
+              </Subtitle>
+              <Subtitle>
+                {t('problemTitle.memoryLimit', {
+                  memory: overrides.memoryLimitMb.override ?? overrides.memoryLimitMb.defaultValue,
+                })}
+              </Subtitle>
               {!!checker && (
-                <>
-                  &emsp;
+                <Subtitle>
                   <CphLink
                     name={checker.path}
                     onClick={() => {
@@ -164,11 +176,10 @@ export const ProblemTitle = memo(
                   >
                     {t('problemTitle.specialJudge')}
                   </CphLink>
-                </>
+                </Subtitle>
               )}
               {!!interactor && (
-                <>
-                  &emsp;
+                <Subtitle>
                   <CphLink
                     name={interactor.path}
                     onClick={() => {
@@ -181,15 +192,14 @@ export const ProblemTitle = memo(
                   >
                     {t('problemTitle.interact')}
                   </CphLink>
-                </>
+                </Subtitle>
               )}
-              <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}>
-                &emsp;
-                <span title={t('problemTitle.timeElapsed')} className='defaultBlur'>
+              <CphTooltip title={t('problemTitle.timeElapsed')}>
+                <Subtitle className='defaultBlur' sx={{ display: { xs: 'none', md: 'inline' } }}>
                   {formatDuration(timeElapsedMs + timeElapsed)}
-                </span>
-              </Box>
-            </CphText>
+                </Subtitle>
+              </CphTooltip>
+            </CphFlex>
           </CphFlex>
           <CphMenu
             menu={{

@@ -20,7 +20,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Chip from '@mui/material/Chip';
-import Tooltip from '@mui/material/Tooltip';
+import { CphTooltip } from '@w/components/base/cphTooltip';
 import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VerdictType } from '@/domain/entities/verdict';
@@ -64,7 +64,7 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
   return (
     <CphFlex alignStart flexWrap='wrap' sx={{ display: { xs: 'none', sm: 'flex' } }}>
       {stats.passed > 0 && (
-        <Tooltip disableInteractive followCursor title={t('verdictSummary.passed')}>
+        <CphTooltip title={t('verdictSummary.passed')}>
           <Chip
             icon={<CheckCircleIcon />}
             label={stats.passed}
@@ -72,10 +72,10 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
             color='success'
             variant='outlined'
           />
-        </Tooltip>
+        </CphTooltip>
       )}
       {stats.failed > 0 && (
-        <Tooltip disableInteractive followCursor title={t('verdictSummary.failed')}>
+        <CphTooltip title={t('verdictSummary.failed')}>
           <Chip
             icon={<ErrorIcon />}
             label={stats.failed}
@@ -83,10 +83,10 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
             color='error'
             variant='outlined'
           />
-        </Tooltip>
+        </CphTooltip>
       )}
       {stats.running > 0 && (
-        <Tooltip disableInteractive followCursor title={t('verdictSummary.running')}>
+        <CphTooltip title={t('verdictSummary.running')}>
           <Chip
             icon={<HourglassEmptyIcon />}
             label={stats.running}
@@ -94,17 +94,17 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
             color='info'
             variant='outlined'
           />
-        </Tooltip>
+        </CphTooltip>
       )}
       {stats.pending > 0 && (
-        <Tooltip disableInteractive followCursor title={t('verdictSummary.pending')}>
+        <CphTooltip title={t('verdictSummary.pending')}>
           <Chip
             icon={<RemoveCircleOutlineIcon />}
             label={stats.pending}
             size='small'
             variant='outlined'
           />
-        </Tooltip>
+        </CphTooltip>
       )}
     </CphFlex>
   );

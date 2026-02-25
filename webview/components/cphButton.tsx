@@ -17,7 +17,7 @@
 
 import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
 import type SvgIcon from '@mui/material/SvgIcon';
-import Tooltip from '@mui/material/Tooltip';
+import { CphTooltip } from '@w/components/base/cphTooltip';
 import React from 'react';
 import { deleteProps } from '../utils';
 
@@ -29,7 +29,7 @@ interface CphButtonProps extends IconButtonProps {
 
 export const CphButton = (props: CphButtonProps) => {
   return (
-    <Tooltip disableInteractive followCursor title={props.name}>
+    <CphTooltip title={props.name}>
       <IconButton
         color='primary'
         size={props.larger ? 'medium' : 'small'}
@@ -37,6 +37,6 @@ export const CphButton = (props: CphButtonProps) => {
       >
         <props.icon fontSize='small' />
       </IconButton>
-    </Tooltip>
+    </CphTooltip>
   );
 };
