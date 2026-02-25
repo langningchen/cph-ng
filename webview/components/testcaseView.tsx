@@ -345,30 +345,34 @@ export const TestcaseView = memo(
                 )}
               </CphNgFlex>
               {!isNil(testcase.result?.memoryMb) && (
-                <Chip
-                  label={t('testcaseView.memory', {
-                    memory: testcase.result.memoryMb.toFixed(1),
-                  })}
-                  size='small'
-                  variant='outlined'
-                  sx={{
-                    fontSize: '0.8rem',
-                    display: { xs: 'none', xl: 'flex' },
-                  }}
-                />
+                <CphNgTooltip title={testcase.result.memoryMb}>
+                  <Chip
+                    label={t('testcaseView.memory', {
+                      memory: testcase.result.memoryMb.toFixed(1),
+                    })}
+                    size='small'
+                    variant='outlined'
+                    sx={{
+                      fontSize: '0.8rem',
+                      display: { xs: 'none', xl: 'flex' },
+                    }}
+                  />
+                </CphNgTooltip>
               )}
               {!isNil(testcase.result?.timeMs) && (
-                <Chip
-                  label={t('testcaseView.time', {
-                    time: testcase.result.timeMs.toFixed(1),
-                  })}
-                  size='small'
-                  variant='outlined'
-                  sx={{
-                    fontSize: '0.8rem',
-                    display: { xs: 'none', lg: 'flex' },
-                  }}
-                />
+                <CphNgTooltip title={testcase.result.timeMs}>
+                  <Chip
+                    label={t('testcaseView.time', {
+                      time: testcase.result.timeMs.toFixed(1),
+                    })}
+                    size='small'
+                    variant='outlined'
+                    sx={{
+                      fontSize: '0.8rem',
+                      display: { xs: 'none', lg: 'flex' },
+                    }}
+                  />
+                </CphNgTooltip>
               )}
               {isRunning ? (
                 <CphNgButton
