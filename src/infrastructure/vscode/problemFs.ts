@@ -16,6 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { EventEmitter } from 'node:events';
+import { decode, encode } from 'hi-base32';
 import { inject, injectable } from 'tsyringe';
 import type TypedEventEmitter from 'typed-emitter';
 import {
@@ -31,6 +32,7 @@ import {
   EventEmitter as vsEventEmitter,
 } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
@@ -71,21 +73,22 @@ export class ProblemFs implements IProblemFs {
 
   public constructor(
     @inject(ProblemMapper) private readonly mapper: ProblemMapper,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.testcaseIoService) private readonly testcaseIoService: ITestcaseIoService,
-    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
   ) {
     this.logger = this.logger.withScope('problemFs');
 
     this.signals.on('patchProblem', (srcPath: string) => {
-      const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
+      const baseUri = this.getUri(srcPath, '/');
       this.changeEmitter.fire([
         { uri: Uri.joinPath(baseUri, 'problem.cph-ng.json'), type: FileChangeType.Changed },
       ]);
     });
     this.signals.on('addTestcase', (srcPath: string, testcaseId: TestcaseId, payload: Testcase) => {
-      const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
+      const baseUri = this.getUri(srcPath, '/');
       const addedFiles = ['stdin', 'answer'];
       if (payload.result?.stdout) addedFiles.push('stdout');
       if (payload.result?.stderr) addedFiles.push('stderr');
@@ -98,7 +101,7 @@ export class ProblemFs implements IProblemFs {
       ]);
     });
     this.signals.on('deleteTestcase', (srcPath: string, testcaseId: TestcaseId) => {
-      const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
+      const baseUri = this.getUri(srcPath, '/');
       const deletedFiles = ['stdin', 'answer', 'stdout', 'stderr'];
       this.changeEmitter.fire([
         { uri: Uri.joinPath(baseUri, 'problem.cph-ng.json'), type: FileChangeType.Changed },
@@ -111,14 +114,15 @@ export class ProblemFs implements IProblemFs {
     this.signals.on(
       'patchTestcase',
       (srcPath: string, testcaseId: TestcaseId, payload: Partial<Testcase | TestcaseResult>) => {
-        const baseUri = Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path: '/' });
+        const baseUri = this.getUri(srcPath, '/');
         const changedFiles = [];
         if ('stdin' in payload && payload.stdin) changedFiles.push('stdin');
         if ('answer' in payload && payload.answer) changedFiles.push('answer');
         if ('stdout' in payload && payload.stdout) changedFiles.push('stdout');
         if ('stderr' in payload && payload.stderr) changedFiles.push('stderr');
+        const problemUri = Uri.joinPath(baseUri, 'problem.cph-ng.json');
         this.changeEmitter.fire([
-          { uri: Uri.joinPath(baseUri, 'problem.cph-ng.json'), type: FileChangeType.Changed },
+          { uri: problemUri, type: FileChangeType.Changed },
           ...changedFiles.map((type) => ({
             uri: Uri.joinPath(baseUri, 'testcases', testcaseId, type),
             type: FileChangeType.Changed,
@@ -129,14 +133,22 @@ export class ProblemFs implements IProblemFs {
   }
 
   public getUri(srcPath: string, path: string) {
-    return Uri.from({ scheme: ProblemFs.scheme, authority: srcPath, path });
+    const authority = encode(srcPath).replaceAll('=', '');
+    const base = Uri.from({ scheme: ProblemFs.scheme, authority, path: '/' });
+    return Uri.joinPath(base, this.path.basename(srcPath), path);
+  }
+  private parseUri(uri: Uri): { srcPath: string; path: string } {
+    const srcPath = decode(uri.authority);
+    const path = uri.path.substring(1 + this.path.basename(srcPath).length);
+    return { srcPath, path };
   }
 
-  public async parseUri(uri: Uri): Promise<CphFsItem> {
-    const backgroundProblem = await this.repo.loadByPath(uri.authority);
+  private async getFile(uri: Uri): Promise<CphFsItem> {
+    const { srcPath, path } = this.parseUri(uri);
+    const backgroundProblem = await this.repo.loadByPath(srcPath);
     if (!backgroundProblem) throw FileSystemError.FileNotFound();
     const problem = backgroundProblem.problem;
-    const pathParts = uri.path.split('/').filter((p) => p.length > 0);
+    const pathParts = path.split('/').filter((p) => p.length > 0);
     const testcaseIds = problem.getEnabledTestcaseIds();
     const root: CphFsDir = [
       [
@@ -203,7 +215,7 @@ export class ProblemFs implements IProblemFs {
   }
 
   public async stat(uri: Uri): Promise<FileStat> {
-    const item = await this.parseUri(uri);
+    const item = await this.getFile(uri);
     if (Array.isArray(item)) {
       return {
         type: FileType.Directory,
@@ -232,14 +244,14 @@ export class ProblemFs implements IProblemFs {
   }
 
   public async readFile(uri: Uri): Promise<Uint8Array> {
-    const item = await this.parseUri(uri);
+    const item = await this.getFile(uri);
     if (Array.isArray(item)) throw FileSystemError.FileIsADirectory();
     const data = item.data instanceof Uri ? await this.fs.readFile(item.data.fsPath) : item.data;
     return Buffer.from(data);
   }
 
   public async writeFile(uri: Uri, content: Uint8Array): Promise<void> {
-    const item = await this.parseUri(uri);
+    const item = await this.getFile(uri);
     if (Array.isArray(item)) throw FileSystemError.FileIsADirectory();
     if (!item.set) throw FileSystemError.NoPermissions();
     await item.set(content.toString());
@@ -256,7 +268,7 @@ export class ProblemFs implements IProblemFs {
     throw FileSystemError.NoPermissions();
   }
   public async readDirectory(uri: Uri): Promise<[string, FileType][]> {
-    const item = await this.parseUri(uri);
+    const item = await this.getFile(uri);
     if (!Array.isArray(item)) throw FileSystemError.FileNotADirectory();
     return item.map(([name, child]) => [
       name,

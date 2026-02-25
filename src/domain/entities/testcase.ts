@@ -117,13 +117,13 @@ export class Testcase {
     ];
   }
   public isRelated(path: string): boolean {
-    path = path.toLowerCase();
-    return (
-      this.stdin.path?.toLowerCase() === path ||
-      this.answer.path?.toLowerCase() === path ||
-      this._result?.stdout?.path?.toLowerCase() === path ||
-      this._result?.stderr?.path?.toLowerCase() === path
-    );
+    const paths = [
+      this.stdin.path,
+      this.answer.path,
+      this._result?.stdout?.path,
+      this._result?.stderr?.path,
+    ];
+    return paths.includes(path);
   }
   private formatMessage(oldMsg: string | null, newMsg?: string | null): string | null {
     if (!newMsg) return oldMsg;

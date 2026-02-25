@@ -185,15 +185,14 @@ export class Problem {
     return disposables;
   }
   public isRelated(path: string): boolean {
-    path = path.toLowerCase();
-    if (
-      this.src.path?.toLowerCase() === path ||
-      this._checker?.path?.toLowerCase() === path ||
-      this._interactor?.path?.toLowerCase() === path ||
-      this._stressTest?.bruteForce?.path?.toLowerCase() === path ||
-      this._stressTest?.generator?.path?.toLowerCase() === path
-    )
-      return true;
+    const paths = [
+      this.src.path,
+      this._checker?.path,
+      this._interactor?.path,
+      this._stressTest?.bruteForce?.path,
+      this._stressTest?.generator?.path,
+    ];
+    if (paths.includes(path)) return true;
     for (const [_, testcase] of this._testcases) if (testcase.isRelated(path)) return true;
     return false;
   }

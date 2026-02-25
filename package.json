@@ -833,6 +833,7 @@
     "commander": "^14.0.3",
     "copy-webpack-plugin": "^13.0.1",
     "crypto-js": "^4.2.0",
+    "hi-base32": "^0.5.1",
     "hono": "^4.12.2",
     "i18next": "^25.8.13",
     "immer": "^11.1.4",

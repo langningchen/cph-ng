@@ -37,10 +37,7 @@ export class DocumentAdapter implements IDocument {
   };
 
   public async save(path: string): Promise<void> {
-    path = path.toLowerCase();
-    const editor = window.visibleTextEditors.find(
-      (editor) => editor.document.fileName?.toLowerCase() === path,
-    );
+    const editor = window.visibleTextEditors.find((editor) => editor.document.fileName === path);
     if (editor) {
       await editor.document.save();
       await this.waitUntil(() => !editor.document.isDirty);

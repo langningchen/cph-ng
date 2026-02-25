@@ -169,13 +169,13 @@ export class ProblemService implements IProblemService {
 
   public isRelated(problem: Problem, path: string): boolean {
     if (!path) return false;
-    path = path.toLowerCase();
 
     // We always consider the IO files related to the problem
+    const ext = extname(path).toLowerCase();
     if (
-      this.settings.problem.inputFileExtensionList.includes(extname(path)) ||
-      this.settings.problem.outputFileExtensionList.includes(extname(path)) ||
-      path.startsWith(this.resolver.renderPath(this.settings.cache.directory).toLowerCase()) ||
+      this.settings.problem.inputFileExtensionList.includes(ext) ||
+      this.settings.problem.outputFileExtensionList.includes(ext) ||
+      path.startsWith(this.resolver.renderPath(this.settings.cache.directory)) ||
       problem.isRelated(path)
     )
       return true;
