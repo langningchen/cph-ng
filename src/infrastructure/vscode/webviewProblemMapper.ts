@@ -137,10 +137,14 @@ export class WebviewProblemMapper {
       [StressTestState.internalError]: this.translator.t('Internal Error'),
     };
     return {
-      generator: stressTest.generator ? this.fileWithHashToDto(stressTest.generator) : undefined,
-      bruteForce: stressTest.bruteForce ? this.fileWithHashToDto(stressTest.bruteForce) : undefined,
+      generator: stressTest.generator
+        ? this.fileWithHashToDto(stressTest.generator)
+        : stressTest.generator,
+      bruteForce: stressTest.bruteForce
+        ? this.fileWithHashToDto(stressTest.bruteForce)
+        : stressTest.bruteForce,
       isRunning: isRunningState(stressTest.state),
-      msg: stressTest.state ? msgs[stressTest.state] : undefined,
+      msg: stressTest.state ? msgs[stressTest.state] : stressTest.state,
     };
   }
 
