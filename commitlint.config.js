@@ -8,5 +8,10 @@ export default {
     ],
     'type-case': [2, 'always', 'lower-case'],
     'subject-full-stop': [2, 'never', '.'],
-  },
+    'scope-enum': [
+      2,
+      'always',
+      ['webview', 'router', 'api', 'core', 'config', 'deps', 'readme']
+    ],
+  }
 };
