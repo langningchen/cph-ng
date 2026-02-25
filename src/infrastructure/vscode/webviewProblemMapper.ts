@@ -119,7 +119,7 @@ export class WebviewProblemMapper {
   public stressTestToDto(stressTest: Partial<StressTest>): Partial<IWebviewStressTest>;
   public stressTestToDto(stressTest: Partial<StressTest>): Partial<IWebviewStressTest> {
     const msgs = {
-      [StressTestState.inactive]: this.translator.t('Brute Force Compare is Idle'),
+      [StressTestState.inactive]: this.translator.t('Stress Test is Idle'),
       [StressTestState.compiling]: this.translator.t('Compiling...'),
       [StressTestState.compilationError]: this.translator.t('Compilation Error'),
       [StressTestState.generating]: this.translator.t('Generating Data (#{cnt})...', {

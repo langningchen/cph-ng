@@ -33,7 +33,7 @@ This is the next generation of the
 | Store Result and Time   | ❌                       | ✅                       |
 | Cache compiled program  | ❌                       | ✅ [^3]                  |
 | SPJ and interactive     | ❌                       | ✅                       |
-| Brute Force Compare     | ❌                       | ✅                       |
+| Stress Test             | ❌                       | ✅                       |
 
 [^1]: CPH-NG supports C/C++, Java, Python, JavaScript, Rust
 

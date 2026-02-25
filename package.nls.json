@@ -110,7 +110,7 @@
   "cph-ng.configuration.sidebar.title": "Sidebar",
   "cph-ng.configuration.stressTest.properties.bruteForceTimeLimit.markdownDescription": "Set the **time limit** for the brute force run (in **milliseconds**). If the brute force does not complete within this time, it will be terminated. This helps prevent the brute force from running too long and affecting overall performance.",
   "cph-ng.configuration.stressTest.properties.generatorTimeLimit.markdownDescription": "Set the **time limit** for the generator run (in **milliseconds**). If the generator does not complete within this time, it will be terminated. This helps prevent the generator from running too long and affecting overall performance.",
-  "cph-ng.configuration.stressTest.title": "Brute Force Compare",
+  "cph-ng.configuration.stressTest.title": "Stress Test",
   "cph-ng.sidebar.hiddenStatuses.enumDescriptions.AC": "Accepted",
   "cph-ng.sidebar.hiddenStatuses.enumDescriptions.CE": "Compilation Error",
   "cph-ng.sidebar.hiddenStatuses.enumDescriptions.CMP": "Comparing",
