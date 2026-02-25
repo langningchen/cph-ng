@@ -20,7 +20,6 @@ permissions:
   id-token: write
   attestations: write
   issues: write
-  pages: write
 
 jobs:
   release:
@@ -89,9 +88,7 @@ jobs:
       - name: Package
         run: pnpm package
         env:
-          BUILD_TYPE:
-            ${{ steps.version.outputs.pre_release == 'true' && 'Pre-release' ||
-            'Release' }}
+          BUILD_TYPE: ${{ steps.version.outputs.pre_release == 'true' && 'Pre-release' || 'Release' }}
 
       - name: Extract Changelog
         id: changelog
@@ -128,8 +125,6 @@ jobs:
           prerelease: ${{ steps.version.outputs.pre_release }}
           generate_release_notes: false
           body: |
-            🎉 New release v${{ steps.version.outputs.version }}
-
             ## What's Changed
             ${{ steps.changelog.outputs.CHANGELOG_CONTENT }}
 
