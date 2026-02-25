@@ -10,6 +10,8 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 - **chore**: upgrade settings file
 - **fix**(webview): use custom tooltip element
 - **fix**(webview): improve error handling for large files and message processing
+- **fix**(core): webview patch message
+- **chore**(deps): upgrade packages
 
 ## 0.6.2
 
