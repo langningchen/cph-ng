@@ -32,8 +32,8 @@ export class LangC extends AbstractLanguageStrategy {
   ) {
     super({ ...context, logger: logger.withScope('langsC') });
     this.defaultValues = {
-      compiler: this.settings.compilation.cCompiler,
-      compilerArgs: this.settings.compilation.cArgs,
+      compiler: this.settings.languages.cCompiler,
+      compilerArgs: this.settings.languages.cCompilerArgs,
     } satisfies ILanguageDefaultValues;
   }
 
@@ -53,7 +53,7 @@ export class LangC extends AbstractLanguageStrategy {
 
     const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
     const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
-    const { unlimitedStack } = this.settings.runner;
+    const { unlimitedStack } = this.settings.run;
 
     const { skip, hash } = await this.checkHash(
       src,

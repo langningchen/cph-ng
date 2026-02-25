@@ -236,7 +236,7 @@ describe('ExternalRunnerStrategy', () => {
 
     const resultPromise = strategy.execute(mockCtxNoArg, signal);
     await vi.advanceTimersByTimeAsync(
-      mockCtxNoArg.timeLimitMs + settingsMock.runner.timeAddition + 100,
+      mockCtxNoArg.timeLimitMs + settingsMock.run.timeAddition + 100,
     );
     const result = await resultPromise;
 
@@ -427,7 +427,7 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
     beforeEach(async () => {
       settingsMock.cache.directory = testWorkspace = createTestWorkspace();
       writeFileSync(join(testWorkspace, inputFile), '');
-      settingsMock.runner.timeAddition = 100;
+      settingsMock.run.timeAddition = 100;
 
       runnerProviderMock = mock<IRunnerProvider>();
       runnerProviderMock.getRunnerPath.mockResolvedValue(mockRunnerPath);
@@ -520,7 +520,7 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
       };
 
       await run(stackOverflow);
-      settingsMock.runner.unlimitedStack = true;
+      settingsMock.run.unlimitedStack = true;
       await run(0);
     }, 10000);
   },

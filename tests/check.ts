@@ -21,7 +21,7 @@ import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 
 export const hasCppCompiler = (() => {
   try {
-    execSync(`${settingsMock.compilation.cppCompiler} --version`, {
+    execSync(`${settingsMock.languages.cppCompiler} --version`, {
       stdio: 'ignore',
     });
     return true;

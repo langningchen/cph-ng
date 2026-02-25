@@ -166,11 +166,19 @@ export class Companion implements ICompanion {
     if (!problem.url) throw new Error(this.translator.t('Problem URL is undefined'));
     this.logger.info('Submitting problem', { problem });
 
+    let sourceCode = await this.fs.readFile(problem.src.path);
+    if (sourceCode.trim() === '') {
+      this.ui.alert('warn', this.translator.t('Source code is empty'));
+      return;
+    }
+    if (this.settings.companion.addTimestamp)
+      sourceCode += `\n// Submitted via cph-ng at ${new Date().toISOString()}`;
+
     const data = {
       empty: false,
       problemName: problem.name,
       url: problem.url,
-      sourceCode: await this.fs.readFile(problem.src.path),
+      sourceCode,
       languageId: this.settings.companion.submitLanguage,
     } satisfies CphSubmitData;
 

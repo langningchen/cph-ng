@@ -207,7 +207,7 @@ export class UiAdapter implements IUi {
 
   public openFile(uri: Uri): void {
     this.logger.trace('Opening file', { uri });
-    commands.executeCommand('vscode.open', uri, this.settings.companion.showPanel);
+    commands.executeCommand('vscode.open', uri, this.settings.basic.showPanel);
   }
 
   public openChat(topic: string): void {

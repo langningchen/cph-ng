@@ -53,7 +53,7 @@ describe('SolutionRunnerAdapter', () => {
     });
 
     it('should use external strategy when useRunner is enabled', async () => {
-      settingsMock.runner.useRunner = true;
+      settingsMock.run.useRunner = true;
       const strategyMock = mock<IExecutionStrategy>();
       strategyMock.execute.mockResolvedValue({
         codeOrSignal: 0,
@@ -70,7 +70,7 @@ describe('SolutionRunnerAdapter', () => {
     });
 
     it('should use wrapper strategy when useWrapper is enabled', async () => {
-      settingsMock.compilation.useWrapper = true;
+      settingsMock.run.useWrapper = true;
       const strategyMock = mock<IExecutionStrategy>();
       strategyMock.execute.mockResolvedValue({
         codeOrSignal: 0,
@@ -87,8 +87,8 @@ describe('SolutionRunnerAdapter', () => {
     });
 
     it('should return ExecutionRejected when both useRunner and useWrapper are enabled', async () => {
-      settingsMock.runner.useRunner = true;
-      settingsMock.compilation.useWrapper = true;
+      settingsMock.run.useRunner = true;
+      settingsMock.run.useWrapper = true;
 
       const result = await runner.run(ctx, signal);
 

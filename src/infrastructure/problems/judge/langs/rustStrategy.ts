@@ -49,8 +49,8 @@ export class LangRust extends AbstractLanguageStrategy {
   ) {
     super({ ...context, logger: logger.withScope('langsRust') });
     this.defaultValues = {
-      compiler: this.settings.compilation.rustCompiler,
-      compilerArgs: this.settings.compilation.rustArgs,
+      compiler: this.settings.languages.rustCompiler,
+      compilerArgs: this.settings.languages.rustCompilerArgs,
     } satisfies ILanguageDefaultValues;
   }
 
@@ -76,7 +76,7 @@ export class LangRust extends AbstractLanguageStrategy {
 
     const compilerArgs = args.split(/\s+/).filter(Boolean);
     const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
-    if (this.settings.runner.unlimitedStack && this.sys.platform() === 'win32') {
+    if (this.settings.run.unlimitedStack && this.sys.platform() === 'win32') {
       cmd.push('-C', 'link-args=-Wl,--stack,268435456');
     }
 

@@ -69,7 +69,7 @@ export class RunnerProviderAdapter implements IRunnerProvider {
 
     this.logger.info('Compiling runner utility...', { srcPath, outputPath });
 
-    const compiler = this.settings.compilation.cppCompiler;
+    const compiler = this.settings.languages.cppCompiler;
     const flags = isWin ? ['-lpsapi', '-ladvapi32', '-static'] : ['-pthread'];
     const cmd = [compiler, srcPath, '-o', outputPath, ...flags, '-O3'];
     const result = await this.executor.execute({ cmd, signal });

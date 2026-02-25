@@ -47,12 +47,12 @@ export class WrapperStrategy implements IExecutionStrategy {
     const reportPath = this.tmp.create('wrapperStrategy.reportPath');
     const res = await this.executor.execute({
       cmd: ctx.cmd,
-      timeoutMs: ctx.timeLimitMs + this.settings.runner.timeAddition,
+      timeoutMs: ctx.timeLimitMs + this.settings.run.timeAddition,
       stdinPath: ctx.stdinPath,
       signal,
       env: {
         CPH_NG_REPORT_PATH: reportPath,
-        CPH_NG_UNLIMITED_STACK: this.settings.runner.unlimitedStack ? '1' : '0',
+        CPH_NG_UNLIMITED_STACK: this.settings.run.unlimitedStack ? '1' : '0',
       },
     });
     if (res instanceof Error) {

@@ -172,7 +172,7 @@
       "cphNgContainer": [
         {
           "id": "cphNgSidebar",
-          "name": "%cph-ng.views.cphNgContainer.name%",
+          "name": "%views.cphNgContainer.name%",
           "type": "webview",
           "icon": "./res/panel-view-icon.svg"
         }
@@ -182,7 +182,7 @@
       "activitybar": [
         {
           "id": "cphNgContainer",
-          "title": "%cph-ng.viewsContainers.activitybar.title%",
+          "title": "%viewsContainers.activitybar%",
           "icon": "./res/panel-view-icon.svg"
         }
       ]
@@ -191,7 +191,7 @@
       {
         "id": "basic",
         "order": 0,
-        "title": "%cph-ng.configuration.basic.title%",
+        "title": "%config.basic%",
         "properties": {
           "cph-ng.basic.folderOpener": {
             "type": "string",
@@ -200,367 +200,16 @@
               "tree",
               "flat"
             ],
-            "markdownDescription": "%cph-ng.configuration.basic.properties.folderOpener.markdownDescription%",
+            "markdownDescription": "%config.basic.folderOpener%",
             "markdownEnumDescriptions": [
-              "%cph-ng.configuration.basic.properties.folderOpener.enumDescriptions.tree%",
-              "%cph-ng.configuration.basic.properties.folderOpener.enumDescriptions.flat%"
-            ]
-          }
-        }
-      },
-      {
-        "id": "compilation",
-        "order": 1,
-        "title": "%cph-ng.configuration.compilation.title%",
-        "properties": {
-          "cph-ng.compilation.cCompiler": {
-            "type": "string",
-            "default": "gcc",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.cCompiler.markdownDescription%"
-          },
-          "cph-ng.compilation.cArgs": {
-            "type": "string",
-            "default": "-O2 -std=c11 -Wall -DCPH",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.cArgs.markdownDescription%"
-          },
-          "cph-ng.compilation.cppCompiler": {
-            "type": "string",
-            "default": "g++",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.cppCompiler.markdownDescription%"
-          },
-          "cph-ng.compilation.cppArgs": {
-            "type": "string",
-            "default": "-O2 -std=c++14 -Wall -DCPH",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.cppArgs.markdownDescription%"
-          },
-          "cph-ng.compilation.rustCompiler": {
-            "type": "string",
-            "default": "rustc",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.rustCompiler.markdownDescription%"
-          },
-          "cph-ng.compilation.rustArgs": {
-            "type": "string",
-            "default": "-C opt-level=2",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.rustArgs.markdownDescription%"
-          },
-          "cph-ng.compilation.javaCompiler": {
-            "type": "string",
-            "default": "javac",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.javaCompiler.markdownDescription%"
-          },
-          "cph-ng.compilation.javaArgs": {
-            "type": "string",
-            "default": "-cp .",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.javaArgs.markdownDescription%"
-          },
-          "cph-ng.compilation.javaRunner": {
-            "type": "string",
-            "default": "java",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.javaRunner.markdownDescription%"
-          },
-          "cph-ng.compilation.javaRunArgs": {
-            "type": "string",
-            "default": "",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.javaRunArgs.markdownDescription%"
-          },
-          "cph-ng.compilation.pythonCompiler": {
-            "type": "string",
-            "default": "pypy3",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonCompiler.markdownDescription%"
-          },
-          "cph-ng.compilation.pythonArgs": {
-            "type": "string",
-            "default": "",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonArgs.markdownDescription%"
-          },
-          "cph-ng.compilation.pythonRunner": {
-            "type": "string",
-            "default": "pypy3",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonRunner.markdownDescription%"
-          },
-          "cph-ng.compilation.pythonRunArgs": {
-            "type": "string",
-            "default": "",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.pythonRunArgs.markdownDescription%"
-          },
-          "cph-ng.compilation.javascriptRunner": {
-            "type": "string",
-            "default": "node",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.javascriptRunner.markdownDescription%"
-          },
-          "cph-ng.compilation.javascriptRunArgs": {
-            "type": "string",
-            "default": "",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.javascriptRunArgs.markdownDescription%"
-          },
-          "cph-ng.compilation.objcopy": {
-            "type": "string",
-            "default": "objcopy",
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.objcopy.markdownDescription%"
-          },
-          "cph-ng.compilation.timeout": {
-            "type": "number",
-            "default": 10000,
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.timeout.markdownDescription%"
-          },
-          "cph-ng.compilation.useWrapper": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.useWrapper.markdownDescription%"
-          },
-          "cph-ng.compilation.useHook": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "%cph-ng.configuration.compilation.properties.useHook.markdownDescription%"
-          }
-        }
-      },
-      {
-        "id": "runner",
-        "order": 2,
-        "title": "%cph-ng.configuration.runner.title%",
-        "properties": {
-          "cph-ng.runner.timeAddition": {
-            "type": "number",
-            "default": 1000,
-            "markdownDescription": "%cph-ng.configuration.runner.properties.timeAddition.markdownDescription%"
-          },
-          "cph-ng.runner.useRunner": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "%cph-ng.configuration.runner.properties.useRunner.markdownDescription%"
-          },
-          "cph-ng.runner.unlimitedStack": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "%cph-ng.configuration.runner.properties.unlimitedStack.markdownDescription%"
-          }
-        }
-      },
-      {
-        "id": "comparing",
-        "order": 3,
-        "title": "%cph-ng.configuration.comparing.title%",
-        "properties": {
-          "cph-ng.comparing.oleSize": {
-            "type": "number",
-            "default": 8,
-            "markdownDescription": "%cph-ng.configuration.comparing.properties.oleSize.markdownDescription%"
-          },
-          "cph-ng.comparing.regardPEAsAC": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "%cph-ng.configuration.comparing.properties.regardPEAsAC.markdownDescription%"
-          },
-          "cph-ng.comparing.ignoreError": {
-            "type": "boolean",
-            "default": true,
-            "markdownDescription": "%cph-ng.configuration.comparing.properties.ignoreError.markdownDescription%"
-          }
-        }
-      },
-      {
-        "id": "stressTest",
-        "order": 4,
-        "title": "%cph-ng.configuration.stressTest.title%",
-        "properties": {
-          "cph-ng.stressTest.generatorTimeLimit": {
-            "type": "number",
-            "default": 10000,
-            "markdownDescription": "%cph-ng.configuration.stressTest.properties.generatorTimeLimit.markdownDescription%"
-          },
-          "cph-ng.stressTest.bruteForceTimeLimit": {
-            "type": "number",
-            "default": 60000,
-            "markdownDescription": "%cph-ng.configuration.stressTest.properties.bruteForceTimeLimit.markdownDescription%"
-          }
-        }
-      },
-      {
-        "id": "problem",
-        "order": 5,
-        "title": "%cph-ng.configuration.problem.title%",
-        "properties": {
-          "cph-ng.problem.defaultTimeLimit": {
-            "type": "number",
-            "default": 1000,
-            "markdownDescription": "%cph-ng.configuration.problem.properties.defaultTimeLimit.markdownDescription%"
-          },
-          "cph-ng.problem.defaultMemoryLimit": {
-            "type": "number",
-            "default": 512,
-            "markdownDescription": "%cph-ng.configuration.problem.properties.defaultMemoryLimit.markdownDescription%"
-          },
-          "cph-ng.problem.foundMatchTestcaseBehavior": {
-            "type": "string",
-            "default": "always",
-            "enum": [
-              "ask",
-              "always",
-              "never"
-            ],
-            "markdownDescription": "%cph-ng.configuration.problem.properties.foundMatchTestcaseBehavior.markdownDescription%",
-            "markdownEnumDescriptions": [
-              "%cph-ng.configuration.problem.properties.foundMatchTestcaseBehavior.enumDescriptions.ask%",
-              "%cph-ng.configuration.problem.properties.foundMatchTestcaseBehavior.enumDescriptions.always%",
-              "%cph-ng.configuration.problem.properties.foundMatchTestcaseBehavior.enumDescriptions.never%"
+              "%config.basic.folderOpener.enumDescriptions.tree%",
+              "%config.basic.folderOpener.enumDescriptions.flat%"
             ]
           },
-          "cph-ng.problem.expandBehavior": {
-            "type": "string",
-            "default": "firstFailed",
-            "enum": [
-              "always",
-              "never",
-              "failed",
-              "first",
-              "firstFailed",
-              "same"
-            ],
-            "markdownDescription": "%cph-ng.configuration.problem.properties.expandBehavior.markdownDescription%",
-            "markdownEnumDescriptions": [
-              "%cph-ng.configuration.problem.properties.expandBehavior.enumDescriptions.always%",
-              "%cph-ng.configuration.problem.properties.expandBehavior.enumDescriptions.never%",
-              "%cph-ng.configuration.problem.properties.expandBehavior.enumDescriptions.failed%",
-              "%cph-ng.configuration.problem.properties.expandBehavior.enumDescriptions.first%",
-              "%cph-ng.configuration.problem.properties.expandBehavior.enumDescriptions.firstFailed%",
-              "%cph-ng.configuration.problem.properties.expandBehavior.enumDescriptions.same%"
-            ]
-          },
-          "cph-ng.problem.templateFile": {
-            "type": "string",
-            "default": "",
-            "markdownDescription": "%cph-ng.configuration.problem.properties.templateFile.markdownDescription%"
-          },
-          "cph-ng.problem.problemFilePath": {
-            "type": "string",
-            "default": "${workspace}/.cph-ng/${relativeDirname}/${basename}.bin",
-            "markdownDescription": "%cph-ng.configuration.problem.properties.problemFilePath.markdownDescription%"
-          },
-          "cph-ng.problem.unzipFolder": {
-            "type": "string",
-            "default": "${workspace}/.cph-ng/${zipBasenameNoExt}",
-            "markdownDescription": "%cph-ng.configuration.problem.properties.unzipFolder.markdownDescription%"
-          },
-          "cph-ng.problem.deleteAfterUnzip": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "%cph-ng.configuration.problem.properties.deleteAfterUnzip.markdownDescription%"
-          },
-          "cph-ng.problem.clearBeforeLoad": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "%cph-ng.configuration.problem.properties.clearBeforeLoad.markdownDescription%"
-          },
-          "cph-ng.problem.maxInlineDataLength": {
-            "type": "number",
-            "default": 65536,
-            "markdownDescription": "%cph-ng.configuration.problem.properties.maxInlineDataLength.markdownDescription%"
-          },
-          "cph-ng.problem.inputFileExtensionList": {
-            "type": "array",
-            "default": [
-              ".in"
-            ],
-            "items": {
-              "type": "string"
-            },
-            "markdownDescription": "%cph-ng.configuration.problem.properties.inputFileExtensionList.markdownDescription%"
-          },
-          "cph-ng.problem.outputFileExtensionList": {
-            "type": "array",
-            "default": [
-              ".ans",
-              ".out"
-            ],
-            "items": {
-              "type": "string"
-            },
-            "markdownDescription": "%cph-ng.configuration.problem.properties.outputFileExtensionList.markdownDescription%"
-          }
-        }
-      },
-      {
-        "id": "cache",
-        "order": 6,
-        "title": "%cph-ng.configuration.cache.title%",
-        "properties": {
-          "cph-ng.cache.directory": {
-            "type": "string",
-            "default": "${tmp}/cph-ng",
-            "markdownDescription": "%cph-ng.configuration.cache.properties.directory.markdownDescription%"
-          },
-          "cph-ng.cache.cleanOnStartup": {
-            "type": "boolean",
-            "default": true,
-            "markdownDescription": "%cph-ng.configuration.cache.properties.cleanOnStartup.markdownDescription%"
-          }
-        }
-      },
-      {
-        "id": "cphCapable",
-        "order": 7,
-        "title": "%cph-ng.configuration.cphCapable.title%",
-        "properties": {
-          "cph-ng.cphCapable.enabled": {
-            "type": "boolean",
-            "default": true,
-            "markdownDescription": "%cph-ng.configuration.cphCapable.properties.enabled.markdownDescription%"
-          }
-        }
-      },
-      {
-        "id": "companion",
-        "order": 8,
-        "title": "%cph-ng.configuration.companion.title%",
-        "properties": {
-          "cph-ng.companion.listenPort": {
-            "type": "number",
-            "scope": "machine",
-            "default": 27121,
-            "markdownDescription": "%cph-ng.configuration.companion.properties.listenPort.markdownDescription%"
-          },
-          "cph-ng.companion.logFile": {
-            "type": "string",
-            "default": "${home}/.cph-ng-router.log",
-            "markdownDescription": "%cph-ng.configuration.companion.properties.logFile.markdownDescription%"
-          },
-          "cph-ng.companion.shutdownTimeout": {
-            "type": "number",
-            "default": 10000,
-            "markdownDescription": "%cph-ng.configuration.companion.properties.shutdownTimeout.markdownDescription%"
-          },
-          "cph-ng.companion.customPathScript": {
-            "type": "string",
-            "default": "${extensionPath}/res/defaultScript.js",
-            "markdownDescription": "%cph-ng.configuration.companion.properties.customPathScript.markdownDescription%"
-          },
-          "cph-ng.companion.submitLanguage": {
+          "cph-ng.basic.showPanel": {
             "type": "number",
             "default": -1,
-            "markdownDescription": "%cph-ng.configuration.companion.properties.submitLanguage.markdownDescription%",
-            "enum": [
-              -1,
-              54,
-              89,
-              91
-            ],
-            "enumItemLabels": [
-              "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.-1%",
-              "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.54%",
-              "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.89%",
-              "%cph-ng.configuration.companion.properties.submitLanguage.enumItemLabels.91%"
-            ]
-          },
-          "cph-ng.companion.addTimestamp": {
-            "type": "boolean",
-            "default": true,
-            "markdownDescription": "%cph-ng.configuration.companion.properties.addTimestamp.markdownDescription%"
-          },
-          "cph-ng.companion.showPanel": {
-            "type": "number",
-            "default": -1,
-            "markdownDescription": "%cph-ng.configuration.companion.properties.showPanel.markdownDescription%",
+            "markdownDescription": "%config.basic.showPanel%",
             "enum": [
               -1,
               -2,
@@ -575,62 +224,411 @@
               9
             ],
             "enumItemLabels": [
-              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.-1%",
-              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.-2%",
-              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.1%",
-              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.2%",
-              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.3%",
-              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.4%",
-              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.5%",
-              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.6%",
-              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.7%",
-              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.8%",
-              "%cph-ng.configuration.companion.properties.showPanel.enumItemLabels.9%"
+              "%config.basic.showPanel.enumItemLabels.-1%",
+              "%config.basic.showPanel.enumItemLabels.-2%",
+              "%config.basic.showPanel.enumItemLabels.1%",
+              "%config.basic.showPanel.enumItemLabels.2%",
+              "%config.basic.showPanel.enumItemLabels.3%",
+              "%config.basic.showPanel.enumItemLabels.4%",
+              "%config.basic.showPanel.enumItemLabels.5%",
+              "%config.basic.showPanel.enumItemLabels.6%",
+              "%config.basic.showPanel.enumItemLabels.7%",
+              "%config.basic.showPanel.enumItemLabels.8%",
+              "%config.basic.showPanel.enumItemLabels.9%"
             ],
             "markdownEnumDescriptions": [
-              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.-1%",
-              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.-2%",
-              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.1%",
-              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.2%",
-              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.3%",
-              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.4%",
-              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.5%",
-              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.6%",
-              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.7%",
-              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.8%",
-              "%cph-ng.configuration.companion.properties.showPanel.markdownEnumDescriptions.9%"
+              "%config.basic.showPanel.markdownEnumDescriptions.-1%",
+              "%config.basic.showPanel.markdownEnumDescriptions.-2%",
+              "%config.basic.showPanel.markdownEnumDescriptions.1%",
+              "%config.basic.showPanel.markdownEnumDescriptions.2%",
+              "%config.basic.showPanel.markdownEnumDescriptions.3%",
+              "%config.basic.showPanel.markdownEnumDescriptions.4%",
+              "%config.basic.showPanel.markdownEnumDescriptions.5%",
+              "%config.basic.showPanel.markdownEnumDescriptions.6%",
+              "%config.basic.showPanel.markdownEnumDescriptions.7%",
+              "%config.basic.showPanel.markdownEnumDescriptions.8%",
+              "%config.basic.showPanel.markdownEnumDescriptions.9%"
             ]
+          }
+        }
+      },
+      {
+        "id": "languages",
+        "order": 1,
+        "title": "%config.languages%",
+        "properties": {
+          "cph-ng.languages.cCompiler": {
+            "type": "string",
+            "default": "gcc",
+            "markdownDescription": "%config.languages.cCompiler%"
+          },
+          "cph-ng.languages.cCompilerArgs": {
+            "type": "string",
+            "default": "-O2 -std=c11 -Wall -DCPH",
+            "markdownDescription": "%config.languages.cCompilerArgs%"
+          },
+          "cph-ng.languages.cppCompiler": {
+            "type": "string",
+            "default": "g++",
+            "markdownDescription": "%config.languages.cppCompiler%"
+          },
+          "cph-ng.languages.cppCompilerArgs": {
+            "type": "string",
+            "default": "-O2 -std=c++14 -Wall -DCPH",
+            "markdownDescription": "%config.languages.cppCompilerArgs%"
+          },
+          "cph-ng.languages.cppObjcopy": {
+            "type": "string",
+            "default": "objcopy",
+            "markdownDescription": "%config.languages.cppObjcopy%"
+          },
+          "cph-ng.languages.rustCompiler": {
+            "type": "string",
+            "default": "rustc",
+            "markdownDescription": "%config.languages.rustCompiler%"
+          },
+          "cph-ng.languages.rustCompilerArgs": {
+            "type": "string",
+            "default": "-C opt-level=2",
+            "markdownDescription": "%config.languages.rustCompilerArgs%"
+          },
+          "cph-ng.languages.javaCompiler": {
+            "type": "string",
+            "default": "javac",
+            "markdownDescription": "%config.languages.javaCompiler%"
+          },
+          "cph-ng.languages.javaCompilerArgs": {
+            "type": "string",
+            "default": "-cp .",
+            "markdownDescription": "%config.languages.javaCompilerArgs%"
+          },
+          "cph-ng.languages.javaRunner": {
+            "type": "string",
+            "default": "java",
+            "markdownDescription": "%config.languages.javaRunner%"
+          },
+          "cph-ng.languages.javaRunnerArgs": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "%config.languages.javaRunnerArgs%"
+          },
+          "cph-ng.languages.pythonCompiler": {
+            "type": "string",
+            "default": "pypy3",
+            "markdownDescription": "%config.languages.pythonCompiler%"
+          },
+          "cph-ng.languages.pythonCompilerArgs": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "%config.languages.pythonCompilerArgs%"
+          },
+          "cph-ng.languages.pythonRunner": {
+            "type": "string",
+            "default": "pypy3",
+            "markdownDescription": "%config.languages.pythonRunner%"
+          },
+          "cph-ng.languages.pythonRunnerArgs": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "%config.languages.pythonRunnerArgs%"
+          },
+          "cph-ng.languages.javascriptRunner": {
+            "type": "string",
+            "default": "node",
+            "markdownDescription": "%config.languages.javascriptRunner%"
+          },
+          "cph-ng.languages.javascriptRunnerArgs": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "%config.languages.javascriptRunnerArgs%"
+          }
+        }
+      },
+      {
+        "id": "run",
+        "order": 2,
+        "title": "%config.run%",
+        "properties": {
+          "cph-ng.run.compilationTimeout": {
+            "type": "number",
+            "default": 10000,
+            "markdownDescription": "%config.run.compilationTimeout%"
+          },
+          "cph-ng.run.useWrapper": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%config.run.useWrapper%"
+          },
+          "cph-ng.run.useHook": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%config.run.useHook%"
+          },
+          "cph-ng.run.useRunner": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%config.run.useRunner%"
+          },
+          "cph-ng.run.timeAddition": {
+            "type": "number",
+            "default": 1000,
+            "markdownDescription": "%config.run.timeAddition%"
+          },
+          "cph-ng.run.unlimitedStack": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%config.run.unlimitedStack%"
+          }
+        }
+      },
+      {
+        "id": "comparing",
+        "order": 3,
+        "title": "%config.comparing%",
+        "properties": {
+          "cph-ng.comparing.oleSize": {
+            "type": "number",
+            "default": 8,
+            "markdownDescription": "%config.comparing.oleSize%"
+          },
+          "cph-ng.comparing.regardPEAsAC": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%config.comparing.regardPEAsAC%"
+          },
+          "cph-ng.comparing.ignoreError": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%config.comparing.ignoreError%"
+          }
+        }
+      },
+      {
+        "id": "stressTest",
+        "order": 4,
+        "title": "%config.stressTest%",
+        "properties": {
+          "cph-ng.stressTest.generatorTimeLimit": {
+            "type": "number",
+            "default": 10000,
+            "markdownDescription": "%config.stressTest.generatorTimeLimit%"
+          },
+          "cph-ng.stressTest.bruteForceTimeLimit": {
+            "type": "number",
+            "default": 60000,
+            "markdownDescription": "%config.stressTest.bruteForceTimeLimit%"
+          }
+        }
+      },
+      {
+        "id": "problem",
+        "order": 5,
+        "title": "%config.problem%",
+        "properties": {
+          "cph-ng.problem.defaultTimeLimit": {
+            "type": "number",
+            "default": 1000,
+            "markdownDescription": "%config.problem.defaultTimeLimit%"
+          },
+          "cph-ng.problem.defaultMemoryLimit": {
+            "type": "number",
+            "default": 512,
+            "markdownDescription": "%config.problem.defaultMemoryLimit%"
+          },
+          "cph-ng.problem.foundMatchTestcaseBehavior": {
+            "type": "string",
+            "default": "always",
+            "enum": [
+              "ask",
+              "always",
+              "never"
+            ],
+            "markdownDescription": "%config.problem.foundMatchTestcaseBehavior%",
+            "markdownEnumDescriptions": [
+              "%config.problem.foundMatchTestcaseBehavior.enumDescriptions.ask%",
+              "%config.problem.foundMatchTestcaseBehavior.enumDescriptions.always%",
+              "%config.problem.foundMatchTestcaseBehavior.enumDescriptions.never%"
+            ]
+          },
+          "cph-ng.problem.expandBehavior": {
+            "type": "string",
+            "default": "firstFailed",
+            "enum": [
+              "always",
+              "never",
+              "failed",
+              "first",
+              "firstFailed",
+              "same"
+            ],
+            "markdownDescription": "%config.problem.expandBehavior%",
+            "markdownEnumDescriptions": [
+              "%config.problem.expandBehavior.enumDescriptions.always%",
+              "%config.problem.expandBehavior.enumDescriptions.never%",
+              "%config.problem.expandBehavior.enumDescriptions.failed%",
+              "%config.problem.expandBehavior.enumDescriptions.first%",
+              "%config.problem.expandBehavior.enumDescriptions.firstFailed%",
+              "%config.problem.expandBehavior.enumDescriptions.same%"
+            ]
+          },
+          "cph-ng.problem.templateFile": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "%config.problem.templateFile%"
+          },
+          "cph-ng.problem.problemFilePath": {
+            "type": "string",
+            "default": "${workspace}/.cph-ng/${relativeDirname}/${basename}.bin",
+            "markdownDescription": "%config.problem.problemFilePath%"
+          },
+          "cph-ng.problem.unzipFolder": {
+            "type": "string",
+            "default": "${workspace}/.cph-ng/${zipBasenameNoExt}",
+            "markdownDescription": "%config.problem.unzipFolder%"
+          },
+          "cph-ng.problem.deleteAfterUnzip": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%config.problem.deleteAfterUnzip%"
+          },
+          "cph-ng.problem.clearBeforeLoad": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%config.problem.clearBeforeLoad%"
+          },
+          "cph-ng.problem.maxInlineDataLength": {
+            "type": "number",
+            "default": 65536,
+            "markdownDescription": "%config.problem.maxInlineDataLength%"
+          },
+          "cph-ng.problem.inputFileExtensionList": {
+            "type": "array",
+            "default": [
+              ".in"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "markdownDescription": "%config.problem.inputFileExtensionList%"
+          },
+          "cph-ng.problem.outputFileExtensionList": {
+            "type": "array",
+            "default": [
+              ".ans",
+              ".out"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "markdownDescription": "%config.problem.outputFileExtensionList%"
+          }
+        }
+      },
+      {
+        "id": "cache",
+        "order": 6,
+        "title": "%config.cache%",
+        "properties": {
+          "cph-ng.cache.directory": {
+            "type": "string",
+            "default": "${tmp}/cph-ng",
+            "markdownDescription": "%config.cache.directory%"
+          },
+          "cph-ng.cache.cleanOnStartup": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%config.cache.cleanOnStartup%"
+          }
+        }
+      },
+      {
+        "id": "cphCapable",
+        "order": 7,
+        "title": "%config.cphCapable%",
+        "properties": {
+          "cph-ng.cphCapable.enabled": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%config.cphCapable.enabled%"
+          }
+        }
+      },
+      {
+        "id": "companion",
+        "order": 8,
+        "title": "%config.companion%",
+        "properties": {
+          "cph-ng.companion.listenPort": {
+            "type": "number",
+            "scope": "machine",
+            "default": 27121,
+            "markdownDescription": "%config.companion.listenPort%"
+          },
+          "cph-ng.companion.logFile": {
+            "type": "string",
+            "default": "${home}/.cph-ng-router.log",
+            "markdownDescription": "%config.companion.logFile%"
+          },
+          "cph-ng.companion.shutdownTimeout": {
+            "type": "number",
+            "default": 10000,
+            "markdownDescription": "%config.companion.shutdownTimeout%"
+          },
+          "cph-ng.companion.customPathScript": {
+            "type": "string",
+            "default": "${extensionPath}/res/defaultScript.js",
+            "markdownDescription": "%config.companion.customPathScript%"
+          },
+          "cph-ng.companion.submitLanguage": {
+            "type": "number",
+            "markdownDescription": "%config.companion.submitLanguage%",
+            "default": 54,
+            "enum": [
+              54,
+              89,
+              91
+            ],
+            "enumItemLabels": [
+              "%config.companion.submitLanguage.enumItemLabels.54%",
+              "%config.companion.submitLanguage.enumItemLabels.89%",
+              "%config.companion.submitLanguage.enumItemLabels.91%"
+            ]
+          },
+          "cph-ng.companion.addTimestamp": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%config.companion.addTimestamp%"
           }
         }
       },
       {
         "id": "sidebar",
         "order": 9,
-        "title": "%cph-ng.configuration.sidebar.title%",
+        "title": "%config.sidebar%",
         "properties": {
           "cph-ng.sidebar.retainWhenHidden": {
             "type": "boolean",
             "default": true,
-            "markdownDescription": "%cph-ng.configuration.sidebar.properties.retainWhenHidden.markdownDescription%"
+            "markdownDescription": "%config.sidebar.retainWhenHidden%"
           },
           "cph-ng.sidebar.showAcGif": {
             "type": "boolean",
             "default": true,
-            "markdownDescription": "%cph-ng.configuration.sidebar.properties.showAcGif.markdownDescription%"
+            "markdownDescription": "%config.sidebar.showAcGif%"
           },
           "cph-ng.sidebar.colorTheme": {
             "type": "string",
             "default": "auto",
-            "markdownDescription": "%cph-ng.configuration.sidebar.properties.colorTheme.markdownDescription%",
+            "markdownDescription": "%config.sidebar.colorTheme%",
             "enum": [
               "auto",
               "light",
               "dark"
             ],
             "markdownEnumDescriptions": [
-              "%cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.auto%",
-              "%cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.light%",
-              "%cph-ng.configuration.sidebar.properties.colorTheme.enumDescriptions.dark%"
+              "%config.sidebar.colorTheme.enumDescriptions.auto%",
+              "%config.sidebar.colorTheme.enumDescriptions.light%",
+              "%config.sidebar.colorTheme.enumDescriptions.dark%"
             ]
           },
           "cph-ng.sidebar.hiddenStatuses": {
@@ -661,37 +659,37 @@
                 "RJ"
               ],
               "enumDescriptions": [
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.UKE%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.AC%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.PC%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.PE%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.WA%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.TLE%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.MLE%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.OLE%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.RE%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.RF%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.CE%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.SE%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.WT%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.FC%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.CP%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.CPD%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.JG%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.JGD%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.CMP%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.SK%",
-                "%cph-ng.sidebar.hiddenStatuses.enumDescriptions.RJ%"
+                "%config.sidebar.hiddenStatuses.UKE%",
+                "%config.sidebar.hiddenStatuses.AC%",
+                "%config.sidebar.hiddenStatuses.PC%",
+                "%config.sidebar.hiddenStatuses.PE%",
+                "%config.sidebar.hiddenStatuses.WA%",
+                "%config.sidebar.hiddenStatuses.TLE%",
+                "%config.sidebar.hiddenStatuses.MLE%",
+                "%config.sidebar.hiddenStatuses.OLE%",
+                "%config.sidebar.hiddenStatuses.RE%",
+                "%config.sidebar.hiddenStatuses.RF%",
+                "%config.sidebar.hiddenStatuses.CE%",
+                "%config.sidebar.hiddenStatuses.SE%",
+                "%config.sidebar.hiddenStatuses.WT%",
+                "%config.sidebar.hiddenStatuses.FC%",
+                "%config.sidebar.hiddenStatuses.CP%",
+                "%config.sidebar.hiddenStatuses.CPD%",
+                "%config.sidebar.hiddenStatuses.JG%",
+                "%config.sidebar.hiddenStatuses.JGD%",
+                "%config.sidebar.hiddenStatuses.CMP%",
+                "%config.sidebar.hiddenStatuses.SK%",
+                "%config.sidebar.hiddenStatuses.RJ%"
               ]
             },
             "uniqueItems": true,
             "default": [],
-            "markdownDescription": "%cph-ng.configuration.sidebar.properties.hiddenStatuses.markdownDescription%"
+            "markdownDescription": "%config.sidebar.hiddenStatuses%"
           },
           "cph-ng.sidebar.showTips": {
             "type": "boolean",
             "default": true,
-            "markdownDescription": "%cph-ng.configuration.sidebar.properties.showTips.markdownDescription%"
+            "markdownDescription": "%config.sidebar.showTips%"
           }
         }
       }
@@ -703,31 +701,31 @@
       },
       {
         "command": "cph-ng.importFromCph",
-        "title": "%cph-ng.commands.importFromCph%"
+        "title": "%commands.importFromCph%"
       },
       {
         "command": "cph-ng.createProblem",
-        "title": "%cph-ng.commands.createProblem%",
+        "title": "%commands.createProblem%",
         "icon": "$(rocket)"
       },
       {
         "command": "cph-ng.importProblem",
-        "title": "%cph-ng.commands.importProblem%",
+        "title": "%commands.importProblem%",
         "icon": "$(desktop-download)"
       },
       {
         "command": "cph-ng.runTestcases",
-        "title": "%cph-ng.commands.runTestcases%",
+        "title": "%commands.runTestcases%",
         "icon": "$(run-all)"
       },
       {
         "command": "cph-ng.stopTestcases",
-        "title": "%cph-ng.commands.stopTestcases%",
+        "title": "%commands.stopTestcases%",
         "icon": "$(stop-circle)"
       },
       {
         "command": "cph-ng.submitToCodeforces",
-        "title": "%cph-ng.commands.submitToCodeforces%"
+        "title": "%commands.submitToCodeforces%"
       }
     ],
     "keybindings": [

@@ -33,8 +33,8 @@ export class LangCpp extends AbstractLanguageStrategy {
   ) {
     super({ ...context, logger: logger.withScope('langsCpp') });
     this.defaultValues = {
-      compiler: this.settings.compilation.cppCompiler,
-      compilerArgs: this.settings.compilation.cppArgs,
+      compiler: this.settings.languages.cppCompiler,
+      compilerArgs: this.settings.languages.cppCompilerArgs,
     } satisfies ILanguageDefaultValues;
   }
 
@@ -54,8 +54,8 @@ export class LangCpp extends AbstractLanguageStrategy {
 
     const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
     const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
-    const { objcopy, useWrapper, useHook } = this.settings.compilation;
-    const { unlimitedStack } = this.settings.runner;
+    const { cppObjcopy } = this.settings.languages;
+    const { useWrapper, useHook, unlimitedStack } = this.settings.run;
 
     const { skip, hash } = await this.checkHash(
       src,
@@ -91,7 +91,7 @@ export class LangCpp extends AbstractLanguageStrategy {
       const linkCmd = [compiler, ...linkObjs, ...compilerArgs, '-o', path];
       if (this.sys.platform() === 'linux') linkCmd.push('-ldl');
       if (unlimitedStack && this.sys.platform() === 'win32') linkCmd.push('-Wl,--stack,268435456');
-      postCommands.push([objcopy, '--redefine-sym', 'main=original_main', solObj], linkCmd);
+      postCommands.push([cppObjcopy, '--redefine-sym', 'main=original_main', solObj], linkCmd);
     } else {
       const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
       if (unlimitedStack && this.sys.platform() === 'win32') cmd.push('-Wl,--stack,268435456');

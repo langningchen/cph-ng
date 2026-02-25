@@ -43,10 +43,10 @@ export class LangPython extends AbstractLanguageStrategy {
   ) {
     super({ ...context, logger: logger.withScope('langsPython') });
     this.defaultValues = {
-      compiler: this.settings.compilation.pythonCompiler,
-      compilerArgs: this.settings.compilation.pythonArgs,
-      runner: this.settings.compilation.pythonRunner,
-      runnerArgs: this.settings.compilation.pythonRunArgs,
+      compiler: this.settings.languages.pythonCompiler,
+      compilerArgs: this.settings.languages.pythonCompilerArgs,
+      runner: this.settings.languages.pythonRunner,
+      runnerArgs: this.settings.languages.pythonRunnerArgs,
     } satisfies ILanguageDefaultValues;
   }
 

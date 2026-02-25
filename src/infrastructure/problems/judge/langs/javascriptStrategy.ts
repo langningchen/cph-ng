@@ -35,8 +35,8 @@ export class LangJavascript extends AbstractLanguageStrategy {
   ) {
     super({ ...context, logger: logger.withScope('langsJavascript') });
     this.defaultValues = {
-      runner: this.settings.compilation.javascriptRunner,
-      runnerArgs: this.settings.compilation.javascriptRunArgs,
+      runner: this.settings.languages.javascriptRunner,
+      runnerArgs: this.settings.languages.javascriptRunnerArgs,
     } satisfies ILanguageDefaultValues;
   }
 

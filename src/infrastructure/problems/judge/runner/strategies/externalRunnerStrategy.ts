@@ -88,7 +88,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     const userStderrPath = this.tmp.create(`externalRunner.userStderrPath`);
 
     const runnerCmd = [runnerPath, ctx.cmd[0], userStdinPath, userStdoutPath, userStderrPath];
-    if (this.settings.runner.unlimitedStack) runnerCmd.push('--unlimited-stack');
+    if (this.settings.run.unlimitedStack) runnerCmd.push('--unlimited-stack');
 
     // We use our own timeout handling to allow graceful exit
     const handle = this.executor.spawn({
@@ -106,7 +106,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     signal.addEventListener('abort', onUserAbort);
     unifiedAc.signal.addEventListener('abort', onUnifiedAbort);
 
-    const timeoutVal = ctx.timeLimitMs + this.settings.runner.timeAddition;
+    const timeoutVal = ctx.timeLimitMs + this.settings.run.timeAddition;
     const timeoutId = setTimeout(() => {
       this.logger.warn(`Soft killing runner ${handle.pid} due to timeout`);
       unifiedAc.abort(AbortReason.Timeout);

@@ -53,8 +53,7 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
   }
 
   private getStrategy(): IExecutionStrategy | Error {
-    const useRunner = this.settings.runner.useRunner;
-    const useWrapper = this.settings.compilation.useWrapper;
+    const { useRunner, useWrapper } = this.settings.run;
     if (useRunner && useWrapper)
       return new ExecutionRejected(
         this.translator.t('Cannot use both external runner and wrapper at the same time'),
@@ -70,7 +69,7 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
     signal: AbortSignal,
     interactorPath: string,
   ): Promise<InteractiveExecutionResult> {
-    const timeoutMs = ctx.timeLimitMs + this.settings.runner.timeAddition;
+    const timeoutMs = ctx.timeLimitMs + this.settings.run.timeAddition;
 
     // Prepare input and output files
     const intStdinPath = ctx.stdinPath;

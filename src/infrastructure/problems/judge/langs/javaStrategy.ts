@@ -43,10 +43,10 @@ export class LangJava extends AbstractLanguageStrategy {
   ) {
     super({ ...context, logger: logger.withScope('langsJava') });
     this.defaultValues = {
-      compiler: this.settings.compilation.javaCompiler,
-      compilerArgs: this.settings.compilation.javaArgs,
-      runner: this.settings.compilation.javaRunner,
-      runnerArgs: this.settings.compilation.javaRunArgs,
+      compiler: this.settings.languages.javaCompiler,
+      compilerArgs: this.settings.languages.javaCompilerArgs,
+      runner: this.settings.languages.javaRunner,
+      runnerArgs: this.settings.languages.javaRunnerArgs,
     } satisfies ILanguageDefaultValues;
   }
 

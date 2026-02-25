@@ -215,7 +215,7 @@ describe('WrapperStrategy', () => {
 
     expect(executorMock.execute).toHaveBeenCalledWith(
       expect.objectContaining({
-        timeoutMs: mockCtx.timeLimitMs + settingsMock.runner.timeAddition,
+        timeoutMs: mockCtx.timeLimitMs + settingsMock.run.timeAddition,
       }),
     );
     tempStorageMock.checkFile();
@@ -248,7 +248,7 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
 
     beforeEach(() => {
       settingsMock.cache.directory = testWorkspace = createTestWorkspace();
-      settingsMock.compilation.useWrapper = true;
+      settingsMock.run.useWrapper = true;
 
       container.registerInstance(TOKENS.compilationOutputChannel, compilationOutputChannelMock);
       container.registerInstance(TOKENS.extensionPath, extensionPathMock);
@@ -310,7 +310,7 @@ describe.runIf(hasCppCompiler && (isWin || isLinux))(
       };
 
       await run(stackOverflow);
-      settingsMock.runner.unlimitedStack = true;
+      settingsMock.run.unlimitedStack = true;
       await run(0);
     });
   },

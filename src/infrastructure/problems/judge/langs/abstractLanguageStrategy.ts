@@ -107,7 +107,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     const result = await this.processExecutor.execute({
       cmd,
       signal,
-      timeoutMs: this.settings.compilation.timeout,
+      timeoutMs: this.settings.run.compilationTimeout,
     });
     if (result instanceof Error) throw result;
     if (result.abortReason === AbortReason.UserAbort)
