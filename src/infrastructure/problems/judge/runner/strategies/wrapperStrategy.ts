@@ -80,7 +80,15 @@ export class WrapperStrategy implements IExecutionStrategy {
     }
     this.logger.trace('Wrapper report content', content);
     try {
-      return JSON.parse(content) as WrapperData;
+      const wrapperData = JSON.parse(content);
+      if (typeof wrapperData.timeMs !== 'number') {
+        this.logger.error('Invalid wrapper report format: timeMs is missing or not a number');
+        this.telemetry.error('wrapperError', new Error('Invalid wrapper report format'), {
+          content,
+        });
+        return null;
+      }
+      return { timeMs: wrapperData.timeMs };
     } catch (e) {
       this.logger.error('Failed to parse wrapper report', e as Error);
       this.telemetry.error('wrapperError', e, { content });

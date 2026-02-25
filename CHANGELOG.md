@@ -2,6 +2,10 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## [Unreleased]
+
+- **fix**: validate wrapper report format and handle errors
+
 ## 0.6.2
 
 - **fix**: remove waiting
