@@ -9,6 +9,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 - **feat**: add commitlint scope
 - **chore**: upgrade settings file
 - **fix**(webview): use custom tooltip element
+- **fix**(webview): improve error handling for large files and message processing
 
 ## 0.6.2
 

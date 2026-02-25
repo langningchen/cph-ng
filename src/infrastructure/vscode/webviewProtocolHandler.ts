@@ -18,6 +18,8 @@
 import type { WebviewMsg } from '@w/msgs';
 import { container, type InjectionToken, inject, injectable } from 'tsyringe';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
 import { AddTestcase } from '@/application/useCases/webview/AddTestcase';
 import { ChooseSrcFile } from '@/application/useCases/webview/ChooseSrcFile';
 import { ChooseTestcaseFile } from '@/application/useCases/webview/ChooseTestcaseFile';
@@ -82,7 +84,11 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
 
 @injectable()
 export class WebviewProtocolHandler {
-  public constructor(@inject(TOKENS.logger) private readonly logger: ILogger) {
+  public constructor(
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.ui) private readonly ui: IUi,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
+  ) {
     this.logger = this.logger.withScope('webviewProtocolHandler');
   }
 
@@ -95,6 +101,10 @@ export class WebviewProtocolHandler {
       await useCase.exec(msg);
     } catch (e) {
       this.logger.error(`Handle message ${msg.type} failed`, e);
+      this.ui.alert(
+        'error',
+        this.translator.t('Handle message failed: {msg}', { msg: (e as Error).message }),
+      );
     }
   }
 }

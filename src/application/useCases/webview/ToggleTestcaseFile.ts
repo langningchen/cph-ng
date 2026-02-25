@@ -52,8 +52,10 @@ export class ToggleTestcaseFile extends BaseProblemUseCase<ToggleTestcaseFileMsg
     await fileIo.match(
       async (path) => {
         const stat = await this.fs.stat(path);
-        if (stat.size > this.settings.problem.maxInlineDataLength)
-          throw new Error('File too large to inline');
+        if (stat.size > this.settings.problem.maxInlineDataLength) {
+          this.ui.alert('error', this.translator.t('File too large to inline'));
+          return;
+        }
         const data = await this.fs.readFile(path);
         testcase[msg.label] = new TestcaseIo({ data });
       },
