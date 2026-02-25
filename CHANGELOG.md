@@ -6,6 +6,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 
 - **feat**(core): use base32 in problem fs
 - **fix**(core): problem fs refresh
+- **feat**(webview): show test case id on hover
 
 ## 0.6.3
 

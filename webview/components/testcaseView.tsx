@@ -325,7 +325,9 @@ export const TestcaseView = memo(
           >
             <CphNgFlex smallGap>
               <CphNgFlex flex={1}>
-                <CphNgText fontWeight='bold'>#{idx + 1}</CphNgText>
+                <CphNgTooltip title={testcaseId}>
+                  <CphNgText fontWeight='bold'>#{idx + 1}</CphNgText>
+                </CphNgTooltip>
                 {!!testcase.result?.verdict && (
                   <CphNgTooltip title={testcase.result.verdict.fullName}>
                     <Chip
