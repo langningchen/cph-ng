@@ -5,8 +5,8 @@
   "search.exclude": {
     "dist": true
   },
-  "typescript.tsc.autoDetect": "off",
-  "typescript.preferences.autoImportSpecifierExcludeRegexes": [
+  "js/ts.tsc.autoDetect": "off",
+  "js/ts.preferences.autoImportSpecifierExcludeRegexes": [
     "^@mui/[^/]+$",
     "^@mui/[^/]+/esm$",
     "^@mui/[^/]+/esm/[^/]+$"
@@ -50,7 +50,7 @@
     "tag:yaml.org,2002:python/name:pymdownx.superfences.fence_code_format",
     "tag:yaml.org,2002:python/object/apply:pymdownx.slugs.slugify mapping"
   ],
-  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "js/ts.preferences.importModuleSpecifier": "non-relative",
   "docthis.includeTypes": false,
   "docthis.includeMemberOfOnClassMembers": false,
   "docthis.includeMemberOfOnInterfaceMembers": false,
