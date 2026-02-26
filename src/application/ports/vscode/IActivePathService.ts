@@ -16,6 +16,6 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 export interface IActivePathService {
-  getActivePath(): string | undefined;
-  setActivePath(path: string | undefined): void;
+  getActivePath(): string | null;
+  setActivePath(path: string | null): void;
 }

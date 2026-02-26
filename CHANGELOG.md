@@ -12,6 +12,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 - **test**: update isRelated tests for case sensitivity
 - **chore**(config): simplify translation keys
 - **chore**(deps): upgrade packages
+- **feat**(core): close problem when no editor
 
 ## 0.6.3
 

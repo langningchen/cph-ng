@@ -18,8 +18,8 @@
 import { inject, injectable } from 'tsyringe';
 import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IExtensionContext } from '@/application/ports/vscode/IExtensionContext';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
@@ -29,19 +29,17 @@ import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import type { Problem, ProblemMetaPayload } from '@/domain/entities/problem';
 import type { StressTest } from '@/domain/entities/stressTest';
 import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
-import type { ProblemId, TestcaseId, WithRevision } from '@/domain/types';
+import type { TestcaseId, WithRevision } from '@/domain/types';
 import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapper';
 
 @injectable()
 export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
   private active: BackgroundProblem | null = null;
-  private lastAccessMap: Map<ProblemId, number> = new Map();
-  private monitorInterval: NodeJS.Timeout;
 
   public constructor(
+    @inject(TOKENS.activePathService) private readonly activePathService: IActivePathService,
     @inject(TOKENS.cphMigrationService) private readonly cph: ICphMigrationService,
     @inject(TOKENS.extensionContext) private readonly context: IExtensionContext,
-    @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
@@ -49,19 +47,6 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     @inject(WebviewProblemMapper) private readonly mapper: WebviewProblemMapper,
   ) {
     this.logger = this.logger.withScope('activeProblemCoordinator');
-    this.monitorInterval = setInterval(async () => {
-      const now = Date.now();
-      for (const [problemId, lastAccess] of this.lastAccessMap)
-        if (
-          now - lastAccess > 60 * 1000 &&
-          problemId !== this.active?.problemId &&
-          (await this.repo.persist(problemId))
-        ) {
-          this.logger.trace('Persisted inactive problem', { problemId });
-          this.lastAccessMap.delete(problemId);
-        }
-    }, 1000);
-
     this.problemFs.signals.on('problemFileChanged', () => {
       this.dispatchFullData();
     });
@@ -158,46 +143,40 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     problem.signals.off('patchTestcaseResult', this.onPatchTestcaseResult);
   }
 
-  public dispose() {
-    clearInterval(this.monitorInterval);
-  }
+  public async onActiveEditorChanged() {
+    if (this.active) {
+      this.detachListeners(this.active.problem);
+      this.logger.debug('Unload previous active problem', { problemId: this.active.problemId });
+      await this.repo.persist(this.active.problemId);
+      this.logger.trace('Persisted previous active problem on active change', {
+        problemId: this.active.problemId,
+      });
+    }
 
-  public async onActiveEditorChanged(filePath: string | undefined) {
-    if (!filePath) return;
+    const filePath = this.activePathService.getActivePath();
+    if (!filePath) {
+      this.active = null;
+      this.context.hasProblem = false;
+      this.eventBus.noProblem(false);
+      return;
+    }
     const backgroundProblem = await this.repo.loadByPath(filePath);
     this.logger.trace('Active editor changed', { filePath, backgroundProblem });
     if (!backgroundProblem) {
-      if (this.lang.getLang(filePath)) {
-        this.context.hasProblem = false;
-        if (this.active) this.detachListeners(this.active.problem);
-        this.active = null;
-        const canImport = await this.cph.canMigrate(filePath);
-        this.context.canImport = canImport;
-        this.eventBus.noProblem(canImport);
-      }
-      return;
-    }
-    this.context.hasProblem = true;
-    const { problem, problemId } = backgroundProblem;
-    if (problemId !== this.active?.problemId) {
-      if (this.active) {
-        this.detachListeners(this.active.problem);
-        await this.repo.persist(this.active.problemId);
-        this.logger.debug('Unload previous active problem', { problemId: this.active.problemId });
-      }
-      if (!problem) {
-        this.logger.error('Active problem not found in repository after loading', {
-          problemId,
-        });
-        return;
-      }
-      this.active = backgroundProblem;
-      this.lastAccessMap.set(problemId, Date.now());
-      this.eventBus.fullProblem(problemId, this.mapper.toDto(problem));
-      this.attachListeners(problem);
-      this.logger.debug('Loaded new active problem', { problemId });
+      this.active = null;
+      const canImport = await this.cph.canMigrate(filePath);
+      this.context.hasProblem = false;
+      this.context.canImport = canImport;
+      this.eventBus.noProblem(canImport);
     } else {
-      this.logger.trace('Active problem remains unchanged', { problemId });
+      this.active = backgroundProblem;
+      this.attachListeners(backgroundProblem.problem);
+      this.eventBus.fullProblem(
+        backgroundProblem.problemId,
+        this.mapper.toDto(backgroundProblem.problem),
+      );
+      this.context.hasProblem = true;
+      this.logger.debug('Set new active problem', { problemId: backgroundProblem.problemId });
     }
   }
 }

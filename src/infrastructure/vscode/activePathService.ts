@@ -20,13 +20,13 @@ import type { IActivePathService } from '@/application/ports/vscode/IActivePathS
 
 @injectable()
 export class ActivePathService implements IActivePathService {
-  private _activePath: string | undefined;
+  private _activePath: string | null = null;
 
-  public getActivePath(): string | undefined {
+  public getActivePath(): string | null {
     return this._activePath;
   }
 
-  public setActivePath(path: string | undefined): void {
+  public setActivePath(path: string | null): void {
     this._activePath = path;
   }
 }

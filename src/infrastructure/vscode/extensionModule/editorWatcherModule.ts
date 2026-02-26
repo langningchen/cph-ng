@@ -44,14 +44,12 @@ export class EditorWatcherModule implements IExtensionModule {
     await this.handleEditorChange(window.activeTextEditor);
   }
 
-  public dispose() {
-    this.coordinator.dispose();
-  }
-
   private async handleEditorChange(editor: TextEditor | undefined) {
-    let path: string | undefined;
+    let path: string | null = null;
     if (editor && editor.document.uri.scheme === 'file') path = editor.document.uri.fsPath;
+    else if (!window.tabGroups.activeTabGroup.tabs.length) path = null;
+    else return this.logger.debug('Focusing on non-text editor');
     this.activePathService.setActivePath(path);
-    await this.coordinator.onActiveEditorChanged(path);
+    await this.coordinator.onActiveEditorChanged();
   }
 }

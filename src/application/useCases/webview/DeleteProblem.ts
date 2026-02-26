@@ -20,7 +20,6 @@ import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
-import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
@@ -29,8 +28,7 @@ import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 export class DeleteProblem extends BaseProblemUseCase<DeleteProblemMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.problemService) protected readonly service: IProblemService,
-    @inject(TOKENS.activePathService) protected readonly activePath: IActivePathService,
+    @inject(TOKENS.problemService) private readonly service: IProblemService,
     @inject(TOKENS.activeProblemCoordinator)
     private readonly coordinator: IActiveProblemCoordinator,
   ) {
@@ -45,7 +43,7 @@ export class DeleteProblem extends BaseProblemUseCase<DeleteProblemMsg> {
     const { problemId, problem } = backgroundProblem;
     await this.repo.unload(problemId);
     await this.service.delete(problem);
-    await this.coordinator.onActiveEditorChanged(this.activePath.getActivePath());
+    await this.coordinator.onActiveEditorChanged();
     await this.coordinator.dispatchFullData();
   }
 }
