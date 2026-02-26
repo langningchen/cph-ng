@@ -8,6 +8,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 - **fix**(core): problem fs refresh
 - **feat**(webview): show test case id on hover
 - **feat**(webview): hover time and memory to display details
+- **fix**(core): duplicate load problem
 
 ## 0.6.3
 

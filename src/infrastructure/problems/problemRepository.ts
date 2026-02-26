@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import pMemoize from 'p-memoize';
 import { inject, injectable } from 'tsyringe';
 import type { IClock } from '@/application/ports/node/IClock';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
@@ -59,10 +60,10 @@ export class ProblemRepository implements IProblemRepository {
     return null;
   }
 
-  public async loadByPath(
+  private _loadByPath = async (
     srcPath: string,
     allowCreate: boolean = false,
-  ): Promise<BackgroundProblem | null> {
+  ): Promise<BackgroundProblem | null> => {
     const existingProblem = await this.getByPath(srcPath);
     if (existingProblem) return existingProblem;
     let problem = await this.problemService.loadBySrc(srcPath);
@@ -84,7 +85,11 @@ export class ProblemRepository implements IProblemRepository {
     this.backgroundProblems.set(problemId, backgroundProblem);
     this.fireBackgroundEvent();
     return backgroundProblem;
-  }
+  };
+  public loadByPath = pMemoize(this._loadByPath, {
+    cacheKey: ([srcPath]) => srcPath,
+    cache: false,
+  });
 
   public async get(problemId?: ProblemId): Promise<BackgroundProblem | undefined> {
     if (!problemId) return undefined;
