@@ -172,9 +172,10 @@ describe('Testcase', () => {
   });
 
   describe('isRelated', () => {
-    it('should match stdin path case-insensitively', () => {
-      const testcase = new Testcase(new TestcaseIo({ path: '/tmp/Input.txt' }));
+    it('should match stdin path case-sensitively', () => {
+      const testcase = new Testcase(new TestcaseIo({ path: '/tmp/input.txt' }));
       expect(testcase.isRelated('/tmp/input.txt')).toBe(true);
+      expect(testcase.isRelated('/tmp/Input.txt')).toBe(false);
     });
 
     it('should match answer path', () => {
@@ -182,7 +183,7 @@ describe('Testcase', () => {
         new TestcaseIo({ data: '' }),
         new TestcaseIo({ path: '/tmp/answer.txt' }),
       );
-      expect(testcase.isRelated('/tmp/Answer.txt')).toBe(true);
+      expect(testcase.isRelated('/tmp/answer.txt')).toBe(true);
     });
 
     it('should match stdout path from result', () => {

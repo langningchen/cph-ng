@@ -217,27 +217,28 @@ describe('Problem', () => {
   });
 
   describe('isRelated', () => {
-    it('should match src path case-insensitively', () => {
-      const p = new Problem('test', '/src/Main.cpp');
+    it('should match src path case-sensitively', () => {
+      const p = new Problem('test', '/src/main.cpp');
       expect(p.isRelated('/src/main.cpp')).toBe(true);
+      expect(p.isRelated('/src/Main.cpp')).toBe(false);
     });
 
     it('should match checker path', () => {
       const p = new Problem('test', '/src/main.cpp');
       p.checker = { path: '/checker.cpp', hash: null };
-      expect(p.isRelated('/Checker.cpp')).toBe(true);
+      expect(p.isRelated('/checker.cpp')).toBe(true);
     });
 
     it('should match interactor path', () => {
       const p = new Problem('test', '/src/main.cpp');
       p.interactor = { path: '/interactor.cpp', hash: null };
-      expect(p.isRelated('/Interactor.cpp')).toBe(true);
+      expect(p.isRelated('/interactor.cpp')).toBe(true);
     });
 
-    it('should match stressTest paths', () => {
+    it('should match stress test paths', () => {
       const p = new Problem('test', '/src/main.cpp');
       p.stressTest.generator = { path: '/gen.cpp', hash: null };
-      expect(p.isRelated('/Gen.cpp')).toBe(true);
+      expect(p.isRelated('/gen.cpp')).toBe(true);
     });
 
     it('should match testcase paths', () => {
