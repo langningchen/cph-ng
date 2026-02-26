@@ -202,8 +202,8 @@
             ],
             "markdownDescription": "%config.basic.folderOpener%",
             "markdownEnumDescriptions": [
-              "%config.basic.folderOpener.enumDescriptions.tree%",
-              "%config.basic.folderOpener.enumDescriptions.flat%"
+              "%config.basic.folderOpener.tree%",
+              "%config.basic.folderOpener.flat%"
             ]
           },
           "cph-ng.basic.showPanel": {
@@ -224,30 +224,17 @@
               9
             ],
             "enumItemLabels": [
-              "%config.basic.showPanel.enumItemLabels.-1%",
-              "%config.basic.showPanel.enumItemLabels.-2%",
-              "%config.basic.showPanel.enumItemLabels.1%",
-              "%config.basic.showPanel.enumItemLabels.2%",
-              "%config.basic.showPanel.enumItemLabels.3%",
-              "%config.basic.showPanel.enumItemLabels.4%",
-              "%config.basic.showPanel.enumItemLabels.5%",
-              "%config.basic.showPanel.enumItemLabels.6%",
-              "%config.basic.showPanel.enumItemLabels.7%",
-              "%config.basic.showPanel.enumItemLabels.8%",
-              "%config.basic.showPanel.enumItemLabels.9%"
-            ],
-            "markdownEnumDescriptions": [
-              "%config.basic.showPanel.markdownEnumDescriptions.-1%",
-              "%config.basic.showPanel.markdownEnumDescriptions.-2%",
-              "%config.basic.showPanel.markdownEnumDescriptions.1%",
-              "%config.basic.showPanel.markdownEnumDescriptions.2%",
-              "%config.basic.showPanel.markdownEnumDescriptions.3%",
-              "%config.basic.showPanel.markdownEnumDescriptions.4%",
-              "%config.basic.showPanel.markdownEnumDescriptions.5%",
-              "%config.basic.showPanel.markdownEnumDescriptions.6%",
-              "%config.basic.showPanel.markdownEnumDescriptions.7%",
-              "%config.basic.showPanel.markdownEnumDescriptions.8%",
-              "%config.basic.showPanel.markdownEnumDescriptions.9%"
+              "%config.basic.showPanel.-1%",
+              "%config.basic.showPanel.-2%",
+              "%config.basic.showPanel.1%",
+              "%config.basic.showPanel.2%",
+              "%config.basic.showPanel.3%",
+              "%config.basic.showPanel.4%",
+              "%config.basic.showPanel.5%",
+              "%config.basic.showPanel.6%",
+              "%config.basic.showPanel.7%",
+              "%config.basic.showPanel.8%",
+              "%config.basic.showPanel.9%"
             ]
           }
         }
@@ -445,9 +432,9 @@
             ],
             "markdownDescription": "%config.problem.foundMatchTestcaseBehavior%",
             "markdownEnumDescriptions": [
-              "%config.problem.foundMatchTestcaseBehavior.enumDescriptions.ask%",
-              "%config.problem.foundMatchTestcaseBehavior.enumDescriptions.always%",
-              "%config.problem.foundMatchTestcaseBehavior.enumDescriptions.never%"
+              "%config.problem.foundMatchTestcaseBehavior.ask%",
+              "%config.problem.foundMatchTestcaseBehavior.always%",
+              "%config.problem.foundMatchTestcaseBehavior.never%"
             ]
           },
           "cph-ng.problem.expandBehavior": {
@@ -463,12 +450,12 @@
             ],
             "markdownDescription": "%config.problem.expandBehavior%",
             "markdownEnumDescriptions": [
-              "%config.problem.expandBehavior.enumDescriptions.always%",
-              "%config.problem.expandBehavior.enumDescriptions.never%",
-              "%config.problem.expandBehavior.enumDescriptions.failed%",
-              "%config.problem.expandBehavior.enumDescriptions.first%",
-              "%config.problem.expandBehavior.enumDescriptions.firstFailed%",
-              "%config.problem.expandBehavior.enumDescriptions.same%"
+              "%config.problem.expandBehavior.always%",
+              "%config.problem.expandBehavior.never%",
+              "%config.problem.expandBehavior.failed%",
+              "%config.problem.expandBehavior.first%",
+              "%config.problem.expandBehavior.firstFailed%",
+              "%config.problem.expandBehavior.same%"
             ]
           },
           "cph-ng.problem.templateFile": {
@@ -626,9 +613,9 @@
               "dark"
             ],
             "markdownEnumDescriptions": [
-              "%config.sidebar.colorTheme.enumDescriptions.auto%",
-              "%config.sidebar.colorTheme.enumDescriptions.light%",
-              "%config.sidebar.colorTheme.enumDescriptions.dark%"
+              "%config.sidebar.colorTheme.auto%",
+              "%config.sidebar.colorTheme.light%",
+              "%config.sidebar.colorTheme.dark%"
             ]
           },
           "cph-ng.sidebar.hiddenStatuses": {
