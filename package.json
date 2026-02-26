@@ -701,7 +701,7 @@
         "icon": "$(desktop-download)"
       },
       {
-        "command": "cph-ng.runTestcases",
+        "command": "cph-ng.runAllTestcases",
         "title": "%commands.runTestcases%",
         "icon": "$(run-all)"
       },
@@ -727,7 +727,7 @@
         "when": "!cph-ng.hasProblem && cph-ng.canImport"
       },
       {
-        "command": "cph-ng.runTestcases",
+        "command": "cph-ng.runAllTestcases",
         "key": "ctrl+alt+b",
         "when": "cph-ng.hasProblem && !cph-ng.isRunning"
       },
@@ -745,7 +745,7 @@
           "group": "navigation"
         },
         {
-          "command": "cph-ng.runTestcases",
+          "command": "cph-ng.runAllTestcases",
           "when": "cph-ng.hasProblem && !cph-ng.isRunning",
           "group": "navigation"
         },
