@@ -4,6 +4,10 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 
 ## [Unreleased]
 
+- **refactor**: rename "Brute Force Compare" to "Stress Test" in documentation and code
+- **refactor**(config): rename and move keys
+- **docs**: remove documents since they are outdated
+- **ci**: remove unnecessary permissions and streamline environment variables
 - **feat**(core): use base32 in problem fs
 - **fix**(core): problem fs refresh
 - **feat**(webview): show test case id on hover
@@ -13,6 +17,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 - **chore**(config): simplify translation keys
 - **chore**(deps): upgrade packages
 - **feat**(core): close problem when no editor
+- **ci**: upgrade versions
 
 ## 0.6.3
 

@@ -778,7 +778,7 @@
     "@biomejs/biome": "^2.4.4",
     "@commitlint/cli": "^20.4.2",
     "@commitlint/config-conventional": "^20.4.2",
-    "@swc/core": "^1.15.13",
+    "@swc/core": "^1.15.17",
     "@types/adm-zip": "^0.5.7",
     "@types/crypto-js": "^4.2.2",
     "@types/lodash": "^4.17.24",
@@ -802,7 +802,7 @@
     "typescript": "^5.9.3",
     "vitest": "^4.0.18",
     "vitest-mock-extended": "^3.1.0",
-    "webpack": "^5.105.2",
+    "webpack": "^5.105.3",
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
@@ -821,7 +821,7 @@
     "copy-webpack-plugin": "^13.0.1",
     "crypto-js": "^4.2.0",
     "hi-base32": "^0.5.1",
-    "hono": "^4.12.2",
+    "hono": "^4.12.3",
     "i18next": "^25.8.13",
     "immer": "^11.1.4",
     "lodash": "^4.17.23",
