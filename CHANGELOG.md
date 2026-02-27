@@ -2,7 +2,7 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
-## [Unreleased]
+## 0.6.4
 
 - **refactor**: rename "Brute Force Compare" to "Stress Test" in documentation and code
 - **refactor**(config): rename and move keys
