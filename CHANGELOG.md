@@ -18,6 +18,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 - **chore**(deps): upgrade packages
 - **feat**(core): close problem when no editor
 - **ci**: upgrade versions
+- **feat**(webview): add contact information
 
 ## 0.6.3
 

@@ -52,6 +52,9 @@ export const WelcomeDialog = () => {
             {t('welcomeDialog.refactorWarning')}
           </Alert>
           <Typography variant='body2'>{t('welcomeDialog.content')}</Typography>
+          <Alert severity='info' sx={{ width: '100%', boxSizing: 'border-box' }}>
+            {t('welcomeDialog.contactUs')}
+          </Alert>
           <Box>
             <Link
               href='https://github.com/langningchen/cph-ng/issues'
