@@ -11,7 +11,7 @@ export default {
     'scope-enum': [
       2,
       'always',
-      ['webview', 'router', 'core', 'judge', 'ui', 'config', 'deps']
+      ['webview', 'router', 'userScript', 'core', 'judge', 'ui', 'config', 'deps']
     ],
   }
 };

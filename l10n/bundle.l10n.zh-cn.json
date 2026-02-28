@@ -10,6 +10,7 @@
   "CPH-NG: Connecting...": "CPH-NG: 正在连接...",
   "CPH-NG: Offline": "CPH-NG: 离线",
   "Cannot determine the programming language of the source file: {file}.": "无法确定源文件的编程语言：{file}。",
+  "Cannot resolve user script path": "无法解析用户脚本路径",
   "Cannot use both external runner and wrapper at the same time": "无法同时使用外部运行器和包装器。",
   "Checker": "检查器",
   "Choose a folder containing test cases": "选择包含测试样例的文件夹",

@@ -5,6 +5,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 ## [Unreleased]
 
 - **fix(ui)**: focus on compilation output channel when compilation error occurs
+- **fix(userScript)**: resolve workspace path [#168](https://github.com/langningchen/cph-ng/issues/168)
 
 ## 0.6.4
 

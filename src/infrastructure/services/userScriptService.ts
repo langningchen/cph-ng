@@ -66,7 +66,13 @@ export class UserScriptService implements IUserScriptService {
       this.logger.debug('No user script configured');
       return undefined;
     }
-    const scriptFile = this.pathResolver.renderPath(this.settings.companion.customPathScript);
+    const scriptFile = await this.pathResolver.renderWorkspacePath(
+      this.settings.companion.customPathScript,
+    );
+    if (!scriptFile) {
+      this.ui.alert('error', this.translator.t('Cannot resolve user script path'));
+      return undefined;
+    }
 
     let code: string;
     try {
