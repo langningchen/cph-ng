@@ -89,6 +89,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     } catch (e) {
       this.logger.error('Compilation failed', e);
       this.compilation.append((e as Error).message);
+      this.compilation.show(true);
       this.telemetry.error('compileError', e);
       return e as Error;
     }

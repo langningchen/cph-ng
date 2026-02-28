@@ -2,6 +2,10 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## [Unreleased]
+
+- **fix(ui)**: focus on compilation output channel when compilation error occurs
+
 ## 0.6.4
 
 - **refactor**: rename "Brute Force Compare" to "Stress Test" in documentation and code
