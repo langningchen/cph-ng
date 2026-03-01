@@ -51,24 +51,22 @@ export class PathResolverAdapter implements IPathResolver {
   }
 
   private _renderPath(original: string): string {
-    return this.path.resolve(
-      this.renderString(original, [
-        ['tmp', this.sys.tmpdir()],
-        ['home', this.sys.homedir()],
-        ['extensionPath', this.extPath],
-      ]),
-    );
+    return this.renderString(original, [
+      ['tmp', this.sys.tmpdir()],
+      ['home', this.sys.homedir()],
+      ['extensionPath', this.extPath],
+    ]);
   }
 
   public renderPath(original: string): string {
-    const result = this._renderPath(original);
+    const result = this.path.resolve(this._renderPath(original));
     this.logger.trace('Rendered path', { original, result });
     return result;
   }
 
   public async renderWorkspacePath(original: string): Promise<string | null> {
     let result = this._renderPath(original);
-    if (!result.includes('${workspace}')) return result;
+    if (!result.includes('${workspace}')) return this.path.resolve(result);
 
     const folders = workspace.workspaceFolders;
     if (!folders || folders.length === 0) {
@@ -112,7 +110,7 @@ export class PathResolverAdapter implements IPathResolver {
       selectedWsPath = picked;
     }
 
-    result = this.renderString(result, [['workspace', selectedWsPath]]);
+    result = this.path.resolve(this.renderString(result, [['workspace', selectedWsPath]]));
     this.logger.trace('Rendered workspace path', { original, result });
     return result;
   }
