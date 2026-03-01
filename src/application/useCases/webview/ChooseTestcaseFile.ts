@@ -61,7 +61,7 @@ export class ChooseTestcaseFile extends BaseProblemUseCase<ChooseTestcaseFileMsg
     if (!fileUri?.length) return;
     const testcase = problem.getTestcase(msg.testcaseId);
     const partialTestcase = await this.testcaseScanner.fromFile(fileUri);
-    if (partialTestcase.stdin) testcase.stdin = partialTestcase.stdin;
-    if (partialTestcase.answer) testcase.answer = partialTestcase.answer;
+    if (isInput) testcase.stdin = partialTestcase.stdin;
+    else testcase.answer = partialTestcase.answer;
   }
 }

@@ -7,6 +7,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 - **fix(ui)**: focus on compilation output channel when compilation error occurs
 - **fix(userScript)**: resolve workspace path [#168](https://github.com/langningchen/cph-ng/issues/168)
 - **fix**(userScript): render path on after resolving [#168](https://github.com/langningchen/cph-ng/issues/168)
+- **fix(core)**: update testcase properties based on input type [#169](https://github.com/langningchen/cph-ng/issues/169)
 
 ## 0.6.4
 
