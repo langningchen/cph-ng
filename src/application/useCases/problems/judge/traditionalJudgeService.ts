@@ -82,7 +82,7 @@ export class TraditionalJudgeService implements IJudgeService {
       );
       const stdout = new TestcaseIo({ path: executionResult.stdoutPath });
       const stderr = new TestcaseIo({ path: executionResult.stderrPath });
-      observer.onResult({
+      await observer.onResult({
         verdict: finalResult.verdict,
         timeMs: finalResult.timeMs,
         memoryMb: finalResult.memoryMb,
@@ -92,8 +92,8 @@ export class TraditionalJudgeService implements IJudgeService {
       });
     } catch (e) {
       if (e instanceof ExecutionRejected)
-        observer.onResult({ verdict: VerdictName.rejected, msg: e.message });
-      else observer.onError(e as Error);
+        await observer.onResult({ verdict: VerdictName.rejected, msg: e.message });
+      else await observer.onError(e as Error);
     }
   }
 }

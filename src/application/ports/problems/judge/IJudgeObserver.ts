@@ -15,11 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Promisable } from 'type-fest';
 import type { TestcaseResult } from '@/domain/entities/testcase';
 import type { VerdictName } from '@/domain/entities/verdict';
 
 export interface IJudgeObserver {
   onStatusChange(verdict: VerdictName): void;
-  onResult(result: Partial<TestcaseResult>): void;
-  onError(error: Error): void;
+  onResult(result: Partial<TestcaseResult>): Promisable<void>;
+  onError(error: Error): Promisable<void>;
 }

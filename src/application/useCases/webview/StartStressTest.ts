@@ -18,7 +18,11 @@
 import type { StartStressTestMsg } from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
-import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
+import {
+  AbortReason,
+  type IProcessExecutor,
+  type ProcessOptions,
+} from '@/application/ports/node/IProcessExecutor';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
@@ -33,7 +37,7 @@ import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import { StressTestState } from '@/domain/entities/stressTest';
+import { type StressTest, StressTestState } from '@/domain/entities/stressTest';
 import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import { VerdictName } from '@/domain/entities/verdict';
@@ -41,6 +45,8 @@ import type { TestcaseId } from '@/domain/types';
 
 @injectable()
 export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
+  private tempFiles: string[] = [];
+
   public constructor(
     @inject(TOKENS.compilerService) private readonly compiler: ICompilerService,
     @inject(TOKENS.judgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
@@ -62,7 +68,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
   ): Promise<void> {
     const { problem } = fullProblem;
     const stressTest = problem.stressTest;
-    if (!stressTest || !stressTest.generator || !stressTest.bruteForce) {
+    if (!stressTest?.generator || !stressTest?.bruteForce) {
       this.ui.alert(
         'warn',
         this.translator.t('Please choose both generator and brute force files first.'),
@@ -89,74 +95,91 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
     const judgeService = this.judgeFactory.create(problem);
     stressTest.clearCnt();
 
-    while (!ac.signal.aborted) {
-      stressTest.count();
-      stressTest.state = StressTestState.generating;
-      const genRes = await this.executor.execute({
-        cmd: [artifacts.stressTest.generator.path],
-        timeoutMs: this.settings.stressTest.generatorTimeLimit,
-        signal: ac.signal,
-      });
-      if (genRes instanceof Error) {
-        stressTest.state = StressTestState.internalError;
-        this.ui.alert('warn', genRes.message);
-        break;
+    try {
+      while (!ac.signal.aborted) {
+        stressTest.count();
+        stressTest.state = StressTestState.generating;
+        const genRes = await this.runStep({
+          cmd: [artifacts.stressTest.generator.path],
+          timeoutMs: this.settings.stressTest.generatorTimeLimit,
+          signal: ac.signal,
+        });
+        if (!genRes) break;
+
+        stressTest.state = StressTestState.runningBruteForce;
+        const bfRes = await this.runStep({
+          cmd: [artifacts.stressTest.bruteForce.path],
+          timeoutMs: this.settings.stressTest.bruteForceTimeLimit,
+          signal: ac.signal,
+          stdinPath: genRes.stdoutPath,
+        });
+        if (!bfRes) break;
+
+        const ctx: JudgeContext = {
+          problem,
+          stdinPath: genRes.stdoutPath,
+          answerPath: bfRes.stdoutPath,
+          artifacts,
+        };
+
+        const observer: IJudgeObserver = {
+          onStatusChange: () => {},
+          onResult: async (res: FinalResult) => {
+            if (res.verdict === VerdictName.accepted) return;
+            if (res.verdict === VerdictName.rejected) stressTest.state = StressTestState.inactive;
+            else {
+              stressTest.state = StressTestState.foundDifference;
+              const testcaseId = this.crypto.randomUUID() as TestcaseId;
+              const testcase = new Testcase(
+                await this.testcaseIoService.tryInlining(
+                  new TestcaseIo({ path: genRes.stdoutPath }),
+                ),
+                await this.testcaseIoService.tryInlining(
+                  new TestcaseIo({ path: bfRes.stdoutPath }),
+                ),
+                true,
+              );
+              testcase.updateResult({
+                verdict: res.verdict,
+                timeMs: res.timeMs,
+                memoryMb: res.memoryMb,
+                msg: res.msg,
+              });
+              problem.addTestcase(testcaseId, testcase);
+            }
+          },
+          onError: (e) => {
+            throw e;
+          },
+        };
+
+        stressTest.state = StressTestState.runningSolution;
+        await judgeService.judge(ctx, observer, ac.signal);
+        if (!stressTest.isRunning) break;
+        this.cleanup();
       }
-
-      stressTest.state = StressTestState.runningBruteForce;
-      const bfRes = await this.executor.execute({
-        cmd: [artifacts.stressTest.bruteForce.path],
-        timeoutMs: this.settings.stressTest.bruteForceTimeLimit,
-        signal: ac.signal,
-        stdinPath: genRes.stdoutPath,
-      });
-      if (bfRes instanceof Error) {
-        stressTest.state = StressTestState.internalError;
-        this.ui.alert('warn', bfRes.message);
-        break;
-      }
-
-      const ctx: JudgeContext = {
-        problem,
-        stdinPath: genRes.stdoutPath,
-        answerPath: bfRes.stdoutPath,
-        artifacts,
-      };
-
-      const observer: IJudgeObserver = {
-        onStatusChange: () => {},
-        onResult: async (res: FinalResult) => {
-          if (res.verdict === VerdictName.accepted) return;
-          if (res.verdict === VerdictName.rejected) stressTest.state = StressTestState.inactive;
-          else {
-            stressTest.state = StressTestState.foundDifference;
-            const testcaseId = this.crypto.randomUUID() as TestcaseId;
-            const testcase = new Testcase(
-              await this.testcaseIoService.tryInlining(new TestcaseIo({ path: genRes.stdoutPath })),
-              await this.testcaseIoService.tryInlining(new TestcaseIo({ path: bfRes.stdoutPath })),
-              true,
-            );
-            testcase.updateResult({
-              verdict: res.verdict,
-              timeMs: res.timeMs,
-              memoryMb: res.memoryMb,
-              msg: res.msg,
-            });
-            problem.addTestcase(testcaseId, testcase);
-          }
-        },
-        onError: (e) => {
-          stressTest.state = StressTestState.internalError;
-          this.ui.alert('warn', e.message);
-        },
-      };
-
-      stressTest.state = StressTestState.runningSolution;
-      await judgeService.judge(ctx, observer, ac.signal);
-      if (!stressTest.isRunning) break;
-
-      this.tmp.dispose([genRes.stdoutPath, genRes.stderrPath, bfRes.stdoutPath, bfRes.stderrPath]);
+    } catch (e) {
+      this.handleError(stressTest, e as Error);
+    } finally {
+      this.cleanup();
+      if (ac.signal.aborted) stressTest.state = StressTestState.inactive;
+      fullProblem.abort();
     }
-    fullProblem.abort();
+  }
+
+  private cleanup() {
+    this.tmp.dispose(this.tempFiles);
+    this.tempFiles = [];
+  }
+  private async runStep(params: ProcessOptions) {
+    const res = await this.executor.execute(params);
+    if (res instanceof Error) throw res;
+    if (res.abortReason === AbortReason.UserAbort) return null;
+    this.tempFiles.push(res.stdoutPath, res.stderrPath);
+    return res;
+  }
+  private handleError(stressTest: StressTest, error: Error) {
+    stressTest.state = StressTestState.internalError;
+    this.ui.alert('warn', error.message);
   }
 }

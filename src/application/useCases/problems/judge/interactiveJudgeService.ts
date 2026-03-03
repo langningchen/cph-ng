@@ -85,11 +85,11 @@ export class InteractiveJudgeService implements IJudgeService {
         },
         signal,
       );
-      observer.onResult(finalResult);
+      await observer.onResult(finalResult);
     } catch (e) {
       if (e instanceof ExecutionRejected)
-        observer.onResult({ verdict: VerdictName.rejected, msg: e.message });
-      else observer.onError(e as Error);
+        await observer.onResult({ verdict: VerdictName.rejected, msg: e.message });
+      else await observer.onError(e as Error);
     }
   }
 }
