@@ -9,6 +9,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 - **fix**(userScript): render path on after resolving [#168](https://github.com/langningchen/cph-ng/issues/168)
 - **fix(core)**: update testcase properties based on input type [#169](https://github.com/langningchen/cph-ng/issues/169)
 - **fix(core)**: stress test can not end manually
+- **chore**(deps): upgrade packages
 
 ## 0.6.4
 
