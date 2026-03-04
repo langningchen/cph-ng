@@ -107,7 +107,8 @@ export const RunButtonGroup = ({
               name={action.label}
               larger={larger}
               color={action.color}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setOpen(false);
                 action.onClick();
               }}
