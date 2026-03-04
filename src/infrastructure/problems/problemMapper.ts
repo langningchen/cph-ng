@@ -49,6 +49,7 @@ export class ProblemMapper {
   }
   public toEntity(dto: IProblem): Problem {
     const problem = new Problem(dto.name, dto.src.path);
+    problem.src.hash = dto.src.hash;
     problem.url = dto.url;
     for (const testcaseId of dto.testcaseOrder) {
       const testcase = dto.testcases[testcaseId];

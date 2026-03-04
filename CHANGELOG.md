@@ -2,6 +2,10 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## [Unreleased]
+
+- **fix(core)**: set hash when loading problem
+
 ## 0.6.5
 
 - **fix(ui)**: focus on compilation output channel when compilation error occurs
