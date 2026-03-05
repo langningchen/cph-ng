@@ -99,16 +99,32 @@ export class ProblemRepository implements IProblemRepository {
   public async persist(problemId: ProblemId): Promise<boolean> {
     const backgroundProblem = this.backgroundProblems.get(problemId);
     if (!backgroundProblem || backgroundProblem.ac) return false;
+
+    // Check if this is the currently active problem synchronously to avoid race
     const activePath = this.activePath.getActivePath();
-    if (activePath && (await this.getByPath(activePath))?.problemId === problemId) {
-      this.logger.trace('Cannot persist active problem', problemId);
+    if (activePath) {
+      // Synchronous check - iterate through background problems
+      for (const bgProblem of this.backgroundProblems.values()) {
+        if (bgProblem.problemId === problemId && bgProblem.problem.isRelated(activePath)) {
+          this.logger.trace('Cannot persist active problem', problemId);
+          return false;
+        }
+      }
+    }
+
+    backgroundProblem.addTimeElapsed(this.clock.now());
+    try {
+      await this.problemService.save(backgroundProblem.problem);
+      this.logger.debug('Persisted problem', problemId);
+    } catch (e) {
+      this.logger.error('Failed to save problem, keeping in memory', e);
+      // Don't delete from memory if save failed
       return false;
     }
-    backgroundProblem.addTimeElapsed(this.clock.now());
-    await this.problemService.save(backgroundProblem.problem);
+
+    // Only delete after successful save
     this.backgroundProblems.delete(problemId);
     this.fireBackgroundEvent();
-    this.logger.debug('Persisted problem', problemId);
     return true;
   }
 

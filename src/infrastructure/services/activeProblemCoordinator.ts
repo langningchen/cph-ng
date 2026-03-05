@@ -18,6 +18,7 @@
 import { inject, injectable } from 'tsyringe';
 import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IExtensionContext } from '@/application/ports/vscode/IExtensionContext';
@@ -35,6 +36,9 @@ import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapp
 @injectable()
 export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
   private active: BackgroundProblem | null = null;
+  private switchingPromise: Promise<void> | null = null;
+  private autoSaveTimer: NodeJS.Timeout | null = null;
+  private readonly autoSaveDelayMs = 2000; // 2 seconds debounce
 
   public constructor(
     @inject(TOKENS.activePathService) private readonly activePathService: IActivePathService,
@@ -45,6 +49,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
     @inject(WebviewProblemMapper) private readonly mapper: WebviewProblemMapper,
+    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
   ) {
     this.logger = this.logger.withScope('activeProblemCoordinator');
     this.problemFs.signals.on('problemFileChanged', () => {
@@ -61,6 +66,29 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     const canImport = this.context.canImport;
     this.logger.trace('No active problem to dispatch', { canImport });
     this.eventBus.noProblem(canImport);
+  }
+
+  private scheduleAutoSave() {
+    if (!this.active) return;
+
+    // Clear existing timer
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+    }
+
+    // Schedule new auto-save
+    this.autoSaveTimer = setTimeout(async () => {
+      if (!this.active) return;
+
+      this.logger.debug('Auto-saving active problem', { problemId: this.active.problemId });
+      try {
+        await this.problemService.save(this.active.problem);
+        this.logger.trace('Auto-save completed', { problemId: this.active.problemId });
+      } catch (e) {
+        this.logger.error('Auto-save failed', e);
+        // Don't throw - auto-save is best-effort
+      }
+    }, this.autoSaveDelayMs);
   }
 
   private onPatchMeta = async (payload: WithRevision<ProblemMetaPayload>) => {
@@ -91,12 +119,14 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       revision,
     });
     this.problemFs.signals.emit('addTestcase', this.active.problem.src.path, testcaseId, payload);
+    this.scheduleAutoSave();
   };
 
   private onDeleteTestcase = async (testcaseId: TestcaseId, revision: number) => {
     if (!this.active) return;
     this.eventBus.deleteTestcase(this.active.problemId, testcaseId, { revision });
     this.problemFs.signals.emit('deleteTestcase', this.active.problem.src.path, testcaseId);
+    this.scheduleAutoSave();
   };
 
   private onPatchTestcase = async (
@@ -110,6 +140,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       revision,
     });
     this.problemFs.signals.emit('patchTestcase', this.active.problem.src.path, testcaseId, payload);
+    this.scheduleAutoSave();
   };
 
   private onPatchTestcaseResult = async (
@@ -144,13 +175,39 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
   }
 
   public async onActiveEditorChanged() {
+    // Serialize calls to prevent race conditions during rapid file switching
+    if (this.switchingPromise) {
+      this.logger.debug('Waiting for previous editor change to complete');
+      await this.switchingPromise;
+    }
+
+    this.switchingPromise = this._onActiveEditorChangedImpl();
+    try {
+      await this.switchingPromise;
+    } finally {
+      this.switchingPromise = null;
+    }
+  }
+
+  private async _onActiveEditorChangedImpl() {
+    // Clear any pending auto-save timer
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+      this.autoSaveTimer = null;
+    }
+
     if (this.active) {
       this.detachListeners(this.active.problem);
       this.logger.debug('Unload previous active problem', { problemId: this.active.problemId });
-      await this.repo.persist(this.active.problemId);
-      this.logger.trace('Persisted previous active problem on active change', {
-        problemId: this.active.problemId,
-      });
+      try {
+        await this.repo.persist(this.active.problemId);
+        this.logger.trace('Persisted previous active problem on active change', {
+          problemId: this.active.problemId,
+        });
+      } catch (e) {
+        this.logger.error('Failed to persist previous active problem', e);
+        // Continue even if persist fails - the problem is still in memory in the repo
+      }
     }
 
     const filePath = this.activePathService.getActivePath();
