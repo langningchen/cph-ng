@@ -9,6 +9,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 - **chore**(deps): upgrade packages
 - **fix**(core): improve editor change handling with promise chaining [#170](https://github.com/langningchen/cph-ng/issues/170)
 - **fix**(webview): handle abort in stress test compilation errors
+- **fix**(welcomeDialog): update content and contact information for clarity
 
 ## 0.6.5
 

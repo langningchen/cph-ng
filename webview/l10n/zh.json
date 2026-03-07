@@ -108,10 +108,8 @@
   "verdictSummary.pending": "等待中",
   "verdictSummary.running": "运行中",
   "welcomeDialog.close": "知道了！",
-  "welcomeDialog.contactUs": "如有任何问题或建议，您可以添加我们的 QQ 交流群：1084083880，或者通过 GitHub 反馈给我们。",
-  "welcomeDialog.content": "我们正在为 CPH-NG 1.0.0 稳定版做准备。在此准备阶段，插件进行了完整的重构。尽管我们已尽力确保一切正常运行，但某些功能可能不会按预期工作。请及时反馈您遇到的任何问题，以便我们在稳定版发布前修复它们。",
-  "welcomeDialog.feedbackLink": "在 GitHub 上报告问题 \u2192",
-  "welcomeDialog.refactorWarning": "此版本进行了完整的重构，所有功能可能存在问题。部分设置名称变动，请重新检查并配置您的设置项。",
-  "welcomeDialog.subtitle": "正在为 1.0.0 稳定版做准备",
+  "welcomeDialog.contactUs": "问题或建议，欢迎进 QQ 群 1084083880 或在 GitHub 反馈。",
+  "welcomeDialog.content": "CPH-NG 1.0.0 正式版临近，期待您的宝贵反馈，助力我们打磨产品。",
+  "welcomeDialog.refactorWarning": "版本重大重构：部分设置项已变更，请务必检查并重新配置。",
   "welcomeDialog.title": "欢迎使用 CPH-NG v{{version}}！"
 }

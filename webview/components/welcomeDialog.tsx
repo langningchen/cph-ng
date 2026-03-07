@@ -17,13 +17,11 @@
 
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import React, { useState } from 'react';
@@ -45,26 +43,13 @@ export const WelcomeDialog = () => {
       </DialogTitle>
       <DialogContent>
         <CphNgFlex column>
-          <Typography variant='body2' color='primary' fontWeight='bold'>
-            {t('welcomeDialog.subtitle')}
-          </Typography>
+          <Typography variant='body2'>{t('welcomeDialog.content')}</Typography>
           <Alert severity='warning' sx={{ width: '100%', boxSizing: 'border-box' }}>
             {t('welcomeDialog.refactorWarning')}
           </Alert>
-          <Typography variant='body2'>{t('welcomeDialog.content')}</Typography>
           <Alert severity='info' sx={{ width: '100%', boxSizing: 'border-box' }}>
             {t('welcomeDialog.contactUs')}
           </Alert>
-          <Box>
-            <Link
-              href='https://github.com/langningchen/cph-ng/issues'
-              target='_blank'
-              rel='noreferrer'
-              variant='body2'
-            >
-              {t('welcomeDialog.feedbackLink')}
-            </Link>
-          </Box>
         </CphNgFlex>
       </DialogContent>
       <DialogActions>
