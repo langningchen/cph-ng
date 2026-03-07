@@ -10,8 +10,7 @@ export default {
     'subject-full-stop': [2, 'never', '.'],
     'scope-enum': [
       2,
-      'always',
-      ['webview', 'router', 'userScript', 'core', 'judge', 'ui', 'config', 'deps']
+      'always'
     ],
   }
 };

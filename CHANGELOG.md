@@ -4,19 +4,19 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 
 ## [Unreleased]
 
-- **fix(core)**: set hash when loading problem
-- **fix(webview)**: stop propagation when clicking floating button
-- **chore(deps)**: upgrade packages
-- **fix(core)**: improve editor change handling with promise chaining [#170](https://github.com/langningchen/cph-ng/issues/170)
-- **fix(webview)**: handle abort in stress test compilation errors
+- **fix**(core): set hash when loading problem
+- **fix**(webview): stop propagation when clicking floating button
+- **chore**(deps): upgrade packages
+- **fix**(core): improve editor change handling with promise chaining [#170](https://github.com/langningchen/cph-ng/issues/170)
+- **fix**(webview): handle abort in stress test compilation errors
 
 ## 0.6.5
 
-- **fix(ui)**: focus on compilation output channel when compilation error occurs
-- **fix(userScript)**: resolve workspace path [#168](https://github.com/langningchen/cph-ng/issues/168)
+- **fix**(ui): focus on compilation output channel when compilation error occurs
+- **fix**(userScript): resolve workspace path [#168](https://github.com/langningchen/cph-ng/issues/168)
 - **fix**(userScript): render path on after resolving [#168](https://github.com/langningchen/cph-ng/issues/168)
-- **fix(core)**: update testcase properties based on input type [#169](https://github.com/langningchen/cph-ng/issues/169)
-- **fix(core)**: stress test can not end manually
+- **fix**(core): update testcase properties based on input type [#169](https://github.com/langningchen/cph-ng/issues/169)
+- **fix**(core): stress test can not end manually
 - **chore**(deps): upgrade packages
 
 ## 0.6.4
