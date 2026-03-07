@@ -6,6 +6,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 
 - **fix(core)**: set hash when loading problem
 - **fix(webview)**: stop propagation when clicking floating button
+- **chore(deps)**: upgrade packages
 
 ## 0.6.5
 
