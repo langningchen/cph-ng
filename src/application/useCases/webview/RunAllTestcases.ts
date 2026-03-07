@@ -80,85 +80,88 @@ export class RunAllTestcases extends BaseProblemUseCase<RunAllTestcasesMsg> {
     bgProblem.ac = new AbortController();
     setupAbortListener();
 
-    const testcaseOrder = problem.getEnabledTestcaseIds();
+    try {
+      const testcaseOrder = problem.getEnabledTestcaseIds();
 
-    for (const testcaseId of testcaseOrder) {
-      const testcase = problem.getTestcase(testcaseId);
-      this.tmp.dispose(testcase.clearResult());
-      testcase.updateResult({ verdict: VerdictName.compiling });
-    }
-
-    await this.document.save(problem.src.path);
-    const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
-    if (artifacts instanceof Error) {
-      const verdict =
-        artifacts instanceof CompileError
-          ? VerdictName.compilationError
-          : artifacts instanceof CompileAborted
-            ? VerdictName.rejected
-            : VerdictName.systemError;
-      problem.updateResult({ verdict, msg: artifacts.message });
-      return;
-    }
-    problem.updateResult({ verdict: VerdictName.compiled });
-
-    const expandBehavior = this.settings.problem.expandBehavior;
-    let hasAnyExpanded = false;
-
-    const judgeService = this.judgeFactory.create(problem);
-
-    for (const testcaseId of testcaseOrder) {
-      currentId = testcaseId;
-      const testcase = problem.getTestcase(testcaseId);
-      if (testcase.result?.verdict !== VerdictName.compiled) continue;
-      if (skipAll) {
-        testcase.updateResult({ verdict: VerdictName.skipped });
-        continue;
+      for (const testcaseId of testcaseOrder) {
+        const testcase = problem.getTestcase(testcaseId);
+        this.tmp.dispose(testcase.clearResult());
+        testcase.updateResult({ verdict: VerdictName.compiling });
       }
 
-      const stdinPathResult = await this.testcaseIoService.ensureFilePath(testcase.stdin);
-      const answerPathResult = await this.testcaseIoService.ensureFilePath(testcase.answer);
-      const ctx: JudgeContext = {
-        problem,
-        stdinPath: stdinPathResult.path,
-        answerPath: answerPathResult.path,
-        artifacts,
-      };
+      await this.document.save(problem.src.path);
+      const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
+      if (artifacts instanceof Error) {
+        const verdict =
+          artifacts instanceof CompileError
+            ? VerdictName.compilationError
+            : artifacts instanceof CompileAborted
+              ? VerdictName.rejected
+              : VerdictName.systemError;
+        problem.updateResult({ verdict, msg: artifacts.message });
+        return;
+      }
+      problem.updateResult({ verdict: VerdictName.compiled });
 
-      const observer: IJudgeObserver = {
-        onStatusChange: (verdict) => {
-          testcase.updateResult({ verdict });
-        },
-        onResult: (res: FinalResult) => {
-          testcase.updateResult(res);
+      const expandBehavior = this.settings.problem.expandBehavior;
+      let hasAnyExpanded = false;
 
-          let isExpand: boolean = false;
-          if (expandBehavior === 'always') {
-            isExpand = true;
-          } else if (expandBehavior === 'never') {
-            isExpand = false;
-          } else if (expandBehavior === 'failed') {
-            isExpand = Verdicts[res.verdict].type === VerdictType.failed;
-          } else if (expandBehavior === 'first') {
-            isExpand = !hasAnyExpanded;
-          } else if (expandBehavior === 'firstFailed') {
-            isExpand = !hasAnyExpanded && Verdicts[res.verdict].type === VerdictType.failed;
-          } else if (expandBehavior === 'same') {
-            isExpand = testcase.isExpand;
-          }
-          hasAnyExpanded ||= isExpand;
-          testcase.isExpand = isExpand;
-        },
-        onError: (e) => {
-          testcase.updateResult({ verdict: VerdictName.systemError, msg: e.message });
-        },
-      };
+      const judgeService = this.judgeFactory.create(problem);
 
-      await judgeService.judge(ctx, observer, ac.signal);
+      for (const testcaseId of testcaseOrder) {
+        currentId = testcaseId;
+        const testcase = problem.getTestcase(testcaseId);
+        if (testcase.result?.verdict !== VerdictName.compiled) continue;
+        if (skipAll) {
+          testcase.updateResult({ verdict: VerdictName.skipped });
+          continue;
+        }
 
-      if (stdinPathResult.needDispose) this.tmp.dispose(stdinPathResult.path);
-      if (answerPathResult.needDispose) this.tmp.dispose(answerPathResult.path);
+        const stdinPathResult = await this.testcaseIoService.ensureFilePath(testcase.stdin);
+        const answerPathResult = await this.testcaseIoService.ensureFilePath(testcase.answer);
+        const ctx: JudgeContext = {
+          problem,
+          stdinPath: stdinPathResult.path,
+          answerPath: answerPathResult.path,
+          artifacts,
+        };
+
+        const observer: IJudgeObserver = {
+          onStatusChange: (verdict) => {
+            testcase.updateResult({ verdict });
+          },
+          onResult: (res: FinalResult) => {
+            testcase.updateResult(res);
+
+            let isExpand: boolean = false;
+            if (expandBehavior === 'always') {
+              isExpand = true;
+            } else if (expandBehavior === 'never') {
+              isExpand = false;
+            } else if (expandBehavior === 'failed') {
+              isExpand = Verdicts[res.verdict].type === VerdictType.failed;
+            } else if (expandBehavior === 'first') {
+              isExpand = !hasAnyExpanded;
+            } else if (expandBehavior === 'firstFailed') {
+              isExpand = !hasAnyExpanded && Verdicts[res.verdict].type === VerdictType.failed;
+            } else if (expandBehavior === 'same') {
+              isExpand = testcase.isExpand;
+            }
+            hasAnyExpanded ||= isExpand;
+            testcase.isExpand = isExpand;
+          },
+          onError: (e) => {
+            testcase.updateResult({ verdict: VerdictName.systemError, msg: e.message });
+          },
+        };
+
+        await judgeService.judge(ctx, observer, ac.signal);
+
+        if (stdinPathResult.needDispose) this.tmp.dispose(stdinPathResult.path);
+        if (answerPathResult.needDispose) this.tmp.dispose(answerPathResult.path);
+      }
+    } finally {
+      bgProblem.abort();
     }
-    bgProblem.abort();
   }
 }

@@ -61,51 +61,54 @@ export class RunSingleTestcase extends BaseProblemUseCase<RunSingleTestcaseMsg> 
     const ac = new AbortController();
     bgProblem.ac = ac;
 
-    this.tmp.dispose(testcase.clearResult());
-    testcase.updateResult({ verdict: VerdictName.compiling });
+    try {
+      this.tmp.dispose(testcase.clearResult());
+      testcase.updateResult({ verdict: VerdictName.compiling });
 
-    await this.document.save(problem.src.path);
-    const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
-    if (artifacts instanceof Error) {
-      testcase.updateResult({
-        verdict:
-          artifacts instanceof CompileError
-            ? VerdictName.compilationError
-            : artifacts instanceof CompileAborted
-              ? VerdictName.rejected
-              : VerdictName.systemError,
-        msg: artifacts.message,
-      });
-      return;
+      await this.document.save(problem.src.path);
+      const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
+      if (artifacts instanceof Error) {
+        testcase.updateResult({
+          verdict:
+            artifacts instanceof CompileError
+              ? VerdictName.compilationError
+              : artifacts instanceof CompileAborted
+                ? VerdictName.rejected
+                : VerdictName.systemError,
+          msg: artifacts.message,
+        });
+        return;
+      }
+      testcase.updateResult({ verdict: VerdictName.compiled });
+
+      const judgeService = this.judgeFactory.create(problem);
+      const stdinPathResult = await this.testcaseIoService.ensureFilePath(testcase.stdin);
+      const answerPathResult = await this.testcaseIoService.ensureFilePath(testcase.answer);
+      const ctx: JudgeContext = {
+        problem,
+        stdinPath: stdinPathResult.path,
+        answerPath: answerPathResult.path,
+        artifacts,
+      };
+
+      const observer: IJudgeObserver = {
+        onStatusChange: (verdict) => {
+          testcase.updateResult({ verdict });
+        },
+        onResult: (res: FinalResult) => {
+          testcase.updateResult(res);
+        },
+        onError: (e) => {
+          testcase.updateResult({ verdict: VerdictName.systemError, msg: e.message });
+        },
+      };
+
+      await judgeService.judge(ctx, observer, ac.signal);
+
+      if (stdinPathResult.needDispose) this.tmp.dispose(stdinPathResult.path);
+      if (answerPathResult.needDispose) this.tmp.dispose(answerPathResult.path);
+    } finally {
+      bgProblem.abort();
     }
-    testcase.updateResult({ verdict: VerdictName.compiled });
-
-    const judgeService = this.judgeFactory.create(problem);
-    const stdinPathResult = await this.testcaseIoService.ensureFilePath(testcase.stdin);
-    const answerPathResult = await this.testcaseIoService.ensureFilePath(testcase.answer);
-    const ctx: JudgeContext = {
-      problem,
-      stdinPath: stdinPathResult.path,
-      answerPath: answerPathResult.path,
-      artifacts,
-    };
-
-    const observer: IJudgeObserver = {
-      onStatusChange: (verdict) => {
-        testcase.updateResult({ verdict });
-      },
-      onResult: (res: FinalResult) => {
-        testcase.updateResult(res);
-      },
-      onError: (e) => {
-        testcase.updateResult({ verdict: VerdictName.systemError, msg: e.message });
-      },
-    };
-
-    await judgeService.judge(ctx, observer, ac.signal);
-
-    if (stdinPathResult.needDispose) this.tmp.dispose(stdinPathResult.path);
-    if (answerPathResult.needDispose) this.tmp.dispose(answerPathResult.path);
-    bgProblem.abort();
   }
 }

@@ -85,10 +85,12 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
     const artifacts = await this.compiler.compileAll(problem, msg.forceCompile, ac.signal);
     if (artifacts instanceof Error) {
       stressTest.state = StressTestState.compilationError;
+      fullProblem.abort();
       return;
     }
     if (!artifacts.stressTest) {
       stressTest.state = StressTestState.internalError;
+      fullProblem.abort();
       return;
     }
 
