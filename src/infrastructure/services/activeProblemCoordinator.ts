@@ -87,6 +87,10 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       } catch (e) {
         this.logger.error('Auto-save failed', e);
         // Don't throw - auto-save is best-effort
+      } finally {
+        // Clear the timer reference when finished so callers can reliably check
+        // whether a pending timer exists.
+        this.autoSaveTimer = null;
       }
     }, this.autoSaveDelayMs);
   }
@@ -176,17 +180,22 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
 
   public async onActiveEditorChanged() {
     // Serialize calls to prevent race conditions during rapid file switching
-    if (this.switchingPromise) {
-      this.logger.debug('Waiting for previous editor change to complete');
-      await this.switchingPromise;
-    }
+    // Chain each call onto the previous promise so callers queue instead of
+    // all awaiting the same promise and racing when it resolves.
+    const previous = this.switchingPromise ?? Promise.resolve();
 
-    this.switchingPromise = this._onActiveEditorChangedImpl();
-    try {
-      await this.switchingPromise;
-    } finally {
-      this.switchingPromise = null;
-    }
+    let queuePromise: Promise<void>;
+    queuePromise = previous
+      .then(() => this._onActiveEditorChangedImpl())
+      .finally(() => {
+        // Only clear if this is still the latest queued operation
+        if (this.switchingPromise === queuePromise) {
+          this.switchingPromise = null;
+        }
+      });
+
+    this.switchingPromise = queuePromise;
+    await queuePromise;
   }
 
   private async _onActiveEditorChangedImpl() {

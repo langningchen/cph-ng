@@ -102,14 +102,9 @@ export class ProblemRepository implements IProblemRepository {
 
     // Check if this is the currently active problem synchronously to avoid race
     const activePath = this.activePath.getActivePath();
-    if (activePath) {
-      // Synchronous check - iterate through background problems
-      for (const bgProblem of this.backgroundProblems.values()) {
-        if (bgProblem.problemId === problemId && bgProblem.problem.isRelated(activePath)) {
-          this.logger.trace('Cannot persist active problem', problemId);
-          return false;
-        }
-      }
+    if (activePath && backgroundProblem.problem.isRelated(activePath)) {
+      this.logger.trace('Cannot persist active problem', problemId);
+      return false;
     }
 
     backgroundProblem.addTimeElapsed(this.clock.now());
