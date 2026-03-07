@@ -25,6 +25,8 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class EditorWatcherModule implements IExtensionModule {
+  private _editorChangeChain: Promise<void> = Promise.resolve();
+
   public constructor(
     @inject(TOKENS.activePathService) private readonly activePathService: IActivePathService,
     @inject(TOKENS.logger) private readonly logger: ILogger,
@@ -36,15 +38,23 @@ export class EditorWatcherModule implements IExtensionModule {
 
   public async setup(context: ExtensionContext): Promise<void> {
     context.subscriptions.push(
-      window.onDidChangeActiveTextEditor(async (editor) => {
-        await this.handleEditorChange(editor);
+      window.onDidChangeActiveTextEditor((editor) => {
+        this._enqueueEditorChange(editor);
       }),
     );
 
-    await this.handleEditorChange(window.activeTextEditor);
+    await this._enqueueEditorChange(window.activeTextEditor);
   }
 
-  private async handleEditorChange(editor: TextEditor | undefined) {
+  private _enqueueEditorChange(editor: TextEditor | undefined): Promise<void> {
+    const p = this._editorChangeChain
+      .catch(() => {})
+      .then(() => this._doHandleEditorChange(editor));
+    this._editorChangeChain = p.catch(() => {});
+    return p;
+  }
+
+  private async _doHandleEditorChange(editor: TextEditor | undefined): Promise<void> {
     let path: string | null = null;
     if (editor && editor.document.uri.scheme === 'file') path = editor.document.uri.fsPath;
     else if (!window.tabGroups.activeTabGroup.tabs.length) path = null;

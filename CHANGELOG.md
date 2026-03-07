@@ -7,6 +7,7 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 - **fix(core)**: set hash when loading problem
 - **fix(webview)**: stop propagation when clicking floating button
 - **chore(deps)**: upgrade packages
+- **fix(core)**: improve editor change handling with promise chaining [#170](https://github.com/langningchen/cph-ng/issues/170)
 
 ## 0.6.5
 
