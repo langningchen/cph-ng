@@ -17,9 +17,10 @@
 
 import type { CphSubmitData } from '@cph-ng/core';
 import { BaseSubmitter, type CMWrapped } from './base';
+import { submitterDomains } from './domains';
 
 export class LuoguSubmitter extends BaseSubmitter {
-  public readonly supportedDomains = ['www.luogu.com.cn'] as const;
+  public readonly supportedDomains = submitterDomains.LUOGU;
 
   public getSubmitUrl(data: CphSubmitData): string {
     return data.url;

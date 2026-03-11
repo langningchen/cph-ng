@@ -18,9 +18,10 @@
 import type { CphSubmitData } from '@cph-ng/core';
 import { ExtractError } from '../errors';
 import { BaseSubmitter } from './base';
+import { submitterDomains } from './domains';
 
 export class CodeforcesSubmitter extends BaseSubmitter {
-  public readonly supportedDomains = ['codeforces.com'] as const;
+  public readonly supportedDomains = submitterDomains.CODEFORCES;
   private readonly contestRegex =
     /^https?:\/\/codeforces\.com\/contest\/([0-9]+)\/problem\/([A-Z0-9]+)/;
   private readonly problemRegex =

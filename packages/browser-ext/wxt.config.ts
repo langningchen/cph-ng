@@ -18,12 +18,11 @@
 /// <reference path="./.wxt/wxt.d.ts" />
 import { resolve } from 'node:path';
 import { defineConfig } from 'wxt';
-import { submitters } from './src/submitters/index';
+import { allDomains } from './src/submitters/domains';
 
 const buildHostPermissions = (): string[] => {
   const patterns = new Set<string>();
-  for (const submitter of submitters)
-    for (const domain of submitter.supportedDomains) patterns.add(`*://${domain}/*`);
+  for (const domain of allDomains) patterns.add(`*://${domain}/*`);
   return [...patterns].sort();
 };
 

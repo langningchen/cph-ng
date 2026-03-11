@@ -17,9 +17,10 @@
 
 import type { CphSubmitData } from '@cph-ng/core';
 import { BaseSubmitter, type CMWrapped } from './base';
+import { submitterDomains } from './domains';
 
 export class AtCoderSubmitter extends BaseSubmitter {
-  public readonly supportedDomains = ['atcoder.jp'] as const;
+  public readonly supportedDomains = submitterDomains.ATCODER;
 
   public getSubmitUrl(data: CphSubmitData): string {
     try {
