@@ -15,7 +15,7 @@ This project exclusively uses **pnpm**. Never provide npm or yarn commands.
 ### Post-Coding Verification Pipeline
 After any code modification, instruct the user to execute this sequence to ensure zero errors/warnings:
 1.  **Format & Lint**: `pnpm run format`
-2.  **Type Check**: `pnpm exec tsc --noEmit`
+2.  **Type Check**: `pnpm run check`
 3.  **Build Validation**: `pnpm run package`
 
 ## 3. Code Generation Quality

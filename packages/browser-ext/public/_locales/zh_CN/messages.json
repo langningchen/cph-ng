@@ -1,0 +1,57 @@
+{
+  "appDescription": {
+    "message": "CPH-NG 的浏览器扩展：通过 WebSocket 向竞赛编程评测提交解答。"
+  },
+  "appName": {
+    "message": "CPH-NG 提交"
+  },
+  "appTitle": {
+    "message": "CPH-NG 提交"
+  },
+  "btnActivate": {
+    "message": "激活"
+  },
+  "btnConnect": {
+    "message": "连接"
+  },
+  "btnDisconnect": {
+    "message": "断开"
+  },
+  "btnSet": {
+    "message": "设置"
+  },
+  "elementErrorMessage": {
+    "message": "找不到选择器 \"$SELECTOR$\" 对应的元素",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
+  "extractErrorMessage": {
+    "message": "无法从现有数据中提取信息 \"$KEY$\"",
+    "placeholders": {
+      "key": {
+        "content": "$1"
+      }
+    }
+  },
+  "labelPort": {
+    "message": "端口"
+  },
+  "longTimeSubmission": {
+    "message": "提交正在进行中，可能需要比预期更长的时间。请耐心等待或重试。如果问题持续存在，请在 GitHub 上报告。"
+  },
+  "recentSubmissions": {
+    "message": "最近提交"
+  },
+  "statusConnected": {
+    "message": "已连接"
+  },
+  "statusDisconnected": {
+    "message": "未连接"
+  },
+  "statusInactive": {
+    "message": "未激活"
+  }
+}

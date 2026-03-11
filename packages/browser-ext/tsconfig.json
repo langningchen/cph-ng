@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "out",
+    "lib": ["ES2022", "DOM"],
+    "paths": {
+      "@cph-ng/core": ["../core/out/src"]
+    }
+  },
+  "include": ["src", "entrypoints", "wxt.config.ts"],
+  "exclude": [".output", ".wxt"],
+  "references": [{ "path": "../core" }]
+}

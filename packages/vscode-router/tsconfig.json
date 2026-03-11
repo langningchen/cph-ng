@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "out",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "paths": {
+      "@r/*": ["./src/*"],
+      "@cph-ng/core": ["../core/out/src"]
+    }
+  },
+  "references": [{ "path": "../core" }],
+  "include": ["src"]
+}

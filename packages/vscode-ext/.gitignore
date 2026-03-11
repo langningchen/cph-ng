@@ -1,0 +1,3 @@
+src/application/ports/vscode/ISettings.ts
+src/infrastructure/vscode/settingsAdapter.ts
+tests/infrastructure/vscode/settingsMock.ts

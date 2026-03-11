@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
   issues: write
   id-token: write
   attestations: write
@@ -37,30 +38,235 @@ jobs:
   build:
     needs: [lint, test]
     runs-on: ubuntu-latest
+    outputs:
+      vscode_version: ${{ steps.versions.outputs.vscode_version }}
+      vscode_changed: ${{ steps.versions.outputs.vscode_changed }}
+      browser_version: ${{ steps.versions.outputs.browser_version }}
+      browser_changed: ${{ steps.versions.outputs.browser_changed }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
+          submodules: true
+          fetch-depth: 0
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - uses: ./.github/actions/setup-node-pnpm
+      - name: Build all packages
+        run: pnpm run pack
+        env:
+          BUILD_TYPE: Auto build
+      - name: Detect version changes
+        id: versions
+        if: github.event_name == 'push'
+        run: |
+          VSCODE_VERSION=$(node -p "require('./packages/vscode-ext/package.json').version")
+          BROWSER_VERSION=$(node -p "require('./packages/browser-ext/package.json').version")
+
+          LATEST_VSCODE_TAG=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -1 || echo '')
+          LATEST_BROWSER_TAG=$(git tag --list 'browser-v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -1 || echo '')
+          LATEST_VSCODE_VERSION="${LATEST_VSCODE_TAG#v}"
+          LATEST_BROWSER_VERSION="${LATEST_BROWSER_TAG#browser-v}"
+
+          if [ "$VSCODE_VERSION" != "$LATEST_VSCODE_VERSION" ]; then
+            echo "vscode_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "vscode_changed=false" >> $GITHUB_OUTPUT
+          fi
+          if [ "$BROWSER_VERSION" != "$LATEST_BROWSER_VERSION" ]; then
+            echo "browser_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "browser_changed=false" >> $GITHUB_OUTPUT
+          fi
+          echo "vscode_version=$VSCODE_VERSION" >> $GITHUB_OUTPUT
+          echo "browser_version=$BROWSER_VERSION" >> $GITHUB_OUTPUT
+      - name: Upload VSCode extension artifact
+        uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: dist/*.vsix
+          if-no-files-found: error
+      - name: Upload browser extension artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-extension
+          path: dist/*.zip
+          if-no-files-found: error
+      - name: Generate Provenance
+        if: |
+          (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.action != 'closed') &&
+          (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/*.vsix
+
+  publish-vscode:
+    needs: [build]
+    if: >
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main' &&
+      needs.build.outputs.vscode_changed == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
           submodules: true
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - uses: ./.github/actions/setup-node-pnpm
-      - name: Build Package
-        run: pnpm package
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact
+      - name: Determine release type
+        id: release
+        run: |
+          VERSION="${{ needs.build.outputs.vscode_version }}"
+          PATCH=$(echo "$VERSION" | awk -F. '{print $3}')
+          if [ "$PATCH" = "0" ]; then
+            PRE_RELEASE=false
+          else
+            PRE_RELEASE=true
+          fi
+          echo "pre_release=$PRE_RELEASE" >> $GITHUB_OUTPUT
+      - name: Create tag
+        run: |
+          git tag "v${{ needs.build.outputs.vscode_version }}"
+          git push origin "v${{ needs.build.outputs.vscode_version }}"
+      - name: Publish to Marketplace
+        run: |
+          if [ "${{ steps.release.outputs.pre_release }}" = "true" ]; then
+            pnpm run publish --pre-release
+          else
+            pnpm run publish
+          fi
+        working-directory: packages/vscode-ext
         env:
-          BUILD_TYPE: Auto build
-      - name: Upload Artifact
-        if: github.event_name == 'push' || github.event.action != 'closed'
-        uses: actions/upload-artifact@v7
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: Extract changelog
+        id: changelog
+        run: |
+          VERSION="${{ needs.build.outputs.vscode_version }}"
+          CHANGELOG_CONTENT=$(awk "/^## $VERSION\$/{flag=1; next} (/^## / || /^<details>/){flag=0} flag" CHANGELOG.md)
+          [ -z "$CHANGELOG_CONTENT" ] && CHANGELOG_CONTENT="- No changelog content available"
+          echo "CHANGELOG_CONTENT<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
         with:
-          archive: false
-          path: ./*.vsix
-          if-no-files-found: error
-      - name: Generate Provenance
-        if: |
-          (github.event_name == 'push' || github.event.action != 'closed') &&
-          (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
-        uses: actions/attest-build-provenance@v2
+          tag_name: v${{ needs.build.outputs.vscode_version }}
+          name: v${{ needs.build.outputs.vscode_version }}
+          files: ./*.vsix
+          prerelease: ${{ steps.release.outputs.pre_release }}
+          body: |
+            ## What's Changed
+            ${{ steps.changelog.outputs.CHANGELOG_CONTENT }}
+
+            ${{ steps.release.outputs.pre_release == 'true' && '⚠️ **This is a pre-release version.**' || '' }}
+
+            ## Installation
+            Download the `.vsix` file or install from the marketplace.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Move cards in project
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.PROJECTS_GITHUB_TOKEN }}
+          PRE_RELEASE: ${{ steps.release.outputs.pre_release }}
+        run: |
+          set -eux
+          PROJECT="/users/langningchen/projectsV2/8"
+          ACCEPT_HEADER="application/vnd.github+json"
+
+          move_cards() {
+            ENCODED_STATUS=$(printf '%s' "$1" | jq -s -R -r @uri)
+            cards_json=$(gh api "$PROJECT/items?q=status:$ENCODED_STATUS" -H "Accept: $ACCEPT_HEADER")
+            echo "$cards_json" | jq -r '.[].id' | while read -r card_id; do
+              if [ -z "$card_id" ] || [ "$card_id" = "null" ]; then
+                continue
+              fi
+              echo "Moving card $card_id -> column $2"
+              gh api -X PATCH $PROJECT/items/"$card_id" -H "Accept: $ACCEPT_HEADER" --input - <<< '{
+                "fields": [
+                  {
+                    "id": 234281529,
+                    "value": "'"$2"'"
+                  }
+                ]
+              }'
+            done
+          }
+
+          if [ "$PRE_RELEASE" = "false" ]; then
+            echo "Normal release: moving Done -> Released and Pre-release -> Released"
+            move_cards "Done" 98236657
+            move_cards "Pre-released" 98236657
+          else
+            echo "Pre-release only: moving Done -> Pre-release"
+            move_cards "Done" 300944f4
+          fi
+
+  publish-browser:
+    needs: [build]
+    if: >
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main' &&
+      needs.build.outputs.browser_changed == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
         with:
-          subject-path: ./*.vsix
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - uses: ./.github/actions/setup-node-pnpm
+      - name: Download browser artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: browser-extension
+      - name: Create tag
+        run: |
+          git tag "browser-v${{ needs.build.outputs.browser_version }}"
+          git push origin "browser-v${{ needs.build.outputs.browser_version }}"
+      - name: Publish to stores via wxt submit
+        working-directory: packages/browser-ext
+        run: pnpm run publish
+        env:
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
+          FIREFOX_JWT_ISSUER: ${{ secrets.AMO_API_KEY }}
+          FIREFOX_JWT_SECRET: ${{ secrets.AMO_API_SECRET }}
+          EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
+          EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+          EDGE_CLIENT_SECRET: ${{ secrets.EDGE_CLIENT_SECRET }}
+          EDGE_ACCESS_TOKEN_URL: https://login.microsoftonline.com/${{ secrets.EDGE_TENANT_ID }}/oauth2/v2.0/token
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: browser-v${{ needs.build.outputs.browser_version }}
+          name: Browser Extension v${{ needs.build.outputs.browser_version }}
+          files: |
+            browser-ext-chrome-${{ needs.build.outputs.browser_version }}.zip
+            browser-ext-firefox-${{ needs.build.outputs.browser_version }}.zip
+          body: |
+            ## Browser Extension v${{ needs.build.outputs.browser_version }}
+
+            Published to Firefox Add-ons and Edge Add-on Store automatically.
+
+            **Chrome manual install**: Download the `.zip`, extract it, then load via `chrome://extensions` with developer mode enabled.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

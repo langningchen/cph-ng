@@ -10,6 +10,19 @@ body:
         Thank you for suggesting a feature! Please provide as much detail as
         possible to help us understand the problem, evaluate the request, and
         implement a solution.
+  - type: dropdown
+    attributes:
+      label: Module
+      description: Which module does this feature apply to?
+      options:
+        - VSCode Extension
+        - Browser Extension
+        - Webview
+        - Router
+        - Core
+        - Other / Unknown
+    validations:
+      required: true
   - type: input
     attributes:
       label: Summary

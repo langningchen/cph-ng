@@ -1,10 +1,4 @@
 {
-  "files.exclude": {
-    "dist": false
-  },
-  "search.exclude": {
-    "dist": true
-  },
   "js/ts.tsc.autoDetect": "off",
   "js/ts.preferences.autoImportSpecifierExcludeRegexes": [
     "^@mui/[^/]+$",
@@ -44,4 +38,5 @@
   "docthis.includeMemberOfOnInterfaceMembers": false,
   "emmet.showAbbreviationSuggestions": false,
   "emmet.showExpandedAbbreviation": "never"
+  // "explorer.excludeGitIgnore": true
 }

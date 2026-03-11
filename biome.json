@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.5/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -7,19 +7,24 @@
   },
   "files": {
     "includes": [
-      "src/**",
-      "tests/**",
-      "webview/**",
-      "router/**",
       "scripts/**",
-      "webpack.config.ts",
-      "l10n/**",
-      "package*.json"
+      "packages/*/src/**",
+      "packages/*/entrypoints/**",
+      "packages/*/tests/**",
+      "packages/*/scripts/**",
+      "packages/*/webpack.config.ts",
+      "packages/*/wxt.config.ts",
+      "packages/*/l10n/**",
+      "packages/*/public/_locales/**",
+      "**/package.nls*.json",
+      "**/l10n/**/*.json",
+      "**/_locales/**/*.json"
     ]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
+    "indentWidth": 2,
     "lineWidth": 100
   },
   "linter": {
@@ -100,7 +105,11 @@
   },
   "overrides": [
     {
-      "includes": ["package.nls*.json", "**/l10n/*.json"],
+      "includes": [
+        "packages/vscode-ext/package.nls*.json",
+        "**/l10n/**/*.json",
+        "**/_locales/**/*.json"
+      ],
       "assist": {
         "actions": {
           "source": {
@@ -115,11 +124,36 @@
       }
     },
     {
-      "includes": ["src/application/ports/problems/history/*.ts"],
+      "includes": ["packages/vscode-ext/src/application/ports/problems/history/*.ts"],
       "linter": {
         "rules": {
           "style": {
             "useNamingConvention": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["packages/browser-ext/wxt.config.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useNamingConvention": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "packages/*/webpack.config.ts",
+        "packages/*/wxt.config.ts",
+        "packages/*/entrypoints/**",
+        "packages/*/tests/env.d.ts"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
           }
         }
       }

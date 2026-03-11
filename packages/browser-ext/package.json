@@ -1,0 +1,34 @@
+{
+  "name": "@cph-ng/browser-ext",
+  "version": "0.6.6",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "scripts": {
+    "compile": "wxt build && wxt build -b firefox",
+    "package": "wxt zip && wxt zip -b firefox",
+    "publish": "pnpm run package && wxt submit",
+    "prepare": "wxt prepare",
+    "watch": "wxt",
+    "clean": "rimraf dist .output .wxt out scripts/out",
+    "check-translations": "tsx --tsconfig scripts/tsconfig.json scripts/check-translations.ts"
+  },
+  "dependencies": {
+    "@cph-ng/core": "workspace:*",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.9",
+    "@mui/material": "^7.3.9",
+    "@webext-core/messaging": "^1.4.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "socket.io-client": "^4.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "~22.19.15",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@wxt-dev/auto-icons": "^1.1.1",
+    "wxt": "^0.20.5"
+  }
+}
