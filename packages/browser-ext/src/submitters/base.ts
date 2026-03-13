@@ -26,11 +26,7 @@ export abstract class BaseSubmitter {
   public abstract getSubmitUrl(data: SubmitData): string;
   public abstract fill(data: SubmitData): Promise<void>;
 
-  protected waitForElement<T extends Element>(
-    selector: string,
-    timeout = 15000,
-    interval = 400,
-  ): Promise<T> {
+  protected waitForElement<T extends Element>(selector: string): Promise<T> {
     return new Promise((resolve, reject) => {
       const el = document.querySelector<T>(selector);
       if (el) {
@@ -38,7 +34,7 @@ export abstract class BaseSubmitter {
         return;
       }
 
-      const deadline = Date.now() + timeout;
+      const deadline = Date.now() + 15000;
       const check = setInterval(() => {
         const el = document.querySelector<T>(selector);
         if (el) {
@@ -51,7 +47,7 @@ export abstract class BaseSubmitter {
           reject(new ElementError(selector));
           return;
         }
-      }, interval);
+      }, 100);
     });
   }
 

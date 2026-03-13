@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { SubmitData } from '@cph-ng/core';
-import { BaseSubmitter, type CMWrapped } from './base';
+import { BaseSubmitter } from './base';
 import { submitterDomains } from './domains';
 
 export class LuoguSubmitter extends BaseSubmitter {
@@ -26,21 +26,14 @@ export class LuoguSubmitter extends BaseSubmitter {
     return data.url;
   }
 
-  public async fill(data: SubmitData) {
+  public async fill({ sourceCode }: SubmitData): Promise<void> {
     const showSubmit = await this.waitForElement<HTMLButtonElement>(
       '#app > div.main-container > header > div > div > div > div:nth-child(1) > button.solid.lform-size-middle',
     );
     showSubmit.click();
 
-    const cmWrapper = await this.waitForElement<CMWrapped>('v-codemirror');
-    if (cmWrapper.CodeMirror) {
-      cmWrapper.CodeMirror.setValue(data.sourceCode);
-    } else {
-      const textarea = await this.waitForElement<HTMLTextAreaElement>(
-        'textarea.source-code, textarea#code, textarea[name="code"]',
-      );
-      this.setCodeMirrorOrTextarea(textarea, data.sourceCode);
-    }
+    const cmContent = await this.waitForElement<HTMLElement>('.cm-content');
+    cmContent.innerText = sourceCode;
 
     const submitBtn = await this.waitForElement<HTMLButtonElement>(
       '#app > div.main-container > main > div > div > div.main > div > div.body > button',
