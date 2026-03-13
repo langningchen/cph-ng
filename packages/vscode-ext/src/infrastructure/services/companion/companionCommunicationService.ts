@@ -22,10 +22,9 @@ import type {
   C2rMsg,
   ClientId,
   CompanionProblem,
-  CphSubmitData,
   R2cMsg,
   RouterConfig,
-  SubmissionId,
+  SubmitData,
 } from '@cph-ng/core';
 import type { ICrypto } from '@v/application/ports/node/ICrypto';
 import type { IPath } from '@v/application/ports/node/IPath';
@@ -42,7 +41,6 @@ type CompanionCommunicationEvents = {
   readingBatch: (batchId: BatchId, count: number, size: number) => void;
   batchAvailable: (batchId: BatchId, problems: CompanionProblem[], autoImport: boolean) => void;
   batchClaimed: (batchId: BatchId) => void;
-  submissionConsumed: (submissionId: SubmissionId) => void;
 };
 
 export type RouterStatus = 'OFFLINE' | 'CONNECTING' | 'ONLINE';
@@ -146,10 +144,6 @@ export class CompanionCommunicationService {
       this.logger.trace(`Received batchClaimed message`, { batchId: msg.batchId });
       this.signals.emit('batchClaimed', msg.batchId);
     });
-    this.ws.on('submissionConsumed', (msg) => {
-      this.logger.trace(`Received submissionConsumed message`, { submissionId: msg.submissionId });
-      this.signals.emit('submissionConsumed', msg.submissionId);
-    });
     this.ws.on('browserStatus', (msg) => {
       this.logger.trace(`Received browserStatus message`, { connected: msg.connected });
       this._isBrowserConnected = msg.connected;
@@ -162,13 +156,8 @@ export class CompanionCommunicationService {
   public claimBatch(batchId: BatchId) {
     this.ws?.emit('claimBatch', { batchId });
   }
-  public submit(data: CphSubmitData) {
-    const submissionId = this.crypto.randomUUID() as SubmissionId;
-    this.ws?.emit('submit', { submissionId, data });
-    return submissionId;
-  }
-  public cancelSubmit(submissionId: SubmissionId) {
-    this.ws?.emit('cancelSubmit', { submissionId });
+  public submit(data: SubmitData) {
+    this.ws?.emit('submit', data);
   }
   public updateConfig(config: Partial<RouterConfig>) {
     this.ws?.emit('updateConfig', { config });

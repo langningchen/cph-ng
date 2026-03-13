@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { BatchId, SubmissionId } from './types';
+import type { BatchId } from './types';
 
 // Router Config
 export interface RouterConfig {
@@ -58,20 +58,13 @@ export interface CompanionProblem {
   };
 }
 
-// Submission Types
-export type CphSubmitEmpty = {
-  empty: true;
-};
-export type CphSubmitData = {
-  empty: false;
-  problemName: string;
+export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error';
+export type SubmitLanguage = string; // TO-DO
+export interface SubmitData {
   url: string;
   sourceCode: string;
-  languageId: number;
-};
-export type CphSubmitResponse = CphSubmitEmpty | CphSubmitData;
-
-export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error';
+  language: SubmitLanguage;
+}
 
 // Router -> Client
 export interface R2cMsg {
@@ -82,14 +75,13 @@ export interface R2cMsg {
     autoImport: boolean;
   }) => void;
   batchClaimed: (msg: { batchId: BatchId }) => void;
-  submissionConsumed: (msg: { submissionId: SubmissionId }) => void;
   log: (msg: { level: LogLevel; message: string; details?: unknown }) => void;
   browserStatus: (msg: { connected: boolean }) => void;
 }
 
 // Router -> Browser messages
 export interface R2bMsg {
-  submitRequest: (msg: { submissionId: SubmissionId; data: CphSubmitData }) => void;
+  submitRequest: (msg: SubmitData) => void;
   status: (msg: { isActive: boolean }) => void;
 }
 
@@ -97,8 +89,7 @@ export interface R2bMsg {
 export interface C2rMsg {
   cancelBatch: (msg: { batchId: BatchId }) => void;
   claimBatch: (msg: { batchId: BatchId }) => void;
-  submit: (msg: { submissionId: SubmissionId; data: CphSubmitData }) => void;
-  cancelSubmit: (msg: { submissionId: SubmissionId }) => void;
+  submit: (msg: SubmitData) => void;
   updateConfig: (msg: { config: Partial<RouterConfig> }) => void;
 }
 

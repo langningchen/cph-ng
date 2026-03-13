@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { B2rMsg, CphSubmitData, R2bMsg } from '@cph-ng/core';
+import type { B2rMsg, R2bMsg, SubmitData } from '@cph-ng/core';
 import { io, type Socket } from 'socket.io-client';
 import { browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
 import { storage } from 'wxt/utils/storage';
-import { onMessage, type PageReadyResponse, sendMessage } from '../src/messaging';
+import { onMessage, sendMessage } from '../src/messaging';
 import { findSubmitter } from '../src/submitters';
 
 const routerPort = storage.defineItem<number>('local:routerPort', {
@@ -85,23 +85,22 @@ export default defineBackground(async () => {
       broadcastStatus();
     });
     state.socket.on('submitRequest', (request) => {
-      console.log('[cph-ng-submit] Received submit request:', request.submissionId);
+      console.log('[cph-ng-submit] Received submit request:', request);
       handleSubmitRequest(request);
     });
   };
 
-  const pendingSubmissions = new Map<number, { submissionId: string; data: CphSubmitData }>();
+  const pendingSubmissions = new Map<number, SubmitData>();
 
-  const handleSubmitRequest = (request: { submissionId: string; data: CphSubmitData }) => {
-    const submitter = findSubmitter(request.data.url);
+  const handleSubmitRequest = (request: SubmitData) => {
+    const submitter = findSubmitter(new URL(request.url));
     if (!submitter) {
-      showError(`No submitter found for URL: ${request.data.url}`);
+      showError(`No submitter found for URL: ${request.url}`);
       return;
     }
 
     try {
-      const submitUrl = submitter.getSubmitUrl(request.data);
-      browser.tabs.create({ url: submitUrl }, (tab) => {
+      browser.tabs.create({ url: submitter.getSubmitUrl(request) }, (tab) => {
         if (browser.runtime.lastError || tab.id === undefined) {
           showError('Failed to open tab');
           return;
@@ -138,10 +137,10 @@ export default defineBackground(async () => {
     connect();
   });
 
-  onMessage('pageReady', ({ sender }): PageReadyResponse | null => {
+  onMessage('pageReady', ({ sender }): SubmitData | null => {
     if (sender.tab?.id !== undefined) {
       const pending = pendingSubmissions.get(sender.tab.id);
-      return pending ? { submissionId: pending.submissionId, data: pending.data } : null;
+      return pending ? pending : null;
     }
     return null;
   });

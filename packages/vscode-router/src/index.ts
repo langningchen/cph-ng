@@ -20,11 +20,9 @@ import type {
   BatchId,
   C2rMsg,
   CompanionProblem,
-  CphSubmitData,
   LogLevel,
   R2bMsg,
   R2cMsg,
-  SubmissionId,
 } from '@cph-ng/core';
 import { serve } from '@hono/node-server';
 import { debug, error, info, trace, warn } from '@r/logger';
@@ -39,10 +37,6 @@ export const batches = new Map<
   BatchId,
   { ignored: boolean; problems: CompanionProblem[]; size: number }
 >();
-export const submissionQueue: {
-  submissionId: SubmissionId;
-  data: CphSubmitData;
-}[] = [];
 
 let isRestarting = false;
 let currentRunningPort = config.port;
@@ -84,16 +78,6 @@ const refreshAllStatus = () => {
     isAnyBrowserConnected,
     browserCount: browserRoom?.size || 0,
   });
-};
-
-const pushToBrowserOrQueue = (submissionId: SubmissionId, data: CphSubmitData) => {
-  if (activeBrowserId) {
-    io.to(activeBrowserId).emit('submitRequest', { submissionId, data });
-    io.to('vscode-clients').emit('submissionConsumed', { submissionId });
-    return true;
-  }
-  submissionQueue.push({ submissionId, data });
-  return false;
 };
 
 export const broadcastLog = (level: LogLevel, message: string, details: unknown) => {
@@ -163,19 +147,6 @@ app.get('/', (ctx) => {
             )
             .join('')}
         </ul>
-        <h3>Submission Queue</h3>
-        <p>Count: ${submissionQueue.length} problem(s)</p>
-        <ul>
-          ${submissionQueue
-            .map(
-              (sub) => `
-            <li>
-              <pre>${sub.submissionId}</pre> to ${sub.data.url}
-            </li>
-          `,
-            )
-            .join('')}
-        </ul>
       </body>
     </html>
   `;
@@ -211,13 +182,6 @@ app.post('/', async (ctx) => {
   return ctx.json({ status: 'ok' });
 });
 
-app.get('/getSubmit', (ctx) => {
-  const submission = submissionQueue.shift();
-  if (!submission) return ctx.json({ empty: true });
-  io.to('vscode-clients').emit('submissionConsumed', { submissionId: submission.submissionId });
-  return ctx.json({ empty: false, ...submission });
-});
-
 let activeBrowserId: string | null = null;
 
 const startServer = () => {
@@ -237,17 +201,11 @@ const startServer = () => {
       info('VSCode connected', { id: socket.id });
 
       socket.emit('browserStatus', { connected: !!activeBrowserId });
-      socket.on('submit', ({ submissionId, data }) => {
-        if (pushToBrowserOrQueue(submissionId, data))
-          info('Submission forwarded to browser extension', { submissionId });
-        else info('New submission added to queue', { submissionId });
-      });
-      socket.on('cancelSubmit', ({ submissionId }) => {
-        const idx = submissionQueue.findIndex((s) => s.submissionId === submissionId);
-        if (idx !== -1) {
-          submissionQueue.splice(idx, 1);
-          info('Submission cancelled', { submissionId });
-        } else warn('Submission to cancel not found in queue', { submissionId });
+      socket.on('submit', (msg) => {
+        if (activeBrowserId) {
+          io.to(activeBrowserId).emit('submitRequest', msg);
+          info('Submission forwarded to browser extension', { msg });
+        } else error('No browser connected');
       });
       socket.on('cancelBatch', ({ batchId }) => {
         const batch = batches.get(batchId);
@@ -276,16 +234,6 @@ const startServer = () => {
       info('Browser connected', { id: socket.id });
       if (!activeBrowserId) activeBrowserId = socket.id;
       refreshAllStatus();
-      if (socket.id === activeBrowserId) {
-        while (submissionQueue.length > 0) {
-          const sub = submissionQueue.shift();
-          if (sub) {
-            pushToBrowserOrQueue(sub.submissionId, sub.data);
-            info('Queued submission flushed to new browser', { submissionId: sub.submissionId });
-          }
-        }
-      }
-
       socket.on('setActive', () => {
         activeBrowserId = socket.id;
         refreshAllStatus();

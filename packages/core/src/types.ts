@@ -23,5 +23,4 @@ export type Branded<T, Label> = T & { [BrandSym]?: Label };
 export type ProblemId = Branded<Uuid, 'ProblemId'>;
 export type TestcaseId = Branded<Uuid, 'TestcaseId'>;
 export type ClientId = Branded<Uuid, 'ClientId'>;
-export type SubmissionId = Branded<Uuid, 'SubmissionId'>;
 export type BatchId = Branded<Uuid, 'BatchId'>;

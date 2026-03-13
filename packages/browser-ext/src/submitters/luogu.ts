@@ -15,18 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { CphSubmitData } from '@cph-ng/core';
+import type { SubmitData } from '@cph-ng/core';
 import { BaseSubmitter, type CMWrapped } from './base';
 import { submitterDomains } from './domains';
 
 export class LuoguSubmitter extends BaseSubmitter {
   public readonly supportedDomains = submitterDomains.LUOGU;
 
-  public getSubmitUrl(data: CphSubmitData): string {
+  public getSubmitUrl(data: SubmitData) {
     return data.url;
   }
 
-  public async fill(data: CphSubmitData): Promise<void> {
+  public async fill(data: SubmitData) {
     const showSubmit = await this.waitForElement<HTMLButtonElement>(
       '#app > div.main-container > header > div > div > div > div:nth-child(1) > button.solid.lform-size-middle',
     );

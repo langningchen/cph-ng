@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { CphSubmitData } from '@cph-ng/core';
+import type { SubmitData } from '@cph-ng/core';
 import { ElementError } from '../errors';
 
 // biome-ignore lint/style/useNamingConvention: CodeMirror is the external API's property name
@@ -23,8 +23,8 @@ export type CMWrapped = HTMLElement & { CodeMirror?: { setValue(v: string): void
 
 export abstract class BaseSubmitter {
   public abstract readonly supportedDomains: readonly string[];
-  public abstract getSubmitUrl(data: CphSubmitData): string;
-  public abstract fill(data: CphSubmitData): Promise<void>;
+  public abstract getSubmitUrl(data: SubmitData): string;
+  public abstract fill(data: SubmitData): Promise<void>;
 
   protected waitForElement<T extends Element>(
     selector: string,

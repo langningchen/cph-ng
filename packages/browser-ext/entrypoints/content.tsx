@@ -48,7 +48,7 @@ const removeOverlay = () => {
 export default defineContentScript({
   matches: ['<all_urls>'],
   async main() {
-    const submitter = findSubmitter(window.location.href);
+    const submitter = findSubmitter(new URL(window.location.href));
     if (!submitter) return;
 
     const response = await sendMessage('pageReady', undefined);
@@ -61,16 +61,14 @@ export default defineContentScript({
     }, 10000);
 
     try {
-      await submitter.fill(response.data);
+      await submitter.fill(response);
       await sendMessage('submitDone', {
-        submissionId: response.submissionId,
         success: true,
         message: '',
       });
       removeOverlay();
     } catch (e) {
       await sendMessage('submitDone', {
-        submissionId: response.submissionId,
         success: false,
         message: String(e),
       });

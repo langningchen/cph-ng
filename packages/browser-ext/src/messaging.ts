@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { CphSubmitData } from '@cph-ng/core';
+import type { SubmitData } from '@cph-ng/core';
 import { defineExtensionMessaging } from '@webext-core/messaging';
 
 export interface StatusResponse {
@@ -24,13 +24,7 @@ export interface StatusResponse {
   port: number;
 }
 
-export interface PageReadyResponse {
-  submissionId: string;
-  data: CphSubmitData;
-}
-
 export interface SubmitDoneData {
-  submissionId: string;
   success: boolean;
   message: string;
 }
@@ -53,7 +47,7 @@ interface ProtocolMap {
   disconnect(data: undefined): void;
   setPort(data: { port: number }): void;
   setActive(data: undefined): void;
-  pageReady(data: undefined): PageReadyResponse | null;
+  pageReady(data: undefined): SubmitData | null;
   submitDone(data: SubmitDoneData): void;
   statusUpdate(data: StatusUpdateData): void;
   submitResult(data: SubmitResultData): void;

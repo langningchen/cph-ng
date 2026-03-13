@@ -28,9 +28,8 @@ export const submitters: readonly BaseSubmitter[] = [
   new LuoguSubmitter(),
 ];
 
-export const findSubmitter = (url: string): BaseSubmitter | null => {
+export const findSubmitter = ({ hostname }: URL): BaseSubmitter | null => {
   try {
-    const { hostname } = new URL(url);
     return submitters.find((s) => s.supportedDomains.includes(hostname)) ?? null;
   } catch {
     return null;

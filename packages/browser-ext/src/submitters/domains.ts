@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 export const submitterDomains = {
-  CODEFORCES: ['codeforces.com', 'm1.codeforces.com'],
+  CODEFORCES: ['codeforces.com', 'm1.codeforces.com', 'm2.codeforces.com', 'm3.codeforces.com'],
   ATCODER: ['atcoder.jp'],
   LUOGU: ['www.luogu.com.cn'],
 } as const;

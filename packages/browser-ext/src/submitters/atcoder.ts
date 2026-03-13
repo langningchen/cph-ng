@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { CphSubmitData } from '@cph-ng/core';
+import type { SubmitData } from '@cph-ng/core';
 import { BaseSubmitter, type CMWrapped } from './base';
 import { submitterDomains } from './domains';
 
 export class AtCoderSubmitter extends BaseSubmitter {
   public readonly supportedDomains = submitterDomains.ATCODER;
 
-  public getSubmitUrl(data: CphSubmitData): string {
+  public getSubmitUrl(data: SubmitData) {
     try {
       const url = new URL(data.url);
       const parts = url.pathname.split('/').filter(Boolean);
@@ -30,13 +30,14 @@ export class AtCoderSubmitter extends BaseSubmitter {
       if (contestsIdx !== -1 && parts[contestsIdx + 2] === 'tasks') {
         const contest = parts[contestsIdx + 1];
         const task = parts[contestsIdx + 3];
-        return `${url.origin}/contests/${contest}/submit?taskScreen=${task}`;
+        url.pathname = `/contests/${contest}/submit?taskScreen=${task}`;
+        return url.toString();
       }
     } catch {}
     return data.url;
   }
 
-  public async fill(data: CphSubmitData): Promise<void> {
+  public async fill(data: SubmitData) {
     const cmWrapper = await this.waitForElement<CMWrapped>('.CodeMirror');
 
     if (cmWrapper.CodeMirror) {

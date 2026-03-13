@@ -567,21 +567,6 @@
             "default": "${extensionPath}/res/defaultScript.js",
             "markdownDescription": "%config.companion.customPathScript%"
           },
-          "cph-ng.companion.submitLanguage": {
-            "type": "number",
-            "markdownDescription": "%config.companion.submitLanguage%",
-            "default": 54,
-            "enum": [
-              54,
-              89,
-              91
-            ],
-            "enumItemLabels": [
-              "%config.companion.submitLanguage.enumItemLabels.54%",
-              "%config.companion.submitLanguage.enumItemLabels.89%",
-              "%config.companion.submitLanguage.enumItemLabels.91%"
-            ]
-          },
           "cph-ng.companion.addTimestamp": {
             "type": "boolean",
             "default": true,

@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { BatchId, CompanionProblem, CphSubmitData, SubmissionId } from '@cph-ng/core';
+import type { BatchId, CompanionProblem, SubmitData } from '@cph-ng/core';
 import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
 import type { ICompanion } from '@v/application/ports/services/ICompanion';
 import type { ILogger } from '@v/application/ports/vscode/ILogger';
@@ -33,7 +33,7 @@ export type BatchList = Map<BatchId, CompanionProblem[]>;
 
 @injectable()
 export class Companion implements ICompanion {
-  private abortControllers: Map<BatchId | SubmissionId, AbortController> = new Map();
+  private abortControllers: Map<BatchId, AbortController> = new Map();
   private readingProgress: Map<BatchId, (count: number, size: number) => void> = new Map();
   private batchesToClaim: BatchList = new Map();
 
@@ -52,7 +52,6 @@ export class Companion implements ICompanion {
     this.ws.signals.on('readingBatch', this.readingBatch);
     this.ws.signals.on('batchAvailable', this.batchAvailable);
     this.ws.signals.on('batchClaimed', this.batchClaimed);
-    this.ws.signals.on('submissionConsumed', this.submissionConsumed);
     this.statusbar.signals.on('click', this.handleStatusBarClick);
   }
 
@@ -146,14 +145,6 @@ export class Companion implements ICompanion {
     if (controller) controller.abort();
     this.updateStatusbar();
   };
-  private submissionConsumed = (submissionId: SubmissionId) => {
-    this.logger.info('Submission consumed', { submissionId });
-    const controller = this.abortControllers.get(submissionId);
-    if (controller) {
-      controller.abort();
-      this.abortControllers.delete(submissionId);
-    }
-  };
 
   public connect() {
     this.ws.connect();
@@ -166,7 +157,12 @@ export class Companion implements ICompanion {
     return this.ws.isBrowserConnected();
   }
   public async submit(problem: Problem) {
-    if (!problem.url) throw new Error(this.translator.t('Problem URL is undefined'));
+    if (!problem.url) throw new Error(this.translator.t('Can not parse problem URL'));
+    try {
+      new URL(problem.url);
+    } catch {
+      throw new Error(this.translator.t('Can not parse problem URL'));
+    }
     this.logger.info('Submitting problem', { problem });
 
     if (!this.ws.isBrowserConnected()) {
@@ -176,6 +172,7 @@ export class Companion implements ICompanion {
           'Browser extension not connected. Install or open the CPH-NG Submit browser extension.',
         ),
       );
+      return;
     }
 
     let sourceCode = await this.fs.readFile(problem.src.path);
@@ -186,30 +183,10 @@ export class Companion implements ICompanion {
     if (this.settings.companion.addTimestamp)
       sourceCode += `\n// Submitted via cph-ng at ${new Date().toISOString()}`;
 
-    const data = {
-      empty: false,
-      problemName: problem.name,
+    this.ws.submit({
       url: problem.url,
       sourceCode,
-      languageId: this.settings.companion.submitLanguage,
-    } satisfies CphSubmitData;
-
-    return new Promise<void>((resolve) => {
-      const submissionId = this.ws.submit(data);
-      const controller = new AbortController();
-      this.abortControllers.set(submissionId, controller);
-      const progress = this.ui.progress(
-        this.translator.t('Submitting {name}...', { name: problem.name }),
-        () => {
-          this.ws.cancelSubmit(submissionId);
-          resolve();
-        },
-      );
-      controller.signal.addEventListener('abort', () => {
-        progress.done();
-        this.abortControllers.delete(submissionId);
-        resolve();
-      });
-    });
+      language: '', // TO-DO
+    } satisfies SubmitData);
   }
 }
