@@ -21,7 +21,7 @@ import { BaseSubmitter } from './base';
 import { submitterDomains } from './domains';
 
 export class AtCoderSubmitter extends BaseSubmitter {
-  public readonly supportedDomains = submitterDomains.ATCODER;
+  public readonly supportedDomains = submitterDomains.atcoder;
   private readonly contestRegex = /^\/contests\/(?<contest>[\w-]+)\/tasks\/(?<problem>\w+)/;
 
   public getSubmitUrl(data: SubmitData) {

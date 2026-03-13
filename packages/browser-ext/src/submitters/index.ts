@@ -20,6 +20,7 @@ export { BaseSubmitter } from './base';
 import { AtCoderSubmitter } from './atcoder';
 import type { BaseSubmitter } from './base';
 import { CodeforcesSubmitter } from './codeforces';
+import { HydroSubmitter } from './hydro';
 import { LuoguSubmitter } from './luogu';
 
 export const findSubmitter = ({ hostname }: URL): BaseSubmitter | null => {
@@ -27,6 +28,7 @@ export const findSubmitter = ({ hostname }: URL): BaseSubmitter | null => {
     new CodeforcesSubmitter(),
     new AtCoderSubmitter(),
     new LuoguSubmitter(),
+    new HydroSubmitter(),
   ];
 
   try {

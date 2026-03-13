@@ -15,11 +15,24 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export const submitterDomains = {
-  codeforces: ['codeforces.com', 'm1.codeforces.com', 'm2.codeforces.com', 'm3.codeforces.com'],
-  atcoder: ['atcoder.jp'],
-  luogu: ['www.luogu.com.cn'],
-  hydro: ['hydro.ac'],
-} as const;
+import type { SubmitData } from '@cph-ng/core';
+import { BaseSubmitter } from './base';
+import { submitterDomains } from './domains';
 
-export const allDomains = Object.values(submitterDomains).flat();
+export class HydroSubmitter extends BaseSubmitter {
+  public readonly supportedDomains = submitterDomains.hydro;
+
+  public getSubmitUrl(data: SubmitData) {
+    const url = new URL(data.url);
+    url.pathname += '/submit';
+    return url.toString();
+  }
+
+  public async fill({ sourceCode }: SubmitData): Promise<void> {
+    const sourceCodeEl = await this.waitForElement<HTMLTextAreaElement>('textarea');
+    sourceCodeEl.value = sourceCode;
+
+    const submitBtn = await this.waitForElement<HTMLButtonElement>('input[type="submit"]');
+    submitBtn.click();
+  }
+}

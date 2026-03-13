@@ -21,7 +21,7 @@ import { BaseSubmitter } from './base';
 import { submitterDomains } from './domains';
 
 export class CodeforcesSubmitter extends BaseSubmitter {
-  public readonly supportedDomains = submitterDomains.CODEFORCES;
+  public readonly supportedDomains = submitterDomains.codeforces;
   private readonly contestRegex = /^\/contest\/(?<contest>\d+)\/problem\/(?<problem>\w+)/;
   private readonly problemRegex = /^\/problemset\/problem\/(?<contest>\d+)\/(?<problem>\w+)/;
 

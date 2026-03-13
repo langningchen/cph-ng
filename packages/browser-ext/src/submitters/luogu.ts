@@ -20,7 +20,7 @@ import { BaseSubmitter } from './base';
 import { submitterDomains } from './domains';
 
 export class LuoguSubmitter extends BaseSubmitter {
-  public readonly supportedDomains = submitterDomains.LUOGU;
+  public readonly supportedDomains = submitterDomains.luogu;
 
   public getSubmitUrl(data: SubmitData) {
     return data.url;
