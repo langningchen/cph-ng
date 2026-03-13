@@ -16,40 +16,45 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { SubmitData } from '@cph-ng/core';
-import { BaseSubmitter, type CMWrapped } from './base';
+import { ExtractError } from '../errors';
+import { BaseSubmitter } from './base';
 import { submitterDomains } from './domains';
 
 export class AtCoderSubmitter extends BaseSubmitter {
   public readonly supportedDomains = submitterDomains.ATCODER;
+  private readonly contestRegex = /^\/contests\/(?<contest>[\w-]+)\/tasks\/(?<problem>\w+)/;
 
   public getSubmitUrl(data: SubmitData) {
-    try {
-      const url = new URL(data.url);
-      const parts = url.pathname.split('/').filter(Boolean);
-      const contestsIdx = parts.indexOf('contests');
-      if (contestsIdx !== -1 && parts[contestsIdx + 2] === 'tasks') {
-        const contest = parts[contestsIdx + 1];
-        const task = parts[contestsIdx + 3];
-        url.pathname = `/contests/${contest}/submit?taskScreen=${task}`;
-        return url.toString();
-      }
-    } catch {}
-    return data.url;
+    const url = new URL(data.url);
+    const isContest = url.pathname.match(this.contestRegex)?.groups;
+    if (isContest) {
+      url.pathname = `/contests/${isContest.contest}/submit`;
+      url.searchParams.set('taskScreenName', isContest.problem);
+    } else throw new ExtractError('type');
+    return url.toString();
   }
 
   public async fill(data: SubmitData) {
-    const cmWrapper = await this.waitForElement<CMWrapped>('.CodeMirror');
+    const languageEl = await this.waitForElement<HTMLSelectElement>('#select-lang > div > select');
+    languageEl.value = '6017';
 
-    if (cmWrapper.CodeMirror) {
-      cmWrapper.CodeMirror.setValue(data.sourceCode);
-    } else {
-      const textarea = await this.waitForElement<HTMLTextAreaElement>('#sourceCode');
-      this.setCodeMirrorOrTextarea(textarea, data.sourceCode);
-    }
-
-    const submitBtn = await this.waitForElement<HTMLElement>(
-      '#submit, input[type="submit"], button[type="submit"]',
+    const editorBtn = await this.waitForElement<HTMLButtonElement>(
+      '.editor-buttons > button:nth-child(3)',
     );
+    if (editorBtn.getAttribute('aria-pressed') !== 'true') editorBtn.click();
+
+    const codeEl = await this.waitForElement<HTMLTextAreaElement>('#plain-textarea');
+    await this.waitFor(() => codeEl.style.display !== 'none');
+    codeEl.value = data.sourceCode;
+
+    editorBtn.click();
+
+    this.requireInteraction('.cf-challenge');
+    const captchaEl = await this.waitForElement<HTMLInputElement>('.cf-challenge > div > input');
+    await this.waitFor(() => captchaEl.value.trim() !== '');
+    this.clearInteraction();
+
+    const submitBtn = await this.waitForElement<HTMLButtonElement>('#submit');
     submitBtn.click();
   }
 }

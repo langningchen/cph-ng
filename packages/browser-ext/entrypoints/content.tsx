@@ -19,20 +19,20 @@ import { createRoot, type Root } from 'react-dom/client';
 import { defineContentScript } from 'wxt/utils/define-content-script';
 import { t } from '../src/i18n';
 import { sendMessage } from '../src/messaging';
-import { LoadingOverlay } from '../src/overlay';
+import { LoadingOverlay, type OverlayProps } from '../src/overlay';
 import { findSubmitter } from '../src/submitters';
 
 let root: Root | null = null;
 let container: HTMLDivElement | null = null;
 
-const showOverlay = (error?: string) => {
+const showOverlay = (props: OverlayProps = {}) => {
   if (!container) {
     container = document.createElement('div');
     const shadow = container.attachShadow({ mode: 'open' });
     document.body.appendChild(container);
     root = createRoot(shadow);
   }
-  root?.render(<LoadingOverlay error={error} />);
+  root?.render(<LoadingOverlay {...props} />);
 };
 const removeOverlay = () => {
   if (root) {
@@ -50,6 +50,15 @@ export default defineContentScript({
   async main() {
     const submitter = findSubmitter(new URL(window.location.href));
     if (!submitter) return;
+    submitter.requireInteraction = (selector: string | null) => {
+      if (!selector) {
+        showOverlay();
+        return;
+      }
+      showOverlay({ info: t('interactionRequired'), holeSelector: selector });
+      const element = document.querySelector(selector);
+      element?.scrollIntoView();
+    };
 
     const response = await sendMessage('pageReady', undefined);
     if (!response) return;
@@ -57,7 +66,7 @@ export default defineContentScript({
     showOverlay();
 
     const timer = setTimeout(() => {
-      showOverlay(t('longTimeSubmission'));
+      showOverlay({ info: t('longTimeSubmission') });
     }, 10000);
 
     try {
@@ -72,7 +81,7 @@ export default defineContentScript({
         success: false,
         message: String(e),
       });
-      showOverlay(String(e));
+      showOverlay({ error: String(e) });
     } finally {
       clearTimeout(timer);
     }

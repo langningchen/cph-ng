@@ -36,6 +36,12 @@
       }
     }
   },
+  "interactionRequired": {
+    "message": "请与页面进行交互以完成提交。"
+  },
+  "internalErrorMessage": {
+    "message": "发生内部错误，请重试。如果问题持续存在，请在 GitHub 上报告。"
+  },
   "labelPort": {
     "message": "端口"
   },

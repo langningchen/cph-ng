@@ -22,13 +22,13 @@ import type { BaseSubmitter } from './base';
 import { CodeforcesSubmitter } from './codeforces';
 import { LuoguSubmitter } from './luogu';
 
-export const submitters: readonly BaseSubmitter[] = [
-  new CodeforcesSubmitter(),
-  new AtCoderSubmitter(),
-  new LuoguSubmitter(),
-];
-
 export const findSubmitter = ({ hostname }: URL): BaseSubmitter | null => {
+  const submitters: readonly BaseSubmitter[] = [
+    new CodeforcesSubmitter(),
+    new AtCoderSubmitter(),
+    new LuoguSubmitter(),
+  ];
+
   try {
     return submitters.find((s) => s.supportedDomains.includes(hostname)) ?? null;
   } catch {

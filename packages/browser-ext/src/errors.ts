@@ -36,3 +36,13 @@ export class ExtractError extends Error {
     return t('extractErrorMessage', [this.key]);
   }
 }
+
+export class InternalError extends Error {
+  public readonly name = 'internalError';
+  public constructor(public readonly message: string) {
+    super();
+  }
+  public toString() {
+    return `${t('internalErrorMessage')}\n\n${this.message}`;
+  }
+}

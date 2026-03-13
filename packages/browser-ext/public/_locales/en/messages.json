@@ -29,12 +29,18 @@
     }
   },
   "extractErrorMessage": {
-    "message": "Can not extract the \"$KEY$\" info from existing data",
+    "message": "Can not extract the \"$KEY$\" info from existing data.",
     "placeholders": {
       "key": {
         "content": "$1"
       }
     }
+  },
+  "interactionRequired": {
+    "message": "Please interact with the page to complete the submission."
+  },
+  "internalErrorMessage": {
+    "message": "An internal error occurred. Please try again. If the problem persists, please report it on GitHub."
   },
   "labelPort": {
     "message": "Port"

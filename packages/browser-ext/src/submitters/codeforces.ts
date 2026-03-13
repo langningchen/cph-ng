@@ -22,15 +22,15 @@ import { submitterDomains } from './domains';
 
 export class CodeforcesSubmitter extends BaseSubmitter {
   public readonly supportedDomains = submitterDomains.CODEFORCES;
-  private readonly contestRegex = /^\/contest\/([0-9]+)\/problem\/([A-Z0-9]+)/;
-  private readonly problemRegex = /^\/problemset\/problem\/([0-9]+)\/([A-Z0-9]+)/;
+  private readonly contestRegex = /^\/contest\/(?<contest>\d+)\/problem\/(?<problem>\w+)/;
+  private readonly problemRegex = /^\/problemset\/problem\/(?<contest>\d+)\/(?<problem>\w+)/;
 
   public getSubmitUrl(data: SubmitData) {
     const url = new URL(data.url);
-    const isContest = url.pathname.match(this.contestRegex);
-    const isProblem = url.pathname.match(this.problemRegex);
-    if (isContest) url.pathname = `/contest/${isContest[0]}/submit`;
-    else if (isProblem) url.pathname = '/problemset/submit';
+    const contest = url.pathname.match(this.contestRegex)?.groups;
+    const problem = url.pathname.match(this.problemRegex)?.groups;
+    if (contest) url.pathname = `/contest/${contest.contest}/submit`;
+    else if (problem) url.pathname = `/problemset/submit`;
     else throw new ExtractError('type');
     return url.toString();
   }
@@ -42,20 +42,20 @@ export class CodeforcesSubmitter extends BaseSubmitter {
     sourceCodeEl.value = data.sourceCode;
 
     const url = new URL(data.url);
-    const isContest = url.pathname.match(this.contestRegex);
-    if (isContest) {
+    const contest = url.pathname.match(this.contestRegex)?.groups;
+    if (contest) {
       const problemIndexEl = await this.waitForElement<HTMLSelectElement>(
         'select[name="submittedProblemIndex"]',
       );
-      problemIndexEl.value = isContest[1];
+      problemIndexEl.value = contest.problem;
     }
 
-    const isProblem = url.pathname.match(this.problemRegex);
-    if (isProblem) {
+    const problem = url.pathname.match(this.problemRegex)?.groups;
+    if (problem) {
       const problemNameEl = await this.waitForElement<HTMLInputElement>(
         'input[name="submittedProblemCode"]',
       );
-      problemNameEl.value = `${isProblem[1]}${isProblem[2]}`;
+      problemNameEl.value = `${problem.contest}${problem.problem}`;
     }
 
     const submitBtn = document.querySelector('.submit') as HTMLButtonElement;
