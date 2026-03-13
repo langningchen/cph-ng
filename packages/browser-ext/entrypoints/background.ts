@@ -109,7 +109,7 @@ export default defineBackground(async () => {
         pendingSubmissions.set(tab.id, request);
       });
     } catch (e) {
-      showError(String(e));
+      showError(e?.toString() || String(e));
     }
   };
 
