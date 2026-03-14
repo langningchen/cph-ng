@@ -173,7 +173,7 @@ export class ProblemMigrationService implements IProblemMigrationService {
         version: '0.4.8',
       };
     },
-    '0.3.7': (problem: History.IProblem_0_3_7): History.IProblem_0_4_3 =>
+    '0.3.6': (problem: History.IProblem_0_3_6): History.IProblem_0_4_3 =>
       ({
         ...problem,
         version: '0.4.3',
@@ -184,8 +184,8 @@ export class ProblemMigrationService implements IProblemMigrationService {
           ]),
         ),
       }) satisfies History.IProblem_0_4_3,
-    '0.2.4': (problem: History.IProblem_0_2_4): History.IProblem_0_3_7 => {
-      const newProblem: History.IProblem_0_3_7 = {
+    '0.2.4': (problem: History.IProblem_0_2_4): History.IProblem_0_3_6 => {
+      const newProblem: History.IProblem_0_3_6 = {
         ...problem,
         version: '0.3.7',
         tcs: {},

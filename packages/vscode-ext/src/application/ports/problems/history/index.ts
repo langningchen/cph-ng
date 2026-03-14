@@ -30,7 +30,7 @@ export type { Problem as IProblem_0_1_1 } from './0.1.1';
 export type { Problem as IProblem_0_2_1 } from './0.2.1';
 export type { Problem as IProblem_0_2_3 } from './0.2.3';
 export type { Problem as IProblem_0_2_4 } from './0.2.4';
-export type { Problem as IProblem_0_3_7 } from './0.3.7';
+export type { Problem as IProblem_0_3_6 } from './0.3.6';
 export type { Problem as IProblem_0_4_3 } from './0.4.3';
 export type { IProblem as IProblem_0_4_8, ITcIo as ITestcaseIo_0_4_8 } from './0.4.8';
 export type {

@@ -21,7 +21,7 @@ import type * as History from '@v/application/ports/problems/history';
 export type OldProblem =
   | History.IProblem_0_4_8
   | History.IProblem_0_4_3
-  | History.IProblem_0_3_7
+  | History.IProblem_0_3_6
   | History.IProblem_0_2_4
   | History.IProblem_0_2_3
   | History.IProblem_0_2_1
