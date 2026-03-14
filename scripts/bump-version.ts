@@ -1,6 +1,7 @@
 import { execSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { createInterface } from 'node:readline';
 
 // Constants
 const changelogPath = 'CHANGELOG.md';
@@ -12,6 +13,12 @@ const die = (message: string): never => {
   console.error(`❌ ${message}`);
   process.exit(1);
 };
+
+// Ensure work tree clean
+const status = execSync('git status --porcelain', { encoding: 'utf-8' }).trim();
+if (status.length > 0) {
+  die('Working tree is not clean. Please commit or stash your changes first.');
+}
 
 // Parse arguments
 const args = process.argv.slice(2);
@@ -163,9 +170,25 @@ if (commits.length === 0) {
   writeFileSync(changelogPath, updatedChangelog.trimEnd());
 }
 
-console.log(`\n✅ Done! ${releaseType}: ${newVersion}`);
-console.log(`\n📝 Next steps:`);
-console.log(`Review and edit CHANGELOG.md if needed, then commit and push:`);
-console.log(`\ngit add -A`);
-console.log(`git commit -m "chore: dump version to ${newVersion}"`);
-console.log(`git push`);
+const commitAndExit = (version: string) => {
+  console.log(`\n🚀 Committing changes...`);
+  execSync('git add -A', { stdio: 'inherit' });
+  execSync(`git commit -m "chore: dump version to ${version}"`, { stdio: 'inherit' });
+  console.log(`\n✅ Successfully committed version ${version}.`);
+};
+
+const rl = createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+if (isPreRelease) {
+  commitAndExit(newVersion);
+  rl.close();
+} else {
+  console.log(`\n📝 Please review and manually update CHANGELOG.md if needed.`);
+  rl.question('\nPress ENTER to commit the changes...', () => {
+    commitAndExit(newVersion);
+    rl.close();
+  });
+}
