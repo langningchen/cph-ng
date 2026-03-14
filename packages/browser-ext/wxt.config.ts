@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-/// <reference path="./.wxt/wxt.d.ts" />
+import { readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { defineConfig } from 'wxt';
 import { allDomains } from './src/submitters/domains';
@@ -25,8 +25,6 @@ const buildHostPermissions = (): string[] => {
   for (const domain of allDomains) patterns.add(`*://${domain}/*`);
   return [...patterns].sort();
 };
-
-const buildContentScriptMatches = (): string[] => buildHostPermissions();
 
 export default defineConfig({
   srcDir: '.',
@@ -55,6 +53,10 @@ export default defineConfig({
           resources: ['/icons/128.png'],
           matches: ['<all_urls>'],
         },
+        {
+          resources: ['assets/*'],
+          matches: ['<all_urls>'],
+        },
       ],
       ...(browser === 'firefox'
         ? {
@@ -72,9 +74,19 @@ export default defineConfig({
     'build:manifestGenerated': (_wxt, manifest) => {
       if (manifest.content_scripts) {
         for (const cs of manifest.content_scripts) {
-          cs.matches = buildContentScriptMatches();
+          cs.matches = buildHostPermissions();
         }
       }
+    },
+    'build:publicAssets': async (wxt, files) => {
+      const wasmDir = resolve(wxt.config.root, 'node_modules/onnxruntime-web/dist');
+      const wasmFiles = await readdir(wasmDir);
+      for (const file of wasmFiles)
+        if (file.startsWith('ort-wasm-simd-threaded.'))
+          files.push({
+            absoluteSrc: resolve(wasmDir, file),
+            relativeDest: `assets/onnx-wasm/${file}`,
+          });
     },
   },
   vite: () => ({

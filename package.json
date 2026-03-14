@@ -43,6 +43,14 @@
   "pnpm": {
     "patchedDependencies": {
       "ts-json-schema-generator@2.9.0": "patches/ts-json-schema-generator.patch"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@getgrit/cli",
+      "@swc/core",
+      "esbuild",
+      "protobufjs",
+      "sharp",
+      "spawn-sync"
+    ]
   }
 }

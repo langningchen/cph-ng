@@ -8,7 +8,7 @@
       "@cph-ng/core": ["../core/out/src"]
     }
   },
-  "include": ["src", "entrypoints", "wxt.config.ts"],
-  "exclude": [".output", ".wxt"],
+  "include": ["src", "entrypoints", "wxt.config.ts", ".wxt/wxt.d.ts"],
+  "exclude": [".output"],
   "references": [{ "path": "../core" }]
 }
