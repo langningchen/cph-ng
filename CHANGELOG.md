@@ -2,6 +2,13 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.6.8
+
+- **fix**(vscode-ext): migration from 0.3.6 ([#177](https://github.com/langningchen/cph-ng/issues/177))
+- **fix**(vscode-ext): remove compile telemetry
+- **fix**(ci): update attest-build-provenance action to v4
+- **fix**(ci): update actions/checkout version to v6
+
 ## 0.6.7
 
 - **feat**: browser extension ([#176](https://github.com/langningchen/cph-ng/issues/176))
