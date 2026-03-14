@@ -50,7 +50,7 @@ jobs:
       - name: Build all packages
         run: pnpm build-all
         env:
-          BUILD_TYPE: Auto build
+          BUILD_TYPE: Auto Build
       - name: Detect version changes
         id: versions
         if: github.event_name == 'push'
@@ -116,6 +116,7 @@ jobs:
           fi
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          BUILD_TYPE: Marketplace Publish
       - name: Publish Browser
         working-directory: packages/browser-ext
         run: |
@@ -142,12 +143,16 @@ jobs:
           echo "changelog_content<<EOF" >> $GITHUB_OUTPUT
           echo "$changelog_content" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+      - name: Build all
+        run: pnpm build-all
+        env:
+          BUILD_TYPE: GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.build.outputs.version }}
           name: v${{ needs.build.outputs.version }}
-          files: ./*.vsix
+          files: ./dist/*
           prerelease: ${{ steps.release.outputs.pre_release }}
           body: |
             ## What's Changed
