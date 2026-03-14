@@ -82,7 +82,7 @@ const generateSettings = () => {
   return {
     apply: (compiler: Compiler) => {
       const generate = () => {
-        execSync('pnpm run generate-settings', { stdio: 'inherit', cwd: __dirname });
+        execSync('pnpm generate-settings', { stdio: 'inherit', cwd: __dirname });
       };
       compiler.hooks.beforeRun.tap('Generate Settings Plugin', generate);
       compiler.hooks.watchRun.tap('Generate Settings Plugin', (compiler) => {

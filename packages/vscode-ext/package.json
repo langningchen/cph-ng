@@ -756,8 +756,8 @@
     "package": "vsce package --allow-star-activation --no-dependencies",
     "release": "vsce publish --allow-star-activation --no-dependencies",
     "release:pre": "vsce publish --allow-star-activation --no-dependencies --pre-release",
-    "vscode:prepublish": "pnpm run compile",
-    "postinstall": "pnpm run generate-settings"
+    "vscode:prepublish": "pnpm compile",
+    "postinstall": "pnpm generate-settings"
   },
   "devDependencies": {
     "@swc/core": "^1.15.18",

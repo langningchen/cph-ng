@@ -1,6 +1,6 @@
 {
   "appDescription": {
-    "message": "Browser extension for CPH-NG: submits solutions to competitive programming judges via WebSocket."
+    "message": "Browser extension for CPH-NG: submits solutions automatically from VS Code to competitive programming judges."
   },
   "appName": {
     "message": "CPH-NG Submit"

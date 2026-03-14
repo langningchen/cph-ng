@@ -39,59 +39,35 @@ jobs:
     needs: [lint, test]
     runs-on: ubuntu-latest
     outputs:
-      vscode_version: ${{ steps.versions.outputs.vscode_version }}
-      vscode_changed: ${{ steps.versions.outputs.vscode_changed }}
-      browser_version: ${{ steps.versions.outputs.browser_version }}
-      browser_changed: ${{ steps.versions.outputs.browser_changed }}
+      version: ${{ steps.versions.outputs.version }}
+      version_changed: ${{ steps.versions.outputs.version_changed }}
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-          fetch-depth: 0
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          fetch-depth: 2
       - uses: ./.github/actions/setup-node-pnpm
       - name: Build all packages
-        run: pnpm run pack
+        run: pnpm build-all
         env:
           BUILD_TYPE: Auto build
       - name: Detect version changes
         id: versions
         if: github.event_name == 'push'
         run: |
-          VSCODE_VERSION=$(node -p "require('./packages/vscode-ext/package.json').version")
-          BROWSER_VERSION=$(node -p "require('./packages/browser-ext/package.json').version")
-
-          LATEST_VSCODE_TAG=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -1 || echo '')
-          LATEST_BROWSER_TAG=$(git tag --list 'browser-v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -1 || echo '')
-          LATEST_VSCODE_VERSION="${LATEST_VSCODE_TAG#v}"
-          LATEST_BROWSER_VERSION="${LATEST_BROWSER_TAG#browser-v}"
-
-          if [ "$VSCODE_VERSION" != "$LATEST_VSCODE_VERSION" ]; then
-            echo "vscode_changed=true" >> $GITHUB_OUTPUT
+          CURRENT_VERSION=$(node -p "require('./packages/vscode-ext/package.json').version")
+          PREV_VERSION=$(git show HEAD~1:packages/vscode-ext/package.json | node -p "JSON.parse(fs.readFileSync(0)).version" || echo "0.0.0")
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          if [ "$CURRENT_VERSION" != "$PREV_VERSION" ]; then
+            echo "version_changed=true" >> $GITHUB_OUTPUT
           else
-            echo "vscode_changed=false" >> $GITHUB_OUTPUT
+            echo "version_changed=false" >> $GITHUB_OUTPUT
           fi
-          if [ "$BROWSER_VERSION" != "$LATEST_BROWSER_VERSION" ]; then
-            echo "browser_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "browser_changed=false" >> $GITHUB_OUTPUT
-          fi
-          echo "vscode_version=$VSCODE_VERSION" >> $GITHUB_OUTPUT
-          echo "browser_version=$BROWSER_VERSION" >> $GITHUB_OUTPUT
-      - name: Upload VSCode extension artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
           archive: false
-          path: dist/*.vsix
-          if-no-files-found: error
-      - name: Upload browser extension artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: browser-extension
-          path: dist/*.zip
+          path: dist/*
           if-no-files-found: error
       - name: Generate Provenance
         if: |
@@ -99,35 +75,27 @@ jobs:
           (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         uses: actions/attest-build-provenance@v2
         with:
-          subject-path: dist/*.vsix
+          subject-path: dist/*
 
-  publish-vscode:
+  publish:
     needs: [build]
-    if: >
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      github.ref == 'refs/heads/main' &&
-      needs.build.outputs.vscode_changed == 'true'
+    if: needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
           submodules: true
-      - name: Configure Git
+      - name: Create Tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - uses: ./.github/actions/setup-node-pnpm
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: artifact
       - name: Determine release type
         id: release
         run: |
-          VERSION="${{ needs.build.outputs.vscode_version }}"
+          VERSION="${{ needs.build.outputs.version }}"
           PATCH=$(echo "$VERSION" | awk -F. '{print $3}')
           if [ "$PATCH" = "0" ]; then
             PRE_RELEASE=false
@@ -137,37 +105,54 @@ jobs:
           echo "pre_release=$PRE_RELEASE" >> $GITHUB_OUTPUT
       - name: Create tag
         run: |
-          git tag "v${{ needs.build.outputs.vscode_version }}"
-          git push origin "v${{ needs.build.outputs.vscode_version }}"
-      - name: Publish to Marketplace
+          git tag "v${{ needs.build.outputs.version }}"
+          git push origin "v${{ needs.build.outputs.version }}"
+      - name: Publish VS Code
+        working-directory: packages/vscode-ext
         run: |
           if [ "${{ steps.release.outputs.pre_release }}" = "true" ]; then
-            pnpm run publish --pre-release
+            pnpm publish --pre-release
           else
-            pnpm run publish
+            pnpm publish
           fi
-        working-directory: packages/vscode-ext
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: Publish Browser
+        working-directory: packages/browser-ext
+        run: |
+          VERSION="${{ needs.build.outputs.version }}"
+          pnpm release \
+            --firefox-zip ./dist/cph-ng-submit-$VERSION-firefox.zip \
+            --firefox-sources-zip ./dist/cph-ng-submit-$VERSION-sources.zip \
+            --edge-zip ./dist/cph-ng-submit-$VERSION-chrome.zip
+        env:
+          EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
+          EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+          EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
+          EDGE_SKIP_SUBMIT_REVIEW: ${{ secrets.EDGE_SKIP_SUBMIT_REVIEW }}
+          FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
+          FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
+          FIREFOX_CHANNEL: ${{ secrets.FIREFOX_CHANNEL }}
       - name: Extract changelog
         id: changelog
         run: |
-          VERSION="${{ needs.build.outputs.vscode_version }}"
-          CHANGELOG_CONTENT=$(awk "/^## $VERSION\$/{flag=1; next} (/^## / || /^<details>/){flag=0} flag" CHANGELOG.md)
-          [ -z "$CHANGELOG_CONTENT" ] && CHANGELOG_CONTENT="- No changelog content available"
-          echo "CHANGELOG_CONTENT<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
+          VERSION="${{ needs.build.outputs.version }}"
+          changelog_content=$(awk "/^## $VERSION\$/{flag=1; next} (/^## / || /^<details>/){flag=0} flag" CHANGELOG.md)
+          [ -z "$changelog_content" ] && changelog_content="- No changelog content available"
+          echo "changelog_content<<EOF" >> $GITHUB_OUTPUT
+          echo "$changelog_content" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-      - name: Create GitHub release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ needs.build.outputs.vscode_version }}
-          name: v${{ needs.build.outputs.vscode_version }}
+          tag_name: v${{ needs.build.outputs.version }}
+          name: v${{ needs.build.outputs.version }}
           files: ./*.vsix
           prerelease: ${{ steps.release.outputs.pre_release }}
           body: |
             ## What's Changed
-            ${{ steps.changelog.outputs.CHANGELOG_CONTENT }}
+            ${{ steps.changelog.outputs.changelog_content }}
 
             ${{ steps.release.outputs.pre_release == 'true' && '⚠️ **This is a pre-release version.**' || '' }}
 
@@ -212,61 +197,3 @@ jobs:
             echo "Pre-release only: moving Done -> Pre-release"
             move_cards "Done" 300944f4
           fi
-
-  publish-browser:
-    needs: [build]
-    if: >
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      github.ref == 'refs/heads/main' &&
-      needs.build.outputs.browser_changed == 'true'
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - uses: ./.github/actions/setup-node-pnpm
-      - name: Download browser artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: browser-extension
-      - name: Create tag
-        run: |
-          git tag "browser-v${{ needs.build.outputs.browser_version }}"
-          git push origin "browser-v${{ needs.build.outputs.browser_version }}"
-      - name: Publish to stores via wxt submit
-        working-directory: packages/browser-ext
-        run: pnpm run publish
-        env:
-          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
-          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
-          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
-          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
-          FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
-          FIREFOX_JWT_ISSUER: ${{ secrets.AMO_API_KEY }}
-          FIREFOX_JWT_SECRET: ${{ secrets.AMO_API_SECRET }}
-          EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
-          EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
-          EDGE_CLIENT_SECRET: ${{ secrets.EDGE_CLIENT_SECRET }}
-          EDGE_ACCESS_TOKEN_URL: https://login.microsoftonline.com/${{ secrets.EDGE_TENANT_ID }}/oauth2/v2.0/token
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: browser-v${{ needs.build.outputs.browser_version }}
-          name: Browser Extension v${{ needs.build.outputs.browser_version }}
-          files: |
-            browser-ext-chrome-${{ needs.build.outputs.browser_version }}.zip
-            browser-ext-firefox-${{ needs.build.outputs.browser_version }}.zip
-          body: |
-            ## Browser Extension v${{ needs.build.outputs.browser_version }}
-
-            Published to Firefox Add-ons and Edge Add-on Store automatically.
-
-            **Chrome manual install**: Download the `.zip`, extract it, then load via `chrome://extensions` with developer mode enabled.
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

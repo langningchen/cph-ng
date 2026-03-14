@@ -64,6 +64,9 @@ export default defineConfig({
               gecko: {
                 id: 'cph-ng-submit@langningchen.com',
                 strict_min_version: '109.0',
+                data_collection_permissions: {
+                  required: ['none'],
+                },
               },
             },
           }

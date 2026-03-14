@@ -1,6 +1,6 @@
 {
   "appDescription": {
-    "message": "CPH-NG 的浏览器扩展：通过 WebSocket 向竞赛编程评测提交解答。"
+    "message": "CPH-NG 的浏览器扩展：自动从 VS Code 向竞赛编程评测提交解答。"
   },
   "appName": {
     "message": "CPH-NG 提交"
