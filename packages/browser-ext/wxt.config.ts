@@ -95,6 +95,7 @@ export default defineConfig({
   vite: () => ({
     resolve: {
       alias: {
+        '@b': resolve(__dirname, './src'),
         '@cph-ng/core': resolve(__dirname, '../core/src'),
       },
     },
