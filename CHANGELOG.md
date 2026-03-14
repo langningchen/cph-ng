@@ -2,6 +2,10 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.6.7
+
+- **feat**: browser extension ([#176](https://github.com/langningchen/cph-ng/issues/176))
+
 ## 0.6.6
 
 - **fix**(core): set hash when loading problem
