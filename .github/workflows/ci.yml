@@ -154,14 +154,7 @@ jobs:
           name: v${{ needs.build.outputs.version }}
           files: ./dist/*
           prerelease: ${{ steps.release.outputs.pre_release }}
-          body: |
-            ## What's Changed
-            ${{ steps.changelog.outputs.changelog_content }}
-
-            ${{ steps.release.outputs.pre_release == 'true' && '⚠️ **This is a pre-release version.**' || '' }}
-
-            ## Installation
-            Download the `.vsix` file or install from the marketplace.
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Move cards in project
