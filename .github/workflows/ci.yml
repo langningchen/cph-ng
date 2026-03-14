@@ -110,9 +110,9 @@ jobs:
         working-directory: packages/vscode-ext
         run: |
           if [ "${{ steps.release.outputs.pre_release }}" = "true" ]; then
-            pnpm publish --pre-release
+            pnpm release:pre
           else
-            pnpm publish
+            pnpm release
           fi
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
