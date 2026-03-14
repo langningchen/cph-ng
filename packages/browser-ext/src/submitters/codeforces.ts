@@ -58,7 +58,7 @@ export class CodeforcesSubmitter extends BaseSubmitter {
       problemNameEl.value = `${problem.contest}${problem.problem}`;
     }
 
-    const submitBtn = document.querySelector('.submit') as HTMLButtonElement;
+    const submitBtn = await this.waitForElement<HTMLButtonElement>('.submit');
     submitBtn.disabled = false;
     submitBtn.click();
   }

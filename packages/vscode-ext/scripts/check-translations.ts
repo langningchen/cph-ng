@@ -17,7 +17,7 @@
 
 import { checkTranslations, extractKeys, loadJsonFile } from '@s/check-translations';
 
-const extensionSuccess = checkTranslations({
+const extensionHasError = checkTranslations({
   title: 'Extension Configuration',
   getKeys: () => {
     const keys = new Set<string>();
@@ -36,7 +36,7 @@ const extensionSuccess = checkTranslations({
   },
   files: ['package.nls.json', 'package.nls.zh.json'],
 });
-const runtimeSuccess = checkTranslations({
+const runtimeHasError = checkTranslations({
   title: 'Extension Runtime',
   getKeys: () =>
     extractKeys(
@@ -46,4 +46,4 @@ const runtimeSuccess = checkTranslations({
     ),
   files: ['l10n/bundle.l10n.zh-cn.json'],
 });
-process.exit(extensionSuccess || runtimeSuccess ? 1 : 0);
+process.exit(extensionHasError || runtimeHasError ? 1 : 0);

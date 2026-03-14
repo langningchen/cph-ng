@@ -154,8 +154,9 @@ if (commits.length === 0) {
     if (!lastReleaseVersion) die('No previous release tag found, cannot link to last release');
 
     const newContent = `## ${newVersion}\n\nAggregated from prereleases ${firstPreRelease}~${lastPreRelease}.\n\n${commits.join('\n')}\n\n<details>\n<summary>Pre-release history (${firstPreRelease}~${lastPreRelease})</summary>`;
-    const releasePattern = new RegExp(`(## ${lastReleaseVersion.replace(/\./g, '\\.')})`);
-    const modifiedOldVersions = oldVersions.replace(releasePattern, `</details>\n\n$1`);
+    const lastVersion = oldVersions.indexOf(`## ${lastReleaseVersion}`);
+    if (lastVersion === -1) die('Last release version not found in CHANGELOG.md');
+    const modifiedOldVersions = `${oldVersions.slice(0, lastVersion)}</details>\n\n${oldVersions.slice(lastVersion)}`;
     updatedChangelog = `${changelogHeader}${newContent}\n\n${modifiedOldVersions}`;
   }
 

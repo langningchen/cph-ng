@@ -5,7 +5,7 @@
   "type": "module",
   "license": "AGPL-3.0-only",
   "main": "./src/index.ts",
-  "types": "./out/index.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
     "./package.json": "./package.json"

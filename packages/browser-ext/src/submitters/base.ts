@@ -44,7 +44,7 @@ export abstract class BaseSubmitter {
         }
         if (Date.now() >= deadline) {
           clearInterval(check);
-          reject();
+          reject(new Error('Timeout waiting for condition'));
           return;
         }
       }, 100);
@@ -59,7 +59,6 @@ export abstract class BaseSubmitter {
     })
       .then(() => {
         if (!element) throw new Error();
-        console.log(`Element found for selector: ${selector}`, element);
         return element;
       })
       .catch(() => {
