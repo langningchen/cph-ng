@@ -1,4 +1,6 @@
-onlyBuiltDependencies:
-  - '@getgrit/cli'
-  - '@swc/core'
-  - esbuild
+packages:
+  - "packages/*"
+
+fetchRetryFactor: 2
+fetchRetryMintimeout: 1000
+fetchTimeout: 30000

@@ -1,0 +1,10 @@
+**/*
+!dist/**
+!l10n/**
+!res/**
+!CHANGELOG.md
+!LICENSE
+!package.json
+!package.nls.json
+!package.nls.zh.json
+!README.md

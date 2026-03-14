@@ -1,13 +1,6 @@
-__pycache__/
-.mypy_cache/
-.pytest_cache/
-*.pyc
 *.vsix
-dist
-node_modules
-site/
-venv/
-src/application/ports/vscode/ISettings.ts
-src/infrastructure/vscode/settingsAdapter.ts
-tests/infrastructure/vscode/settingsMock.ts
+dist/
+out/
+node_modules/
 coverage/
+*.tsbuildinfo

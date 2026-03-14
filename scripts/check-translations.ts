@@ -30,50 +30,13 @@ import {
   ScriptTarget,
 } from 'typescript';
 
-interface TranslationConfig {
+export interface TranslationConfig {
   title: string;
   getKeys: () => Set<string>;
   files: string[];
 }
 
-const Configs: TranslationConfig[] = [
-  {
-    title: 'Extension Configuration',
-    getKeys: () => {
-      const keys = new Set<string>();
-      const visit = (obj: unknown) => {
-        if (typeof obj === 'string' && obj.startsWith('%') && obj.endsWith('%'))
-          keys.add(obj.slice(1, -1));
-        else if (Array.isArray(obj))
-          obj.forEach((item) => {
-            visit(item);
-          });
-        else if (typeof obj === 'object' && obj !== null)
-          for (const value of Object.values(obj)) visit(value);
-      };
-      visit(loadJsonFile('package.json'));
-      return keys;
-    },
-    files: ['package.nls.json', 'package.nls.zh.json'],
-  },
-  {
-    title: 'Extension Runtime',
-    getKeys: () =>
-      extractKeys(
-        'src',
-        ['ts', 'js', 'tsx', 'jsx'],
-        ['src/infrastructure/vscode/translatorAdapter.ts'],
-      ),
-    files: ['l10n/bundle.l10n.zh-cn.json'],
-  },
-  {
-    title: 'Webview',
-    getKeys: () => extractKeys(join('webview'), ['tsx', 'ts']),
-    files: ['webview/l10n/en.json', 'webview/l10n/zh.json'],
-  },
-];
-
-const loadJsonFile = (filePath: string): unknown => {
+export const loadJsonFile = (filePath: string): unknown => {
   try {
     return JSON.parse(readFileSync(filePath, 'utf8'));
   } catch (error) {
@@ -85,7 +48,6 @@ const findFilesRecursively = (dir: string, exts: string[], excludes: string[]) =
   const files: string[] = [];
   const ig = ignore();
   ig.add(excludes);
-  ig.add(readFileSync('.gitignore', 'utf8'));
   const visit = (dir: string) => {
     for (const name of readdirSync(dir)) {
       const path = join(dir, name);
@@ -99,7 +61,11 @@ const findFilesRecursively = (dir: string, exts: string[], excludes: string[]) =
   return files;
 };
 
-const extractKeys = (dir: string, exts: string[], excludes: string[] = []): Set<string> => {
+export const extractKeys = (
+  dir: string,
+  exts: string[] = ['ts', 'tsx'],
+  excludes: string[] = [],
+): Set<string> => {
   const keys = new Set<string>();
   const files = findFilesRecursively(dir, exts, excludes);
   for (const file of files) {
@@ -131,7 +97,7 @@ const isTranslationCall = (expression: LeftHandSideExpression) => {
   return false;
 };
 
-const checkTranslations = (config: TranslationConfig) => {
+export const checkTranslations = (config: TranslationConfig) => {
   let hasErrors = false;
   const requiredKeys = config.getKeys();
   for (const file of config.files) {
@@ -158,9 +124,3 @@ const checkTranslations = (config: TranslationConfig) => {
   }
   return hasErrors;
 };
-
-let hasError = false;
-for (const config of Configs) hasError = hasError || checkTranslations(config);
-if (hasError) process.exit(1);
-
-process.exit(0);

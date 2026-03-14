@@ -1,0 +1,41 @@
+{
+  "name": "@cph-ng/vscode-webview",
+  "version": "0.6.6",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "main": "./src/App.tsx",
+  "scripts": {
+    "compile": "webpack --disable-interpret --mode production",
+    "watch": "webpack --disable-interpret --watch --mode development",
+    "clean": "rimraf dist out scripts/out",
+    "check-translations": "tsx --tsconfig scripts/tsconfig.json scripts/check-translations.ts"
+  },
+  "dependencies": {
+    "@cph-ng/core": "workspace:*",
+    "@mui/icons-material": "^7.3.9",
+    "@mui/lab": "7.0.1-beta.23",
+    "@mui/material": "^7.3.9",
+    "anser": "^2.3.5",
+    "crypto-js": "^4.2.0",
+    "i18next": "^25.8.18",
+    "immer": "^11.1.4",
+    "lodash": "^4.17.23",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-i18next": "^16.5.8",
+    "react-textarea-autosize": "^8.5.9",
+    "stacktrace-js": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/lodash": "^4.17.24",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "copy-webpack-plugin": "^14.0.0",
+    "swc-loader": "^0.2.7",
+    "tsconfig-paths-webpack-plugin": "^4.2.0",
+    "webpack": "^5.105.4",
+    "webpack-cli": "^7.0.0"
+  }
+}

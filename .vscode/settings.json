@@ -1,10 +1,4 @@
 {
-  "files.exclude": {
-    "dist": false
-  },
-  "search.exclude": {
-    "dist": true
-  },
   "js/ts.tsc.autoDetect": "off",
   "js/ts.preferences.autoImportSpecifierExcludeRegexes": [
     "^@mui/[^/]+$",
@@ -30,12 +24,15 @@
     "Monaspace",
     "msys",
     "objcopy",
+    "onnx",
+    "onnxruntime",
     "partysocket",
     "problemset",
     "Promisable",
     "testlib",
     "tsyringe",
     "ucrtbase",
+    "webext",
     "winlibs"
   ],
   "js/ts.preferences.importModuleSpecifier": "non-relative",
@@ -44,4 +41,5 @@
   "docthis.includeMemberOfOnInterfaceMembers": false,
   "emmet.showAbbreviationSuggestions": false,
   "emmet.showExpandedAbbreviation": "never"
+  // "explorer.excludeGitIgnore": true
 }

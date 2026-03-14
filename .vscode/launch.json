@@ -11,11 +11,9 @@
       "request": "launch",
       "args": [
         "--disable-extensions",
-        "--extensionDevelopmentPath=${workspaceFolder}"
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode-ext"
       ],
-      "outFiles": [
-        "${workspaceFolder}/dist/**/*.js"
-      ],
+      "outFiles": ["${workspaceFolder}/packages/vscode-ext/dist/**/*"],
       "preLaunchTask": "${defaultBuildTask}"
     }
   ]

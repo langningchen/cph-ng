@@ -12,6 +12,7 @@
         "reveal": "never",
         "group": "watchers"
       },
+      "path": "packages/vscode-ext",
       "group": {
         "kind": "build",
         "isDefault": true

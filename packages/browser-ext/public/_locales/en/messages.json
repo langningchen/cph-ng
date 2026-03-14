@@ -1,0 +1,63 @@
+{
+  "appDescription": {
+    "message": "Browser extension for CPH-NG: submits solutions automatically from VS Code to competitive programming judges."
+  },
+  "appName": {
+    "message": "CPH-NG Submit"
+  },
+  "appTitle": {
+    "message": "CPH-NG Submit"
+  },
+  "btnActivate": {
+    "message": "Activate"
+  },
+  "btnConnect": {
+    "message": "Connect"
+  },
+  "btnDisconnect": {
+    "message": "Disconnect"
+  },
+  "btnSet": {
+    "message": "Set"
+  },
+  "elementErrorMessage": {
+    "message": "Can not find the element using the selector \"$SELECTOR$\"",
+    "placeholders": {
+      "selector": {
+        "content": "$1"
+      }
+    }
+  },
+  "extractErrorMessage": {
+    "message": "Can not extract the \"$KEY$\" info from existing data.",
+    "placeholders": {
+      "key": {
+        "content": "$1"
+      }
+    }
+  },
+  "interactionRequired": {
+    "message": "Please interact with the page to complete the submission."
+  },
+  "internalErrorMessage": {
+    "message": "An internal error occurred. Please try again. If the problem persists, please report it on GitHub."
+  },
+  "labelPort": {
+    "message": "Port"
+  },
+  "longTimeSubmission": {
+    "message": "The submission is taking longer than expected. Please wait patiently or try again. If the problem persists, please report it on GitHub."
+  },
+  "recentSubmissions": {
+    "message": "Recent Submissions"
+  },
+  "statusConnected": {
+    "message": "Connected"
+  },
+  "statusDisconnected": {
+    "message": "Disconnected"
+  },
+  "statusInactive": {
+    "message": "Inactive"
+  }
+}

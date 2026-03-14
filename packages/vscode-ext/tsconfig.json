@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "out",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "paths": {
+      "@v/*": ["./src/*"],
+      "@w/*": ["../vscode-webview/out/src/*"],
+      "@cph-ng/core": ["../core/out/src"]
+    }
+  },
+  "include": ["src"],
+  "references": [{ "path": "../core" }, { "path": "../vscode-webview" }]
+}

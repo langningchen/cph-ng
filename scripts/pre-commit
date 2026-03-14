@@ -1,15 +1,5 @@
 #!/usr/bin/env sh
 
-pnpm run check-translations
-if [ $? -ne 0 ]; then
-  echo "pre-commit: translation check failed" >&2
-  exit 1
-fi
-
-pnpm run lint
-if [ $? -ne 0 ]; then
-  echo "pre-commit: linting failed" >&2
-  exit 1
-fi
-
-exit 0
+pnpm check-translations || exit 1
+pnpm lint || exit 1
+pnpm typecheck || exit 1

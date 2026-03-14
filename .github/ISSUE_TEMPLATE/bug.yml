@@ -10,6 +10,19 @@ body:
         information below to help us reproduce and fix the issue. Before
         submitting, please search the existing issues to see if someone else has
         already reported the same bug.
+  - type: dropdown
+    attributes:
+      label: Module
+      description: Which module is this bug related to?
+      options:
+        - VSCode Extension
+        - Browser Extension
+        - Webview
+        - Router
+        - Core
+        - Other / Unknown
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Extension Version

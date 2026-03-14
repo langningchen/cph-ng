@@ -1,46 +1,17 @@
 {
-  "compilerOptions": {
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "target": "ES2022",
-    "jsx": "react",
-    "lib": [
-      "ES2022",
-      "dom"
-    ],
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@t/*": [
-        "./tests/*"
-      ],
-      "@w/*": [
-        "./webview/*"
-      ],
-      "@r/*": [
-        "./router/*"
-      ]
-    },
-    "sourceMap": true,
-    "rootDir": ".",
-    "strict": true /* enable all strict type-checking options */,
-    /* Additional Checks */
-    // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
-    // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
-    // "noUnusedParameters": true,  /* Report errors on unused parameters. */
-    "resolveJsonModule": true,
-    "types": [
-      "node",
-      "vitest/globals"
-    ]
-  },
-  "include": [
-    "src/**/*",
-    "tests/**/*",
-    "webview/**/*",
-    "router/**/*",
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    { "path": "scripts" },
+    { "path": "packages/core" },
+    { "path": "packages/browser-ext" },
+    { "path": "packages/browser-ext/scripts" },
+    { "path": "packages/vscode-ext" },
+    { "path": "packages/vscode-ext/scripts" },
+    { "path": "packages/vscode-ext/tsconfig.test.json" },
+    { "path": "packages/vscode-webview" },
+    { "path": "packages/vscode-webview/scripts" },
+    { "path": "packages/vscode-router" }
   ]
 }
