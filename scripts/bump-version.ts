@@ -165,7 +165,7 @@ if (commits.length === 0) {
 
 console.log(`\n✅ Done! ${releaseType}: ${newVersion}`);
 console.log(`\n📝 Next steps:`);
-console.log(`  1. Review and edit CHANGELOG.md`);
-console.log(`  2. git add -A`);
-console.log(`  3. git commit -m "chore: dump version to ${newVersion}"`);
-console.log(`  4. git push`);
+console.log(`Review and edit CHANGELOG.md if needed, then commit and push:`);
+console.log(`\ngit add -A`);
+console.log(`git commit -m "chore: dump version to ${newVersion}"`);
+console.log(`git push`);
