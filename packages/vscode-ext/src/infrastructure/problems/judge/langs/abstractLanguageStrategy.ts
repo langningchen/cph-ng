@@ -76,13 +76,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     this.compilation.clear();
 
     try {
-      const compileEnd = this.telemetry.start('compile', {
-        lang: this.name,
-        forceCompile: forceCompile === null ? 'auto' : String(forceCompile),
-      });
       const result = await this.internalCompile(src, signal, forceCompile, additionalData);
-      compileEnd({ ...result });
-
       if (!(await this.fs.exists(result.path)))
         return new CompileError(this.translator.t('Compilation output does not exist'));
       return result;

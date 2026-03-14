@@ -44,8 +44,6 @@ export class LangCpp extends AbstractLanguageStrategy {
     forceCompile: boolean | null,
     additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
   ): Promise<LangCompileData> {
-    this.logger.trace('compile', { src, forceCompile });
-
     const path = this.path.join(
       this.resolver.renderPath(this.settings.cache.directory),
       this.path.basename(src.path, this.path.extname(src.path)) +
