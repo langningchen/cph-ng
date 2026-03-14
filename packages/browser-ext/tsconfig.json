@@ -5,6 +5,7 @@
     "outDir": "out",
     "lib": ["ES2022", "DOM"],
     "paths": {
+      "@b/*": ["./src/*"],
       "@cph-ng/core": ["../core/out/src"]
     }
   },

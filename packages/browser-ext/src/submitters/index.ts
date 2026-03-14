@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-export { BaseSubmitter } from './base';
+export { BaseSubmitter } from '@b/submitters/base';
 
-import { AtCoderSubmitter } from './atcoder';
-import type { BaseSubmitter } from './base';
-import { CodeforcesSubmitter } from './codeforces';
-import { HydroSubmitter } from './hydro';
-import { LuoguSubmitter } from './luogu';
+import { AtCoderSubmitter } from '@b/submitters/atcoder';
+import type { BaseSubmitter } from '@b/submitters/base';
+import { CodeforcesSubmitter } from '@b/submitters/codeforces';
+import { HydroSubmitter } from '@b/submitters/hydro';
+import { LuoguSubmitter } from '@b/submitters/luogu';
 
 export const findSubmitter = ({ hostname }: URL): BaseSubmitter | null => {
   const submitters: readonly BaseSubmitter[] = [

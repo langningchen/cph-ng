@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { t } from './i18n';
+import { t } from '@b/i18n';
 
 export class ElementError extends Error {
   public readonly name = 'elementError';

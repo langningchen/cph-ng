@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { t } from '@b/i18n';
+import { sendMessage } from '@b/messaging';
+import { LoadingOverlay, type OverlayProps } from '@b/overlay';
+import { findSubmitter } from '@b/submitters';
 import { createRoot, type Root } from 'react-dom/client';
 import { defineContentScript } from 'wxt/utils/define-content-script';
-import { t } from '../src/i18n';
-import { sendMessage } from '../src/messaging';
-import { LoadingOverlay, type OverlayProps } from '../src/overlay';
-import { findSubmitter } from '../src/submitters';
 
 let root: Root | null = null;
 let container: HTMLDivElement | null = null;

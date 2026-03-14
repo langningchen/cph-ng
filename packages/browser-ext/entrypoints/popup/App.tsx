@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { t } from '@b/i18n';
+import { onMessage, type StatusResponse, sendMessage } from '@b/messaging';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import Box from '@mui/material/Box';
@@ -31,8 +33,6 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useCallback, useEffect, useState } from 'react';
-import { t } from '../../src/i18n';
-import { onMessage, type StatusResponse, sendMessage } from '../../src/messaging';
 
 const theme = createTheme({ palette: { mode: 'dark' } });
 

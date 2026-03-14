@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BaseSubmitter } from '@b/submitters/base';
+import { submitterDomains } from '@b/submitters/domains';
 import type { SubmitData } from '@cph-ng/core';
-import { BaseSubmitter } from './base';
-import { submitterDomains } from './domains';
 
 export class HydroSubmitter extends BaseSubmitter {
   public readonly supportedDomains = submitterDomains.hydro;

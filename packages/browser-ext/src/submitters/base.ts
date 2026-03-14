@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { ElementError, InternalError } from '@b/errors';
 import type { SubmitData } from '@cph-ng/core';
-import { ElementError, InternalError } from '../errors';
 
 // biome-ignore lint/style/useNamingConvention: CodeMirror is the external API's property name
 export type CMWrapped = HTMLElement & { CodeMirror?: { setValue(v: string): void } };

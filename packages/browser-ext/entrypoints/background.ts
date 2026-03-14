@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { onMessage, sendMessage } from '@b/messaging';
+import { findSubmitter } from '@b/submitters';
 import type { B2rMsg, R2bMsg, SubmitData } from '@cph-ng/core';
 import { io, type Socket } from 'socket.io-client';
 import { browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
 import { storage } from 'wxt/utils/storage';
-import { onMessage, sendMessage } from '../src/messaging';
-import { findSubmitter } from '../src/submitters';
 
 const routerPort = storage.defineItem<number>('local:routerPort', {
   fallback: 27121,
