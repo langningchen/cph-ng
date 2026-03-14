@@ -1,17 +1,6 @@
 packages:
   - "packages/*"
 
-onlyBuiltDependencies:
-  - "@getgrit/cli"
-  - "@swc/core"
-  - esbuild
-  - sharp
-
-updateConfig:
-  ignoreDependencies:
-    - "@types/vscode"
-    - "@types/node"
-
 fetchRetryFactor: 2
 fetchRetryMintimeout: 1000
 fetchTimeout: 30000

@@ -19,30 +19,36 @@
     "prepare": "tsx scripts/install-hooks.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.6",
-    "@commitlint/cli": "^20.4.3",
-    "@commitlint/config-conventional": "^20.4.3",
+    "@biomejs/biome": "^2.4.7",
+    "@commitlint/cli": "^20.4.4",
+    "@commitlint/config-conventional": "^20.4.4",
     "@swc/core": "^1.15.18",
     "@types/node": "~22.19.7",
-    "@vitest/coverage-v8": "4.0.18",
-    "@vitest/ui": "^4.0.18",
+    "@vitest/coverage-v8": "4.1.0",
+    "@vitest/ui": "^4.1.0",
     "@vscode/vsce": "^3.7.1",
     "copy-webpack-plugin": "^14.0.0",
     "ignore": "^7.0.5",
-    "knip": "^5.85.0",
+    "knip": "^5.86.0",
     "rimraf": "^6.1.3",
     "swc-loader": "^0.2.7",
-    "terser-webpack-plugin": "^5.3.17",
+    "terser-webpack-plugin": "^5.4.0",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.18",
+    "vitest": "^4.1.0",
     "webpack": "^5.105.4",
-    "webpack-cli": "^6.0.1"
+    "webpack-cli": "^7.0.0"
   },
   "pnpm": {
     "patchedDependencies": {
       "ts-json-schema-generator@2.9.0": "patches/ts-json-schema-generator.patch"
+    },
+    "updateConfig": {
+      "ignoreDependencies": [
+        "@types/vscode",
+        "@types/node"
+      ]
     },
     "onlyBuiltDependencies": [
       "@getgrit/cli",
