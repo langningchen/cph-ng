@@ -18,9 +18,6 @@
 import { ElementError, InternalError } from '@b/errors';
 import type { SubmitData } from '@cph-ng/core';
 
-// biome-ignore lint/style/useNamingConvention: CodeMirror is the external API's property name
-export type CMWrapped = HTMLElement & { CodeMirror?: { setValue(v: string): void } };
-
 export abstract class BaseSubmitter {
   public abstract readonly supportedDomains: readonly string[];
   public abstract getSubmitUrl(data: SubmitData): string;
@@ -71,20 +68,5 @@ export abstract class BaseSubmitter {
   };
   protected clearInteraction() {
     this.requireInteraction(null);
-  }
-
-  protected setCodeMirrorOrTextarea(textarea: HTMLTextAreaElement, code: string): void {
-    const cm = (textarea as CMWrapped).CodeMirror;
-    if (cm) {
-      cm.setValue(code);
-      return;
-    }
-    const nativeSetter = Object.getOwnPropertyDescriptor(
-      HTMLTextAreaElement.prototype,
-      'value',
-    )?.set;
-    if (nativeSetter) nativeSetter.call(textarea, code);
-    else textarea.value = code;
-    textarea.dispatchEvent(new Event('input', { bubbles: true }));
   }
 }
