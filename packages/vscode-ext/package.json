@@ -749,9 +749,6 @@
     "check-translations": "tsx --tsconfig scripts/tsconfig.json scripts/check-translations.ts",
     "generate-settings": "tsx scripts/generate-settings.ts",
     "package": "vsce package --allow-star-activation --no-dependencies",
-    "release": "vsce publish --allow-star-activation --no-dependencies",
-    "release:pre": "vsce publish --allow-star-activation --no-dependencies --pre-release",
-    "vscode:prepublish": "pnpm compile",
     "postinstall": "pnpm generate-settings"
   },
   "devDependencies": {

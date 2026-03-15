@@ -7,7 +7,6 @@
   "scripts": {
     "compile": "wxt build && wxt build -b firefox",
     "package": "wxt zip && wxt zip -b firefox",
-    "release": "pnpm package && wxt submit",
     "prepare": "wxt prepare",
     "watch": "wxt",
     "clean": "rimraf dist .output .wxt out scripts/out",
