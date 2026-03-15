@@ -2,6 +2,14 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.6.9
+
+- **fix**(ci): add build step before publishing VS Code
+- **fix**(ci): enable automatic generation of release notes
+- **fix**(bump-version): ensure clean working tree before version bump and automate commit process
+- **fix**(ci): update build type
+- **fix**(bump-version): improve output instructions for version bump process
+
 ## 0.6.8
 
 - **fix**(vscode-ext): migration from 0.3.6 ([#177](https://github.com/langningchen/cph-ng/issues/177))
