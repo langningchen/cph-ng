@@ -175,18 +175,15 @@ export class Companion implements ICompanion {
       return;
     }
 
-    let sourceCode = await this.fs.readFile(problem.src.path);
+    const sourceCode = await this.fs.readFile(problem.src.path);
     if (sourceCode.trim() === '') {
       this.ui.alert('warn', this.translator.t('Source code is empty'));
       return;
     }
-    if (this.settings.companion.addTimestamp)
-      sourceCode += `\n// Submitted via cph-ng at ${new Date().toISOString()}`;
 
     this.ws.submit({
       url: problem.url,
       sourceCode,
-      language: '', // TO-DO
     } satisfies SubmitData);
   }
 }

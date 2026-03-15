@@ -59,11 +59,9 @@ export interface CompanionProblem {
 }
 
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error';
-export type SubmitLanguage = string; // TO-DO
 export interface SubmitData {
   url: string;
   sourceCode: string;
-  language: SubmitLanguage;
 }
 
 // Router -> Client

@@ -566,11 +566,6 @@
             "type": "string",
             "default": "${extensionPath}/res/defaultScript.js",
             "markdownDescription": "%config.companion.customPathScript%"
-          },
-          "cph-ng.companion.addTimestamp": {
-            "type": "boolean",
-            "default": true,
-            "markdownDescription": "%config.companion.addTimestamp%"
           }
         }
       },
