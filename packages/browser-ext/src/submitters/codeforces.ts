@@ -36,8 +36,6 @@ export class CodeforcesSubmitter extends BaseSubmitter {
   }
 
   public async fill(data: SubmitData) {
-    const languageEl = await this.waitForElement<HTMLSelectElement>('select[name="programTypeId"]');
-    languageEl.value = '54'; // TO-DO
     const sourceCodeEl = await this.waitForElement<HTMLTextAreaElement>('#sourceCodeTextarea');
     sourceCodeEl.value = data.sourceCode;
 
