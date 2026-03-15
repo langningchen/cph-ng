@@ -137,20 +137,19 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
                 return null;
 
               return (
-                <Box key={testcaseId} onDragOver={(e) => handleDragOver(e, displayIdx)}>
-                  <ErrorBoundary>
-                    <TestcaseView
-                      problemId={problemId}
-                      testcaseId={testcaseId}
-                      testcase={testcase}
-                      isExpand={testcase.isExpand && draggedIdx === null}
-                      idx={originalIdx}
-                      onDragStart={handleDragStart}
-                      onDragEnd={handleDragEnd}
-                      isDragging={draggedIdx === originalIdx}
-                    />
-                  </ErrorBoundary>
-                </Box>
+                <ErrorBoundary key={testcaseId}>
+                  <TestcaseView
+                    problemId={problemId}
+                    testcaseId={testcaseId}
+                    testcase={testcase}
+                    isExpand={testcase.isExpand && draggedIdx === null}
+                    idx={originalIdx}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                    isDragging={draggedIdx === originalIdx}
+                    onDragOver={(e) => handleDragOver(e, displayIdx)}
+                  />
+                </ErrorBoundary>
               );
             })}
           </Box>

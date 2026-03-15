@@ -47,6 +47,7 @@ interface TestcaseViewProp {
   isExpand: boolean;
   idx: number;
   onDragStart?: (idx: number, e: React.DragEvent) => void;
+  onDragOver?: (e: React.DragEvent) => void;
   onDragEnd?: () => void;
   isDragging?: boolean;
   autoFocus?: boolean;
@@ -60,6 +61,7 @@ export const TestcaseView = memo(
     isExpand,
     idx,
     onDragStart,
+    onDragOver,
     onDragEnd,
     isDragging = false,
     autoFocus = false,
@@ -242,71 +244,68 @@ export const TestcaseView = memo(
       : testcase.result?.verdict?.color;
 
     return (
-      <CphNgMenu
-        menu={
-          testcase.isDisabled
-            ? {
-                [t('testcaseView.menu.enableTestcase')]: () =>
-                  dispatch({
-                    type: 'updateTestcase',
-                    problemId,
-                    testcaseId,
-                    event: 'setDisable',
-                    value: false,
-                  }),
-              }
-            : {
-                [t('testcaseView.menu.disableTestcase')]: () =>
-                  dispatch({
-                    type: 'updateTestcase',
-                    problemId,
-                    testcaseId,
-                    event: 'setDisable',
-                    value: true,
-                  }),
-                [t('testcaseView.menu.clearTestcaseStatus')]: () =>
-                  dispatch({ type: 'clearTestcaseStatus', problemId, testcaseId }),
-              }
-        }
+      <Accordion
+        slotProps={{ transition: { unmountOnExit: true } }}
+        expanded={expanded}
+        disableGutters
+        onChange={() => {
+          dispatch({
+            type: 'updateTestcase',
+            problemId,
+            testcaseId,
+            event: 'setExpand',
+            value: !isExpand,
+          });
+        }}
+        disabled={testcase.isDisabled}
+        sx={{
+          borderLeft: `4px solid ${verdictColor || 'transparent'}`,
+          backgroundColor: verdictColor ? `${verdictColor}10` : undefined,
+          transition: 'all 0.2s',
+          filter: testcase.isDisabled ? 'grayscale(100%)' : 'none',
+        }}
       >
-        <Accordion
-          slotProps={{ transition: { unmountOnExit: true } }}
-          expanded={expanded}
-          disableGutters
-          onChange={() => {
-            if (testcase.isDisabled) return;
-            dispatch({
-              type: 'updateTestcase',
-              problemId,
-              testcaseId,
-              event: 'setExpand',
-              value: !isExpand,
-            });
-          }}
-          sx={{
-            borderLeft: `4px solid ${verdictColor || 'transparent'}`,
-            backgroundColor: verdictColor ? `${verdictColor}10` : undefined,
-            transition: 'all 0.2s',
-            opacity: isDragging || testcase.isDisabled ? 0.5 : 1,
-            filter: testcase.isDisabled ? 'grayscale(100%)' : 'none',
-          }}
+        <CphNgMenu
+          menu={
+            testcase.isDisabled
+              ? {
+                  [t('testcaseView.menu.enableTestcase')]: () =>
+                    dispatch({
+                      type: 'updateTestcase',
+                      problemId,
+                      testcaseId,
+                      event: 'setDisable',
+                      value: false,
+                    }),
+                }
+              : {
+                  [t('testcaseView.menu.disableTestcase')]: () =>
+                    dispatch({
+                      type: 'updateTestcase',
+                      problemId,
+                      testcaseId,
+                      event: 'setDisable',
+                      value: true,
+                    }),
+                  [t('testcaseView.menu.clearTestcaseStatus')]: () =>
+                    dispatch({ type: 'clearTestcaseStatus', problemId, testcaseId }),
+                }
+          }
         >
           <AccordionSummary
-            disabled={testcase.isDisabled}
             draggable
             onDragStart={(e) => {
               e.stopPropagation();
               onDragStart?.(idx, e);
             }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onDragOver?.(e);
+            }}
             onDragEnd={(e) => {
               e.stopPropagation();
               onDragEnd?.();
-            }}
-            onClick={(e) => {
-              if (testcase.isDisabled) {
-                e.stopPropagation();
-                e.preventDefault();
-              }
             }}
             sx={{
               '& > span': { margin: '0 !important' },
@@ -315,12 +314,6 @@ export const TestcaseView = memo(
               '&[draggable="true"]': {
                 pointerEvents: 'auto',
               },
-              '& *': testcase.isDisabled
-                ? {
-                    cursor: 'not-allowed !important',
-                    pointerEvents: 'none !important',
-                  }
-                : {},
             }}
           >
             <CphNgFlex smallGap>
@@ -406,15 +399,9 @@ export const TestcaseView = memo(
               />
             </CphNgFlex>
           </AccordionSummary>
-          <AccordionDetails
-            sx={{
-              padding: { xs: '8px 8px', md: '8px 16px' },
-            }}
-          >
-            {details}
-          </AccordionDetails>
-        </Accordion>
-      </CphNgMenu>
+        </CphNgMenu>
+        <AccordionDetails>{details}</AccordionDetails>
+      </Accordion>
     );
   },
 );

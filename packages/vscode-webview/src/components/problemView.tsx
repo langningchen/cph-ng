@@ -69,8 +69,7 @@ export const ProblemView = memo(
           width='100%'
           sx={{
             overflowY: 'scroll',
-            scrollbarWidth: 'thin',
-            scrollbarGutter: 'stable',
+            scrollbarWidth: 'none',
           }}
           paddingY={2}
         >
