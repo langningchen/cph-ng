@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { stat } from 'node:fs/promises';
 import { dirname, extname, relative } from 'node:path';
 import { gunzipSync, gzipSync } from 'node:zlib';
 import type { IFileWithHash, IProblem, ITestcase, ITestcaseIo, TestcaseId } from '@cph-ng/core';
@@ -101,32 +102,16 @@ export class ProblemService implements IProblemService {
   }
 
   public async loadTestcases(problem: Problem): Promise<void> {
-    const option = await this.ui.quickPick(
-      [
-        { label: this.translator.t('Load from a zip file'), value: 'zip' },
-        { label: this.translator.t('Load from a folder'), value: 'folder' },
-      ],
-      {},
-    );
-    if (!option) return;
-
-    if (option === 'zip') {
-      const zipFile = await this.ui.openDialog({
-        title: this.translator.t('Choose a zip file containing test cases'),
-        filters: {
-          [this.translator.t('Zip files')]: ['zip'],
-          [this.translator.t('All files')]: ['*'],
-        },
-      });
-      if (!zipFile) return;
-      this.applyTestcases(problem, await this.testcaseScanner.fromZip(problem.src.path, zipFile));
-    } else if (option === 'folder') {
-      const folderUri = await this.ui.chooseFolder(
-        this.translator.t('Choose a folder containing test cases'),
-      );
-      if (!folderUri) return;
-      this.applyTestcases(problem, await this.testcaseScanner.fromFolder(folderUri));
-    }
+    const path = await this.ui.openDialog({
+      title: this.translator.t('Choose a zip file or folder containing test cases'),
+      canSelectFiles: true,
+      canSelectFolders: true,
+    });
+    if (!path) return;
+    const testcases = (await stat(path)).isFile()
+      ? await this.testcaseScanner.fromZip(problem.src.path, path)
+      : await this.testcaseScanner.fromFolder(path);
+    this.applyTestcases(problem, testcases);
   }
 
   public applyTestcases(problem: Problem, testcases: Testcase[]): void {
