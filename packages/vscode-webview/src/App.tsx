@@ -20,7 +20,6 @@ import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { ErrorBoundary } from '@w/components/base/errorBoundary';
-import { BgProblemView } from '@w/components/bgProblemView';
 import { CreateProblemView } from '@w/components/createProblemView';
 import { DragOverlay } from '@w/components/dragOverlay';
 import { InitView } from '@w/components/initView';
@@ -66,14 +65,14 @@ const Main = () => {
           padding={{ xs: 0.5, md: 1 }}
         >
           {state.isInitialized ? (
-            <>
-              {state.currentProblem.type === 'active' ? (
-                <ProblemView {...state.currentProblem} />
-              ) : (
-                <CreateProblemView canImport={state.currentProblem.canImport} />
-              )}
-              <BgProblemView bgProblems={state.backgroundProblems} />
-            </>
+            state.currentProblem.type === 'active' ? (
+              <ProblemView
+                {...state.currentProblem}
+                backgroundProblems={state.backgroundProblems}
+              />
+            ) : (
+              <CreateProblemView canImport={state.currentProblem.canImport} />
+            )
           ) : (
             <InitView />
           )}

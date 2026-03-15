@@ -25,7 +25,7 @@ import { ProblemTitle } from '@w/components/problemTitle';
 import { TestcasesView } from '@w/components/testcasesView';
 import { VerdictSummary } from '@w/components/verdictSummary';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import type { IWebviewProblem } from '@w/types';
+import type { IWebviewBackgroundProblem, IWebviewProblem } from '@w/types';
 import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -33,71 +33,75 @@ interface ProblemViewProps {
   problemId: ProblemId;
   problem: IWebviewProblem;
   startTime: number;
+  backgroundProblems: IWebviewBackgroundProblem[];
 }
 
-export const ProblemView = memo(({ problemId, problem, startTime }: ProblemViewProps) => {
-  const { t } = useTranslation();
-  const dispatch = useProblemDispatch();
-  const hasRunning = useMemo(() => {
-    for (const [_, testcase] of Object.entries(problem.testcases))
-      if (testcase.result?.verdict.type === VerdictType.running) return true;
-    return false;
-  }, [problem.testcases]);
+export const ProblemView = memo(
+  ({ problemId, problem, startTime, backgroundProblems }: ProblemViewProps) => {
+    const { t } = useTranslation();
+    const dispatch = useProblemDispatch();
+    const hasRunning = useMemo(() => {
+      for (const [_, testcase] of Object.entries(problem.testcases))
+        if (testcase.result?.verdict.type === VerdictType.running) return true;
+      return false;
+    }, [problem.testcases]);
 
-  return (
-    <>
-      <ErrorBoundary>
-        <ProblemTitle
-          problemId={problemId}
-          name={problem.name}
-          url={problem.url}
-          checker={problem.checker}
-          interactor={problem.interactor}
-          timeElapsedMs={problem.timeElapsedMs}
-          overrides={problem.overrides}
-          startTime={startTime}
-        />
-      </ErrorBoundary>
-      <ErrorBoundary>
-        <VerdictSummary testcaseOrder={problem.testcaseOrder} testcases={problem.testcases} />
-      </ErrorBoundary>
-      <CphNgFlex
-        column
-        flex={1}
-        width='100%'
-        sx={{
-          overflowY: 'scroll',
-          scrollbarWidth: 'thin',
-          scrollbarGutter: 'stable',
-        }}
-        paddingY={2}
-      >
+    return (
+      <>
         <ErrorBoundary>
-          <CphNgMenu
-            menu={{
-              [t('problemView.menu.clearStatus')]: () => {
-                dispatch({ type: 'clearTestcaseStatus', problemId });
-              },
-            }}
-            flex={1}
-            width='100%'
-          >
-            <TestcasesView
-              problemId={problemId}
-              testcaseOrder={problem.testcaseOrder}
-              testcases={problem.testcases}
-            />
-          </CphNgMenu>
+          <ProblemTitle
+            problemId={problemId}
+            name={problem.name}
+            url={problem.url}
+            checker={problem.checker}
+            interactor={problem.interactor}
+            timeElapsedMs={problem.timeElapsedMs}
+            overrides={problem.overrides}
+            startTime={startTime}
+          />
         </ErrorBoundary>
-      </CphNgFlex>
-      <ErrorBoundary>
-        <ProblemActions
-          problemId={problemId}
-          url={problem.url}
-          stressTest={problem.stressTest}
-          hasRunning={hasRunning}
-        />
-      </ErrorBoundary>
-    </>
-  );
-});
+        <ErrorBoundary>
+          <VerdictSummary testcaseOrder={problem.testcaseOrder} testcases={problem.testcases} />
+        </ErrorBoundary>
+        <CphNgFlex
+          column
+          flex={1}
+          width='100%'
+          sx={{
+            overflowY: 'scroll',
+            scrollbarWidth: 'thin',
+            scrollbarGutter: 'stable',
+          }}
+          paddingY={2}
+        >
+          <ErrorBoundary>
+            <CphNgMenu
+              menu={{
+                [t('problemView.menu.clearStatus')]: () => {
+                  dispatch({ type: 'clearTestcaseStatus', problemId });
+                },
+              }}
+              flex={1}
+              width='100%'
+            >
+              <TestcasesView
+                problemId={problemId}
+                testcaseOrder={problem.testcaseOrder}
+                testcases={problem.testcases}
+              />
+            </CphNgMenu>
+          </ErrorBoundary>
+        </CphNgFlex>
+        <ErrorBoundary>
+          <ProblemActions
+            problemId={problemId}
+            url={problem.url}
+            stressTest={problem.stressTest}
+            hasRunning={hasRunning}
+            backgroundProblems={backgroundProblems}
+          />
+        </ErrorBoundary>
+      </>
+    );
+  },
+);

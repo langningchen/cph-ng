@@ -16,12 +16,10 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { ProblemId } from '@cph-ng/core';
-import AddIcon from '@mui/icons-material/Add';
 import BackupIcon from '@mui/icons-material/Backup';
 import CloseIcon from '@mui/icons-material/Close';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
@@ -34,12 +32,13 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
+import { BackgroundProblemView } from '@w/components/backggroundProblemView';
 import { CphNgButton } from '@w/components/base/cphNgButton';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { CphNgLink } from '@w/components/base/cphNgLink';
 import { RunButtonGroup } from '@w/components/runButtonGroup';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import type { IWebviewStressTest } from '@w/types';
+import type { IWebviewBackgroundProblem, IWebviewStressTest } from '@w/types';
 import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -48,10 +47,11 @@ interface ProblemActionsProps {
   url: string | null;
   stressTest: IWebviewStressTest;
   hasRunning: boolean;
+  backgroundProblems: IWebviewBackgroundProblem[];
 }
 
 export const ProblemActions = memo(
-  ({ problemId, url, stressTest, hasRunning }: ProblemActionsProps) => {
+  ({ problemId, url, stressTest, hasRunning, backgroundProblems }: ProblemActionsProps) => {
     const { t } = useTranslation();
     const dispatch = useProblemDispatch();
     const [clickTime, setClickTime] = useState<number[]>([]);
@@ -68,71 +68,60 @@ export const ProblemActions = memo(
       <>
         <CphNgFlex
           smallGap
-          flexWrap='wrap'
           justifyContent='center'
           onClick={() => setClickTime((times) => [...times, Date.now()].slice(-10))}
         >
-          <CphNgButton
-            larger
-            name={t('problemActions.addTestcase')}
-            icon={AddIcon}
-            onClick={() => dispatch({ type: 'addTestcase', problemId })}
-          />
-          <CphNgButton
-            larger
-            name={t('problemActions.loadTestcases')}
-            icon={FileCopyIcon}
-            onClick={() => dispatch({ type: 'loadTestcases', problemId })}
-          />
-
-          {hasRunning ? (
+          <CphNgFlex flex={1} smallGap flexWrap='wrap' justifyContent='center'>
+            {hasRunning ? (
+              <CphNgButton
+                larger
+                name={t('problemActions.stopTestcases')}
+                icon={PlaylistRemoveIcon}
+                color='warning'
+                onClick={() =>
+                  dispatch({
+                    type: 'stopTestcases',
+                    problemId,
+                  })
+                }
+              />
+            ) : (
+              <RunButtonGroup
+                larger
+                icon={PlaylistPlayIcon}
+                name={t('problemActions.runAllTestcases')}
+                color='success'
+                onRun={(forceCompile) =>
+                  dispatch({ type: 'runAllTestcases', problemId, forceCompile })
+                }
+              />
+            )}
             <CphNgButton
               larger
-              name={t('problemActions.stopTestcases')}
-              icon={PlaylistRemoveIcon}
-              color='warning'
-              onClick={() =>
-                dispatch({
-                  type: 'stopTestcases',
-                  problemId,
-                })
-              }
+              name={t('problemActions.stressTest')}
+              icon={CompareArrowsIcon}
+              onClick={() => setStressTestDialogOpen(true)}
+              sx={stressTest.isRunning ? { animation: 'pulse 1s infinite' } : undefined}
             />
-          ) : (
-            <RunButtonGroup
-              larger
-              icon={PlaylistPlayIcon}
-              name={t('problemActions.runAllTestcases')}
-              color='success'
-              onRun={(forceCompile) =>
-                dispatch({ type: 'runAllTestcases', problemId, forceCompile })
-              }
-            />
-          )}
-          <CphNgButton
-            larger
-            name={t('problemActions.stressTest')}
-            icon={CompareArrowsIcon}
-            onClick={() => setStressTestDialogOpen(true)}
-            sx={stressTest.isRunning ? { animation: 'pulse 1s infinite' } : undefined}
-          />
-          {!!url && (
+            {!!url && (
+              <CphNgButton
+                larger
+                name={t('problemActions.submit')}
+                icon={BackupIcon}
+                color='secondary'
+                onClick={() => dispatch({ type: 'submitToCodeforces', problemId })}
+              />
+            )}
             <CphNgButton
               larger
-              name={t('problemActions.submit')}
-              icon={BackupIcon}
-              color='success'
-              onClick={() => dispatch({ type: 'submitToCodeforces', problemId })}
+              name={t('problemActions.deleteProblem')}
+              icon={DeleteForeverIcon}
+              color='error'
+              onClick={() => setDeleteDialogOpen(true)}
             />
-          )}
-          <CphNgButton
-            larger
-            name={t('problemActions.deleteProblem')}
-            icon={DeleteForeverIcon}
-            color='error'
-            onClick={() => setDeleteDialogOpen(true)}
-          />
-          {!!window.easterEgg && <div title={t('problemActions.easterEgg')}>🐰</div>}
+            {!!window.easterEgg && <div title={t('problemActions.easterEgg')}>🐰</div>}
+          </CphNgFlex>
+          <BackgroundProblemView backgroundProblems={backgroundProblems} />
         </CphNgFlex>
         <Dialog
           fullWidth

@@ -18,6 +18,7 @@
 import type { ProblemId, TestcaseId } from '@cph-ng/core';
 import { VerdictName } from '@cph-ng/core';
 import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
 import { AcCongrats } from '@w/components/acCongrats';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { ErrorBoundary } from '@w/components/base/errorBoundary';
@@ -27,6 +28,33 @@ import { useProblemDispatch } from '@w/context/ProblemContext';
 import type { IWebviewTestcase } from '@w/types';
 import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+interface InfoButtonProps {
+  message: string;
+  onClick: () => void;
+}
+
+export const InfoButton = memo(({ message, onClick }: InfoButtonProps) => {
+  return (
+    <Box flex={1}>
+      <Paper
+        onClick={onClick}
+        sx={{
+          py: 1,
+          cursor: 'pointer',
+          textAlign: 'center',
+          opacity: 0.5,
+          '&:hover': {
+            opacity: 1,
+          },
+          transition: 'all 0.2s',
+        }}
+      >
+        {message}
+      </Paper>
+    </Box>
+  );
+});
 
 interface TestcasesViewProps {
   problemId: ProblemId;
@@ -130,25 +158,16 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
       ) : (
         <NoTestcases />
       )}
-      <Box
-        onClick={() => dispatch({ type: 'addTestcase', problemId })}
-        sx={{
-          width: '100%',
-          minHeight: '40px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: 0.5,
-          '&:hover': {
-            opacity: 1,
-            backgroundColor: 'rgba(127, 127, 127, 0.1)',
-          },
-          transition: 'all 0.2s',
-        }}
-      >
-        {t('testcasesView.addTestcaseHint')}
-      </Box>
+      <CphNgFlex smallGap>
+        <InfoButton
+          message={t('testcasesView.addTestcaseHint')}
+          onClick={() => dispatch({ type: 'addTestcase', problemId })}
+        />
+        <InfoButton
+          message={t('testcasesView.loadTestcasesHint')}
+          onClick={() => dispatch({ type: 'loadTestcases', problemId })}
+        />
+      </CphNgFlex>
     </CphNgFlex>
   );
 });
