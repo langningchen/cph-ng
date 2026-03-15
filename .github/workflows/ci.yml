@@ -106,6 +106,8 @@ jobs:
         run: |
           git tag "v${{ needs.build.outputs.version }}"
           git push origin "v${{ needs.build.outputs.version }}"
+      - name: Build
+        run: pnpm build-all
       - name: Publish VS Code
         working-directory: packages/vscode-ext
         run: |
