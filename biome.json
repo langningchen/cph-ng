@@ -16,6 +16,7 @@
       "packages/*/wxt.config.ts",
       "packages/*/l10n/**",
       "packages/*/public/_locales/**",
+      "commitlint.config.ts",
       "**/package.nls*.json",
       "**/l10n/**/*.json",
       "**/_locales/**/*.json"
@@ -148,7 +149,8 @@
         "packages/*/webpack.config.ts",
         "packages/*/wxt.config.ts",
         "packages/*/entrypoints/**",
-        "packages/*/tests/env.d.ts"
+        "packages/*/tests/env.d.ts",
+        "commitlint.config.ts"
       ],
       "linter": {
         "rules": {
