@@ -58,7 +58,7 @@ jobs:
       - name: Build all packages
         run: |
           echo "::group::Building packages"
-          pnpm build-all
+          pnpm package
           echo "::endgroup::"
         env:
           BUILD_TYPE: Auto Build

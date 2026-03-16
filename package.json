@@ -5,8 +5,7 @@
   "license": "AGPL-3.0-only",
   "scripts": {
     "compile": "pnpm -r --parallel compile",
-    "package": "pnpm -r --parallel package",
-    "build-all": "tsx scripts/build-all.ts",
+    "package": "tsx scripts/package.ts",
     "watch": "pnpm -r --parallel watch",
     "test": "pnpm -r --parallel test",
     "test:run": "pnpm -r --parallel test:run",
