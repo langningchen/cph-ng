@@ -2,6 +2,62 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.0
+
+Aggregated from prereleases 0.5.6~0.6.9.
+
+### Added
+
+- **New Features**:
+  - Added support for **Browser Extension** integration.
+  - Implemented **base32** encoding for problem filesystem to improve path compatibility.
+  - Added feature to automatically close problems when no associated editor is active.
+- **Webview & UI**:
+  - Enhanced background problem management and real-time UI updates.
+  - Added detailed hover information (time, memory usage, and test case ID) in the webview.
+  - Added contact information section in the webview.
+  - Experimental implementation of UI auto-focus for better accessibility.
+- **Project Tools**:
+  - Added `commitlint` scope and transitioned to TypeScript-based configuration.
+
+### Fixed
+
+- **Core Stability**:
+  - Improved editor change handling using promise chaining.
+  - Fixed issue where **Stress Tests** could not be terminated manually.
+  - Resolved duplicate problem loading and improved filesystem refresh logic.
+  - Fixed environment variable passing in router spawn parameters.
+  - Improved path resolution and directory walking logic.
+  - Fixed testcase property updates based on input types.
+- **UX & Interface**:
+  - Simplified testcase loading dialog to support both **zip files and folders**.
+  - Improved sidebar UX and fixed event propagation for floating buttons.
+  - Fixed focus handling to highlight compilation output when errors occur.
+  - Enhanced error handling for large files and message processing in webview.
+  - Fixed data persistence by ensuring problems are saved before reload.
+  - Updated Welcome Dialog content and contact information for better clarity.
+- **CI/CD & Maintenance**:
+  - Fixed VS Code publishing by adding a mandatory build step.
+  - Enabled automatic generation of release notes and automated version bump commits.
+  - Updated CI actions (actions/checkout v6, attest-build-provenance v4).
+  - Fixed package script errors and standardized changelog formatting.
+
+### Changed
+
+- **Refactoring**:
+  - **Major Refactor**: Migrated the codebase to a **Dependency Injection (DI)** structure.
+  - Renamed "Brute Force Compare" to **"Stress Test"** throughout the application and documentation.
+  - Refactored CI workflow steps for improved artifact handling.
+  - Simplified translation keys and reorganized configuration keys.
+  - Removed unused types and legacy methods.
+- **Maintenance**:
+  - Upgraded numerous dependencies across the workspace.
+  - Cleaned up outdated documentation and updated issue templates.
+  - Updated tests to be case-sensitive.
+
+<details>
+<summary>Pre-release history (0.5.6~0.6.9)</summary>
+
 ## 0.6.9
 
 - **fix**(ci): add build step before publishing VS Code
@@ -90,6 +146,8 @@ All notable changes to the "cph-ng" extension will be documented in this file.
 - **fix**: mkdir in root
 - **feat**: try to implement auto focus
 - **feat**: suppress backend data refresh
+
+</details>
 
 ## 0.5.5
 
