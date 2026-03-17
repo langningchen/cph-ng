@@ -107,8 +107,8 @@
   "verdictSummary.pending": "等待中",
   "verdictSummary.running": "运行中",
   "welcomeDialog.close": "知道了！",
-  "welcomeDialog.contactUs": "问题或建议，欢迎进 QQ 群 1084083880 或在 GitHub 反馈。",
-  "welcomeDialog.content": "CPH-NG 1.0.0 正式版临近，期待您的宝贵反馈，助力我们打磨产品。",
-  "welcomeDialog.refactorWarning": "版本重大重构：部分设置项已变更，请务必检查并重新配置。",
+  "welcomeDialog.contactUs": "如有问题或建议，欢迎进 QQ 群 1084083880 或在 GitHub 反馈。",
+  "welcomeDialog.content": "CPH-NG 1.0.0 正式版临近，目前开启公测，期待您的宝贵反馈，助力我们打磨产品。",
+  "welcomeDialog.refactorWarning": "部分设置项已变更，请务必检查并重新配置。",
   "welcomeDialog.title": "欢迎使用 CPH-NG v{{version}}！"
 }

@@ -108,7 +108,7 @@
   "verdictSummary.running": "Running",
   "welcomeDialog.close": "Got it!",
   "welcomeDialog.contactUs": "Questions or feedback? Join our QQ group (1084083880) or open an issue on GitHub.",
-  "welcomeDialog.content": "CPH-NG 1.0.0 is coming soon. Please share your feedback to help us polish the release.",
-  "welcomeDialog.refactorWarning": "Major refactor: Some settings have been renamed. Please review and update your configuration.",
+  "welcomeDialog.content": "CPH-NG 1.0.0 is coming soon! We are now in public beta and look forward to your valuable feedback to help us polish the product.",
+  "welcomeDialog.refactorWarning": "Some settings have been renamed. Please review and update your configuration.",
   "welcomeDialog.title": "Welcome to CPH-NG v{{version}}!"
 }
