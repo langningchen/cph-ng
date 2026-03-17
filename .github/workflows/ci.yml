@@ -164,7 +164,7 @@ jobs:
           echo "::group::Publishing to VS Code Marketplace"
           VERSION="${{ needs.build.outputs.version }}"
           IS_PRE="${{ steps.release.outputs.pre_release }}"
-          FLAGS="--allow-star-activation --no-dependencies -i ./dist/cph-ng-$VERSION.vsix"
+          FLAGS="--allow-star-activation --no-dependencies -i ../../dist/cph-ng-$VERSION.vsix"
           [ "$IS_PRE" = "true" ] && FLAGS="$FLAGS --pre-release"
           pnpm -C packages/vscode-ext exec vsce publish $FLAGS
           echo "::endgroup::"
@@ -183,9 +183,9 @@ jobs:
           echo "::group::Publishing to Browser Stores"
           VERSION="${{ needs.build.outputs.version }}"
           pnpm -C packages/browser-ext exec wxt submit \
-            --firefox-zip ./dist/cph-ng-submit-$VERSION-firefox.zip \
-            --firefox-sources-zip ./dist/cph-ng-submit-$VERSION-sources.zip \
-            --edge-zip ./dist/cph-ng-submit-$VERSION-chrome.zip
+            --firefox-zip ../../dist/cph-ng-submit-$VERSION-firefox.zip \
+            --firefox-sources-zip ../../dist/cph-ng-submit-$VERSION-sources.zip \
+            --edge-zip ../../dist/cph-ng-submit-$VERSION-chrome.zip
           echo "::endgroup::"
 
       - name: Create GitHub Release
