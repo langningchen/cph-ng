@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      force_publish:
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -66,7 +72,7 @@ jobs:
           BUILD_TYPE: Auto Build
       - name: Detect version changes
         id: versions
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
           echo "::group::Detecting version"
           CURRENT_VERSION=$(node -p "require('./packages/vscode-ext/package.json').version")
@@ -75,13 +81,17 @@ jobs:
           echo "Current: $CURRENT_VERSION, Previous: $PREV_VERSION"
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
+          VERSION_CHANGED=false
           if [ "$CURRENT_VERSION" != "$PREV_VERSION" ]; then
-            echo "version_changed=true" >> $GITHUB_OUTPUT
-            echo "Version changed!"
-          else
-            echo "version_changed=false" >> $GITHUB_OUTPUT
-            echo "Version unchanged."
+            VERSION_CHANGED=true
+            echo "Version change detected via git diff."
+          elif [ "${{ github.event.inputs.force_publish }}" == "true" ]; then
+            VERSION_CHANGED=true
+            echo "Version change forced via manual input."
           fi
+
+          echo "version_changed=$VERSION_CHANGED" >> $GITHUB_OUTPUT
+          echo "Version changed: $VERSION_CHANGED"
           echo "::endgroup::"
       - name: Check Artifacts
         run: |
@@ -148,7 +158,6 @@ jobs:
           echo "::endgroup::"
 
       - name: Publish VS Code
-        working-directory: packages/vscode-ext
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
@@ -161,7 +170,6 @@ jobs:
           echo "::endgroup::"
 
       - name: Publish Browser
-        working-directory: packages/browser-ext
         env:
           EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
           EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
