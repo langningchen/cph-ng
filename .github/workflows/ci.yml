@@ -158,6 +158,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Publish VS Code
+        continue-on-error: true
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
@@ -170,6 +171,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Publish Browser
+        continue-on-error: true
         env:
           EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
           EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
