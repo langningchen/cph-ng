@@ -2,6 +2,13 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.1
+
+- **feat**(vscode-webview): add support component and remove welcome dialog
+- **fix**(vscode-ext): update copyright year to 2026
+- **refactor**(vscode-webview): remove showTips configuration and related components
+- **fix**(ci): allow publish step to continue on error
+
 ## 0.7.0
 
 Aggregated from prereleases 0.5.6~0.6.9.
