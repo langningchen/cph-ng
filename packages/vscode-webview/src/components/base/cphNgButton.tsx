@@ -19,7 +19,7 @@ import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
 import type SvgIcon from '@mui/material/SvgIcon';
 import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
 import { deleteProps } from '@w/utils';
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 interface CphNgButtonProps extends IconButtonProps {
   icon: typeof SvgIcon;
@@ -27,16 +27,15 @@ interface CphNgButtonProps extends IconButtonProps {
   larger?: boolean;
 }
 
-export const CphNgButton = (props: CphNgButtonProps) => {
-  return (
-    <CphNgTooltip title={props.name}>
-      <IconButton
-        color='primary'
-        size={props.larger ? 'medium' : 'small'}
-        {...deleteProps(props, ['icon', 'name', 'larger'])}
-      >
-        <props.icon fontSize='small' />
-      </IconButton>
-    </CphNgTooltip>
-  );
-};
+export const CphNgButton = forwardRef<HTMLButtonElement, CphNgButtonProps>((props, ref) => (
+  <CphNgTooltip title={props.name}>
+    <IconButton
+      ref={ref}
+      color='primary'
+      size={props.larger ? 'medium' : 'small'}
+      {...deleteProps(props, ['icon', 'name', 'larger'])}
+    >
+      <props.icon fontSize='small' />
+    </IconButton>
+  </CphNgTooltip>
+));

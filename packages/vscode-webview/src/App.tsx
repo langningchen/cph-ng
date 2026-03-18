@@ -24,7 +24,6 @@ import { CreateProblemView } from '@w/components/createProblemView';
 import { DragOverlay } from '@w/components/dragOverlay';
 import { InitView } from '@w/components/initView';
 import { ProblemView } from '@w/components/problemView';
-import { WelcomeDialog } from '@w/components/welcomeDialog';
 import { ProblemProvider, useProblemState } from '@w/context/ProblemContext';
 import langEn from '@w/l10n/en.json';
 import langZh from '@w/l10n/zh.json';
@@ -50,7 +49,6 @@ const Main = () => {
 
   return (
     <>
-      <WelcomeDialog />
       <ErrorBoundary>
         <DragOverlay />
       </ErrorBoundary>

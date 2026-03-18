@@ -17,10 +17,10 @@
 
 import type { ProblemId } from '@cph-ng/core';
 import { VerdictType } from '@cph-ng/core';
+import { ProblemActions } from '@w/components/actions/problemActions';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { CphNgMenu } from '@w/components/base/cphNgMenu';
 import { ErrorBoundary } from '@w/components/base/errorBoundary';
-import { ProblemActions } from '@w/components/problemActions';
 import { ProblemTitle } from '@w/components/problemTitle';
 import { TestcasesView } from '@w/components/testcasesView';
 import { VerdictSummary } from '@w/components/verdictSummary';

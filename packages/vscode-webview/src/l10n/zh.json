@@ -64,6 +64,11 @@
   "problemView.menu.clearStatus": "清除所有测试样例状态",
   "runButtonGroup.forceCompile": "[Ctrl] 强制编译",
   "runButtonGroup.skipCompile": "[Alt] 跳过编译",
+  "support.docs": "文档",
+  "support.feedback": "反馈",
+  "support.github": "GitHub 仓库",
+  "support.help": "帮助",
+  "support.joinQQ": "加入我们的 QQ 群",
   "testcaseDataView.clearFile": "清空文件",
   "testcaseDataView.compare": "与答案比较",
   "testcaseDataView.copied": "已复制",
@@ -90,10 +95,5 @@
   "verdictSummary.failed": "未通过",
   "verdictSummary.passed": "通过",
   "verdictSummary.pending": "等待中",
-  "verdictSummary.running": "运行中",
-  "welcomeDialog.close": "知道了！",
-  "welcomeDialog.contactUs": "如有问题或建议，欢迎进 QQ 群 1084083880 或在 GitHub 反馈。",
-  "welcomeDialog.content": "CPH-NG 1.0.0 正式版临近，目前开启公测，期待您的宝贵反馈，助力我们打磨产品。",
-  "welcomeDialog.refactorWarning": "部分设置项已变更，请务必检查并重新配置。",
-  "welcomeDialog.title": "欢迎使用 CPH-NG v{{version}}！"
+  "verdictSummary.running": "运行中"
 }
