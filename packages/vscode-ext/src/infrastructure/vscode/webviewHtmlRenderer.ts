@@ -43,7 +43,6 @@ export class WebviewHtmlRenderer {
       hiddenStatuses: this.settings.sidebar.hiddenStatuses,
       partyUri: this.settings.sidebar.showAcGif ? getUri('res/party.gif').toString() : '',
       language: env.language,
-      showTips: this.settings.sidebar.showTips,
     };
 
     return `<!DOCTYPE html><html>

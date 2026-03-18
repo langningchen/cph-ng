@@ -111,7 +111,6 @@
   "config.sidebar.hiddenStatuses.WT": "等待中",
   "config.sidebar.retainWhenHidden": "如果为 `true`，即使侧边栏视图被隐藏，它也将**保持活动并保留其状态**。如果为 `false`，侧边栏在隐藏时将被释放，并在再次显示时重新创建，这可能会影响性能或导致短暂的视觉闪烁。设置此项时请考虑你的工作流程和系统资源。",
   "config.sidebar.showAcGif": "启用后，每当题目成功被通过（收到“通过”判决）时，侧边栏中将显示一个**祝贺 GIF**。这为成功的提交提供了视觉反馈。",
-  "config.sidebar.showTips": "启用后，一个**随机提示**会在没有题目的时候显示。",
   "config.stressTest": "对拍",
   "config.stressTest.bruteForceTimeLimit": "设置暴力运行的**时间限制**（单位为**毫秒**）。如果暴力在此时间内未完成，将被终止。这有助于防止暴力运行过长时间，影响整体性能。",
   "config.stressTest.generatorTimeLimit": "设置生成器运行的**时间限制**（单位为**毫秒**）。如果生成器在此时间内未完成，将被终止。这有助于防止生成器运行过长时间，影响整体性能。",

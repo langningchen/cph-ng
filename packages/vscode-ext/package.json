@@ -653,11 +653,6 @@
             "uniqueItems": true,
             "default": [],
             "markdownDescription": "%config.sidebar.hiddenStatuses%"
-          },
-          "cph-ng.sidebar.showTips": {
-            "type": "boolean",
-            "default": true,
-            "markdownDescription": "%config.sidebar.showTips%"
           }
         }
       }

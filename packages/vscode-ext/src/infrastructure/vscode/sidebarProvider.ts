@@ -51,8 +51,7 @@ export class SidebarProvider implements ISidebarProvider {
         e.affectsConfiguration('cph-ng.sidebar.retainWhenHidden') ||
         e.affectsConfiguration('cph-ng.sidebar.showAcGif') ||
         e.affectsConfiguration('cph-ng.sidebar.colorTheme') ||
-        e.affectsConfiguration('cph-ng.sidebar.hiddenStatuses') ||
-        e.affectsConfiguration('cph-ng.sidebar.showTips')
+        e.affectsConfiguration('cph-ng.sidebar.hiddenStatuses')
       ) {
         const choice = await this.ui.alert(
           'info',

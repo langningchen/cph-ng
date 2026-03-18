@@ -33,14 +33,12 @@ import { Init } from '@v/application/useCases/webview/Init';
 import { LoadTestcases } from '@v/application/useCases/webview/LoadTestcases';
 import type { IMsgHandle } from '@v/application/useCases/webview/msgHandle';
 import { OpenFile } from '@v/application/useCases/webview/OpenFile';
-import { OpenSettings } from '@v/application/useCases/webview/OpenSettings';
 import { OpenTestlib } from '@v/application/useCases/webview/OpenTestlib';
 import { RemoveSrcFile } from '@v/application/useCases/webview/RemoveSrcFile';
 import { ReorderTestcase } from '@v/application/useCases/webview/ReorderTestcase';
 import { RunAllTestcases } from '@v/application/useCases/webview/RunAllTestcases';
 import { RunSingleTestcase } from '@v/application/useCases/webview/RunSingleTestcase';
 import { SetTestcaseString } from '@v/application/useCases/webview/SetTestcaseString';
-import { StartChat } from '@v/application/useCases/webview/StartChat';
 import { StartStressTest } from '@v/application/useCases/webview/StartStressTest';
 import { StopStressTest } from '@v/application/useCases/webview/StopStressTest';
 import { StopTestcases } from '@v/application/useCases/webview/StopTestcases';
@@ -66,7 +64,6 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
   init: Init,
   loadTestcases: LoadTestcases,
   openFile: OpenFile,
-  openSettings: OpenSettings,
   openTestlib: OpenTestlib,
   removeSrcFile: RemoveSrcFile,
   reorderTestcase: ReorderTestcase,
@@ -74,7 +71,6 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
   runAllTestcases: RunAllTestcases,
   setTestcaseString: SetTestcaseString,
   startStressTest: StartStressTest,
-  startChat: StartChat,
   stopStressTest: StopStressTest,
   stopTestcases: StopTestcases,
   submitToCodeforces: SubmitToCodeforces,

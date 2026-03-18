@@ -20,7 +20,6 @@ import SendIcon from '@mui/icons-material/Send';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { Tips } from '@w/components/tips';
 import { useProblemDispatch } from '@w/context/ProblemContext';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -67,7 +66,6 @@ export const CreateProblemView = ({ canImport }: CreateProblemProps) => {
           </Button>
         </CphNgFlex>
       </CphNgFlex>
-      {!!showTips && <Tips />}
     </CphNgFlex>
   );
 };

@@ -133,14 +133,6 @@ export interface DragDropMsg extends BaseMsg {
   items: string[];
 }
 
-export interface StartChatMsg extends BaseMsg {
-  type: 'startChat';
-}
-export interface OpenSettingsMsg extends BaseMsg {
-  type: 'openSettings';
-  item: string;
-}
-
 export type ProblemMsg =
   | EditProblemDetailsMsg
   | DeleteProblemMsg
@@ -170,6 +162,4 @@ export type WebviewMsg =
   | ImportProblemMsg
   | InitMsg
   | OpenFileMsg
-  | OpenTestlibMsg
-  | StartChatMsg
-  | OpenSettingsMsg;
+  | OpenTestlibMsg;

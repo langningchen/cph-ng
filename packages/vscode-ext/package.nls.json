@@ -111,7 +111,6 @@
   "config.sidebar.hiddenStatuses.WT": "Waiting",
   "config.sidebar.retainWhenHidden": "If `true`, the sidebar view will **remain active and retain its state** even when it's hidden. If `false`, the sidebar will be disposed of when hidden and recreated when shown again, which might impact performance or cause a brief visual flicker. Consider your workflow and system resources when setting this.",
   "config.sidebar.showAcGif": "When enabled, a **congratulatory GIF** will be displayed in the sidebar whenever a problem is successfully accepted (receives an 'Accepted' verdict). This provides visual feedback for successful submissions.",
-  "config.sidebar.showTips": "When enabled, a **random tip** will be displayed when there is no problem.",
   "config.stressTest": "Stress Test",
   "config.stressTest.bruteForceTimeLimit": "Set the **time limit** for the brute force run (in **milliseconds**). If the brute force does not complete within this time, it will be terminated. This helps prevent the brute force from running too long and affecting overall performance.",
   "config.stressTest.generatorTimeLimit": "Set the **time limit** for the generator run (in **milliseconds**). If the generator does not complete within this time, it will be terminated. This helps prevent the generator from running too long and affecting overall performance.",
