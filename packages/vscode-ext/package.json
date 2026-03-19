@@ -743,7 +743,7 @@
     "test:ui": "vitest --ui --coverage",
     "check-translations": "tsx --tsconfig scripts/tsconfig.json scripts/check-translations.ts",
     "generate-settings": "tsx scripts/generate-settings.ts",
-    "package": "vsce package --allow-star-activation --no-dependencies",
+    "package": "tsx scripts/package.ts",
     "postinstall": "pnpm generate-settings"
   },
   "devDependencies": {

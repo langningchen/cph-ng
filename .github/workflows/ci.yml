@@ -54,6 +54,7 @@ jobs:
     outputs:
       version: ${{ steps.versions.outputs.version }}
       version_changed: ${{ steps.versions.outputs.version_changed }}
+      pre_release: ${{ steps.versions.outputs.pre_release }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -63,23 +64,18 @@ jobs:
       - name: Setup Node and pnpm
         uses: ./.github/actions/setup-node-pnpm
 
-      - name: Build all packages
-        run: |
-          echo "::group::Building packages"
-          pnpm package
-          echo "::endgroup::"
-        env:
-          BUILD_TYPE: Auto Build
       - name: Detect version changes
         id: versions
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
           echo "::group::Detecting version"
-          CURRENT_VERSION=$(node -p "require('./packages/vscode-ext/package.json').version")
-          PREV_VERSION=$(git show HEAD^:packages/vscode-ext/package.json 2>/dev/null | node -p "JSON.parse(fs.readFileSync(0) || '{}').version" || echo "0.0.0")
+          CURRENT_VERSION=$(node -p "require('./.cph-ng-release.json').version")
+          PREV_VERSION=$(git show HEAD^:.cph-ng-release.json 2>/dev/null | node -p "JSON.parse(require('fs').readFileSync(0, 'utf-8')).version" || echo "0.0.0")
+          PRE_RELEASE=$(node -p "require('./.cph-ng-release.json').preRelease || false")
 
-          echo "Current: $CURRENT_VERSION, Previous: $PREV_VERSION"
+          echo "Current: $CURRENT_VERSION, Previous: $PREV_VERSION, Pre-release: $PRE_RELEASE"
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "pre_release=$PRE_RELEASE" >> $GITHUB_OUTPUT
 
           VERSION_CHANGED=false
           if [ "$CURRENT_VERSION" != "$PREV_VERSION" ]; then
@@ -93,6 +89,16 @@ jobs:
           echo "version_changed=$VERSION_CHANGED" >> $GITHUB_OUTPUT
           echo "Version changed: $VERSION_CHANGED"
           echo "::endgroup::"
+
+      - name: Build all packages
+        run: |
+          echo "::group::Building packages"
+          pnpm package
+          echo "::endgroup::"
+        env:
+          BUILD_TYPE: Auto Build
+          PRE_RELEASE: ${{ steps.versions.outputs.pre_release }}
+
       - name: Check Artifacts
         run: |
           echo "::group::Verifying artifacts"
@@ -127,18 +133,6 @@ jobs:
       - name: Setup Node and pnpm
         uses: ./.github/actions/setup-node-pnpm
 
-      - name: Determine release type
-        id: release
-        run: |
-          VERSION="${{ needs.build.outputs.version }}"
-          echo "::group::Versioning Info"
-          echo "Version: $VERSION"
-          PATCH=$(echo "$VERSION" | awk -F. '{print $3}')
-          PRE_RELEASE=$([ "$PATCH" = "0" ] && echo "false" || echo "true")
-          echo "pre_release=$PRE_RELEASE" >> $GITHUB_OUTPUT
-          echo "Prerelease: $PRE_RELEASE"
-          echo "::endgroup::"
-
       - name: Create tag
         run: |
           git config user.name "github-actions[bot]"
@@ -164,10 +158,7 @@ jobs:
         run: |
           echo "::group::Publishing to VS Code Marketplace"
           VERSION="${{ needs.build.outputs.version }}"
-          IS_PRE="${{ steps.release.outputs.pre_release }}"
-          FLAGS="--allow-star-activation --no-dependencies -i ../../dist/cph-ng-$VERSION.vsix"
-          [ "$IS_PRE" = "true" ] && FLAGS="$FLAGS --pre-release"
-          pnpm -C packages/vscode-ext exec vsce publish $FLAGS
+          pnpm -C packages/vscode-ext exec vsce publish --allow-star-activation --no-dependencies -i ../../dist/cph-ng-$VERSION.vsix
           echo "::endgroup::"
 
       - name: Publish Browser
@@ -196,7 +187,7 @@ jobs:
           tag_name: v${{ needs.build.outputs.version }}
           name: v${{ needs.build.outputs.version }}
           files: ./dist/*
-          prerelease: ${{ steps.release.outputs.pre_release }}
+          prerelease: ${{ needs.build.outputs.pre_release }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -204,5 +195,5 @@ jobs:
       - name: Move cards in project
         env:
           GITHUB_TOKEN: ${{ secrets.PROJECTS_GITHUB_TOKEN }}
-          PRE_RELEASE: ${{ steps.release.outputs.pre_release }}
+          PRE_RELEASE: ${{ needs.build.outputs.pre_release }}
         run: bash scripts/move-cards.sh

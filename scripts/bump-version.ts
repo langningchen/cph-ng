@@ -6,6 +6,7 @@ import { createInterface } from 'node:readline';
 // Constants
 const changelogPath = 'CHANGELOG.md';
 const packagesDir = 'packages';
+const releaseConfigPath = '.cph-ng-release.json';
 const commitLogPattern = /^([a-z]+)(\([a-zA-Z-]+\))?:\s*(.+)$/;
 const changelogHeader =
   '# Change Log\n\nAll notable changes to the "cph-ng" extension will be documented in this file.\n\n';
@@ -28,12 +29,14 @@ const bumpType = args.find((arg) => ['patch', 'minor', 'major'].includes(arg)) a
   | 'major'
   | undefined;
 
+const isPreRelease = args.includes('--pre-release') || args.includes('-p');
+
 if (!bumpType) {
-  console.error('Usage: pnpm bump <patch|minor|major>');
+  console.error('Usage: pnpm bump <patch|minor|major> [--pre-release|-p]');
+  console.error('  --pre-release, -p: Mark as pre-release version');
   process.exit(1);
 }
 
-const isPreRelease = bumpType === 'patch';
 const releaseType = isPreRelease ? 'Pre-release' : 'Release';
 
 // Find configuration files
@@ -97,8 +100,15 @@ console.log(`\n🔖 ${releaseType}: ${currentVersion} -> ${newVersion}`);
 for (const pkgPath of packageJsonPaths) {
   const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
   pkg.version = newVersion;
-  writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
+  writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
 }
+
+// Update release config
+const releaseConfig = {
+  version: newVersion,
+  preRelease: isPreRelease,
+};
+writeFileSync(releaseConfigPath, `${JSON.stringify(releaseConfig, null, 2)}\n`);
 
 // Generate CHANGELOG
 const getLastReleaseTag = (): string => {
@@ -167,7 +177,7 @@ if (commits.length === 0) {
     updatedChangelog = `${changelogHeader}${newContent}\n\n${modifiedOldVersions}`;
   }
 
-  writeFileSync(changelogPath, updatedChangelog.trimEnd());
+  writeFileSync(changelogPath, `${updatedChangelog.trimEnd()}\n`);
 }
 
 const commitAndExit = (version: string) => {
