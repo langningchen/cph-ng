@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { defineConfig } from 'wxt';
 import { allDomains } from './src/submitters/domains';
@@ -83,13 +82,14 @@ export default defineConfig({
     },
     'build:publicAssets': async (wxt, files) => {
       const wasmDir = resolve(wxt.config.root, 'node_modules/onnxruntime-web/dist');
-      const wasmFiles = await readdir(wasmDir);
-      for (const file of wasmFiles)
-        if (file.startsWith('ort-wasm-simd-threaded.'))
-          files.push({
-            absoluteSrc: resolve(wasmDir, file),
-            relativeDest: `assets/onnx-wasm/${file}`,
-          });
+      files.push({
+        absoluteSrc: resolve(wasmDir, 'ort-wasm-simd-threaded.mjs'),
+        relativeDest: `assets/onnx-wasm/ort-wasm-simd-threaded.mjs`,
+      });
+      files.push({
+        absoluteSrc: resolve(wasmDir, 'ort-wasm-simd-threaded.wasm'),
+        relativeDest: `assets/onnx-wasm/ort-wasm-simd-threaded.wasm`,
+      });
     },
   },
   vite: () => ({
