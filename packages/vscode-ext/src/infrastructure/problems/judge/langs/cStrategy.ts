@@ -35,6 +35,12 @@ export class LangC extends AbstractLanguageStrategy {
       compiler: this.settings.languages.cCompiler,
       compilerArgs: this.settings.languages.cCompilerArgs,
     } satisfies ILanguageDefaultValues;
+    this.settings.languages.onChangeCCompiler(
+      (compiler) => (this.defaultValues.compiler = compiler),
+    );
+    this.settings.languages.onChangeCCompilerArgs(
+      (args) => (this.defaultValues.compilerArgs = args),
+    );
   }
 
   protected override async internalCompile(
@@ -49,8 +55,8 @@ export class LangC extends AbstractLanguageStrategy {
         (this.sys.platform() === 'win32' ? '.exe' : ''),
     );
 
-    const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
-    const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
+    const compiler = additionalData.overrides?.compiler || this.defaultValues.compiler;
+    const args = additionalData.overrides?.compilerArgs || this.defaultValues.compilerArgs;
     const { unlimitedStack } = this.settings.run;
 
     const { skip, hash } = await this.checkHash(

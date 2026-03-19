@@ -48,6 +48,16 @@ export class LangJava extends AbstractLanguageStrategy {
       runner: this.settings.languages.javaRunner,
       runnerArgs: this.settings.languages.javaRunnerArgs,
     } satisfies ILanguageDefaultValues;
+    this.settings.languages.onChangeJavaCompiler(
+      (compiler) => (this.defaultValues.compiler = compiler),
+    );
+    this.settings.languages.onChangeJavaCompilerArgs(
+      (args) => (this.defaultValues.compilerArgs = args),
+    );
+    this.settings.languages.onChangeJavaRunner((runner) => (this.defaultValues.runner = runner));
+    this.settings.languages.onChangeJavaRunnerArgs(
+      (args) => (this.defaultValues.runnerArgs = args),
+    );
   }
 
   protected override async internalCompile(
@@ -61,8 +71,8 @@ export class LangJava extends AbstractLanguageStrategy {
       `${this.path.basename(src.path, this.path.extname(src.path))}.class`,
     );
 
-    const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
-    const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
+    const compiler = additionalData.overrides?.compiler || this.defaultValues.compiler;
+    const args = additionalData.overrides?.compilerArgs || this.defaultValues.compilerArgs;
 
     const { skip, hash } = await this.checkHash(src, path, compiler + args, forceCompile);
     if (skip) return { path, hash };
@@ -81,8 +91,8 @@ export class LangJava extends AbstractLanguageStrategy {
 
   public override async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner = overrides?.runner ?? this.defaultValues.runner;
-    const runArgs = overrides?.runnerArgs ?? this.defaultValues.runnerArgs;
+    const runner = overrides?.runner || this.defaultValues.runner;
+    const runArgs = overrides?.runnerArgs || this.defaultValues.runnerArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

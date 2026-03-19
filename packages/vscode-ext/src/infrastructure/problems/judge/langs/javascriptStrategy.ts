@@ -38,12 +38,18 @@ export class LangJavascript extends AbstractLanguageStrategy {
       runner: this.settings.languages.javascriptRunner,
       runnerArgs: this.settings.languages.javascriptRunnerArgs,
     } satisfies ILanguageDefaultValues;
+    this.settings.languages.onChangeJavascriptRunner(
+      (runner) => (this.defaultValues.runner = runner),
+    );
+    this.settings.languages.onChangeJavascriptRunnerArgs(
+      (args) => (this.defaultValues.runnerArgs = args),
+    );
   }
 
   public override async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner = overrides?.runner ?? this.defaultValues.runner;
-    const runArgs = overrides?.runnerArgs ?? this.defaultValues.runnerArgs;
+    const runner = overrides?.runner || this.defaultValues.runner;
+    const runArgs = overrides?.runnerArgs || this.defaultValues.runnerArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

@@ -16,6 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { ILogger } from '@v/application/ports/vscode/ILogger';
+import type { ISettings } from '@v/application/ports/vscode/ISettings';
 import type { ISidebarProvider } from '@v/application/ports/vscode/ISidebarProvider';
 import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
 import type { IUi } from '@v/application/ports/vscode/IUi';
@@ -24,7 +25,7 @@ import { TOKENS } from '@v/composition/tokens';
 import { WebviewHtmlRenderer } from '@v/infrastructure/vscode/webviewHtmlRenderer';
 import { WebviewProtocolHandler } from '@v/infrastructure/vscode/webviewProtocolHandler';
 import { inject, injectable } from 'tsyringe';
-import { Uri, type WebviewView, workspace } from 'vscode';
+import { Uri, type WebviewView } from 'vscode';
 
 @injectable()
 export class SidebarProvider implements ISidebarProvider {
@@ -32,11 +33,12 @@ export class SidebarProvider implements ISidebarProvider {
   private _view?: WebviewView;
 
   public constructor(
-    @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.extensionPath) private readonly extPath: string,
-    @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
+    @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
     @inject(WebviewHtmlRenderer) private readonly htmlRenderer: WebviewHtmlRenderer,
     @inject(WebviewProtocolHandler) private readonly protocolHandler: WebviewProtocolHandler,
   ) {
@@ -46,23 +48,20 @@ export class SidebarProvider implements ISidebarProvider {
       this._view?.webview.postMessage(data);
     });
 
-    workspace.onDidChangeConfiguration(async (e) => {
-      if (
-        e.affectsConfiguration('cph-ng.sidebar.retainWhenHidden') ||
-        e.affectsConfiguration('cph-ng.sidebar.showAcGif') ||
-        e.affectsConfiguration('cph-ng.sidebar.colorTheme') ||
-        e.affectsConfiguration('cph-ng.sidebar.hiddenStatuses')
-      ) {
-        const choice = await this.ui.alert(
-          'info',
-          this.translator.t(
-            'Sidebar configuration changed, please refresh to apply the new settings.',
-          ),
-          this.translator.t('Refresh'),
-        );
-        if (choice) this.refresh();
-      }
-    });
+    const refreshConfig = async () => {
+      const choice = await this.ui.alert(
+        'info',
+        this.translator.t(
+          'Sidebar configuration changed, please refresh to apply the new settings.',
+        ),
+        this.translator.t('Refresh'),
+      );
+      if (choice) this.refresh();
+    };
+    this.settings.sidebar.onChangeRetainWhenHidden(refreshConfig);
+    this.settings.sidebar.onChangeShowAcGif(refreshConfig);
+    this.settings.sidebar.onChangeColorTheme(refreshConfig);
+    this.settings.sidebar.onChangeHiddenStatuses(refreshConfig);
   }
 
   public resolveWebviewView(webviewView: WebviewView) {

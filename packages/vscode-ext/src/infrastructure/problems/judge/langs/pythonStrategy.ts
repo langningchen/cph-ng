@@ -48,6 +48,16 @@ export class LangPython extends AbstractLanguageStrategy {
       runner: this.settings.languages.pythonRunner,
       runnerArgs: this.settings.languages.pythonRunnerArgs,
     } satisfies ILanguageDefaultValues;
+    this.settings.languages.onChangePythonCompiler(
+      (compiler) => (this.defaultValues.compiler = compiler),
+    );
+    this.settings.languages.onChangePythonCompilerArgs(
+      (args) => (this.defaultValues.compilerArgs = args),
+    );
+    this.settings.languages.onChangePythonRunner((runner) => (this.defaultValues.runner = runner));
+    this.settings.languages.onChangePythonRunnerArgs(
+      (args) => (this.defaultValues.runnerArgs = args),
+    );
   }
 
   protected override async internalCompile(
@@ -61,8 +71,8 @@ export class LangPython extends AbstractLanguageStrategy {
       `${this.path.basename(src.path, this.path.extname(src.path))}.pyc`,
     );
 
-    const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
-    const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
+    const compiler = additionalData.overrides?.compiler || this.defaultValues.compiler;
+    const args = additionalData.overrides?.compilerArgs || this.defaultValues.compilerArgs;
 
     const { skip, hash } = await this.checkHash(src, path, compiler + args, forceCompile);
     if (skip) {
@@ -85,8 +95,8 @@ export class LangPython extends AbstractLanguageStrategy {
 
   public override async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner = overrides?.runner ?? this.defaultValues.runner;
-    const runArgs = overrides?.runnerArgs ?? this.defaultValues.runnerArgs;
+    const runner = overrides?.runner || this.defaultValues.runner;
+    const runArgs = overrides?.runnerArgs || this.defaultValues.runnerArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

@@ -52,6 +52,12 @@ export class LangRust extends AbstractLanguageStrategy {
       compiler: this.settings.languages.rustCompiler,
       compilerArgs: this.settings.languages.rustCompilerArgs,
     } satisfies ILanguageDefaultValues;
+    this.settings.languages.onChangeRustCompiler(
+      (compiler) => (this.defaultValues.compiler = compiler),
+    );
+    this.settings.languages.onChangeRustCompilerArgs(
+      (args) => (this.defaultValues.compilerArgs = args),
+    );
   }
 
   protected override async internalCompile(
@@ -66,8 +72,8 @@ export class LangRust extends AbstractLanguageStrategy {
         (this.sys.platform() === 'win32' ? '.exe' : ''),
     );
 
-    const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
-    const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
+    const compiler = additionalData.overrides?.compiler || this.defaultValues.compiler;
+    const args = additionalData.overrides?.compilerArgs || this.defaultValues.compilerArgs;
 
     const { skip, hash } = await this.checkHash(src, path, compiler + args, forceCompile);
     if (skip) return { path, hash };

@@ -36,6 +36,12 @@ export class LangCpp extends AbstractLanguageStrategy {
       compiler: this.settings.languages.cppCompiler,
       compilerArgs: this.settings.languages.cppCompilerArgs,
     } satisfies ILanguageDefaultValues;
+    this.settings.languages.onChangeCppCompiler(
+      (compiler) => (this.defaultValues.compiler = compiler),
+    );
+    this.settings.languages.onChangeCppCompilerArgs(
+      (args) => (this.defaultValues.compilerArgs = args),
+    );
   }
 
   protected override async internalCompile(
@@ -50,8 +56,8 @@ export class LangCpp extends AbstractLanguageStrategy {
         (this.sys.platform() === 'win32' ? '.exe' : ''),
     );
 
-    const compiler = additionalData.overrides?.compiler ?? this.defaultValues.compiler;
-    const args = additionalData.overrides?.compilerArgs ?? this.defaultValues.compilerArgs;
+    const compiler = additionalData.overrides?.compiler || this.defaultValues.compiler;
+    const args = additionalData.overrides?.compilerArgs || this.defaultValues.compilerArgs;
     const { cppObjcopy } = this.settings.languages;
     const { useWrapper, useHook, unlimitedStack } = this.settings.run;
 

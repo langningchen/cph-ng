@@ -50,6 +50,8 @@ const header = [
 
 const AdapterBaseClass = `
 class SettingsSectionBase {
+  protected readonly listeners = new Map<string, Set<ChangeListener<unknown>>>();
+
   public constructor(
     protected readonly section: string,
     protected readonly logger: ILogger,
@@ -71,10 +73,54 @@ class SettingsSectionBase {
     return value ?? defaultValue;
   }
 
-  protected set(key: string, value: unknown): Thenable<void> {
+  protected async set<T>(key: string, value: T, defaultValue: T): Promise<void> {
     const fullKey = \`cph-ng.\${this.section}.\${key}\`;
-    this.logger.debug(\`Setting setting\`, { key, value });
-    return workspace.getConfiguration().update(fullKey, value, ConfigurationTarget.Global);
+    const oldValue = this.get(key, defaultValue);
+    this.logger.debug(\`Setting setting\`, { key, value, oldValue });
+    await workspace.getConfiguration().update(fullKey, value, ConfigurationTarget.Global);
+    this.notifyListeners(key, value, oldValue);
+  }
+
+  protected onChange<T>(key: string, listener: ChangeListener<T>): Unsubscribe {
+    if (!this.listeners.has(key)) {
+      this.listeners.set(key, new Set());
+    }
+    this.listeners.get(key)!.add(listener as ChangeListener<unknown>);
+    this.logger.debug(\`Added onChange listener\`, { key });
+    return () => {
+      this.listeners.get(key)?.delete(listener as ChangeListener<unknown>);
+      this.logger.debug(\`Removed onChange listener\`, { key });
+    };
+  }
+
+  protected notifyListeners<T>(key: string, newValue: T, oldValue: T): void {
+    const keyListeners = this.listeners.get(key);
+    if (!keyListeners || keyListeners.size === 0) return;
+    this.logger.debug(\`Notifying listeners\`, { key, newValue, oldValue, count: keyListeners.size });
+    for (const listener of keyListeners) {
+      try {
+        listener(newValue, oldValue);
+      } catch (error) {
+        this.logger.error(\`Error in onChange listener for \${key}\`, error);
+      }
+    }
+  }
+
+  public handleConfigurationChange(event: ConfigurationChangeEvent): void {
+    for (const [key, keyListeners] of this.listeners) {
+      const fullKey = \`cph-ng.\${this.section}.\${key}\`;
+      if (event.affectsConfiguration(fullKey) && keyListeners.size > 0) {
+        const newValue = workspace.getConfiguration().get(fullKey);
+        this.logger.debug(\`Configuration changed externally\`, { key, newValue });
+        for (const listener of keyListeners) {
+          try {
+            listener(newValue, undefined);
+          } catch (error) {
+            this.logger.error(\`Error in onChange listener for \${key}\`, error);
+          }
+        }
+      }
+    }
   }
 }`;
 
@@ -153,28 +199,44 @@ const parseSections = (): Section[] => {
 };
 
 const generateInterface = (sections: Section[]) => {
+  const typeAliases = [
+    `export type ChangeListener<T> = (newValue: T, oldValue: T | undefined) => void;`,
+    `export type Unsubscribe = () => void;`,
+  ].join('\n');
+
   const subInterfaces = sections.map((s) => {
     const props = s.props.map((p) => `  ${p.shortKey}: ${p.type};`).join('\n');
-    return `export interface I${s.className} {\n${props}\n}`;
+    const onChangeMethods = s.props
+      .map(
+        (p) =>
+          `  onChange${capitalize(p.shortKey)}(listener: ChangeListener<${p.type}>): Unsubscribe;`,
+      )
+      .join('\n');
+    return `export interface I${s.className} {\n${props}\n${onChangeMethods}\n}`;
   });
 
   const mainInterface = [
     `export interface ISettings {`,
     sections.map((s) => `  readonly ${s.name}: I${s.className};`).join('\n'),
+    `  dispose(): void;`,
     `}`,
   ].join('\n');
 
-  return [header, mainInterface, ...subInterfaces].join('\n\n');
+  return [header, typeAliases, mainInterface, ...subInterfaces].join('\n\n');
 };
+
+const capitalize = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
 
 const generateAdapter = (sections: Section[]) => {
   const imports = [
     `import { injectable, inject } from 'tsyringe';`,
-    `import { ConfigurationTarget, workspace } from 'vscode';`,
+    `import { ConfigurationTarget, workspace, type ConfigurationChangeEvent, Disposable } from 'vscode';`,
     `import { TOKENS } from '@v/composition/tokens';`,
     `import type { ILogger } from '@v/application/ports/vscode/ILogger';`,
     `import type { `,
     `  ISettings,`,
+    `  ChangeListener,`,
+    `  Unsubscribe,`,
     ...sections.map(({ className }) => `  I${className},`),
     `} from '@v/application/ports/vscode/ISettings';`,
   ].join('\n');
@@ -187,7 +249,11 @@ const generateAdapter = (sections: Section[]) => {
           `    return this.get('${p.shortKey}', ${p.defaultValue});`,
           `  }`,
           `  set ${p.shortKey}(value: ${p.type}) {`,
-          `    this.set('${p.shortKey}', value);`,
+          `    this.set('${p.shortKey}', value, ${p.defaultValue});`,
+          `  }`,
+          ``,
+          `  onChange${capitalize(p.shortKey)}(listener: ChangeListener<${p.type}>): Unsubscribe {`,
+          `    return this.onChange('${p.shortKey}', listener);`,
           `  }`,
         ].join('\n');
       })
@@ -207,9 +273,19 @@ const generateAdapter = (sections: Section[]) => {
     `@injectable()`,
     `export class SettingsAdapter implements ISettings {`,
     sections.map((s) => `  public readonly ${s.name}: ${s.className};`).join('\n'),
+    `  private readonly disposable: Disposable;`,
     ``,
     `  public constructor(@inject(TOKENS.logger) logger: ILogger) {`,
     sections.map((s) => `    this.${s.name} = new ${s.className}(logger);`).join('\n'),
+    ``,
+    `    // Listen for external configuration changes`,
+    `    this.disposable = workspace.onDidChangeConfiguration((event) => {`,
+    sections.map((s) => `      this.${s.name}.handleConfigurationChange(event);`).join('\n'),
+    `    });`,
+    `  }`,
+    ``,
+    `  public dispose(): void {`,
+    `    this.disposable.dispose();`,
     `  }`,
     `}`,
   ].join('\n');
@@ -218,30 +294,86 @@ const generateAdapter = (sections: Section[]) => {
 };
 
 const generateMock = (sections: Section[]) => {
-  const imports = `import type { ISettings, ${sections.map((s) => `I${s.className}`).join(', ')} } from '@v/application/ports/vscode/ISettings';`;
+  const imports = [
+    `import type { ISettings, ChangeListener, Unsubscribe, ${sections.map((s) => `I${s.className}`).join(', ')} } from '@v/application/ports/vscode/ISettings';`,
+  ].join('\n');
 
-  const mockProps = sections.map((s) => {
-    const fields = s.props.map((p) => `    ${p.shortKey}: ${p.defaultValue}`).join(',\n');
-    return `  public readonly ${s.name}: I${s.className} = {\n${fields}\n  };`;
+  const mockSectionClasses = sections.map((s) => {
+    const fields = s.props
+      .map((p) => `  private _${p.shortKey}: ${p.type} = ${p.defaultValue};`)
+      .join('\n');
+    const listeners = s.props
+      .map((p) => `  private _${p.shortKey}Listeners = new Set<ChangeListener<${p.type}>>();`)
+      .join('\n');
+
+    const gettersSettersOnChange = s.props
+      .map((p) => {
+        return [
+          `  get ${p.shortKey}(): ${p.type} {`,
+          `    return this._${p.shortKey};`,
+          `  }`,
+          `  set ${p.shortKey}(value: ${p.type}) {`,
+          `    const oldValue = this._${p.shortKey};`,
+          `    this._${p.shortKey} = value;`,
+          `    this._${p.shortKey}Listeners.forEach(listener => listener(value, oldValue));`,
+          `  }`,
+          ``,
+          `  onChange${capitalize(p.shortKey)}(listener: ChangeListener<${p.type}>): Unsubscribe {`,
+          `    this._${p.shortKey}Listeners.add(listener);`,
+          `    return () => this._${p.shortKey}Listeners.delete(listener);`,
+          `  }`,
+        ].join('\n');
+      })
+      .join('\n\n');
+
+    const resetFields = s.props
+      .map((p) => `    this._${p.shortKey} = ${p.defaultValue};`)
+      .join('\n');
+    const clearListeners = s.props
+      .map((p) => `    this._${p.shortKey}Listeners.clear();`)
+      .join('\n');
+
+    return [
+      `class ${s.className}Mock implements I${s.className} {`,
+      fields,
+      listeners,
+      ``,
+      gettersSettersOnChange,
+      ``,
+      `  reset(): void {`,
+      resetFields,
+      clearListeners,
+      `  }`,
+      `}`,
+    ].join('\n');
   });
 
-  const resetLogic = sections.flatMap((s) =>
-    s.props.map((p) => `    this.${s.name}.${p.shortKey} = ${p.defaultValue};`),
-  );
+  const mockProps = sections.map((s) => `  public readonly ${s.name} = new ${s.className}Mock();`);
+
+  const resetLogic = sections.map((s) => `    this.${s.name}.reset();`);
 
   const classDef = [
     `class SettingsMock implements ISettings {`,
-    mockProps.join('\n\n'),
+    mockProps.join('\n'),
     ``,
     `  public reset(): void {`,
     resetLogic.join('\n'),
     `  }`,
+    ``,
+    `  public dispose(): void {`,
+    `    // No-op for mock`,
+    `  }`,
     `}`,
   ].join('\n');
 
-  return [header, imports, classDef, `export const settingsMock = new SettingsMock();`].join(
-    '\n\n',
-  );
+  return [
+    header,
+    imports,
+    ...mockSectionClasses,
+    '',
+    classDef,
+    `export const settingsMock = new SettingsMock();`,
+  ].join('\n\n');
 };
 
 const sections = parseSections();
