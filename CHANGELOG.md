@@ -2,6 +2,12 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.2
+
+- **feat**(ci): enhance CI workflow and versioning with pre-release support
+- **fix**(browser-ext): remove useless onnx files
+- **feat**(vscode-ext): implement dynamic settings updates for language compilers and runners
+
 ## 0.7.1
 
 - **feat**(vscode-webview): add support component and remove welcome dialog
