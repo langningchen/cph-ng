@@ -53,7 +53,7 @@ export default defineConfig({
           matches: ['<all_urls>'],
         },
         {
-          resources: ['assets/*'],
+          resources: ['/assets/*'],
           matches: ['<all_urls>'],
         },
       ],
@@ -80,16 +80,19 @@ export default defineConfig({
         }
       }
     },
-    'build:publicAssets': async (wxt, files) => {
-      const wasmDir = resolve(wxt.config.root, 'node_modules/onnxruntime-web/dist');
+    'build:publicAssets': async (_wxt, files) => {
       files.push({
-        absoluteSrc: resolve(wasmDir, 'ort-wasm-simd-threaded.mjs'),
+        absoluteSrc: resolve('node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.mjs'),
         relativeDest: `assets/onnx-wasm/ort-wasm-simd-threaded.mjs`,
       });
       files.push({
-        absoluteSrc: resolve(wasmDir, 'ort-wasm-simd-threaded.wasm'),
+        absoluteSrc: resolve('node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm'),
         relativeDest: `assets/onnx-wasm/ort-wasm-simd-threaded.wasm`,
       });
+    },
+    'prepare:publicPaths': (_wxt, paths) => {
+      paths.push('assets/onnx-wasm/ort-wasm-simd-threaded.mjs');
+      paths.push('assets/onnx-wasm/ort-wasm-simd-threaded.wasm');
     },
   },
   vite: () => ({

@@ -26,12 +26,8 @@ export class LuoguSubmitter extends BaseSubmitter {
   private session: Promise<InferenceSession>;
   public constructor() {
     super();
-    const wasmFile = browser.runtime.getURL(
-      // biome-ignore lint/suspicious/noExplicitAny: getURL does not accept dirname
-      '/assets/onnx-wasm/ort-wasm-simd-threaded.wasm' as any,
-    );
+    const wasmFile = browser.runtime.getURL('/assets/onnx-wasm/ort-wasm-simd-threaded.wasm');
     const wasmPath = `${wasmFile.split('/').slice(0, -1).join('/')}/`;
-    console.log(wasmPath);
     env.wasm.wasmPaths = wasmPath;
     this.session = InferenceSession.create(browser.runtime.getURL('/assets/model.onnx'));
   }
