@@ -51,6 +51,7 @@ interface ProtocolMap {
   submitDone(data: SubmitDoneData): void;
   statusUpdate(data: StatusUpdateData): void;
   submitResult(data: SubmitResultData): void;
+  solveLuoguCaptcha(data: string): string;
 }
 
 export const { sendMessage, onMessage } = defineExtensionMessaging<ProtocolMap>();

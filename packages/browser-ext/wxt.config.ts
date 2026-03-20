@@ -41,10 +41,13 @@ export default defineConfig({
   },
   manifest: ({ browser }) => {
     const hostPermissions = buildHostPermissions();
+    const permissions = ['activeTab', 'storage', 'scripting', 'notifications'];
+    if (browser === 'chrome') permissions.push('offscreen');
+
     return {
       name: '__MSG_appName__',
       description: '__MSG_appDescription__',
-      permissions: ['activeTab', 'storage', 'scripting', 'notifications'],
+      permissions,
       host_permissions: hostPermissions,
       default_locale: 'en',
       web_accessible_resources: [

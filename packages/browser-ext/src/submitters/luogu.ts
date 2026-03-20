@@ -15,71 +15,31 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { sendMessage } from '@b/messaging';
 import { BaseSubmitter } from '@b/submitters/base';
 import { submitterDomains } from '@b/submitters/domains';
 import type { SubmitData } from '@cph-ng/core';
-import { env, InferenceSession, Tensor } from 'onnxruntime-web';
-import { browser } from 'wxt/browser';
 
 export class LuoguSubmitter extends BaseSubmitter {
   public readonly supportedDomains = submitterDomains.luogu;
-  private session: Promise<InferenceSession>;
-  public constructor() {
-    super();
-    const wasmFile = browser.runtime.getURL('/assets/onnx-wasm/ort-wasm-simd-threaded.wasm');
-    const wasmPath = `${wasmFile.split('/').slice(0, -1).join('/')}/`;
-    env.wasm.wasmPaths = wasmPath;
-    this.session = InferenceSession.create(browser.runtime.getURL('/assets/model.onnx'));
-  }
 
   public getSubmitUrl(data: SubmitData) {
     return data.url;
   }
 
   private async predict(captchaImg: HTMLImageElement): Promise<string> {
-    const encodeInput = (captchaImg: HTMLImageElement) => {
-      const width = 90;
-      const height = 35;
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Failed to get canvas context');
+    if (captchaImg.loading)
+      await new Promise((resolve) => captchaImg.addEventListener('load', resolve, { once: true }));
+    const canvas = document.createElement('canvas');
+    canvas.width = captchaImg.naturalWidth || captchaImg.width;
+    canvas.height = captchaImg.naturalHeight || captchaImg.height;
 
-      ctx.drawImage(captchaImg, 0, 0, width, height);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Failed to get canvas context');
+    ctx.drawImage(captchaImg, 0, 0, canvas.width, canvas.height);
 
-      const imageData = ctx.getImageData(0, 0, width, height);
-      const pixels = imageData.data;
-
-      const floatData = new Float32Array(1 * height * width * 1);
-      for (let i = 0; i < height * width; i++) {
-        const r = pixels[i * 4];
-        const g = pixels[i * 4 + 1];
-        const b = pixels[i * 4 + 2];
-        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-        floatData[i] = gray / 255.0;
-      }
-      return new Tensor('float32', floatData, [1, height, width, 1]);
-    };
-
-    const session = await this.session;
-    const results = await session.run({ [session.inputNames[0]]: encodeInput(captchaImg) });
-
-    const outputData = results[session.outputNames[0]].data as Float32Array;
-    let answer = '';
-    for (let i = 0; i < 4; i++) {
-      let maxVal = -Infinity;
-      let maxIdx = 0;
-      for (let j = 0; j < 256; j++) {
-        const val = outputData[i * 256 + j];
-        if (val > maxVal) {
-          maxVal = val;
-          maxIdx = j;
-        }
-      }
-      answer += String.fromCharCode(maxIdx);
-    }
-    return answer;
+    const imageDataUrl = canvas.toDataURL('image/png');
+    return await sendMessage('solveLuoguCaptcha', imageDataUrl);
   }
 
   public async fill({ sourceCode }: SubmitData): Promise<void> {
