@@ -2,6 +2,13 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.3
+
+- **chore**(deps): upgrade packages
+- **feat**(browser-ext): implement offscreen document handling and captcha solving functionality
+- **refactor**(browser-ext): streamline messaging protocol and remove unused CSS
+- **fix**(browser-ext): correct WASM file paths and improve asset handling
+
 ## 0.7.2
 
 - **feat**(ci): enhance CI workflow and versioning with pre-release support
