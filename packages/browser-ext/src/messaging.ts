@@ -42,12 +42,12 @@ export interface SubmitResultData {
 }
 
 interface ProtocolMap {
-  getStatus(data: undefined): StatusResponse;
-  connect(data: undefined): void;
-  disconnect(data: undefined): void;
+  getStatus(): StatusResponse;
+  connect(): void;
+  disconnect(): void;
   setPort(data: { port: number }): void;
-  setActive(data: undefined): void;
-  pageReady(data: undefined): SubmitData | null;
+  setActive(): void;
+  pageReady(): SubmitData | null;
   submitDone(data: SubmitDoneData): void;
   statusUpdate(data: StatusUpdateData): void;
   submitResult(data: SubmitResultData): void;
