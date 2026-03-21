@@ -2,6 +2,12 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.5
+
+- **fix**(browser-ext): prevent badge color update in Firefox
+- **feat**(ci): add build summary generation for artifacts
+- **fix**(browser-ext): prevent captcha handling in Firefox
+
 ## 0.7.4
 
 - **chore**(deps): upgrade packages
