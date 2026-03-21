@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { registerLuoguCaptchaSolver } from '@b/luoguCaptchaSolver';
 import { onMessage, sendMessage } from '@b/messaging';
 import { findSubmitter } from '@b/submitters';
 import type { B2rMsg, R2bMsg, SubmitData } from '@cph-ng/core';
@@ -35,10 +34,8 @@ interface ConnectionState {
 }
 
 const setupCaptchaRuntime = async (): Promise<void> => {
-  if (import.meta.env.FIREFOX) {
-    registerLuoguCaptchaSolver();
-    return;
-  }
+  // Firefox do not support offscreen documents
+  if (import.meta.env.FIREFOX) return;
 
   const contexts = await browser.runtime.getContexts({
     contextTypes: [browser.runtime.ContextType.OFFSCREEN_DOCUMENT],

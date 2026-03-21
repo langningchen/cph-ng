@@ -60,6 +60,7 @@ export class LuoguSubmitter extends BaseSubmitter {
     // Whether there is a captcha or not, we must return immediately after clicking the submit button.
     // Otherwise the `submitDone` event will never be emitted, and the extension will be stuck in the "Submitting..." state.
     (async () => {
+      if (import.meta.env.FIREFOX) return;
       const captcha = await this.waitForElement<HTMLImageElement>('#--swal-problem-submit-captcha');
       const captchaCode = await this.predict(captcha);
 
