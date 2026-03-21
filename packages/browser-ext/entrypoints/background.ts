@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { registerLuoguCaptchaSolver } from '@b/luoguCaptchaSolver';
 import { onMessage, sendMessage } from '@b/messaging';
 import { findSubmitter } from '@b/submitters';
 import type { B2rMsg, R2bMsg, SubmitData } from '@cph-ng/core';
@@ -33,20 +34,26 @@ interface ConnectionState {
   isActive: boolean;
 }
 
+const setupCaptchaRuntime = async (): Promise<void> => {
+  if (import.meta.env.FIREFOX) {
+    registerLuoguCaptchaSolver();
+    return;
+  }
+
+  const contexts = await browser.runtime.getContexts({
+    contextTypes: [browser.runtime.ContextType.OFFSCREEN_DOCUMENT],
+  });
+  if (contexts.length !== 0)
+    return console.log('[cph-ng-submit] Offscreen document already exists, skipping creation');
+  await browser.offscreen.createDocument({
+    url: browser.runtime.getURL('/offscreen.html'),
+    reasons: [browser.offscreen.Reason.WORKERS],
+    justification: 'Keep Luogu captcha model loaded for low-latency ONNX inference.',
+  });
+};
+
 export default defineBackground(() => {
-  browser.runtime
-    .getContexts({
-      contextTypes: [browser.runtime.ContextType.OFFSCREEN_DOCUMENT],
-    })
-    .then((contexts) => {
-      if (contexts.length !== 0)
-        return console.log('[cph-ng-submit] Offscreen document already exists, skipping creation');
-      browser.offscreen.createDocument({
-        url: browser.runtime.getURL('/offscreen.html'),
-        reasons: [browser.offscreen.Reason.WORKERS],
-        justification: 'Keep Luogu captcha model loaded for low-latency ONNX inference.',
-      });
-    });
+  void setupCaptchaRuntime();
 
   routerPort.getValue().then((port) => {
     const state: ConnectionState = {
