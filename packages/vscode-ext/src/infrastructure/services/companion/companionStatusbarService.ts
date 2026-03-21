@@ -52,10 +52,17 @@ export class CompanionStatusbarService {
         'error',
       );
     }
+    if (status === 'STARTING') {
+      return this.statusBarController.update(
+        this.translator.t('CPH-NG: Starting...'),
+        this.translator.t('Launching router process'),
+        'warn',
+      );
+    }
     if (status === 'CONNECTING') {
       return this.statusBarController.update(
         this.translator.t('CPH-NG: Connecting...'),
-        this.translator.t('Launching router and establishing connection'),
+        this.translator.t('Establishing websocket connection'),
         'warn',
       );
     }

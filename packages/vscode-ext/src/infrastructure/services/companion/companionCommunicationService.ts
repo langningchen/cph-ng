@@ -79,7 +79,7 @@ const formatError = (error: unknown): string => {
   return String(error);
 };
 
-export type RouterStatus = 'OFFLINE' | 'CONNECTING' | 'ONLINE' | 'FAILED';
+export type RouterStatus = 'OFFLINE' | 'STARTING' | 'CONNECTING' | 'ONLINE' | 'FAILED';
 
 @injectable()
 export class CompanionCommunicationService {
@@ -90,6 +90,7 @@ export class CompanionCommunicationService {
   private status: RouterStatus = 'OFFLINE';
   private statusDetail: string | undefined;
   private isDisconnecting = false;
+  private startupPromise: Promise<void> | undefined;
   public readonly signals = new EventEmitter() as TypedEventEmitter<CompanionCommunicationEvents>;
 
   public constructor(
@@ -106,19 +107,32 @@ export class CompanionCommunicationService {
   }
 
   public connect() {
-    if (this.ws || this.status === 'CONNECTING') return;
-    this.setStatus('CONNECTING');
-    void this.launchRouter()
+    if (this.startupPromise) {
+      this.logger.debug('Router startup already in progress');
+      return;
+    }
+
+    if (this.ws) {
+      this.connectSocket();
+      return;
+    }
+
+    this.setStatus('STARTING');
+    this.startupPromise = this.launchRouter()
       .then(() => {
+        this.startupPromise = undefined;
         this.createSocket();
+        this.connectSocket();
       })
       .catch((error) => {
+        this.startupPromise = undefined;
         this.setStatus('FAILED', formatError(error));
       });
   }
 
   public disconnect() {
     this.isDisconnecting = true;
+    this.startupPromise = undefined;
     this.ws?.close();
     this.ws = undefined;
     this._isBrowserConnected = false;
@@ -268,10 +282,17 @@ export class CompanionCommunicationService {
       reconnectionDelay: 500,
       reconnectionDelayMax: 3000,
       timeout: 1000,
-      autoConnect: true,
+      autoConnect: false,
       query: { clientId: this.clientId, type: 'vscode' },
     });
     this.bindEvents();
+  }
+
+  private connectSocket() {
+    this.createSocket();
+    if (!this.ws) return;
+    this.setStatus('CONNECTING');
+    this.ws.connect();
   }
 
   private bindEvents() {

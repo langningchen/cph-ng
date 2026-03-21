@@ -40,6 +40,7 @@ class FakeChildProcess extends EventEmitter {
 
 class FakeSocket extends EventEmitter {
   public connected = false;
+  public connect = vi.fn(() => this);
   public close = vi.fn();
 }
 
@@ -87,7 +88,7 @@ describe('CompanionCommunicationService', () => {
 
     service.connect();
 
-    expect(service.getStatus()).toBe('CONNECTING');
+    expect(service.getStatus()).toBe('STARTING');
     expect(mockedModules.io).not.toHaveBeenCalled();
     expect(loggerMock.info).toHaveBeenCalledWith('Launching router process...');
     expect(loggerMock.info).toHaveBeenCalledWith(
@@ -104,11 +105,13 @@ describe('CompanionCommunicationService', () => {
         transports: ['websocket'],
       }),
     );
+    expect(socket.connect).toHaveBeenCalled();
     expect(child.disconnect).toHaveBeenCalled();
     expect(child.unref).toHaveBeenCalled();
     expect(loggerMock.info).toHaveBeenCalledWith(
       `Router ready on port ${settingsMock.companion.listenPort}`,
     );
+    expect(service.getStatus()).toBe('CONNECTING');
 
     socket.connected = true;
     socket.emit('connect');
@@ -143,5 +146,36 @@ describe('CompanionCommunicationService', () => {
     expect(service.getStatus()).toBe('FAILED');
     expect(service.getStatusDetail()).toContain('EADDRINUSE');
     expect(mockedModules.io).not.toHaveBeenCalled();
+  });
+
+  it('does not spawn a second router while startup is already in progress', () => {
+    const child = new FakeChildProcess();
+    mockedModules.spawn.mockReturnValue(child as unknown as ChildProcess);
+
+    service.connect();
+    service.connect();
+
+    expect(service.getStatus()).toBe('STARTING');
+    expect(mockedModules.spawn).toHaveBeenCalledTimes(1);
+  });
+
+  it('can retry websocket connection after a connect_error failure', async () => {
+    const child = new FakeChildProcess();
+    const socket = new FakeSocket();
+    mockedModules.spawn.mockReturnValue(child as unknown as ChildProcess);
+    mockedModules.io.mockReturnValue(socket as unknown as Socket<R2cMsg, C2rMsg>);
+
+    service.connect();
+    child.emit('message', { type: 'ready', port: settingsMock.companion.listenPort });
+    await flushAsyncWork();
+
+    socket.emit('connect_error', new Error('ECONNREFUSED'));
+    expect(service.getStatus()).toBe('FAILED');
+
+    service.connect();
+
+    expect(mockedModules.spawn).toHaveBeenCalledTimes(1);
+    expect(socket.connect).toHaveBeenCalledTimes(2);
+    expect(service.getStatus()).toBe('CONNECTING');
   });
 });
