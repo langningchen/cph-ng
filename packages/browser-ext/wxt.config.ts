@@ -20,7 +20,7 @@ import { defineConfig } from 'wxt';
 import { allDomains } from './src/submitters/domains';
 
 const buildHostPermissions = (): string[] => {
-  const patterns = new Set<string>();
+  const patterns = new Set<string>(['*://localhost/*']);
   for (const domain of allDomains) patterns.add(`*://${domain}/*`);
   return [...patterns].sort();
 };
