@@ -18,6 +18,7 @@
 import type { TestcaseId } from '@cph-ng/core';
 import { StressTestState, VerdictName } from '@cph-ng/core';
 import type { ICrypto } from '@v/application/ports/node/ICrypto';
+import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
 import {
   AbortReason,
   type IProcessExecutor,
@@ -25,6 +26,7 @@ import {
 } from '@v/application/ports/node/IProcessExecutor';
 import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
 import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@v/application/ports/problems/IProblemService';
 import type { ITestcaseIoService } from '@v/application/ports/problems/ITestcaseIoService';
 import type { ICompilerService } from '@v/application/ports/problems/judge/ICompilerService';
 import type { IJudgeObserver } from '@v/application/ports/problems/judge/IJudgeObserver';
@@ -49,15 +51,17 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
 
   public constructor(
     @inject(TOKENS.compilerService) private readonly compiler: ICompilerService,
+    @inject(TOKENS.crypto) private readonly crypto: ICrypto,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.judgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
+    @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.tempStorage) private readonly tmp: ITempStorage,
-    @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
-    @inject(TOKENS.ui) private readonly ui: IUi,
-    @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.testcaseIoService) private readonly testcaseIoService: ITestcaseIoService,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TOKENS.ui) private readonly ui: IUi,
   ) {
     super(repo);
   }
@@ -132,6 +136,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
             else {
               stressTest.state = StressTestState.foundDifference;
               const testcaseId = this.crypto.randomUUID() as TestcaseId;
+
               const testcase = new Testcase(
                 await this.testcaseIoService.tryInlining(
                   new TestcaseIo({ path: genRes.stdoutPath }),
@@ -141,6 +146,30 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
                 ),
                 true,
               );
+
+              if (testcase.stdin.path) {
+                const inputFile = this.problemService.getTestcasePath(
+                  problem.src.path,
+                  testcaseId,
+                  this.settings.problem.inputFileExtensionList[0].substring(1) || 'in',
+                );
+                if (inputFile) {
+                  await this.fs.copyFile(genRes.stdoutPath, inputFile);
+                  testcase.stdin = new TestcaseIo({ path: inputFile });
+                }
+              }
+              if (testcase.answer.path) {
+                const outputFile = this.problemService.getTestcasePath(
+                  problem.src.path,
+                  testcaseId,
+                  this.settings.problem.outputFileExtensionList[0].substring(1) || 'out',
+                );
+                if (outputFile) {
+                  await this.fs.copyFile(bfRes.stdoutPath, outputFile);
+                  testcase.answer = new TestcaseIo({ path: outputFile });
+                }
+              }
+
               testcase.updateResult({
                 verdict: res.verdict,
                 timeMs: res.timeMs,

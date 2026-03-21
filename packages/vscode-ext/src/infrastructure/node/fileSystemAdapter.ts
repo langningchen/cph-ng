@@ -23,7 +23,7 @@ import {
   type RmOptions,
   writeFileSync,
 } from 'node:fs';
-import { access, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { access, copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import type { Readable, Writable } from 'node:stream';
 import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
 import type { IPath } from '@v/application/ports/node/IPath';
@@ -87,6 +87,11 @@ export class FileSystemAdapter implements IFileSystem {
       isFile: () => stats.isFile(),
       isDirectory: () => stats.isDirectory(),
     };
+  }
+
+  public async copyFile(src: string, dest: string): Promise<void> {
+    await mkdir(this.path.dirname(dest), { recursive: true });
+    await copyFile(src, dest);
   }
 
   public async rm(path: string, options?: RmOptions): Promise<void> {

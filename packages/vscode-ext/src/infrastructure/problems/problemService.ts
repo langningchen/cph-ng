@@ -64,6 +64,17 @@ export class ProblemService implements IProblemService {
   public getDataPath(srcPath: string): string | null {
     return this.resolver.renderPathWithFile(this.settings.problem.problemFilePath, srcPath, true);
   }
+  public getTestcasePath(srcPath: string, id: TestcaseId, ext: string): string | null {
+    const result = this.resolver.renderPathWithFile(
+      this.settings.problem.testcaseFilePath,
+      srcPath,
+    );
+    if (!result) return null;
+    return this.resolver.renderString(result, [
+      ['id', id.substring(0, 8)],
+      ['ext', ext],
+    ]);
+  }
 
   public async create(srcPath: string): Promise<Problem | null> {
     const binPath = this.getDataPath(srcPath);

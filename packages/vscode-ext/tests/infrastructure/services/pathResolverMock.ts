@@ -29,7 +29,7 @@ export class PathResolverMock implements IPathResolver {
     @inject(TOKENS.system) private readonly sys: ISystem,
   ) {}
 
-  private renderString(original: string, replacements: [string, string][]): string {
+  public renderString(original: string, replacements: [string, string][]): string {
     let result = original;
     for (const [key, value] of replacements) {
       result = result.replaceAll(`\${${key}}`, value);

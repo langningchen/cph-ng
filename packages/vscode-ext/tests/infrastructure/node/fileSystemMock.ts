@@ -70,6 +70,10 @@ export function createFileSystemMock(vol: InstanceType<typeof Volume> = new Volu
       isDirectory: () => stats.isDirectory(),
     };
   });
+  fileSystemMock.copyFile.mockImplementation(async (src, dest) => {
+    await fs.promises.mkdir(dirname(dest), { recursive: true });
+    await fs.promises.copyFile(src, dest);
+  });
   fileSystemMock.rm.mockImplementation(async (path, options?) => {
     await fs.promises.rm(path, options);
   });

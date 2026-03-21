@@ -469,6 +469,11 @@
             "default": "${workspace}/.cph-ng/${relativeDirname}/${basename}.bin",
             "markdownDescription": "%config.problem.problemFilePath%"
           },
+          "cph-ng.problem.testcaseFilePath": {
+            "type": "string",
+            "default": "${workspace}/.cph-ng/${relativeDirname}/${basename}.${id}.${ext}",
+            "markdownDescription": "%config.problem.testcaseFilePath%"
+          },
           "cph-ng.problem.unzipFolder": {
             "type": "string",
             "default": "${workspace}/.cph-ng/${zipBasenameNoExt}",
