@@ -67,6 +67,7 @@ export default defineBackground(() => {
         port: state.port,
       });
 
+      if (import.meta.env.FIREFOX) return;
       let badgeColor = '#F44336';
       if (state.connected) badgeColor = state.isActive ? '#4CAF50' : '#9E9E9E';
       browser.action.setBadgeText({ text: '　' });
