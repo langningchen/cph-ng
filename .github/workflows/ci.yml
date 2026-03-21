@@ -104,6 +104,74 @@ jobs:
           echo "::group::Verifying artifacts"
           ls -lh dist/
           echo "::endgroup::"
+
+      - name: Build Summary
+        run: |
+          echo "## 📦 Build Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Summary table
+          echo "### Overview" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+          TOTAL_SIZE=0
+          for f in dist/*; do
+            FILENAME=$(basename "$f")
+            SIZE_BYTES=$(stat --format="%s" "$f")
+            TOTAL_SIZE=$((TOTAL_SIZE + SIZE_BYTES))
+            SIZE_HUMAN=$(numfmt --to=iec-i --suffix=B --format="%.2f" "$SIZE_BYTES")
+            echo "| \`$FILENAME\` | $SIZE_HUMAN |" >> $GITHUB_STEP_SUMMARY
+          done
+          TOTAL_HUMAN=$(numfmt --to=iec-i --suffix=B --format="%.2f" "$TOTAL_SIZE")
+          echo "| **Total** | **$TOTAL_HUMAN** |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Detailed contents of each archive
+          echo "### Archive Contents" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          TEMP_DIR=$(mktemp -d)
+
+          for f in dist/*; do
+            FILENAME=$(basename "$f")
+            SIZE_HUMAN=$(numfmt --to=iec-i --suffix=B --format="%.2f" "$(stat --format="%s" "$f")")
+
+            echo "<details>" >> $GITHUB_STEP_SUMMARY
+            echo "<summary><code>$FILENAME</code> ($SIZE_HUMAN)</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            EXTRACT_DIR="$TEMP_DIR/$FILENAME"
+            mkdir -p "$EXTRACT_DIR"
+
+            # Try to extract as zip (vsix, zip, crx are all zip-based)
+            if unzip -q "$f" -d "$EXTRACT_DIR" 2>/dev/null; then
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              # Use tree if available, with file sizes
+              if command -v tree &>/dev/null; then
+                tree -h --du "$EXTRACT_DIR" | sed "s|$EXTRACT_DIR|$FILENAME|" >> $GITHUB_STEP_SUMMARY
+              else
+                # Fallback: use find to produce a tree-like output
+                (cd "$EXTRACT_DIR" && find . -print | sort | sed -e 's/[^/]*\//│   /g' -e 's/│   \([^│]\)/├── \1/') >> $GITHUB_STEP_SUMMARY
+              fi
+              echo '```' >> $GITHUB_STEP_SUMMARY
+
+              # File count and total uncompressed size
+              FILE_COUNT=$(find "$EXTRACT_DIR" -type f | wc -l)
+              UNCOMPRESSED=$(du -sh "$EXTRACT_DIR" | cut -f1)
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "> **$FILE_COUNT** files, **$UNCOMPRESSED** uncompressed" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "*Unable to extract (not a recognized archive format)*" >> $GITHUB_STEP_SUMMARY
+            fi
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          done
+
+          rm -rf "$TEMP_DIR"
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
