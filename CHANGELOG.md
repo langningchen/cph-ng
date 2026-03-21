@@ -2,6 +2,14 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.4
+
+- **chore**(deps): upgrade packages
+- **fix**(bump-version): enhance version consistency check with release config
+- **fix**(browser-ext): support firefox luogu captcha solving
+- **fix**(browser-ext): initialize host permissions with localhost pattern ([#181](https://github.com/langningchen/cph-ng/issues/181))
+- **fix**(vscode-ext): copy test case to working folder in stress test ([#182](https://github.com/langningchen/cph-ng/issues/182))
+
 ## 0.7.3
 
 - **chore**(deps): upgrade packages
