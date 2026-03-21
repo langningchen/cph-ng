@@ -43,7 +43,7 @@ export class CompanionStatusbarService {
     this.statusBarController = this.ui.showStatusbar('companion', () => this.signals.emit('click'));
   }
 
-  public update(status: RouterStatus, batches: BatchList) {
+  public update(status: RouterStatus, batches: BatchList, detail?: string) {
     this.logger.debug('Updating companion status bar', { status, batchCount: batches.size });
     if (status === 'OFFLINE') {
       return this.statusBarController.update(
@@ -55,8 +55,17 @@ export class CompanionStatusbarService {
     if (status === 'CONNECTING') {
       return this.statusBarController.update(
         this.translator.t('CPH-NG: Connecting...'),
-        this.translator.t('Attempting to establish connection'),
+        this.translator.t('Launching router and establishing connection'),
         'warn',
+      );
+    }
+    if (status === 'FAILED') {
+      return this.statusBarController.update(
+        this.translator.t('CPH-NG: Failed'),
+        detail
+          ? this.translator.t('Router startup failed: {detail}', { detail })
+          : this.translator.t('Router startup failed. Click to retry.'),
+        'error',
       );
     }
 

@@ -30,8 +30,28 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { Server } from 'socket.io';
-import { config, updateConfig } from './config';
+import { config, initializeConfig, updateConfig } from './config';
 import { shouldScheduleShutdown } from './shutdown';
+
+type RouterStartupMessage =
+  | { type: 'ready'; port: number }
+  | { type: 'startup-error'; message: string };
+
+const sendStartupMessage = (message: RouterStartupMessage) => {
+  if (typeof process.send === 'function') process.send(message);
+};
+
+const formatStartupError = (err: unknown): string => {
+  if (err instanceof Error) return err.stack ?? err.message;
+  return String(err);
+};
+
+const reportStartupError = (err: unknown): never => {
+  const message = formatStartupError(err);
+  console.error(message);
+  sendStartupMessage({ type: 'startup-error', message });
+  process.exit(1);
+};
 
 let io: Server<C2rMsg & B2rMsg, R2cMsg & R2bMsg>;
 export const batches = new Map<
@@ -40,7 +60,7 @@ export const batches = new Map<
 >();
 
 let isRestarting = false;
-let currentRunningPort = config.port;
+let currentRunningPort = 0;
 const restartServer = async () => {
   if (isRestarting) return;
   isRestarting = true;
@@ -186,9 +206,9 @@ app.post('/', async (ctx) => {
 let activeBrowserId: string | null = null;
 
 const startServer = () => {
-  const server = serve({ fetch: app.fetch, port: config.port });
+  const httpServer = serve({ fetch: app.fetch, port: config.port });
 
-  io = new Server(server, {
+  io = new Server(httpServer, {
     path: '/ws',
     cors: { origin: '*' },
   });
@@ -250,8 +270,23 @@ const startServer = () => {
     });
   });
 
-  return server;
+  return httpServer;
 };
+
+const waitForServerReady = (httpServer: ReturnType<typeof serve>) =>
+  new Promise<void>((resolve, reject) => {
+    const onListening = () => {
+      httpServer.off('error', onError);
+      resolve();
+    };
+    const onError = (err: Error) => {
+      httpServer.off('listening', onListening);
+      reject(err);
+    };
+    httpServer.once('listening', onListening);
+    httpServer.once('error', onError);
+  });
+
 const stopServer = () => {
   server.close(() => {
     info(`Server stopped`);
@@ -259,9 +294,7 @@ const stopServer = () => {
   });
 };
 
-export let server = startServer();
-
-info(`Router started on port ${config.port}`, { config });
+export let server!: ReturnType<typeof serve>;
 
 let shutdownTimer: NodeJS.Timeout | null = null;
 const resetShutdownTimer = () => {
@@ -274,3 +307,18 @@ const resetShutdownTimer = () => {
     stopServer();
   }, config.shutdownTimeout);
 };
+
+const bootstrap = async () => {
+  try {
+    await initializeConfig();
+    currentRunningPort = config.port;
+    server = startServer();
+    await waitForServerReady(server);
+    info(`Router started on port ${config.port}`, { config });
+    sendStartupMessage({ type: 'ready', port: config.port });
+  } catch (err) {
+    reportStartupError(err);
+  }
+};
+
+void bootstrap();

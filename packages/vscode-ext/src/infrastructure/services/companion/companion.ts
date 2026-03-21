@@ -60,12 +60,12 @@ export class Companion implements ICompanion {
     this.batchesToClaim.delete(batchId);
   }
   private updateStatusbar = () => {
-    this.statusbar.update(this.ws.getStatus(), this.batchesToClaim);
+    this.statusbar.update(this.ws.getStatus(), this.batchesToClaim, this.ws.getStatusDetail());
   };
 
   private handleStatusBarClick = async () => {
     this.logger.debug('Status bar item clicked');
-    if (this.ws.getStatus() !== 'ONLINE') return this.ws.spawnRouter();
+    if (this.ws.getStatus() !== 'ONLINE') return this.ws.connect();
     if (this.batchesToClaim.size === 0) this.logger.info('No batches to claim');
     else if (this.batchesToClaim.size === 1) {
       const batchId = Array.from(this.batchesToClaim.keys())[0];

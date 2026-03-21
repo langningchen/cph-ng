@@ -8,6 +8,7 @@ const shutdownModulePath = new URL('../../../vscode-router/src/shutdown.ts', imp
 
 const loadConfigModule = async (): Promise<{
   config: { logFile: string; shutdownTimeout: number };
+  initializeConfig: (argv?: string[]) => Promise<void>;
 }> => import(configModulePath);
 
 const loadShutdownModule = async (): Promise<{
@@ -35,7 +36,8 @@ describe('router config', () => {
     const logFile = join(dir, 'router.log');
     process.argv = ['node', 'router.cjs', '-p', '27121', '-l', logFile, '-s', '0'];
 
-    const { config } = await loadConfigModule();
+    const { config, initializeConfig } = await loadConfigModule();
+    await initializeConfig(process.argv);
 
     expect(config.shutdownTimeout).toBe(0);
     expect(config.logFile).toBe(logFile);
@@ -48,7 +50,8 @@ describe('router config', () => {
     const logFile = join(dir, 'router.log');
     process.argv = ['node', 'router.cjs', '-p', '27121', '-l', logFile, '-s', '-1'];
 
-    await expect(loadConfigModule()).rejects.toThrow('Invalid timeout');
+    const { initializeConfig } = await loadConfigModule();
+    await expect(initializeConfig(process.argv)).rejects.toThrow('Invalid timeout');
   });
 });
 

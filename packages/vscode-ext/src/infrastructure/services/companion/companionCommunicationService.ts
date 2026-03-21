@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { spawn } from 'node:child_process';
+import { type ChildProcess, spawn } from 'node:child_process';
 import EventEmitter from 'node:events';
 import type {
   BatchId,
@@ -43,7 +43,43 @@ type CompanionCommunicationEvents = {
   batchClaimed: (batchId: BatchId) => void;
 };
 
-export type RouterStatus = 'OFFLINE' | 'CONNECTING' | 'ONLINE';
+type RouterStartupMessage =
+  | { type: 'ready'; port: number }
+  | { type: 'startup-error'; message: string };
+
+const ROUTER_STARTUP_TIMEOUT_MS = 5000;
+const MAX_STARTUP_STDERR_LENGTH = 4096;
+
+const isReadyMessage = (message: unknown): message is { type: 'ready'; port: number } => {
+  return (
+    typeof message === 'object' &&
+    message !== null &&
+    'type' in message &&
+    message.type === 'ready' &&
+    'port' in message &&
+    typeof message.port === 'number'
+  );
+};
+
+const isStartupErrorMessage = (
+  message: unknown,
+): message is { type: 'startup-error'; message: string } => {
+  return (
+    typeof message === 'object' &&
+    message !== null &&
+    'type' in message &&
+    message.type === 'startup-error' &&
+    'message' in message &&
+    typeof message.message === 'string'
+  );
+};
+
+const formatError = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  return String(error);
+};
+
+export type RouterStatus = 'OFFLINE' | 'CONNECTING' | 'ONLINE' | 'FAILED';
 
 @injectable()
 export class CompanionCommunicationService {
@@ -51,6 +87,9 @@ export class CompanionCommunicationService {
   private routerLogger: ILogger;
   private ws: Socket<R2cMsg, C2rMsg> | undefined;
   private _isBrowserConnected = false;
+  private status: RouterStatus = 'OFFLINE';
+  private statusDetail: string | undefined;
+  private isDisconnecting = false;
   public readonly signals = new EventEmitter() as TypedEventEmitter<CompanionCommunicationEvents>;
 
   public constructor(
@@ -66,15 +105,52 @@ export class CompanionCommunicationService {
     this.routerLogger = this.logger.withScope('companionRouter');
   }
 
-  public spawnRouter() {
-    this.logger.info('Spawning router process...');
+  public connect() {
+    if (this.ws || this.status === 'CONNECTING') return;
+    this.setStatus('CONNECTING');
+    void this.launchRouter()
+      .then(() => {
+        this.createSocket();
+      })
+      .catch((error) => {
+        this.setStatus('FAILED', formatError(error));
+      });
+  }
+
+  public disconnect() {
+    this.isDisconnecting = true;
+    this.ws?.close();
+    this.ws = undefined;
+    this._isBrowserConnected = false;
+    this.setStatus('OFFLINE');
+    this.isDisconnecting = false;
+  }
+
+  public getStatus(): RouterStatus {
+    return this.status;
+  }
+
+  public getStatusDetail(): string | undefined {
+    return this.statusDetail;
+  }
+
+  private setStatus(status: RouterStatus, detail?: string) {
+    const nextDetail = detail?.trim() || undefined;
+    if (this.status === status && this.statusDetail === nextDetail) return;
+    this.status = status;
+    this.statusDetail = nextDetail;
+    this.signals.emit('statusChanged');
+  }
+
+  private launchRouter() {
+    this.logger.info('Launching router process...');
     const node = process.execPath;
     const routerPath = this.path.join(this.extPath, 'dist', 'router.cjs');
     const port = this.settings.companion.listenPort.toString();
     const logFile = this.pathResolver.renderPath(this.settings.companion.logFile);
     const shutdownTimeout = this.settings.companion.shutdownTimeout.toString();
 
-    this.logger.debug('Router spawn parameters', {
+    this.logger.debug('Router launch parameters', {
       node,
       routerPath,
       port,
@@ -84,15 +160,107 @@ export class CompanionCommunicationService {
     const childProcess = spawn(
       node,
       [routerPath, '-p', port, '-l', logFile, '-s', shutdownTimeout],
-      { detached: true, stdio: 'ignore', env: process.env },
+      {
+        detached: true,
+        stdio: ['ignore', 'ignore', 'pipe', 'ipc'],
+        env: process.env,
+      },
     );
-    childProcess.unref();
-    this.logger.info(`Router process spawned on port ${port}`);
+    this.logger.info(`Router launch requested on port ${port}`);
+
+    return this.waitForRouterReady(childProcess)
+      .then(() => {
+        this.logger.info(`Router ready on port ${port}`);
+      })
+      .catch((error) => {
+        this.logger.error('Router launch failed', { message: formatError(error) });
+        throw error;
+      });
   }
 
-  public connect() {
+  private waitForRouterReady(childProcess: ChildProcess) {
+    return new Promise<void>((resolve, reject) => {
+      let stderrOutput = '';
+      let settled = false;
+
+      const stderr = childProcess.stderr;
+      const onStderr = (chunk: Buffer | string) => {
+        stderrOutput = `${stderrOutput}${chunk.toString()}`;
+        if (stderrOutput.length > MAX_STARTUP_STDERR_LENGTH)
+          stderrOutput = stderrOutput.slice(-MAX_STARTUP_STDERR_LENGTH);
+      };
+
+      const cleanup = () => {
+        clearTimeout(timeout);
+        childProcess.off('message', onMessage);
+        childProcess.off('error', onError);
+        childProcess.off('exit', onExit);
+        stderr?.off('data', onStderr);
+      };
+
+      const settle = (callback: () => void) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        callback();
+      };
+
+      const withStderr = (message: string) => {
+        const detail = stderrOutput.trim();
+        if (!detail) return message;
+        return `${message}: ${detail}`;
+      };
+
+      const onMessage = (message: unknown) => {
+        if (isReadyMessage(message)) {
+          settle(() => {
+            if (childProcess.connected) childProcess.disconnect();
+            stderr?.destroy();
+            childProcess.unref();
+            resolve();
+          });
+          return;
+        }
+        if (isStartupErrorMessage(message)) {
+          settle(() => reject(new Error(message.message)));
+        }
+      };
+
+      const onError = (error: Error) => {
+        settle(() => reject(error));
+      };
+
+      const onExit = (code: number | null, signal: NodeJS.Signals | null) => {
+        settle(() =>
+          reject(
+            new Error(
+              withStderr(
+                `Router exited before becoming ready (code: ${code ?? 'null'}, signal: ${signal ?? 'null'})`,
+              ),
+            ),
+          ),
+        );
+      };
+
+      const timeout = setTimeout(() => {
+        settle(() =>
+          reject(
+            new Error(
+              withStderr(`Router did not become ready within ${ROUTER_STARTUP_TIMEOUT_MS}ms`),
+            ),
+          ),
+        );
+      }, ROUTER_STARTUP_TIMEOUT_MS);
+
+      childProcess.on('message', onMessage as (message: RouterStartupMessage) => void);
+      childProcess.once('error', onError);
+      childProcess.once('exit', onExit);
+      stderr?.on('data', onStderr);
+    });
+  }
+
+  private createSocket() {
     if (this.ws) return;
-    this.spawnRouter();
     const port = this.settings.companion.listenPort;
     this.ws = io(`ws://localhost:${port}`, {
       path: '/ws',
@@ -106,21 +274,20 @@ export class CompanionCommunicationService {
     this.bindEvents();
   }
 
-  public disconnect() {
-    this.ws?.close();
-    this.ws = undefined;
-  }
-
-  public getStatus(): RouterStatus {
-    if (!this.ws) return 'OFFLINE';
-    if (this.ws.connected) return 'ONLINE';
-    return 'CONNECTING';
-  }
-
   private bindEvents() {
     if (!this.ws) return;
-    this.ws.on('connect', () => this.signals.emit('statusChanged'));
-    this.ws.on('disconnect', () => this.signals.emit('statusChanged'));
+    this.ws.on('connect', () => {
+      this.setStatus('ONLINE');
+    });
+    this.ws.on('connect_error', (error) => {
+      this.logger.error('Failed to connect to router', { message: error.message });
+      this.setStatus('FAILED', error.message);
+    });
+    this.ws.on('disconnect', () => {
+      this._isBrowserConnected = false;
+      if (this.isDisconnecting) return;
+      this.setStatus('CONNECTING');
+    });
     this.ws.on('log', ({ level, message, details }) => {
       this.routerLogger[level](message, details);
     });

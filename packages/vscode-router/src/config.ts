@@ -21,35 +21,48 @@ import type { RouterConfig } from '@cph-ng/core';
 import { Command } from 'commander';
 import { lock } from 'proper-lockfile';
 
-const program = new Command();
-
-program
-  .requiredOption('-p, --port <number>', 'Port number (1-65535)', (val) => {
-    const p = parseInt(val, 10);
-    if (Number.isNaN(p) || p <= 0 || p > 65535) throw new Error('Invalid port');
-    return p;
-  })
-  .requiredOption('-l, --log-file <path>', 'Path to the log file')
-  .requiredOption('-s, --shutdown-timeout <number>', 'Shutdown timeout in ms', (val) => {
-    const t = parseInt(val, 10);
-    if (Number.isNaN(t) || t < 0) throw new Error('Invalid timeout');
-    return t;
-  })
-  .parse(process.argv);
-
-const options = program.opts();
-
 export const config: RouterConfig = {
-  port: options.port,
-  logFile: resolve(options.logFile),
-  shutdownTimeout: options.shutdownTimeout,
+  port: 27121,
+  logFile: '',
+  shutdownTimeout: 10000,
 };
 
-const logFile = config.logFile;
-const logDir = dirname(logFile);
-if (!existsSync(logDir)) mkdirSync(logDir, { recursive: true });
-if (!existsSync(logFile)) writeFileSync(logFile, '');
-await lock(logFile);
+const parseConfig = (argv: string[]): RouterConfig => {
+  const program = new Command();
+  program
+    .requiredOption('-p, --port <number>', 'Port number (1-65535)', (val) => {
+      const p = parseInt(val, 10);
+      if (Number.isNaN(p) || p <= 0 || p > 65535) throw new Error('Invalid port');
+      return p;
+    })
+    .requiredOption('-l, --log-file <path>', 'Path to the log file')
+    .requiredOption('-s, --shutdown-timeout <number>', 'Shutdown timeout in ms', (val) => {
+      const t = parseInt(val, 10);
+      if (Number.isNaN(t) || t < 0) throw new Error('Invalid timeout');
+      return t;
+    })
+    .parse(argv);
+
+  const options = program.opts();
+  return {
+    port: options.port,
+    logFile: resolve(options.logFile),
+    shutdownTimeout: options.shutdownTimeout,
+  } satisfies RouterConfig;
+};
+
+const prepareLogFile = async (logFile: string) => {
+  const logDir = dirname(logFile);
+  if (!existsSync(logDir)) mkdirSync(logDir, { recursive: true });
+  if (!existsSync(logFile)) writeFileSync(logFile, '');
+  await lock(logFile);
+};
+
+export const initializeConfig = async (argv: string[] = process.argv) => {
+  const parsedConfig = parseConfig(argv);
+  await prepareLogFile(parsedConfig.logFile);
+  Object.assign(config, parsedConfig);
+};
 
 export const updateConfig = (newConfig: Partial<RouterConfig>) => {
   Object.assign(config, newConfig);
