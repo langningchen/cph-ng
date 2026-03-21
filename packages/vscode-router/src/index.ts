@@ -31,6 +31,7 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { Server } from 'socket.io';
 import { config, updateConfig } from './config';
+import { shouldScheduleShutdown } from './shutdown';
 
 let io: Server<C2rMsg & B2rMsg, R2cMsg & R2bMsg>;
 export const batches = new Map<
@@ -267,7 +268,7 @@ const resetShutdownTimer = () => {
   if (isRestarting) return;
   if (shutdownTimer) clearTimeout(shutdownTimer);
   const totalClients = io.engine.clientsCount;
-  if (totalClients > 0 || !config.shutdownTimeout) return;
+  if (!shouldScheduleShutdown(totalClients, config.shutdownTimeout)) return;
   shutdownTimer = setTimeout(() => {
     info(`No clients connected for ${config.shutdownTimeout}ms, shutting down router`);
     stopServer();
