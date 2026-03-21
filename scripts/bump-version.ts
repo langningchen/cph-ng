@@ -57,21 +57,33 @@ packageJsonPaths.forEach((p) => {
   console.log(`  - ${p}`);
 });
 
-// Read version numbers
+// Read release config
+interface ReleaseConfig {
+  version: string;
+  preRelease: boolean;
+  previousVersion: string;
+}
+
+const releaseConfig = JSON.parse(readFileSync(releaseConfigPath, 'utf-8')) as ReleaseConfig;
+
+// Read version numbers from all sources (packages + release config)
 const packages = packageJsonPaths.map((p) => {
   const pkg = JSON.parse(readFileSync(p, 'utf-8'));
   return { path: p, version: pkg.version || '0.0.0' };
 });
 
 // Check version consistency
-const versions = [...new Set(packages.map((p) => p.version))];
-
+const versionSources = [
+  ...packages.map((p) => ({ path: p.path, version: p.version })),
+  { path: releaseConfigPath, version: releaseConfig.version },
+];
+const versions = [...new Set(versionSources.map((s) => s.version))];
 if (versions.length > 1) {
   console.log('\n⚠️  Version mismatch detected:\n');
-  packages.forEach((p) => {
-    console.log(`  ${p.version.padEnd(10)} ${p.path}`);
+  versionSources.forEach((s) => {
+    console.log(`  ${s.version.padEnd(10)} ${s.path}`);
   });
-  die('All packages must have the same version.');
+  die('All files must have the same version.');
 }
 
 // Get current latest version
@@ -104,36 +116,15 @@ for (const pkgPath of packageJsonPaths) {
 }
 
 // Update release config
-const releaseConfig = {
+const newReleaseConfig: ReleaseConfig = {
   version: newVersion,
   preRelease: isPreRelease,
+  previousVersion: releaseConfig.preRelease ? releaseConfig.previousVersion : newVersion,
 };
-writeFileSync(releaseConfigPath, `${JSON.stringify(releaseConfig, null, 2)}\n`);
+writeFileSync(releaseConfigPath, `${JSON.stringify(newReleaseConfig, null, 2)}\n`);
 
 // Generate CHANGELOG
-const getLastReleaseTag = (): string => {
-  const tags = execSync('git tag --list "v*" --sort=-v:refname', {
-    encoding: 'utf-8',
-  })
-    .trim()
-    .split('\n')
-    .filter(Boolean);
-  for (const tag of tags) {
-    const match = tag.match(/^v(\d+)\.(\d+)\.(\d+)$/);
-    if (match && match[3] === '0') return tag;
-  }
-  return tags[0] || '';
-};
-
-const getLastTag = (): string => {
-  return execSync('git describe --tags --abbrev=0 2>/dev/null', {
-    encoding: 'utf-8',
-  }).trim();
-};
-
-const lastTag = isPreRelease ? getLastTag() : getLastReleaseTag();
-const commitRange = lastTag ? `${lastTag}..HEAD` : 'HEAD';
-const commits = execSync(`git log ${commitRange} --format=%s`, {
+const commits = execSync(`git log v${releaseConfig.previousVersion}..HEAD --format=%s`, {
   encoding: 'utf-8',
 })
   .trim()
@@ -161,16 +152,16 @@ if (commits.length === 0) {
 
   let updatedChangelog: string;
 
-  if (isPreRelease) {
+  if (isPreRelease || releaseConfig.previousVersion === releaseConfig.version) {
     const newContent = `## ${newVersion}\n\n${commits.join('\n')}`;
     updatedChangelog = `${changelogHeader}${newContent}\n\n${oldVersions}`;
   } else {
-    const firstPreRelease = `${major}.${minor}.1`;
-    const lastPreRelease = currentVersion;
-    const lastReleaseVersion = lastTag.replace('v', '');
+    const preReleaseBegin = releaseConfig.previousVersion;
+    const preReleaseEnd = currentVersion;
+    const lastReleaseVersion = releaseConfig.previousVersion;
     if (!lastReleaseVersion) die('No previous release tag found, cannot link to last release');
 
-    const newContent = `## ${newVersion}\n\nAggregated from prereleases ${firstPreRelease}~${lastPreRelease}.\n\n${commits.join('\n')}\n\n<details>\n<summary>Pre-release history (${firstPreRelease}~${lastPreRelease})</summary>`;
+    const newContent = `## ${newVersion}\n\nAggregated from prereleases ${preReleaseBegin}~${preReleaseEnd}.\n\n${commits.join('\n')}\n\n<details>\n<summary>Pre-release history (${preReleaseEnd}~${preReleaseEnd})</summary>`;
     const lastVersion = oldVersions.indexOf(`## ${lastReleaseVersion}`);
     if (lastVersion === -1) die('Last release version not found in CHANGELOG.md');
     const modifiedOldVersions = `${oldVersions.slice(0, lastVersion)}</details>\n\n${oldVersions.slice(lastVersion)}`;

@@ -1,4 +1,5 @@
 {
   "version": "0.7.3",
-  "preRelease": false
+  "preRelease": false,
+  "previousVersion": "0.7.3"
 }
