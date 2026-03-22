@@ -39,6 +39,13 @@ interface ConnectionState {
 
 const CONNECTION_TIMEOUT_MS = 1000;
 
+const isExpectedMessagingError = (error: unknown): boolean => {
+  if (!(error instanceof Error)) return false;
+  return (
+    error.message.includes('Receiving end does not exist') || error.message.includes('No response')
+  );
+};
+
 const setupCaptchaRuntime = async (): Promise<void> => {
   // Firefox do not support offscreen documents
   if (import.meta.env.FIREFOX) return;
@@ -86,7 +93,10 @@ export default defineBackground(() => {
     };
 
     const broadcastStatus = () => {
-      sendMessage('statusUpdate', getStatus());
+      void sendMessage('statusUpdate', getStatus()).catch((error) => {
+        if (!isExpectedMessagingError(error))
+          console.warn('[cph-ng-submit] Failed to notify popup status:', error);
+      });
 
       if (import.meta.env.FIREFOX) return;
       browser.action.setBadgeText({ text: '　' });
