@@ -66,6 +66,7 @@ export class CompanionCommunicationService {
   private clientId: ClientId;
   private routerLogger: ILogger;
   private ws: Socket<R2cMsg, C2rMsg> | undefined;
+  private wsPort: number | undefined;
   private startupProcess: ChildProcess | undefined;
   private status: RouterStatus = 'OFFLINE';
   private failureMessage: string | undefined;
@@ -223,7 +224,8 @@ export class CompanionCommunicationService {
   }
 
   private async connectToRouter() {
-    if (this.ws?.connected) {
+    const port = this.getListenPort();
+    if (this.ws?.connected && this.wsPort === port) {
       this.clearReconnectTimer();
       this.reconnectDelayMs = ROUTER_RECONNECT_INITIAL_DELAY_MS;
       this.updateStatus('ONLINE');
@@ -231,7 +233,6 @@ export class CompanionCommunicationService {
     }
 
     this.clearFailure();
-    const port = this.getListenPort();
 
     if (this.startupPromise) {
       await this.ensureRouterReady();
@@ -371,7 +372,7 @@ export class CompanionCommunicationService {
   }
 
   private async ensureSocketConnected(port: number) {
-    if (this.ws?.connected) {
+    if (this.ws?.connected && this.wsPort === port) {
       this.updateStatus('ONLINE');
       return;
     }
@@ -387,6 +388,7 @@ export class CompanionCommunicationService {
       query: { clientId: this.clientId, type: 'vscode' },
     });
     this.ws = socket;
+    this.wsPort = port;
 
     await new Promise<void>((resolve, reject) => {
       const cleanup = () => {
@@ -463,6 +465,7 @@ export class CompanionCommunicationService {
     this.ws.removeAllListeners();
     this.ws.close();
     this.ws = undefined;
+    this.wsPort = undefined;
     this._isBrowserConnected = false;
   }
 

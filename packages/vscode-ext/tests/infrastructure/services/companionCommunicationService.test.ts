@@ -217,6 +217,30 @@ describe('CompanionCommunicationService', () => {
     expect(service.getStatus()).toBe('ONLINE');
   });
 
+  it('keeps retrying connection after a launch conflict until the router becomes available', async () => {
+    const connectPromise = service.connect();
+
+    await vi.waitFor(() => expect(sockets).toHaveLength(1));
+    sockets[0].receive('connect_error', new Error('Connection timeout'));
+
+    await vi.waitFor(() => expect(children).toHaveLength(1));
+    children[0].emit('message', {
+      type: 'startup-error',
+      message: 'Lock file is already being held',
+    });
+
+    await vi.waitFor(() => expect(sockets).toHaveLength(2));
+    sockets[1].receive('connect_error', new Error('Connection timeout'));
+
+    await vi.waitFor(() => expect(sockets).toHaveLength(3), { timeout: 2000 });
+    sockets[2].receive('connect');
+    await connectPromise;
+
+    expect(spawnMock).toHaveBeenCalledOnce();
+    expect(ioMock).toHaveBeenCalledTimes(3);
+    expect(service.getStatus()).toBe('ONLINE');
+  });
+
   it('surfaces startup errors and leaves the companion in failed state', async () => {
     const statuses: string[] = [];
     service.signals.on('statusChanged', () => statuses.push(service.getStatus()));
