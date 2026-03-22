@@ -30,12 +30,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { Server } from 'socket.io';
-import {
-  type LogFileLockRelease,
-  parseRouterConfig,
-  prepareLogFile,
-  updateRouterConfig,
-} from './config';
+import { type LogFileLockRelease, parseRouterConfig, prepareLogFile } from './config';
 import { configureLogger, error, info, trace, warn } from './logger';
 
 type RouterProcessMessage =
@@ -77,6 +72,9 @@ const formatErrorMessage = (value: unknown): string => {
 const getRoomSize = (roomName: string): number =>
   io?.sockets.adapter.rooms.get(roomName)?.size ?? 0;
 
+const hasConnectedClients = (): boolean =>
+  getRoomSize('vscode-clients') + getRoomSize('browsers') > 0;
+
 const refreshAllStatus = () => {
   if (!io) return;
   const isAnyBrowserConnected = !!activeBrowserId;
@@ -99,11 +97,88 @@ const refreshAllStatus = () => {
 const scheduleShutdown = () => {
   if (isShuttingDown) return;
   if (shutdownTimer) clearTimeout(shutdownTimer);
-  if (getRoomSize('vscode-clients') > 0) return;
+  if (hasConnectedClients()) return;
 
   shutdownTimer = setTimeout(() => {
-    void stopServer(`No VS Code clients connected for ${config.shutdownTimeout}ms`);
+    void stopServer(`No clients connected for ${config.shutdownTimeout}ms`);
   }, config.shutdownTimeout);
+};
+
+const closeRuntime = async (
+  currentServer: ReturnType<typeof serve> | undefined,
+  currentIo: Server<C2rMsg & B2rMsg, R2cMsg & R2bMsg> | undefined,
+) => {
+  currentIo?.close();
+  if (currentServer)
+    await new Promise<void>((resolve) => {
+      currentServer.close(() => resolve());
+    });
+};
+
+const createRuntime = async (port: number) => {
+  const nextServer = serve({ fetch: app.fetch, port });
+  if (!nextServer.listening)
+    await new Promise<void>((resolve, reject) => {
+      const handleError = (err: Error) => {
+        cleanup();
+        reject(err);
+      };
+      const handleListening = () => {
+        cleanup();
+        resolve();
+      };
+      const cleanup = () => {
+        nextServer.removeListener('error', handleError);
+        nextServer.removeListener('listening', handleListening);
+      };
+
+      nextServer.once('error', handleError);
+      nextServer.once('listening', handleListening);
+    });
+
+  const nextIo = new Server(nextServer, {
+    path: '/ws',
+    cors: { origin: '*' },
+    pingInterval: ROUTER_PING_INTERVAL_MS,
+    pingTimeout: ROUTER_PING_TIMEOUT_MS,
+  });
+
+  return { server: nextServer, io: nextIo };
+};
+
+const restartServer = async (reason: string) => {
+  if (isShuttingDown || !server || !io) return;
+
+  info('Restarting router listener', { port: config.port, reason });
+  const currentServer = server;
+  const currentIo = io;
+  const nextRuntime = await createRuntime(config.port);
+  server = nextRuntime.server;
+  io = nextRuntime.io;
+  attachSocketHandlers(nextRuntime.io);
+  await closeRuntime(currentServer, currentIo);
+  scheduleShutdown();
+  info('Router listener restarted', { port: config.port, reason });
+};
+
+const rotateLogFile = async (nextLogFile: string) => {
+  if (nextLogFile === config.logFile) return;
+
+  const previousLogFile = config.logFile;
+  const previousRelease = releaseLogFileLock;
+  const nextRelease = await prepareLogFile(nextLogFile);
+
+  releaseLogFileLock = nextRelease;
+  config.logFile = nextLogFile;
+  configureLogger(nextLogFile);
+
+  if (previousRelease) {
+    try {
+      await previousRelease();
+    } catch {}
+  }
+
+  info('Router log file updated', { previousLogFile, nextLogFile });
 };
 
 const stopServer = async (reason: string) => {
@@ -118,14 +193,9 @@ const stopServer = async (reason: string) => {
 
   const currentIo = io;
   io = undefined;
-  currentIo?.close();
-
   const currentServer = server;
   server = undefined;
-  if (currentServer)
-    await new Promise<void>((resolve) => {
-      currentServer.close(() => resolve());
-    });
+  await closeRuntime(currentServer, currentIo);
 
   if (releaseLogFileLock) {
     try {
@@ -208,7 +278,7 @@ app.post('/', async (ctx) => {
   const body: CompanionProblem = await ctx.req.json();
   const { id, size } = body.batch;
 
-  const batch = batches.get(id) || { ignored: false, problems: [], size };
+  const batch = batches.get(id) || { ignored: false, problems: [] as CompanionProblem[], size };
   if (batch.problems.length === 0) batches.set(id, batch);
   batch.problems.push(body);
 
@@ -234,9 +304,8 @@ app.post('/', async (ctx) => {
   return ctx.json({ status: 'ok' });
 });
 
-const attachSocketHandlers = () => {
-  if (!io) return;
-  io.on('connection', (socket) => {
+const attachSocketHandlers = (targetIo: Server<C2rMsg & B2rMsg, R2cMsg & R2bMsg>) => {
+  targetIo.on('connection', (socket) => {
     scheduleShutdown();
     const type = socket.handshake.query.type;
 
@@ -245,13 +314,13 @@ const attachSocketHandlers = () => {
       info('VSCode connected', { id: socket.id });
 
       socket.emit('browserStatus', { connected: !!activeBrowserId });
-      socket.on('submit', (msg) => {
+      socket.on('submit', (msg: Parameters<C2rMsg['submit']>[0]) => {
         if (activeBrowserId) {
           io?.to(activeBrowserId).emit('submitRequest', msg);
           info('Submission forwarded to browser extension', { msg });
         } else error('No browser connected');
       });
-      socket.on('cancelBatch', ({ batchId }) => {
+      socket.on('cancelBatch', ({ batchId }: Parameters<C2rMsg['cancelBatch']>[0]) => {
         const batch = batches.get(batchId);
         if (batch) {
           batch.ignored = true;
@@ -265,14 +334,42 @@ const attachSocketHandlers = () => {
           });
         } else warn(`Batch ${batchId} not found for cancellation`, { batchId });
       });
-      socket.on('claimBatch', ({ batchId }) => {
+      socket.on('claimBatch', ({ batchId }: Parameters<C2rMsg['claimBatch']>[0]) => {
         io?.to('vscode-clients').emit('batchClaimed', { batchId });
       });
-      socket.on('updateConfig', ({ config: nextConfig }) => {
-        updateRouterConfig(config, nextConfig);
-        scheduleShutdown();
-        info('Config updated dynamically', nextConfig);
-      });
+      socket.on(
+        'updateConfig',
+        async ({ config: nextConfig }: Parameters<C2rMsg['updateConfig']>[0]) => {
+          try {
+            if (nextConfig.logFile && nextConfig.logFile !== config.logFile)
+              await rotateLogFile(nextConfig.logFile);
+
+            if (
+              typeof nextConfig.shutdownTimeout === 'number' &&
+              nextConfig.shutdownTimeout !== config.shutdownTimeout
+            )
+              config.shutdownTimeout = nextConfig.shutdownTimeout;
+
+            if (typeof nextConfig.port === 'number' && nextConfig.port !== config.port) {
+              const previousPort = config.port;
+              config.port = nextConfig.port;
+              try {
+                await restartServer('Router listen port changed');
+              } catch (err) {
+                config.port = previousPort;
+                throw err;
+              }
+            }
+            scheduleShutdown();
+            info('Config updated dynamically', nextConfig);
+          } catch (err) {
+            error('Failed to update router config', {
+              message: formatErrorMessage(err),
+              nextConfig,
+            });
+          }
+        },
+      );
     } else if (type === 'browser') {
       socket.join('browsers');
       info('Browser connected', { id: socket.id });
@@ -296,34 +393,10 @@ const attachSocketHandlers = () => {
 };
 
 const startServer = async () => {
-  const nextServer = serve({ fetch: app.fetch, port: config.port });
-  if (!nextServer.listening)
-    await new Promise<void>((resolve, reject) => {
-      const handleError = (err: Error) => {
-        cleanup();
-        reject(err);
-      };
-      const handleListening = () => {
-        cleanup();
-        resolve();
-      };
-      const cleanup = () => {
-        nextServer.removeListener('error', handleError);
-        nextServer.removeListener('listening', handleListening);
-      };
-
-      nextServer.once('error', handleError);
-      nextServer.once('listening', handleListening);
-    });
-
-  server = nextServer;
-  io = new Server(nextServer, {
-    path: '/ws',
-    cors: { origin: '*' },
-    pingInterval: ROUTER_PING_INTERVAL_MS,
-    pingTimeout: ROUTER_PING_TIMEOUT_MS,
-  });
-  attachSocketHandlers();
+  const nextRuntime = await createRuntime(config.port);
+  server = nextRuntime.server;
+  io = nextRuntime.io;
+  attachSocketHandlers(nextRuntime.io);
 };
 
 const bootstrap = async () => {
