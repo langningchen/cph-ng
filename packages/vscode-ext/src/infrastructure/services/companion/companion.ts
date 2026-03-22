@@ -19,7 +19,6 @@ import type { BatchId, CompanionProblem, SubmitData } from '@cph-ng/core';
 import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
 import type { ICompanion } from '@v/application/ports/services/ICompanion';
 import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
 import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
 import type { IUi } from '@v/application/ports/vscode/IUi';
 import { ImportCompanionProblems } from '@v/application/useCases/companion/ImportCompanionProblems';
@@ -39,7 +38,6 @@ export class Companion implements ICompanion {
 
   public constructor(
     @inject(TOKENS.translator) private readonly translator: ITranslator,
-    @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.ui) private readonly ui: IUi,
     @inject(TOKENS.logger) private readonly logger: ILogger,
@@ -60,12 +58,12 @@ export class Companion implements ICompanion {
     this.batchesToClaim.delete(batchId);
   }
   private updateStatusbar = () => {
-    this.statusbar.update(this.ws.getStatus(), this.batchesToClaim);
+    this.statusbar.update(this.ws.getStatus(), this.batchesToClaim, this.ws.getFailureMessage());
   };
 
   private handleStatusBarClick = async () => {
     this.logger.debug('Status bar item clicked');
-    if (this.ws.getStatus() !== 'ONLINE') return this.ws.spawnRouter();
+    if (this.ws.getStatus() !== 'ONLINE') return await this.ws.connect();
     if (this.batchesToClaim.size === 0) this.logger.info('No batches to claim');
     else if (this.batchesToClaim.size === 1) {
       const batchId = Array.from(this.batchesToClaim.keys())[0];
@@ -146,12 +144,12 @@ export class Companion implements ICompanion {
     this.updateStatusbar();
   };
 
-  public connect() {
-    this.ws.connect();
+  public async connect() {
+    await this.ws.connect();
     this.updateStatusbar();
   }
-  public disconnect() {
-    this.ws.disconnect();
+  public async disconnect() {
+    await this.ws.disconnect();
   }
   public isBrowserExtConnected(): boolean {
     return this.ws.isBrowserConnected();

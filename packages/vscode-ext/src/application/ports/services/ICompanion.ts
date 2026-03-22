@@ -18,8 +18,8 @@
 import type { Problem } from '@v/domain/entities/problem';
 
 export interface ICompanion {
-  connect(): void;
-  disconnect(): void;
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
   isBrowserExtConnected(): boolean;
   submit(problem: Problem): Promise<void>;
 }

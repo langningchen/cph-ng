@@ -21,36 +21,44 @@ import type { RouterConfig } from '@cph-ng/core';
 import { Command } from 'commander';
 import { lock } from 'proper-lockfile';
 
-const program = new Command();
+export type LogFileLockRelease = Awaited<ReturnType<typeof lock>>;
 
-program
-  .requiredOption('-p, --port <number>', 'Port number (1-65535)', (val) => {
-    const p = parseInt(val, 10);
-    if (Number.isNaN(p) || p <= 0 || p > 65535) throw new Error('Invalid port');
-    return p;
-  })
-  .requiredOption('-l, --log-file <path>', 'Path to the log file')
-  .requiredOption('-s, --shutdown-timeout <number>', 'Shutdown timeout in ms', (val) => {
-    const t = parseInt(val, 10);
-    if (Number.isNaN(t) || t <= 0) throw new Error('Invalid timeout');
-    return t;
-  })
-  .parse(process.argv);
+export const parseRouterConfig = (argv: string[]): RouterConfig => {
+  const program = new Command();
+  program
+    .requiredOption('-p, --port <number>', 'Port number (1-65535)', (val) => {
+      const port = Number.parseInt(val, 10);
+      if (!Number.isInteger(port) || port <= 0 || port > 65535) throw new Error('Invalid port');
+      return port;
+    })
+    .requiredOption('-l, --log-file <path>', 'Path to the log file')
+    .requiredOption('-s, --shutdown-timeout <number>', 'Shutdown timeout in ms', (val) => {
+      const timeout = Number.parseInt(val, 10);
+      if (!Number.isInteger(timeout) || timeout <= 0) throw new Error('Invalid timeout');
+      return timeout;
+    })
+    .exitOverride();
 
-const options = program.opts();
+  const options = program.parse(argv, { from: 'node' }).opts<{
+    port: number;
+    logFile: string;
+    shutdownTimeout: number;
+  }>();
 
-export const config: RouterConfig = {
-  port: options.port,
-  logFile: resolve(options.logFile),
-  shutdownTimeout: options.shutdownTimeout,
+  return {
+    port: options.port,
+    logFile: resolve(options.logFile),
+    shutdownTimeout: options.shutdownTimeout,
+  };
 };
 
-const logFile = config.logFile;
-const logDir = dirname(logFile);
-if (!existsSync(logDir)) mkdirSync(logDir, { recursive: true });
-if (!existsSync(logFile)) writeFileSync(logFile, '');
-await lock(logFile);
+export const prepareLogFile = async (logFile: string): Promise<LogFileLockRelease> => {
+  const logDir = dirname(logFile);
+  if (!existsSync(logDir)) mkdirSync(logDir, { recursive: true });
+  if (!existsSync(logFile)) writeFileSync(logFile, '');
+  return await lock(logFile);
+};
 
-export const updateConfig = (newConfig: Partial<RouterConfig>) => {
+export const updateRouterConfig = (config: RouterConfig, newConfig: Partial<RouterConfig>) => {
   Object.assign(config, newConfig);
 };

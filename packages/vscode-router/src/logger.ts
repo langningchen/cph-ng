@@ -17,8 +17,13 @@
 
 import { appendFileSync } from 'node:fs';
 import type { LogLevel } from '@cph-ng/core';
-import { config } from '@r/config';
 import { broadcastLog } from '@r/index';
+
+let logFile: string | null = null;
+
+export const configureLogger = (nextLogFile: string) => {
+  logFile = nextLogFile;
+};
 
 export const writeLog = (level: LogLevel, message: string, ...args: unknown[]) => {
   const timeString = new Date().toISOString();
@@ -27,9 +32,10 @@ export const writeLog = (level: LogLevel, message: string, ...args: unknown[]) =
     .map((arg) => (typeof arg === 'string' ? arg : JSON.stringify(arg)))
     .join(' ');
   const logLine = `[${timeString}] [${levelString}] ${message} ${argsString}`;
-  try {
-    appendFileSync(config.logFile, `${logLine}\n`);
-  } catch {}
+  if (logFile)
+    try {
+      appendFileSync(logFile, `${logLine}\n`);
+    } catch {}
   console.log(logLine);
   broadcastLog(level, message, args);
 };

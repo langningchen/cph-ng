@@ -50,7 +50,7 @@ export class EnvironmentModule implements IExtensionModule {
     }
 
     await this.tmp.startMonitor();
-    this.companion.connect();
+    await this.companion.connect();
 
     let lastAlertTime = 0;
     this.timer = setInterval(async () => {
@@ -75,7 +75,7 @@ export class EnvironmentModule implements IExtensionModule {
 
   public async dispose() {
     if (this.timer) clearInterval(this.timer);
-    this.companion.disconnect();
+    await this.companion.disconnect();
     await this.repo.dispose();
   }
 }

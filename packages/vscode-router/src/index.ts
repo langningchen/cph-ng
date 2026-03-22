@@ -23,46 +23,62 @@ import type {
   LogLevel,
   R2bMsg,
   R2cMsg,
+  RouterConfig,
 } from '@cph-ng/core';
 import { serve } from '@hono/node-server';
-import { debug, error, info, trace, warn } from '@r/logger';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { Server } from 'socket.io';
-import { config, updateConfig } from './config';
+import {
+  type LogFileLockRelease,
+  parseRouterConfig,
+  prepareLogFile,
+  updateRouterConfig,
+} from './config';
+import { configureLogger, error, info, trace, warn } from './logger';
 
-let io: Server<C2rMsg & B2rMsg, R2cMsg & R2bMsg>;
+type RouterProcessMessage =
+  | { type: 'ready'; port: number }
+  | { type: 'startup-error'; message: string };
+
+const ROUTER_PING_INTERVAL_MS = 5000;
+const ROUTER_PING_TIMEOUT_MS = 5000;
+
+let io: Server<C2rMsg & B2rMsg, R2cMsg & R2bMsg> | undefined;
+let server: ReturnType<typeof serve> | undefined;
+let config: RouterConfig;
+let releaseLogFileLock: LogFileLockRelease | undefined;
+let isShuttingDown = false;
+let activeBrowserId: string | null = null;
+let shutdownTimer: NodeJS.Timeout | null = null;
+
 export const batches = new Map<
   BatchId,
   { ignored: boolean; problems: CompanionProblem[]; size: number }
 >();
 
-let isRestarting = false;
-let currentRunningPort = config.port;
-const restartServer = async () => {
-  if (isRestarting) return;
-  isRestarting = true;
-  try {
-    while (config.port !== undefined && currentRunningPort !== config.port) {
-      const targetPort = config.port;
-      debug(`Port mismatch detected. Restarting: ${currentRunningPort} -> ${targetPort}`);
-      io.close();
-      await new Promise<void>((resolve) => {
-        server.close(() => resolve());
-      });
-      server = startServer();
-      currentRunningPort = targetPort;
-      info(`Server successfully moved to port ${currentRunningPort}`);
-    }
-  } catch (err) {
-    error('Error during server restart', err);
-  } finally {
-    isRestarting = false;
-  }
+const app = new Hono();
+
+export const broadcastLog = (level: LogLevel, message: string, details: unknown) => {
+  io?.to('vscode-clients').emit('log', { message, level, details });
 };
 
+const postParentMessage = (message: RouterProcessMessage) => {
+  if (typeof process.send === 'function') process.send(message);
+};
+
+const formatErrorMessage = (value: unknown): string => {
+  if (value instanceof Error) return value.message;
+  if (typeof value === 'string') return value;
+  return JSON.stringify(value);
+};
+
+const getRoomSize = (roomName: string): number =>
+  io?.sockets.adapter.rooms.get(roomName)?.size ?? 0;
+
 const refreshAllStatus = () => {
+  if (!io) return;
   const isAnyBrowserConnected = !!activeBrowserId;
 
   io.to('vscode-clients').emit('browserStatus', {
@@ -80,18 +96,53 @@ const refreshAllStatus = () => {
   });
 };
 
-export const broadcastLog = (level: LogLevel, message: string, details: unknown) => {
-  io.to('vscode-clients').emit('log', { message, level, details });
+const scheduleShutdown = () => {
+  if (isShuttingDown) return;
+  if (shutdownTimer) clearTimeout(shutdownTimer);
+  if (getRoomSize('vscode-clients') > 0) return;
+
+  shutdownTimer = setTimeout(() => {
+    void stopServer(`No VS Code clients connected for ${config.shutdownTimeout}ms`);
+  }, config.shutdownTimeout);
 };
 
-const app = new Hono();
+const stopServer = async (reason: string) => {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+  if (shutdownTimer) {
+    clearTimeout(shutdownTimer);
+    shutdownTimer = null;
+  }
+
+  info('Stopping router', { reason });
+
+  const currentIo = io;
+  io = undefined;
+  currentIo?.close();
+
+  const currentServer = server;
+  server = undefined;
+  if (currentServer)
+    await new Promise<void>((resolve) => {
+      currentServer.close(() => resolve());
+    });
+
+  if (releaseLogFileLock) {
+    try {
+      await releaseLogFileLock();
+    } catch {}
+    releaseLogFileLock = undefined;
+  }
+
+  process.exit(0);
+};
 
 app.use(logger(trace));
 app.use('/*', cors());
 
 app.get('/', (ctx) => {
-  const browserRoom = io.sockets.adapter.rooms.get('browsers') || new Set();
-  const vscodeRoom = io.sockets.adapter.rooms.get('vscode-clients') || new Set();
+  const browserRoom = io?.sockets.adapter.rooms.get('browsers') || new Set();
+  const vscodeRoom = io?.sockets.adapter.rooms.get('vscode-clients') || new Set();
   const html = `
     <html>
       <head>
@@ -152,6 +203,7 @@ app.get('/', (ctx) => {
   `;
   return ctx.html(html);
 });
+
 app.post('/', async (ctx) => {
   const body: CompanionProblem = await ctx.req.json();
   const { id, size } = body.batch;
@@ -161,7 +213,7 @@ app.post('/', async (ctx) => {
   batch.problems.push(body);
 
   if (size !== 1 && !batch.ignored) {
-    io.to('vscode-clients').emit('readingBatch', {
+    io?.to('vscode-clients').emit('readingBatch', {
       batchId: id,
       count: batch.problems.length,
       size,
@@ -170,10 +222,10 @@ app.post('/', async (ctx) => {
 
   if (batch.problems.length >= size) {
     if (!batch.ignored) {
-      io.to('vscode-clients').emit('batchAvailable', {
+      io?.to('vscode-clients').emit('batchAvailable', {
         batchId: id,
         problems: [...batch.problems],
-        autoImport: io.sockets.adapter.rooms.get('vscode-clients')?.size === 1,
+        autoImport: getRoomSize('vscode-clients') === 1,
       });
       info(`Batch ${id} dispatched`, { size });
     }
@@ -182,18 +234,10 @@ app.post('/', async (ctx) => {
   return ctx.json({ status: 'ok' });
 });
 
-let activeBrowserId: string | null = null;
-
-const startServer = () => {
-  const server = serve({ fetch: app.fetch, port: config.port });
-
-  io = new Server(server, {
-    path: '/ws',
-    cors: { origin: '*' },
-  });
-
+const attachSocketHandlers = () => {
+  if (!io) return;
   io.on('connection', (socket) => {
-    resetShutdownTimer();
+    scheduleShutdown();
     const type = socket.handshake.query.type;
 
     if (type === 'vscode') {
@@ -203,7 +247,7 @@ const startServer = () => {
       socket.emit('browserStatus', { connected: !!activeBrowserId });
       socket.on('submit', (msg) => {
         if (activeBrowserId) {
-          io.to(activeBrowserId).emit('submitRequest', msg);
+          io?.to(activeBrowserId).emit('submitRequest', msg);
           info('Submission forwarded to browser extension', { msg });
         } else error('No browser connected');
       });
@@ -211,9 +255,9 @@ const startServer = () => {
         const batch = batches.get(batchId);
         if (batch) {
           batch.ignored = true;
-          io.to('vscode-clients').emit('readingBatch', {
+          io?.to('vscode-clients').emit('readingBatch', {
             batchId,
-            count: batch.size + 1, // Force clients to ignore this batch
+            count: batch.size + 1,
             size: batch.size,
           });
           info(`Batch ${batchId} marked as ignored due to cancellation`, {
@@ -222,12 +266,12 @@ const startServer = () => {
         } else warn(`Batch ${batchId} not found for cancellation`, { batchId });
       });
       socket.on('claimBatch', ({ batchId }) => {
-        io.to('vscode-clients').emit('batchClaimed', { batchId });
+        io?.to('vscode-clients').emit('batchClaimed', { batchId });
       });
-      socket.on('updateConfig', ({ config }) => {
-        updateConfig(config);
-        if (config.port !== undefined) restartServer();
-        info('Config updated dynamically', config);
+      socket.on('updateConfig', ({ config: nextConfig }) => {
+        updateRouterConfig(config, nextConfig);
+        scheduleShutdown();
+        info('Config updated dynamically', nextConfig);
       });
     } else if (type === 'browser') {
       socket.join('browsers');
@@ -239,37 +283,87 @@ const startServer = () => {
         refreshAllStatus();
       });
     }
+
     socket.on('disconnect', () => {
       if (socket.id === activeBrowserId) {
-        const nextSocket = io.sockets.adapter.rooms.get('browsers')?.values().next().value;
+        const nextSocket = io?.sockets.adapter.rooms.get('browsers')?.values().next().value;
         activeBrowserId = nextSocket || null;
       }
       refreshAllStatus();
-      resetShutdownTimer();
+      scheduleShutdown();
     });
   });
-
-  return server;
 };
-const stopServer = () => {
-  server.close(() => {
-    info(`Server stopped`);
-    process.exit(0);
+
+const startServer = async () => {
+  const nextServer = serve({ fetch: app.fetch, port: config.port });
+  if (!nextServer.listening)
+    await new Promise<void>((resolve, reject) => {
+      const handleError = (err: Error) => {
+        cleanup();
+        reject(err);
+      };
+      const handleListening = () => {
+        cleanup();
+        resolve();
+      };
+      const cleanup = () => {
+        nextServer.removeListener('error', handleError);
+        nextServer.removeListener('listening', handleListening);
+      };
+
+      nextServer.once('error', handleError);
+      nextServer.once('listening', handleListening);
+    });
+
+  server = nextServer;
+  io = new Server(nextServer, {
+    path: '/ws',
+    cors: { origin: '*' },
+    pingInterval: ROUTER_PING_INTERVAL_MS,
+    pingTimeout: ROUTER_PING_TIMEOUT_MS,
   });
+  attachSocketHandlers();
 };
 
-export let server = startServer();
+const bootstrap = async () => {
+  try {
+    config = parseRouterConfig(process.argv);
+    releaseLogFileLock = await prepareLogFile(config.logFile);
+    configureLogger(config.logFile);
 
-info(`Router started on port ${config.port}`, { config });
+    await startServer();
+    info(`Router started on port ${config.port}`, {
+      config,
+      pingInterval: ROUTER_PING_INTERVAL_MS,
+      pingTimeout: ROUTER_PING_TIMEOUT_MS,
+    });
+    scheduleShutdown();
 
-let shutdownTimer: NodeJS.Timeout | null = null;
-const resetShutdownTimer = () => {
-  if (isRestarting) return;
-  if (shutdownTimer) clearTimeout(shutdownTimer);
-  const totalClients = io.engine.clientsCount;
-  if (totalClients > 0) return;
-  shutdownTimer = setTimeout(() => {
-    info(`No clients connected for ${config.shutdownTimeout}ms, shutting down router`);
-    stopServer();
-  }, config.shutdownTimeout);
+    process.once('SIGTERM', () => {
+      void stopServer('Received SIGTERM');
+    });
+    process.once('SIGINT', () => {
+      void stopServer('Received SIGINT');
+    });
+
+    postParentMessage({ type: 'ready', port: config.port });
+  } catch (err) {
+    const message = formatErrorMessage(err);
+    try {
+      process.stderr.write(`${message}\n`);
+    } catch {}
+    postParentMessage({ type: 'startup-error', message });
+
+    if (releaseLogFileLock) {
+      try {
+        await releaseLogFileLock();
+      } catch {}
+      releaseLogFileLock = undefined;
+    }
+
+    process.exit(1);
+  }
 };
+
+void bootstrap();
