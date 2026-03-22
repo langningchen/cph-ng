@@ -9,7 +9,7 @@ import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { CompanionCommunicationService } from '@v/infrastructure/services/companion/companionCommunicationService';
 import type { Socket } from 'socket.io-client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { ioMock, spawnMock } = vi.hoisted(() => ({
   ioMock: vi.fn(),
@@ -136,6 +136,10 @@ describe('CompanionCommunicationService', () => {
     service = makeService();
   });
 
+  afterEach(async () => {
+    await service.disconnect();
+  });
+
   it('reports startup and connection states when the router becomes ready', async () => {
     const statuses: string[] = [];
     service.signals.on('statusChanged', () => statuses.push(service.getStatus()));
@@ -155,6 +159,16 @@ describe('CompanionCommunicationService', () => {
         reconnection: false,
       }),
     );
+    expect(spawnMock).toHaveBeenCalledWith(
+      process.execPath,
+      expect.any(Array),
+      expect.objectContaining({
+        detached: true,
+        stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
+      }),
+    );
+    expect(children[0].disconnectCalls).toBe(1);
+    expect(children[0].unrefCalls).toBe(2);
   });
 
   it('does not spawn duplicate routers when connect is requested concurrently', async () => {
@@ -217,37 +231,26 @@ describe('CompanionCommunicationService', () => {
 
     expect(statuses).toEqual(['CONNECTING', 'STARTING', 'FAILED']);
     expect(service.getFailureMessage()).toBe('Port 27121 is busy.');
-    expect(children[0].killCalls).toEqual(['SIGTERM']);
+    expect(children[0].killCalls).toEqual([]);
     expect(ioMock).toHaveBeenCalledOnce();
   });
 
-  it('restarts the router when the listen port changes', async () => {
+  it('forwards listen port updates to the connected router', async () => {
     const connectPromise = service.connect();
     await connectRouter(settingsMock.companion.listenPort);
     await connectPromise;
 
-    const firstChild = children[0];
-    const firstSocket = sockets[1];
+    const socket = sockets[1];
 
     settingsMock.companion.listenPort = 27122;
 
-    await vi.waitFor(() => expect(children).toHaveLength(2));
-    children[1].emit('message', { type: 'ready', port: 27122 });
-    await vi.waitFor(() => expect(sockets).toHaveLength(3));
-    sockets[2].receive('connect');
-    await vi.waitFor(() => expect(service.getStatus()).toBe('ONLINE'));
-
-    expect(firstChild.killCalls).toEqual(['SIGTERM']);
-    expect(firstSocket.closeCalls).toBe(1);
-    expect(spawnMock).toHaveBeenCalledTimes(2);
-    expect(ioMock).toHaveBeenNthCalledWith(
-      3,
-      'ws://localhost:27122',
-      expect.objectContaining({
-        timeout: 1000,
-        query: expect.objectContaining({ type: 'vscode' }),
+    await vi.waitFor(() =>
+      expect(socket.outboundEvents).toContainEqual({
+        event: 'updateConfig',
+        args: [{ config: { port: 27122 } satisfies Partial<RouterConfig> }],
       }),
     );
+    expect(spawnMock).toHaveBeenCalledOnce();
   });
 
   it('hot-updates shutdown timeout without restarting an online router', async () => {
@@ -283,7 +286,22 @@ describe('CompanionCommunicationService', () => {
     expect(socket.closeCalls).toBe(1);
     expect(child.killCalls).toEqual([]);
     expect(child.disconnectCalls).toBe(1);
-    expect(child.unrefCalls).toBe(1);
+    expect(child.unrefCalls).toBe(2);
     expect(service.getStatus()).toBe('OFFLINE');
+  });
+
+  it('reconnects automatically after an unexpected router disconnect', async () => {
+    const connectPromise = service.connect();
+    await connectRouter(settingsMock.companion.listenPort);
+    await connectPromise;
+
+    const activeSocket = sockets[1];
+    activeSocket.receive('disconnect', 'transport close');
+
+    await vi.waitFor(() => expect(sockets).toHaveLength(3), { timeout: 3000 });
+    sockets[2].receive('connect');
+    await vi.waitFor(() => expect(service.getStatus()).toBe('ONLINE'));
+
+    expect(spawnMock).toHaveBeenCalledOnce();
   });
 });

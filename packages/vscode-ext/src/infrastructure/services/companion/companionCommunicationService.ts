@@ -57,20 +57,23 @@ export type RouterStatus = 'OFFLINE' | 'STARTING' | 'CONNECTING' | 'ONLINE' | 'F
 
 const ROUTER_STARTUP_TIMEOUT_MS = 5000;
 const ROUTER_CONNECT_TIMEOUT_MS = 1000;
-const ROUTER_STOP_TIMEOUT_MS = 3000;
+const ROUTER_CONNECT_RETRY_DELAY_MS = 200;
+const ROUTER_RECONNECT_INITIAL_DELAY_MS = 1000;
+const ROUTER_RECONNECT_MAX_DELAY_MS = 10000;
 
 @injectable()
 export class CompanionCommunicationService {
   private clientId: ClientId;
   private routerLogger: ILogger;
   private ws: Socket<R2cMsg, C2rMsg> | undefined;
-  private routerProcess: ChildProcess | undefined;
+  private startupProcess: ChildProcess | undefined;
   private status: RouterStatus = 'OFFLINE';
   private failureMessage: string | undefined;
   private startupPromise: Promise<void> | undefined;
   private lifecycleQueue: Promise<void> = Promise.resolve();
-  private routerReady = false;
-  private isStoppingRouter = false;
+  private reconnectTimer: NodeJS.Timeout | undefined;
+  private reconnectDelayMs = ROUTER_RECONNECT_INITIAL_DELAY_MS;
+  private shouldMaintainConnection = false;
   private settingsUnsubscribers: Unsubscribe[];
   private _isBrowserConnected = false;
   public readonly signals = new EventEmitter() as TypedEventEmitter<CompanionCommunicationEvents>;
@@ -106,6 +109,7 @@ export class CompanionCommunicationService {
   }
 
   public async connect() {
+    this.shouldMaintainConnection = true;
     await this.enqueueLifecycleTask(async () => {
       try {
         await this.connectToRouter();
@@ -116,12 +120,14 @@ export class CompanionCommunicationService {
   }
 
   public async disconnect() {
+    this.shouldMaintainConnection = false;
+    this.clearReconnectTimer();
     for (const unsubscribe of this.settingsUnsubscribers) unsubscribe();
     this.settingsUnsubscribers = [];
     await this.enqueueLifecycleTask(async () => {
       this.clearFailure();
       this.disposeSocket();
-      this.releaseRouterProcessOwnership('Extension disconnected');
+      this.releaseStartupProcessOwnership('Extension disconnected');
       this.updateStatus('OFFLINE');
     });
   }
@@ -176,11 +182,21 @@ export class CompanionCommunicationService {
     else this.failureMessage = undefined;
   }
 
-  private buildLaunchConfig(): RouterLaunchConfig {
+  private clearReconnectTimer() {
+    if (!this.reconnectTimer) return;
+    clearTimeout(this.reconnectTimer);
+    this.reconnectTimer = undefined;
+  }
+
+  private getListenPort(): number {
     const port = this.settings.companion.listenPort;
     if (!Number.isInteger(port) || port <= 0 || port > 65535)
       throw new Error(`Companion listen port must be between 1 and 65535. Received ${port}.`);
+    return port;
+  }
 
+  private buildLaunchConfig(): RouterLaunchConfig {
+    const port = this.getListenPort();
     const shutdownTimeout = this.settings.companion.shutdownTimeout;
     if (!Number.isInteger(shutdownTimeout) || shutdownTimeout <= 0)
       throw new Error(
@@ -195,7 +211,6 @@ export class CompanionCommunicationService {
   }
 
   private async ensureRouterReady() {
-    if (this.routerProcess && this.routerReady) return;
     if (this.startupPromise) return await this.startupPromise;
 
     const launchConfig = this.buildLaunchConfig();
@@ -209,26 +224,30 @@ export class CompanionCommunicationService {
 
   private async connectToRouter() {
     if (this.ws?.connected) {
+      this.clearReconnectTimer();
+      this.reconnectDelayMs = ROUTER_RECONNECT_INITIAL_DELAY_MS;
       this.updateStatus('ONLINE');
       return;
     }
 
     this.clearFailure();
+    const port = this.getListenPort();
 
-    if (this.routerProcess || this.startupPromise) {
+    if (this.startupPromise) {
       await this.ensureRouterReady();
-      await this.ensureSocketConnected();
+      await this.waitForRouterConnection(port, ROUTER_STARTUP_TIMEOUT_MS);
       return;
     }
 
     try {
-      await this.ensureSocketConnected();
-      this.logger.info('Connected to existing router', { port: this.buildLaunchConfig().port });
+      await this.ensureSocketConnected(port);
+      this.logger.info('Connected to existing router', { port });
       return;
     } catch (error) {
       this.disposeSocket();
       this.logger.debug('Unable to connect to existing router, attempting launch', {
         message: error instanceof Error ? error.message : String(error),
+        port,
       });
     }
 
@@ -238,10 +257,11 @@ export class CompanionCommunicationService {
       if (!this.canRetryExistingRouterConnection(error)) throw error;
       this.logger.warn('Router launch conflicted with an existing instance, retrying connection', {
         message: error instanceof Error ? error.message : String(error),
+        port,
       });
     }
 
-    await this.ensureSocketConnected();
+    await this.waitForRouterConnection(port, ROUTER_STARTUP_TIMEOUT_MS);
   }
 
   private launchRouterProcess(launchConfig: RouterLaunchConfig): Promise<void> {
@@ -261,31 +281,23 @@ export class CompanionCommunicationService {
         launchConfig.shutdownTimeout.toString(),
       ],
       {
+        detached: true,
         env: process.env,
-        stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
+        stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
       },
     );
+    child.unref();
 
-    this.routerProcess = child;
-    this.routerReady = false;
+    this.startupProcess = child;
     this._isBrowserConnected = false;
-
-    let startupStderr = '';
-    child.stdout?.setEncoding('utf8');
-    child.stdout?.on('data', (chunk: string) => {
-      const message = chunk.trim();
-      if (message) this.routerLogger.debug(message);
-    });
-    child.stderr?.setEncoding('utf8');
-    child.stderr?.on('data', (chunk: string) => {
-      startupStderr = `${startupStderr}${chunk}`.slice(-4000);
-      const message = chunk.trim();
-      if (message) this.routerLogger.error(message);
-    });
 
     return new Promise<void>((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         cleanup();
+        void this.terminateStartupProcess(
+          child,
+          `Timed out waiting for router readiness on port ${launchConfig.port}`,
+        );
         reject(new Error(`Timed out waiting for router readiness on port ${launchConfig.port}.`));
       }, ROUTER_STARTUP_TIMEOUT_MS);
 
@@ -298,15 +310,16 @@ export class CompanionCommunicationService {
 
       const handleError = (error: Error) => {
         cleanup();
+        this.clearStartupProcess(child);
         reject(error);
       };
 
       const handleExit = (code: number | null, signal: NodeJS.Signals | null) => {
         cleanup();
-        const stderrSuffix = startupStderr.trim() ? ` ${startupStderr.trim()}` : '';
+        this.clearStartupProcess(child);
         reject(
           new Error(
-            `Router exited before becoming ready (code: ${code ?? 'null'}, signal: ${signal ?? 'null'}).${stderrSuffix}`,
+            `Router exited before becoming ready (code: ${code ?? 'null'}, signal: ${signal ?? 'null'}).`,
           ),
         );
       };
@@ -315,11 +328,11 @@ export class CompanionCommunicationService {
         if (!this.isRouterProcessMessage(message)) return;
         cleanup();
         if (message.type === 'startup-error') {
+          this.releaseStartupProcessOwnership('Router startup failed', child);
           reject(new Error(message.message));
           return;
         }
-        this.routerReady = true;
-        this.attachRuntimeProcessHandlers(child);
+        this.releaseStartupProcessOwnership('Router ready', child);
         this.logger.info(`Router ready on port ${message.port}`);
         resolve();
       };
@@ -330,38 +343,40 @@ export class CompanionCommunicationService {
     });
   }
 
-  private attachRuntimeProcessHandlers(child: ChildProcess) {
-    child.on('error', (error) => {
-      if (child !== this.routerProcess || this.isStoppingRouter) return;
-      this.logger.error('Router process emitted an error', error);
-    });
-    child.on('exit', (code, signal) => {
-      if (child !== this.routerProcess) return;
-      this.routerProcess = undefined;
-      this.routerReady = false;
-      this._isBrowserConnected = false;
-      this.disposeSocket();
+  private async waitForRouterConnection(port: number, timeoutMs: number) {
+    const deadline = Date.now() + timeoutMs;
+    let lastError: unknown;
 
-      if (this.isStoppingRouter) {
-        this.logger.info('Router process stopped', { code, signal });
-        this.updateStatus('OFFLINE');
+    while (true) {
+      try {
+        await this.ensureSocketConnected(port);
         return;
+      } catch (error) {
+        lastError = error;
+        this.disposeSocket();
       }
 
-      const message = `Router exited unexpectedly (code: ${code ?? 'null'}, signal: ${signal ?? 'null'}).`;
-      this.logger.error(message);
-      this.updateStatus('FAILED', message);
-    });
+      const remainingMs = deadline - Date.now();
+      if (remainingMs <= 0) break;
+      await this.delay(Math.min(ROUTER_CONNECT_RETRY_DELAY_MS, remainingMs));
+    }
+
+    throw lastError instanceof Error
+      ? lastError
+      : new Error(`Failed to connect to router on port ${port}.`);
   }
 
-  private async ensureSocketConnected() {
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private async ensureSocketConnected(port: number) {
     if (this.ws?.connected) {
       this.updateStatus('ONLINE');
       return;
     }
 
     this.disposeSocket();
-    const port = this.buildLaunchConfig().port;
     const socket = io(`ws://localhost:${port}`, {
       path: '/ws',
       transports: ['websocket'],
@@ -381,6 +396,8 @@ export class CompanionCommunicationService {
 
       const handleConnect = () => {
         cleanup();
+        this.clearReconnectTimer();
+        this.reconnectDelayMs = ROUTER_RECONNECT_INITIAL_DELAY_MS;
         this.bindSocketEvents(socket);
         this.updateStatus('ONLINE');
         resolve();
@@ -402,12 +419,10 @@ export class CompanionCommunicationService {
     socket.on('disconnect', (reason) => {
       if (socket !== this.ws) return;
       this.disposeSocket();
-      if (this.isStoppingRouter) return;
-      const message = this.routerProcess
-        ? `Router connection closed unexpectedly: ${reason}`
-        : 'Router is offline.';
+      const message = `Router connection closed unexpectedly: ${reason}`;
       this.logger.error(message);
       this.updateStatus('FAILED', message);
+      this.scheduleReconnect(message);
     });
     socket.on('log', ({ level, message, details }) => {
       if (socket !== this.ws) return;
@@ -451,74 +466,53 @@ export class CompanionCommunicationService {
     this._isBrowserConnected = false;
   }
 
-  private releaseRouterProcessOwnership(reason: string) {
-    const child = this.routerProcess;
-    this.routerProcess = undefined;
-    this.routerReady = false;
-    if (!child) return;
+  private clearStartupProcess(child: ChildProcess) {
+    if (this.startupProcess !== child) return;
+    this.startupProcess = undefined;
+  }
 
-    this.logger.info('Releasing router process ownership', { pid: child.pid, reason });
+  private releaseStartupProcessOwnership(reason: string, child = this.startupProcess) {
+    if (!child) return;
+    this.clearStartupProcess(child);
+    this.logger.info('Releasing router launch process ownership', { pid: child.pid, reason });
     child.removeAllListeners();
-    child.stdout?.removeAllListeners();
-    child.stderr?.removeAllListeners();
     if (child.connected) {
       try {
         child.disconnect();
       } catch {}
     }
-    child.stdout?.destroy();
-    child.stderr?.destroy();
     child.unref();
   }
 
-  private async stopRouterProcess(reason: string) {
-    const child = this.routerProcess;
-    this.routerProcess = undefined;
-    this.routerReady = false;
-    if (!child || child.killed || child.exitCode !== null || child.signalCode !== null) return;
+  private terminateStartupProcess(child: ChildProcess, reason: string) {
+    this.clearStartupProcess(child);
+    if (child.killed || child.exitCode !== null || child.signalCode !== null) return;
 
-    this.logger.info('Stopping router process', { pid: child.pid, reason });
-    this.isStoppingRouter = true;
-    try {
-      await new Promise<void>((resolve) => {
-        const timeoutId = setTimeout(() => {
-          child.kill('SIGKILL');
-        }, ROUTER_STOP_TIMEOUT_MS);
-
-        child.once('exit', () => {
-          clearTimeout(timeoutId);
-          resolve();
-        });
-        child.kill('SIGTERM');
-      });
-    } finally {
-      this.isStoppingRouter = false;
-    }
+    this.logger.warn('Terminating router launch process', { pid: child.pid, reason });
+    child.removeAllListeners();
+    child.kill('SIGTERM');
   }
 
   private async handleConnectionFailure(error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     this.logger.error('Companion connection failed', error);
     this.disposeSocket();
-    await this.stopRouterProcess('Companion connection failed');
     this.updateStatus('FAILED', message);
-  }
-
-  private async restartRouter(reason: string) {
-    this.logger.info('Restarting router', { reason });
-    this.disposeSocket();
-    await this.stopRouterProcess(reason);
-    try {
-      await this.ensureRouterReady();
-      await this.ensureSocketConnected();
-    } catch (error) {
-      await this.handleConnectionFailure(error);
-    }
+    this.scheduleReconnect(message);
   }
 
   private async handleCriticalConfigChange(setting: 'listenPort' | 'logFile') {
-    if (!this.routerProcess && this.status === 'OFFLINE' && !this.startupPromise) return;
-    await this.restartRouter(`Companion ${setting} changed`);
+    if (this.status === 'ONLINE' && this.ws?.connected) {
+      const config =
+        setting === 'listenPort'
+          ? ({ port: this.settings.companion.listenPort } satisfies Partial<RouterConfig>)
+          : ({
+              logFile: this.pathResolver.renderPath(this.settings.companion.logFile),
+            } satisfies Partial<RouterConfig>);
+      this.logger.info('Applying critical companion config update', { setting, config });
+      this.updateConfig(config);
+      return;
+    }
   }
 
   private async handleShutdownTimeoutChange(shutdownTimeout: number) {
@@ -534,11 +528,6 @@ export class CompanionCommunicationService {
     if (this.status === 'ONLINE' && this.ws?.connected) {
       this.logger.info('Applying shutdown timeout update', { shutdownTimeout });
       this.updateConfig({ shutdownTimeout });
-      return;
-    }
-
-    if (this.routerProcess || this.startupPromise) {
-      await this.restartRouter('Companion shutdown timeout changed');
     }
   }
 
@@ -557,6 +546,26 @@ export class CompanionCommunicationService {
       message.includes('Lock file is already being held') ||
       message.includes('EADDRINUSE') ||
       message.includes('address already in use')
+    );
+  }
+
+  private scheduleReconnect(reason: string) {
+    if (!this.shouldMaintainConnection || this.reconnectTimer) return;
+    if (!this.shouldAutoReconnect(reason)) return;
+
+    const delayMs = this.reconnectDelayMs;
+    this.reconnectDelayMs = Math.min(this.reconnectDelayMs * 2, ROUTER_RECONNECT_MAX_DELAY_MS);
+    this.logger.info('Scheduling router reconnect', { delayMs, reason });
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = undefined;
+      void this.connect();
+    }, delayMs);
+  }
+
+  private shouldAutoReconnect(message: string): boolean {
+    return !(
+      message.includes('Companion listen port must be between') ||
+      message.includes('Companion shutdown timeout must be greater than 0')
     );
   }
 }
