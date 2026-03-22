@@ -108,8 +108,7 @@ export class CompanionCommunicationService {
   public async connect() {
     await this.enqueueLifecycleTask(async () => {
       try {
-        await this.ensureRouterReady();
-        await this.ensureSocketConnected();
+        await this.connectToRouter();
       } catch (error) {
         await this.handleConnectionFailure(error);
       }
@@ -122,7 +121,7 @@ export class CompanionCommunicationService {
     await this.enqueueLifecycleTask(async () => {
       this.clearFailure();
       this.disposeSocket();
-      await this.stopRouterProcess('Extension disconnected');
+      this.releaseRouterProcessOwnership('Extension disconnected');
       this.updateStatus('OFFLINE');
     });
   }
@@ -206,6 +205,43 @@ export class CompanionCommunicationService {
     } finally {
       this.startupPromise = undefined;
     }
+  }
+
+  private async connectToRouter() {
+    if (this.ws?.connected) {
+      this.updateStatus('ONLINE');
+      return;
+    }
+
+    this.clearFailure();
+
+    if (this.routerProcess || this.startupPromise) {
+      await this.ensureRouterReady();
+      await this.ensureSocketConnected();
+      return;
+    }
+
+    try {
+      await this.ensureSocketConnected();
+      this.logger.info('Connected to existing router', { port: this.buildLaunchConfig().port });
+      return;
+    } catch (error) {
+      this.disposeSocket();
+      this.logger.debug('Unable to connect to existing router, attempting launch', {
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    try {
+      await this.ensureRouterReady();
+    } catch (error) {
+      if (!this.canRetryExistingRouterConnection(error)) throw error;
+      this.logger.warn('Router launch conflicted with an existing instance, retrying connection', {
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    await this.ensureSocketConnected();
   }
 
   private launchRouterProcess(launchConfig: RouterLaunchConfig): Promise<void> {
@@ -415,6 +451,26 @@ export class CompanionCommunicationService {
     this._isBrowserConnected = false;
   }
 
+  private releaseRouterProcessOwnership(reason: string) {
+    const child = this.routerProcess;
+    this.routerProcess = undefined;
+    this.routerReady = false;
+    if (!child) return;
+
+    this.logger.info('Releasing router process ownership', { pid: child.pid, reason });
+    child.removeAllListeners();
+    child.stdout?.removeAllListeners();
+    child.stderr?.removeAllListeners();
+    if (child.connected) {
+      try {
+        child.disconnect();
+      } catch {}
+    }
+    child.stdout?.destroy();
+    child.stderr?.destroy();
+    child.unref();
+  }
+
   private async stopRouterProcess(reason: string) {
     const child = this.routerProcess;
     this.routerProcess = undefined;
@@ -493,5 +549,14 @@ export class CompanionCommunicationService {
     if (type === 'startup-error')
       return typeof (message as { message?: unknown }).message === 'string';
     return false;
+  }
+
+  private canRetryExistingRouterConnection(error: unknown): boolean {
+    const message = error instanceof Error ? error.message : String(error);
+    return (
+      message.includes('Lock file is already being held') ||
+      message.includes('EADDRINUSE') ||
+      message.includes('address already in use')
+    );
   }
 }
