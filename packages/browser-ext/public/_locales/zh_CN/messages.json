@@ -54,10 +54,16 @@
   "statusConnected": {
     "message": "已连接"
   },
+  "statusConnecting": {
+    "message": "连接中"
+  },
   "statusDisconnected": {
     "message": "未连接"
   },
   "statusInactive": {
     "message": "未激活"
+  },
+  "statusReconnecting": {
+    "message": "重连中"
   }
 }

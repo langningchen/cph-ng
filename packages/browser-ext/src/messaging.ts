@@ -18,10 +18,14 @@
 import type { SubmitData } from '@cph-ng/core';
 import { defineExtensionMessaging } from '@webext-core/messaging';
 
+export type ConnectionPhase = 'DISCONNECTED' | 'CONNECTING' | 'RECONNECTING' | 'CONNECTED';
+
 export interface StatusResponse {
   connected: boolean;
   isActive: boolean;
   port: number;
+  phase: ConnectionPhase;
+  lastError?: string;
 }
 
 export interface SubmitDoneData {
@@ -33,6 +37,8 @@ export interface StatusUpdateData {
   connected: boolean;
   isActive: boolean;
   port: number;
+  phase: ConnectionPhase;
+  lastError?: string;
 }
 
 export interface SubmitResultData {

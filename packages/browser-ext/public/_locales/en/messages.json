@@ -54,10 +54,16 @@
   "statusConnected": {
     "message": "Connected"
   },
+  "statusConnecting": {
+    "message": "Connecting"
+  },
   "statusDisconnected": {
     "message": "Disconnected"
   },
   "statusInactive": {
     "message": "Inactive"
+  },
+  "statusReconnecting": {
+    "message": "Reconnecting"
   }
 }

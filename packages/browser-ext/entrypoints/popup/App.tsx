@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { t } from '@b/i18n';
-import { onMessage, type StatusResponse, sendMessage } from '@b/messaging';
+import { type ConnectionPhase, onMessage, type StatusResponse, sendMessage } from '@b/messaging';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import Box from '@mui/material/Box';
@@ -43,11 +43,29 @@ interface SubmitLog {
   timestamp: number;
 }
 
+const statusLabelByPhase = (phase: ConnectionPhase, isActive: boolean): string => {
+  if (phase === 'CONNECTED') return isActive ? t('statusConnected') : t('statusInactive');
+  if (phase === 'CONNECTING') return t('statusConnecting');
+  if (phase === 'RECONNECTING') return t('statusReconnecting');
+  return t('statusDisconnected');
+};
+
+const statusColorByPhase = (
+  phase: ConnectionPhase,
+  isActive: boolean,
+): 'success' | 'warning' | 'info' | 'error' => {
+  if (phase === 'CONNECTED') return isActive ? 'success' : 'warning';
+  if (phase === 'CONNECTING') return 'info';
+  if (phase === 'RECONNECTING') return 'warning';
+  return 'error';
+};
+
 const PopupInner = () => {
   const [status, setStatus] = useState<StatusResponse>({
     connected: false,
     isActive: false,
     port: 27121,
+    phase: 'DISCONNECTED',
   });
   const [portInput, setPortInput] = useState('27121');
   const [logs, setLogs] = useState<SubmitLog[]>([]);
@@ -59,7 +77,13 @@ const PopupInner = () => {
     });
 
     const removeStatusUpdate = onMessage('statusUpdate', ({ data }) => {
-      setStatus({ connected: data.connected, isActive: data.isActive, port: data.port });
+      setStatus({
+        connected: data.connected,
+        isActive: data.isActive,
+        port: data.port,
+        phase: data.phase,
+        lastError: data.lastError,
+      });
     });
     const removeSubmitResult = onMessage('submitResult', ({ data }) => {
       setLogs((prev) =>
@@ -98,20 +122,17 @@ const PopupInner = () => {
     }
   }, [portInput]);
 
+  const canDisconnect = status.phase !== 'DISCONNECTED';
+  const canActivate = status.phase === 'CONNECTED' && !status.isActive;
+
   return (
     <Box sx={{ width: 320, p: 1.5 }}>
       <Box pb={2}>
         <Typography variant='h6'>
           {t('appTitle')}
           <Chip
-            label={
-              status.connected
-                ? status.isActive
-                  ? t('statusConnected')
-                  : t('statusInactive')
-                : t('statusDisconnected')
-            }
-            color={status.connected ? (status.isActive ? 'success' : 'warning') : 'error'}
+            label={statusLabelByPhase(status.phase, status.isActive)}
+            color={statusColorByPhase(status.phase, status.isActive)}
             size='small'
             variant='outlined'
             sx={{ marginLeft: 2 }}
@@ -136,7 +157,7 @@ const PopupInner = () => {
         </Stack>
 
         <Stack direction='row' spacing={1} mt={1}>
-          {status.connected ? (
+          {canDisconnect ? (
             <Button variant='contained' color='error' size='small' onClick={handleDisconnect}>
               {t('btnDisconnect')}
             </Button>
@@ -145,12 +166,17 @@ const PopupInner = () => {
               {t('btnConnect')}
             </Button>
           )}
-          {status.connected && !status.isActive && (
+          {canActivate ? (
             <Button variant='contained' color='warning' size='small' onClick={handleActivate}>
               {t('btnActivate')}
             </Button>
-          )}
+          ) : null}
         </Stack>
+        {status.lastError && status.phase !== 'CONNECTED' ? (
+          <Typography variant='caption' sx={{ color: 'warning.main', display: 'block', mt: 1 }}>
+            {status.lastError}
+          </Typography>
+        ) : null}
       </Box>
 
       {logs.length > 0 && (

@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { onMessage, sendMessage } from '@b/messaging';
+import { type ConnectionPhase, onMessage, type StatusResponse, sendMessage } from '@b/messaging';
 import { findSubmitter } from '@b/submitters';
 import type { B2rMsg, R2bMsg, SubmitData } from '@cph-ng/core';
 import { io, type Socket } from 'socket.io-client';
@@ -28,10 +28,16 @@ const routerPort = storage.defineItem<number>('local:routerPort', {
 });
 interface ConnectionState {
   socket: Socket<R2bMsg, B2rMsg> | null;
-  port: number;
+  desiredPort: number;
+  socketPort: number | null;
+  socketGeneration: number;
   connected: boolean;
   isActive: boolean;
+  phase: ConnectionPhase;
+  lastError: string | null;
 }
+
+const CONNECTION_TIMEOUT_MS = 1000;
 
 const setupCaptchaRuntime = async (): Promise<void> => {
   // Firefox do not support offscreen documents
@@ -55,55 +61,131 @@ export default defineBackground(() => {
   routerPort.getValue().then((port) => {
     const state: ConnectionState = {
       socket: null,
-      port,
+      desiredPort: port,
+      socketPort: null,
+      socketGeneration: 0,
       connected: false,
       isActive: false,
+      phase: 'DISCONNECTED',
+      lastError: null,
+    };
+
+    const getStatus = (): StatusResponse => ({
+      connected: state.connected,
+      isActive: state.isActive,
+      port: state.desiredPort,
+      phase: state.phase,
+      lastError: state.lastError || undefined,
+    });
+
+    const getBadgeColor = () => {
+      if (state.phase === 'CONNECTED') return state.isActive ? '#4CAF50' : '#9E9E9E';
+      if (state.phase === 'CONNECTING') return '#2196F3';
+      if (state.phase === 'RECONNECTING') return '#FF9800';
+      return '#F44336';
     };
 
     const broadcastStatus = () => {
-      sendMessage('statusUpdate', {
-        connected: state.connected,
-        isActive: state.isActive,
-        port: state.port,
-      });
+      sendMessage('statusUpdate', getStatus());
 
       if (import.meta.env.FIREFOX) return;
-      let badgeColor = '#F44336';
-      if (state.connected) badgeColor = state.isActive ? '#4CAF50' : '#9E9E9E';
       browser.action.setBadgeText({ text: '　' });
-      browser.action.setBadgeBackgroundColor({ color: badgeColor });
+      browser.action.setBadgeBackgroundColor({ color: getBadgeColor() });
     };
 
-    const connect = () => {
-      if (state.socket?.connected) return;
-      if (state.socket) state.socket.close();
+    const closeSocket = () => {
+      if (!state.socket) return;
+      state.socket.removeAllListeners();
+      state.socket.io.removeAllListeners();
+      state.socket.close();
+      state.socket = null;
+      state.socketPort = null;
+      state.connected = false;
+      state.isActive = false;
+    };
 
-      state.socket = io(`ws://localhost:${state.port}`, {
+    const connect = (phase: ConnectionPhase) => {
+      const targetPort = state.desiredPort;
+      if (state.socket && state.connected && state.socketPort === targetPort) return;
+
+      closeSocket();
+      state.phase = phase;
+      state.lastError = null;
+      broadcastStatus();
+
+      const generation = state.socketGeneration + 1;
+      state.socketGeneration = generation;
+      const socket = io(`ws://localhost:${targetPort}`, {
         path: '/ws',
         query: { type: 'browser' },
         transports: ['websocket'],
+        timeout: CONNECTION_TIMEOUT_MS,
         reconnectionDelay: 3000,
+        reconnectionDelayMax: 5000,
         autoConnect: true,
+        forceNew: true,
       });
-      broadcastStatus();
+      state.socket = socket;
+      state.socketPort = targetPort;
 
-      state.socket.on('connect', () => {
+      socket.on('connect', () => {
+        if (generation !== state.socketGeneration) return;
         state.connected = true;
+        state.phase = 'CONNECTED';
+        state.lastError = null;
         console.log('[cph-ng-submit] Connected to router');
         broadcastStatus();
       });
-      state.socket.on('disconnect', () => {
+      socket.on('disconnect', (reason) => {
+        if (generation !== state.socketGeneration) return;
         state.connected = false;
         state.isActive = false;
-        console.log('[cph-ng-submit] Disconnected from router');
+        state.phase = reason === 'io client disconnect' ? 'DISCONNECTED' : 'RECONNECTING';
+        if (reason && reason !== 'io client disconnect')
+          state.lastError = `Disconnected: ${reason}`;
+        console.log('[cph-ng-submit] Disconnected from router:', reason);
         broadcastStatus();
       });
-      state.socket.on('status', ({ isActive }) => {
+      socket.on('connect_error', (err) => {
+        if (generation !== state.socketGeneration) return;
+        state.connected = false;
+        state.isActive = false;
+        state.phase = socket.active ? 'RECONNECTING' : 'DISCONNECTED';
+        state.lastError = err.message || 'Connection failed';
+        console.warn('[cph-ng-submit] Failed to connect to router:', err.message);
+        broadcastStatus();
+      });
+      socket.io.on('reconnect_attempt', () => {
+        if (generation !== state.socketGeneration) return;
+        state.connected = false;
+        state.isActive = false;
+        state.phase = 'RECONNECTING';
+        broadcastStatus();
+      });
+      socket.io.on('reconnect_error', (err) => {
+        if (generation !== state.socketGeneration) return;
+        state.connected = false;
+        state.isActive = false;
+        state.phase = 'RECONNECTING';
+        state.lastError = err instanceof Error ? err.message : String(err);
+        broadcastStatus();
+      });
+      socket.io.on('reconnect_failed', () => {
+        if (generation !== state.socketGeneration) return;
+        state.connected = false;
+        state.isActive = false;
+        state.phase = 'DISCONNECTED';
+        state.lastError = 'Reconnection failed';
+        broadcastStatus();
+      });
+      socket.on('status', ({ isActive }) => {
+        if (generation !== state.socketGeneration) return;
         state.isActive = isActive;
         console.log('[cph-ng-submit] Active status changed:', isActive);
         broadcastStatus();
       });
-      state.socket.on('submitRequest', (request) => {
+      socket.on('submitRequest', (request) => {
+        if (generation !== state.socketGeneration) return;
         console.log('[cph-ng-submit] Received submit request:', request);
         handleSubmitRequest(request);
       });
@@ -131,29 +213,32 @@ export default defineBackground(() => {
       }
     };
 
-    onMessage('getStatus', () => ({
-      connected: state.connected,
-      port: state.port,
-      isActive: state.isActive,
-    }));
+    onMessage('getStatus', () => getStatus());
 
     onMessage('setActive', () => {
       state.socket?.emit('setActive');
     });
 
     onMessage('connect', () => {
-      connect();
+      connect('CONNECTING');
     });
 
     onMessage('disconnect', () => {
-      state.socket?.disconnect();
-      state.socket = null;
+      closeSocket();
+      state.phase = 'DISCONNECTED';
+      state.lastError = null;
+      broadcastStatus();
     });
 
     onMessage('setPort', ({ data }) => {
-      state.port = data.port;
-      routerPort.setValue(data.port);
-      connect();
+      const port = Math.trunc(data.port);
+      if (port <= 0 || port >= 65536) return;
+
+      const isChanged = port !== state.desiredPort;
+      state.desiredPort = port;
+      void routerPort.setValue(port);
+      if (isChanged || !state.connected || state.socketPort !== port) connect('CONNECTING');
+      else broadcastStatus();
     });
 
     onMessage('pageReady', ({ sender }): SubmitData | null => {
@@ -178,6 +263,6 @@ export default defineBackground(() => {
         priority: 2,
       });
     };
-    connect();
+    connect('CONNECTING');
   });
 });
