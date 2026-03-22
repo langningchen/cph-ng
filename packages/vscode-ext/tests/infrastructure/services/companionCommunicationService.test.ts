@@ -29,9 +29,12 @@ class FakeChildProcess extends EventEmitter {
   public readonly stderr = new PassThrough();
   public readonly pid = 4242;
   public killed = false;
+  public connected = true;
   public exitCode: number | null = null;
   public signalCode: NodeJS.Signals | null = null;
   public readonly killCalls: NodeJS.Signals[] = [];
+  public disconnectCalls = 0;
+  public unrefCalls = 0;
 
   public kill(signal: NodeJS.Signals = 'SIGTERM'): boolean {
     this.killed = true;
@@ -41,6 +44,15 @@ class FakeChildProcess extends EventEmitter {
       this.emit('exit', null, signal);
     });
     return true;
+  }
+
+  public disconnect(): void {
+    this.connected = false;
+    this.disconnectCalls += 1;
+  }
+
+  public unref(): void {
+    this.unrefCalls += 1;
   }
 }
 
@@ -93,10 +105,12 @@ describe('CompanionCommunicationService', () => {
     );
 
   const connectRouter = async (port: number) => {
+    await vi.waitFor(() => expect(sockets).toHaveLength(1));
+    sockets[0].receive('connect_error', new Error('Connection timeout'));
     await vi.waitFor(() => expect(children).toHaveLength(1));
     children[0].emit('message', { type: 'ready', port });
-    await vi.waitFor(() => expect(sockets).toHaveLength(1));
-    sockets[0].receive('connect');
+    await vi.waitFor(() => expect(sockets).toHaveLength(2));
+    sockets[1].receive('connect');
   };
 
   beforeEach(() => {
@@ -130,11 +144,11 @@ describe('CompanionCommunicationService', () => {
     await connectRouter(settingsMock.companion.listenPort);
     await connectPromise;
 
-    expect(statuses).toEqual(['STARTING', 'CONNECTING', 'ONLINE']);
+    expect(statuses).toEqual(['CONNECTING', 'STARTING', 'CONNECTING', 'ONLINE']);
     expect(service.getStatus()).toBe('ONLINE');
     expect(spawnMock).toHaveBeenCalledOnce();
-    expect(ioMock).toHaveBeenCalledOnce();
-    expect(ioMock).toHaveBeenCalledWith(
+    expect(ioMock).toHaveBeenCalledTimes(2);
+    expect(ioMock).toHaveBeenLastCalledWith(
       `ws://localhost:${settingsMock.companion.listenPort}`,
       expect.objectContaining({
         timeout: 1000,
@@ -151,7 +165,41 @@ describe('CompanionCommunicationService', () => {
     await Promise.all([firstConnect, secondConnect]);
 
     expect(spawnMock).toHaveBeenCalledOnce();
+    expect(ioMock).toHaveBeenCalledTimes(2);
+    expect(service.getStatus()).toBe('ONLINE');
+  });
+
+  it('connects to an existing router before attempting to launch a new one', async () => {
+    const statuses: string[] = [];
+    service.signals.on('statusChanged', () => statuses.push(service.getStatus()));
+
+    const connectPromise = service.connect();
+    await vi.waitFor(() => expect(sockets).toHaveLength(1));
+    sockets[0].receive('connect');
+    await connectPromise;
+
+    expect(statuses).toEqual(['CONNECTING', 'ONLINE']);
+    expect(spawnMock).not.toHaveBeenCalled();
     expect(ioMock).toHaveBeenCalledOnce();
+    expect(service.getStatus()).toBe('ONLINE');
+  });
+
+  it('retries connecting after a launch conflict indicates another router already exists', async () => {
+    const connectPromise = service.connect();
+
+    await vi.waitFor(() => expect(sockets).toHaveLength(1));
+    sockets[0].receive('connect_error', new Error('Connection timeout'));
+    await vi.waitFor(() => expect(children).toHaveLength(1));
+    children[0].emit('message', {
+      type: 'startup-error',
+      message: 'Lock file is already being held',
+    });
+    await vi.waitFor(() => expect(sockets).toHaveLength(2));
+    sockets[1].receive('connect');
+    await connectPromise;
+
+    expect(spawnMock).toHaveBeenCalledOnce();
+    expect(ioMock).toHaveBeenCalledTimes(2);
     expect(service.getStatus()).toBe('ONLINE');
   });
 
@@ -159,15 +207,18 @@ describe('CompanionCommunicationService', () => {
     const statuses: string[] = [];
     service.signals.on('statusChanged', () => statuses.push(service.getStatus()));
 
-    await service.connect();
+    const connectPromise = service.connect();
+    await vi.waitFor(() => expect(sockets).toHaveLength(1));
+    sockets[0].receive('connect_error', new Error('Connection timeout'));
     await vi.waitFor(() => expect(children).toHaveLength(1));
     children[0].emit('message', { type: 'startup-error', message: 'Port 27121 is busy.' });
+    await connectPromise;
     await vi.waitFor(() => expect(service.getStatus()).toBe('FAILED'));
 
-    expect(statuses).toEqual(['STARTING', 'FAILED']);
+    expect(statuses).toEqual(['CONNECTING', 'STARTING', 'FAILED']);
     expect(service.getFailureMessage()).toBe('Port 27121 is busy.');
     expect(children[0].killCalls).toEqual(['SIGTERM']);
-    expect(ioMock).not.toHaveBeenCalled();
+    expect(ioMock).toHaveBeenCalledOnce();
   });
 
   it('restarts the router when the listen port changes', async () => {
@@ -176,21 +227,21 @@ describe('CompanionCommunicationService', () => {
     await connectPromise;
 
     const firstChild = children[0];
-    const firstSocket = sockets[0];
+    const firstSocket = sockets[1];
 
     settingsMock.companion.listenPort = 27122;
 
     await vi.waitFor(() => expect(children).toHaveLength(2));
     children[1].emit('message', { type: 'ready', port: 27122 });
-    await vi.waitFor(() => expect(sockets).toHaveLength(2));
-    sockets[1].receive('connect');
+    await vi.waitFor(() => expect(sockets).toHaveLength(3));
+    sockets[2].receive('connect');
     await vi.waitFor(() => expect(service.getStatus()).toBe('ONLINE'));
 
     expect(firstChild.killCalls).toEqual(['SIGTERM']);
     expect(firstSocket.closeCalls).toBe(1);
     expect(spawnMock).toHaveBeenCalledTimes(2);
     expect(ioMock).toHaveBeenNthCalledWith(
-      2,
+      3,
       'ws://localhost:27122',
       expect.objectContaining({
         timeout: 1000,
@@ -204,7 +255,7 @@ describe('CompanionCommunicationService', () => {
     await connectRouter(settingsMock.companion.listenPort);
     await connectPromise;
 
-    const socket = sockets[0];
+    const socket = sockets[1];
 
     settingsMock.companion.shutdownTimeout = 20000;
 
@@ -215,7 +266,24 @@ describe('CompanionCommunicationService', () => {
       }),
     );
     expect(spawnMock).toHaveBeenCalledOnce();
-    expect(ioMock).toHaveBeenCalledOnce();
+    expect(ioMock).toHaveBeenCalledTimes(2);
     expect(children[0].killCalls).toEqual([]);
+  });
+
+  it('disconnects without stopping the router so shutdown timeout remains in effect', async () => {
+    const connectPromise = service.connect();
+    await connectRouter(settingsMock.companion.listenPort);
+    await connectPromise;
+
+    const child = children[0];
+    const socket = sockets[1];
+
+    await service.disconnect();
+
+    expect(socket.closeCalls).toBe(1);
+    expect(child.killCalls).toEqual([]);
+    expect(child.disconnectCalls).toBe(1);
+    expect(child.unrefCalls).toBe(1);
+    expect(service.getStatus()).toBe('OFFLINE');
   });
 });
