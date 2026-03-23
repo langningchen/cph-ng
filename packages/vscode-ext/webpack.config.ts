@@ -142,6 +142,7 @@ export default (_env: Record<string, unknown>, argv: Record<string, unknown>): C
       filename: 'extension.js',
       library: { type: 'module' },
       chunkFormat: 'module',
+      devtoolModuleFilenameTemplate: ({ absoluteResourcePath }) => absoluteResourcePath,
     },
     externals: { vscode: 'vscode' },
     plugins: [
