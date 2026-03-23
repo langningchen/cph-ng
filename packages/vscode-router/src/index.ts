@@ -267,7 +267,7 @@ const resetShutdownTimer = () => {
   if (isRestarting) return;
   if (shutdownTimer) clearTimeout(shutdownTimer);
   const totalClients = io.engine.clientsCount;
-  if (totalClients > 0 || !config.shutdownTimeout) return;
+  if (totalClients > 0) return;
   shutdownTimer = setTimeout(() => {
     info(`No clients connected for ${config.shutdownTimeout}ms, shutting down router`);
     stopServer();
