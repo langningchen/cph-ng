@@ -22,7 +22,7 @@ import type { IUi } from '@v/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@v/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@v/composition/tokens';
 import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
-import { TestcaseScanner } from '@v/domain/services/TestcaseScanner';
+import { TestcaseIo } from '@v/domain/entities/testcaseIo';
 import type { ChooseTestcaseFileMsg } from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
 
@@ -33,7 +33,6 @@ export class ChooseTestcaseFile extends BaseProblemUseCase<ChooseTestcaseFileMsg
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.ui) private readonly ui: IUi,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
-    @inject(TestcaseScanner) private readonly testcaseScanner: TestcaseScanner,
   ) {
     super(repo);
   }
@@ -46,7 +45,7 @@ export class ChooseTestcaseFile extends BaseProblemUseCase<ChooseTestcaseFileMsg
     const mainExt = isInput
       ? this.settings.problem.inputFileExtensionList
       : this.settings.problem.outputFileExtensionList;
-    const fileUri = await this.ui.openDialog({
+    const path = await this.ui.openDialog({
       canSelectFiles: true,
       canSelectFolders: false,
       canSelectMany: false,
@@ -58,10 +57,10 @@ export class ChooseTestcaseFile extends BaseProblemUseCase<ChooseTestcaseFileMsg
         [this.translator.t('All files')]: ['*'],
       },
     });
-    if (!fileUri?.length) return;
+    if (!path?.length) return;
     const testcase = problem.getTestcase(msg.testcaseId);
-    const partialTestcase = await this.testcaseScanner.fromFile(fileUri);
-    if (isInput) testcase.stdin = partialTestcase.stdin;
-    else testcase.answer = partialTestcase.answer;
+    const testcaseIo = new TestcaseIo({ path });
+    if (isInput) testcase.stdin = testcaseIo;
+    else testcase.answer = testcaseIo;
   }
 }
