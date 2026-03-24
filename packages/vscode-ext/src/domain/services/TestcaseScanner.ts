@@ -47,7 +47,7 @@ export class TestcaseScanner {
     const isInput = inputExts.includes(this.path.extname(path).toLowerCase());
 
     let input = isInput ? path : undefined;
-    let output = isInput ? undefined : path;
+    let answer = isInput ? undefined : path;
 
     const behavior = this.settings.problem.foundMatchTestcaseBehavior;
     if (behavior !== 'never') {
@@ -67,7 +67,7 @@ export class TestcaseScanner {
               : true;
 
           if (confirmed) {
-            if (isInput) output = pairPath;
+            if (isInput) answer = pairPath;
             else input = pairPath;
             break;
           }
@@ -75,7 +75,7 @@ export class TestcaseScanner {
       }
     }
 
-    return this.toEntity({ input, output });
+    return this.toEntity({ input, answer });
   }
 
   public async fromZip(srcPath: string, zipPath: string): Promise<Testcase[]> {
@@ -97,10 +97,10 @@ export class TestcaseScanner {
     const items = pairs.map(
       (p, idx) =>
         ({
-          label: `${this.path.basename(p.input ? p.input : p.output ? p.output : 'unknown')}`,
+          label: `${this.path.basename(p.input ? p.input : p.answer ? p.answer : 'unknown')}`,
           description: this.translator.t('Input {input}, Answer {answer}', {
             input: p.input?.replace(`${folderPath}/`, '') ?? this.translator.t('not found'),
-            answer: p.output?.replace(`${folderPath}/`, '') ?? this.translator.t('not found'),
+            answer: p.answer?.replace(`${folderPath}/`, '') ?? this.translator.t('not found'),
           }),
           value: idx,
           picked: true,
@@ -115,7 +115,7 @@ export class TestcaseScanner {
   private toEntity(pair: FilePair): Testcase {
     return new Testcase(
       new TestcaseIo(pair.input ? { path: pair.input } : { data: '' }),
-      new TestcaseIo(pair.output ? { path: pair.output } : { data: '' }),
+      new TestcaseIo(pair.answer ? { path: pair.answer } : { data: '' }),
     );
   }
 }

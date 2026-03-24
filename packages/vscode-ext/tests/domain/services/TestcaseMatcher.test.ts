@@ -14,40 +14,40 @@ describe('TestcaseMatcher', () => {
     matcher = container.resolve(TestcaseMatcher);
   });
 
-  it('should match input and output files with same basename', () => {
+  it('should match input and answer files with same basename', () => {
     const files = ['/tests/1.in', '/tests/1.ans'];
     const pairs = matcher.matchPairs(files);
 
     expect(pairs).toHaveLength(1);
     expect(pairs[0].input).toBe('/tests/1.in');
-    expect(pairs[0].output).toBe('/tests/1.ans');
+    expect(pairs[0].answer).toBe('/tests/1.ans');
   });
 
-  it('should prefer .ans over .out as output extension', () => {
+  it('should prefer .ans over .out as answer extension', () => {
     const files = ['/tests/1.in', '/tests/1.ans', '/tests/1.out'];
     const pairs = matcher.matchPairs(files);
 
     expect(pairs).toHaveLength(2);
     const inputPair = pairs.find((p) => p.input === '/tests/1.in');
-    expect(inputPair?.output).toBe('/tests/1.ans');
+    expect(inputPair?.answer).toBe('/tests/1.ans');
   });
 
-  it('should create orphaned output for unmatched output files', () => {
+  it('should create orphaned answer for unmatched answer files', () => {
     const files = ['/tests/1.in', '/tests/2.ans'];
     const pairs = matcher.matchPairs(files);
 
     expect(pairs).toHaveLength(2);
     const orphaned = pairs.find((p) => !p.input);
-    expect(orphaned?.output).toBe('/tests/2.ans');
+    expect(orphaned?.answer).toBe('/tests/2.ans');
   });
 
-  it('should create input-only pair when no matching output', () => {
+  it('should create input-only pair when no matching answer', () => {
     const files = ['/tests/1.in'];
     const pairs = matcher.matchPairs(files);
 
     expect(pairs).toHaveLength(1);
     expect(pairs[0].input).toBe('/tests/1.in');
-    expect(pairs[0].output).toBeUndefined();
+    expect(pairs[0].answer).toBeUndefined();
   });
 
   it('should return empty array for empty input', () => {
@@ -59,7 +59,7 @@ describe('TestcaseMatcher', () => {
     const pairs = matcher.matchPairs(files);
 
     expect(pairs).toHaveLength(2);
-    expect(pairs.every((p) => p.input && p.output)).toBe(true);
+    expect(pairs.every((p) => p.input && p.answer)).toBe(true);
   });
 
   it('should sort input pairs before orphaned outputs', () => {
@@ -68,16 +68,16 @@ describe('TestcaseMatcher', () => {
 
     expect(pairs[0].input).toBe('/tests/1.in');
     expect(pairs[1].input).toBeUndefined();
-    expect(pairs[1].output).toBe('/tests/orphan.ans');
+    expect(pairs[1].answer).toBe('/tests/orphan.ans');
   });
 
   it('should not treat non-input extensions as input', () => {
     const files = ['/tests/1.txt', '/tests/1.ans'];
     const pairs = matcher.matchPairs(files);
 
-    // 1.txt is not an input file, 1.ans is orphaned output
+    // 1.txt is not an input file, 1.ans is orphaned answer
     expect(pairs).toHaveLength(1);
     expect(pairs[0].input).toBeUndefined();
-    expect(pairs[0].output).toBe('/tests/1.ans');
+    expect(pairs[0].answer).toBe('/tests/1.ans');
   });
 });

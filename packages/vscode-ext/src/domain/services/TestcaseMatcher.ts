@@ -23,7 +23,7 @@ import { inject, injectable } from 'tsyringe';
 
 export interface FilePair {
   input?: string;
-  output?: string;
+  answer?: string;
 }
 
 @injectable()
@@ -47,26 +47,26 @@ export class TestcaseMatcher {
       const dir = this.path.dirname(input);
       const nameWithoutExt = this.path.basename(input, this.path.extname(input));
 
-      let output: string | undefined;
+      let answer: string | undefined;
       for (const outExt of outputExts) {
         const potentialOutput = this.path.join(dir, nameWithoutExt + outExt);
         if (filePaths.includes(potentialOutput)) {
-          output = potentialOutput;
+          answer = potentialOutput;
           usedOutputs.add(potentialOutput);
           break;
         }
       }
-      pairs.push({ input, output });
+      pairs.push({ input, answer });
     }
 
     const orphanedOutputs = filePaths.filter(
       (p) => outputExts.includes(this.path.extname(p).toLowerCase()) && !usedOutputs.has(p),
     );
-    for (const output of orphanedOutputs) pairs.push({ output });
+    for (const answer of orphanedOutputs) pairs.push({ answer });
 
     return orderBy(pairs, [
       (p) => (p.input ? 0 : 1),
-      (p) => this.path.basename(p.input || p.output || ''),
+      (p) => this.path.basename(p.input || p.answer || ''),
     ]);
   }
 }
