@@ -29,7 +29,12 @@ jobs:
           fetch-depth: 0
       - name: Setup Node and pnpm
         uses: ./.github/actions/setup-node-pnpm
-      - run: pnpm lint
+      - name: Run lint
+        run: pnpm lint
+      - name: Check translations
+        run: pnpm check-translations
+      - name: Type check
+        run: pnpm typecheck
 
   test:
     name: Test on ${{ matrix.os }}
