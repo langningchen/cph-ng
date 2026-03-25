@@ -1,0 +1,23 @@
+area:ci:
+  - changed-files:
+      - any-glob-to-any-file: ".github/workflows/**"
+
+pkg:browser-ext:
+  - changed-files:
+      - any-glob-to-any-file: "packages/browser-ext/**"
+
+pkg:core:
+  - changed-files:
+      - any-glob-to-any-file: "packages/core/**"
+
+pkg:vscode-ext:
+  - changed-files:
+      - any-glob-to-any-file: "packages/vscode-ext/**"
+
+pkg:vscode-router:
+  - changed-files:
+      - any-glob-to-any-file: "packages/vscode-router/**"
+
+pkg:vscode-webview:
+  - changed-files:
+      - any-glob-to-any-file: "packages/vscode-webview/**"
