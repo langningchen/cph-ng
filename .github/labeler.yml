@@ -1,6 +1,6 @@
 area:ci:
   - changed-files:
-      - any-glob-to-any-file: "ci/**"
+      - any-glob-to-any-file: ".github/workflows/**"
 
 pkg:browser-ext:
   - changed-files:
