@@ -25,6 +25,7 @@
   "config.cache.cleanOnStartup": "启用后，每次扩展启动时，**缓存目录将自动清除**。这有助于确保你始终使用最新数据，并防止旧文件堆积占用磁盘空间。",
   "config.cache.directory": "指定用于存储已编译文件和扩展生成的其他临时数据的**缓存目录**。你可以使用以下占位符：\n- `${tmp}`：表示系统的默认临时文件夹。\n- `${home}`：表示用户的主目录。\n\n请确保此目录具有适当的写入权限。",
   "config.companion": "Competitive Companion",
+  "config.companion.confirmSubmit": "启用后，在通过 Competitive Companion 提交题目之前，系统将提示你确认提交。这有助于防止意外提交，确保你有机会检查提交的内容和目标平台。",
   "config.companion.customPathScript": "指定一个**自定义脚本的路径**，该脚本将在通过 Competitive Companion 导入题目后执行。此脚本用于根据题目数据来自定义文件保存路径。你可以使用以下占位符：\n- `${tmp}`：表示系统的默认临时文件夹。\n- `${home}`：表示用户的主目录。\n- `${extensionPath}`：表示扩展的安装路径。\n- `${workspace}`：表示打开的文件夹路径（如果你的工作区中有多个文件夹并都包含这一文件，每次导入题目会出现选择的提示）",
   "config.companion.listenPort": "设置 Competitive Companion 服务器的**监听端口**。此端口用于扩展与浏览器扩展等外部工具之间的通信，这些工具会自动获取题目数据。请确保此端口未被防火墙阻止。",
   "config.companion.logFile": "指定一个**日志文件路径**，用于记录与 Competitive Companion 集成相关的事件和错误。你可以使用以下占位符：\n- `${tmp}`：表示系统的默认临时文件夹。\n- `${home}`：表示用户的主目录。\n\n确保此文件具有适当的写入权限。",
