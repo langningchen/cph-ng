@@ -91,7 +91,7 @@ export const HelpButton = () => {
           {t('support.edgeAddon')}
         </MenuItem>
         <MenuItem
-          onClick={openLink('https://addons.mozilla.org/en-US/firefox/addon/cph-ng-submit/')}
+          onClick={openLink('https://addons.mozilla.org/firefox/addon/cph-ng-submit/')}
         >
           <ListItemIcon>
             <ExtensionIcon fontSize='small' />
