@@ -562,6 +562,11 @@
             "default": "${home}/.cph-ng-router.log",
             "markdownDescription": "%config.companion.logFile%"
           },
+          "cph-ng.companion.confirmSubmit": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "%config.companion.confirmSubmit%"
+          },
           "cph-ng.companion.shutdownTimeout": {
             "type": "number",
             "default": 10000,

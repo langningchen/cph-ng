@@ -24,6 +24,7 @@ import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import { BackgroundProblemView } from '@w/components/actions/backgroundProblemView';
 import { DeleteProblemDialog } from '@w/components/actions/deleteProblemDialog';
 import { StressTestDialog } from '@w/components/actions/stressTestDialog';
+import { SubmitDialog } from '@w/components/actions/submitDialog';
 import { HelpButton } from '@w/components/actions/support';
 import { CphNgButton } from '@w/components/base/cphNgButton';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
@@ -47,6 +48,7 @@ export const ProblemActions = memo(
     const dispatch = useProblemDispatch();
     const [clickTime, setClickTime] = useState<number[]>([]);
     const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [isSubmitDialogOpen, setSubmitDialogOpen] = useState(false);
     const [isStressTestDialogOpen, setStressTestDialogOpen] = useState(false);
 
     useEffect(() => {
@@ -101,7 +103,11 @@ export const ProblemActions = memo(
                 name={t('problemActions.submit')}
                 icon={BackupIcon}
                 color='secondary'
-                onClick={() => dispatch({ type: 'submit', problemId })}
+                onClick={() =>
+                  confirmSubmit
+                    ? setSubmitDialogOpen(true)
+                    : dispatch({ type: 'submit', problemId })
+                }
               />
             )}
             <CphNgButton
@@ -122,6 +128,15 @@ export const ProblemActions = memo(
           onConfirm={() => {
             dispatch({ type: 'deleteProblem', problemId });
             setDeleteDialogOpen(false);
+          }}
+        />
+
+        <SubmitDialog
+          open={isSubmitDialogOpen}
+          onClose={() => setSubmitDialogOpen(false)}
+          onConfirm={() => {
+            dispatch({ type: 'submit', problemId });
+            setSubmitDialogOpen(false);
           }}
         />
 

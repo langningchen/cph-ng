@@ -40,6 +40,7 @@ export class WebviewHtmlRenderer {
     const config = {
       version: this.version,
       isDarkMode,
+      confirmSubmit: this.settings.companion.confirmSubmit,
       hiddenStatuses: this.settings.sidebar.hiddenStatuses,
       partyUri: this.settings.sidebar.showAcGif ? getUri('res/party.gif').toString() : '',
       language: env.language,

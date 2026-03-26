@@ -21,6 +21,7 @@ declare const vscode: {
 
 declare const version: string;
 declare const isDarkMode: boolean;
+declare const confirmSubmit: boolean;
 declare const partyUri: string;
 declare const hiddenStatuses: string[];
 declare const language: string;
