@@ -125,8 +125,8 @@ export interface StartStressTestMsg extends ProblemBaseMsg {
 export interface StopStressTestMsg extends ProblemBaseMsg {
   type: 'stopStressTest';
 }
-export interface SubmitToCodeforcesMsg extends ProblemBaseMsg {
-  type: 'submitToCodeforces';
+export interface SubmitMsg extends ProblemBaseMsg {
+  type: 'submit';
 }
 export interface DragDropMsg extends BaseMsg {
   type: 'dragDrop';
@@ -153,7 +153,7 @@ export type ProblemMsg =
   | RemoveSrcFileMsg
   | StartStressTestMsg
   | StopStressTestMsg
-  | SubmitToCodeforcesMsg
+  | SubmitMsg
   | DragDropMsg;
 
 export type WebviewMsg =

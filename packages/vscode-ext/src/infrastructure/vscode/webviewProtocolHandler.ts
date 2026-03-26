@@ -42,7 +42,7 @@ import { SetTestcaseString } from '@v/application/useCases/webview/SetTestcaseSt
 import { StartStressTest } from '@v/application/useCases/webview/StartStressTest';
 import { StopStressTest } from '@v/application/useCases/webview/StopStressTest';
 import { StopTestcases } from '@v/application/useCases/webview/StopTestcases';
-import { SubmitToCodeforces } from '@v/application/useCases/webview/SubmitToCodeforces';
+import { Submit } from '@v/application/useCases/webview/Submit';
 import { ToggleTestcaseFile } from '@v/application/useCases/webview/ToggleTestcaseFile';
 import { UpdateTestcase } from '@v/application/useCases/webview/UpdateTestcase';
 import { TOKENS } from '@v/composition/tokens';
@@ -73,7 +73,7 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
   startStressTest: StartStressTest,
   stopStressTest: StopStressTest,
   stopTestcases: StopTestcases,
-  submitToCodeforces: SubmitToCodeforces,
+  submit: Submit,
   toggleTestcaseFile: ToggleTestcaseFile,
   updateTestcase: UpdateTestcase,
 };
