@@ -20,11 +20,11 @@ import type { ICompanion } from '@v/application/ports/services/ICompanion';
 import { BaseProblemUseCase } from '@v/application/useCases/webview/BaseProblemUseCase';
 import { TOKENS } from '@v/composition/tokens';
 import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
-import type { SubmitToCodeforcesMsg } from '@w/msgs';
+import type { SubmitMsg } from '@w/msgs';
 import { inject, injectable } from 'tsyringe';
 
 @injectable()
-export class SubmitToCodeforces extends BaseProblemUseCase<SubmitToCodeforcesMsg> {
+export class Submit extends BaseProblemUseCase<SubmitMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.companion) protected readonly companion: ICompanion,
@@ -32,10 +32,7 @@ export class SubmitToCodeforces extends BaseProblemUseCase<SubmitToCodeforcesMsg
     super(repo);
   }
 
-  protected async performAction(
-    { problem }: BackgroundProblem,
-    _msg: SubmitToCodeforcesMsg,
-  ): Promise<void> {
+  protected async performAction({ problem }: BackgroundProblem, _msg: SubmitMsg): Promise<void> {
     await this.companion.submit(problem);
   }
 }

@@ -101,7 +101,7 @@ export const ProblemActions = memo(
                 name={t('problemActions.submit')}
                 icon={BackupIcon}
                 color='secondary'
-                onClick={() => dispatch({ type: 'submitToCodeforces', problemId })}
+                onClick={() => dispatch({ type: 'submit', problemId })}
               />
             )}
             <CphNgButton

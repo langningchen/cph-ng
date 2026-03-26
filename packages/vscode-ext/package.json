@@ -693,8 +693,8 @@
         "icon": "$(stop-circle)"
       },
       {
-        "command": "cph-ng.submitToCodeforces",
-        "title": "%commands.submitToCodeforces%"
+        "command": "cph-ng.submit",
+        "title": "%commands.submit%"
       }
     ],
     "keybindings": [

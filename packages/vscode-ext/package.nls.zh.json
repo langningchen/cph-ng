@@ -4,7 +4,7 @@
   "commands.importProblem": "CPH-NG: 导入题目",
   "commands.runTestcases": "CPH-NG: 运行所有测试样例",
   "commands.stopTestcases": "CPH-NG: 停止测试样例",
-  "commands.submitToCodeforces": "CPH-NG: 提交到 Codeforces",
+  "commands.submit": "CPH-NG: 提交",
   "config.basic": "基础",
   "config.basic.folderOpener": "选择在 VSCode 中选择文件夹的方法。",
   "config.basic.folderOpener.flat": "使用快速选择菜单显示工作区中所有子文件夹的平面列表。",

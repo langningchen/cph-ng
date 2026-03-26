@@ -4,7 +4,7 @@
   "commands.importProblem": "CPH-NG: Import Problem",
   "commands.runTestcases": "CPH-NG: Run Test Cases",
   "commands.stopTestcases": "CPH-NG: Stop Test Cases",
-  "commands.submitToCodeforces": "CPH-NG: Submit to Codeforces",
+  "commands.submit": "CPH-NG: Submit",
   "config.basic": "Basic",
   "config.basic.folderOpener": "Choose the method to choose folders in VSCode.",
   "config.basic.folderOpener.flat": "Display a flat list of all subfolders in the workspace using a quick pick menu.",
