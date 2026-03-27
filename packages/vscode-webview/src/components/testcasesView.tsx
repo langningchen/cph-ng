@@ -26,7 +26,6 @@ import { NoTestcases } from '@w/components/noTestcases';
 import { TestcaseView } from '@w/components/testcaseView';
 import { useConfigState } from '@w/context/ConfigContext';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import type { IWebviewTestcase } from '@w/types';
 import { deleteProps } from '@w/utils';
 import { type DragEvent, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
