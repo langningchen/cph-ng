@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemId, TestcaseId } from '@cph-ng/core';
+import type { IWebviewTestcase, ProblemId, TestcaseId } from '@cph-ng/core';
 import { VerdictName } from '@cph-ng/core';
 import Box, { type BoxProps } from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -24,10 +24,10 @@ import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { ErrorBoundary } from '@w/components/base/errorBoundary';
 import { NoTestcases } from '@w/components/noTestcases';
 import { TestcaseView } from '@w/components/testcaseView';
+import { useConfigState } from '@w/context/ConfigContext';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import type { IWebviewTestcase } from '@w/types';
 import { deleteProps } from '@w/utils';
-import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { type DragEvent, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface InfoButtonProps extends BoxProps {
@@ -65,6 +65,7 @@ interface TestcasesViewProps {
 
 export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: TestcasesViewProps) => {
   const { t } = useTranslation();
+  const { config } = useConfigState();
   const dispatch = useProblemDispatch();
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
@@ -80,7 +81,7 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
     );
   }, [testcaseOrder, testcases]);
 
-  const handleDragStart = useCallback((idx: number, e: React.DragEvent) => {
+  const handleDragStart = useCallback((idx: number, e: DragEvent) => {
     const dragImage = document.createElement('div');
     dragImage.style.opacity = '0';
     document.body.appendChild(dragImage);
@@ -93,7 +94,7 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
     setDragOverIdx(idx);
   }, []);
 
-  const handleDragOver = useCallback((e: React.DragEvent, idx: number) => {
+  const handleDragOver = useCallback((e: DragEvent, idx: number) => {
     e.preventDefault();
     if (dragOverIdxRef.current !== idx) {
       dragOverIdxRef.current = idx;
@@ -126,14 +127,15 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
     <CphNgFlex column>
       {testcaseOrder.length ? (
         <>
-          {partyUri && isAllAccepted ? <AcCongrats /> : null}
+          {config.showAcGif && isAllAccepted ? <AcCongrats /> : null}
           <Box width='100%'>
             {displayOrder.map((originalIdx, displayIdx) => {
               const testcaseId = testcaseOrder[originalIdx];
               const testcase = testcases[testcaseId];
               if (
                 !testcase ||
-                (testcase.result?.verdict && hiddenStatuses.includes(testcase.result?.verdict.name))
+                (testcase.result?.verdict &&
+                  config.hiddenStatuses?.includes(testcase.result?.verdict.name))
               )
                 return null;
 

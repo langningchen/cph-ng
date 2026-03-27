@@ -15,12 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemId } from '@cph-ng/core';
+import type {
+  IWebviewBackgroundProblem,
+  IWebviewProblem,
+  IWebviewTestcaseResult,
+  ProblemId,
+  WebviewEvent,
+} from '@cph-ng/core';
 import type { WebviewMsg } from '@w/msgs';
-import type { IWebviewBackgroundProblem, IWebviewProblem, IWebviewTestcaseResult } from '@w/types';
-import type { WebviewEvent } from '@w/webviewEvents';
 import { produce } from 'immer';
-import React, {
+import {
   createContext,
   type ReactNode,
   useCallback,
@@ -42,7 +46,7 @@ interface CurrentProblemStateActive {
 type CurrentProblemState = CurrentProblemStateIdle | CurrentProblemStateActive;
 
 type State = {
-  isInitialized: boolean;
+  isReady: boolean;
   currentProblem: CurrentProblemState;
   backgroundProblems: IWebviewBackgroundProblem[];
 };
@@ -53,7 +57,7 @@ const DispatchContext = createContext<((msg: WebviewMsg) => void) | undefined>(u
 const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State => {
   return produce(state, (draft) => {
     if (action.type === 'FULL_PROBLEM') {
-      draft.isInitialized = true;
+      draft.isReady = true;
       draft.currentProblem = {
         type: 'active',
         problemId: action.problemId,
@@ -67,8 +71,12 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
       return;
     }
     if (action.type === 'NO_PROBLEM') {
-      draft.isInitialized = true;
+      draft.isReady = true;
       draft.currentProblem = { type: 'idle', canImport: action.canImport };
+      return;
+    }
+    if (action.type === 'CONFIG_CHANGE') {
+      // We handle this event in the ConfigContext, so we can ignore it here
       return;
     }
 
@@ -173,7 +181,7 @@ export const ProblemProvider = ({ children }: { children: ReactNode }) => {
   const [state, reactDispatch] = useReducer(problemReducer, {
     currentProblem: { type: 'idle', canImport: false },
     backgroundProblems: [],
-    isInitialized: false,
+    isReady: false,
   });
 
   useEffect(() => {

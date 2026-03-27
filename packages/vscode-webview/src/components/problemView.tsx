@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemId } from '@cph-ng/core';
+import type { IWebviewBackgroundProblem, IWebviewProblem, ProblemId } from '@cph-ng/core';
 import { VerdictType } from '@cph-ng/core';
 import { ProblemActions } from '@w/components/actions/problemActions';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
@@ -25,8 +25,7 @@ import { ProblemTitle } from '@w/components/problemTitle';
 import { TestcasesView } from '@w/components/testcasesView';
 import { VerdictSummary } from '@w/components/verdictSummary';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import type { IWebviewBackgroundProblem, IWebviewProblem } from '@w/types';
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ProblemViewProps {

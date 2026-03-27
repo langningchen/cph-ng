@@ -24,11 +24,12 @@ import { CreateProblemView } from '@w/components/createProblemView';
 import { DragOverlay } from '@w/components/dragOverlay';
 import { InitView } from '@w/components/initView';
 import { ProblemView } from '@w/components/problemView';
+import { ConfigProvider, useConfigState } from '@w/context/ConfigContext';
 import { ProblemProvider, useProblemState } from '@w/context/ProblemContext';
 import langEn from '@w/l10n/en.json';
 import langZh from '@w/l10n/zh.json';
 import i18n from 'i18next';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initReactI18next, useTranslation } from 'react-i18next';
 
@@ -42,10 +43,13 @@ i18n.use(initReactI18next).init({
 });
 
 const Main = () => {
-  const state = useProblemState();
+  const problem = useProblemState();
+  const config = useConfigState();
   const { t } = useTranslation();
   const theme = useTheme();
   const isNarrow = useMediaQuery(theme.breakpoints.down('xl'));
+
+  if (!problem.isReady || !config.isReady) return <InitView />;
 
   return (
     <>
@@ -57,22 +61,16 @@ const Main = () => {
           column
           smallGap
           height='100%'
-          sx={{
-            boxSizing: 'border-box',
-          }}
+          sx={{ boxSizing: 'border-box' }}
           padding={{ xs: 0.5, md: 1 }}
         >
-          {state.isInitialized ? (
-            state.currentProblem.type === 'active' ? (
-              <ProblemView
-                {...state.currentProblem}
-                backgroundProblems={state.backgroundProblems}
-              />
-            ) : (
-              <CreateProblemView canImport={state.currentProblem.canImport} />
-            )
+          {problem.currentProblem.type === 'active' ? (
+            <ProblemView
+              {...problem.currentProblem}
+              backgroundProblems={problem.backgroundProblems}
+            />
           ) : (
-            <InitView />
+            <CreateProblemView canImport={problem.currentProblem.canImport} />
           )}
           {isNarrow && (
             <Alert severity='info' sx={{ fontSize: '0.75rem', py: 0 }}>
@@ -91,23 +89,15 @@ const App = () => {
   }, []);
 
   const theme = createTheme({
-    palette: {
-      mode: isDarkMode ? 'dark' : 'light',
-    },
-    breakpoints: {
-      values: {
-        xs: 170,
-        sm: 220,
-        md: 270,
-        lg: 320,
-        xl: 370,
-      },
-    },
+    palette: { mode: isDark ? 'dark' : 'light' },
+    breakpoints: { values: { xs: 170, sm: 220, md: 270, lg: 320, xl: 370 } },
   });
   return (
     <ThemeProvider theme={theme}>
       <ProblemProvider>
-        <Main />
+        <ConfigProvider>
+          <Main />
+        </ConfigProvider>
       </ProblemProvider>
     </ThemeProvider>
   );

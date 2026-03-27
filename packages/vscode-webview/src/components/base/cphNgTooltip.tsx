@@ -16,7 +16,6 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import Tooltip, { type TooltipProps } from '@mui/material/Tooltip';
-import React from 'react';
 
 interface CphNgTooltipProps extends TooltipProps {}
 

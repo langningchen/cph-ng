@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { IWebviewTestcaseIo } from '@cph-ng/core';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -27,9 +28,8 @@ import { CphNgButton } from '@w/components/base/cphNgButton';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { CphNgLink } from '@w/components/base/cphNgLink';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import type { IWebviewTestcaseIo } from '@w/types';
 import { type AnserJsonEntry, ansiToJson } from 'anser';
-import React, { type CSSProperties, memo, useEffect, useRef, useState } from 'react';
+import { type CSSProperties, memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
 

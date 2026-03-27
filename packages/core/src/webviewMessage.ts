@@ -15,7 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemId, TestcaseId, WithRevision } from '@cph-ng/core';
+import type { WithRevision } from './interfaces';
+import type { ProblemId, TestcaseId } from './types';
 import type {
   IWebviewBackgroundProblem,
   IWebviewFileWithHash,
@@ -23,7 +24,13 @@ import type {
   IWebviewStressTest,
   IWebviewTestcase,
   IWebviewTestcaseResult,
-} from '@w/types';
+} from './webview';
+
+export interface WebviewConfig {
+  confirmSubmit: boolean;
+  showAcGif: boolean;
+  hiddenStatuses: string[];
+}
 
 const WebviewEventName = {
   FULL_PROBLEM: 'FULL_PROBLEM',
@@ -35,7 +42,9 @@ const WebviewEventName = {
   PATCH_TESTCASE_RESULT: 'PATCH_TESTCASE_RESULT',
   BACKGROUND: 'BACKGROUND',
   NO_PROBLEM: 'NO_PROBLEM',
+  CONFIG_CHANGE: 'CONFIG_CHANGE',
 } as const;
+
 interface WebviewFullProblemEvent {
   type: typeof WebviewEventName.FULL_PROBLEM;
   problemId: ProblemId;
@@ -92,6 +101,11 @@ interface WebviewNoProblemEvent {
   type: typeof WebviewEventName.NO_PROBLEM;
   canImport: boolean;
 }
+interface WebviewConfigChangeEvent {
+  type: typeof WebviewEventName.CONFIG_CHANGE;
+  payload: Partial<WebviewConfig>;
+}
+
 export type WebviewEvent =
   | WebviewFullProblemEvent
   | WebviewPatchMetaEvent
@@ -101,4 +115,5 @@ export type WebviewEvent =
   | WebviewPatchTestcaseEvent
   | WebviewPatchTestcaseResultEvent
   | WebviewBackgroundEvent
-  | WebviewNoProblemEvent;
+  | WebviewNoProblemEvent
+  | WebviewConfigChangeEvent;

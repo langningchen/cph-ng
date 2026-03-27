@@ -17,7 +17,6 @@
 
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { CphNgText } from '@w/components/base/cphNgText';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const AcCongrats = () => {

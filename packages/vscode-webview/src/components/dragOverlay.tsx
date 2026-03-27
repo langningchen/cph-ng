@@ -26,7 +26,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const DragOverlay = () => {

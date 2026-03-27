@@ -18,8 +18,6 @@
 import type { ILogger } from '@v/application/ports/vscode/ILogger';
 import type { ISettings } from '@v/application/ports/vscode/ISettings';
 import type { ISidebarProvider } from '@v/application/ports/vscode/ISidebarProvider';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi } from '@v/application/ports/vscode/IUi';
 import type { IWebviewEventBus } from '@v/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@v/composition/tokens';
 import { WebviewHtmlRenderer } from '@v/infrastructure/vscode/webviewHtmlRenderer';
@@ -36,8 +34,6 @@ export class SidebarProvider implements ISidebarProvider {
     @inject(TOKENS.extensionPath) private readonly extPath: string,
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.settings) private readonly settings: ISettings,
-    @inject(TOKENS.translator) private readonly translator: ITranslator,
-    @inject(TOKENS.ui) private readonly ui: IUi,
     @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
     @inject(WebviewHtmlRenderer) private readonly htmlRenderer: WebviewHtmlRenderer,
     @inject(WebviewProtocolHandler) private readonly protocolHandler: WebviewProtocolHandler,
@@ -48,20 +44,15 @@ export class SidebarProvider implements ISidebarProvider {
       this._view?.webview.postMessage(data);
     });
 
-    const refreshConfig = async () => {
-      const choice = await this.ui.alert(
-        'info',
-        this.translator.t(
-          'Sidebar configuration changed, please refresh to apply the new settings.',
-        ),
-        this.translator.t('Refresh'),
-      );
-      if (choice) this.refresh();
-    };
-    this.settings.sidebar.onChangeRetainWhenHidden(refreshConfig);
-    this.settings.sidebar.onChangeShowAcGif(refreshConfig);
-    this.settings.sidebar.onChangeColorTheme(refreshConfig);
-    this.settings.sidebar.onChangeHiddenStatuses(refreshConfig);
+    this.settings.companion.onChangeConfirmSubmit((confirmSubmit) =>
+      this.eventBus.configChange({ confirmSubmit }),
+    );
+    this.settings.sidebar.onChangeShowAcGif((showAcGif) =>
+      this.eventBus.configChange({ showAcGif }),
+    );
+    this.settings.sidebar.onChangeHiddenStatuses((hiddenStatuses) =>
+      this.eventBus.configChange({ hiddenStatuses }),
+    );
   }
 
   public resolveWebviewView(webviewView: WebviewView) {
@@ -70,11 +61,15 @@ export class SidebarProvider implements ISidebarProvider {
       enableScripts: true,
       localResourceRoots: [Uri.file(this.extPath)],
     };
-    this.refresh();
+    webviewView.webview.html = this.htmlRenderer.render(this._view.webview);
     webviewView.webview.onDidReceiveMessage((msg) => this.protocolHandler.handle(msg));
   }
 
-  public refresh() {
-    if (this._view) this._view.webview.html = this.htmlRenderer.render(this._view.webview);
+  public dispatchFullConfig() {
+    this.eventBus.configChange({
+      confirmSubmit: this.settings.companion.confirmSubmit,
+      showAcGif: this.settings.sidebar.showAcGif,
+      hiddenStatuses: this.settings.sidebar.hiddenStatuses,
+    });
   }
 }

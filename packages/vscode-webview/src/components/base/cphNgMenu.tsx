@@ -20,10 +20,10 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import type { PopoverPosition } from '@mui/material/Popover';
 import { deleteProps } from '@w/utils';
-import React, { useState } from 'react';
+import { type MouseEvent, type ReactNode, useState } from 'react';
 
 interface CphNgMenuProps extends BoxProps {
-  children: React.ReactNode;
+  children: ReactNode;
   menu: Record<string, () => void>;
 }
 
@@ -31,7 +31,7 @@ export const CphNgMenu = (props: CphNgMenuProps) => {
   const [contextMenu, setContextMenu] = useState<PopoverPosition>();
   return (
     <Box
-      onContextMenu={(e: React.MouseEvent) => {
+      onContextMenu={(e: MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         setContextMenu({

@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TestcaseId } from '@cph-ng/core';
+import type { IWebviewTestcase, TestcaseId } from '@cph-ng/core';
 import { VerdictType } from '@cph-ng/core';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -24,8 +24,7 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Chip from '@mui/material/Chip';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
-import type { IWebviewTestcase } from '@w/types';
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface VerdictSummaryProps {

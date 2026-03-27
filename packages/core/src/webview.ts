@@ -15,7 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TestcaseId, Verdict } from '@cph-ng/core';
+import type { TestcaseId } from './types';
+import type { Verdict } from './verdict';
 
 export type IWebviewTestcaseIo =
   | { type: 'string'; data: string }

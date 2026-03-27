@@ -16,20 +16,23 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { EventEmitter } from 'node:events';
-import type { ProblemId, TestcaseId } from '@cph-ng/core';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
 import type {
-  IWebviewEventBus,
+  IWebviewBackgroundProblem,
+  IWebviewProblem,
+  ProblemId,
+  TestcaseId,
   WebviewAddTestcasePayload,
+  WebviewConfig,
   WebviewDeleteTestcasePayload,
   WebviewEvent,
   WebviewPatchMetaPayload,
   WebviewPatchStressTestPayload,
   WebviewPatchTestcasePayload,
   WebviewPatchTestcaseResultPayload,
-} from '@v/application/ports/vscode/IWebviewEventBus';
+} from '@cph-ng/core';
+import type { ILogger } from '@v/application/ports/vscode/ILogger';
+import type { IWebviewEventBus } from '@v/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@v/composition/tokens';
-import type { IWebviewBackgroundProblem, IWebviewProblem } from '@w/types';
 import { inject, injectable } from 'tsyringe';
 import type TypedEventEmitter from 'typed-emitter';
 
@@ -100,5 +103,9 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
   public noProblem(canImport: boolean): void {
     this.logger.debug('Emitting noProblem event', { canImport });
     this.emitter.emit('message', { type: 'NO_PROBLEM', canImport });
+  }
+  public configChange(payload: Partial<WebviewConfig>): void {
+    this.logger.debug('Emitting configChange event', { payload });
+    this.emitter.emit('message', { type: 'CONFIG_CHANGE', payload });
   }
 }

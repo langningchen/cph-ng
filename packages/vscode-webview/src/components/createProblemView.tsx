@@ -21,7 +21,6 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface CreateProblemProps {

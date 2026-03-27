@@ -15,7 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileWithHash, IOverrides, TestcaseId } from '@cph-ng/core';
+import type {
+  IFileWithHash,
+  IOverrides,
+  IWebviewFileWithHash,
+  IWebviewOverrides,
+  IWebviewProblem,
+  IWebviewStressTest,
+  IWebviewTestcase,
+  IWebviewTestcaseIo,
+  IWebviewTestcaseResult,
+  TestcaseId,
+} from '@cph-ng/core';
 import { StressTestState, type Verdict, VerdictName, Verdicts } from '@cph-ng/core';
 import type { IPath } from '@v/application/ports/node/IPath';
 import type { ILanguageRegistry } from '@v/application/ports/problems/judge/langs/ILanguageRegistry';
@@ -26,15 +37,6 @@ import type { Problem } from '@v/domain/entities/problem';
 import { isRunningState, type StressTest } from '@v/domain/entities/stressTest';
 import type { Testcase, TestcaseResult } from '@v/domain/entities/testcase';
 import type { TestcaseIo } from '@v/domain/entities/testcaseIo';
-import type {
-  IWebviewFileWithHash,
-  IWebviewOverrides,
-  IWebviewProblem,
-  IWebviewStressTest,
-  IWebviewTestcase,
-  IWebviewTestcaseIo,
-  IWebviewTestcaseResult,
-} from '@w/types';
 import { isNil } from 'lodash';
 import { inject, injectable } from 'tsyringe';
 

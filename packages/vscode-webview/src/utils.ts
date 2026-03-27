@@ -15,11 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { MouseEvent } from 'react';
+
 export const deleteProps = (obj: object, props: string[]) => {
   return Object.fromEntries(Object.entries(obj).filter(([key]) => !props.includes(key)));
 };
 
-export const getCompile = (e: React.MouseEvent) => {
+export const getCompile = (e: MouseEvent) => {
   if (e.ctrlKey) {
     return true;
   }

@@ -17,6 +17,7 @@
 
 import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
 import type { IActiveProblemCoordinator } from '@v/application/ports/services/IActiveProblemCoordinator';
+import type { ISidebarProvider } from '@v/application/ports/vscode/ISidebarProvider';
 import type { IMsgHandle } from '@v/application/useCases/webview/msgHandle';
 import { TOKENS } from '@v/composition/tokens';
 import type { InitMsg } from '@w/msgs';
@@ -26,6 +27,8 @@ import { inject, injectable } from 'tsyringe';
 export class Init implements IMsgHandle<InitMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
+    @inject(TOKENS.sidebarProvider)
+    private readonly sidebarProvider: ISidebarProvider,
     @inject(TOKENS.activeProblemCoordinator)
     private readonly coordinator: IActiveProblemCoordinator,
   ) {}
@@ -33,5 +36,6 @@ export class Init implements IMsgHandle<InitMsg> {
   public async exec(_msg: InitMsg): Promise<void> {
     this.repo.fireBackgroundEvent();
     await this.coordinator.dispatchFullData();
+    this.sidebarProvider.dispatchFullConfig();
   }
 }

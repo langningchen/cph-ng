@@ -18,7 +18,6 @@
 import Link, { type LinkProps } from '@mui/material/Link';
 import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
 import { deleteProps } from '@w/utils';
-import React from 'react';
 
 interface CphNgLinkProps extends LinkProps {
   name: string;
