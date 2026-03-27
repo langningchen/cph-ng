@@ -96,7 +96,10 @@ export const ProblemActions = memo(
               name={t('problemActions.stressTest')}
               icon={CompareArrowsIcon}
               onClick={() => setStressTestDialogOpen(true)}
-              sx={stressTest.isRunning ? { animation: 'pulse 1s infinite' } : undefined}
+              sx={{
+                display: { xs: 'none', sm: 'block' },
+                animation: stressTest.isRunning ? 'pulse 1s infinite' : undefined,
+              }}
             />
             {!!url && (
               <CphNgButton
@@ -112,6 +115,7 @@ export const ProblemActions = memo(
               />
             )}
             <CphNgButton
+              sx={{ display: { xs: 'none', sm: 'block' } }}
               larger
               name={t('problemActions.deleteProblem')}
               icon={DeleteForeverIcon}

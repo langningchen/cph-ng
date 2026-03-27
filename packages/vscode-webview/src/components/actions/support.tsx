@@ -58,6 +58,7 @@ export const HelpButton = () => {
         name={t('support.help')}
         onClick={handleClick}
         larger
+        sx={{ display: { xs: 'none', md: 'block' } }}
       />
 
       <Menu anchorEl={anchorRef.current} open={open} onClose={handleClose}>
