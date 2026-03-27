@@ -34,8 +34,8 @@ export class LoadTestcases extends BaseProblemUseCase<LoadTestcasesMsg> {
 
   protected async performAction(
     { problem }: BackgroundProblem,
-    _msg: LoadTestcasesMsg,
+    msg: LoadTestcasesMsg,
   ): Promise<void> {
-    await this.problemService.loadTestcases(problem);
+    await this.problemService.loadTestcases(problem, msg.file);
   }
 }

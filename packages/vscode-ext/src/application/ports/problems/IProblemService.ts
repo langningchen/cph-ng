@@ -24,7 +24,7 @@ export interface IProblemService {
   getTestcasePath(srcPath: string, id: TestcaseId, ext: string): string | null;
   create(srcPath: string): Promise<Problem | null>;
   loadBySrc(srcPath: string): Promise<Problem | null>;
-  loadTestcases(problem: Problem): Promise<void>;
+  loadTestcases(problem: Problem, file: boolean): Promise<void>;
   applyTestcases(problem: Problem, testcases: Testcase[]): void;
   save(problem: Problem): Promise<void>;
   delete(problem: Problem): Promise<void>;
