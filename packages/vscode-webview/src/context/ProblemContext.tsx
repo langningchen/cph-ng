@@ -76,7 +76,7 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
       return;
     }
     if (action.type === 'CONFIG_CHANGE') {
-      // TO-DO
+      // We handle this event in the ConfigContext, so we can ignore it here
       return;
     }
 
