@@ -29,6 +29,7 @@ import { HelpButton } from '@w/components/actions/support';
 import { CphNgButton } from '@w/components/base/cphNgButton';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { RunButtonGroup } from '@w/components/runButtonGroup';
+import { useConfigState } from '@w/context/ConfigContext';
 import { useProblemDispatch } from '@w/context/ProblemContext';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -44,6 +45,7 @@ interface ProblemActionsProps {
 export const ProblemActions = memo(
   ({ problemId, url, stressTest, hasRunning, backgroundProblems }: ProblemActionsProps) => {
     const { t } = useTranslation();
+    const { config } = useConfigState();
     const dispatch = useProblemDispatch();
     const [clickTime, setClickTime] = useState<number[]>([]);
     const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -103,7 +105,7 @@ export const ProblemActions = memo(
                 icon={BackupIcon}
                 color='secondary'
                 onClick={() =>
-                  confirmSubmit
+                  config.confirmSubmit
                     ? setSubmitDialogOpen(true)
                     : dispatch({ type: 'submit', problemId })
                 }

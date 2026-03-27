@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
 import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
 import { ColorThemeKind, env, Uri, type Webview, window } from 'vscode';
@@ -24,7 +23,6 @@ import { ColorThemeKind, env, Uri, type Webview, window } from 'vscode';
 export class WebviewHtmlRenderer {
   public constructor(
     @inject(TOKENS.extensionPath) private readonly extPath: string,
-    @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.version) private readonly version: string,
   ) {}
 
@@ -32,17 +30,11 @@ export class WebviewHtmlRenderer {
     const getUri = (filename: string) =>
       webview.asWebviewUri(Uri.joinPath(Uri.file(this.extPath), filename));
 
-    let isDarkMode = window.activeColorTheme.kind === ColorThemeKind.Dark;
-    const themePref = this.settings.sidebar.colorTheme;
-    if (themePref === 'light') isDarkMode = false;
-    if (themePref === 'dark') isDarkMode = true;
-
+    const colorTheme = window.activeColorTheme.kind;
     const config = {
       version: this.version,
-      isDarkMode,
-      confirmSubmit: this.settings.companion.confirmSubmit,
-      hiddenStatuses: this.settings.sidebar.hiddenStatuses,
-      partyUri: this.settings.sidebar.showAcGif ? getUri('res/party.gif').toString() : '',
+      isDark: colorTheme === ColorThemeKind.Dark || colorTheme === ColorThemeKind.HighContrast,
+      partyUri: getUri('res/party.gif').toString(),
       language: env.language,
     };
 

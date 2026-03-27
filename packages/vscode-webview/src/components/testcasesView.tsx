@@ -24,6 +24,7 @@ import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { ErrorBoundary } from '@w/components/base/errorBoundary';
 import { NoTestcases } from '@w/components/noTestcases';
 import { TestcaseView } from '@w/components/testcaseView';
+import { useConfigState } from '@w/context/ConfigContext';
 import { useProblemDispatch } from '@w/context/ProblemContext';
 import { type DragEvent, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -63,6 +64,7 @@ interface TestcasesViewProps {
 
 export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: TestcasesViewProps) => {
   const { t } = useTranslation();
+  const { config } = useConfigState();
   const dispatch = useProblemDispatch();
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
@@ -124,14 +126,15 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
     <CphNgFlex column>
       {testcaseOrder.length ? (
         <>
-          {partyUri && isAllAccepted ? <AcCongrats /> : null}
+          {config.showAcGif && isAllAccepted ? <AcCongrats /> : null}
           <Box width='100%'>
             {displayOrder.map((originalIdx, displayIdx) => {
               const testcaseId = testcaseOrder[originalIdx];
               const testcase = testcases[testcaseId];
               if (
                 !testcase ||
-                (testcase.result?.verdict && hiddenStatuses.includes(testcase.result?.verdict.name))
+                (testcase.result?.verdict &&
+                  config.hiddenStatuses?.includes(testcase.result?.verdict.name))
               )
                 return null;
 

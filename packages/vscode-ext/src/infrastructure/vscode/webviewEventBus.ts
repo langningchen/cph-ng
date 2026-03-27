@@ -22,6 +22,7 @@ import type {
   ProblemId,
   TestcaseId,
   WebviewAddTestcasePayload,
+  WebviewConfig,
   WebviewDeleteTestcasePayload,
   WebviewEvent,
   WebviewPatchMetaPayload,
@@ -102,5 +103,9 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
   public noProblem(canImport: boolean): void {
     this.logger.debug('Emitting noProblem event', { canImport });
     this.emitter.emit('message', { type: 'NO_PROBLEM', canImport });
+  }
+  public configChange(payload: Partial<WebviewConfig>): void {
+    this.logger.debug('Emitting configChange event', { payload });
+    this.emitter.emit('message', { type: 'CONFIG_CHANGE', payload });
   }
 }

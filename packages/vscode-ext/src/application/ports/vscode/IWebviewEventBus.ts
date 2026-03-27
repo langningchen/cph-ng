@@ -21,6 +21,7 @@ import type {
   ProblemId,
   TestcaseId,
   WebviewAddTestcasePayload,
+  WebviewConfig,
   WebviewDeleteTestcasePayload,
   WebviewEvent,
   WebviewPatchMetaPayload,
@@ -56,4 +57,5 @@ export interface IWebviewEventBus {
   ): void;
   background(payload: IWebviewBackgroundProblem[]): void;
   noProblem(canImport: boolean): void;
+  configChange(payload: Partial<WebviewConfig>): void;
 }

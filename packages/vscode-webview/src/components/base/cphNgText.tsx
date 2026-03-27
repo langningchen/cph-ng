@@ -16,7 +16,6 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import Typography, { type TypographyProps } from '@mui/material/Typography';
-import React from 'react';
 
 interface CphNgTextProps extends TypographyProps {}
 

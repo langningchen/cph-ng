@@ -595,21 +595,6 @@
             "default": true,
             "markdownDescription": "%config.sidebar.showAcGif%"
           },
-          "cph-ng.sidebar.colorTheme": {
-            "type": "string",
-            "default": "auto",
-            "markdownDescription": "%config.sidebar.colorTheme%",
-            "enum": [
-              "auto",
-              "light",
-              "dark"
-            ],
-            "markdownEnumDescriptions": [
-              "%config.sidebar.colorTheme.auto%",
-              "%config.sidebar.colorTheme.light%",
-              "%config.sidebar.colorTheme.dark%"
-            ]
-          },
           "cph-ng.sidebar.hiddenStatuses": {
             "type": "array",
             "items": {
