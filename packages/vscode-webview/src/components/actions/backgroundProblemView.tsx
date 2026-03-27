@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { IWebviewBackgroundProblem } from '@cph-ng/core';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import Chip from '@mui/material/Chip';
 import Dialog from '@mui/material/Dialog';
@@ -25,7 +26,6 @@ import { CphNgLink } from '@w/components/base/cphNgLink';
 import { CphNgText } from '@w/components/base/cphNgText';
 import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import type { IWebviewBackgroundProblem } from '@w/types';
 import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

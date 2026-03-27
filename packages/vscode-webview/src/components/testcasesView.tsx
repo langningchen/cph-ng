@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemId, TestcaseId } from '@cph-ng/core';
+import type { IWebviewTestcase, ProblemId, TestcaseId } from '@cph-ng/core';
 import { VerdictName } from '@cph-ng/core';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -25,7 +25,6 @@ import { ErrorBoundary } from '@w/components/base/errorBoundary';
 import { NoTestcases } from '@w/components/noTestcases';
 import { TestcaseView } from '@w/components/testcaseView';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import type { IWebviewTestcase } from '@w/types';
 import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

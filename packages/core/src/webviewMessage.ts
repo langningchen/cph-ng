@@ -15,7 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemId, TestcaseId, WithRevision } from '@cph-ng/core';
+import type { WithRevision } from './interfaces';
+import type { ProblemId, TestcaseId } from './types';
 import type {
   IWebviewBackgroundProblem,
   IWebviewFileWithHash,
@@ -23,7 +24,7 @@ import type {
   IWebviewStressTest,
   IWebviewTestcase,
   IWebviewTestcaseResult,
-} from '@w/types';
+} from './webview';
 
 const WebviewEventName = {
   FULL_PROBLEM: 'FULL_PROBLEM',

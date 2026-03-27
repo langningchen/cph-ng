@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemId } from '@cph-ng/core';
+import type { IWebviewFileWithHash, IWebviewOverrides, ProblemId } from '@cph-ng/core';
 import EditIcon from '@mui/icons-material/Edit';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -38,7 +38,6 @@ import { CphNgMenu } from '@w/components/base/cphNgMenu';
 import { CphNgText } from '@w/components/base/cphNgText';
 import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import type { IWebviewFileWithHash, IWebviewOverrides } from '@w/types';
 import React, { memo, type SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

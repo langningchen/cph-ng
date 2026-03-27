@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemId } from '@cph-ng/core';
+import type { IWebviewStressTest, ProblemId } from '@cph-ng/core';
 import CloseIcon from '@mui/icons-material/Close';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
@@ -27,7 +27,6 @@ import { CphNgButton } from '@w/components/base/cphNgButton';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { RunButtonGroup } from '@w/components/runButtonGroup';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import type { IWebviewStressTest } from '@w/types';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 

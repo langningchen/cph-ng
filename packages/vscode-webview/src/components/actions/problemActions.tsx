@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemId } from '@cph-ng/core';
+import type { IWebviewBackgroundProblem, IWebviewStressTest, ProblemId } from '@cph-ng/core';
 import BackupIcon from '@mui/icons-material/Backup';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -30,7 +30,6 @@ import { CphNgButton } from '@w/components/base/cphNgButton';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { RunButtonGroup } from '@w/components/runButtonGroup';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import type { IWebviewBackgroundProblem, IWebviewStressTest } from '@w/types';
 import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

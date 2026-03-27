@@ -16,10 +16,11 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { EventEmitter } from 'node:events';
-import type { ProblemId, TestcaseId } from '@cph-ng/core';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
 import type {
-  IWebviewEventBus,
+  IWebviewBackgroundProblem,
+  IWebviewProblem,
+  ProblemId,
+  TestcaseId,
   WebviewAddTestcasePayload,
   WebviewDeleteTestcasePayload,
   WebviewEvent,
@@ -27,9 +28,10 @@ import type {
   WebviewPatchStressTestPayload,
   WebviewPatchTestcasePayload,
   WebviewPatchTestcaseResultPayload,
-} from '@v/application/ports/vscode/IWebviewEventBus';
+} from '@cph-ng/core';
+import type { ILogger } from '@v/application/ports/vscode/ILogger';
+import type { IWebviewEventBus } from '@v/application/ports/vscode/IWebviewEventBus';
 import { TOKENS } from '@v/composition/tokens';
-import type { IWebviewBackgroundProblem, IWebviewProblem } from '@w/types';
 import { inject, injectable } from 'tsyringe';
 import type TypedEventEmitter from 'typed-emitter';
 

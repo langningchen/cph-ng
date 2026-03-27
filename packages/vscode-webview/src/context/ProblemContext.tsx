@@ -15,10 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemId } from '@cph-ng/core';
+import type {
+  IWebviewBackgroundProblem,
+  IWebviewProblem,
+  IWebviewTestcaseResult,
+  ProblemId,
+  WebviewEvent,
+} from '@cph-ng/core';
 import type { WebviewMsg } from '@w/msgs';
-import type { IWebviewBackgroundProblem, IWebviewProblem, IWebviewTestcaseResult } from '@w/types';
-import type { WebviewEvent } from '@w/webviewEvents';
 import { produce } from 'immer';
 import React, {
   createContext,

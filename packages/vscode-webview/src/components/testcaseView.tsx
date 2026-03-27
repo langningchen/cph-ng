@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemId, TestcaseId } from '@cph-ng/core';
+import type { IWebviewTestcase, ProblemId, TestcaseId } from '@cph-ng/core';
 import { VerdictType } from '@cph-ng/core';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -34,7 +34,6 @@ import { ErrorBoundary } from '@w/components/base/errorBoundary';
 import { RunButtonGroup } from '@w/components/runButtonGroup';
 import { TestcaseDataView } from '@w/components/testcaseDataView';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import type { IWebviewTestcase } from '@w/types';
 import MD5 from 'crypto-js/md5';
 import { isNil } from 'lodash';
 import React, { memo, useMemo } from 'react';
