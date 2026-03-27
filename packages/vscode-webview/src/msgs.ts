@@ -56,6 +56,7 @@ export interface AddTestcaseMsg extends ProblemBaseMsg {
 }
 export interface LoadTestcasesMsg extends ProblemBaseMsg {
   type: 'loadTestcases';
+  file: boolean;
 }
 export interface RunSingleTestcaseMsg extends ProblemBaseMsg {
   type: 'runSingleTestcase';

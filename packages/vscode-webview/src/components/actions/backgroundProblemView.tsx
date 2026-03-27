@@ -51,6 +51,7 @@ export const BackgroundProblemView = memo(({ backgroundProblems }: BackgroundPro
           onClick={() => {
             setOpen(true);
           }}
+          sx={{ display: { xs: 'none', md: 'block' } }}
         />
       </CphNgTooltip>
       <Dialog

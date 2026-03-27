@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { stat } from 'node:fs/promises';
 import { dirname, extname, relative } from 'node:path';
 import { gunzipSync, gzipSync } from 'node:zlib';
 import type { IFileWithHash, IProblem, ITestcase, ITestcaseIo, TestcaseId } from '@cph-ng/core';
@@ -112,14 +111,16 @@ export class ProblemService implements IProblemService {
     return this.mapper.toEntity(problem);
   }
 
-  public async loadTestcases(problem: Problem): Promise<void> {
+  public async loadTestcases(problem: Problem, file: boolean): Promise<void> {
     const path = await this.ui.openDialog({
-      title: this.translator.t('Choose a zip file or folder containing test cases'),
-      canSelectFiles: true,
-      canSelectFolders: true,
+      title: file
+        ? this.translator.t('Choose a zip file containing test cases')
+        : this.translator.t('Choose a folder containing test cases'),
+      canSelectFiles: file,
+      canSelectFolders: !file,
     });
     if (!path) return;
-    const testcases = (await stat(path)).isFile()
+    const testcases = file
       ? await this.testcaseScanner.fromZip(problem.src.path, path)
       : await this.testcaseScanner.fromFolder(path);
     this.applyTestcases(problem, testcases);

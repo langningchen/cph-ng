@@ -17,7 +17,7 @@
 
 import type { ProblemId, TestcaseId } from '@cph-ng/core';
 import { VerdictName } from '@cph-ng/core';
-import Box from '@mui/material/Box';
+import Box, { type BoxProps } from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import { AcCongrats } from '@w/components/acCongrats';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
@@ -26,19 +26,20 @@ import { NoTestcases } from '@w/components/noTestcases';
 import { TestcaseView } from '@w/components/testcaseView';
 import { useProblemDispatch } from '@w/context/ProblemContext';
 import type { IWebviewTestcase } from '@w/types';
+import { deleteProps } from '@w/utils';
 import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface InfoButtonProps {
+interface InfoButtonProps extends BoxProps {
   message: string;
   onClick: () => void;
 }
 
-export const InfoButton = memo(({ message, onClick }: InfoButtonProps) => {
+export const InfoButton = memo((props: InfoButtonProps) => {
   return (
-    <Box flex={1}>
+    <Box flex={1} {...deleteProps(props, ['message', 'onClick'])}>
       <Paper
-        onClick={onClick}
+        onClick={props.onClick}
         sx={{
           py: 1,
           cursor: 'pointer',
@@ -50,7 +51,7 @@ export const InfoButton = memo(({ message, onClick }: InfoButtonProps) => {
           transition: 'all 0.2s',
         }}
       >
-        {message}
+        {props.message}
       </Paper>
     </Box>
   );
@@ -163,8 +164,14 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
           onClick={() => dispatch({ type: 'addTestcase', problemId })}
         />
         <InfoButton
-          message={t('testcasesView.loadTestcasesHint')}
-          onClick={() => dispatch({ type: 'loadTestcases', problemId })}
+          sx={{ display: { xs: 'none', lg: 'block' } }}
+          message={t('testcasesView.loadFolderHint')}
+          onClick={() => dispatch({ type: 'loadTestcases', problemId, file: false })}
+        />
+        <InfoButton
+          sx={{ display: { xs: 'none', md: 'block' } }}
+          message={t('testcasesView.loadZipHint')}
+          onClick={() => dispatch({ type: 'loadTestcases', problemId, file: true })}
         />
       </CphNgFlex>
     </CphNgFlex>
