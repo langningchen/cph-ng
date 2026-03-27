@@ -38,7 +38,7 @@ import { CphNgMenu } from '@w/components/base/cphNgMenu';
 import { CphNgText } from '@w/components/base/cphNgText';
 import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import React, { memo, type SyntheticEvent, useEffect, useState } from 'react';
+import { memo, type SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ProblemTitleProps {

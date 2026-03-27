@@ -23,7 +23,7 @@ import type SvgIcon from '@mui/material/SvgIcon';
 import { CphNgButton } from '@w/components/base/cphNgButton';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { getCompile } from '@w/utils';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface RunButtonGroupProps {

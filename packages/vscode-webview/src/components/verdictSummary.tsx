@@ -24,7 +24,7 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Chip from '@mui/material/Chip';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface VerdictSummaryProps {

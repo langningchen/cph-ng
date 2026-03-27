@@ -29,7 +29,7 @@ import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { CphNgLink } from '@w/components/base/cphNgLink';
 import { useProblemDispatch } from '@w/context/ProblemContext';
 import { type AnserJsonEntry, ansiToJson } from 'anser';
-import React, { type CSSProperties, memo, useEffect, useRef, useState } from 'react';
+import { type CSSProperties, memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
 

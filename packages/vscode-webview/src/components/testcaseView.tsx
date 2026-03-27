@@ -36,7 +36,7 @@ import { TestcaseDataView } from '@w/components/testcaseDataView';
 import { useProblemDispatch } from '@w/context/ProblemContext';
 import MD5 from 'crypto-js/md5';
 import { isNil } from 'lodash';
-import React, { memo, useMemo } from 'react';
+import { type DragEvent, memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface TestcaseViewProp {
@@ -45,8 +45,8 @@ interface TestcaseViewProp {
   testcase: IWebviewTestcase;
   isExpand: boolean;
   idx: number;
-  onDragStart?: (idx: number, e: React.DragEvent) => void;
-  onDragOver?: (e: React.DragEvent) => void;
+  onDragStart?: (idx: number, e: DragEvent) => void;
+  onDragOver?: (e: DragEvent) => void;
   onDragEnd?: () => void;
   isDragging?: boolean;
   autoFocus?: boolean;

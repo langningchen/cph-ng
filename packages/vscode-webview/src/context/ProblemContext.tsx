@@ -24,7 +24,7 @@ import type {
 } from '@cph-ng/core';
 import type { WebviewMsg } from '@w/msgs';
 import { produce } from 'immer';
-import React, {
+import {
   createContext,
   type ReactNode,
   useCallback,

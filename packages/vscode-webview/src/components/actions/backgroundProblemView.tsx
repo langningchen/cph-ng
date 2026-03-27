@@ -26,7 +26,7 @@ import { CphNgLink } from '@w/components/base/cphNgLink';
 import { CphNgText } from '@w/components/base/cphNgText';
 import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface BackgroundProblemViewProps {

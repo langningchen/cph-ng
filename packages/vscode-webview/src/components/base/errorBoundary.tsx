@@ -27,7 +27,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import { CphNgButton } from '@w/components/base/cphNgButton';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import React, { useEffect, useState } from 'react';
+import { Component, type ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import StackTrace from 'stacktrace-js';
 
@@ -107,7 +107,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
 };
 
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 interface State {
@@ -115,7 +115,7 @@ interface State {
   error: Error | null;
 }
 
-export class ErrorBoundary extends React.Component<Props, State> {
+export class ErrorBoundary extends Component<Props, State> {
   public constructor(props: Props) {
     super(props);
     this.state = { hasError: false, error: null };

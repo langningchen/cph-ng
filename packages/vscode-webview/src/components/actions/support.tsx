@@ -23,7 +23,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import HelpIcon from '@mui/icons-material/Help';
 import { Divider, ListItemIcon, Menu, MenuItem } from '@mui/material';
 import { CphNgButton } from '@w/components/base/cphNgButton';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const openLink = (url: string) => () => {

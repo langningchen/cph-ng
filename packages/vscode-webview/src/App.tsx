@@ -28,7 +28,7 @@ import { ProblemProvider, useProblemState } from '@w/context/ProblemContext';
 import langEn from '@w/l10n/en.json';
 import langZh from '@w/l10n/zh.json';
 import i18n from 'i18next';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initReactI18next, useTranslation } from 'react-i18next';
 

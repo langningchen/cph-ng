@@ -30,7 +30,7 @@ import { CphNgButton } from '@w/components/base/cphNgButton';
 import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { RunButtonGroup } from '@w/components/runButtonGroup';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import React, { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ProblemActionsProps {

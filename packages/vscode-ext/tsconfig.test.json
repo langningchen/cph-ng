@@ -13,5 +13,5 @@
     }
   },
   "include": ["src", "tests"],
-  "references": [{ "path": "./" }, { "path": "../core" }, { "path": "../vscode-webview" }]
+  "references": [ { "path": "../core" }, { "path": "../vscode-webview" }]
 }

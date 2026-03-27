@@ -25,7 +25,7 @@ import { ProblemTitle } from '@w/components/problemTitle';
 import { TestcasesView } from '@w/components/testcasesView';
 import { VerdictSummary } from '@w/components/verdictSummary';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ProblemViewProps {

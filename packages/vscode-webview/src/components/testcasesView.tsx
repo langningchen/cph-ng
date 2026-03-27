@@ -25,7 +25,7 @@ import { ErrorBoundary } from '@w/components/base/errorBoundary';
 import { NoTestcases } from '@w/components/noTestcases';
 import { TestcaseView } from '@w/components/testcaseView';
 import { useProblemDispatch } from '@w/context/ProblemContext';
-import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { type DragEvent, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface InfoButtonProps {
@@ -78,7 +78,7 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
     );
   }, [testcaseOrder, testcases]);
 
-  const handleDragStart = useCallback((idx: number, e: React.DragEvent) => {
+  const handleDragStart = useCallback((idx: number, e: DragEvent) => {
     const dragImage = document.createElement('div');
     dragImage.style.opacity = '0';
     document.body.appendChild(dragImage);
@@ -91,7 +91,7 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
     setDragOverIdx(idx);
   }, []);
 
-  const handleDragOver = useCallback((e: React.DragEvent, idx: number) => {
+  const handleDragOver = useCallback((e: DragEvent, idx: number) => {
     e.preventDefault();
     if (dragOverIdxRef.current !== idx) {
       dragOverIdxRef.current = idx;
