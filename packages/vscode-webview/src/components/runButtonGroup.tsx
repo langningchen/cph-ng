@@ -86,6 +86,7 @@ export const RunButtonGroup = ({
         }}
       />
       <Popover
+        disableRestoreFocus
         open={open}
         anchorEl={anchorEl}
         anchorOrigin={{
