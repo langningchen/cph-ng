@@ -26,15 +26,15 @@ import type {
   RouterConfig,
   SubmitData,
 } from '@cph-ng/core';
-import type { ICrypto } from '@v/application/ports/node/ICrypto';
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { IPathResolver } from '@v/application/ports/services/IPathResolver';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import { TOKENS } from '@v/composition/tokens';
 import { io, type Socket } from 'socket.io-client';
 import { inject, injectable } from 'tsyringe';
 import type TypedEventEmitter from 'typed-emitter';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import { TOKENS } from '@/composition/tokens';
 
 type CompanionCommunicationEvents = {
   statusChanged: () => void;

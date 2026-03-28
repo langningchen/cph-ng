@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbortReason, type IProcessExecutor } from '@v/application/ports/node/IProcessExecutor';
-import type { IExecutionStrategy } from '@v/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import { TOKENS } from '@v/composition/tokens';
-import type { ExecutionContext, ExecutionResult } from '@v/domain/execution';
 import { inject, injectable } from 'tsyringe';
+import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
+import type { IExecutionStrategy } from '@/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import { TOKENS } from '@/composition/tokens';
+import type { ExecutionContext, ExecutionResult } from '@/domain/execution';
 
 @injectable()
 export class NormalStrategy implements IExecutionStrategy {

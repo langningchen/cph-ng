@@ -16,11 +16,11 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import 'reflect-metadata';
-import { setupContainer } from '@v/composition/container';
-import { ExtensionManager } from '@v/infrastructure/vscode/extensionManager';
 import { install } from 'source-map-support';
 import { container } from 'tsyringe';
 import type { ExtensionContext } from 'vscode';
+import { setupContainer } from '@/composition/container';
+import { ExtensionManager } from '@/infrastructure/vscode/extensionManager';
 
 install();
 let extensionManager: ExtensionManager | null = null;

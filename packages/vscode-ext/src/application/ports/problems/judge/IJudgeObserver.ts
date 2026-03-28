@@ -16,8 +16,8 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { VerdictName } from '@cph-ng/core';
-import type { TestcaseResult } from '@v/domain/entities/testcase';
 import type { Promisable } from 'type-fest';
+import type { TestcaseResult } from '@/domain/entities/testcase';
 
 export interface IJudgeObserver {
   onStatusChange(verdict: VerdictName): void;

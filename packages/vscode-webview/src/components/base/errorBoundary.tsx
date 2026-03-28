@@ -25,11 +25,11 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
-import { CphNgButton } from '@w/components/base/cphNgButton';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
 import { Component, type ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import StackTrace from 'stacktrace-js';
+import { CphNgButton } from '@/components/base/cphNgButton';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
 
 interface ErrorFallbackProps {
   error: Error;

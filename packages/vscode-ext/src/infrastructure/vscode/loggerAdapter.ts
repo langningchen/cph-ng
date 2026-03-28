@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
 import type { LogOutputChannel } from 'vscode';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class LoggerAdapter implements ILogger {

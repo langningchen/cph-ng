@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import { BaseProblemUseCase } from '@v/application/useCases/webview/BaseProblemUseCase';
-import { TOKENS } from '@v/composition/tokens';
-import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
-import type { ChooseTestcaseFileMsg } from '@w/msgs';
+import type { ChooseTestcaseFileMsg } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 @injectable()
 export class ChooseTestcaseFile extends BaseProblemUseCase<ChooseTestcaseFileMsg> {

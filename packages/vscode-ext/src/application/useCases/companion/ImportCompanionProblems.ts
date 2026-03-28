@@ -16,24 +16,24 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { CompanionProblem, TestcaseId } from '@cph-ng/core';
-import type { ICrypto } from '@v/application/ports/node/ICrypto';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { IProblemService } from '@v/application/ports/problems/IProblemService';
-import type { IActiveProblemCoordinator } from '@v/application/ports/services/IActiveProblemCoordinator';
-import type { ITemplateRenderer } from '@v/application/ports/services/ITemplateRenderer';
-import type { IUserScriptService } from '@v/application/ports/services/IUserScriptService';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import type { IWorkspace } from '@v/application/ports/vscode/IWorkspace';
-import { TOKENS } from '@v/composition/tokens';
-import { Problem } from '@v/domain/entities/problem';
-import { Testcase } from '@v/domain/entities/testcase';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
 import { inject, injectable } from 'tsyringe';
 import { Uri } from 'vscode';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
+import type { ITemplateRenderer } from '@/application/ports/services/ITemplateRenderer';
+import type { IUserScriptService } from '@/application/ports/services/IUserScriptService';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import type { IWorkspace } from '@/application/ports/vscode/IWorkspace';
+import { TOKENS } from '@/composition/tokens';
+import { Problem } from '@/domain/entities/problem';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 @injectable()
 export class ImportCompanionProblems {

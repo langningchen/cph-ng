@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
 import { ColorThemeKind, env, Uri, type Webview, window } from 'vscode';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class WebviewHtmlRenderer {

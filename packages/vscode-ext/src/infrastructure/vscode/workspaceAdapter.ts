@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IWorkspace, WorkspaceFolder } from '@v/application/ports/vscode/IWorkspace';
 import { injectable } from 'tsyringe';
 import { workspace as vscodeWorkspace } from 'vscode';
+import type { IWorkspace, WorkspaceFolder } from '@/application/ports/vscode/IWorkspace';
 
 @injectable()
 export class WorkspaceAdapter implements IWorkspace {

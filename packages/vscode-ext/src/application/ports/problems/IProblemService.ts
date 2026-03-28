@@ -16,8 +16,8 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { TestcaseId } from '@cph-ng/core';
-import type { Problem } from '@v/domain/entities/problem';
-import type { Testcase } from '@v/domain/entities/testcase';
+import type { Problem } from '@/domain/entities/problem';
+import type { Testcase } from '@/domain/entities/testcase';
 
 export interface IProblemService {
   getDataPath(srcPath: string): string | null;

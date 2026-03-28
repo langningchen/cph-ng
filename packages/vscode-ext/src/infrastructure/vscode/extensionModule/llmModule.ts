@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IExtensionModule } from '@v/application/ports/vscode/IExtensionModule';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import { TOKENS } from '@v/composition/tokens';
-import { LlmDataInspector } from '@v/infrastructure/vscode/llmTools/llmDataInspector';
-import { LlmProblemContext } from '@v/infrastructure/vscode/llmTools/llmProblemContext';
-import { LlmTestcaseRunner } from '@v/infrastructure/vscode/llmTools/llmTcRunner';
-import { LlmTestcaseEditor } from '@v/infrastructure/vscode/llmTools/llmTestCaseEditor';
 import { inject, injectable } from 'tsyringe';
 import { type ExtensionContext, lm } from 'vscode';
+import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import { TOKENS } from '@/composition/tokens';
+import { LlmDataInspector } from '@/infrastructure/vscode/llmTools/llmDataInspector';
+import { LlmProblemContext } from '@/infrastructure/vscode/llmTools/llmProblemContext';
+import { LlmTestcaseRunner } from '@/infrastructure/vscode/llmTools/llmTcRunner';
+import { LlmTestcaseEditor } from '@/infrastructure/vscode/llmTools/llmTestCaseEditor';
 
 @injectable()
 export class LlmModule implements IExtensionModule {

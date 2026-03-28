@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import { AbortReason, type IProcessExecutor } from '@v/application/ports/node/IProcessExecutor';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
-import type { IExecutionStrategy } from '@v/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITelemetry } from '@v/application/ports/vscode/ITelemetry';
-import { TOKENS } from '@v/composition/tokens';
-import type { ExecutionContext, ExecutionResult } from '@v/domain/execution';
 import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { IExecutionStrategy } from '@/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
+import { TOKENS } from '@/composition/tokens';
+import type { ExecutionContext, ExecutionResult } from '@/domain/execution';
 
 export interface WrapperData {
   timeMs: number;

@@ -16,12 +16,12 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { IProblem, IStressTest, ITestcase, ITestcaseIo, TestcaseId } from '@cph-ng/core';
-import { TOKENS } from '@v/composition/tokens';
-import { Problem } from '@v/domain/entities/problem';
-import { StressTest } from '@v/domain/entities/stressTest';
-import { Testcase } from '@v/domain/entities/testcase';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
 import { inject, injectable } from 'tsyringe';
+import { TOKENS } from '@/composition/tokens';
+import { Problem } from '@/domain/entities/problem';
+import { StressTest } from '@/domain/entities/stressTest';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 @injectable()
 export class ProblemMapper {

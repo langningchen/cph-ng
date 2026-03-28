@@ -22,10 +22,10 @@ import ErrorIcon from '@mui/icons-material/Error';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Chip from '@mui/material/Chip';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { CphNgTooltip } from '@/components/base/cphNgTooltip';
 
 interface VerdictSummaryProps {
   testcaseOrder: TestcaseId[];

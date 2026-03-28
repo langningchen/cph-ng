@@ -28,17 +28,17 @@ import type {
   TestcaseId,
 } from '@cph-ng/core';
 import { StressTestState, type Verdict, VerdictName, Verdicts } from '@cph-ng/core';
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { ILanguageRegistry } from '@v/application/ports/problems/judge/langs/ILanguageRegistry';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import { TOKENS } from '@v/composition/tokens';
-import type { Problem } from '@v/domain/entities/problem';
-import { isRunningState, type StressTest } from '@v/domain/entities/stressTest';
-import type { Testcase, TestcaseResult } from '@v/domain/entities/testcase';
-import type { TestcaseIo } from '@v/domain/entities/testcaseIo';
 import { isNil } from 'lodash';
 import { inject, injectable } from 'tsyringe';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import { TOKENS } from '@/composition/tokens';
+import type { Problem } from '@/domain/entities/problem';
+import { isRunningState, type StressTest } from '@/domain/entities/stressTest';
+import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
+import type { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 @injectable()
 export class WebviewProblemMapper {

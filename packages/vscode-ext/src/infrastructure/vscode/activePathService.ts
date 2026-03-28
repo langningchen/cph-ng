@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IActivePathService } from '@v/application/ports/vscode/IActivePathService';
 import { injectable } from 'tsyringe';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 
 @injectable()
 export class ActivePathService implements IActivePathService {

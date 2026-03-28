@@ -16,17 +16,17 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { IWebviewBackgroundProblem, ProblemId } from '@cph-ng/core';
-import type { IClock } from '@v/application/ports/node/IClock';
-import type { ICrypto } from '@v/application/ports/node/ICrypto';
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { IProblemService } from '@v/application/ports/problems/IProblemService';
-import type { IActivePathService } from '@v/application/ports/vscode/IActivePathService';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { IWebviewEventBus } from '@v/application/ports/vscode/IWebviewEventBus';
-import { TOKENS } from '@v/composition/tokens';
-import { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
 import pMemoize from 'p-memoize';
 import { inject, injectable } from 'tsyringe';
+import type { IClock } from '@/application/ports/node/IClock';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
+import { TOKENS } from '@/composition/tokens';
+import { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 @injectable()
 export class ProblemRepository implements IProblemRepository {

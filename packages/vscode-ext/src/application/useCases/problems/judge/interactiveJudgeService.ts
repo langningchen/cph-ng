@@ -16,19 +16,16 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { VerdictName } from '@cph-ng/core';
-import type { IProblemService } from '@v/application/ports/problems/IProblemService';
-import type { IJudgeObserver } from '@v/application/ports/problems/judge/IJudgeObserver';
-import type {
-  IJudgeService,
-  JudgeContext,
-} from '@v/application/ports/problems/judge/IJudgeService';
-import type { IResultEvaluator } from '@v/application/ports/problems/judge/IResultEvaluator';
-import type { ILanguageRegistry } from '@v/application/ports/problems/judge/langs/ILanguageRegistry';
-import type { ISolutionRunner } from '@v/application/ports/problems/judge/runner/ISolutionRunner';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import { TOKENS } from '@v/composition/tokens';
-import { ExecutionRejected } from '@v/domain/execution';
 import { inject, injectable } from 'tsyringe';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
+import type { IJudgeService, JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
+import type { IResultEvaluator } from '@/application/ports/problems/judge/IResultEvaluator';
+import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
+import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import { TOKENS } from '@/composition/tokens';
+import { ExecutionRejected } from '@/domain/execution';
 
 @injectable()
 export class InteractiveJudgeService implements IJudgeService {

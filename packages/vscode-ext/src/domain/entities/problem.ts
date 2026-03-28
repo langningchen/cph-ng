@@ -17,9 +17,9 @@
 
 import EventEmitter from 'node:events';
 import type { IFileWithHash, IOverrides, TestcaseId, WithRevision } from '@cph-ng/core';
-import { StressTest } from '@v/domain/entities/stressTest';
-import type { Testcase, TestcaseResult } from '@v/domain/entities/testcase';
 import type TypedEventEmitter from 'typed-emitter';
+import { StressTest } from '@/domain/entities/stressTest';
+import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
 
 export interface ProblemMetaPayload {
   checker?: IFileWithHash | null;

@@ -17,14 +17,6 @@
 
 import type { TestcaseId } from '@cph-ng/core';
 import { Verdicts } from '@cph-ng/core';
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { IActivePathService } from '@v/application/ports/vscode/IActivePathService';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import { RunAllTestcases } from '@v/application/useCases/webview/RunAllTestcases';
-import { RunSingleTestcase } from '@v/application/useCases/webview/RunSingleTestcase';
-import { StopTestcases } from '@v/application/useCases/webview/StopTestcases';
-import { TOKENS } from '@v/composition/tokens';
-import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
 import { inject, injectable } from 'tsyringe';
 import type {
   CancellationToken,
@@ -32,6 +24,14 @@ import type {
   LanguageModelToolResult,
   PreparedToolInvocation,
 } from 'vscode';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import { RunAllTestcases } from '@/application/useCases/webview/RunAllTestcases';
+import { RunSingleTestcase } from '@/application/useCases/webview/RunSingleTestcase';
+import { StopTestcases } from '@/application/useCases/webview/StopTestcases';
+import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { BaseLlmTool, type BaseLlmToolParams } from './baseLlmTool';
 
 interface LlmTestcaseRunnerParams extends BaseLlmToolParams {

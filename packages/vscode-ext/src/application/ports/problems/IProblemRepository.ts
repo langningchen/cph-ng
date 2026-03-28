@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { ProblemId } from '@cph-ng/core';
-import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 export interface IProblemRepository {
   fireBackgroundEvent(): void;

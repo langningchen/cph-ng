@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IActiveProblemCoordinator } from '@v/application/ports/services/IActiveProblemCoordinator';
-import type { IActivePathService } from '@v/application/ports/vscode/IActivePathService';
-import type { IExtensionModule } from '@v/application/ports/vscode/IExtensionModule';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
 import { type ExtensionContext, type TextEditor, window } from 'vscode';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
+import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class EditorWatcherModule implements IExtensionModule {

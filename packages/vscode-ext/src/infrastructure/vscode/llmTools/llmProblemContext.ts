@@ -15,12 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { IProblemService } from '@v/application/ports/problems/IProblemService';
-import type { IActivePathService } from '@v/application/ports/vscode/IActivePathService';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import { TOKENS } from '@v/composition/tokens';
-import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
 import { inject, injectable } from 'tsyringe';
 import type {
   CancellationToken,
@@ -28,6 +22,12 @@ import type {
   LanguageModelToolResult,
   PreparedToolInvocation,
 } from 'vscode';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { BaseLlmTool, type BaseLlmToolParams } from './baseLlmTool';
 
 @injectable()

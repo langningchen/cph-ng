@@ -17,7 +17,7 @@
 
 import type { BoxProps } from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import { deleteProps } from '@w/utils';
+import { deleteProps } from '@/utils';
 
 interface CphNgFlexProps extends BoxProps {
   smallGap?: boolean;

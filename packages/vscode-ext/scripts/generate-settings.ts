@@ -231,14 +231,14 @@ const generateAdapter = (sections: Section[]) => {
   const imports = [
     `import { injectable, inject } from 'tsyringe';`,
     `import { ConfigurationTarget, workspace, type ConfigurationChangeEvent, Disposable } from 'vscode';`,
-    `import { TOKENS } from '@v/composition/tokens';`,
-    `import type { ILogger } from '@v/application/ports/vscode/ILogger';`,
+    `import { TOKENS } from '@/composition/tokens';`,
+    `import type { ILogger } from '@/application/ports/vscode/ILogger';`,
     `import type { `,
     `  ISettings,`,
     `  ChangeListener,`,
     `  Unsubscribe,`,
     ...sections.map(({ className }) => `  I${className},`),
-    `} from '@v/application/ports/vscode/ISettings';`,
+    `} from '@/application/ports/vscode/ISettings';`,
   ].join('\n');
 
   const sectionClasses = sections.map((s) => {
@@ -295,7 +295,7 @@ const generateAdapter = (sections: Section[]) => {
 
 const generateMock = (sections: Section[]) => {
   const imports = [
-    `import type { ISettings, ChangeListener, Unsubscribe, ${sections.map((s) => `I${s.className}`).join(', ')} } from '@v/application/ports/vscode/ISettings';`,
+    `import type { ISettings, ChangeListener, Unsubscribe, ${sections.map((s) => `I${s.className}`).join(', ')} } from '@/application/ports/vscode/ISettings';`,
   ].join('\n');
 
   const mockSectionClasses = sections.map((s) => {

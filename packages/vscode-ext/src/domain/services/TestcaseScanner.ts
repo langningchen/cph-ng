@@ -15,18 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { IArchive } from '@v/application/ports/services/IArchive';
-import type { IPathResolver } from '@v/application/ports/services/IPathResolver';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { CustomQuickPickItem, IUi } from '@v/application/ports/vscode/IUi';
-import { TOKENS } from '@v/composition/tokens';
-import { Testcase } from '@v/domain/entities/testcase';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
-import { type FilePair, TestcaseMatcher } from '@v/domain/services/TestcaseMatcher';
 import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { IArchive } from '@/application/ports/services/IArchive';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { CustomQuickPickItem, IUi } from '@/application/ports/vscode/IUi';
+import { TOKENS } from '@/composition/tokens';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import { type FilePair, TestcaseMatcher } from '@/domain/services/TestcaseMatcher';
 
 @injectable()
 export class TestcaseScanner {

@@ -15,19 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TestcaseId } from '@cph-ng/core';
-import type { ICrypto } from '@v/application/ports/node/ICrypto';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { IProblemService } from '@v/application/ports/problems/IProblemService';
-import type { IActivePathService } from '@v/application/ports/vscode/IActivePathService';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { IMsgHandle } from '@v/application/useCases/webview/msgHandle';
-import { TOKENS } from '@v/composition/tokens';
-import { TestcaseScanner } from '@v/domain/services/TestcaseScanner';
-import type { DragDropMsg } from '@w/msgs';
+import type { DragDropMsg, TestcaseId } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
+import { TOKENS } from '@/composition/tokens';
+import { TestcaseScanner } from '@/domain/services/TestcaseScanner';
 
 @injectable()
 export class DragDrop implements IMsgHandle<DragDropMsg> {

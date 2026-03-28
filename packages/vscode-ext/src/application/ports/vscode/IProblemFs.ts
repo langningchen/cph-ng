@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ProblemFsEvents } from '@v/infrastructure/vscode/problemFs';
 import type TypedEventEmitter from 'typed-emitter';
 import type { FileSystemProvider, Uri } from 'vscode';
+import type { ProblemFsEvents } from '@/infrastructure/vscode/problemFs';
 
 export interface IProblemFs extends FileSystemProvider {
   scheme: string;

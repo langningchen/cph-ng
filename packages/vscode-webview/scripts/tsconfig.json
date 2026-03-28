@@ -1,13 +1,3 @@
 {
-  "extends": "../../../tsconfig.base.json",
-  "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "out",
-    "types": ["node"],
-    "paths": {
-      "@s/*": ["../../../scripts/*"]
-    }
-  },
-  "include": ["./**/*.ts"],
-  "references": [{ "path": "../../../scripts" }]
+  "extends": "../../../scripts/tsconfig.json"
 }

@@ -25,10 +25,10 @@ import {
 } from 'node:fs';
 import { access, copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import type { Readable, Writable } from 'node:stream';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IPath } from '@v/application/ports/node/IPath';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class FileSystemAdapter implements IFileSystem {

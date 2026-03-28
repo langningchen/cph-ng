@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ICrypto } from '@v/application/ports/node/ICrypto';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
-import type { IPathResolver } from '@v/application/ports/services/IPathResolver';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class TempStorageAdapter implements ITempStorage {

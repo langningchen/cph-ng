@@ -17,12 +17,6 @@
 
 import type { TestcaseId } from '@cph-ng/core';
 import { Verdicts } from '@cph-ng/core';
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { ITestcaseIoService } from '@v/application/ports/problems/ITestcaseIoService';
-import type { IActivePathService } from '@v/application/ports/vscode/IActivePathService';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import { TOKENS } from '@v/composition/tokens';
-import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
 import { inject, injectable } from 'tsyringe';
 import type {
   CancellationToken,
@@ -30,6 +24,12 @@ import type {
   LanguageModelToolResult,
   PreparedToolInvocation,
 } from 'vscode';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { BaseLlmTool, type BaseLlmToolParams } from './baseLlmTool';
 
 type DataType = 'stdin' | 'answer' | 'stdout' | 'stderr' | 'meta';

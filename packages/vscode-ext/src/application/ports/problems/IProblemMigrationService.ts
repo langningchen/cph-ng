@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { IProblem } from '@cph-ng/core';
-import type * as History from '@v/application/ports/problems/history';
+import type * as History from '@/application/ports/problems/history';
 
 export type OldProblem =
   | History.IProblem_0_4_8

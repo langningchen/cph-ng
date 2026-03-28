@@ -1,13 +1,13 @@
 import type { TestcaseId } from '@cph-ng/core';
 import { StressTestState, VerdictName } from '@cph-ng/core';
-import { TOKENS } from '@v/composition/tokens';
-import { Problem } from '@v/domain/entities/problem';
-import { StressTest } from '@v/domain/entities/stressTest';
-import { Testcase } from '@v/domain/entities/testcase';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
-import { ProblemMapper } from '@v/infrastructure/problems/problemMapper';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { TOKENS } from '@/composition/tokens';
+import { Problem } from '@/domain/entities/problem';
+import { StressTest } from '@/domain/entities/stressTest';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 
 describe('ProblemMapper', () => {
   let mapper: ProblemMapper;

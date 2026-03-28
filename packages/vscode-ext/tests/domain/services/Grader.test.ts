@@ -1,7 +1,7 @@
 import { VerdictName } from '@cph-ng/core';
-import { Grader } from '@v/domain/services/Grader';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { Grader } from '@/domain/services/Grader';
 
 describe('Grader', () => {
   let grader: Grader;

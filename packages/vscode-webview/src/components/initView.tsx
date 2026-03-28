@@ -16,9 +16,9 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import CircularProgress from '@mui/material/CircularProgress';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { CphNgText } from '@w/components/base/cphNgText';
 import { useTranslation } from 'react-i18next';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { CphNgText } from '@/components/base/cphNgText';
 
 export const InitView = () => {
   const { t } = useTranslation();

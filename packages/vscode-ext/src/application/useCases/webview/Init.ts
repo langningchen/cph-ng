@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { IActiveProblemCoordinator } from '@v/application/ports/services/IActiveProblemCoordinator';
-import type { ISidebarProvider } from '@v/application/ports/vscode/ISidebarProvider';
-import type { IMsgHandle } from '@v/application/useCases/webview/msgHandle';
-import { TOKENS } from '@v/composition/tokens';
-import type { InitMsg } from '@w/msgs';
+import type { InitMsg } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
+import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvider';
+import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class Init implements IMsgHandle<InitMsg> {

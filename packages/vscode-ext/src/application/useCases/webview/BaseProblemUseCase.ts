@@ -16,8 +16,8 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { ProblemId } from '@cph-ng/core';
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 export abstract class BaseProblemUseCase<T extends { problemId: ProblemId }> {
   public constructor(protected readonly repo: IProblemRepository) {}

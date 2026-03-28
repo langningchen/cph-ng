@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TestcaseIo } from '@v/domain/entities/testcaseIo';
+import type { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 export interface FilePathResult {
   path: string;

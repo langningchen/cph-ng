@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IExtensionModule } from '@v/application/ports/vscode/IExtensionModule';
-import type { IProblemFs } from '@v/application/ports/vscode/IProblemFs';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ISidebarProvider } from '@v/application/ports/vscode/ISidebarProvider';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
 import { type ExtensionContext, window, workspace } from 'vscode';
+import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
+import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvider';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class ProviderModule implements IExtensionModule {

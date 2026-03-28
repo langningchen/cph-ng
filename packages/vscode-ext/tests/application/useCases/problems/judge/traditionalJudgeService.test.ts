@@ -1,22 +1,22 @@
 import { VerdictName } from '@cph-ng/core';
 import { translatorMock } from '@t/infrastructure/vscode/translatorMock';
 import { mock } from '@t/mock';
-import type { IProblemService } from '@v/application/ports/problems/IProblemService';
-import type { ITestcaseIoService } from '@v/application/ports/problems/ITestcaseIoService';
-import type { IJudgeObserver } from '@v/application/ports/problems/judge/IJudgeObserver';
-import type { JudgeContext } from '@v/application/ports/problems/judge/IJudgeService';
-import type { IResultEvaluator } from '@v/application/ports/problems/judge/IResultEvaluator';
-import type { ILanguageRegistry } from '@v/application/ports/problems/judge/langs/ILanguageRegistry';
-import type { ILanguageStrategy } from '@v/application/ports/problems/judge/langs/ILanguageStrategy';
-import type { ISolutionRunner } from '@v/application/ports/problems/judge/runner/ISolutionRunner';
-import { TraditionalJudgeService } from '@v/application/useCases/problems/judge/traditionalJudgeService';
-import { TOKENS } from '@v/composition/tokens';
-import { Problem } from '@v/domain/entities/problem';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
-import { type ExecutionData, ExecutionRejected } from '@v/domain/execution';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
+import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
+import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
+import type { IResultEvaluator } from '@/application/ports/problems/judge/IResultEvaluator';
+import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
+import type { ILanguageStrategy } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
+import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
+import { TraditionalJudgeService } from '@/application/useCases/problems/judge/traditionalJudgeService';
+import { TOKENS } from '@/composition/tokens';
+import { Problem } from '@/domain/entities/problem';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import { type ExecutionData, ExecutionRejected } from '@/domain/execution';
 
 describe('TraditionalJudgeService', () => {
   let service: TraditionalJudgeService;

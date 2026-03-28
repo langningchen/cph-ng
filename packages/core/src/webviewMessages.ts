@@ -15,7 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IOverrides, ProblemId, TestcaseId } from '@cph-ng/core';
+import type { IOverrides } from './interfaces';
+import type { ProblemId, TestcaseId } from './types';
 
 interface BaseMsg {
   type: string;

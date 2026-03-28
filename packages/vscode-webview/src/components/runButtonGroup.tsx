@@ -20,11 +20,11 @@ import FastForwardIcon from '@mui/icons-material/FastForward';
 import { type IconButtonProps, Popover } from '@mui/material';
 import Box from '@mui/material/Box';
 import type SvgIcon from '@mui/material/SvgIcon';
-import { CphNgButton } from '@w/components/base/cphNgButton';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { getCompile } from '@w/utils';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CphNgButton } from '@/components/base/cphNgButton';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { getCompile } from '@/utils';
 
 interface RunButtonGroupProps {
   icon: typeof SvgIcon;

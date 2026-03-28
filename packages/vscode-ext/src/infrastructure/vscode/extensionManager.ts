@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IExtensionModule } from '@v/application/ports/vscode/IExtensionModule';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ITelemetry } from '@v/application/ports/vscode/ITelemetry';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectAll, injectable } from 'tsyringe';
 import type { ExtensionContext } from 'vscode';
+import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class ExtensionManager {

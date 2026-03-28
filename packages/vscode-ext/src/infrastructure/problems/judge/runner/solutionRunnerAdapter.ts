@@ -15,22 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbortReason, type IProcessExecutor } from '@v/application/ports/node/IProcessExecutor';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
-import type { IExecutionStrategyFactory } from '@v/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
-import type { IExecutionStrategy } from '@v/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
-import type { ISolutionRunner } from '@v/application/ports/problems/judge/runner/ISolutionRunner';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import { TOKENS } from '@v/composition/tokens';
+import { inject, injectable } from 'tsyringe';
+import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { IExecutionStrategyFactory } from '@/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
+import type { IExecutionStrategy } from '@/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
+import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import { TOKENS } from '@/composition/tokens';
 import {
   type ExecutionContext,
   ExecutionRejected,
   type ExecutionResult,
   type InteractiveExecutionResult,
-} from '@v/domain/execution';
-import { inject, injectable } from 'tsyringe';
+} from '@/domain/execution';
 
 @injectable()
 export class SolutionRunnerAdapter implements ISolutionRunner {

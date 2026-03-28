@@ -16,17 +16,17 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { IFileWithHash, IOverrides } from '@cph-ng/core';
-import type { IPath } from '@v/application/ports/node/IPath';
+import { inject, injectable } from 'tsyringe';
+import type { IPath } from '@/application/ports/node/IPath';
 import type {
   CompileAdditionalData,
   ILanguageDefaultValues,
   LangCompileData,
-} from '@v/application/ports/problems/judge/langs/ILanguageStrategy';
-import type { IPathResolver } from '@v/application/ports/services/IPathResolver';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import { TOKENS } from '@v/composition/tokens';
-import { LanguageStrategyContext } from '@v/infrastructure/problems/judge/langs/languageStrategyContext';
-import { inject, injectable } from 'tsyringe';
+} from '@/application/ports/problems/judge/langs/ILanguageStrategy';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import { TOKENS } from '@/composition/tokens';
+import { LanguageStrategyContext } from '@/infrastructure/problems/judge/langs/languageStrategyContext';
 import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstractLanguageStrategy';
 
 @injectable()

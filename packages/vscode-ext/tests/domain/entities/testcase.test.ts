@@ -1,7 +1,7 @@
 import { VerdictName } from '@cph-ng/core';
-import { Testcase } from '@v/domain/entities/testcase';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
 import { describe, expect, it, vi } from 'vitest';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 describe('Testcase', () => {
   describe('constructor defaults', () => {

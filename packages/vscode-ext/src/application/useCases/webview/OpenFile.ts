@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { IProblemFs } from '@v/application/ports/vscode/IProblemFs';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import type { IMsgHandle } from '@v/application/useCases/webview/msgHandle';
-import { TOKENS } from '@v/composition/tokens';
-import type { OpenFileMsg } from '@w/msgs';
+import type { OpenFileMsg } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import { Uri } from 'vscode';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class OpenFile implements IMsgHandle<OpenFileMsg> {

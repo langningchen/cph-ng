@@ -28,18 +28,18 @@ import { extensionPathMock } from '@t/infrastructure/vscode/extensionPathMock';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { mock } from '@t/mock';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type {
-  IProcessExecutor,
-  ProcessExecuteResult,
-} from '@v/application/ports/node/IProcessExecutor';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
-import { TOKENS } from '@v/composition/tokens';
-import { RunnerProviderAdapter } from '@v/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 import type { Volume } from 'memfs';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type {
+  IProcessExecutor,
+  ProcessExecuteResult,
+} from '@/application/ports/node/IProcessExecutor';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import { TOKENS } from '@/composition/tokens';
+import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 
 describe('RunnerProviderAdapter', () => {
   let adapter: RunnerProviderAdapter;

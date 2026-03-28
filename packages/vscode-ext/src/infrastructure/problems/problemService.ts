@@ -18,27 +18,27 @@
 import { dirname, extname, relative } from 'node:path';
 import { gunzipSync, gzipSync } from 'node:zlib';
 import type { IFileWithHash, IProblem, ITestcase, ITestcaseIo, TestcaseId } from '@cph-ng/core';
-import type { ICrypto } from '@v/application/ports/node/ICrypto';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
+import { inject, injectable } from 'tsyringe';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type {
   IProblemMigrationService,
   OldProblem,
-} from '@v/application/ports/problems/IProblemMigrationService';
-import type { IProblemService } from '@v/application/ports/problems/IProblemService';
-import type { IPathResolver } from '@v/application/ports/services/IPathResolver';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITelemetry } from '@v/application/ports/vscode/ITelemetry';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import { TOKENS } from '@v/composition/tokens';
-import { Problem } from '@v/domain/entities/problem';
-import type { Testcase } from '@v/domain/entities/testcase';
-import { TestcaseScanner } from '@v/domain/services/TestcaseScanner';
-import { ProblemMapper } from '@v/infrastructure/problems/problemMapper';
-import { inject, injectable } from 'tsyringe';
+} from '@/application/ports/problems/IProblemMigrationService';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import { TOKENS } from '@/composition/tokens';
+import { Problem } from '@/domain/entities/problem';
+import type { Testcase } from '@/domain/entities/testcase';
+import { TestcaseScanner } from '@/domain/services/TestcaseScanner';
+import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 
 @injectable()
 export class ProblemService implements IProblemService {

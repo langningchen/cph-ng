@@ -22,9 +22,9 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import GroupIcon from '@mui/icons-material/Group';
 import HelpIcon from '@mui/icons-material/Help';
 import { Divider, ListItemIcon, Menu, MenuItem } from '@mui/material';
-import { CphNgButton } from '@w/components/base/cphNgButton';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CphNgButton } from '@/components/base/cphNgButton';
 
 const openLink = (url: string) => () => {
   const a = document.createElement('a');

@@ -17,8 +17,8 @@
 
 import { appendFileSync } from 'node:fs';
 import type { LogLevel } from '@cph-ng/core';
-import { config } from '@r/config';
-import { broadcastLog } from '@r/index';
+import { config } from '@/config';
+import { broadcastLog } from '@/index';
 
 export const writeLog = (level: LogLevel, message: string, ...args: unknown[]) => {
   const timeString = new Date().toISOString();

@@ -21,8 +21,8 @@ import type {
   IWebviewTestcaseResult,
   ProblemId,
   WebviewEvent,
+  WebviewMsg,
 } from '@cph-ng/core';
-import type { WebviewMsg } from '@w/msgs';
 import { produce } from 'immer';
 import {
   createContext,

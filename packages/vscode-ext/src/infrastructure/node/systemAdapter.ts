@@ -17,8 +17,8 @@
 
 import { homedir, platform, release, tmpdir } from 'node:os';
 import { cwd } from 'node:process';
-import type { ISystem, SystemPlatform } from '@v/application/ports/node/ISystem';
 import { injectable } from 'tsyringe';
+import type { ISystem, SystemPlatform } from '@/application/ports/node/ISystem';
 
 @injectable()
 export class SystemAdapter implements ISystem {

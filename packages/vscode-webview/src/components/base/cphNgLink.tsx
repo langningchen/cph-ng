@@ -16,8 +16,8 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import Link, { type LinkProps } from '@mui/material/Link';
-import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
-import { deleteProps } from '@w/utils';
+import { CphNgTooltip } from '@/components/base/cphNgTooltip';
+import { deleteProps } from '@/utils';
 
 interface CphNgLinkProps extends LinkProps {
   name: string;

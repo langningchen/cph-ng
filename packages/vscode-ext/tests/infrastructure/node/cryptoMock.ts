@@ -17,7 +17,7 @@
 
 import { createHash } from 'node:crypto';
 import { mock } from '@t/mock';
-import type { ICrypto } from '@v/application/ports/node/ICrypto';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
 
 export const cryptoMock = mock<ICrypto>();
 cryptoMock.randomUUID.mockImplementation(() => {

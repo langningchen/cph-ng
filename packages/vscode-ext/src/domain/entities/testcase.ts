@@ -17,8 +17,8 @@
 
 import EventEmitter from 'node:events';
 import { VerdictName } from '@cph-ng/core';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
 import type TypedEventEmitter from 'typed-emitter';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 export interface TestcaseResult {
   verdict: VerdictName;

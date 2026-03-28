@@ -29,18 +29,18 @@ import {
 } from 'node:path';
 import { createContext, Script } from 'node:vm';
 import type { CompanionProblem } from '@cph-ng/core';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IPathResolver } from '@v/application/ports/services/IPathResolver';
+import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type {
   IUserScriptService,
   WorkspaceFolderContext,
-} from '@v/application/ports/services/IUserScriptService';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import { TOKENS } from '@v/composition/tokens';
-import { inject, injectable } from 'tsyringe';
+} from '@/application/ports/services/IUserScriptService';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class UserScriptService implements IUserScriptService {

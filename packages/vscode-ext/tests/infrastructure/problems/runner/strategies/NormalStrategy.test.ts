@@ -23,13 +23,13 @@ import {
   stdoutPath,
 } from '@t/infrastructure/problems/runner/strategies/constants';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
-import { AbortReason, type ProcessOutput } from '@v/application/ports/node/IProcessExecutor';
-import { TOKENS } from '@v/composition/tokens';
-import type { ExecutionData } from '@v/domain/execution';
-import { NormalStrategy } from '@v/infrastructure/problems/judge/runner/strategies/normalStrategy';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { anyNumber } from 'vitest-mock-extended';
+import { AbortReason, type ProcessOutput } from '@/application/ports/node/IProcessExecutor';
+import { TOKENS } from '@/composition/tokens';
+import type { ExecutionData } from '@/domain/execution';
+import { NormalStrategy } from '@/infrastructure/problems/judge/runner/strategies/normalStrategy';
 
 describe('NormalStrategy', () => {
   let strategy: NormalStrategy;

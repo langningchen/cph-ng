@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import { TOKENS } from '@v/composition/tokens';
 import { orderBy } from 'natural-orderby';
 import { inject, injectable } from 'tsyringe';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import { TOKENS } from '@/composition/tokens';
 
 export interface FilePair {
   input?: string;

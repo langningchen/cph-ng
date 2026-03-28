@@ -15,19 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import { BaseProblemUseCase } from '@v/application/useCases/webview/BaseProblemUseCase';
-import { TOKENS } from '@v/composition/tokens';
-import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
-import type { TestcaseIoService } from '@v/infrastructure/problems/testcaseIoService';
-import type { ToggleTestcaseFileMsg, WebviewTestcaseFileTypes } from '@w/msgs';
+import type { ToggleTestcaseFileMsg, WebviewTestcaseFileTypes } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import type { TestcaseIoService } from '@/infrastructure/problems/testcaseIoService';
 
 @injectable()
 export class ToggleTestcaseFile extends BaseProblemUseCase<ToggleTestcaseFileMsg> {

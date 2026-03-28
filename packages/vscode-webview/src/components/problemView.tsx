@@ -17,16 +17,16 @@
 
 import type { IWebviewBackgroundProblem, IWebviewProblem, ProblemId } from '@cph-ng/core';
 import { VerdictType } from '@cph-ng/core';
-import { ProblemActions } from '@w/components/actions/problemActions';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { CphNgMenu } from '@w/components/base/cphNgMenu';
-import { ErrorBoundary } from '@w/components/base/errorBoundary';
-import { ProblemTitle } from '@w/components/problemTitle';
-import { TestcasesView } from '@w/components/testcasesView';
-import { VerdictSummary } from '@w/components/verdictSummary';
-import { useProblemDispatch } from '@w/context/ProblemContext';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ProblemActions } from '@/components/actions/problemActions';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { CphNgMenu } from '@/components/base/cphNgMenu';
+import { ErrorBoundary } from '@/components/base/errorBoundary';
+import { ProblemTitle } from '@/components/problemTitle';
+import { TestcasesView } from '@/components/testcasesView';
+import { VerdictSummary } from '@/components/verdictSummary';
+import { useProblemDispatch } from '@/context/ProblemContext';
 
 interface ProblemViewProps {
   problemId: ProblemId;

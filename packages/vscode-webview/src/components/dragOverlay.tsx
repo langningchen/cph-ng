@@ -24,10 +24,10 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { useProblemDispatch } from '@w/context/ProblemContext';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { useProblemDispatch } from '@/context/ProblemContext';
 
 export const DragOverlay = () => {
   const { t } = useTranslation();

@@ -1,20 +1,20 @@
 import type { IFileWithHash } from '@cph-ng/core';
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { ISystem } from '@v/application/ports/node/ISystem';
+import { inject, injectable } from 'tsyringe';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { ISystem } from '@/application/ports/node/ISystem';
 import type {
   CompileAdditionalData,
   ILanguageDefaultValues,
   LangCompileData,
-} from '@v/application/ports/problems/judge/langs/ILanguageStrategy';
-import type { IPathResolver } from '@v/application/ports/services/IPathResolver';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import { TOKENS } from '@v/composition/tokens';
+} from '@/application/ports/problems/judge/langs/ILanguageStrategy';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import { TOKENS } from '@/composition/tokens';
 import {
   AbstractLanguageStrategy,
   DefaultCompileAdditionalData,
-} from '@v/infrastructure/problems/judge/langs/abstractLanguageStrategy';
-import { LanguageStrategyContext } from '@v/infrastructure/problems/judge/langs/languageStrategyContext';
-import { inject, injectable } from 'tsyringe';
+} from '@/infrastructure/problems/judge/langs/abstractLanguageStrategy';
+import { LanguageStrategyContext } from '@/infrastructure/problems/judge/langs/languageStrategyContext';
 
 @injectable()
 export class LangC extends AbstractLanguageStrategy {

@@ -4,14 +4,14 @@ import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { mock } from '@t/mock';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { ICheckerRunner } from '@v/application/ports/problems/judge/ICheckerRunner';
-import { TOKENS } from '@v/composition/tokens';
-import type { ExecutionData } from '@v/domain/execution';
-import { ResultEvaluatorAdaptor } from '@v/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { ICheckerRunner } from '@/application/ports/problems/judge/ICheckerRunner';
+import { TOKENS } from '@/composition/tokens';
+import type { ExecutionData } from '@/domain/execution';
+import { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 
 describe('ResultEvaluatorAdaptor', () => {
   let evaluator: ResultEvaluatorAdaptor;

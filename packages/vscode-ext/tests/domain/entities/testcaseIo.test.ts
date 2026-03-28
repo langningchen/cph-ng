@@ -1,5 +1,5 @@
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
 import { describe, expect, it } from 'vitest';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 describe('TestcaseIo', () => {
   describe('constructor', () => {

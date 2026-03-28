@@ -47,34 +47,34 @@ import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { telemetryMock } from '@t/infrastructure/vscode/telemetryMock';
 import { translatorMock } from '@t/infrastructure/vscode/translatorMock';
 import { mock } from '@t/mock';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
+import type { Volume } from 'memfs';
+import { container } from 'tsyringe';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { MockProxy } from 'vitest-mock-extended';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type {
   IProcessExecutor,
   ProcessExecuteResult,
   ProcessHandle,
   ProcessOutput,
-} from '@v/application/ports/node/IProcessExecutor';
-import type { IRunnerProvider } from '@v/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
-import { TOKENS } from '@v/composition/tokens';
-import type { ExecutionContext, ExecutionData } from '@v/domain/execution';
-import { ClockAdapter } from '@v/infrastructure/node/clockAdapter';
-import { CryptoAdapter } from '@v/infrastructure/node/cryptoAdapter';
-import { FileSystemAdapter } from '@v/infrastructure/node/fileSystemAdapter';
-import { PathAdapter } from '@v/infrastructure/node/pathAdapter';
-import { ProcessExecutorAdapter } from '@v/infrastructure/node/processExecutorAdapter';
-import { SystemAdapter } from '@v/infrastructure/node/systemAdapter';
-import { TempStorageAdapter } from '@v/infrastructure/node/tempStorageAdapter';
-import { LangCpp } from '@v/infrastructure/problems/judge/langs/cppStrategy';
-import { LanguageRegistry } from '@v/infrastructure/problems/judge/langs/languageRegistry';
+} from '@/application/ports/node/IProcessExecutor';
+import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
+import { TOKENS } from '@/composition/tokens';
+import type { ExecutionContext, ExecutionData } from '@/domain/execution';
+import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
+import { CryptoAdapter } from '@/infrastructure/node/cryptoAdapter';
+import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
+import { PathAdapter } from '@/infrastructure/node/pathAdapter';
+import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
+import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
+import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
+import { LangCpp } from '@/infrastructure/problems/judge/langs/cppStrategy';
+import { LanguageRegistry } from '@/infrastructure/problems/judge/langs/languageRegistry';
 import {
   ExternalRunnerStrategy,
   type RunnerOutput,
-} from '@v/infrastructure/problems/judge/runner/strategies/externalRunnerStrategy';
-import { RunnerProviderAdapter } from '@v/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
-import type { Volume } from 'memfs';
-import { container } from 'tsyringe';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { MockProxy } from 'vitest-mock-extended';
+} from '@/infrastructure/problems/judge/runner/strategies/externalRunnerStrategy';
+import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 
 describe('ExternalRunnerStrategy', () => {
   let strategy: ExternalRunnerStrategy;

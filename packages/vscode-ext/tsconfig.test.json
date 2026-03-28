@@ -1,15 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
     "outDir": "out",
     "lib": ["ES2022"],
     "types": ["node", "vitest/globals"],
     "paths": {
-      "@v/*": ["./src/*"],
+      "@/*": ["./src/*"],
       "@t/*": ["./tests/*"],
-      "@w/*": ["../vscode-webview/out/src/*"],
-      "@cph-ng/core": ["../core/out/src"]
     }
   },
   "include": ["src", "tests"],

@@ -17,8 +17,9 @@
 
 import { type ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
 import { pipeline } from 'node:stream/promises';
-import type { IClock } from '@v/application/ports/node/IClock';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
+import { inject, injectable } from 'tsyringe';
+import type { IClock } from '@/application/ports/node/IClock';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import {
   AbortReason,
   type IProcessExecutor,
@@ -27,12 +28,11 @@ import {
   type ProcessHandle,
   type ProcessOptions,
   type ProcessOutput,
-} from '@v/application/ports/node/IProcessExecutor';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ITelemetry } from '@v/application/ports/vscode/ITelemetry';
-import { TOKENS } from '@v/composition/tokens';
-import { inject, injectable } from 'tsyringe';
+} from '@/application/ports/node/IProcessExecutor';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
+import { TOKENS } from '@/composition/tokens';
 
 // https://nodejs.org/docs/latest/api/child_process.html#event-close
 // "One of the two will always be non-null."

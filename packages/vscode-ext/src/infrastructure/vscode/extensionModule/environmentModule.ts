@@ -15,18 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { ICompanion } from '@v/application/ports/services/ICompanion';
-import type { IPathResolver } from '@v/application/ports/services/IPathResolver';
-import type { IExtensionModule } from '@v/application/ports/vscode/IExtensionModule';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
 import { type ExtensionContext, extensions } from 'vscode';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { ICompanion } from '@/application/ports/services/ICompanion';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class EnvironmentModule implements IExtensionModule {

@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
+import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type {
   FilePathResult,
   ITestcaseIoService,
-} from '@v/application/ports/problems/ITestcaseIoService';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import { TOKENS } from '@v/composition/tokens';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
-import { inject, injectable } from 'tsyringe';
+} from '@/application/ports/problems/ITestcaseIoService';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import { TOKENS } from '@/composition/tokens';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 @injectable()
 export class TestcaseIoService implements ITestcaseIoService {

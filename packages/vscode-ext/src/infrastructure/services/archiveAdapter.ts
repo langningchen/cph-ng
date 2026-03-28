@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IArchive } from '@v/application/ports/services/IArchive';
-import { TOKENS } from '@v/composition/tokens';
 import AdmZip from 'adm-zip';
 import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IArchive } from '@/application/ports/services/IArchive';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class ArchiveAdapter implements IArchive {
