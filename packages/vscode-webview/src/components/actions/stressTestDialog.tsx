@@ -22,13 +22,13 @@ import StopCircleIcon from '@mui/icons-material/StopCircle';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { SrcFileSelect } from '@w/components/actions/srcFileSelect';
-import { CphNgButton } from '@w/components/base/cphNgButton';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { RunButtonGroup } from '@w/components/runButtonGroup';
-import { useProblemDispatch } from '@w/context/ProblemContext';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SrcFileSelect } from '@/components/actions/srcFileSelect';
+import { CphNgButton } from '@/components/base/cphNgButton';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { RunButtonGroup } from '@/components/runButtonGroup';
+import { useProblemDispatch } from '@/context/ProblemContext';
 
 interface StressTestDialogProps {
   open: boolean;

@@ -19,9 +19,9 @@ import InputIcon from '@mui/icons-material/Input';
 import SendIcon from '@mui/icons-material/Send';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { useProblemDispatch } from '@w/context/ProblemContext';
 import { useTranslation } from 'react-i18next';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { useProblemDispatch } from '@/context/ProblemContext';
 
 interface CreateProblemProps {
   canImport: boolean;

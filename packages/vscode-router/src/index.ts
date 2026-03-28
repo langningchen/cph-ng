@@ -25,11 +25,11 @@ import type {
   R2cMsg,
 } from '@cph-ng/core';
 import { serve } from '@hono/node-server';
-import { debug, error, info, trace, warn } from '@r/logger';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { Server } from 'socket.io';
+import { debug, error, info, trace, warn } from '@/logger';
 import { config, updateConfig } from './config';
 
 let io: Server<C2rMsg & B2rMsg, R2cMsg & R2bMsg>;

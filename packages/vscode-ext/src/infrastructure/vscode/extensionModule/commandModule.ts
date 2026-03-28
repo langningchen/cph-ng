@@ -15,23 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { ISystem } from '@v/application/ports/node/ISystem';
-import type { ICphMigrationService } from '@v/application/ports/problems/ICphMigrationService';
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { IProblemService } from '@v/application/ports/problems/IProblemService';
-import type { IActivePathService } from '@v/application/ports/vscode/IActivePathService';
-import type { IExtensionModule } from '@v/application/ports/vscode/IExtensionModule';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import { CreateProblem } from '@v/application/useCases/webview/CreateProblem';
-import { ImportProblem } from '@v/application/useCases/webview/ImportProblem';
-import { RunAllTestcases } from '@v/application/useCases/webview/RunAllTestcases';
-import { StopTestcases } from '@v/application/useCases/webview/StopTestcases';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
 import { commands, type ExtensionContext, env } from 'vscode';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { ISystem } from '@/application/ports/node/ISystem';
+import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
+import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import { CreateProblem } from '@/application/useCases/webview/CreateProblem';
+import { ImportProblem } from '@/application/useCases/webview/ImportProblem';
+import { RunAllTestcases } from '@/application/useCases/webview/RunAllTestcases';
+import { StopTestcases } from '@/application/useCases/webview/StopTestcases';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class CommandModule implements IExtensionModule {

@@ -19,16 +19,16 @@ import type { IWebviewTestcase, ProblemId, TestcaseId } from '@cph-ng/core';
 import { VerdictName } from '@cph-ng/core';
 import Box, { type BoxProps } from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import { AcCongrats } from '@w/components/acCongrats';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { ErrorBoundary } from '@w/components/base/errorBoundary';
-import { NoTestcases } from '@w/components/noTestcases';
-import { TestcaseView } from '@w/components/testcaseView';
-import { useConfigState } from '@w/context/ConfigContext';
-import { useProblemDispatch } from '@w/context/ProblemContext';
-import { deleteProps } from '@w/utils';
 import { type DragEvent, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AcCongrats } from '@/components/acCongrats';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { ErrorBoundary } from '@/components/base/errorBoundary';
+import { NoTestcases } from '@/components/noTestcases';
+import { TestcaseView } from '@/components/testcaseView';
+import { useConfigState } from '@/context/ConfigContext';
+import { useProblemDispatch } from '@/context/ProblemContext';
+import { deleteProps } from '@/utils';
 
 interface InfoButtonProps extends BoxProps {
   message: string;

@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { ISystem } from '@v/application/ports/node/ISystem';
-import type { IPathResolver } from '@v/application/ports/services/IPathResolver';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { ISystem } from '@/application/ports/node/ISystem';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class PathResolverMock implements IPathResolver {

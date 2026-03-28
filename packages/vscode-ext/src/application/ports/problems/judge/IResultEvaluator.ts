@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { VerdictName } from '@cph-ng/core';
-import type { ExecutionData } from '@v/domain/execution';
+import type { ExecutionData } from '@/domain/execution';
 
 export interface JudgeRequest {
   executionResult: ExecutionData;

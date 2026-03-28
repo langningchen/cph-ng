@@ -19,14 +19,14 @@
 
 import type { TestcaseId, VerdictName } from '@cph-ng/core';
 import { StressTestState } from '@cph-ng/core';
-import type { ICrypto } from '@v/application/ports/node/ICrypto';
-import type * as History from '@v/application/ports/problems/history';
-import type { IProblemMigrationService } from '@v/application/ports/problems/IProblemMigrationService';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import { TOKENS } from '@v/composition/tokens';
 import mapValues from 'lodash/mapValues';
 import { compare, lte } from 'semver';
 import { inject, injectable } from 'tsyringe';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
+import type * as History from '@/application/ports/problems/history';
+import type { IProblemMigrationService } from '@/application/ports/problems/IProblemMigrationService';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class ProblemMigrationService implements IProblemMigrationService {

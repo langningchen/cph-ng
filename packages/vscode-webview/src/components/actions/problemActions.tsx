@@ -21,18 +21,18 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
-import { BackgroundProblemView } from '@w/components/actions/backgroundProblemView';
-import { DeleteProblemDialog } from '@w/components/actions/deleteProblemDialog';
-import { StressTestDialog } from '@w/components/actions/stressTestDialog';
-import { SubmitDialog } from '@w/components/actions/submitDialog';
-import { HelpButton } from '@w/components/actions/support';
-import { CphNgButton } from '@w/components/base/cphNgButton';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { RunButtonGroup } from '@w/components/runButtonGroup';
-import { useConfigState } from '@w/context/ConfigContext';
-import { useProblemDispatch } from '@w/context/ProblemContext';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BackgroundProblemView } from '@/components/actions/backgroundProblemView';
+import { DeleteProblemDialog } from '@/components/actions/deleteProblemDialog';
+import { StressTestDialog } from '@/components/actions/stressTestDialog';
+import { SubmitDialog } from '@/components/actions/submitDialog';
+import { HelpButton } from '@/components/actions/support';
+import { CphNgButton } from '@/components/base/cphNgButton';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { RunButtonGroup } from '@/components/runButtonGroup';
+import { useConfigState } from '@/context/ConfigContext';
+import { useProblemDispatch } from '@/context/ProblemContext';
 
 interface ProblemActionsProps {
   problemId: ProblemId;

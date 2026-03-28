@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { ProblemId, TestcaseId } from '@cph-ng/core';
-import type { Problem } from '@v/domain/entities/problem';
+import type { Problem } from '@/domain/entities/problem';
 
 export class BackgroundProblem {
   private _ac: AbortController | null = null;

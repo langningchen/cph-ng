@@ -16,6 +16,6 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { mock } from '@t/mock';
-import type { IProcessExecutor } from '@v/application/ports/node/IProcessExecutor';
+import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 
 export const executorMock = mock<IProcessExecutor>();

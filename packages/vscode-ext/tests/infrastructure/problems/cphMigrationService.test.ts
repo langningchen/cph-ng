@@ -2,12 +2,12 @@ import { cryptoMock } from '@t/infrastructure/node/cryptoMock';
 import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { pathMock } from '@t/infrastructure/node/pathMock';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import { TOKENS } from '@v/composition/tokens';
-import { CphMigrationService } from '@v/infrastructure/problems/cphMigrationService';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import { TOKENS } from '@/composition/tokens';
+import { CphMigrationService } from '@/infrastructure/problems/cphMigrationService';
 
 describe('CphMigrationService', () => {
   let service: CphMigrationService;

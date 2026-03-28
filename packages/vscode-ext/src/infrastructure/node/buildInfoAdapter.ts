@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { BuildInfoData, IBuildInfo } from '@v/application/ports/node/IBuildInfo';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IPath } from '@v/application/ports/node/IPath';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
+import type { BuildInfoData, IBuildInfo } from '@/application/ports/node/IBuildInfo';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class BuildInfoAdapter implements IBuildInfo {

@@ -17,7 +17,7 @@
 
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { mock } from '@t/mock';
-import type { ITelemetry } from '@v/application/ports/vscode/ITelemetry';
+import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 
 const logger = loggerMock.withScope('TelemetryMock');
 export const telemetryMock = mock<ITelemetry>();

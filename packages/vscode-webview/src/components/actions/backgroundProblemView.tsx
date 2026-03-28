@@ -21,13 +21,13 @@ import Chip from '@mui/material/Chip';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { CphNgLink } from '@w/components/base/cphNgLink';
-import { CphNgText } from '@w/components/base/cphNgText';
-import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
-import { useProblemDispatch } from '@w/context/ProblemContext';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { CphNgLink } from '@/components/base/cphNgLink';
+import { CphNgText } from '@/components/base/cphNgText';
+import { CphNgTooltip } from '@/components/base/cphNgTooltip';
+import { useProblemDispatch } from '@/context/ProblemContext';
 
 interface BackgroundProblemViewProps {
   backgroundProblems: IWebviewBackgroundProblem[];

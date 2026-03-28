@@ -16,11 +16,11 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { extname } from 'node:path';
-import type { ILanguageRegistry } from '@v/application/ports/problems/judge/langs/ILanguageRegistry';
-import type { ILanguageStrategy } from '@v/application/ports/problems/judge/langs/ILanguageStrategy';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectAll, injectable } from 'tsyringe';
+import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
+import type { ILanguageStrategy } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class LanguageRegistry implements ILanguageRegistry {

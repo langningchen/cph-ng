@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
 import { type MockProxy, mock } from 'vitest-mock-extended';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
 
 const LogLevels = ['info', 'warn', 'error', 'debug', 'trace'] as const;
 type LogLevel = (typeof LogLevels)[number];

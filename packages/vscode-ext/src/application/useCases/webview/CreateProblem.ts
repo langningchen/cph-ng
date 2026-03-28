@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { IActiveProblemCoordinator } from '@v/application/ports/services/IActiveProblemCoordinator';
-import type { IActivePathService } from '@v/application/ports/vscode/IActivePathService';
-import { TOKENS } from '@v/composition/tokens';
-import type { CreateProblemMsg } from '@w/msgs';
+import type { CreateProblemMsg } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class CreateProblem {

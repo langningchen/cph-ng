@@ -16,9 +16,11 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { IFileWithHash, IOverrides } from '@cph-ng/core';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import { AbortReason, type IProcessExecutor } from '@v/application/ports/node/IProcessExecutor';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
+import SHA256 from 'crypto-js/sha256';
+import type { OutputChannel } from 'vscode';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import {
   CompileAborted,
   type CompileAdditionalData,
@@ -27,14 +29,12 @@ import {
   type ILanguageStrategy,
   type LangCompileData,
   type LangCompileResult,
-} from '@v/application/ports/problems/judge/langs/ILanguageStrategy';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITelemetry } from '@v/application/ports/vscode/ITelemetry';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { LanguageStrategyContext } from '@v/infrastructure/problems/judge/langs/languageStrategyContext';
-import SHA256 from 'crypto-js/sha256';
-import type { OutputChannel } from 'vscode';
+} from '@/application/ports/problems/judge/langs/ILanguageStrategy';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { LanguageStrategyContext } from '@/infrastructure/problems/judge/langs/languageStrategyContext';
 
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
   canUseWrapper: false,

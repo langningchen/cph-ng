@@ -17,7 +17,7 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { checkTranslations, extractKeys } from '@s/check-translations';
+import { checkTranslations, extractKeys } from '@cph-ng/core/check-translations';
 
 process.exit(
   checkTranslations({

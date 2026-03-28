@@ -16,18 +16,18 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { VerdictName } from '@cph-ng/core';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
-import type { ICheckerRunner } from '@v/application/ports/problems/judge/ICheckerRunner';
+import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { ICheckerRunner } from '@/application/ports/problems/judge/ICheckerRunner';
 import type {
   FinalResult,
   IResultEvaluator,
   JudgeRequest,
-} from '@v/application/ports/problems/judge/IResultEvaluator';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import { TOKENS } from '@v/composition/tokens';
-import { Grader } from '@v/domain/services/Grader';
-import { inject, injectable } from 'tsyringe';
+} from '@/application/ports/problems/judge/IResultEvaluator';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import { TOKENS } from '@/composition/tokens';
+import { Grader } from '@/domain/services/Grader';
 
 @injectable()
 export class ResultEvaluatorAdaptor implements IResultEvaluator {

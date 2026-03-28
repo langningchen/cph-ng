@@ -17,8 +17,8 @@
 
 import { dirname, resolve } from 'node:path';
 import { mock } from '@t/mock';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
 import { createFsFromVolume, Volume } from 'memfs';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 
 export function createFileSystemMock(vol: InstanceType<typeof Volume> = new Volume()) {
   const fs = createFsFromVolume(vol);

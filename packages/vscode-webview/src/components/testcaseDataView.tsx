@@ -24,14 +24,14 @@ import DifferenceIcon from '@mui/icons-material/Difference';
 import DoneIcon from '@mui/icons-material/Done';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import Box from '@mui/material/Box';
-import { CphNgButton } from '@w/components/base/cphNgButton';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { CphNgLink } from '@w/components/base/cphNgLink';
-import { useProblemDispatch } from '@w/context/ProblemContext';
 import { type AnserJsonEntry, ansiToJson } from 'anser';
 import { type CSSProperties, memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
+import { CphNgButton } from '@/components/base/cphNgButton';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { CphNgLink } from '@/components/base/cphNgLink';
+import { useProblemDispatch } from '@/context/ProblemContext';
 
 interface OutputActions {
   onSetAnswer: () => void;

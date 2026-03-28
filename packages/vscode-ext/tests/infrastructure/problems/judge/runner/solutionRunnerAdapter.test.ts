@@ -3,15 +3,15 @@ import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { translatorMock } from '@t/infrastructure/vscode/translatorMock';
 import { mock } from '@t/mock';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
-import type { IExecutionStrategyFactory } from '@v/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
-import type { IExecutionStrategy } from '@v/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
-import { TOKENS } from '@v/composition/tokens';
-import { ExecutionRejected } from '@v/domain/execution';
-import { SolutionRunnerAdapter } from '@v/infrastructure/problems/judge/runner/solutionRunnerAdapter';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { IExecutionStrategyFactory } from '@/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
+import type { IExecutionStrategy } from '@/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
+import { TOKENS } from '@/composition/tokens';
+import { ExecutionRejected } from '@/domain/execution';
+import { SolutionRunnerAdapter } from '@/infrastructure/problems/judge/runner/solutionRunnerAdapter';
 
 describe('SolutionRunnerAdapter', () => {
   let runner: SolutionRunnerAdapter;

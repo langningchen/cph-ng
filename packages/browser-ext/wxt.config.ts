@@ -102,7 +102,6 @@ export default defineConfig({
     resolve: {
       alias: {
         '@b': resolve(__dirname, './src'),
-        '@cph-ng/core': resolve(__dirname, '../core/src'),
       },
     },
     build: {

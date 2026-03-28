@@ -1,13 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
     "outDir": "out",
     "lib": ["ES2022", "DOM"],
     "paths": {
-      "@w/*": ["./src/*"],
-      "@cph-ng/core": ["../core/out/src"],
-      "@cph-ng/core/*": ["../core/out/src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src/**/*", "src/**/*.json"],

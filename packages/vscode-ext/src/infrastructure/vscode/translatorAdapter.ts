@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
 import { injectable } from 'tsyringe';
 import { l10n } from 'vscode';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 
 @injectable()
 export class TranslatorAdapter implements ITranslator {

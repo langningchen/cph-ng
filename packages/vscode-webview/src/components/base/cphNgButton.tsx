@@ -17,9 +17,9 @@
 
 import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
 import type SvgIcon from '@mui/material/SvgIcon';
-import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
-import { deleteProps } from '@w/utils';
 import { forwardRef } from 'react';
+import { CphNgTooltip } from '@/components/base/cphNgTooltip';
+import { deleteProps } from '@/utils';
 
 interface CphNgButtonProps extends IconButtonProps {
   icon: typeof SvgIcon;

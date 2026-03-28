@@ -16,8 +16,8 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { basename, dirname, extname, join, normalize, relative, resolve } from 'node:path';
-import type { IPath } from '@v/application/ports/node/IPath';
 import { injectable } from 'tsyringe';
+import type { IPath } from '@/application/ports/node/IPath';
 
 @injectable()
 export class PathAdapter implements IPath {

@@ -1,9 +1,9 @@
-import { ExecutionStrategyFactoryAdapter } from '@v/infrastructure/problems/judge/runner/executionStrategyFactoryAdapter';
-import { ExternalRunnerStrategy } from '@v/infrastructure/problems/judge/runner/strategies/externalRunnerStrategy';
-import { NormalStrategy } from '@v/infrastructure/problems/judge/runner/strategies/normalStrategy';
-import { WrapperStrategy } from '@v/infrastructure/problems/judge/runner/strategies/wrapperStrategy';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { ExecutionStrategyFactoryAdapter } from '@/infrastructure/problems/judge/runner/executionStrategyFactoryAdapter';
+import { ExternalRunnerStrategy } from '@/infrastructure/problems/judge/runner/strategies/externalRunnerStrategy';
+import { NormalStrategy } from '@/infrastructure/problems/judge/runner/strategies/normalStrategy';
+import { WrapperStrategy } from '@/infrastructure/problems/judge/runner/strategies/wrapperStrategy';
 
 describe('ExecutionStrategyFactoryAdapter', () => {
   let factory: ExecutionStrategyFactoryAdapter;

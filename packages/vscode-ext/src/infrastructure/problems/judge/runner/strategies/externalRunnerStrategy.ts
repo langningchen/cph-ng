@@ -16,22 +16,22 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { constants } from 'node:os';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
+import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import {
   AbortReason,
   type IProcessExecutor,
   type ProcessHandle,
-} from '@v/application/ports/node/IProcessExecutor';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
-import type { IExecutionStrategy } from '@v/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
-import type { IRunnerProvider } from '@v/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITelemetry } from '@v/application/ports/vscode/ITelemetry';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import { TOKENS } from '@v/composition/tokens';
-import type { ExecutionContext, ExecutionData, ExecutionResult } from '@v/domain/execution';
-import { inject, injectable } from 'tsyringe';
+} from '@/application/ports/node/IProcessExecutor';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { IExecutionStrategy } from '@/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
+import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import { TOKENS } from '@/composition/tokens';
+import type { ExecutionContext, ExecutionData, ExecutionResult } from '@/domain/execution';
 
 export type RunnerOutput =
   | {

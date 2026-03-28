@@ -1,9 +1,9 @@
-import { InteractiveJudgeService } from '@v/application/useCases/problems/judge/interactiveJudgeService';
-import { TraditionalJudgeService } from '@v/application/useCases/problems/judge/traditionalJudgeService';
-import { Problem } from '@v/domain/entities/problem';
-import { JudgeServiceFactory } from '@v/infrastructure/problems/judge/judgeServiceFactoryAdapter';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { InteractiveJudgeService } from '@/application/useCases/problems/judge/interactiveJudgeService';
+import { TraditionalJudgeService } from '@/application/useCases/problems/judge/traditionalJudgeService';
+import { Problem } from '@/domain/entities/problem';
+import { JudgeServiceFactory } from '@/infrastructure/problems/judge/judgeServiceFactoryAdapter';
 
 describe('JudgeServiceFactory', () => {
   let factory: JudgeServiceFactory;

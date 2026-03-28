@@ -15,7 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IClock } from '@v/application/ports/node/IClock';
+import type { TelemetryEventMeasurements, TelemetryReporter } from '@vscode/extension-telemetry';
+import { inject, injectable } from 'tsyringe';
+import { TelemetryTrustedValue as vsTelemetryTrustedValue } from 'vscode';
+import type { IClock } from '@/application/ports/node/IClock';
 import {
   type ITelemetry,
   TELEMETRY_ERROR_NAMES,
@@ -24,11 +27,8 @@ import {
   type TelemetryEventProps,
   type TelemetryName,
   TelemetryTrustedValue,
-} from '@v/application/ports/vscode/ITelemetry';
-import { TOKENS } from '@v/composition/tokens';
-import type { TelemetryEventMeasurements, TelemetryReporter } from '@vscode/extension-telemetry';
-import { inject, injectable } from 'tsyringe';
-import { TelemetryTrustedValue as vsTelemetryTrustedValue } from 'vscode';
+} from '@/application/ports/vscode/ITelemetry';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class TelemetryAdapter implements ITelemetry {

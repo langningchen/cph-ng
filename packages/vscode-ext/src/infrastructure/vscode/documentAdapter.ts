@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IDocument } from '@v/application/ports/vscode/IDocument';
 import { injectable } from 'tsyringe';
 import { window } from 'vscode';
+import type { IDocument } from '@/application/ports/vscode/IDocument';
 
 @injectable()
 export class DocumentAdapter implements IDocument {

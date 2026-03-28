@@ -20,4 +20,5 @@ export * from './protocol';
 export * from './types';
 export * from './verdict';
 export * from './webview';
-export * from './webviewMessage';
+export * from './webviewEvents';
+export * from './webviewMessages';

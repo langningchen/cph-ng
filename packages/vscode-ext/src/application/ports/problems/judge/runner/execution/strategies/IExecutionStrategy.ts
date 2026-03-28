@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ExecutionContext, ExecutionResult } from '@v/domain/execution';
+import type { ExecutionContext, ExecutionResult } from '@/domain/execution';
 
 export interface IExecutionStrategy {
   execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult>;

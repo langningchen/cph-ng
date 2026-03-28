@@ -2,15 +2,15 @@ import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 import { translatorMock } from '@t/infrastructure/vscode/translatorMock';
 import { mock } from '@t/mock';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IPathResolver } from '@v/application/ports/services/IPathResolver';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import { TOKENS } from '@v/composition/tokens';
-import { Problem } from '@v/domain/entities/problem';
-import { TemplateRenderer } from '@v/infrastructure/services/templateRenderer';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import { TOKENS } from '@/composition/tokens';
+import { Problem } from '@/domain/entities/problem';
+import { TemplateRenderer } from '@/infrastructure/services/templateRenderer';
 
 describe('TemplateRenderer', () => {
   let renderer: TemplateRenderer;

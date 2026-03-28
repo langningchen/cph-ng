@@ -1,16 +1,16 @@
 import type { IFileWithHash } from '@cph-ng/core';
+import { inject, injectable } from 'tsyringe';
 import type {
   CompileData,
   CompileResult,
   ICompilerService,
-} from '@v/application/ports/problems/judge/ICompilerService';
-import type { ILanguageRegistry } from '@v/application/ports/problems/judge/langs/ILanguageRegistry';
-import type { LangCompileResult } from '@v/application/ports/problems/judge/langs/ILanguageStrategy';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import { TOKENS } from '@v/composition/tokens';
-import type { Problem } from '@v/domain/entities/problem';
-import { inject, injectable } from 'tsyringe';
+} from '@/application/ports/problems/judge/ICompilerService';
+import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
+import type { LangCompileResult } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import { TOKENS } from '@/composition/tokens';
+import type { Problem } from '@/domain/entities/problem';
 
 @injectable()
 export class CompilerService implements ICompilerService {

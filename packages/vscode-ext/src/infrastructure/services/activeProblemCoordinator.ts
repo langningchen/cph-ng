@@ -16,21 +16,21 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { TestcaseId, WithRevision } from '@cph-ng/core';
-import type { ICphMigrationService } from '@v/application/ports/problems/ICphMigrationService';
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { IActiveProblemCoordinator } from '@v/application/ports/services/IActiveProblemCoordinator';
-import type { IActivePathService } from '@v/application/ports/vscode/IActivePathService';
-import type { IExtensionContext } from '@v/application/ports/vscode/IExtensionContext';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { IProblemFs } from '@v/application/ports/vscode/IProblemFs';
-import type { IWebviewEventBus } from '@v/application/ports/vscode/IWebviewEventBus';
-import { TOKENS } from '@v/composition/tokens';
-import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
-import type { Problem, ProblemMetaPayload } from '@v/domain/entities/problem';
-import type { StressTest } from '@v/domain/entities/stressTest';
-import type { Testcase, TestcaseResult } from '@v/domain/entities/testcase';
-import { WebviewProblemMapper } from '@v/infrastructure/vscode/webviewProblemMapper';
 import { inject, injectable } from 'tsyringe';
+import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
+import type { IExtensionContext } from '@/application/ports/vscode/IExtensionContext';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
+import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
+import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import type { Problem, ProblemMetaPayload } from '@/domain/entities/problem';
+import type { StressTest } from '@/domain/entities/stressTest';
+import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
+import { WebviewProblemMapper } from '@/infrastructure/vscode/webviewProblemMapper';
 
 @injectable()
 export class ActiveProblemCoordinator implements IActiveProblemCoordinator {

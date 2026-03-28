@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ISidebarProvider } from '@v/application/ports/vscode/ISidebarProvider';
-import type { IWebviewEventBus } from '@v/application/ports/vscode/IWebviewEventBus';
-import { TOKENS } from '@v/composition/tokens';
-import { WebviewHtmlRenderer } from '@v/infrastructure/vscode/webviewHtmlRenderer';
-import { WebviewProtocolHandler } from '@v/infrastructure/vscode/webviewProtocolHandler';
 import { inject, injectable } from 'tsyringe';
 import { Uri, type WebviewView } from 'vscode';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvider';
+import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
+import { TOKENS } from '@/composition/tokens';
+import { WebviewHtmlRenderer } from '@/infrastructure/vscode/webviewHtmlRenderer';
+import { WebviewProtocolHandler } from '@/infrastructure/vscode/webviewProtocolHandler';
 
 @injectable()
 export class SidebarProvider implements ISidebarProvider {

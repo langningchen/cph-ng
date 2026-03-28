@@ -1,10 +1,10 @@
 import type { TestcaseId } from '@cph-ng/core';
 import { StressTestState, VerdictName } from '@cph-ng/core';
-import { Problem } from '@v/domain/entities/problem';
-import { StressTest } from '@v/domain/entities/stressTest';
-import { Testcase } from '@v/domain/entities/testcase';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
 import { describe, expect, it, vi } from 'vitest';
+import { Problem } from '@/domain/entities/problem';
+import { StressTest } from '@/domain/entities/stressTest';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 describe('Problem', () => {
   const createTestcase = (input = '', answer = '') =>

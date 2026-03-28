@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { mock } from '@t/mock';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 
 export const translatorMock = mock<ITranslator>();
 translatorMock.t.mockImplementation((message, args) => {

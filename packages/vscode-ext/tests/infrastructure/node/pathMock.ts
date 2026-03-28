@@ -17,7 +17,7 @@
 
 import { basename, dirname, extname, join, relative, resolve } from 'node:path/posix';
 import { mock } from '@t/mock';
-import type { IPath } from '@v/application/ports/node/IPath';
+import type { IPath } from '@/application/ports/node/IPath';
 
 export const pathMock = mock<IPath>();
 pathMock.join.mockImplementation(join);

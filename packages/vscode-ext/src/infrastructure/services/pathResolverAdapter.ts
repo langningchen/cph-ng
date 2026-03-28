@@ -18,16 +18,16 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: Expected curly for resolver
 
 import { existsSync } from 'node:fs';
-import type { IPath } from '@v/application/ports/node/IPath';
-import type { ISystem } from '@v/application/ports/node/ISystem';
-import type { IPathResolver } from '@v/application/ports/services/IPathResolver';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
 import { Uri, window, workspace } from 'vscode';
+import type { IPath } from '@/application/ports/node/IPath';
+import type { ISystem } from '@/application/ports/node/ISystem';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class PathResolverAdapter implements IPathResolver {

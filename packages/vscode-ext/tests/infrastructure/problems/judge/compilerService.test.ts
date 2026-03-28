@@ -1,15 +1,15 @@
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { translatorMock } from '@t/infrastructure/vscode/translatorMock';
 import { mock } from '@t/mock';
-import type { CompileData } from '@v/application/ports/problems/judge/ICompilerService';
-import type { ILanguageRegistry } from '@v/application/ports/problems/judge/langs/ILanguageRegistry';
-import type { ILanguageStrategy } from '@v/application/ports/problems/judge/langs/ILanguageStrategy';
-import { TOKENS } from '@v/composition/tokens';
-import { Problem } from '@v/domain/entities/problem';
-import { CompilerService } from '@v/infrastructure/problems/judge/compilerService';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { CompileData } from '@/application/ports/problems/judge/ICompilerService';
+import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
+import type { ILanguageStrategy } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
+import { TOKENS } from '@/composition/tokens';
+import { Problem } from '@/domain/entities/problem';
+import { CompilerService } from '@/infrastructure/problems/judge/compilerService';
 
 describe('CompilerService', () => {
   let service: CompilerService;

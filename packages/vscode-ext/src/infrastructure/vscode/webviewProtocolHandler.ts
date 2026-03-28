@@ -15,39 +15,39 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import { AddTestcase } from '@v/application/useCases/webview/AddTestcase';
-import { ChooseSrcFile } from '@v/application/useCases/webview/ChooseSrcFile';
-import { ChooseTestcaseFile } from '@v/application/useCases/webview/ChooseTestcaseFile';
-import { ClearTestcaseStatus } from '@v/application/useCases/webview/ClearTestcaseStatus';
-import { CompareTestcase } from '@v/application/useCases/webview/CompareTestcase';
-import { CreateProblem } from '@v/application/useCases/webview/CreateProblem';
-import { DeleteProblem } from '@v/application/useCases/webview/DeleteProblem';
-import { DeleteTestcase } from '@v/application/useCases/webview/DeleteTestcase';
-import { DragDrop } from '@v/application/useCases/webview/DragDrop';
-import { EditProblemDetails } from '@v/application/useCases/webview/EditProblemDetails';
-import { ImportProblem } from '@v/application/useCases/webview/ImportProblem';
-import { Init } from '@v/application/useCases/webview/Init';
-import { LoadTestcases } from '@v/application/useCases/webview/LoadTestcases';
-import type { IMsgHandle } from '@v/application/useCases/webview/msgHandle';
-import { OpenFile } from '@v/application/useCases/webview/OpenFile';
-import { OpenTestlib } from '@v/application/useCases/webview/OpenTestlib';
-import { RemoveSrcFile } from '@v/application/useCases/webview/RemoveSrcFile';
-import { ReorderTestcase } from '@v/application/useCases/webview/ReorderTestcase';
-import { RunAllTestcases } from '@v/application/useCases/webview/RunAllTestcases';
-import { RunSingleTestcase } from '@v/application/useCases/webview/RunSingleTestcase';
-import { SetTestcaseString } from '@v/application/useCases/webview/SetTestcaseString';
-import { StartStressTest } from '@v/application/useCases/webview/StartStressTest';
-import { StopStressTest } from '@v/application/useCases/webview/StopStressTest';
-import { StopTestcases } from '@v/application/useCases/webview/StopTestcases';
-import { Submit } from '@v/application/useCases/webview/Submit';
-import { ToggleTestcaseFile } from '@v/application/useCases/webview/ToggleTestcaseFile';
-import { UpdateTestcase } from '@v/application/useCases/webview/UpdateTestcase';
-import { TOKENS } from '@v/composition/tokens';
-import type { WebviewMsg } from '@w/msgs';
+import type { WebviewMsg } from '@cph-ng/core';
 import { container, type InjectionToken, inject, injectable } from 'tsyringe';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import { AddTestcase } from '@/application/useCases/webview/AddTestcase';
+import { ChooseSrcFile } from '@/application/useCases/webview/ChooseSrcFile';
+import { ChooseTestcaseFile } from '@/application/useCases/webview/ChooseTestcaseFile';
+import { ClearTestcaseStatus } from '@/application/useCases/webview/ClearTestcaseStatus';
+import { CompareTestcase } from '@/application/useCases/webview/CompareTestcase';
+import { CreateProblem } from '@/application/useCases/webview/CreateProblem';
+import { DeleteProblem } from '@/application/useCases/webview/DeleteProblem';
+import { DeleteTestcase } from '@/application/useCases/webview/DeleteTestcase';
+import { DragDrop } from '@/application/useCases/webview/DragDrop';
+import { EditProblemDetails } from '@/application/useCases/webview/EditProblemDetails';
+import { ImportProblem } from '@/application/useCases/webview/ImportProblem';
+import { Init } from '@/application/useCases/webview/Init';
+import { LoadTestcases } from '@/application/useCases/webview/LoadTestcases';
+import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
+import { OpenFile } from '@/application/useCases/webview/OpenFile';
+import { OpenTestlib } from '@/application/useCases/webview/OpenTestlib';
+import { RemoveSrcFile } from '@/application/useCases/webview/RemoveSrcFile';
+import { ReorderTestcase } from '@/application/useCases/webview/ReorderTestcase';
+import { RunAllTestcases } from '@/application/useCases/webview/RunAllTestcases';
+import { RunSingleTestcase } from '@/application/useCases/webview/RunSingleTestcase';
+import { SetTestcaseString } from '@/application/useCases/webview/SetTestcaseString';
+import { StartStressTest } from '@/application/useCases/webview/StartStressTest';
+import { StopStressTest } from '@/application/useCases/webview/StopStressTest';
+import { StopTestcases } from '@/application/useCases/webview/StopTestcases';
+import { Submit } from '@/application/useCases/webview/Submit';
+import { ToggleTestcaseFile } from '@/application/useCases/webview/ToggleTestcaseFile';
+import { UpdateTestcase } from '@/application/useCases/webview/UpdateTestcase';
+import { TOKENS } from '@/composition/tokens';
 
 const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<WebviewMsg>>> = {
   addTestcase: AddTestcase,

@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IExtensionContext } from '@v/application/ports/vscode/IExtensionContext';
 import { injectable } from 'tsyringe';
 import { commands } from 'vscode';
+import type { IExtensionContext } from '@/application/ports/vscode/IExtensionContext';
 
 @injectable()
 export class ExtensionContextAdapter implements IExtensionContext {

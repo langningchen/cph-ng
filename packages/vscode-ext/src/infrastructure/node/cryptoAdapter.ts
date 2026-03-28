@@ -16,8 +16,8 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { createHash, randomUUID, type UUID } from 'node:crypto';
-import type { ICrypto } from '@v/application/ports/node/ICrypto';
 import { injectable } from 'tsyringe';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
 
 @injectable()
 export class CryptoAdapter implements ICrypto {

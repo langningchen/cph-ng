@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { inject, injectable } from 'tsyringe';
 import type {
   ExecutionStrategyType,
   IExecutionStrategyFactory,
-} from '@v/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
-import type { IExecutionStrategy } from '@v/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
-import { ExternalRunnerStrategy } from '@v/infrastructure/problems/judge/runner/strategies/externalRunnerStrategy';
-import { NormalStrategy } from '@v/infrastructure/problems/judge/runner/strategies/normalStrategy';
-import { WrapperStrategy } from '@v/infrastructure/problems/judge/runner/strategies/wrapperStrategy';
-import { inject, injectable } from 'tsyringe';
+} from '@/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
+import type { IExecutionStrategy } from '@/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
+import { ExternalRunnerStrategy } from '@/infrastructure/problems/judge/runner/strategies/externalRunnerStrategy';
+import { NormalStrategy } from '@/infrastructure/problems/judge/runner/strategies/normalStrategy';
+import { WrapperStrategy } from '@/infrastructure/problems/judge/runner/strategies/wrapperStrategy';
 
 @injectable()
 export class ExecutionStrategyFactoryAdapter implements IExecutionStrategyFactory {

@@ -1,9 +1,9 @@
 import { pathMock } from '@t/infrastructure/node/pathMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
-import { TOKENS } from '@v/composition/tokens';
-import { TestcaseMatcher } from '@v/domain/services/TestcaseMatcher';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { TOKENS } from '@/composition/tokens';
+import { TestcaseMatcher } from '@/domain/services/TestcaseMatcher';
 
 describe('TestcaseMatcher', () => {
   let matcher: TestcaseMatcher;

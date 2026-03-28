@@ -19,12 +19,12 @@ import type { ProblemId } from '@cph-ng/core';
 import CloseIcon from '@mui/icons-material/Close';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import Typography from '@mui/material/Typography';
-import { CphNgButton } from '@w/components/base/cphNgButton';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { CphNgLink } from '@w/components/base/cphNgLink';
-import { useProblemDispatch } from '@w/context/ProblemContext';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CphNgButton } from '@/components/base/cphNgButton';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { CphNgLink } from '@/components/base/cphNgLink';
+import { useProblemDispatch } from '@/context/ProblemContext';
 
 interface SrcFileSelectProps {
   label: string;

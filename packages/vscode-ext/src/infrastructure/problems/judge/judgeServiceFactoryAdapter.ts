@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IJudgeService } from '@v/application/ports/problems/judge/IJudgeService';
-import type { IJudgeServiceFactory } from '@v/application/ports/problems/judge/IJudgeServiceFactory';
-import { InteractiveJudgeService } from '@v/application/useCases/problems/judge/interactiveJudgeService';
-import { TraditionalJudgeService } from '@v/application/useCases/problems/judge/traditionalJudgeService';
-import type { Problem } from '@v/domain/entities/problem';
 import { inject, injectable } from 'tsyringe';
+import type { IJudgeService } from '@/application/ports/problems/judge/IJudgeService';
+import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
+import { InteractiveJudgeService } from '@/application/useCases/problems/judge/interactiveJudgeService';
+import { TraditionalJudgeService } from '@/application/useCases/problems/judge/traditionalJudgeService';
+import type { Problem } from '@/domain/entities/problem';
 
 @injectable()
 export class JudgeServiceFactory implements IJudgeServiceFactory {

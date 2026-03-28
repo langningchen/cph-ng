@@ -15,27 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TestcaseId } from '@cph-ng/core';
+import type { RunAllTestcasesMsg, TestcaseId } from '@cph-ng/core';
 import { VerdictName, Verdicts, VerdictType } from '@cph-ng/core';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { ITestcaseIoService } from '@v/application/ports/problems/ITestcaseIoService';
-import type { ICompilerService } from '@v/application/ports/problems/judge/ICompilerService';
-import type { IJudgeObserver } from '@v/application/ports/problems/judge/IJudgeObserver';
-import type { JudgeContext } from '@v/application/ports/problems/judge/IJudgeService';
-import type { IJudgeServiceFactory } from '@v/application/ports/problems/judge/IJudgeServiceFactory';
-import type { FinalResult } from '@v/application/ports/problems/judge/IResultEvaluator';
+import { inject, injectable } from 'tsyringe';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
+import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
+import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
+import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
+import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
+import type { FinalResult } from '@/application/ports/problems/judge/IResultEvaluator';
 import {
   CompileAborted,
   CompileError,
-} from '@v/application/ports/problems/judge/langs/ILanguageStrategy';
-import type { IDocument } from '@v/application/ports/vscode/IDocument';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import { BaseProblemUseCase } from '@v/application/useCases/webview/BaseProblemUseCase';
-import { TOKENS } from '@v/composition/tokens';
-import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
-import type { RunAllTestcasesMsg } from '@w/msgs';
-import { inject, injectable } from 'tsyringe';
+} from '@/application/ports/problems/judge/langs/ILanguageStrategy';
+import type { IDocument } from '@/application/ports/vscode/IDocument';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 @injectable()
 export class RunAllTestcases extends BaseProblemUseCase<RunAllTestcasesMsg> {

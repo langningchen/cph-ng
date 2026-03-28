@@ -18,20 +18,20 @@
 import Alert from '@mui/material/Alert';
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { ErrorBoundary } from '@w/components/base/errorBoundary';
-import { CreateProblemView } from '@w/components/createProblemView';
-import { DragOverlay } from '@w/components/dragOverlay';
-import { InitView } from '@w/components/initView';
-import { ProblemView } from '@w/components/problemView';
-import { ConfigProvider, useConfigState } from '@w/context/ConfigContext';
-import { ProblemProvider, useProblemState } from '@w/context/ProblemContext';
-import langEn from '@w/l10n/en.json';
-import langZh from '@w/l10n/zh.json';
 import i18n from 'i18next';
 import { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initReactI18next, useTranslation } from 'react-i18next';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { ErrorBoundary } from '@/components/base/errorBoundary';
+import { CreateProblemView } from '@/components/createProblemView';
+import { DragOverlay } from '@/components/dragOverlay';
+import { InitView } from '@/components/initView';
+import { ProblemView } from '@/components/problemView';
+import { ConfigProvider, useConfigState } from '@/context/ConfigContext';
+import { ProblemProvider, useProblemState } from '@/context/ProblemContext';
+import langEn from '@/l10n/en.json';
+import langZh from '@/l10n/zh.json';
 
 i18n.use(initReactI18next).init({
   resources: {

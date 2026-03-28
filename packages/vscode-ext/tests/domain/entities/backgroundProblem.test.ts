@@ -1,7 +1,7 @@
 import type { ProblemId, TestcaseId } from '@cph-ng/core';
-import { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
-import { Problem } from '@v/domain/entities/problem';
 import { describe, expect, it } from 'vitest';
+import { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import { Problem } from '@/domain/entities/problem';
 
 describe('BackgroundProblem', () => {
   const makeBg = (startTime = 1000) => {

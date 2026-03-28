@@ -2,13 +2,13 @@ import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
 import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import { TOKENS } from '@v/composition/tokens';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
-import { TestcaseIoService } from '@v/infrastructure/problems/testcaseIoService';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import { TOKENS } from '@/composition/tokens';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import { TestcaseIoService } from '@/infrastructure/problems/testcaseIoService';
 
 describe('TestcaseIoService', () => {
   let service: TestcaseIoService;

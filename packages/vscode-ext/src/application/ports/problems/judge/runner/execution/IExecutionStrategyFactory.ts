@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IExecutionStrategy } from '@v/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
+import type { IExecutionStrategy } from '@/application/ports/problems/judge/runner/execution/strategies/IExecutionStrategy';
 
 export type ExecutionStrategyType = 'normal' | 'wrapper' | 'external';
 

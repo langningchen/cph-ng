@@ -30,11 +30,11 @@ import type {
   WebviewPatchTestcasePayload,
   WebviewPatchTestcaseResultPayload,
 } from '@cph-ng/core';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { IWebviewEventBus } from '@v/application/ports/vscode/IWebviewEventBus';
-import { TOKENS } from '@v/composition/tokens';
 import { inject, injectable } from 'tsyringe';
 import type TypedEventEmitter from 'typed-emitter';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
+import { TOKENS } from '@/composition/tokens';
 
 type WebviewEvents = {
   message: (payload: WebviewEvent) => void;

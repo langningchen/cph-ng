@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { checkTranslations, extractKeys, loadJsonFile } from '@s/check-translations';
+import { checkTranslations, extractKeys, loadJsonFile } from '@cph-ng/core/check-translations';
 
 const extensionHasError = checkTranslations({
   title: 'Extension Configuration',

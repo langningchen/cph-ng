@@ -25,19 +25,19 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
-import { CphNgButton } from '@w/components/base/cphNgButton';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { CphNgMenu } from '@w/components/base/cphNgMenu';
-import { CphNgText } from '@w/components/base/cphNgText';
-import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
-import { ErrorBoundary } from '@w/components/base/errorBoundary';
-import { RunButtonGroup } from '@w/components/runButtonGroup';
-import { TestcaseDataView } from '@w/components/testcaseDataView';
-import { useProblemDispatch } from '@w/context/ProblemContext';
 import MD5 from 'crypto-js/md5';
 import { isNil } from 'lodash';
 import { type DragEvent, memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CphNgButton } from '@/components/base/cphNgButton';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { CphNgMenu } from '@/components/base/cphNgMenu';
+import { CphNgText } from '@/components/base/cphNgText';
+import { CphNgTooltip } from '@/components/base/cphNgTooltip';
+import { ErrorBoundary } from '@/components/base/errorBoundary';
+import { RunButtonGroup } from '@/components/runButtonGroup';
+import { TestcaseDataView } from '@/components/testcaseDataView';
+import { useProblemDispatch } from '@/context/ProblemContext';
 
 interface TestcaseViewProp {
   problemId: ProblemId;

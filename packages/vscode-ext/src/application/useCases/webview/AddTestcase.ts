@@ -15,16 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TestcaseId } from '@cph-ng/core';
-import type { ICrypto } from '@v/application/ports/node/ICrypto';
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import { BaseProblemUseCase } from '@v/application/useCases/webview/BaseProblemUseCase';
-import { TOKENS } from '@v/composition/tokens';
-import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
-import { Testcase } from '@v/domain/entities/testcase';
-import { TestcaseIo } from '@v/domain/entities/testcaseIo';
-import type { AddTestcaseMsg } from '@w/msgs';
+import type { AddTestcaseMsg, TestcaseId } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 @injectable()
 export class AddTestcase extends BaseProblemUseCase<AddTestcaseMsg> {

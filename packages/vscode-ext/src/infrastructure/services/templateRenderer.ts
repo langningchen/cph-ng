@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IPathResolver } from '@v/application/ports/services/IPathResolver';
-import type { ITemplateRenderer } from '@v/application/ports/services/ITemplateRenderer';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import { TOKENS } from '@v/composition/tokens';
-import type { Problem } from '@v/domain/entities/problem';
 import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPathResolver } from '@/application/ports/services/IPathResolver';
+import type { ITemplateRenderer } from '@/application/ports/services/ITemplateRenderer';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import { TOKENS } from '@/composition/tokens';
+import type { Problem } from '@/domain/entities/problem';
 
 @injectable()
 export class TemplateRenderer implements ITemplateRenderer {

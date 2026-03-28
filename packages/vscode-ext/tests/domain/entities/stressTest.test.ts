@@ -1,6 +1,6 @@
 import { StressTestState } from '@cph-ng/core';
-import { isRunningState, StressTest } from '@v/domain/entities/stressTest';
 import { describe, expect, it, vi } from 'vitest';
+import { isRunningState, StressTest } from '@/domain/entities/stressTest';
 
 describe('StressTest', () => {
   describe('constructor defaults', () => {

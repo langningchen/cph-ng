@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { mock } from '@t/mock';
-import type { ISystem } from '@v/application/ports/node/ISystem';
+import type { ISystem } from '@/application/ports/node/ISystem';
 
 export const systemMock = mock<ISystem>();
 systemMock.cwd.mockReturnValue('/working/directory');

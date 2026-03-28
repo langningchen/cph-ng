@@ -16,14 +16,14 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { EventEmitter } from 'node:events';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi, StatusBarController } from '@v/application/ports/vscode/IUi';
-import { TOKENS } from '@v/composition/tokens';
-import type { BatchList } from '@v/infrastructure/services/companion/companion';
-import type { RouterStatus } from '@v/infrastructure/services/companion/companionCommunicationService';
 import { inject, injectable } from 'tsyringe';
 import type TypedEventEmitter from 'typed-emitter';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi, StatusBarController } from '@/application/ports/vscode/IUi';
+import { TOKENS } from '@/composition/tokens';
+import type { BatchList } from '@/infrastructure/services/companion/companion';
+import type { RouterStatus } from '@/infrastructure/services/companion/companionCommunicationService';
 
 type CompanionStatusbarEvents = {
   click: () => void;

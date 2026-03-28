@@ -16,18 +16,18 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { BatchId, CompanionProblem, SubmitData } from '@cph-ng/core';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { ICompanion } from '@v/application/ports/services/ICompanion';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import type { ISettings } from '@v/application/ports/vscode/ISettings';
-import type { ITranslator } from '@v/application/ports/vscode/ITranslator';
-import type { IUi } from '@v/application/ports/vscode/IUi';
-import { ImportCompanionProblems } from '@v/application/useCases/companion/ImportCompanionProblems';
-import { TOKENS } from '@v/composition/tokens';
-import type { Problem } from '@v/domain/entities/problem';
-import { CompanionCommunicationService } from '@v/infrastructure/services/companion/companionCommunicationService';
-import { CompanionStatusbarService } from '@v/infrastructure/services/companion/companionStatusbarService';
 import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { ICompanion } from '@/application/ports/services/ICompanion';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ITranslator } from '@/application/ports/vscode/ITranslator';
+import type { IUi } from '@/application/ports/vscode/IUi';
+import { ImportCompanionProblems } from '@/application/useCases/companion/ImportCompanionProblems';
+import { TOKENS } from '@/composition/tokens';
+import type { Problem } from '@/domain/entities/problem';
+import { CompanionCommunicationService } from '@/infrastructure/services/companion/companionCommunicationService';
+import { CompanionStatusbarService } from '@/infrastructure/services/companion/companionStatusbarService';
 
 export type BatchList = Map<BatchId, CompanionProblem[]>;
 

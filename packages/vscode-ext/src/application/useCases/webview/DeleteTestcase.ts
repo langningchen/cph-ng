@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IProblemRepository } from '@v/application/ports/problems/IProblemRepository';
-import type { IProblemService } from '@v/application/ports/problems/IProblemService';
-import { BaseProblemUseCase } from '@v/application/useCases/webview/BaseProblemUseCase';
-import { TOKENS } from '@v/composition/tokens';
-import type { BackgroundProblem } from '@v/domain/entities/backgroundProblem';
-import type { DeleteTestcaseMsg } from '@w/msgs';
+import type { DeleteTestcaseMsg } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
+import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 @injectable()
 export class DeleteTestcase extends BaseProblemUseCase<DeleteTestcaseMsg> {

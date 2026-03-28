@@ -19,8 +19,8 @@ import Box, { type BoxProps } from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import type { PopoverPosition } from '@mui/material/Popover';
-import { deleteProps } from '@w/utils';
 import { type MouseEvent, type ReactNode, useState } from 'react';
+import { deleteProps } from '@/utils';
 
 interface CphNgMenuProps extends BoxProps {
   children: ReactNode;

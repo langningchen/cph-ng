@@ -2,13 +2,13 @@ import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { executorMock } from '@t/infrastructure/node/processExecutorMock';
 import { TempStorageMock } from '@t/infrastructure/node/tempStorageMock';
 import { loggerMock } from '@t/infrastructure/vscode/loggerMock';
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { ProcessOutput } from '@v/application/ports/node/IProcessExecutor';
-import { TOKENS } from '@v/composition/tokens';
-import { CheckerRunnerAdapter } from '@v/infrastructure/problems/judge/checkerRunnerAdapter';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { ProcessOutput } from '@/application/ports/node/IProcessExecutor';
+import { TOKENS } from '@/composition/tokens';
+import { CheckerRunnerAdapter } from '@/infrastructure/problems/judge/checkerRunnerAdapter';
 
 describe('CheckerRunnerAdapter', () => {
   let runner: CheckerRunnerAdapter;

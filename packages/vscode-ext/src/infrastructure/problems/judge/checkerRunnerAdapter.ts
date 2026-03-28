@@ -15,17 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileSystem } from '@v/application/ports/node/IFileSystem';
-import type { IProcessExecutor } from '@v/application/ports/node/IProcessExecutor';
-import type { ITempStorage } from '@v/application/ports/node/ITempStorage';
+import { inject, injectable } from 'tsyringe';
+import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
+import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type {
   CheckerOptions,
   CheckerResult,
   ICheckerRunner,
-} from '@v/application/ports/problems/judge/ICheckerRunner';
-import type { ILogger } from '@v/application/ports/vscode/ILogger';
-import { TOKENS } from '@v/composition/tokens';
-import { inject, injectable } from 'tsyringe';
+} from '@/application/ports/problems/judge/ICheckerRunner';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class CheckerRunnerAdapter implements ICheckerRunner {

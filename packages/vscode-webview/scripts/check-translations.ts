@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { join } from 'node:path';
-import { checkTranslations, extractKeys } from '@s/check-translations';
+import { checkTranslations, extractKeys } from '@cph-ng/core/check-translations';
 
 process.exit(
   checkTranslations({

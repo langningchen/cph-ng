@@ -1,20 +1,20 @@
 import { VerdictName } from '@cph-ng/core';
 import { translatorMock } from '@t/infrastructure/vscode/translatorMock';
 import { mock } from '@t/mock';
-import type { IProblemService } from '@v/application/ports/problems/IProblemService';
-import type { IJudgeObserver } from '@v/application/ports/problems/judge/IJudgeObserver';
-import type { JudgeContext } from '@v/application/ports/problems/judge/IJudgeService';
-import type { IResultEvaluator } from '@v/application/ports/problems/judge/IResultEvaluator';
-import type { ILanguageRegistry } from '@v/application/ports/problems/judge/langs/ILanguageRegistry';
-import type { ILanguageStrategy } from '@v/application/ports/problems/judge/langs/ILanguageStrategy';
-import type { ISolutionRunner } from '@v/application/ports/problems/judge/runner/ISolutionRunner';
-import { InteractiveJudgeService } from '@v/application/useCases/problems/judge/interactiveJudgeService';
-import { TOKENS } from '@v/composition/tokens';
-import { Problem } from '@v/domain/entities/problem';
-import { ExecutionRejected, type InteractiveExecutionResult } from '@v/domain/execution';
 import { container } from 'tsyringe';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
+import type { IProblemService } from '@/application/ports/problems/IProblemService';
+import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
+import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
+import type { IResultEvaluator } from '@/application/ports/problems/judge/IResultEvaluator';
+import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
+import type { ILanguageStrategy } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
+import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
+import { InteractiveJudgeService } from '@/application/useCases/problems/judge/interactiveJudgeService';
+import { TOKENS } from '@/composition/tokens';
+import { Problem } from '@/domain/entities/problem';
+import { ExecutionRejected, type InteractiveExecutionResult } from '@/domain/execution';
 
 describe('InteractiveJudgeService', () => {
   let service: InteractiveJudgeService;

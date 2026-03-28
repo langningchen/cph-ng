@@ -31,15 +31,15 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Tab from '@mui/material/Tab';
 import TextField from '@mui/material/TextField';
 import type { TypographyProps } from '@mui/material/Typography';
-import { CphNgButton } from '@w/components/base/cphNgButton';
-import { CphNgFlex } from '@w/components/base/cphNgFlex';
-import { CphNgLink } from '@w/components/base/cphNgLink';
-import { CphNgMenu } from '@w/components/base/cphNgMenu';
-import { CphNgText } from '@w/components/base/cphNgText';
-import { CphNgTooltip } from '@w/components/base/cphNgTooltip';
-import { useProblemDispatch } from '@w/context/ProblemContext';
 import { memo, type SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CphNgButton } from '@/components/base/cphNgButton';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { CphNgLink } from '@/components/base/cphNgLink';
+import { CphNgMenu } from '@/components/base/cphNgMenu';
+import { CphNgText } from '@/components/base/cphNgText';
+import { CphNgTooltip } from '@/components/base/cphNgTooltip';
+import { useProblemDispatch } from '@/context/ProblemContext';
 
 interface ProblemTitleProps {
   problemId: ProblemId;

@@ -9,11 +9,8 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     retry: 3,
     alias: {
-      '@v/': resolve(__dirname, 'src') + '/',
-      '@t/': resolve(__dirname, 'tests') + '/',
-      '@w/': resolve(__dirname, '../vscode-webview/src') + '/',
-      '@r/': resolve(__dirname, '../vscode-router/src') + '/',
-      '@cph-ng/core': resolve(__dirname, '../core/src'),
+      '@/': resolve(__dirname, 'src') + '/',
+      '@t/': resolve(__dirname, 'tests') + '/'
     },
     coverage: {
       provider: 'v8',

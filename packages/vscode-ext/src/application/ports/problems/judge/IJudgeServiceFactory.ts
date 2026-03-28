@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IJudgeService } from '@v/application/ports/problems/judge/IJudgeService';
-import type { Problem } from '@v/domain/entities/problem';
+import type { IJudgeService } from '@/application/ports/problems/judge/IJudgeService';
+import type { Problem } from '@/domain/entities/problem';
 
 export interface IJudgeServiceFactory {
   create(problem: Problem): IJudgeService;
