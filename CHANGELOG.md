@@ -2,6 +2,22 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.6
+
+- **chore**(deps): bump the npm-non-major group with 10 updates ([#199](https://github.com/langningchen/cph-ng/issues/199))
+- **feat**(dependabot): add configuration for npm and GitHub Actions updates ([#198](https://github.com/langningchen/cph-ng/issues/198))
+- **feat**(vscode-webview): dynamic load configuration ([#196](https://github.com/langningchen/cph-ng/issues/196))
+- **fix**(vscode-ext): update vscode support version to 1.97.0 ([#194](https://github.com/langningchen/cph-ng/issues/194)) ([#197](https://github.com/langningchen/cph-ng/issues/197))
+- **fix**(vscode-ext): enhance testcase loading functionality with zip and folder options ([#195](https://github.com/langningchen/cph-ng/issues/195))
+- **feat**(vscode-webview): add links for Edge and Firefox add-ons in support menu ([#193](https://github.com/langningchen/cph-ng/issues/193))
+- **feat**(vscode-ext): add confirmation dialog for submission ([#184](https://github.com/langningchen/cph-ng/issues/184)) ([#192](https://github.com/langningchen/cph-ng/issues/192))
+- **refactor**: rename submit command ([#191](https://github.com/langningchen/cph-ng/issues/191))
+- **feat**(ci): add GitHub Actions labeler configuration ([#190](https://github.com/langningchen/cph-ng/issues/190))
+- **fix**(ci): add translation check and type checking steps to CI workflow ([#189](https://github.com/langningchen/cph-ng/issues/189))
+- **fix**(companion): forbid zero shutdown timeout ([#188](https://github.com/langningchen/cph-ng/issues/188))
+- **fix**(vscode-ext): load file from non input files ([#180](https://github.com/langningchen/cph-ng/issues/180))
+- **chore**(webpack): change webpack devtool template
+
 ## 0.7.5
 
 - **fix**(browser-ext): prevent badge color update in Firefox

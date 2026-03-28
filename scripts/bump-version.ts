@@ -15,12 +15,6 @@ const die = (message: string): never => {
   process.exit(1);
 };
 
-// Ensure work tree clean
-const status = execSync('git status --porcelain', { encoding: 'utf-8' }).trim();
-if (status.length > 0) {
-  die('Working tree is not clean. Please commit or stash your changes first.');
-}
-
 // Parse arguments
 const args = process.argv.slice(2);
 const bumpType = args.find((arg) => ['patch', 'minor', 'major'].includes(arg)) as
@@ -28,16 +22,24 @@ const bumpType = args.find((arg) => ['patch', 'minor', 'major'].includes(arg)) a
   | 'minor'
   | 'major'
   | undefined;
-
 const isPreRelease = args.includes('--pre-release') || args.includes('-p');
+const isForce = args.includes('--force') || args.includes('-f');
 
 if (!bumpType) {
-  console.error('Usage: pnpm bump <patch|minor|major> [--pre-release|-p]');
+  console.error('Usage: pnpm bump <patch|minor|major> [--pre-release|-p] [--force|-f]');
   console.error('  --pre-release, -p: Mark as pre-release version');
+  console.error('  --force, -f: Skip working tree check');
   process.exit(1);
 }
 
 const releaseType = isPreRelease ? 'Pre-release' : 'Release';
+
+// Ensure work tree clean
+if (!isForce) {
+  const status = execSync('git status --porcelain', { encoding: 'utf-8' }).trim();
+  if (status.length > 0)
+    die('Working tree is not clean. Please commit or stash your changes first.');
+}
 
 // Find configuration files
 const findPackageJsons = (): string[] => {
@@ -173,6 +175,7 @@ if (commits.length === 0) {
 
 const commitAndExit = (version: string) => {
   console.log(`\n🚀 Committing changes...`);
+  execSync(`git checkout -b chore/version-dump-${version}`);
   execSync('git add -A', { stdio: 'inherit' });
   execSync(`git commit -m "chore: dump version to ${version}"`, { stdio: 'inherit' });
   console.log(`\n✅ Successfully committed version ${version}.`);
