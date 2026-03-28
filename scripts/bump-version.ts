@@ -35,9 +35,10 @@ if (!bumpType) {
 const releaseType = isPreRelease ? 'Pre-release' : 'Release';
 
 // Ensure work tree clean
-const status = execSync('git status --porcelain', { encoding: 'utf-8' }).trim();
-if (status.length > 0 && !isForce) {
-  die('Working tree is not clean. Please commit or stash your changes first.');
+if (!isForce) {
+  const status = execSync('git status --porcelain', { encoding: 'utf-8' }).trim();
+  if (status.length > 0)
+    die('Working tree is not clean. Please commit or stash your changes first.');
 }
 
 // Find configuration files
