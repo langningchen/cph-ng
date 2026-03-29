@@ -16,8 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import Alert from '@mui/material/Alert';
-import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import i18n from 'i18next';
 import { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -27,6 +26,7 @@ import { ErrorBoundary } from '@/components/base/errorBoundary';
 import { CreateProblemView } from '@/components/createProblemView';
 import { DragOverlay } from '@/components/dragOverlay';
 import { InitView } from '@/components/initView';
+import { OobeView } from '@/components/oobe';
 import { ProblemView } from '@/components/problemView';
 import { ConfigProvider, useConfigState } from '@/context/ConfigContext';
 import { ProblemProvider, useProblemState } from '@/context/ProblemContext';
@@ -46,9 +46,9 @@ const Main = () => {
   const problem = useProblemState();
   const config = useConfigState();
   const { t } = useTranslation();
-  const theme = useTheme();
-  const isNarrow = useMediaQuery(theme.breakpoints.down('xl'));
 
+  // biome-ignore lint/correctness/noConstantCondition: test only
+  if (1 + 1 === 2) return <OobeView />;
   if (!problem.isReady || !config.isReady) return <InitView />;
 
   return (
@@ -72,11 +72,12 @@ const Main = () => {
           ) : (
             <CreateProblemView canImport={problem.currentProblem.canImport} />
           )}
-          {isNarrow && (
-            <Alert severity='info' sx={{ fontSize: '0.75rem', py: 0 }}>
-              {t('main.narrowWidthAlert')}
-            </Alert>
-          )}
+          <Alert
+            severity='info'
+            sx={{ fontSize: '0.75rem', py: 0, display: { sm: 'block', xl: 'none' } }}
+          >
+            {t('main.narrowWidthAlert')}
+          </Alert>
         </CphNgFlex>
       </ErrorBoundary>
     </>

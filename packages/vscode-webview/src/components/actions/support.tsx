@@ -25,17 +25,7 @@ import { Divider, ListItemIcon, Menu, MenuItem } from '@mui/material';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CphNgButton } from '@/components/base/cphNgButton';
-
-const openLink = (url: string) => () => {
-  const a = document.createElement('a');
-  a.href = url;
-  a.target = '_blank';
-  a.rel = 'noopener noreferrer';
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-};
+import { openLink, urls } from '@/utils';
 
 export const HelpButton = () => {
   const { t } = useTranslation();
@@ -62,43 +52,39 @@ export const HelpButton = () => {
       />
 
       <Menu anchorEl={anchorRef.current} open={open} onClose={handleClose}>
-        <MenuItem onClick={openLink('https://github.com/langningchen/cph-ng')}>
+        <MenuItem onClick={openLink(urls.github)}>
           <ListItemIcon>
             <GitHubIcon fontSize='small' />
           </ListItemIcon>
           {t('support.github')}
         </MenuItem>
-        <MenuItem onClick={openLink('https://github.com/langningchen/cph-ng/issues')}>
+        <MenuItem onClick={openLink(urls.feedback)}>
           <ListItemIcon>
             <BugReportIcon fontSize='small' />
           </ListItemIcon>
           {t('support.feedback')}
         </MenuItem>
-        <MenuItem onClick={openLink('https://deepwiki.com/langningchen/cph-ng')}>
+        <MenuItem onClick={openLink(urls.docs)}>
           <ListItemIcon>
             <DescriptionIcon fontSize='small' />
           </ListItemIcon>
           {t('support.docs')}
         </MenuItem>
         <Divider />
-        <MenuItem
-          onClick={openLink(
-            'https://microsoftedge.microsoft.com/addons/detail/cphng-submit/hfpfdaggmljfccmnfljldojbgfhpfomb',
-          )}
-        >
+        <MenuItem onClick={openLink(urls.edgeAddon)}>
           <ListItemIcon>
             <ExtensionIcon fontSize='small' />
           </ListItemIcon>
           {t('support.edgeAddon')}
         </MenuItem>
-        <MenuItem onClick={openLink('https://addons.mozilla.org/firefox/addon/cph-ng-submit/')}>
+        <MenuItem onClick={openLink(urls.firefoxAddon)}>
           <ListItemIcon>
             <ExtensionIcon fontSize='small' />
           </ListItemIcon>
           {t('support.firefoxAddon')}
         </MenuItem>
         <Divider />
-        <MenuItem onClick={openLink('https://qm.qq.com/q/pXStina3jU')}>
+        <MenuItem onClick={openLink(urls.joinQQ)}>
           <ListItemIcon>
             <GroupIcon fontSize='small' />
           </ListItemIcon>
