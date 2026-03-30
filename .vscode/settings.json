@@ -41,6 +41,7 @@
   "docthis.includeMemberOfOnClassMembers": false,
   "docthis.includeMemberOfOnInterfaceMembers": false,
   "emmet.showAbbreviationSuggestions": false,
-  "emmet.showExpandedAbbreviation": "never"
-  // "explorer.excludeGitIgnore": true
+  "emmet.showExpandedAbbreviation": "never",
+  "explorer.excludeGitIgnore": true,
+  "editor.defaultFormatter": "biomejs.biome"
 }
