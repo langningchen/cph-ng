@@ -15,6 +15,7 @@ CPH-NG Submit currently supports the following online judge platforms:
 - Codeforces
 - AtCoder
 - Luogu
+- Hydro
 
 More platforms will be added in future updates. If you have a specific platform you'd like to see supported, please submit a feature request on the [GitHub repository](https://github.com/langningchen/cph-ng/issues).
 
