@@ -126,11 +126,18 @@ export const TestcaseDataView = memo(
       }),
       [],
     );
-    useEffect(() => debouncedOnChange.cancel, [debouncedOnChange]);
+    useEffect(
+      () => () => {
+        debouncedOnChange.flush();
+        debouncedOnChange.cancel();
+      },
+      [debouncedOnChange],
+    );
 
     useEffect(() => {
+      debouncedOnChange.cancel();
       setInternalValue(value);
-    }, [value]);
+    }, [debouncedOnChange, value]);
 
     useEffect(() => {
       if (autoFocus && textareaRef.current) textareaRef.current.focus();
