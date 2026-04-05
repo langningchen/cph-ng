@@ -25,8 +25,8 @@ import DoneIcon from '@mui/icons-material/Done';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import Box from '@mui/material/Box';
 import { type AnserJsonEntry, ansiToJson } from 'anser';
-import { debounce } from 'lodash';
-import { type CSSProperties, memo, useCallback, useEffect, useRef, useState } from 'react';
+import debounce from 'lodash/debounce';
+import { type CSSProperties, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
 import { CphNgButton } from '@/components/base/cphNgButton';
@@ -119,11 +119,12 @@ export const TestcaseDataView = memo(
     useEffect(() => {
       onChangeRef.current = onChange;
     }, [onChange]);
-    const debouncedOnChange = useCallback(
-      debounce((val: string) => onChangeRef.current?.(val), 500, {
-        leading: false,
-        trailing: true,
-      }),
+    const debouncedOnChange = useMemo(
+      () =>
+        debounce((val: string) => onChangeRef.current?.(val), 500, {
+          leading: false,
+          trailing: true,
+        }),
       [],
     );
     useEffect(
