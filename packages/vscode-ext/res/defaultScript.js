@@ -22,12 +22,22 @@ const process = async () => {
     return 'No workspace folder found';
   }
   let folder = null;
-  if (workspaceFolders.length > 1)
-    folder = await ui.chooseItem(
+  if (workspaceFolders.length > 1) {
+    const selectedFolderName = await ui.chooseItem(
       workspaceFolders.map((f) => f.name),
       'Select a workspace folder to create files in',
     );
-  else
+    if (selectedFolderName === undefined) {
+      return 'No workspace folder selected';
+    }
+    const selectedFolder = workspaceFolders.find(
+      (f) => f.name === selectedFolderName,
+    );
+    if (!selectedFolder) {
+      return 'Selected workspace folder not found';
+    }
+    folder = selectedFolder.path;
+  } else
     folder = workspaceFolders[0].path;
 
   const ext = 'cpp';

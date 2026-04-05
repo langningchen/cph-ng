@@ -71,7 +71,7 @@ An array of `WorkspaceFolderContext` objects representing the current VS Code wo
 
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `uri` | `string` | Absolute path of the workspace folder |
+| `path` | `string` | Absolute path of the workspace folder |
 | `name` | `string` | Display name of the workspace folder |
 | `index` | `number` | Zero-based index of the workspace folder |
 
@@ -186,10 +186,10 @@ async function process() {
 
 ```javascript
 // ✓ Good
-const filePath = path.join(workspaceFolders[0].uri, "problems", fileName);
+const filePath = path.join(workspaceFolders[0].path, "problems", fileName);
 
 // ✗ Bad
-const filePath = workspaceFolders[0].uri + "/problems/" + fileName;
+const filePath = workspaceFolders[0].path + "/problems/" + fileName;
 ```
 
 ### Filename Sanitization
