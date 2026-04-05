@@ -25,7 +25,7 @@ This is the next generation of the
 | Competitive Companion   | ✅                       | ✅                       |
 | Local Problem Support   | ✅                       | ✅                       |
 | Language Support        | ✅ C/C++ and 8 others    | ⚠️ Only common [^1]      |
-| Auto-submit Integration | ✅ Codeforces and Kattis | ✅ 4 Platforms [^2]       |
+| Auto-submit Integration | ✅ Codeforces and Kattis | ✅ 4 platforms [^2]       |
 | Load Local Testcases    | ❌                       | ✅                       |
 | Supported Result        | ⚠️ Only 3                | ✅ AC and 10 others [^3] |
 | Store Result and Time   | ❌                       | ✅                       |
