@@ -16,20 +16,11 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { existsSync } from 'node:fs';
-import {
-  basename,
-  dirname,
-  extname,
-  format,
-  isAbsolute,
-  join,
-  normalize,
-  parse,
-  sep,
-} from 'node:path';
+import path, { isAbsolute } from 'node:path';
 import { createContext, Script } from 'node:vm';
 import type { CompanionProblem } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
+import type { LogOutputChannel } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type {
@@ -44,8 +35,6 @@ import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class UserScriptService implements IUserScriptService {
-  private outputLogger: ILogger;
-
   public constructor(
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.logger) private readonly logger: ILogger,
@@ -53,9 +42,9 @@ export class UserScriptService implements IUserScriptService {
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
+    @inject(TOKENS.userScriptOutputChannel) public readonly outputLogger: LogOutputChannel,
   ) {
     this.logger = this.logger.withScope('userScriptService');
-    this.outputLogger = this.logger.withScope('userScript');
   }
 
   public async resolvePaths(
@@ -87,27 +76,28 @@ export class UserScriptService implements IUserScriptService {
       URL,
       problems,
       workspaceFolders,
-      path: { join, basename, dirname, extname, sep, normalize, isAbsolute, parse, format },
+      path,
       fs: { existsSync },
       utils: {
         sanitize: (name: string) => name.replace(/[\\/:*?"<>|]/g, '_'),
       },
       logger: {
-        trace: (...args: unknown[]) => this.outputLogger.trace('', ...args),
-        debug: (...args: unknown[]) => this.outputLogger.debug('', ...args),
-        info: (...args: unknown[]) => this.outputLogger.info('', ...args),
-        warn: (...args: unknown[]) => this.outputLogger.warn('', ...args),
-        error: (...args: unknown[]) => this.outputLogger.error('', ...args),
+        trace: (message: string, ...args: unknown[]) => this.outputLogger.trace(message, ...args),
+        debug: (message: string, ...args: unknown[]) => this.outputLogger.debug(message, ...args),
+        info: (message: string, ...args: unknown[]) => this.outputLogger.info(message, ...args),
+        warn: (message: string, ...args: unknown[]) => this.outputLogger.warn(message, ...args),
+        error: (message: string, ...args: unknown[]) => this.outputLogger.error(message, ...args),
       },
       ui: {
-        chooseFolder: async (title?: string) =>
+        chooseFolder: async (title?: string): Promise<string | undefined> =>
           await this.ui.chooseFolder(title || this.translator.t('Choose folder for problem')),
-        chooseItem: async (items: string[], placeholder?: string) =>
+        chooseItem: async (items: string[], placeHolder?: string): Promise<string | undefined> =>
           await this.ui.quickPick(
-            items.map((item) => ({ label: item, value: item })),
-            { placeHolder: placeholder },
+            items.map((value) => ({ label: value, value })),
+            { placeHolder },
           ),
-        input: async (prompt?: string, value?: string) => await this.ui.input({ prompt, value }),
+        input: async (prompt?: string, value?: string): Promise<string | undefined> =>
+          await this.ui.input({ prompt, value }),
       },
     });
 
@@ -135,24 +125,32 @@ export class UserScriptService implements IUserScriptService {
         this.ui.alert('error', result);
         return undefined;
       }
-
-      if (Array.isArray(result)) {
-        const mapped = result.map((r) => (typeof r === 'string' && r.trim().length > 0 ? r : null));
-        if (mapped.some((r) => r !== null && !isAbsolute(r))) {
-          this.ui.alert(
-            'error',
-            this.translator.t('All paths returned by user script must be absolute'),
-          );
-          return undefined;
-        }
-        while (mapped.length < problems.length) {
-          mapped.push(null);
-        }
-        return mapped.slice(0, problems.length);
+      if (!Array.isArray(result)) {
+        this.ui.alert('error', this.translator.t('User script does not return an array'));
+        return undefined;
       }
-
-      this.ui.alert('error', this.translator.t('User script does not return a valid path array'));
-      return undefined;
+      if (result.length !== problems.length) {
+        this.ui.alert(
+          'error',
+          this.translator.t('User script must return an array with the same length as problems'),
+        );
+        return undefined;
+      }
+      if (result.some((r) => r !== null && typeof r !== 'string')) {
+        this.ui.alert(
+          'error',
+          this.translator.t('User script must return an array of strings or nulls'),
+        );
+        return undefined;
+      }
+      if (result.some((r) => r !== null && !isAbsolute(r))) {
+        this.ui.alert(
+          'error',
+          this.translator.t('All paths returned by user script must be absolute'),
+        );
+        return undefined;
+      }
+      return result;
     } catch (e) {
       this.logger.error('Error executing user script sandbox', e);
       this.ui.alert('error', this.translator.t('Error executing user script sandbox'));
