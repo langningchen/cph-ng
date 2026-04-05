@@ -15,27 +15,36 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { DeleteTestcaseMsg } from '@cph-ng/core';
+import type { StopTestcasesMsg } from '@cph-ng/core';
+import { VerdictName, Verdicts, VerdictType } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import type { IProblemService } from '@/application/ports/problems/IProblemService';
-import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 @injectable()
-export class DeleteTestcase extends BaseProblemUseCase<DeleteTestcaseMsg> {
+export class StopTestcases extends BaseProblemUseCase<StopTestcasesMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.problemService) protected readonly problemService: IProblemService,
   ) {
     super(repo);
   }
 
   protected async performAction(
-    { problem }: BackgroundProblem,
-    msg: DeleteTestcaseMsg,
+    bgProblem: BackgroundProblem,
+    msg: StopTestcasesMsg,
   ): Promise<void> {
-    problem.deleteTestcase(msg.testcaseId);
+    if (!bgProblem.ac) {
+      const testcaseOrder = bgProblem.problem.getEnabledTestcaseIds();
+      for (const testcaseId of testcaseOrder) {
+        const testcase = bgProblem.problem.getTestcase(testcaseId);
+        if (
+          testcase.result?.verdict &&
+          Verdicts[testcase.result?.verdict].type === VerdictType.running
+        )
+          testcase.updateResult({ verdict: VerdictName.rejected });
+      }
+    } else bgProblem.abort(msg.testcaseId);
   }
 }
