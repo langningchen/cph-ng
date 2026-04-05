@@ -72,6 +72,7 @@ export const TOKENS = {
   extensionPath: 'vscode.ExtensionPath' as InjectionToken<string>,
   logOutputChannel: 'vscode.LogOutputChannel' as InjectionToken<LogOutputChannel>,
   compilationOutputChannel: 'vscode.CompilationOutputChannel' as InjectionToken<OutputChannel>,
+  userScriptOutputChannel: 'vscode.UserScriptOutputChannel' as InjectionToken<LogOutputChannel>,
   telemetryReporter: 'vscode.TelemetryReporter' as InjectionToken<TelemetryReporter>,
   version: 'vscode.Version' as InjectionToken<string>,
 

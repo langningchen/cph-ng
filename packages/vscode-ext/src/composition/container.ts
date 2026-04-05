@@ -142,6 +142,10 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   const translator = container.resolve(TOKENS.translator);
   const compilationOutputChannel = window.createOutputChannel(translator.t('CPH-NG Compilation'));
   container.registerInstance(TOKENS.compilationOutputChannel, compilationOutputChannel);
+  const userScriptOutputChannel = window.createOutputChannel(translator.t('CPH-NG User Script'), {
+    log: true,
+  });
+  container.registerInstance(TOKENS.userScriptOutputChannel, userScriptOutputChannel);
 
   const buildInfo = container.resolve(TOKENS.buildInfo);
   if (buildInfo.load) await buildInfo.load();

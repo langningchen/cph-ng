@@ -15,12 +15,20 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+/// <reference path="./cph-ng.d.ts" />
+
 const process = async () => {
   if (!workspaceFolders || workspaceFolders.length === 0) {
     return 'No workspace folder found';
   }
-  const folder = workspaceFolders[0].path;
-  // const folder = await ui.chooseFolder();
+  let folder = null;
+  if (workspaceFolders.length > 1)
+    folder = await ui.chooseItem(
+      workspaceFolders.map((f) => f.name),
+      'Select a workspace folder to create files in',
+    );
+  else
+    folder = workspaceFolders[0].path;
 
   const ext = 'cpp';
   const results = [];
