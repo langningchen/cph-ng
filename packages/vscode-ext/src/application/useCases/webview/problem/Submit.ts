@@ -15,27 +15,24 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { EditProblemDetailsMsg } from '@cph-ng/core';
+import type { SubmitMsg } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import type { ICompanion } from '@/application/ports/services/ICompanion';
+import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 @injectable()
-export class EditProblemDetails extends BaseProblemUseCase<EditProblemDetailsMsg> {
+export class Submit extends BaseProblemUseCase<SubmitMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.companion) protected readonly companion: ICompanion,
   ) {
     super(repo);
   }
 
-  protected async performAction(
-    { problem }: BackgroundProblem,
-    msg: EditProblemDetailsMsg,
-  ): Promise<void> {
-    problem.name = msg.name;
-    problem.url = msg.url;
-    problem.overrides = msg.overrides;
+  protected async performAction({ problem }: BackgroundProblem, _msg: SubmitMsg): Promise<void> {
+    await this.companion.submit(problem);
   }
 }

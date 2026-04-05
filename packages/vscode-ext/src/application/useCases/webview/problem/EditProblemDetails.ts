@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UpdateTestcaseMsg } from '@cph-ng/core';
+import type { EditProblemDetailsMsg } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 @injectable()
-export class UpdateTestcase extends BaseProblemUseCase<UpdateTestcaseMsg> {
+export class EditProblemDetails extends BaseProblemUseCase<EditProblemDetailsMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
   ) {
@@ -32,12 +32,10 @@ export class UpdateTestcase extends BaseProblemUseCase<UpdateTestcaseMsg> {
 
   protected async performAction(
     { problem }: BackgroundProblem,
-    msg: UpdateTestcaseMsg,
+    msg: EditProblemDetailsMsg,
   ): Promise<void> {
-    const testcase = problem.getTestcase(msg.testcaseId);
-    if (msg.event === 'setDisable') testcase.isDisabled = msg.value;
-    if (msg.event === 'setExpand') testcase.isExpand = msg.value;
-    if (msg.event === 'setAsAnswer' && testcase.result?.stdout)
-      testcase.answer = testcase.result?.stdout;
+    problem.name = msg.name;
+    problem.url = msg.url;
+    problem.overrides = msg.overrides;
   }
 }

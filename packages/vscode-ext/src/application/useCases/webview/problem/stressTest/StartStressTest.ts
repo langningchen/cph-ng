@@ -37,7 +37,7 @@ import type { FinalResult } from '@/application/ports/problems/judge/IResultEval
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
-import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import type { StressTest } from '@/domain/entities/stressTest';

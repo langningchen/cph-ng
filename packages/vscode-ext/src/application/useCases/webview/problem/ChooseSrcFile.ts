@@ -20,7 +20,7 @@ import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
-import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 

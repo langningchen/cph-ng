@@ -31,7 +31,7 @@ import {
   CompileError,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
-import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 

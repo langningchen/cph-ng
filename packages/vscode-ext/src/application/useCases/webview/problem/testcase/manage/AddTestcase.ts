@@ -15,32 +15,31 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { CompareTestcaseMsg } from '@cph-ng/core';
+import type { AddTestcaseMsg, TestcaseId } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
-import type { IUi } from '@/application/ports/vscode/IUi';
-import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import { Testcase } from '@/domain/entities/testcase';
+import { TestcaseIo } from '@/domain/entities/testcaseIo';
 
 @injectable()
-export class CompareTestcase extends BaseProblemUseCase<CompareTestcaseMsg> {
+export class AddTestcase extends BaseProblemUseCase<AddTestcaseMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
-    @inject(TOKENS.ui) private readonly ui: IUi,
+    @inject(TOKENS.crypto) private readonly crypto: ICrypto,
   ) {
     super(repo);
   }
 
   protected async performAction(
     { problem }: BackgroundProblem,
-    msg: CompareTestcaseMsg,
+    _msg: AddTestcaseMsg,
   ): Promise<void> {
-    this.ui.compareFiles(
-      this.problemFs.getUri(problem.src.path, `/testcases/${msg.testcaseId}/answer`),
-      this.problemFs.getUri(problem.src.path, `/testcases/${msg.testcaseId}/stdout`),
-    );
+    const testcaseId = this.crypto.randomUUID() as TestcaseId;
+    const testcase = new Testcase(new TestcaseIo({ data: '' }), new TestcaseIo({ data: '' }), true);
+    problem.addTestcase(testcaseId, testcase);
   }
 }
