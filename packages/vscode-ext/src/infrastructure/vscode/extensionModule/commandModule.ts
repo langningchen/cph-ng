@@ -27,10 +27,10 @@ import type { IActivePathService } from '@/application/ports/vscode/IActivePathS
 import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
-import { CreateProblem } from '@/application/useCases/webview/CreateProblem';
-import { ImportProblem } from '@/application/useCases/webview/ImportProblem';
-import { RunAllTestcases } from '@/application/useCases/webview/RunAllTestcases';
-import { StopTestcases } from '@/application/useCases/webview/StopTestcases';
+import { CreateProblem } from '@/application/useCases/webview/problem/manage/CreateProblem';
+import { ImportProblem } from '@/application/useCases/webview/problem/manage/ImportProblem';
+import { RunAllTestcases } from '@/application/useCases/webview/problem/testcase/run/RunAllTestcases';
+import { StopTestcases } from '@/application/useCases/webview/problem/testcase/run/StopTestcases';
 import { TOKENS } from '@/composition/tokens';
 
 @injectable()

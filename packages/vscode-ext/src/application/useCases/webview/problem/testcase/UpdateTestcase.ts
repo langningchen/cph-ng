@@ -15,35 +15,29 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { DeleteProblemMsg } from '@cph-ng/core';
+import type { UpdateTestcaseMsg } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import type { IProblemService } from '@/application/ports/problems/IProblemService';
-import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
-import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 @injectable()
-export class DeleteProblem extends BaseProblemUseCase<DeleteProblemMsg> {
+export class UpdateTestcase extends BaseProblemUseCase<UpdateTestcaseMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.problemService) private readonly service: IProblemService,
-    @inject(TOKENS.activeProblemCoordinator)
-    private readonly coordinator: IActiveProblemCoordinator,
   ) {
     super(repo);
   }
 
   protected async performAction(
-    backgroundProblem: BackgroundProblem,
-    _msg: DeleteProblemMsg,
+    { problem }: BackgroundProblem,
+    msg: UpdateTestcaseMsg,
   ): Promise<void> {
-    backgroundProblem.abort();
-    const { problemId, problem } = backgroundProblem;
-    await this.repo.unload(problemId);
-    await this.service.delete(problem);
-    await this.coordinator.onActiveEditorChanged();
-    await this.coordinator.dispatchFullData();
+    const testcase = problem.getTestcase(msg.testcaseId);
+    if (msg.event === 'setDisable') testcase.isDisabled = msg.value;
+    if (msg.event === 'setExpand') testcase.isExpand = msg.value;
+    if (msg.event === 'setAsAnswer' && testcase.result?.stdout)
+      testcase.answer = testcase.result?.stdout;
   }
 }

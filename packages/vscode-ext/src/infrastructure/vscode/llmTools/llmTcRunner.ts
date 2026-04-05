@@ -27,9 +27,9 @@ import type {
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
-import { RunAllTestcases } from '@/application/useCases/webview/RunAllTestcases';
-import { RunSingleTestcase } from '@/application/useCases/webview/RunSingleTestcase';
-import { StopTestcases } from '@/application/useCases/webview/StopTestcases';
+import { RunAllTestcases } from '@/application/useCases/webview/problem/testcase/run/RunAllTestcases';
+import { RunSingleTestcase } from '@/application/useCases/webview/problem/testcase/run/RunSingleTestcase';
+import { StopTestcases } from '@/application/useCases/webview/problem/testcase/run/StopTestcases';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { BaseLlmTool, type BaseLlmToolParams } from './baseLlmTool';
