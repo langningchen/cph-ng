@@ -25,7 +25,8 @@ import DoneIcon from '@mui/icons-material/Done';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import Box from '@mui/material/Box';
 import { type AnserJsonEntry, ansiToJson } from 'anser';
-import { type CSSProperties, memo, useEffect, useRef, useState } from 'react';
+import debounce from 'lodash/debounce';
+import { type CSSProperties, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
 import { CphNgButton } from '@/components/base/cphNgButton';
@@ -114,9 +115,30 @@ export const TestcaseDataView = memo(
     const [internalValue, setInternalValue] = useState(value);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+    const onChangeRef = useRef(onChange);
     useEffect(() => {
+      onChangeRef.current = onChange;
+    }, [onChange]);
+    const debouncedOnChange = useMemo(
+      () =>
+        debounce((val: string) => onChangeRef.current?.(val), 500, {
+          leading: false,
+          trailing: true,
+        }),
+      [],
+    );
+    useEffect(
+      () => () => {
+        debouncedOnChange.flush();
+        debouncedOnChange.cancel();
+      },
+      [debouncedOnChange],
+    );
+
+    useEffect(() => {
+      debouncedOnChange.cancel();
       setInternalValue(value);
-    }, [value]);
+    }, [debouncedOnChange, value]);
 
     useEffect(() => {
       if (autoFocus && textareaRef.current) textareaRef.current.focus();
@@ -245,11 +267,12 @@ export const TestcaseDataView = memo(
               ref={textareaRef}
               value={internalValue.data}
               onChange={(e) => {
-                if (onChange) onChange(e.target.value);
+                const data = e.target.value;
                 setInternalValue({
                   type: 'string',
-                  data: e.target.value,
+                  data,
                 });
+                debouncedOnChange(data);
               }}
               tabIndex={tabIndex}
               maxRows={10}
