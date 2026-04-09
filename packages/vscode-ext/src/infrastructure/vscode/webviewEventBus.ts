@@ -52,6 +52,11 @@ export class WebviewEventBusAdapter implements IWebviewEventBus {
     this.emitter.on('message', handler);
   }
 
+  public openSubmitDialog(problemId: ProblemId): void {
+    this.logger.debug('Emitting openSubmitDialog event', { problemId });
+    this.emitter.emit('message', { type: 'OPEN_SUBMIT_DIALOG', problemId });
+  }
+
   public fullProblem(problemId: ProblemId, payload: IWebviewProblem): void {
     this.logger.debug('Emitting fullProblem event', { problemId, payload });
     this.emitter.emit('message', { type: 'FULL_PROBLEM', problemId, payload });

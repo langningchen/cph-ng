@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { WebviewEvent } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import { Uri, type WebviewView } from 'vscode';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
@@ -29,6 +30,8 @@ import { WebviewProtocolHandler } from '@/infrastructure/vscode/webviewProtocolH
 export class SidebarProvider implements ISidebarProvider {
   public readonly viewType = 'cphNgSidebar';
   private _view?: WebviewView;
+  private isReady = false;
+  private readonly pendingMessages: WebviewEvent[] = [];
 
   public constructor(
     @inject(TOKENS.extensionPath) private readonly extPath: string,
@@ -41,7 +44,8 @@ export class SidebarProvider implements ISidebarProvider {
     this.logger = this.logger.withScope('sidebarProvider');
 
     this.eventBus.onMessage((data) => {
-      this._view?.webview.postMessage(data);
+      if (this.isReady && this._view) this._view.webview.postMessage(data);
+      else this.pendingMessages.push(data);
     });
 
     this.settings.companion.onChangeConfirmSubmit((confirmSubmit) =>
@@ -71,5 +75,14 @@ export class SidebarProvider implements ISidebarProvider {
       showAcGif: this.settings.sidebar.showAcGif,
       hiddenStatuses: this.settings.sidebar.hiddenStatuses,
     });
+  }
+
+  public flushPendingMessages(): void {
+    if (!this._view) return;
+    this.isReady = true;
+    while (this.pendingMessages.length > 0) {
+      const message = this.pendingMessages.shift();
+      if (message) this._view.webview.postMessage(message);
+    }
   }
 }
