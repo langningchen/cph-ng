@@ -60,6 +60,7 @@ export class SidebarProvider implements ISidebarProvider {
   }
 
   public resolveWebviewView(webviewView: WebviewView) {
+    this.isReady = false;
     this._view = webviewView;
     webviewView.webview.options = {
       enableScripts: true,
@@ -78,11 +79,12 @@ export class SidebarProvider implements ISidebarProvider {
   }
 
   public flushPendingMessages(): void {
-    if (!this._view) return;
+    const view = this._view;
+    if (!view) return;
     this.isReady = true;
-    while (this.pendingMessages.length > 0) {
-      const message = this.pendingMessages.shift();
-      if (message) this._view.webview.postMessage(message);
+    for (const message of this.pendingMessages) {
+      view.webview.postMessage(message);
     }
+    this.pendingMessages.length = 0;
   }
 }
