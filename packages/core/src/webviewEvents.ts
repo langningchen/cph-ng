@@ -43,6 +43,7 @@ const WebviewEventName = {
   BACKGROUND: 'BACKGROUND',
   NO_PROBLEM: 'NO_PROBLEM',
   CONFIG_CHANGE: 'CONFIG_CHANGE',
+  OPEN_SUBMIT_DIALOG: 'OPEN_SUBMIT_DIALOG',
 } as const;
 
 interface WebviewFullProblemEvent {
@@ -105,6 +106,10 @@ interface WebviewConfigChangeEvent {
   type: typeof WebviewEventName.CONFIG_CHANGE;
   payload: Partial<WebviewConfig>;
 }
+export interface WebviewOpenSubmitDialogEvent {
+  type: typeof WebviewEventName.OPEN_SUBMIT_DIALOG;
+  problemId: ProblemId;
+}
 
 export type WebviewEvent =
   | WebviewFullProblemEvent
@@ -116,4 +121,5 @@ export type WebviewEvent =
   | WebviewPatchTestcaseResultEvent
   | WebviewBackgroundEvent
   | WebviewNoProblemEvent
-  | WebviewConfigChangeEvent;
+  | WebviewConfigChangeEvent
+  | WebviewOpenSubmitDialogEvent;
