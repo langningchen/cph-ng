@@ -91,16 +91,6 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg | Proble
       draft.submitDialogProblemId = action.problemId;
       return;
     }
-    if (action.type === 'openSubmitDialog') {
-      // This is to be used by the webview UI only
-      draft.submitDialogProblemId = action.problemId;
-      return;
-    }
-    if (action.type === 'closeSubmitDialog') {
-      // This is to be used by the webview UI only
-      draft.submitDialogProblemId = null;
-      return;
-    }
 
     if (draft.currentProblem.type !== 'active') return;
     const problem = draft.currentProblem.problem;
@@ -194,6 +184,14 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg | Proble
       const testcaseOrder = problem.testcaseOrder;
       const [movedTestcase] = testcaseOrder.splice(action.fromIdx, 1);
       testcaseOrder.splice(action.toIdx, 0, movedTestcase);
+      return;
+    }
+    if (action.type === 'openSubmitDialog') {
+      draft.submitDialogProblemId = action.problemId;
+      return;
+    }
+    if (action.type === 'closeSubmitDialog') {
+      draft.submitDialogProblemId = null;
       return;
     }
   });
