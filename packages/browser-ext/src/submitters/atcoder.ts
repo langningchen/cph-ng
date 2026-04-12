@@ -49,10 +49,12 @@ export class AtCoderSubmitter extends BaseSubmitter {
 
     editorBtn.click();
 
-    this.requireInteraction('.cf-challenge');
-    const captchaEl = await this.waitForElement<HTMLInputElement>('.cf-challenge > div > input');
-    await this.waitFor(() => captchaEl.value.trim() !== '');
-    this.clearInteraction();
+    if (document.querySelector('.cf-challenge') !== null) {
+      this.requireInteraction('.cf-challenge');
+      const captchaEl = await this.waitForElement<HTMLInputElement>('.cf-challenge > div > input');
+      await this.waitFor(() => captchaEl.value.trim() !== '');
+      this.clearInteraction();
+    }
 
     const submitBtn = await this.waitForElement<HTMLButtonElement>('#submit');
     submitBtn.click();
