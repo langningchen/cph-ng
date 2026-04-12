@@ -45,19 +45,26 @@ interface CurrentProblemStateActive {
 }
 type CurrentProblemState = CurrentProblemStateIdle | CurrentProblemStateActive;
 
+type ProblemUiMsg =
+  | { type: 'openSubmitDialog'; problemId: ProblemId }
+  | { type: 'closeSubmitDialog' };
+
 type State = {
   isReady: boolean;
   currentProblem: CurrentProblemState;
   backgroundProblems: IWebviewBackgroundProblem[];
+  submitDialogProblemId: ProblemId | null;
 };
 
 const StateContext = createContext<State | undefined>(undefined);
 const DispatchContext = createContext<((msg: WebviewMsg) => void) | undefined>(undefined);
+const UiDispatchContext = createContext<((msg: ProblemUiMsg) => void) | undefined>(undefined);
 
-const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State => {
+const problemReducer = (state: State, action: WebviewEvent | WebviewMsg | ProblemUiMsg): State => {
   return produce(state, (draft) => {
     if (action.type === 'FULL_PROBLEM') {
       draft.isReady = true;
+      draft.submitDialogProblemId = null;
       draft.currentProblem = {
         type: 'active',
         problemId: action.problemId,
@@ -72,11 +79,16 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
     }
     if (action.type === 'NO_PROBLEM') {
       draft.isReady = true;
+      draft.submitDialogProblemId = null;
       draft.currentProblem = { type: 'idle', canImport: action.canImport };
       return;
     }
     if (action.type === 'CONFIG_CHANGE') {
       // We handle this event in the ConfigContext, so we can ignore it here
+      return;
+    }
+    if (action.type === 'OPEN_SUBMIT_DIALOG') {
+      draft.submitDialogProblemId = action.problemId;
       return;
     }
 
@@ -174,6 +186,14 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg): State 
       testcaseOrder.splice(action.toIdx, 0, movedTestcase);
       return;
     }
+    if (action.type === 'openSubmitDialog') {
+      draft.submitDialogProblemId = action.problemId;
+      return;
+    }
+    if (action.type === 'closeSubmitDialog') {
+      draft.submitDialogProblemId = null;
+      return;
+    }
   });
 };
 
@@ -182,6 +202,7 @@ export const ProblemProvider = ({ children }: { children: ReactNode }) => {
     currentProblem: { type: 'idle', canImport: false },
     backgroundProblems: [],
     isReady: false,
+    submitDialogProblemId: null,
   });
 
   useEffect(() => {
@@ -196,9 +217,15 @@ export const ProblemProvider = ({ children }: { children: ReactNode }) => {
     vscode.postMessage(msg);
   }, []);
 
+  const uiDispatch = useCallback((msg: ProblemUiMsg) => {
+    reactDispatch(msg);
+  }, []);
+
   return (
     <DispatchContext.Provider value={dispatch}>
-      <StateContext.Provider value={state}>{children}</StateContext.Provider>
+      <UiDispatchContext.Provider value={uiDispatch}>
+        <StateContext.Provider value={state}>{children}</StateContext.Provider>
+      </UiDispatchContext.Provider>
     </DispatchContext.Provider>
   );
 };
@@ -212,5 +239,11 @@ export const useProblemState = () => {
 export const useProblemDispatch = () => {
   const dispatch = useContext(DispatchContext);
   if (!dispatch) throw new Error('useProblemDispatch must be used within a ProblemProvider');
+  return dispatch;
+};
+
+export const useProblemUiDispatch = () => {
+  const dispatch = useContext(UiDispatchContext);
+  if (!dispatch) throw new Error('useProblemUiDispatch must be used within a ProblemProvider');
   return dispatch;
 };
