@@ -15,7 +15,7 @@
     "@cph-ng/core": "workspace:*",
     "@mui/icons-material": "^7.3.9",
     "@mui/lab": "7.0.1-beta.24",
-    "@mui/material": "^7.3.9",
+    "@mui/material": "^9.0.0",
     "anser": "^2.3.5",
     "crypto-js": "^4.2.0",
     "i18next": "^26.0.4",
