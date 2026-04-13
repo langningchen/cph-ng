@@ -15,15 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import Box, { type BoxProps } from '@mui/material/Box';
+import Box from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import type { PopoverPosition } from '@mui/material/Popover';
+import type { SxProps, Theme } from '@mui/material/styles';
 import { type MouseEvent, type ReactNode, useState } from 'react';
-import { deleteProps } from '@/utils';
 
-interface CphNgMenuProps extends BoxProps {
+interface CphNgMenuProps {
   children: ReactNode;
+  sx?: SxProps<Theme>;
   menu: Record<string, () => void>;
 }
 
@@ -40,7 +41,7 @@ export const CphNgMenu = (props: CphNgMenuProps) => {
         });
       }}
       style={{ cursor: 'context-menu' }}
-      {...deleteProps(props, ['children', 'menu'])}
+      sx={props.sx}
     >
       {props.children}
       <Menu

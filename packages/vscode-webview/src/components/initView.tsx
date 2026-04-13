@@ -23,11 +23,9 @@ import { CphNgText } from '@/components/base/cphNgText';
 export const InitView = () => {
   const { t } = useTranslation();
   return (
-    <CphNgFlex column height='100%' justifyContent='center' gap={2}>
+    <CphNgFlex column sx={{ height: '100%', justifyContent: 'center', gap: 2 }}>
       <CircularProgress />
-      <CphNgText fontWeight='bold' fontSize='bigger'>
-        {t('initView.message')}
-      </CphNgText>
+      <CphNgText sx={{ fontWeight: 'bold', fontSize: 'bigger' }}>{t('initView.message')}</CphNgText>
     </CphNgFlex>
   );
 };

@@ -100,7 +100,7 @@ const PopupInner = () => {
 
   return (
     <Box sx={{ width: 320, p: 1.5 }}>
-      <Box pb={2}>
+      <Box sx={{ pb: 2 }}>
         <Typography variant='h6'>
           {t('appTitle')}
           <Chip
@@ -120,7 +120,7 @@ const PopupInner = () => {
       </Box>
 
       <Box>
-        <Stack direction='row' gap={1}>
+        <Stack direction='row' sx={{ gap: 1 }}>
           <TextField
             label={t('labelPort')}
             type='number'
@@ -135,7 +135,7 @@ const PopupInner = () => {
           </Button>
         </Stack>
 
-        <Stack direction='row' spacing={1} mt={1}>
+        <Stack direction='row' spacing={1} sx={{ mt: 1 }}>
           {status.connected ? (
             <Button variant='contained' color='error' size='small' onClick={handleDisconnect}>
               {t('btnDisconnect')}

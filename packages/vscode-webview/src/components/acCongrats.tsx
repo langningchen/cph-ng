@@ -25,7 +25,7 @@ export const AcCongrats = () => {
   return (
     <CphNgFlex column>
       <img width='30%' src={partyUri} alt='AC congratulations gif' />
-      <CphNgText textAlign='center'>
+      <CphNgText sx={{ textAlign: 'center' }}>
         {t('acCongrats.firstLine')}
         <br />
         {t('acCongrats.secondLine')}

@@ -164,13 +164,12 @@ export const TestcaseDataView = memo(
     if (value.type === 'string' && !value.data && readOnly) return null;
     return (
       <CphNgFlex column smallGap>
-        <CphNgFlex justifyContent='space-between'>
-          <CphNgFlex flex={1} flexWrap='wrap'>
+        <CphNgFlex sx={{ justifyContent: 'space-between' }}>
+          <CphNgFlex sx={{ flex: 1, flexWrap: 'wrap' }}>
             <CphNgLink
-              color='inherit'
+              sx={{ color: 'inherit', fontSize: 'larger' }}
               name={t('testcaseDataView.openVirtual')}
               onClick={onOpenVirtual}
-              fontSize='larger'
             >
               {label}
             </CphNgLink>

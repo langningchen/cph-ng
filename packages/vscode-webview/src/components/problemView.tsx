@@ -64,13 +64,13 @@ export const ProblemView = memo(
         </ErrorBoundary>
         <CphNgFlex
           column
-          flex={1}
-          width='100%'
           sx={{
+            flex: 1,
             overflowY: 'scroll',
+            paddingY: 2,
             scrollbarWidth: 'none',
+            width: '100%',
           }}
-          paddingY={2}
         >
           <ErrorBoundary>
             <CphNgMenu
@@ -79,8 +79,7 @@ export const ProblemView = memo(
                   dispatch({ type: 'clearTestcaseStatus', problemId });
                 },
               }}
-              flex={1}
-              width='100%'
+              sx={{ flex: 1, width: '100%' }}
             >
               <TestcasesView
                 problemId={problemId}

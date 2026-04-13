@@ -15,12 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import Link, { type LinkProps } from '@mui/material/Link';
+import Link from '@mui/material/Link';
+import type { SxProps, Theme } from '@mui/material/styles';
+import type { MouseEventHandler } from 'react';
 import { CphNgTooltip } from '@/components/base/cphNgTooltip';
-import { deleteProps } from '@/utils';
 
-interface CphNgLinkProps extends LinkProps {
+interface CphNgLinkProps {
+  children: React.ReactNode;
+  sx?: SxProps<Theme>;
   name: string;
+  onClick?: MouseEventHandler;
 }
 
 export const CphNgLink = (props: CphNgLinkProps) => {
@@ -28,10 +32,9 @@ export const CphNgLink = (props: CphNgLinkProps) => {
     <CphNgTooltip title={props.name}>
       <Link
         href='#'
-        overflow='hidden'
-        textOverflow='ellipsis'
         underline='hover'
-        {...deleteProps(props, ['name'])}
+        onClick={props.onClick}
+        sx={{ overflow: 'hidden', textOverflow: 'ellipsis', ...props.sx }}
       >
         {props.children}
       </Link>

@@ -76,7 +76,10 @@ export const DragOverlay = () => {
       open={dragData !== null}
     >
       {dragData ? (
-        <CphNgFlex width='100%' height='100%' column paddingX={2} justifyContent='center'>
+        <CphNgFlex
+          column
+          sx={{ width: '100%', height: '100%', paddingX: 2, justifyContent: 'center' }}
+        >
           <List
             sx={{
               width: '100%',
@@ -95,12 +98,8 @@ export const DragOverlay = () => {
         </CphNgFlex>
       ) : (
         <CphNgFlex
-          width='100%'
-          height='100%'
           column
-          gap={2}
-          color='#ffffff'
-          justifyContent='center'
+          sx={{ width: '100%', height: '100%', gap: 2, color: '#ffffff', justifyContent: 'center' }}
         >
           <DownloadIcon sx={{ fontSize: 80 }} />
           <Typography variant='h5'>{t('dragOverlay.description')}</Typography>

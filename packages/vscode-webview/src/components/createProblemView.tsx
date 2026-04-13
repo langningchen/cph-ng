@@ -31,7 +31,7 @@ export const CreateProblemView = ({ canImport }: CreateProblemProps) => {
   const { t } = useTranslation();
   const dispatch = useProblemDispatch();
   return (
-    <CphNgFlex column gap={5} paddingY={2}>
+    <CphNgFlex column sx={{ gap: 5, paddingY: 2 }}>
       <CphNgFlex column>
         <Alert
           sx={{ width: '100%', boxSizing: 'border-box' }}

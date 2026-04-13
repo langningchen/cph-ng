@@ -92,7 +92,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
             <Accordion sx={{ width: '100%' }}>
               <AccordionSummary>{t('errorBoundary.details')}</AccordionSummary>
               <AccordionDetails>
-                <Box component='pre' overflow='scroll'>
+                <Box component='pre' sx={{ overflow: 'scroll' }}>
                   {error.name}: {error.message}
                   '\n'
                   {stackTraceString}

@@ -15,25 +15,31 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
+import IconButton, { type IconButtonOwnProps } from '@mui/material/IconButton';
 import type SvgIcon from '@mui/material/SvgIcon';
-import { forwardRef } from 'react';
+import type { SxProps, Theme } from '@mui/material/styles';
+import { forwardRef, type MouseEventHandler } from 'react';
 import { CphNgTooltip } from '@/components/base/cphNgTooltip';
-import { deleteProps } from '@/utils';
 
-interface CphNgButtonProps extends IconButtonProps {
+interface CphNgButtonProps {
+  sx?: SxProps<Theme>;
   icon: typeof SvgIcon;
   name: string;
+  color?: IconButtonOwnProps['color'];
   larger?: boolean;
+  onClick?: MouseEventHandler;
+  disabled?: boolean;
 }
 
 export const CphNgButton = forwardRef<HTMLButtonElement, CphNgButtonProps>((props, ref) => (
   <CphNgTooltip title={props.name}>
     <IconButton
       ref={ref}
-      color='primary'
+      color={props.color ?? 'primary'}
       size={props.larger ? 'medium' : 'small'}
-      {...deleteProps(props, ['icon', 'name', 'larger'])}
+      onClick={props.onClick}
+      disabled={props.disabled}
+      sx={props.sx}
     >
       <props.icon fontSize='small' />
     </IconButton>
