@@ -766,7 +766,7 @@
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
     "vitest": "^4.1.2",
-    "vitest-mock-extended": "^3.1.1",
+    "vitest-mock-extended": "^4.0.0",
     "webpack": "^5.105.4",
     "webpack-cli": "^7.0.2"
   },
