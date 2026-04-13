@@ -66,7 +66,7 @@ const formatDuration = (ms: number) => {
 
 const Subtitle = memo<TypographyProps>((props) => {
   return (
-    <CphNgText fontSize='0.8rem' paddingRight='4px' whiteSpace='normal' {...props}>
+    <CphNgText sx={{ fontSize: '0.8rem', paddingRight: '4px', whiteSpace: 'normal' }} {...props}>
       {props.children}
     </CphNgText>
   );
@@ -140,10 +140,10 @@ export const ProblemTitle = memo(
     return (
       <>
         <CphNgFlex>
-          <CphNgFlex column alignStart flexShrink={1} width='unset'>
-            <CphNgText sx={{ cursor: url ? 'pointer' : 'default' }} title={name} width='100%'>
+          <CphNgFlex column alignStart sx={{ flexShrink: 1, width: 'unset' }}>
+            <CphNgText sx={{ cursor: url ? 'pointer' : 'default', width: '100%', title: name }}>
               {url ? (
-                <CphNgLink href={url} name={url}>
+                <CphNgLink sx={{ href: url }} name={url}>
                   {name}
                 </CphNgLink>
               ) : (
@@ -329,7 +329,7 @@ export const ProblemTitle = memo(
                 )}
               </TabPanel>
               <TabPanel value='advanced' sx={{ padding: '0' }}>
-                <CphNgFlex flexWrap='wrap' py={2}>
+                <CphNgFlex sx={{ flexWrap: 'wrap', py: 2 }}>
                   {checker ? (
                     <Chip
                       label={t('problemTitle.dialog.field.specialJudge')}

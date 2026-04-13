@@ -15,25 +15,31 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { BoxProps } from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import { deleteProps } from '@/utils';
+import type { SxProps, Theme } from '@mui/material/styles';
+import type { MouseEventHandler } from 'react';
 
-interface CphNgFlexProps extends BoxProps {
+interface CphNgFlexProps {
+  children: React.ReactNode;
+  sx?: SxProps<Theme>;
   smallGap?: boolean;
   column?: boolean;
   alignStart?: boolean;
+  onClick?: MouseEventHandler;
 }
 
 export const CphNgFlex = (props: CphNgFlexProps) => {
   return (
     <Stack
-      alignItems={props.alignStart ? 'flex-start' : 'center'}
-      flexDirection={props.column ? 'column' : 'row'}
-      gap={props.smallGap ? 0.5 : 1}
-      width='100%'
-      minWidth={0}
-      {...deleteProps(props, ['smallGap', 'column', 'alignStart'])}
+      onClick={props.onClick}
+      sx={{
+        alignItems: props.alignStart ? 'flex-start' : 'center',
+        flexDirection: props.column ? 'column' : 'row',
+        gap: props.smallGap ? 0.5 : 1,
+        width: '100%',
+        minWidth: 0,
+        ...props.sx,
+      }}
     >
       {props.children}
     </Stack>

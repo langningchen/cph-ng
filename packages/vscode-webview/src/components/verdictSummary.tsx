@@ -20,7 +20,7 @@ import { VerdictType } from '@cph-ng/core';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import RemoveCircleOutlinedIcon from '@mui/icons-material/RemoveCircleOutlined';
 import Chip from '@mui/material/Chip';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -61,7 +61,7 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
   if (stats.total === 0) return null;
 
   return (
-    <CphNgFlex alignStart flexWrap='wrap' sx={{ display: { xs: 'none', sm: 'flex' } }}>
+    <CphNgFlex alignStart sx={{ flexWrap: 'wrap', display: { xs: 'none', sm: 'flex' } }}>
       {stats.passed > 0 && (
         <CphNgTooltip title={t('verdictSummary.passed')}>
           <Chip
@@ -98,7 +98,7 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
       {stats.pending > 0 && (
         <CphNgTooltip title={t('verdictSummary.pending')}>
           <Chip
-            icon={<RemoveCircleOutlineIcon />}
+            icon={<RemoveCircleOutlinedIcon />}
             label={stats.pending}
             size='small'
             variant='outlined'

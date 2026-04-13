@@ -60,9 +60,7 @@ const Main = () => {
         <CphNgFlex
           column
           smallGap
-          height='100%'
-          sx={{ boxSizing: 'border-box' }}
-          padding={{ xs: 0.5, md: 1 }}
+          sx={{ height: '100%', boxSizing: 'border-box', padding: { xs: 0.5, md: 1 } }}
         >
           {problem.currentProblem.type === 'active' ? (
             <ProblemView

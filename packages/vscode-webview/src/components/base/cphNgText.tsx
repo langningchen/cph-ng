@@ -15,21 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import Typography, { type TypographyProps } from '@mui/material/Typography';
+import type { SxProps, Theme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
 
-interface CphNgTextProps extends TypographyProps {}
+interface CphNgTextProps {
+  children: React.ReactNode;
+  sx?: SxProps<Theme>;
+}
 
 export const CphNgText = (props: CphNgTextProps) => {
   return (
     <Typography
-      overflow='hidden'
-      textOverflow='ellipsis'
       component='span'
       sx={{
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
         cursor: 'default',
         userSelect: 'none',
+        ...props.sx,
       }}
-      {...props}
     >
       {props.children}
     </Typography>

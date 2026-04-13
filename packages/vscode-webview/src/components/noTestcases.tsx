@@ -24,7 +24,7 @@ export const NoTestcases = () => {
 
   return (
     <CphNgFlex column>
-      <CphNgText textAlign='center'>
+      <CphNgText sx={{ textAlign: 'center' }}>
         {t('noTestcases.firstLine')}
         <br />
         {t('noTestcases.secondLine')}
