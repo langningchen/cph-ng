@@ -32,6 +32,7 @@ import type {
 
 export interface IWebviewEventBus {
   onMessage(callback: (data: WebviewEvent) => void): void;
+  openSubmitDialog(problemId: ProblemId): void;
   fullProblem(problemId: ProblemId, payload: IWebviewProblem): void;
   patchMeta(problemId: ProblemId, payload: WebviewPatchMetaPayload): void;
   patchStressTest(problemId: ProblemId, payload: WebviewPatchStressTestPayload): void;

@@ -25,12 +25,15 @@ import type { IProblemRepository } from '@/application/ports/problems/IProblemRe
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
-import { CreateProblem } from '@/application/useCases/webview/CreateProblem';
-import { ImportProblem } from '@/application/useCases/webview/ImportProblem';
-import { RunAllTestcases } from '@/application/useCases/webview/RunAllTestcases';
-import { StopTestcases } from '@/application/useCases/webview/StopTestcases';
+import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
+import { CreateProblem } from '@/application/useCases/webview/problem/manage/CreateProblem';
+import { ImportProblem } from '@/application/useCases/webview/problem/manage/ImportProblem';
+import { Submit } from '@/application/useCases/webview/problem/Submit';
+import { RunAllTestcases } from '@/application/useCases/webview/problem/testcase/run/RunAllTestcases';
+import { StopTestcases } from '@/application/useCases/webview/problem/testcase/run/StopTestcases';
 import { TOKENS } from '@/composition/tokens';
 
 @injectable()
@@ -43,6 +46,8 @@ export class CommandModule implements IExtensionModule {
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
+    @inject(TOKENS.webviewEventBus) private readonly webviewEventBus: IWebviewEventBus,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.system) private readonly sys: ISystem,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.version) private readonly version: string,
@@ -52,6 +57,7 @@ export class CommandModule implements IExtensionModule {
     @inject(ImportProblem) private readonly importProblem: ImportProblem,
     @inject(RunAllTestcases) private readonly runAllTestcases: RunAllTestcases,
     @inject(StopTestcases) private readonly stopTestcases: StopTestcases,
+    @inject(Submit) private readonly submit: Submit,
   ) {}
 
   private async getProblemId() {
@@ -86,6 +92,17 @@ export class CommandModule implements IExtensionModule {
         this.ui.showSidebar();
         await this.stopTestcases.exec({
           type: 'stopTestcases',
+          problemId: await this.getProblemId(),
+        });
+      },
+      'cph-ng.submit': async () => {
+        if (this.settings.companion.confirmSubmit) {
+          this.ui.showSidebar();
+          this.webviewEventBus.openSubmitDialog(await this.getProblemId());
+          return;
+        }
+        await this.submit.exec({
+          type: 'submit',
           problemId: await this.getProblemId(),
         });
       },

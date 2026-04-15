@@ -13,17 +13,17 @@
   },
   "dependencies": {
     "@cph-ng/core": "workspace:*",
-    "@mui/icons-material": "^7.3.9",
-    "@mui/lab": "7.0.1-beta.23",
-    "@mui/material": "^7.3.9",
+    "@mui/icons-material": "^9.0.0",
+    "@mui/lab": "9.0.0-beta.2",
+    "@mui/material": "^9.0.0",
     "anser": "^2.3.5",
     "crypto-js": "^4.2.0",
-    "i18next": "^25.10.10",
+    "i18next": "^26.0.4",
     "immer": "^11.1.4",
-    "lodash": "^4.17.23",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "react-i18next": "^16.6.6",
+    "lodash": "^4.18.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-i18next": "^17.0.2",
     "react-textarea-autosize": "^8.5.9",
     "stacktrace-js": "^2.0.2"
   },
@@ -35,7 +35,7 @@
     "copy-webpack-plugin": "^14.0.0",
     "swc-loader": "^0.2.7",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
-    "webpack": "^5.105.4",
+    "webpack": "^5.106.1",
     "webpack-cli": "^7.0.2"
   }
 }

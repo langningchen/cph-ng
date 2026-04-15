@@ -15,27 +15,35 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { LoadTestcasesMsg } from '@cph-ng/core';
+import type { DeleteProblemMsg } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
-import { BaseProblemUseCase } from '@/application/useCases/webview/BaseProblemUseCase';
+import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
+import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 @injectable()
-export class LoadTestcases extends BaseProblemUseCase<LoadTestcasesMsg> {
+export class DeleteProblem extends BaseProblemUseCase<DeleteProblemMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
-    @inject(TOKENS.problemService) private readonly problemService: IProblemService,
+    @inject(TOKENS.problemService) private readonly service: IProblemService,
+    @inject(TOKENS.activeProblemCoordinator)
+    private readonly coordinator: IActiveProblemCoordinator,
   ) {
     super(repo);
   }
 
   protected async performAction(
-    { problem }: BackgroundProblem,
-    msg: LoadTestcasesMsg,
+    backgroundProblem: BackgroundProblem,
+    _msg: DeleteProblemMsg,
   ): Promise<void> {
-    await this.problemService.loadTestcases(problem, msg.file);
+    backgroundProblem.abort();
+    const { problemId, problem } = backgroundProblem;
+    await this.repo.unload(problemId);
+    await this.service.delete(problem);
+    await this.coordinator.onActiveEditorChanged();
+    await this.coordinator.dispatchFullData();
   }
 }

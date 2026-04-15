@@ -17,10 +17,6 @@
 
 import type { MouseEvent } from 'react';
 
-export const deleteProps = (obj: object, props: string[]) => {
-  return Object.fromEntries(Object.entries(obj).filter(([key]) => !props.includes(key)));
-};
-
 export const getCompile = (e: MouseEvent) => {
   if (e.ctrlKey) {
     return true;

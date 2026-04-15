@@ -37,5 +37,6 @@ export class Init implements IMsgHandle<InitMsg> {
     this.repo.fireBackgroundEvent();
     await this.coordinator.dispatchFullData();
     this.sidebarProvider.dispatchFullConfig();
+    this.sidebarProvider.flushPendingMessages();
   }
 }

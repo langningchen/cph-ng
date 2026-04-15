@@ -17,8 +17,9 @@
 
 import type { IWebviewTestcase, ProblemId, TestcaseId } from '@cph-ng/core';
 import { VerdictName } from '@cph-ng/core';
-import Box, { type BoxProps } from '@mui/material/Box';
+import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
+import type { SxProps, Theme } from '@mui/material/styles';
 import { type DragEvent, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AcCongrats } from '@/components/acCongrats';
@@ -28,16 +29,16 @@ import { NoTestcases } from '@/components/noTestcases';
 import { TestcaseView } from '@/components/testcaseView';
 import { useConfigState } from '@/context/ConfigContext';
 import { useProblemDispatch } from '@/context/ProblemContext';
-import { deleteProps } from '@/utils';
 
-interface InfoButtonProps extends BoxProps {
+interface InfoButtonProps {
+  sx?: SxProps<Theme>;
   message: string;
   onClick: () => void;
 }
 
 export const InfoButton = memo((props: InfoButtonProps) => {
   return (
-    <Box flex={1} {...deleteProps(props, ['message', 'onClick'])}>
+    <Box sx={{ flex: 1, ...props.sx }}>
       <Paper
         onClick={props.onClick}
         sx={{
@@ -128,7 +129,7 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
       {testcaseOrder.length ? (
         <>
           {config.showAcGif && isAllAccepted ? <AcCongrats /> : null}
-          <Box width='100%'>
+          <Box sx={{ width: '100%' }}>
             {displayOrder.map((originalIdx, displayIdx) => {
               const testcaseId = testcaseOrder[originalIdx];
               const testcase = testcases[testcaseId];
