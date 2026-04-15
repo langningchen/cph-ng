@@ -75,15 +75,3 @@ export const useConfig = (): WebviewConfig => {
     );
   return state.config;
 };
-
-export const ConfigGuard = ({
-  children,
-  fallback = null,
-}: {
-  children: ReactNode;
-  fallback?: ReactNode;
-}) => {
-  const state = useConfigState();
-  if (!state.isReady) return <>{fallback}</>;
-  return <>{children}</>;
-};

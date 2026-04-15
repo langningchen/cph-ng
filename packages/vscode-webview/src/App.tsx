@@ -26,7 +26,7 @@ import { ErrorBoundary } from '@/components/base/errorBoundary';
 import { CreateProblemView } from '@/components/createProblemView';
 import { DragOverlay } from '@/components/dragOverlay';
 import { InitView } from '@/components/initView';
-import { OobeView } from '@/components/oobe';
+import { OobeView } from '@/components/oobe/oobe';
 import { ProblemView } from '@/components/problemView';
 import { ConfigProvider, useConfigState } from '@/context/ConfigContext';
 import { ProblemProvider, useProblemState } from '@/context/ProblemContext';
