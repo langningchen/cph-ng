@@ -21,7 +21,6 @@ import type { BatchId } from './types';
 export interface RouterConfig {
   port: number;
   logFile: string;
-  shutdownTimeout: number;
 }
 
 // Companion Problem

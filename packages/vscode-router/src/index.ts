@@ -193,7 +193,6 @@ const startServer = () => {
   });
 
   io.on('connection', (socket) => {
-    resetShutdownTimer();
     const type = socket.handshake.query.type;
 
     if (type === 'vscode') {
@@ -245,7 +244,10 @@ const startServer = () => {
         activeBrowserId = nextSocket || null;
       }
       refreshAllStatus();
-      resetShutdownTimer();
+      if (io.sockets.adapter.rooms.get('vscode-clients')?.size === 0) {
+        info(`No clients connected, shutting down router`);
+        stopServer();
+      }
     });
   });
 
@@ -261,15 +263,3 @@ const stopServer = () => {
 export let server = startServer();
 
 info(`Router started on port ${config.port}`, { config });
-
-let shutdownTimer: NodeJS.Timeout | null = null;
-const resetShutdownTimer = () => {
-  if (isRestarting) return;
-  if (shutdownTimer) clearTimeout(shutdownTimer);
-  const totalClients = io.engine.clientsCount;
-  if (totalClients > 0) return;
-  shutdownTimer = setTimeout(() => {
-    info(`No clients connected for ${config.shutdownTimeout}ms, shutting down router`);
-    stopServer();
-  }, config.shutdownTimeout);
-};
