@@ -33,6 +33,7 @@ import { debug, error, info, trace, warn } from '@/logger';
 import { config, updateConfig } from './config';
 
 let io: Server<C2rMsg & B2rMsg, R2cMsg & R2bMsg>;
+let isStopping = false;
 export const batches = new Map<
   BatchId,
   { ignored: boolean; problems: CompanionProblem[]; size: number }
@@ -244,7 +245,8 @@ const startServer = () => {
         activeBrowserId = nextSocket || null;
       }
       refreshAllStatus();
-      if (io.sockets.adapter.rooms.get('vscode-clients')?.size === 0) {
+      const vscodeClientsCount = io.sockets.adapter.rooms.get('vscode-clients')?.size ?? 0;
+      if (vscodeClientsCount === 0) {
         info(`No clients connected, shutting down router`);
         stopServer();
       }
@@ -254,6 +256,11 @@ const startServer = () => {
   return server;
 };
 const stopServer = () => {
+  if (isStopping) return;
+  isStopping = true;
+
+  io.disconnectSockets(true);
+  io.close();
   server.close(() => {
     info(`Server stopped`);
     process.exit(0);
