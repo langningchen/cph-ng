@@ -30,11 +30,6 @@ program
     return p;
   })
   .requiredOption('-l, --log-file <path>', 'Path to the log file')
-  .requiredOption('-s, --shutdown-timeout <number>', 'Shutdown timeout in ms', (val) => {
-    const t = parseInt(val, 10);
-    if (Number.isNaN(t) || t <= 0) throw new Error('Invalid timeout');
-    return t;
-  })
   .parse(process.argv);
 
 const options = program.opts();
@@ -42,7 +37,6 @@ const options = program.opts();
 export const config: RouterConfig = {
   port: options.port,
   logFile: resolve(options.logFile),
-  shutdownTimeout: options.shutdownTimeout,
 };
 
 const logFile = config.logFile;
