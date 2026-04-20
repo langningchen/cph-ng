@@ -29,6 +29,6 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@wxt-dev/auto-icons": "^1.1.1",
-    "wxt": "^0.20.21"
+    "wxt": "^0.20.25"
   }
 }

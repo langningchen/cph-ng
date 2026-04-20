@@ -18,12 +18,12 @@
     "@mui/material": "^9.0.0",
     "anser": "^2.3.5",
     "crypto-js": "^4.2.0",
-    "i18next": "^26.0.4",
+    "i18next": "^26.0.6",
     "immer": "^11.1.4",
     "lodash": "^4.18.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "react-i18next": "^17.0.2",
+    "react-i18next": "^17.0.4",
     "react-textarea-autosize": "^8.5.9",
     "stacktrace-js": "^2.0.2"
   },
@@ -35,7 +35,7 @@
     "copy-webpack-plugin": "^14.0.0",
     "swc-loader": "^0.2.7",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
-    "webpack": "^5.106.1",
+    "webpack": "^5.106.2",
     "webpack-cli": "^7.0.2"
   }
 }
