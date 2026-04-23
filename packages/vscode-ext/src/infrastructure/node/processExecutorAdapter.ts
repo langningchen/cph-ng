@@ -131,6 +131,7 @@ export class ProcessExecutorAdapter implements IProcessExecutor {
     if (signal) signal.addEventListener('abort', () => unifiedAc.abort(AbortReason.UserAbort));
 
     const child = spawn(cmd[0], cmd.slice(1), {
+      cwd: options.cwd,
       signal: unifiedAc.signal,
       env: options.env ? { ...process.env, ...options.env } : process.env,
       killSignal: 'SIGTERM',

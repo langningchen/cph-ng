@@ -17,6 +17,7 @@
 
 import { VerdictName } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
+import type { IPath } from '@/application/ports/node/IPath';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
 import type { IJudgeService, JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
@@ -31,6 +32,7 @@ import { ExecutionRejected } from '@/domain/execution';
 export class InteractiveJudgeService implements IJudgeService {
   public constructor(
     @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,
+    @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.resultEvaluator) private readonly evaluator: IResultEvaluator,
     @inject(TOKENS.solutionRunner) private readonly runner: ISolutionRunner,
@@ -61,10 +63,11 @@ export class InteractiveJudgeService implements IJudgeService {
         ctx.problem.overrides,
       );
       const limits = this.problemService.getLimits(ctx.problem);
+      const cwd = this.path.dirname(srcPath);
 
       observer.onStatusChange(VerdictName.judging);
       const executionResult = await this.runner.runInteractive(
-        { cmd: runCmd, stdinPath: ctx.stdinPath, ...limits },
+        { cmd: runCmd, stdinPath: ctx.stdinPath, cwd, ...limits },
         signal,
         ctx.artifacts.interactor.path,
       );
