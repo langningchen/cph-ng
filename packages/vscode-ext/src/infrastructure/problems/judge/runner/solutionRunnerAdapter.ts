@@ -77,8 +77,8 @@ export class SolutionRunnerAdapter implements ISolutionRunner {
 
     // Launch both processes with pipe
     const { res1: solResult, res2: intResult } = await this.executor.executeWithPipe(
-      { cmd: ctx.cmd, timeoutMs, signal },
-      { cmd: [interactorPath, intStdinPath, intStdoutPath], timeoutMs, signal },
+      { cmd: ctx.cmd, cwd: ctx.cwd, timeoutMs, signal },
+      { cmd: [interactorPath, intStdinPath, intStdoutPath], cwd: ctx.cwd, timeoutMs, signal },
     );
     this.logger.debug('Interactor execution completed', {
       solResult,

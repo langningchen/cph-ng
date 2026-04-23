@@ -47,6 +47,7 @@ export class WrapperStrategy implements IExecutionStrategy {
     const reportPath = this.tmp.create('wrapperStrategy.reportPath');
     const res = await this.executor.execute({
       cmd: ctx.cmd,
+      cwd: ctx.cwd,
       timeoutMs: ctx.timeLimitMs + this.settings.run.timeAddition,
       stdinPath: ctx.stdinPath,
       signal,

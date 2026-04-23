@@ -17,6 +17,7 @@
 
 import { VerdictName } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
+import type { IPath } from '@/application/ports/node/IPath';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
 import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeObserver';
@@ -32,12 +33,13 @@ import { ExecutionRejected } from '@/domain/execution';
 @injectable()
 export class TraditionalJudgeService implements IJudgeService {
   public constructor(
-    @inject(TOKENS.resultEvaluator) private readonly evaluator: IResultEvaluator,
     @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,
+    @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
+    @inject(TOKENS.resultEvaluator) private readonly evaluator: IResultEvaluator,
     @inject(TOKENS.solutionRunner) private readonly runner: ISolutionRunner,
-    @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.testcaseIoService) private readonly testcaseIoService: ITestcaseIoService,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
   ) {}
 
   public async judge(
@@ -61,10 +63,11 @@ export class TraditionalJudgeService implements IJudgeService {
         ctx.problem.overrides,
       );
       const limits = this.problemService.getLimits(ctx.problem);
+      const cwd = this.path.dirname(srcPath);
 
       observer.onStatusChange(VerdictName.judging);
       const executionResult = await this.runner.run(
-        { cmd: runCmd, stdinPath: ctx.stdinPath, ...limits },
+        { cmd: runCmd, stdinPath: ctx.stdinPath, cwd, ...limits },
         signal,
       );
       if (executionResult instanceof Error) throw executionResult;

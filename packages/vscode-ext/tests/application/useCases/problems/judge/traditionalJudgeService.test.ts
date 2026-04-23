@@ -1,4 +1,5 @@
 import { VerdictName } from '@cph-ng/core';
+import { pathMock } from '@t/infrastructure/node/pathMock';
 import { translatorMock } from '@t/infrastructure/vscode/translatorMock';
 import { mock } from '@t/mock';
 import { container } from 'tsyringe';
@@ -40,6 +41,7 @@ describe('TraditionalJudgeService', () => {
     container.registerInstance(TOKENS.languageRegistry, langRegistryMock);
     container.registerInstance(TOKENS.problemService, problemServiceMock);
     container.registerInstance(TOKENS.solutionRunner, runnerMock);
+    container.registerInstance(TOKENS.path, pathMock);
     container.registerInstance(TOKENS.translator, translatorMock);
     container.registerInstance(TOKENS.testcaseIoService, testcaseIoServiceMock);
 
@@ -92,6 +94,7 @@ describe('TraditionalJudgeService', () => {
 
     await service.judge(makeCtx(), observerMock, signal);
 
+    expect(runnerMock.run).toHaveBeenCalledWith(expect.objectContaining({ cwd: '/src' }), signal);
     expect(observerMock.onStatusChange).toHaveBeenCalledWith(VerdictName.judging);
     expect(observerMock.onStatusChange).toHaveBeenCalledWith(VerdictName.judged);
     expect(observerMock.onStatusChange).toHaveBeenCalledWith(VerdictName.comparing);

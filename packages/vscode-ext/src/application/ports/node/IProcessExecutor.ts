@@ -25,6 +25,9 @@ export interface ProcessOptions {
   /** Command and arguments to execute. */
   cmd: string[];
 
+  /** Working directory. */
+  cwd?: string;
+
   /** Timeout in milliseconds. */
   timeoutMs?: number;
 
@@ -42,6 +45,9 @@ export interface ProcessOptions {
 export interface PipeProcessOptions {
   /** Command and arguments to execute. */
   cmd: string[];
+
+  /** Working directory. */
+  cwd?: string;
 
   /** Timeout in milliseconds. */
   timeoutMs?: number;

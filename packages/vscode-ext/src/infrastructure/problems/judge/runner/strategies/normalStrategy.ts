@@ -32,6 +32,7 @@ export class NormalStrategy implements IExecutionStrategy {
   public async execute(ctx: ExecutionContext, signal: AbortSignal): Promise<ExecutionResult> {
     const res = await this.executor.execute({
       cmd: ctx.cmd,
+      cwd: ctx.cwd,
       timeoutMs: ctx.timeLimitMs + this.settings.run.timeAddition,
       stdinPath: ctx.stdinPath,
       signal,
