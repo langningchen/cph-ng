@@ -99,6 +99,8 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
       return;
     }
 
+    const genCwd = this.path.dirname(stressTest.generator.path);
+    const bfCwd = this.path.dirname(stressTest.bruteForce.path);
     const judgeService = this.judgeFactory.create(problem);
     stressTest.clearCnt();
 
@@ -108,7 +110,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
         stressTest.state = StressTestState.generating;
         const genRes = await this.runStep({
           cmd: [artifacts.stressTest.generator.path],
-          cwd: this.path.dirname(stressTest.generator.path),
+          cwd: genCwd,
           timeoutMs: this.settings.stressTest.generatorTimeLimit,
           signal: ac.signal,
         });
@@ -117,7 +119,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
         stressTest.state = StressTestState.runningBruteForce;
         const bfRes = await this.runStep({
           cmd: [artifacts.stressTest.bruteForce.path],
-          cwd: this.path.dirname(stressTest.bruteForce.path),
+          cwd: bfCwd,
           timeoutMs: this.settings.stressTest.bruteForceTimeLimit,
           signal: ac.signal,
           stdinPath: genRes.stdoutPath,
