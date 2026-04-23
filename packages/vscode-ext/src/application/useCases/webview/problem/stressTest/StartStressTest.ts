@@ -20,6 +20,7 @@ import { StressTestState, VerdictName } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
 import {
   AbortReason,
   type IProcessExecutor,
@@ -53,6 +54,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.judgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
+    @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.processExecutor) private readonly executor: IProcessExecutor,
@@ -106,6 +108,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
         stressTest.state = StressTestState.generating;
         const genRes = await this.runStep({
           cmd: [artifacts.stressTest.generator.path],
+          cwd: this.path.dirname(stressTest.generator.path),
           timeoutMs: this.settings.stressTest.generatorTimeLimit,
           signal: ac.signal,
         });
@@ -114,6 +117,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
         stressTest.state = StressTestState.runningBruteForce;
         const bfRes = await this.runStep({
           cmd: [artifacts.stressTest.bruteForce.path],
+          cwd: this.path.dirname(stressTest.bruteForce.path),
           timeoutMs: this.settings.stressTest.bruteForceTimeLimit,
           signal: ac.signal,
           stdinPath: genRes.stdoutPath,
