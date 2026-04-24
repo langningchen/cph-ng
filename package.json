@@ -18,15 +18,15 @@
     "prepare": "tsx scripts/install-hooks.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.11",
+    "@biomejs/biome": "^2.4.12",
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
     "@commitlint/types": "^20.5.0",
-    "@swc/core": "^1.15.24",
+    "@swc/core": "^1.15.30",
     "@types/node": "~22.19.7",
     "@vitest/coverage-v8": "4.1.4",
     "@vitest/ui": "^4.1.4",
-    "@vscode/vsce": "^3.7.1",
+    "@vscode/vsce": "^3.9.1",
     "copy-webpack-plugin": "^14.0.0",
     "ignore": "^7.0.5",
     "knip": "^6.4.1",
@@ -35,9 +35,9 @@
     "terser-webpack-plugin": "^5.4.0",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
     "tsx": "^4.21.0",
-    "typescript": "^6.0.2",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.4",
-    "webpack": "^5.106.1",
+    "webpack": "^5.106.2",
     "webpack-cli": "^7.0.2"
   },
   "pnpm": {

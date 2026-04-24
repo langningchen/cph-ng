@@ -72,20 +72,18 @@ export class CompanionCommunicationService {
     const routerPath = this.path.join(this.extPath, 'dist', 'router.cjs');
     const port = this.settings.companion.listenPort.toString();
     const logFile = this.pathResolver.renderPath(this.settings.companion.logFile);
-    const shutdownTimeout = this.settings.companion.shutdownTimeout.toString();
 
     this.logger.debug('Router spawn parameters', {
       node,
       routerPath,
       port,
       logFile,
-      shutdownTimeout,
     });
-    const childProcess = spawn(
-      node,
-      [routerPath, '-p', port, '-l', logFile, '-s', shutdownTimeout],
-      { detached: true, stdio: 'ignore', env: process.env },
-    );
+    const childProcess = spawn(node, [routerPath, '-p', port, '-l', logFile], {
+      detached: true,
+      stdio: 'ignore',
+      env: process.env,
+    });
     childProcess.unref();
     this.logger.info(`Router process spawned on port ${port}`);
   }

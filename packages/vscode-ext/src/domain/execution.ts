@@ -20,6 +20,7 @@ export interface ExecutionContext {
   stdinPath: string;
   timeLimitMs: number;
   memoryLimitMb?: number;
+  cwd?: string;
 }
 
 export interface ExecutionData {

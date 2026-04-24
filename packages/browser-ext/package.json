@@ -1,6 +1,6 @@
 {
   "name": "@cph-ng/browser-ext",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-only",
@@ -29,6 +29,6 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@wxt-dev/auto-icons": "^1.1.1",
-    "wxt": "^0.20.21"
+    "wxt": "^0.20.25"
   }
 }

@@ -158,6 +158,7 @@ export class ImportCompanionProblems {
     }
 
     // Refresh the coordinator
+    await this.coordinator.onActiveEditorChanged();
     await this.coordinator.dispatchFullData();
   }
 }

@@ -2,6 +2,30 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.7
+
+- **fix**(vscode-router): shutdown immediately after all clients closed ([#227](https://github.com/langningchen/cph-ng/issues/227))
+- **chore**(deps): bump hono from 4.12.12 to 4.12.14 ([#226](https://github.com/langningchen/cph-ng/issues/226))
+- **chore**(deps): bump @mui/material from 7.3.9 to 9.0.0 ([#223](https://github.com/langningchen/cph-ng/issues/223))
+- **chore**(deps): bump the npm-non-major group across 1 directory with 11 updates ([#225](https://github.com/langningchen/cph-ng/issues/225))
+- **chore**(deps-dev): bump vitest-mock-extended from 3.1.1 to 4.0.0 ([#221](https://github.com/langningchen/cph-ng/issues/221))
+- **chore**(deps): bump @mui/lab from 7.0.1-beta.23 to 7.0.1-beta.24 ([#222](https://github.com/langningchen/cph-ng/issues/222))
+- **fix**(browser-ext): atcoder submission in contest mode ([#213](https://github.com/langningchen/cph-ng/issues/213)) ([#219](https://github.com/langningchen/cph-ng/issues/219))
+- **feat**(vscode-ext): register submit command ([#218](https://github.com/langningchen/cph-ng/issues/218))
+- **chore**(deps): bump @hono/node-server from 1.19.12 to 1.19.13 ([#216](https://github.com/langningchen/cph-ng/issues/216))
+- **chore**(deps): bump hono from 4.12.10 to 4.12.12 ([#217](https://github.com/langningchen/cph-ng/issues/217))
+- **chore**(deps): bump the npm-non-major group with 9 updates ([#215](https://github.com/langningchen/cph-ng/issues/215))
+- **docs**: update supported platforms for CPH-NG Submit extension ([#214](https://github.com/langningchen/cph-ng/issues/214))
+- **docs**: add docs for browser-ext and user-script ([#212](https://github.com/langningchen/cph-ng/issues/212))
+- **fix**(vscode-webview): implement debounced onChange for textarea input ([#209](https://github.com/langningchen/cph-ng/issues/209))
+- **refactor**(vscode-ext): move webview use case files ([#211](https://github.com/langningchen/cph-ng/issues/211))
+- **fix**(vscode): update launch and task configurations for improved functionality ([#208](https://github.com/langningchen/cph-ng/issues/208))
+- **chore**(deps): bump the npm-non-major group across 1 directory with 2 updates ([#207](https://github.com/langningchen/cph-ng/issues/207))
+- **chore**(deps): bump i18next from 25.10.10 to 26.0.1 ([#205](https://github.com/langningchen/cph-ng/issues/205))
+- **chore**(deps): bump react-i18next from 16.6.6 to 17.0.1 ([#206](https://github.com/langningchen/cph-ng/issues/206))
+- **fix**(vscode-webview): disable focus restoration on Popover ([#202](https://github.com/langningchen/cph-ng/issues/202))
+- **chore**(deps-dev): bump typescript from 5.9.3 to 6.0.2 ([#200](https://github.com/langningchen/cph-ng/issues/200))
+
 ## 0.7.6
 
 - **chore**(deps): bump the npm-non-major group with 10 updates ([#199](https://github.com/langningchen/cph-ng/issues/199))

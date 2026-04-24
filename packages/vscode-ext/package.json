@@ -2,7 +2,7 @@
   "name": "cph-ng",
   "displayName": "CPH-NG",
   "description": "The next generation of CPH.",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "type": "module",
   "license": "AGPL-3.0-only",
   "publisher": "langningchen",
@@ -567,12 +567,6 @@
             "default": false,
             "markdownDescription": "%config.companion.confirmSubmit%"
           },
-          "cph-ng.companion.shutdownTimeout": {
-            "type": "number",
-            "default": 10000,
-            "minimum": 1,
-            "markdownDescription": "%config.companion.shutdownTimeout%"
-          },
           "cph-ng.companion.customPathScript": {
             "type": "string",
             "default": "${extensionPath}/res/defaultScript.js",
@@ -743,7 +737,7 @@
     "postinstall": "pnpm generate-settings"
   },
   "devDependencies": {
-    "@swc/core": "^1.15.24",
+    "@swc/core": "^1.15.30",
     "@types/adm-zip": "^0.5.8",
     "@types/crypto-js": "^4.2.2",
     "@types/lodash": "^4.17.24",
@@ -755,7 +749,7 @@
     "@types/vscode": "1.97.0",
     "@vitest/coverage-v8": "4.1.4",
     "@vitest/ui": "^4.1.4",
-    "@vscode/vsce": "^3.7.1",
+    "@vscode/vsce": "^3.9.1",
     "copy-webpack-plugin": "^14.0.0",
     "ignore": "^7.0.5",
     "swc-loader": "^0.2.7",
@@ -764,10 +758,10 @@
     "ts-json-schema-generator": "^2.9.0",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
     "tsx": "^4.21.0",
-    "typescript": "^6.0.2",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.4",
     "vitest-mock-extended": "^4.0.0",
-    "webpack": "^5.106.1",
+    "webpack": "^5.106.2",
     "webpack-cli": "^7.0.2"
   },
   "dependencies": {
@@ -777,7 +771,7 @@
     "crypto-js": "^4.2.0",
     "hi-base32": "^0.5.1",
     "lodash": "^4.18.1",
-    "memfs": "^4.57.1",
+    "memfs": "^4.57.2",
     "natural-orderby": "^5.0.0",
     "p-memoize": "^8.0.0",
     "react": "^19.2.5",
@@ -786,7 +780,7 @@
     "socket.io-client": "^4.8.3",
     "source-map-support": "^0.5.21",
     "tsyringe": "^4.10.0",
-    "type-fest": "^5.5.0",
+    "type-fest": "^5.6.0",
     "typed-emitter": "^2.1.0"
   }
 }

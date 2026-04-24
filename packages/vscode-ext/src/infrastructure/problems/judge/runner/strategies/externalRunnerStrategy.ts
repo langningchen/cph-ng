@@ -93,6 +93,7 @@ export class ExternalRunnerStrategy implements IExecutionStrategy {
     // We use our own timeout handling to allow graceful exit
     const handle = this.executor.spawn({
       cmd: runnerCmd,
+      cwd: ctx.cwd,
     });
 
     const unifiedAc = new AbortController();
