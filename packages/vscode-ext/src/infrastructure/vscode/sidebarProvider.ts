@@ -64,6 +64,7 @@ export class SidebarProvider implements ISidebarProvider {
     this._view = webviewView;
     webviewView.webview.options = {
       enableScripts: true,
+      enableCommandUris: true,
       localResourceRoots: [Uri.file(this.extPath)],
     };
     webviewView.webview.html = this.htmlRenderer.render(this._view.webview);

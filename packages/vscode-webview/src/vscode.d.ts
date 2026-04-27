@@ -22,6 +22,7 @@ declare const vscode: {
 declare const version: string;
 declare const isDark: boolean;
 declare const partyUri: string;
+declare const cphNgUri: string;
 declare const language: string;
 
 interface Window {
