@@ -15,13 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileWithHash } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageDefaultValues } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
-import type { IPath } from '@/application/ports/node/IPath';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type {
   CompileAdditionalData,
-  ILanguageDefaultValues,
   LangCompileData,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
@@ -30,20 +28,29 @@ import { TOKENS } from '@/composition/tokens';
 import {
   AbstractLanguageStrategy,
   DefaultCompileAdditionalData,
-} from '@/infrastructure/problems/judge/langs/abstractLanguageStrategy';
-import { LanguageStrategyContext } from '@/infrastructure/problems/judge/langs/languageStrategyContext';
+} from '@/infrastructure/langs/abstractLanguageStrategy';
+import { LanguageStrategyContext } from '@/infrastructure/langs/languageStrategyContext';
 
 @injectable()
 export class LangRust extends AbstractLanguageStrategy {
   public override readonly name = 'Rust';
   public override readonly extensions = ['rs'];
-  public override readonly enableRunner = true;
+  public override readonly enableExternalRunner = true;
   public override readonly defaultValues;
+  public override readonly compilerQuery = {
+    filePatterns: ['rustc', 'rustc.exe'],
+    groupPatterns: [
+      {
+        group: 'Rust',
+        helpRegex: /Print the full set of options rustc accepts/m,
+        versionRegex: /^(?<name>.*) (?<version>[0-9]+\.[0-9]+\.[0-9]+) \((?<description>.+)\)$/m,
+      },
+    ],
+  };
 
   public constructor(
     @inject(LanguageStrategyContext) context: LanguageStrategyContext,
     @inject(TOKENS.logger) logger: ILogger,
-    @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
     @inject(TOKENS.system) private readonly sys: ISystem,
   ) {

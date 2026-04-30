@@ -111,6 +111,47 @@ export interface OpenFileMsg extends BaseMsg {
 export interface OpenTestlibMsg extends BaseMsg {
   type: 'openTestlib';
 }
+
+export interface GetLanguageListMsg extends BaseMsg {
+  type: 'getLanguageList';
+}
+export type LanguageExecutable = 'compiler' | 'Interpreter';
+export interface GetLanguageInfoMsg extends BaseMsg {
+  type: 'getLanguageInfo';
+  language: string;
+  executable: LanguageExecutable;
+}
+export interface CheckLanguageInfoMsg extends BaseMsg {
+  type: 'checkLanguageInfo';
+  language: string;
+  executable: LanguageExecutable;
+  path: string;
+}
+export interface UpdateSettingsMsg extends BaseMsg {
+  type: 'updateSettings';
+  payload: {
+    defaultTimeLimit?: number;
+    defaultMemoryLimit?: number;
+    cppCompiler?: string;
+    cppCompilerArgs?: string;
+    javaCompiler?: string;
+    javaCompilerArgs?: string;
+    javaInterpreter?: string;
+    javaInterpreterArgs?: string;
+    pythonCompiler?: string;
+    pythonCompilerArgs?: string;
+    pythonInterpreter?: string;
+    pythonInterpreterArgs?: string;
+    javascriptInterpreter?: string;
+    javascriptInterpreterArgs?: string;
+    rustCompiler?: string;
+    rustCompilerArgs?: string;
+  };
+}
+export interface OobeDoneMsg extends BaseMsg {
+  type: 'oobeDone';
+}
+
 export type WebviewSrcFileTypes = 'checker' | 'interactor' | 'generator' | 'bruteForce';
 export interface ChooseSrcFileMsg extends ProblemBaseMsg {
   type: 'chooseSrcFile';
@@ -156,12 +197,17 @@ export type ProblemMsg =
   | StartStressTestMsg
   | StopStressTestMsg
   | SubmitMsg
-  | DragDropMsg;
+  | DragDropMsg
+  | CreateProblemMsg
+  | ImportProblemMsg;
 
 export type WebviewMsg =
   | ProblemMsg
-  | CreateProblemMsg
-  | ImportProblemMsg
   | InitMsg
   | OpenFileMsg
-  | OpenTestlibMsg;
+  | OpenTestlibMsg
+  | GetLanguageListMsg
+  | GetLanguageInfoMsg
+  | CheckLanguageInfoMsg
+  | UpdateSettingsMsg
+  | OobeDoneMsg;

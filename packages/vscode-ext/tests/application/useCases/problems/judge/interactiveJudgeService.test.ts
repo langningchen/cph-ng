@@ -63,8 +63,8 @@ describe('InteractiveJudgeService', () => {
 
   it('should judge interactively and call observer', async () => {
     const langMock = mock<ILanguageStrategy>();
-    langMock.getRunCommand.mockResolvedValue(['./solution']);
-    langRegistryMock.getLang.mockReturnValue(langMock);
+    langMock.getInterpretCommand.mockResolvedValue(['./solution']);
+    langRegistryMock.getLangByFile.mockReturnValue(langMock);
     problemServiceMock.getLimits.mockReturnValue({ timeLimitMs: 1000, memoryLimitMb: 512 });
 
     const interactiveResult: InteractiveExecutionResult = {
@@ -117,7 +117,7 @@ describe('InteractiveJudgeService', () => {
   });
 
   it('should call onResult with rejected when lang is not found', async () => {
-    langRegistryMock.getLang.mockReturnValue(undefined);
+    langRegistryMock.getLangByFile.mockReturnValue(undefined);
 
     await service.judge(makeCtx(), observerMock, signal);
 
@@ -128,8 +128,8 @@ describe('InteractiveJudgeService', () => {
 
   it('should call onError when interactor execution returns Error', async () => {
     const langMock = mock<ILanguageStrategy>();
-    langMock.getRunCommand.mockResolvedValue(['./solution']);
-    langRegistryMock.getLang.mockReturnValue(langMock);
+    langMock.getInterpretCommand.mockResolvedValue(['./solution']);
+    langRegistryMock.getLangByFile.mockReturnValue(langMock);
     problemServiceMock.getLimits.mockReturnValue({ timeLimitMs: 1000, memoryLimitMb: 512 });
 
     runnerMock.runInteractive.mockResolvedValue(new Error('interactor crashed'));
@@ -141,8 +141,8 @@ describe('InteractiveJudgeService', () => {
 
   it('should call onResult with rejected when runner returns ExecutionRejected', async () => {
     const langMock = mock<ILanguageStrategy>();
-    langMock.getRunCommand.mockResolvedValue(['./solution']);
-    langRegistryMock.getLang.mockReturnValue(langMock);
+    langMock.getInterpretCommand.mockResolvedValue(['./solution']);
+    langRegistryMock.getLangByFile.mockReturnValue(langMock);
     problemServiceMock.getLimits.mockReturnValue({ timeLimitMs: 1000, memoryLimitMb: 512 });
 
     runnerMock.runInteractive.mockRejectedValue(new ExecutionRejected('rejected'));

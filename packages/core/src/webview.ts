@@ -60,8 +60,8 @@ export interface IWebviewOverrides {
   memoryLimitMb: IWebviewOverride<number>;
   compiler?: IWebviewOverride<string>;
   compilerArgs?: IWebviewOverride<string>;
-  runner?: IWebviewOverride<string>;
-  runnerArgs?: IWebviewOverride<string>;
+  interpreter?: IWebviewOverride<string>;
+  interpreterArgs?: IWebviewOverride<string>;
 }
 
 export interface IWebviewProblem {

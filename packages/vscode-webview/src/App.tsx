@@ -29,7 +29,7 @@ import { InitView } from '@/components/initView';
 import { OobeView } from '@/components/oobe/oobe';
 import { ProblemView } from '@/components/problemView';
 import { ConfigProvider, useConfigState } from '@/context/ConfigContext';
-import { ProblemProvider, useProblemState } from '@/context/ProblemContext';
+import { ProblemProvider, useProblem } from '@/context/ProblemContext';
 import langEn from '@/l10n/en.json';
 import langZh from '@/l10n/zh.json';
 
@@ -43,13 +43,14 @@ i18n.use(initReactI18next).init({
 });
 
 const Main = () => {
-  const problem = useProblemState();
+  const { state } = useProblem();
   const config = useConfigState();
   const { t } = useTranslation();
 
-  // biome-ignore lint/correctness/noConstantCondition: test only
-  if (1 + 1 === 2) return <OobeView />;
-  if (!problem.isReady || !config.isReady) return <InitView />;
+  console.log(state.isReady, config.isReady);
+
+  if (!state.isReady || !config.isReady) return <InitView />;
+  if (config.isReady && config.config.showOobe) return <OobeView />;
 
   return (
     <>
@@ -62,13 +63,10 @@ const Main = () => {
           smallGap
           sx={{ height: '100%', boxSizing: 'border-box', padding: { xs: 0.5, md: 1 } }}
         >
-          {problem.currentProblem.type === 'active' ? (
-            <ProblemView
-              {...problem.currentProblem}
-              backgroundProblems={problem.backgroundProblems}
-            />
+          {state.currentProblem.type === 'active' ? (
+            <ProblemView {...state.currentProblem} backgroundProblems={state.backgroundProblems} />
           ) : (
-            <CreateProblemView canImport={problem.currentProblem.canImport} />
+            <CreateProblemView canImport={state.currentProblem.canImport} />
           )}
           <Alert
             severity='info'

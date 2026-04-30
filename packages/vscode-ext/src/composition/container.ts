@@ -18,6 +18,13 @@
 import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { container } from 'tsyringe';
 import { type ExtensionContext, window } from 'vscode';
+import { LangCpp } from '@/infrastructure/langs/cppStrategy';
+import { LangC } from '@/infrastructure/langs/cStrategy';
+import { LangJava } from '@/infrastructure/langs/javaStrategy';
+import { LangJavascript } from '@/infrastructure/langs/javascriptStrategy';
+import { LanguageRegistry } from '@/infrastructure/langs/languageRegistry';
+import { LangPython } from '@/infrastructure/langs/pythonStrategy';
+import { LangRust } from '@/infrastructure/langs/rustStrategy';
 import { BuildInfoAdapter } from '@/infrastructure/node/buildInfoAdapter';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
 import { CryptoAdapter } from '@/infrastructure/node/cryptoAdapter';
@@ -30,13 +37,6 @@ import { CphMigrationService } from '@/infrastructure/problems/cphMigrationServi
 import { CheckerRunnerAdapter } from '@/infrastructure/problems/judge/checkerRunnerAdapter';
 import { CompilerService } from '@/infrastructure/problems/judge/compilerService';
 import { JudgeServiceFactory } from '@/infrastructure/problems/judge/judgeServiceFactoryAdapter';
-import { LangCpp } from '@/infrastructure/problems/judge/langs/cppStrategy';
-import { LangC } from '@/infrastructure/problems/judge/langs/cStrategy';
-import { LangJava } from '@/infrastructure/problems/judge/langs/javaStrategy';
-import { LangJavascript } from '@/infrastructure/problems/judge/langs/javascriptStrategy';
-import { LanguageRegistry } from '@/infrastructure/problems/judge/langs/languageRegistry';
-import { LangPython } from '@/infrastructure/problems/judge/langs/pythonStrategy';
-import { LangRust } from '@/infrastructure/problems/judge/langs/rustStrategy';
 import { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
 import { ExecutionStrategyFactoryAdapter } from '@/infrastructure/problems/judge/runner/executionStrategyFactoryAdapter';
 import { SolutionRunnerAdapter } from '@/infrastructure/problems/judge/runner/solutionRunnerAdapter';
@@ -70,7 +70,6 @@ import { SidebarProvider } from '@/infrastructure/vscode/sidebarProvider';
 import { TelemetryAdapter } from '@/infrastructure/vscode/telemetryAdapter';
 import { TranslatorAdapter } from '@/infrastructure/vscode/translatorAdapter';
 import { UiAdapter } from '@/infrastructure/vscode/uiAdapter';
-import { WebviewEventBusAdapter } from '@/infrastructure/vscode/webviewEventBus';
 import { WorkspaceAdapter } from '@/infrastructure/vscode/workspaceAdapter';
 import { TOKENS } from './tokens';
 
@@ -112,7 +111,6 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.translator, TranslatorAdapter);
   container.registerSingleton(TOKENS.ui, UiAdapter);
   container.registerSingleton(TOKENS.userScriptService, UserScriptService);
-  container.registerSingleton(TOKENS.webviewEventBus, WebviewEventBusAdapter);
   container.registerSingleton(TOKENS.workspace, WorkspaceAdapter);
 
   container.registerSingleton(LlmTestcaseRunner);

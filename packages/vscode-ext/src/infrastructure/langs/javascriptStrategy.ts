@@ -15,12 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IOverrides } from '@cph-ng/core';
+import type { ILanguageDefaultValues, IOverrides } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
-import type { ILanguageDefaultValues } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
-import { LanguageStrategyContext } from '@/infrastructure/problems/judge/langs/languageStrategyContext';
+import { LanguageStrategyContext } from '@/infrastructure/langs/languageStrategyContext';
 import { AbstractLanguageStrategy } from './abstractLanguageStrategy';
 
 @injectable()
@@ -28,6 +27,27 @@ export class LangJavascript extends AbstractLanguageStrategy {
   public override readonly name = 'JavaScript';
   public override readonly extensions = ['js'];
   public override readonly defaultValues;
+  public override readonly interpreterQuery = {
+    filePatterns: ['node', 'node.exe', 'bun', 'bun.exe', 'deno', 'deno.exe'],
+    groupPatterns: [
+      {
+        group: 'Node',
+        helpRegex: /^Documentation can be found at/m,
+        versionRegex: /^v(?<version>[0-9]+\.[0-9]+\.[0-9]+)/m,
+      },
+      {
+        group: 'Bun',
+        helpRegex: /^Learn more about Bun:/m,
+        versionRegex: /^(?<version>[0-9]+\.[0-9]+\.[0-9]+)/m,
+      },
+      {
+        group: 'Deno',
+        helpRegex: /^Deno: A modern JavaScript and TypeScript runtime$/m,
+        versionRegex:
+          /^(?<name>[a-z]+) (?<version>[0-9]+\.[0-9]+\.[0-9]+) \((?<description>.+)\)$/m,
+      },
+    ],
+  };
 
   public constructor(
     @inject(LanguageStrategyContext) context: LanguageStrategyContext,
@@ -35,21 +55,24 @@ export class LangJavascript extends AbstractLanguageStrategy {
   ) {
     super({ ...context, logger: logger.withScope('langsJavascript') });
     this.defaultValues = {
-      runner: this.settings.languages.javascriptRunner,
-      runnerArgs: this.settings.languages.javascriptRunnerArgs,
+      interpreter: this.settings.languages.javascriptInterpreter,
+      interpreterArgs: this.settings.languages.javascriptInterpreterArgs,
     } satisfies ILanguageDefaultValues;
-    this.settings.languages.onChangeJavascriptRunner(
-      (runner) => (this.defaultValues.runner = runner),
+    this.settings.languages.onChangeJavascriptInterpreter(
+      (interpreter) => (this.defaultValues.interpreter = interpreter),
     );
-    this.settings.languages.onChangeJavascriptRunnerArgs(
-      (args) => (this.defaultValues.runnerArgs = args),
+    this.settings.languages.onChangeJavascriptInterpreterArgs(
+      (args) => (this.defaultValues.interpreterArgs = args),
     );
   }
 
-  public override async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
+  public override async getInterpretCommand(
+    target: string,
+    overrides?: IOverrides,
+  ): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner = overrides?.runner || this.defaultValues.runner;
-    const runArgs = overrides?.runnerArgs || this.defaultValues.runnerArgs;
+    const runner = overrides?.interpreter || this.defaultValues.interpreter;
+    const runArgs = overrides?.interpreterArgs || this.defaultValues.interpreterArgs;
     const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
     return [runner, ...runArgsArray, target];
   }

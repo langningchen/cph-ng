@@ -20,10 +20,11 @@ import { inject, injectable } from 'tsyringe';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
+import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { TOKENS } from '@/composition/tokens';
 
 @injectable()
-export class CreateProblem {
+export class CreateProblem implements IMsgHandle<CreateProblemMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.activePathService) private readonly activePath: IActivePathService,

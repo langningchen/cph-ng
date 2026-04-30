@@ -38,7 +38,18 @@ export class ProblemMigrationService implements IProblemMigrationService {
   }
 
   private readonly migrateFunctions: Record<string, (oldProblem: any) => any> = {
-    '0.6.1': (_: History.IProblem_0_6_1): null => null,
+    '0.7.8': (_: History.IProblem_0_7_8): null => null,
+    '0.6.1': (problem: History.IProblem_0_6_1): History.IProblem_0_7_8 => ({
+      ...problem,
+      overrides: {
+        timeLimitMs: problem.overrides.timeLimitMs,
+        memoryLimitMb: problem.overrides.memoryLimitMb,
+        compiler: problem.overrides.compiler,
+        compilerArgs: problem.overrides.compilerArgs,
+        interpreter: problem.overrides.runner,
+        interpreterArgs: problem.overrides.runnerArgs,
+      },
+    }),
     '0.6.0': (problem: History.IProblem_0_6_0): History.IProblem_0_6_1 => {
       const migrateFileWithHash = (
         file: History.IFileWithHash_0_6_0,

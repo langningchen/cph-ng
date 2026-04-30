@@ -28,7 +28,7 @@ import { SrcFileSelect } from '@/components/actions/srcFileSelect';
 import { CphNgButton } from '@/components/base/cphNgButton';
 import { CphNgFlex } from '@/components/base/cphNgFlex';
 import { RunButtonGroup } from '@/components/runButtonGroup';
-import { useProblemDispatch } from '@/context/ProblemContext';
+import { useProblem } from '@/context/ProblemContext';
 
 interface StressTestDialogProps {
   open: boolean;
@@ -40,7 +40,7 @@ interface StressTestDialogProps {
 export const StressTestDialog = memo(
   ({ open, onClose, problemId, stressTest }: StressTestDialogProps) => {
     const { t } = useTranslation();
-    const dispatch = useProblemDispatch();
+    const { dispatch } = useProblem();
 
     return (
       <Dialog fullWidth maxWidth={false} open={open} onClose={onClose}>

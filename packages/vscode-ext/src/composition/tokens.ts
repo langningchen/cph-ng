@@ -57,7 +57,6 @@ import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvid
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
-import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 import type { IWorkspace } from '@/application/ports/vscode/IWorkspace';
 
 // Centralized DI tokens for tsyringe registrations
@@ -108,7 +107,6 @@ export const TOKENS = {
   ui: 'ports.Ui' as InjectionToken<IUi>,
   userScriptService: 'ports.UserScriptService' as InjectionToken<IUserScriptService>,
   companion: 'ports.Companion' as InjectionToken<ICompanion>,
-  webviewEventBus: 'ports.WebviewEventBus' as InjectionToken<IWebviewEventBus>,
   workspace: 'ports.Workspace' as InjectionToken<IWorkspace>,
   problemMigrationService:
     'ports.ProblemMigrationService' as InjectionToken<IProblemMigrationService>,

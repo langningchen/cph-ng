@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { CphNgButton } from '@/components/base/cphNgButton';
 import { CphNgFlex } from '@/components/base/cphNgFlex';
 import { CphNgLink } from '@/components/base/cphNgLink';
-import { useProblemDispatch } from '@/context/ProblemContext';
+import { useProblem } from '@/context/ProblemContext';
 
 interface SrcFileSelectProps {
   label: string;
@@ -35,7 +35,7 @@ interface SrcFileSelectProps {
 
 export const SrcFileSelect = memo(({ label, file, problemId, fileType }: SrcFileSelectProps) => {
   const { t } = useTranslation();
-  const dispatch = useProblemDispatch();
+  const { dispatch } = useProblem();
 
   return (
     <CphNgFlex>

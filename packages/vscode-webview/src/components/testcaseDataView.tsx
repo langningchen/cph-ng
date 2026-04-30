@@ -32,7 +32,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { CphNgButton } from '@/components/base/cphNgButton';
 import { CphNgFlex } from '@/components/base/cphNgFlex';
 import { CphNgLink } from '@/components/base/cphNgLink';
-import { useProblemDispatch } from '@/context/ProblemContext';
+import { useProblem } from '@/context/ProblemContext';
 
 interface OutputActions {
   onSetAnswer: () => void;
@@ -110,7 +110,7 @@ export const TestcaseDataView = memo(
     tabIndex,
   }: CodeMirrorSectionProps) => {
     const { t } = useTranslation();
-    const dispatch = useProblemDispatch();
+    const { dispatch } = useProblem();
     const [copied, setCopied] = useState(false);
     const [internalValue, setInternalValue] = useState(value);
     const textareaRef = useRef<HTMLTextAreaElement>(null);

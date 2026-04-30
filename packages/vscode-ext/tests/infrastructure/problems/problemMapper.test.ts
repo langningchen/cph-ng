@@ -119,8 +119,8 @@ describe('ProblemMapper', () => {
         memoryLimitMb: 256,
         compiler: null,
         compilerArgs: null,
-        runner: null,
-        runnerArgs: null,
+        interpreter: null,
+        interpreterArgs: null,
       };
 
       const dto = mapper.toDto(problem);
@@ -129,8 +129,8 @@ describe('ProblemMapper', () => {
         memoryLimitMb: 256,
         compiler: null,
         compilerArgs: null,
-        runner: null,
-        runnerArgs: null,
+        interpreter: null,
+        interpreterArgs: null,
       });
 
       const restored = mapper.toEntity(dto);
@@ -139,8 +139,8 @@ describe('ProblemMapper', () => {
         memoryLimitMb: 256,
         compiler: null,
         compilerArgs: null,
-        runner: null,
-        runnerArgs: null,
+        interpreter: null,
+        interpreterArgs: null,
       });
     });
 

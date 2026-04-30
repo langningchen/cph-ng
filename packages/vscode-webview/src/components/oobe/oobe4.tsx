@@ -15,75 +15,147 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
+import type { ILanguageDefaultValues } from '@cph-ng/core';
+import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import ListSubheader from '@mui/material/ListSubheader';
-import Tab from '@mui/material/Tab';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { type SyntheticEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { OOBEPage } from '@/components/oobe/oobePage';
+import { openLink, urls } from '@/utils';
+import Oobe4Svg from './oobe-4.svg';
 
-export const oobe4 = () => {
-  const { t } = useTranslation();
-  const [value, setValue] = useState('edge');
-
-  const handleChange = (_event: SyntheticEvent, newValue: string) => {
-    setValue(newValue);
+export interface Step4Props {
+  config: {
+    language: string;
+    languageConfig: ILanguageDefaultValues;
   };
+  onDone: () => void;
+  onBack: () => void;
+}
+
+export function OobeStep4({ config, onBack, onDone }: Step4Props) {
+  const { t } = useTranslation();
 
   return (
-    <CphNgFlex alignStart column sx={{ gap: 2, key: 4 }}>
-      <Typography variant='h5'>{t('oobe.step4.title')}</Typography>
-      <Typography variant='subtitle2'>{t('oobe.step4.subtitle')}</Typography>
-      <Box>CPH-NG works with both CPH-NG Submit and Competitive Companion.</Box>
-      <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }} dense>
-        <ListSubheader>CPH-NG Submit</ListSubheader>
-        <ListItemButton>
-          <ListItemText primary='Edge' />
-        </ListItemButton>
-        <ListItemButton>
-          <ListItemText primary='Firefox' />
-        </ListItemButton>
-        <ListSubheader>Competitive Companion</ListSubheader>
-        <ListItemButton>
-          <ListItemText primary='Chrome' />
-        </ListItemButton>
-        <ListItemButton>
-          <ListItemText primary='Firefox' />
-        </ListItemButton>
-      </List>
-      <TabContext value={value}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleChange} aria-label='lab API tabs example'>
-            <Tab label={t('oobe.step4.edge')} value='edge' />
-            <Tab label={t('oobe.step4.firefox')} value='firefox' />
-            <Tab label={t('oobe.step4.chrome')} value='chrome' />
-          </TabList>
-        </Box>
-        <TabPanel sx={{ p: 2 }} value='edge'>
-          <Typography>{t('oobe.step4.edge.description')}</Typography>
-        </TabPanel>
-        <TabPanel sx={{ p: 2 }} value='firefox'>
-          <Typography>{t('oobe.step4.firefox.description')}</Typography>
-        </TabPanel>
-        <TabPanel sx={{ p: 2 }} value='chrome'>
-          <Typography>{t('oobe.step4.chrome.description')}</Typography>
-        </TabPanel>
-      </TabContext>
-      <Card>
-        <CardContent>
-          <Typography variant='h6'>{t('oobe.step4.firefox')}</Typography>
-          <Typography variant='body2'>{t('oobe.step4.firefox.description')}</Typography>
-        </CardContent>
-      </Card>
-    </CphNgFlex>
+    <OOBEPage
+      svg={Oobe4Svg}
+      title={t('oobe.step4.title')}
+      subtitle={t('oobe.step4.subtitle')}
+      step={4}
+      totalSteps={4}
+      onBack={onBack}
+      onNext={onDone}
+    >
+      <Stack spacing={2}>
+        <Paper variant='outlined' sx={{ p: 2, borderRadius: 2 }}>
+          <Stack spacing={1}>
+            <SummaryRow label={t('oobe.step4.language')} value={config.language} />
+            <SummaryRow
+              label={t('oobe.step4.compiler')}
+              value={config.languageConfig.compiler || ''}
+            />
+            <SummaryRow
+              label={t('oobe.step4.flags')}
+              value={config.languageConfig.compilerArgs || ''}
+              mono
+            />
+          </Stack>
+        </Paper>
+
+        <Paper variant='outlined' sx={{ borderRadius: 2 }}>
+          <List disablePadding>
+            <LinkItem
+              icon='📖'
+              primary={t('oobe.step4.docs')}
+              secondary={t('oobe.step4.docs.description')}
+              url={urls.docs}
+            />
+            <Divider />
+            <LinkItem
+              icon='⚙️'
+              primary={t('oobe.step4.openSettings')}
+              secondary={t('oobe.step4.openSettings.description')}
+              url={urls.settings}
+            />
+            <Divider />
+            <LinkItem
+              icon='💬'
+              primary={t('oobe.step4.joinQQ')}
+              secondary={t('oobe.step4.joinQQ.description')}
+              url={urls.joinQQ}
+            />
+            <Divider />
+            <LinkItem
+              icon='⭐'
+              primary={t('oobe.step4.source')}
+              secondary={t('oobe.step4.source.description')}
+              url={urls.github}
+            />
+          </List>
+        </Paper>
+      </Stack>
+    </OOBEPage>
   );
-};
+}
+
+function SummaryRow({
+  label,
+  value,
+  mono = false,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
+  return (
+    <Stack direction='row' sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+      <Typography variant='caption' color='text.secondary'>
+        {label}
+      </Typography>
+      <Typography
+        variant='caption'
+        sx={{
+          fontWeight: 600,
+          ...(mono && {
+            fontFamily: 'var(--vscode-editor-font-family)',
+          }),
+        }}
+      >
+        {value}
+      </Typography>
+    </Stack>
+  );
+}
+
+function LinkItem({
+  icon,
+  primary,
+  secondary,
+  url,
+}: {
+  icon: string;
+  primary: string;
+  secondary: string;
+  url: string;
+}) {
+  return (
+    <ListItem disablePadding>
+      <ListItemButton onClick={() => openLink(url)}>
+        <Typography sx={{ mr: 1.5, fontSize: 18 }}>{icon}</Typography>
+        <ListItemText
+          primary={primary}
+          secondary={secondary}
+          slotProps={{
+            primary: { sx: { variant: 'body2', fontWeight: 600 } },
+            secondary: { sx: { variant: 'caption' } },
+          }}
+        />
+      </ListItemButton>
+    </ListItem>
+  );
+}

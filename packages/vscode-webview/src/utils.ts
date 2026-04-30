@@ -43,6 +43,9 @@ export const urls = {
   github: 'https://github.com/langningchen/cph-ng',
   feedback: 'https://github.com/langningchen/cph-ng/issues',
   docs: 'https://deepwiki.com/langningchen/cph-ng',
+  companionChromeAddon:
+    'https://chromewebstore.google.com/detail/competitive-companion/cjnmckjndlpiamhfimnnjmnckgghkjbl',
+  companionFirefoxAddon: 'https://addons.mozilla.org/en-US/firefox/addon/competitive-companion/',
   edgeAddon:
     'https://microsoftedge.microsoft.com/addons/detail/cphng-submit/hfpfdaggmljfccmnfljldojbgfhpfomb',
   firefoxAddon: 'https://addons.mozilla.org/firefox/addon/cph-ng-submit/',

@@ -39,7 +39,7 @@ import { CphNgLink } from '@/components/base/cphNgLink';
 import { CphNgMenu } from '@/components/base/cphNgMenu';
 import { CphNgText } from '@/components/base/cphNgText';
 import { CphNgTooltip } from '@/components/base/cphNgTooltip';
-import { useProblemDispatch } from '@/context/ProblemContext';
+import { useProblem } from '@/context/ProblemContext';
 
 interface ProblemTitleProps {
   problemId: ProblemId;
@@ -84,7 +84,7 @@ export const ProblemTitle = memo(
     startTime,
   }: ProblemTitleProps) => {
     const { t } = useTranslation();
-    const dispatch = useProblemDispatch();
+    const { dispatch } = useProblem();
     const [isEditDialogOpen, setEditDialogOpen] = useState(false);
     const [tabValue, setTabValue] = useState('basic');
     const [editedTitle, setEditedTitle] = useState('');
@@ -93,8 +93,8 @@ export const ProblemTitle = memo(
     const [editedMemoryLimitMb, setEditedMemoryLimitMb] = useState<string | null>();
     const [editedCompiler, setEditedCompiler] = useState<string | null | undefined>();
     const [editedCompilerArgs, setEditedCompilerArgs] = useState<string | null | undefined>();
-    const [editedRunner, setEditedRunner] = useState<string | null | undefined>();
-    const [editedRunnerArgs, setEditedRunnerArgs] = useState<string | null | undefined>();
+    const [editedInterpreter, setEditedRunner] = useState<string | null | undefined>();
+    const [editedInterpreterArgs, setEditedRunnerArgs] = useState<string | null | undefined>();
     const [timeElapsed, setTimeElapsed] = useState(0);
 
     useEffect(() => {
@@ -104,8 +104,8 @@ export const ProblemTitle = memo(
       setEditedMemoryLimitMb(overrides.memoryLimitMb.override?.toString());
       setEditedCompiler(overrides.compiler?.override);
       setEditedCompilerArgs(overrides.compilerArgs?.override);
-      setEditedRunner(overrides.runner?.override);
-      setEditedRunnerArgs(overrides.runnerArgs?.override);
+      setEditedRunner(overrides.interpreter?.override);
+      setEditedRunnerArgs(overrides.interpreterArgs?.override);
     }, [name, url, overrides]);
     useEffect(() => {
       setTimeElapsed(Date.now() - startTime);
@@ -131,8 +131,8 @@ export const ProblemTitle = memo(
           memoryLimitMb: editedMemoryLimitMb ? parseInt(editedMemoryLimitMb, 10) : null,
           compiler: editedCompiler ?? null,
           compilerArgs: editedCompilerArgs ?? null,
-          runner: editedRunner ?? null,
-          runnerArgs: editedRunnerArgs ?? null,
+          interpreter: editedInterpreter ?? null,
+          interpreterArgs: editedInterpreterArgs ?? null,
         },
       });
     };
@@ -305,24 +305,24 @@ export const ProblemTitle = memo(
                     fullWidth
                   />
                 )}
-                {!!overrides.runner && (
+                {!!overrides.interpreter && (
                   <TextField
                     variant='outlined'
                     margin='normal'
-                    label={t('problemTitle.dialog.field.runner')}
-                    value={editedRunner}
-                    placeholder={overrides.runner.defaultValue.toString()}
+                    label={t('problemTitle.dialog.field.interpreter')}
+                    value={editedInterpreter}
+                    placeholder={overrides.interpreter.defaultValue.toString()}
                     onChange={(e) => setEditedRunner(e.target.value)}
                     fullWidth
                   />
                 )}
-                {!!overrides.runnerArgs && (
+                {!!overrides.interpreterArgs && (
                   <TextField
                     variant='outlined'
                     margin='normal'
-                    label={t('problemTitle.dialog.field.runnerArgs')}
-                    value={editedRunnerArgs}
-                    placeholder={overrides.runnerArgs.defaultValue.toString()}
+                    label={t('problemTitle.dialog.field.interpreterArgs')}
+                    value={editedInterpreterArgs}
+                    placeholder={overrides.interpreterArgs.defaultValue.toString()}
                     onChange={(e) => setEditedRunnerArgs(e.target.value)}
                     fullWidth
                   />

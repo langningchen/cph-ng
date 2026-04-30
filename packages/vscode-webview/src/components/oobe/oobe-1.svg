@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+    <defs>
+        <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.08" />
+        </filter>
+        <filter id="shadow-sm" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.12" />
+        </filter>
+        <style>
+            .card { fill: #FFFFFF; stroke: #E0E0E0; filter: url(#shadow); }
+            .card-highlight { fill: #FFFFFF; stroke: #1976D2; filter: url(#shadow); }
+            .line-light { fill: #EEEEEE; }
+            .line-dark { fill: #E0E0E0; }
+            .primary-fill { fill: #1976D2; }
+            .primary-light-fill { fill: #90CAF9; }
+            .dot-1 { fill: #64B5F6; }
+            .dot-2 { fill: #E0E0E0; }
+            .dot-3 { fill: #90CAF9; }
+            .dot-4 { fill: #BDBDBD; }
+            
+            @media (prefers-color-scheme: dark) {
+                .card { fill: #1E1E1E; stroke: #333333; filter: none; }
+                .card-highlight { fill: #1E1E1E; stroke: #64B5F6; filter: none; }
+                .line-light { fill: #2C2C2C; }
+                .line-dark { fill: #424242; }
+                .primary-fill { fill: #64B5F6; }
+                .primary-light-fill { fill: #1976D2; }
+                .dot-1 { fill: #42A5F5; }
+                .dot-2 { fill: #424242; }
+                .dot-3 { fill: #1E88E5; }
+                .dot-4 { fill: #616161; }
+            }
+        </style>
+    </defs>
+    
+    <!-- Decorative Dots -->
+    <circle cx="340" cy="40" r="4" class="dot-1" opacity="0.8" />
+    <circle cx="360" cy="60" r="3" class="dot-2" />
+    <circle cx="320" cy="70" r="5" class="dot-3" opacity="0.5" />
+    <circle cx="370" cy="90" r="4" class="dot-4" opacity="0.4" />
+
+    <!-- Card 1 (Back Left) -->
+    <g transform="translate(60, 60) rotate(-8)">
+        <rect width="140" height="100" rx="8" class="card" stroke-width="1"/>
+        <rect x="20" y="30" width="80" height="6" rx="3" class="line-light"/>
+        <rect x="20" y="50" width="60" height="6" rx="3" class="line-light"/>
+        <rect x="20" y="70" width="40" height="6" rx="3" class="line-light"/>
+    </g>
+
+    <!-- Card 2 (Middle) -->
+    <g transform="translate(110, 50) rotate(4)">
+        <rect width="140" height="100" rx="8" class="card" stroke-width="1"/>
+        <rect x="20" y="30" width="70" height="6" rx="3" class="line-dark"/>
+        <rect x="20" y="50" width="90" height="6" rx="3" class="line-dark"/>
+        <rect x="20" y="70" width="50" height="6" rx="3" class="line-dark"/>
+    </g>
+
+    <!-- Card 3 (Front, Highlighted) -->
+    <g transform="translate(150, 70)">
+        <rect width="150" height="110" rx="8" class="card-highlight" stroke-width="2"/>
+        <!-- Code Lines -->
+        <rect x="24" y="30" width="60" height="8" rx="4" class="primary-fill" opacity="0.8"/>
+        <rect x="24" y="54" width="90" height="8" rx="4" class="primary-light-fill" opacity="0.8"/>
+        <rect x="24" y="78" width="50" height="8" rx="4" class="primary-light-fill" opacity="0.8"/>
+        
+        <!-- Selected Badge -->
+        <g transform="translate(150, 0)" filter="url(#shadow-sm)">
+            <circle cx="0" cy="0" r="14" class="primary-fill"/>
+            <path d="M-5 -1 L-2 2 L5 -5" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+    </g>
+</svg>

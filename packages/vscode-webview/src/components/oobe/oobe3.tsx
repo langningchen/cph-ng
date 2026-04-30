@@ -15,42 +15,96 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { OOBEPage } from '@/components/oobe/oobePage';
+import { openLink, urls } from '@/utils';
+import Oobe3Svg from './oobe-3.svg';
 
-const languageList = ['C++', 'Java', 'Python', 'JavaScript', 'Go'];
-type Language = (typeof languageList)[number];
-const languages: Language[] = languageList;
+export interface Step3Props {
+  onNext: () => void;
+  onBack: () => void;
+}
 
-export const oobe3 = () => {
+export function OobeStep3({ onBack, onNext }: Step3Props) {
   const { t } = useTranslation();
-  const [selectedLanguage, setSelectedLanguage] = useState<Language>(languages[0]);
+
+  const extensions = [
+    {
+      emoji: '📥',
+      name: 'Competitive Companion',
+      description: t('oobe.step3.cc.description'),
+      links: [
+        { label: 'Chrome / Edge', url: urls.companionChromeAddon },
+        { label: 'Firefox', url: urls.companionFirefoxAddon },
+      ],
+    },
+    {
+      emoji: '📤',
+      name: 'CPH-NG Submit',
+      description: t('oobe.step3.submit.description'),
+      links: [
+        { label: 'Edge', url: urls.edgeAddon },
+        { label: 'Firefox', url: urls.firefoxAddon },
+      ],
+    },
+  ];
 
   return (
-    <CphNgFlex alignStart column sx={{ gap: 2, key: 4 }}>
-      <Typography variant='h5'>{t('oobe.step3.title')}</Typography>
-      <Typography variant='subtitle2'>{t('oobe.step3.subtitle')}</Typography>
-      <FormControl fullWidth>
-        <InputLabel>{t('oobe.step3.language')}</InputLabel>
-        <Select
-          value={selectedLanguage}
-          label={t('oobe.step3.language')}
-          onChange={(e) => setSelectedLanguage(e.target.value as Language)}
-        >
-          {languages.map((language) => (
-            <MenuItem key={language} value={language}>
-              {language}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <Typography variant='caption'>{t('oobe.step3.notFound')}</Typography>
-    </CphNgFlex>
+    <OOBEPage
+      svg={Oobe3Svg}
+      title={t('oobe.step3.title')}
+      subtitle={t('oobe.step3.subtitle')}
+      step={3}
+      totalSteps={4}
+      onBack={onBack}
+      onNext={onNext}
+    >
+      <Stack spacing={2}>
+        {extensions.map((ext) => (
+          <Paper key={ext.name} variant='outlined' sx={{ p: 2, borderRadius: 2 }}>
+            <Stack direction='row' spacing={1.5} sx={{ alignItems: 'flex-start' }}>
+              <Typography variant='h6'>{ext.emoji}</Typography>
+              <Box sx={{ flexGrow: 1 }}>
+                <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
+                  {ext.name}
+                </Typography>
+                <Typography
+                  variant='caption'
+                  color='text.secondary'
+                  sx={{ display: 'block', mt: 0.5, mb: 1 }}
+                >
+                  {ext.description}
+                </Typography>
+                <Stack direction='row' spacing={1} sx={{ flexWrap: 'wrap' }}>
+                  {ext.links.map((link) => (
+                    <Chip
+                      key={link.label}
+                      label={link.label}
+                      size='small'
+                      variant='outlined'
+                      onClick={() => {
+                        openLink(link.url);
+                      }}
+                      icon={<OpenInNewIcon sx={{ fontSize: 14 }} />}
+                      clickable
+                    />
+                  ))}
+                </Stack>
+              </Box>
+            </Stack>
+          </Paper>
+        ))}
+
+        <Typography variant='caption' color='text.secondary' sx={{ textAlign: 'center' }}>
+          {t('oobe.step3.bothOptional')}
+        </Typography>
+      </Stack>
+    </OOBEPage>
   );
-};
+}

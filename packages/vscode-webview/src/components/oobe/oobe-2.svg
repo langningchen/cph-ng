@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+    <defs>
+        <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.08" />
+        </filter>
+        <style>
+            .gear { fill: #9E9E9E; }
+            .terminal { filter: url(#shadow); stroke: none; }
+            .success-badge { fill: #4CAF50; filter: url(#shadow); stroke: none; }
+            
+            @media (prefers-color-scheme: dark) {
+                .gear { fill: #616161; }
+                .terminal { filter: none; stroke: #424242; stroke-width: 1px; }
+                .success-badge { fill: #66BB6A; filter: none; stroke: #1E1E1E; stroke-width: 2px; }
+            }
+        </style>
+    </defs>
+
+    <!-- Gear Icon -->
+    <g transform="translate(45, 155) scale(1.4)" opacity="0.3">
+        <path class="gear" d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+    </g>
+
+    <!-- Terminal Window -->
+    <g transform="translate(60, 40)">
+        <rect width="280" height="160" rx="8" fill="#263238" class="terminal" />
+        <path d="M0 8 C0 3.58 3.58 0 8 0 L272 0 C276.42 0 280 3.58 280 8 L280 28 L0 28 Z" fill="#37474F" />
+        <!-- Controls -->
+        <circle cx="18" cy="14" r="4" fill="#FF5F56" />
+        <circle cx="32" cy="14" r="4" fill="#FFBD2E" />
+        <circle cx="46" cy="14" r="4" fill="#27C93F" />
+        <!-- Code -->
+        <rect x="20" y="52" width="120" height="8" rx="4" fill="#64B5F6" />
+        <rect x="150" y="52" width="60" height="8" rx="4" fill="#B0BEC5" />
+        <rect x="20" y="76" width="80" height="8" rx="4" fill="#81C784" />
+        <rect x="20" y="100" width="160" height="8" rx="4" fill="#B0BEC5" />
+        <rect x="20" y="124" width="100" height="8" rx="4" fill="#B0BEC5" opacity="0.5"/>
+        <rect x="128" y="124" width="8" height="8" fill="#FFFFFF" opacity="0.8"/>
+    </g>
+
+    <!-- Success Badge -->
+    <g transform="translate(320, 180)">
+        <circle cx="0" cy="0" r="18" class="success-badge" />
+        <path d="M-6 0 L-2 4 L6 -4" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+</svg>

@@ -15,62 +15,47 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import DoneIcon from '@mui/icons-material/Done';
-import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import Box from '@mui/material/Box';
-import MobileStepper from '@mui/material/MobileStepper';
+import type { ILanguageDefaultValues } from '@cph-ng/core';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { CphNgButton } from '@/components/base/cphNgButton';
-import { CphNgFlex } from '@/components/base/cphNgFlex';
-import { oobe1 } from '@/components/oobe/oobe1';
-import { oobe3 } from '@/components/oobe/oobe3';
-import { oobe4 } from '@/components/oobe/oobe4';
-import { oobe5 } from '@/components/oobe/oobe5';
+import { OobeStep1 } from '@/components/oobe/oobe1';
+import { OobeStep2 } from '@/components/oobe/oobe2';
+import { OobeStep3 } from '@/components/oobe/oobe3';
+import { OobeStep4 } from '@/components/oobe/oobe4';
+import { OobeProvider } from '@/context/OobeContext';
 
-export const OobeView = () => {
-  const { t } = useTranslation();
-  const [activeStep, setActiveStep] = useState(0);
-
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-  const handleDone = () => {
-    setActiveStep(0);
-  };
-  const steps = [oobe1, oobe3, oobe4, oobe5];
+export function OobeView() {
+  const [step, setStep] = useState(1);
+  const [language, setLanguage] = useState('C++');
+  const [languageConfig, setLanguageConfig] = useState<ILanguageDefaultValues>({});
 
   return (
-    <CphNgFlex alignStart column sx={{ height: '100%' }}>
-      <MobileStepper
-        steps={steps.length}
-        activeStep={activeStep}
-        nextButton={
-          activeStep === steps.length - 1 ? (
-            <CphNgButton icon={DoneIcon} name={t('oobe.done')} onClick={handleDone} />
-          ) : (
-            <CphNgButton icon={NavigateNextIcon} name={t('oobe.next')} onClick={handleNext} />
-          )
-        }
-        backButton={
-          <CphNgButton
-            icon={NavigateBeforeIcon}
-            name={t('oobe.back')}
-            onClick={handleBack}
-            disabled={activeStep === 0}
-          />
-        }
-      />
-      {steps.map((StepComponent, index) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: Array does not modify
-        <Box key={index} sx={{ flex: 1, p: 2, display: index === activeStep ? 'block' : 'none' }}>
-          {StepComponent()}
-        </Box>
-      ))}
-    </CphNgFlex>
+    <OobeProvider>
+      {step === 1 && (
+        <OobeStep1
+          language={language}
+          setLanguage={setLanguage}
+          onSkip={() => {}}
+          onNext={() => setStep(2)}
+        />
+      )}
+      {step === 2 && (
+        <OobeStep2
+          language={language}
+          onNext={(compiler, compilerArgs, interpreter, interpreterArgs) => {
+            setLanguageConfig({ compiler, compilerArgs, interpreter, interpreterArgs });
+            setStep(3);
+          }}
+          onBack={() => setStep(1)}
+        />
+      )}
+      {step === 3 && <OobeStep3 onNext={() => setStep(4)} onBack={() => setStep(2)} />}
+      {step === 4 && (
+        <OobeStep4
+          config={{ language, languageConfig }}
+          onBack={() => setStep(3)}
+          onDone={() => {}}
+        />
+      )}
+    </OobeProvider>
   );
-};
+}

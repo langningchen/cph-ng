@@ -24,3 +24,23 @@ export type ProblemId = Branded<Uuid, 'ProblemId'>;
 export type TestcaseId = Branded<Uuid, 'TestcaseId'>;
 export type ClientId = Branded<Uuid, 'ClientId'>;
 export type BatchId = Branded<Uuid, 'BatchId'>;
+
+export interface ToolchainItem {
+  name: string;
+  group: string;
+  version: string | null;
+  description?: string;
+  path: string;
+}
+export interface ToolchainInfo {
+  default: string | null;
+  args?: string;
+  list: ToolchainItem[];
+}
+
+export interface ILanguageDefaultValues {
+  compiler?: string;
+  compilerArgs?: string;
+  interpreter?: string;
+  interpreterArgs?: string;
+}

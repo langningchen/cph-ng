@@ -26,9 +26,9 @@ import type { IProblemService } from '@/application/ports/problems/IProblemServi
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IExtensionModule } from '@/application/ports/vscode/IExtensionModule';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvider';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
-import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
 import { CreateProblem } from '@/application/useCases/webview/problem/manage/CreateProblem';
 import { ImportProblem } from '@/application/useCases/webview/problem/manage/ImportProblem';
 import { Submit } from '@/application/useCases/webview/problem/Submit';
@@ -46,12 +46,12 @@ export class CommandModule implements IExtensionModule {
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
-    @inject(TOKENS.webviewEventBus) private readonly webviewEventBus: IWebviewEventBus,
     @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.sidebarProvider) private readonly sidebarProvider: ISidebarProvider,
     @inject(TOKENS.system) private readonly sys: ISystem,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
-    @inject(TOKENS.version) private readonly version: string,
     @inject(TOKENS.ui) private readonly ui: IUi,
+    @inject(TOKENS.version) private readonly version: string,
 
     @inject(CreateProblem) private readonly createProblem: CreateProblem,
     @inject(ImportProblem) private readonly importProblem: ImportProblem,
@@ -96,15 +96,16 @@ export class CommandModule implements IExtensionModule {
         });
       },
       'cph-ng.submit': async () => {
-        if (this.settings.companion.confirmSubmit) {
-          this.ui.showSidebar();
-          this.webviewEventBus.openSubmitDialog(await this.getProblemId());
-          return;
-        }
-        await this.submit.exec({
-          type: 'submit',
-          problemId: await this.getProblemId(),
-        });
+        if (
+          !this.settings.companion.confirmSubmit ||
+          (await this.ui.confirm(
+            this.translator.t('Are you sure you want to submit this problem?'),
+          ))
+        )
+          await this.submit.exec({
+            type: 'submit',
+            problemId: await this.getProblemId(),
+          });
       },
     };
 

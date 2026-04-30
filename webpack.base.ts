@@ -55,6 +55,10 @@ export const makeBaseConfig = (
           },
         },
       },
+      {
+        test: /\.svg$/i,
+        type: "asset/inline",
+      },
     ],
   },
   optimization: {

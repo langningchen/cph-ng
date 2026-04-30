@@ -44,7 +44,7 @@ export const createCppExecutable = async (workspace: string, content: string): P
   const path = join(workspace, 'code.cpp');
   const langs = container.resolve(TOKENS.languageRegistry);
   writeFileSync(path, content);
-  const langCpp = langs.getLang(path);
+  const langCpp = langs.getLangByFile(path);
   if (!langCpp) throw new Error('Internal error: can not resolve language for cpp');
   const res = await langCpp.compile({ path, hash: null }, signal, null, { canUseWrapper: true });
   if (res instanceof Error) throw res;

@@ -42,8 +42,8 @@ describe('TemplateRenderer', () => {
       memoryLimitMb: 256,
       compiler: null,
       compilerArgs: null,
-      runner: null,
-      runnerArgs: null,
+      interpreter: null,
+      interpreterArgs: null,
     };
     return p;
   };

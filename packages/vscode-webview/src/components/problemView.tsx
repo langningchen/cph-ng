@@ -26,7 +26,7 @@ import { ErrorBoundary } from '@/components/base/errorBoundary';
 import { ProblemTitle } from '@/components/problemTitle';
 import { TestcasesView } from '@/components/testcasesView';
 import { VerdictSummary } from '@/components/verdictSummary';
-import { useProblemDispatch } from '@/context/ProblemContext';
+import { useProblem } from '@/context/ProblemContext';
 
 interface ProblemViewProps {
   problemId: ProblemId;
@@ -38,7 +38,7 @@ interface ProblemViewProps {
 export const ProblemView = memo(
   ({ problemId, problem, startTime, backgroundProblems }: ProblemViewProps) => {
     const { t } = useTranslation();
-    const dispatch = useProblemDispatch();
+    const { dispatch } = useProblem();
     const hasRunning = useMemo(() => {
       for (const [_, testcase] of Object.entries(problem.testcases))
         if (testcase.result?.verdict.type === VerdictType.running) return true;

@@ -37,7 +37,7 @@ describe('CompilerService', () => {
   };
 
   it('should return error when source language is not found', async () => {
-    langRegistryMock.getLang.mockReturnValue(undefined);
+    langRegistryMock.getLangByFile.mockReturnValue(undefined);
 
     const result = await service.compileAll(makeProblem(), null, signal);
 
@@ -46,7 +46,7 @@ describe('CompilerService', () => {
 
   it('should compile solution only when no checker/interactor/stressTest', async () => {
     const lang = makeLang();
-    langRegistryMock.getLang.mockReturnValue(lang);
+    langRegistryMock.getLangByFile.mockReturnValue(lang);
 
     const problem = makeProblem();
     const result = await service.compileAll(problem, null, signal);
@@ -63,7 +63,7 @@ describe('CompilerService', () => {
   it('should compile solution and checker', async () => {
     const solLang = makeLang('/tmp/sol-bin');
     const checkerLang = makeLang('/tmp/checker-bin');
-    langRegistryMock.getLang.mockImplementation((path: string) => {
+    langRegistryMock.getLangByFile.mockImplementation((path: string) => {
       if (path === '/src/main.cpp') return solLang;
       if (path === '/checker.cpp') return checkerLang;
       return undefined;
@@ -82,7 +82,7 @@ describe('CompilerService', () => {
   it('should compile solution and interactor', async () => {
     const solLang = makeLang('/tmp/sol-bin');
     const intLang = makeLang('/tmp/int-bin');
-    langRegistryMock.getLang.mockImplementation((path: string) => {
+    langRegistryMock.getLangByFile.mockImplementation((path: string) => {
       if (path === '/src/main.cpp') return solLang;
       if (path === '/interactor.cpp') return intLang;
       return undefined;
@@ -101,7 +101,7 @@ describe('CompilerService', () => {
     const solLang = makeLang('/tmp/sol-bin');
     const genLang = makeLang('/tmp/gen-bin');
     const bfLang = makeLang('/tmp/bf-bin');
-    langRegistryMock.getLang.mockImplementation((path: string) => {
+    langRegistryMock.getLangByFile.mockImplementation((path: string) => {
       if (path === '/src/main.cpp') return solLang;
       if (path === '/gen.cpp') return genLang;
       if (path === '/bf.cpp') return bfLang;
@@ -124,7 +124,7 @@ describe('CompilerService', () => {
   it('should return error when source compilation fails', async () => {
     const lang = mock<ILanguageStrategy>();
     lang.compile.mockResolvedValue(new Error('compile failed'));
-    langRegistryMock.getLang.mockReturnValue(lang);
+    langRegistryMock.getLangByFile.mockReturnValue(lang);
 
     const result = await service.compileAll(makeProblem(), null, signal);
 
@@ -135,7 +135,7 @@ describe('CompilerService', () => {
     const solLang = makeLang();
     const checkerLang = mock<ILanguageStrategy>();
     checkerLang.compile.mockResolvedValue(new Error('checker compile failed'));
-    langRegistryMock.getLang.mockImplementation((path: string) => {
+    langRegistryMock.getLangByFile.mockImplementation((path: string) => {
       if (path === '/src/main.cpp') return solLang;
       if (path === '/checker.cpp') return checkerLang;
       return undefined;
@@ -150,7 +150,7 @@ describe('CompilerService', () => {
 
   it('should use file path when lang not found for checker (optionalCompile)', async () => {
     const solLang = makeLang();
-    langRegistryMock.getLang.mockImplementation((path: string) => {
+    langRegistryMock.getLangByFile.mockImplementation((path: string) => {
       if (path === '/src/main.cpp') return solLang;
       return undefined; // checker lang not found -> uses raw path
     });

@@ -100,8 +100,8 @@ export class ImportCompanionProblems {
           memoryLimitMb: companionProblem.memoryLimit,
           compiler: null,
           compilerArgs: null,
-          runner: null,
-          runnerArgs: null,
+          interpreter: null,
+          interpreterArgs: null,
         };
 
         // Add testcases

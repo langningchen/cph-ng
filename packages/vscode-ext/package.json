@@ -290,15 +290,15 @@
             "default": "-cp .",
             "markdownDescription": "%config.languages.javaCompilerArgs%"
           },
-          "cph-ng.languages.javaRunner": {
+          "cph-ng.languages.javaInterpreter": {
             "type": "string",
             "default": "java",
-            "markdownDescription": "%config.languages.javaRunner%"
+            "markdownDescription": "%config.languages.javaInterpreter%"
           },
-          "cph-ng.languages.javaRunnerArgs": {
+          "cph-ng.languages.javaInterpreterArgs": {
             "type": "string",
             "default": "",
-            "markdownDescription": "%config.languages.javaRunnerArgs%"
+            "markdownDescription": "%config.languages.javaInterpreterArgs%"
           },
           "cph-ng.languages.pythonCompiler": {
             "type": "string",
@@ -310,25 +310,25 @@
             "default": "",
             "markdownDescription": "%config.languages.pythonCompilerArgs%"
           },
-          "cph-ng.languages.pythonRunner": {
+          "cph-ng.languages.pythonInterpreter": {
             "type": "string",
             "default": "pypy3",
-            "markdownDescription": "%config.languages.pythonRunner%"
+            "markdownDescription": "%config.languages.pythonInterpreter%"
           },
-          "cph-ng.languages.pythonRunnerArgs": {
+          "cph-ng.languages.pythonInterpreterArgs": {
             "type": "string",
             "default": "",
-            "markdownDescription": "%config.languages.pythonRunnerArgs%"
+            "markdownDescription": "%config.languages.pythonInterpreterArgs%"
           },
-          "cph-ng.languages.javascriptRunner": {
+          "cph-ng.languages.javascriptInterpreter": {
             "type": "string",
             "default": "node",
-            "markdownDescription": "%config.languages.javascriptRunner%"
+            "markdownDescription": "%config.languages.javascriptInterpreter%"
           },
-          "cph-ng.languages.javascriptRunnerArgs": {
+          "cph-ng.languages.javascriptInterpreterArgs": {
             "type": "string",
             "default": "",
-            "markdownDescription": "%config.languages.javascriptRunnerArgs%"
+            "markdownDescription": "%config.languages.javascriptInterpreterArgs%"
           }
         }
       },
@@ -643,6 +643,11 @@
             "uniqueItems": true,
             "default": [],
             "markdownDescription": "%config.sidebar.hiddenStatuses%"
+          },
+          "cph-ng.sidebar.showOobe": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%config.sidebar.showOobe%"
           }
         }
       }
@@ -747,6 +752,7 @@
     "@types/semver": "^7.7.1",
     "@types/source-map-support": "^0.5.10",
     "@types/vscode": "1.97.0",
+    "@types/which": "^3.0.4",
     "@vitest/coverage-v8": "4.1.4",
     "@vitest/ui": "^4.1.4",
     "@vscode/vsce": "^3.9.1",
@@ -769,11 +775,13 @@
     "@vscode/extension-telemetry": "^1.5.1",
     "adm-zip": "^0.5.17",
     "crypto-js": "^4.2.0",
+    "glob": "^13.0.6",
     "hi-base32": "^0.5.1",
     "lodash": "^4.18.1",
     "memfs": "^4.57.2",
     "natural-orderby": "^5.0.0",
     "p-memoize": "^8.0.0",
+    "path-key": "^4.0.0",
     "react": "^19.2.5",
     "reflect-metadata": "^0.2.2",
     "semver": "^7.7.4",
@@ -781,6 +789,7 @@
     "source-map-support": "^0.5.21",
     "tsyringe": "^4.10.0",
     "type-fest": "^5.6.0",
-    "typed-emitter": "^2.1.0"
+    "typed-emitter": "^2.1.0",
+    "which": "^6.0.1"
   }
 }

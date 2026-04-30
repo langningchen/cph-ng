@@ -37,7 +37,7 @@ import { CphNgTooltip } from '@/components/base/cphNgTooltip';
 import { ErrorBoundary } from '@/components/base/errorBoundary';
 import { RunButtonGroup } from '@/components/runButtonGroup';
 import { TestcaseDataView } from '@/components/testcaseDataView';
-import { useProblemDispatch } from '@/context/ProblemContext';
+import { useProblem } from '@/context/ProblemContext';
 
 interface TestcaseViewProp {
   problemId: ProblemId;
@@ -66,7 +66,7 @@ export const TestcaseView = memo(
     autoFocus = false,
   }: TestcaseViewProp) => {
     const { t } = useTranslation();
-    const dispatch = useProblemDispatch();
+    const { dispatch } = useProblem();
     const isRunning = testcase.result?.verdict.type === VerdictType.running;
     const expanded = testcase.isDisabled ? false : isExpand;
     const details = useMemo(

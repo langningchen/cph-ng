@@ -20,7 +20,7 @@ import type {
   IWebviewProblem,
   IWebviewTestcaseResult,
   ProblemId,
-  WebviewEvent,
+  WebviewHostEvent,
   WebviewMsg,
 } from '@cph-ng/core';
 import { produce } from 'immer';
@@ -45,26 +45,20 @@ interface CurrentProblemStateActive {
 }
 type CurrentProblemState = CurrentProblemStateIdle | CurrentProblemStateActive;
 
-type ProblemUiMsg =
-  | { type: 'openSubmitDialog'; problemId: ProblemId }
-  | { type: 'closeSubmitDialog' };
-
-type State = {
+type ProblemState = {
   isReady: boolean;
   currentProblem: CurrentProblemState;
   backgroundProblems: IWebviewBackgroundProblem[];
-  submitDialogProblemId: ProblemId | null;
 };
 
-const StateContext = createContext<State | undefined>(undefined);
-const DispatchContext = createContext<((msg: WebviewMsg) => void) | undefined>(undefined);
-const UiDispatchContext = createContext<((msg: ProblemUiMsg) => void) | undefined>(undefined);
+const StateContext = createContext<
+  { state: ProblemState; dispatch: (msg: WebviewMsg) => void } | undefined
+>(undefined);
 
-const problemReducer = (state: State, action: WebviewEvent | WebviewMsg | ProblemUiMsg): State => {
+const HostEventReducer = (state: ProblemState, action: WebviewHostEvent): ProblemState => {
   return produce(state, (draft) => {
-    if (action.type === 'FULL_PROBLEM') {
+    if (action.type === 'fullProblem') {
       draft.isReady = true;
-      draft.submitDialogProblemId = null;
       draft.currentProblem = {
         type: 'active',
         problemId: action.problemId,
@@ -73,75 +67,75 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg | Proble
       };
       return;
     }
-    if (action.type === 'BACKGROUND') {
+    if (action.type === 'background') {
       draft.backgroundProblems = action.payload;
       return;
     }
-    if (action.type === 'NO_PROBLEM') {
+    if (action.type === 'noProblem') {
       draft.isReady = true;
-      draft.submitDialogProblemId = null;
       draft.currentProblem = { type: 'idle', canImport: action.canImport };
       return;
     }
-    if (action.type === 'CONFIG_CHANGE') {
-      // We handle this event in the ConfigContext, so we can ignore it here
-      return;
-    }
-    if (action.type === 'OPEN_SUBMIT_DIALOG') {
-      draft.submitDialogProblemId = action.problemId;
-      return;
-    }
+    if (action.type === 'configChange') return; // Handled in ConfigContext
+    if (action.type === 'languageList') return; // Handled in OobeContext
+    if (action.type === 'languageInfo') return; // Handled in OobeContext
+    if (action.type === 'checkedLanguageInfo') return; // Handled in OobeContext
 
     if (draft.currentProblem.type !== 'active') return;
     const problem = draft.currentProblem.problem;
 
-    if ('payload' in action) {
-      if (action.payload.revision <= problem.revision) return;
-      problem.revision = action.payload.revision;
-      if (action.type === 'PATCH_META') {
-        const { checker, interactor } = action.payload;
-        if (checker !== undefined) problem.checker = checker;
-        if (interactor !== undefined) problem.interactor = interactor;
-        return;
-      }
-      if (action.type === 'PATCH_STRESS_TEST') {
-        const stressTest = problem.stressTest;
-        const { generator, bruteForce, isRunning, msg } = action.payload;
-        if (generator !== undefined) stressTest.generator = generator;
-        if (bruteForce !== undefined) stressTest.bruteForce = bruteForce;
-        if (isRunning !== undefined) stressTest.isRunning = isRunning;
-        if (msg !== undefined) stressTest.msg = msg;
-        return;
-      }
-      if (action.type === 'ADD_TESTCASE') {
-        problem.testcases[action.testcaseId] = action.payload;
-        problem.testcaseOrder.push(action.testcaseId);
-        return;
-      }
-      if (action.type === 'DELETE_TESTCASE') {
-        delete problem.testcases[action.testcaseId];
-        problem.testcaseOrder = problem.testcaseOrder.filter((id) => id !== action.testcaseId);
-        return;
-      }
-      if (action.type === 'PATCH_TESTCASE') {
-        const testcase = problem.testcases[action.testcaseId];
-        if (testcase)
-          problem.testcases[action.testcaseId] = {
-            ...testcase,
-            ...action.payload,
-          };
-        return;
-      }
-      if (action.type === 'PATCH_TESTCASE_RESULT') {
-        const testcase = problem.testcases[action.testcaseId];
-        if (testcase) {
-          const { revision: _, ...payload } = action.payload;
-          if (testcase.result) testcase.result = { ...testcase.result, ...payload };
-          else if (payload.verdict) testcase.result = payload as IWebviewTestcaseResult;
-        }
-        return;
-      }
+    if (action.payload.revision <= problem.revision) return;
+    problem.revision = action.payload.revision;
+    if (action.type === 'patchMeta') {
+      const { checker, interactor } = action.payload;
+      if (checker !== undefined) problem.checker = checker;
+      if (interactor !== undefined) problem.interactor = interactor;
+      return;
     }
+    if (action.type === 'patchStressTest') {
+      const stressTest = problem.stressTest;
+      const { generator, bruteForce, isRunning, msg } = action.payload;
+      if (generator !== undefined) stressTest.generator = generator;
+      if (bruteForce !== undefined) stressTest.bruteForce = bruteForce;
+      if (isRunning !== undefined) stressTest.isRunning = isRunning;
+      if (msg !== undefined) stressTest.msg = msg;
+      return;
+    }
+    if (action.type === 'addTestcase') {
+      problem.testcases[action.testcaseId] = action.payload;
+      problem.testcaseOrder.push(action.testcaseId);
+      return;
+    }
+    if (action.type === 'deleteTestcase') {
+      delete problem.testcases[action.testcaseId];
+      problem.testcaseOrder = problem.testcaseOrder.filter((id) => id !== action.testcaseId);
+      return;
+    }
+    if (action.type === 'patchTestcase') {
+      const testcase = problem.testcases[action.testcaseId];
+      if (testcase)
+        problem.testcases[action.testcaseId] = {
+          ...testcase,
+          ...action.payload,
+        };
+      return;
+    }
+    if (action.type === 'patchTestcaseResult') {
+      const testcase = problem.testcases[action.testcaseId];
+      if (testcase) {
+        const { revision: _, ...payload } = action.payload;
+        if (testcase.result) testcase.result = { ...testcase.result, ...payload };
+        else if (payload.verdict) testcase.result = payload as IWebviewTestcaseResult;
+      }
+      return;
+    }
+  });
+};
+
+const WebviewMsgReducer = (state: ProblemState, action: WebviewMsg): ProblemState => {
+  return produce(state, (draft) => {
+    if (draft.currentProblem.type !== 'active') return;
+    const problem = draft.currentProblem.problem;
 
     if (action.type === 'editProblemDetails') {
       problem.name = action.name;
@@ -186,64 +180,45 @@ const problemReducer = (state: State, action: WebviewEvent | WebviewMsg | Proble
       testcaseOrder.splice(action.toIdx, 0, movedTestcase);
       return;
     }
-    if (action.type === 'openSubmitDialog') {
-      draft.submitDialogProblemId = action.problemId;
-      return;
-    }
-    if (action.type === 'closeSubmitDialog') {
-      draft.submitDialogProblemId = null;
-      return;
-    }
   });
 };
 
+type ProblemReducerType =
+  | { type: 'WebviewHostEvent'; action: WebviewHostEvent }
+  | { type: 'WebviewMsg'; action: WebviewMsg };
+const ProblemReducer = (
+  state: ProblemState,
+  { type, action }: ProblemReducerType,
+): ProblemState => {
+  if (type === 'WebviewHostEvent') return HostEventReducer(state, action);
+  return WebviewMsgReducer(state, action);
+};
+
 export const ProblemProvider = ({ children }: { children: ReactNode }) => {
-  const [state, reactDispatch] = useReducer(problemReducer, {
+  const [state, dispatchState] = useReducer(ProblemReducer, {
     currentProblem: { type: 'idle', canImport: false },
     backgroundProblems: [],
     isReady: false,
-    submitDialogProblemId: null,
   });
 
   useEffect(() => {
-    const handleMessage = ({ data }: MessageEvent<WebviewEvent>) => reactDispatch(data);
+    const handleMessage = ({ data }: MessageEvent<WebviewHostEvent>) =>
+      dispatchState({ type: 'WebviewHostEvent', action: data });
     window.addEventListener('message', handleMessage);
     vscode.postMessage({ type: 'init' });
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   const dispatch = useCallback((msg: WebviewMsg) => {
-    reactDispatch(msg);
+    dispatchState({ type: 'WebviewMsg', action: msg });
     vscode.postMessage(msg);
   }, []);
 
-  const uiDispatch = useCallback((msg: ProblemUiMsg) => {
-    reactDispatch(msg);
-  }, []);
-
-  return (
-    <DispatchContext.Provider value={dispatch}>
-      <UiDispatchContext.Provider value={uiDispatch}>
-        <StateContext.Provider value={state}>{children}</StateContext.Provider>
-      </UiDispatchContext.Provider>
-    </DispatchContext.Provider>
-  );
+  return <StateContext.Provider value={{ state, dispatch }}>{children}</StateContext.Provider>;
 };
 
-export const useProblemState = () => {
-  const state = useContext(StateContext);
-  if (!state) throw new Error('useProblemState must be used within a ProblemProvider');
-  return state;
-};
-
-export const useProblemDispatch = () => {
-  const dispatch = useContext(DispatchContext);
-  if (!dispatch) throw new Error('useProblemDispatch must be used within a ProblemProvider');
-  return dispatch;
-};
-
-export const useProblemUiDispatch = () => {
-  const dispatch = useContext(UiDispatchContext);
-  if (!dispatch) throw new Error('useProblemUiDispatch must be used within a ProblemProvider');
-  return dispatch;
+export const useProblem = () => {
+  const context = useContext(StateContext);
+  if (!context) throw new Error('useProblem must be used within a ProblemProvider');
+  return context;
 };

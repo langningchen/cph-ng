@@ -49,7 +49,7 @@ export class InteractiveJudgeService implements IJudgeService {
         throw new Error('Interactor is missing for interactive problem');
 
       const srcPath = ctx.problem.src.path;
-      const srcLang = this.lang.getLang(srcPath);
+      const srcLang = this.lang.getLangByFile(srcPath);
       if (!srcLang)
         throw new ExecutionRejected(
           this.translator.t(
@@ -58,7 +58,7 @@ export class InteractiveJudgeService implements IJudgeService {
           ),
         );
 
-      const runCmd = await srcLang.getRunCommand(
+      const runCmd = await srcLang.getInterpretCommand(
         ctx.artifacts.solution.path,
         ctx.problem.overrides,
       );
