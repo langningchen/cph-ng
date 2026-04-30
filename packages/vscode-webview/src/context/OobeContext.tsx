@@ -90,12 +90,11 @@ export const OobeProvider = ({ children }: { children: ReactNode }) => {
     const handleMessage = ({ data }: MessageEvent<WebviewHostEvent>) => {
       if (data.type === 'languageList' || data.type === 'languageInfo') dispatch(data);
       if (data.type === 'checkedLanguageInfo') {
-        const resolve = pendingRequests.current.get(
-          `${data.language}:${data.executable}:${data.path}`,
-        );
-        if (resolve) {
+        const requestKey = `${data.language}:${data.executable}:${data.path}`;
+        const resolve = pendingRequests.current.get(requestKey);
+        if (typeof resolve === 'function') {
           resolve(data.item);
-          pendingRequests.current.delete(data.path);
+          pendingRequests.current.delete(requestKey);
         }
       }
     };
