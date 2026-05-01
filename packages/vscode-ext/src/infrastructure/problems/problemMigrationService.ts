@@ -49,6 +49,7 @@ export class ProblemMigrationService implements IProblemMigrationService {
         interpreter: problem.overrides.runner,
         interpreterArgs: problem.overrides.runnerArgs,
       },
+      version: '0.7.8',
     }),
     '0.6.0': (problem: History.IProblem_0_6_0): History.IProblem_0_6_1 => {
       const migrateFileWithHash = (
