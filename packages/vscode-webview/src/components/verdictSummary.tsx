@@ -61,7 +61,7 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
   if (stats.total === 0) return null;
 
   return (
-    <CphNgFlex alignStart sx={{ flexWrap: 'wrap', display: { xs: 'none', sm: 'flex' } }}>
+    <CphNgFlex sx={{ alignItems: 'start', flexWrap: 'wrap', display: { xs: 'none', sm: 'flex' } }}>
       {stats.passed > 0 && (
         <CphNgTooltip title={t('verdictSummary.passed')}>
           <Chip

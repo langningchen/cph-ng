@@ -15,13 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
+import { CphNgFlex } from '@/components/base/cphNgFlex';
+import { CphNgLink } from '@/components/base/cphNgLink';
+import { CphNgText } from '@/components/base/cphNgText';
 import { OOBEPage } from '@/components/oobe/oobePage';
 import { openLink, urls } from '@/utils';
 import Oobe3Svg from './oobe-3.svg';
@@ -36,7 +40,7 @@ export function OobeStep3({ onBack, onNext }: Step3Props) {
 
   const extensions = [
     {
-      emoji: '📥',
+      icon: <CloudDownloadIcon />,
       name: 'Competitive Companion',
       description: t('oobe.step3.cc.description'),
       links: [
@@ -45,7 +49,7 @@ export function OobeStep3({ onBack, onNext }: Step3Props) {
       ],
     },
     {
-      emoji: '📤',
+      icon: <CloudUploadIcon />,
       name: 'CPH-NG Submit',
       description: t('oobe.step3.submit.description'),
       links: [
@@ -65,23 +69,21 @@ export function OobeStep3({ onBack, onNext }: Step3Props) {
       onBack={onBack}
       onNext={onNext}
     >
-      <Stack spacing={2}>
+      <CphNgFlex column sx={{ gap: 0.5, alignItems: 'start' }}>
+        <CphNgText>{t('oobe.step3.description')}</CphNgText>
+        <CphNgLink name={t('oobe.step3.learnMore')} onClick={() => openLink(urls.addonDocs)}>
+          {t('oobe.step3.learnMore')}
+        </CphNgLink>
+      </CphNgFlex>
+      <CphNgFlex column sx={{ gap: 2, alignItems: 'stretch' }}>
         {extensions.map((ext) => (
-          <Paper key={ext.name} variant='outlined' sx={{ p: 2, borderRadius: 2 }}>
-            <Stack direction='row' spacing={1.5} sx={{ alignItems: 'flex-start' }}>
-              <Typography variant='h6'>{ext.emoji}</Typography>
-              <Box sx={{ flexGrow: 1 }}>
-                <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
-                  {ext.name}
-                </Typography>
-                <Typography
-                  variant='caption'
-                  color='text.secondary'
-                  sx={{ display: 'block', mt: 0.5, mb: 1 }}
-                >
-                  {ext.description}
-                </Typography>
-                <Stack direction='row' spacing={1} sx={{ flexWrap: 'wrap' }}>
+          <Paper key={ext.name} sx={{ p: 2 }}>
+            <CphNgFlex sx={{ gap: 2 }}>
+              {ext.icon}
+              <CphNgFlex column sx={{ alignItems: 'start', flexGrow: 1 }}>
+                <CphNgText sx={{ fontWeight: 'bold' }}>{ext.name}</CphNgText>
+                <CphNgText variant='caption'>{ext.description}</CphNgText>
+                <CphNgFlex>
                   {ext.links.map((link) => (
                     <Chip
                       key={link.label}
@@ -91,20 +93,21 @@ export function OobeStep3({ onBack, onNext }: Step3Props) {
                       onClick={() => {
                         openLink(link.url);
                       }}
-                      icon={<OpenInNewIcon sx={{ fontSize: 14 }} />}
+                      icon={<OpenInNewIcon />}
                       clickable
                     />
                   ))}
-                </Stack>
-              </Box>
-            </Stack>
+                </CphNgFlex>
+              </CphNgFlex>
+            </CphNgFlex>
           </Paper>
         ))}
+      </CphNgFlex>
+      <Typography variant='caption'>{t('oobe.step3.bothOptional')}</Typography>
 
-        <Typography variant='caption' color='text.secondary' sx={{ textAlign: 'center' }}>
-          {t('oobe.step3.bothOptional')}
-        </Typography>
-      </Stack>
+      <Alert severity='info' sx={{ mt: 2 }}>
+        {t('oobe.step3.chromeNote')}
+      </Alert>
     </OOBEPage>
   );
 }

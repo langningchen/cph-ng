@@ -60,7 +60,9 @@ export function OOBEPage({
         <CphNgFlex column>
           <img src={svg} alt={title} style={{ width: '100%', maxWidth: '400px' }} />
         </CphNgFlex>
-        {children}
+        <CphNgFlex column sx={{ alignItems: 'stretch' }}>
+          {children}
+        </CphNgFlex>
       </Box>
 
       <CphNgFlex sx={{ width: '100%' }}>

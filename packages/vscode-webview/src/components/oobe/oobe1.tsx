@@ -87,7 +87,7 @@ export function OobeStep1({ language, setLanguage, onNext, onSkip }: Step1Props)
         </RadioGroup>
       </Paper>
 
-      <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1.5 }}>
+      <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
         {t('oobe.step1.addMoreLater')}
       </Typography>
     </OOBEPage>

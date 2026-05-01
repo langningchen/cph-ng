@@ -202,7 +202,7 @@ export function OobeStep2({ language, onBack, onNext }: Step2Props) {
 
   useEffect(() => {
     getLanguageInfo(language, 'compiler');
-    getLanguageInfo(language, 'Interpreter');
+    getLanguageInfo(language, 'interpreter');
   }, [language, getLanguageInfo]);
   useEffect(() => {
     const configs = state.languages?.[language]?.configs;
@@ -236,12 +236,12 @@ export function OobeStep2({ language, onBack, onNext }: Step2Props) {
   useEffect(() => {
     if (!interpreter) return;
     setInterpreterStatus('loading');
-    checkLanguageInfo(language, 'Interpreter', interpreter).then((item) => {
+    checkLanguageInfo(language, 'interpreter', interpreter).then((item) => {
       setInterpreterStatus(item ? item : 'invalid');
     });
   }, [interpreter, language, checkLanguageInfo]);
 
-  const handleRestore = (type: 'compiler' | 'Interpreter') => {
+  const handleRestore = (type: 'compiler' | 'interpreter') => {
     const info = state.languages?.[language]?.[type === 'compiler' ? 'compilers' : 'interpreters'];
     if (type === 'compiler') {
       setCompiler(info?.default || '');
@@ -288,8 +288,8 @@ export function OobeStep2({ language, onBack, onNext }: Step2Props) {
               onInput={() => setInterpreterStatus('unknown')}
               onChangePath={setInterpreter}
               onChangeArgs={setInterpreterArgs}
-              onRefresh={() => getLanguageInfo(language, 'Interpreter')}
-              onRestore={() => handleRestore('Interpreter')}
+              onRefresh={() => getLanguageInfo(language, 'interpreter')}
+              onRestore={() => handleRestore('interpreter')}
               status={interpreterStatus}
             />
           )}

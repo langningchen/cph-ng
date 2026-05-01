@@ -3,10 +3,10 @@
     "message": "CPH-NG 的浏览器扩展：自动从 VS Code 向竞赛编程评测提交解答。"
   },
   "appName": {
-    "message": "CPH-NG 提交"
+    "message": "CPH-NG Submit"
   },
   "appTitle": {
-    "message": "CPH-NG 提交"
+    "message": "CPH-NG Submit"
   },
   "btnActivate": {
     "message": "激活"

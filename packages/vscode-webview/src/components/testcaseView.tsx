@@ -72,7 +72,7 @@ export const TestcaseView = memo(
     const details = useMemo(
       () => (
         <CphNgFlex column>
-          <CphNgFlex smallGap column>
+          <CphNgFlex sx={{ gap: 0.5 }} column>
             <ErrorBoundary>
               <TestcaseDataView
                 label={t('testcaseView.stdin')}
@@ -154,7 +154,7 @@ export const TestcaseView = memo(
             </ErrorBoundary>
           </CphNgFlex>
           <Divider />
-          <CphNgFlex smallGap column>
+          <CphNgFlex sx={{ gap: 0.5 }} column>
             {!!testcase.result?.stdout && (
               <ErrorBoundary>
                 <TestcaseDataView
@@ -315,7 +315,7 @@ export const TestcaseView = memo(
               },
             }}
           >
-            <CphNgFlex smallGap>
+            <CphNgFlex sx={{ gap: 0.5 }}>
               <CphNgFlex sx={{ flex: 1 }}>
                 <CphNgTooltip title={testcaseId}>
                   <CphNgText sx={{ fontWeight: 'bold' }}>#{idx + 1}</CphNgText>

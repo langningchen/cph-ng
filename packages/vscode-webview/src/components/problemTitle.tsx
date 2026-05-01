@@ -140,7 +140,7 @@ export const ProblemTitle = memo(
     return (
       <>
         <CphNgFlex>
-          <CphNgFlex column alignStart sx={{ flexShrink: 1, width: 'unset' }}>
+          <CphNgFlex column sx={{ alignItems: 'start', flexShrink: 1, width: 'unset' }}>
             <CphNgText sx={{ cursor: url ? 'pointer' : 'default', width: '100%', title: name }}>
               {url ? (
                 <CphNgLink sx={{ href: url }} name={url}>

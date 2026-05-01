@@ -61,12 +61,11 @@ export const ProblemActions = memo(
     return (
       <>
         <CphNgFlex
-          smallGap
-          sx={{ justifyContent: 'center' }}
+          sx={{ gap: 0.5, justifyContent: 'center' }}
           onClick={() => setClickTime((times) => [...times, Date.now()].slice(-10))}
         >
           <HelpButton />
-          <CphNgFlex smallGap sx={{ flexWrap: 'wrap', justifyContent: 'center', flex: 1 }}>
+          <CphNgFlex sx={{ gap: 0.5, flexWrap: 'wrap', justifyContent: 'center', flex: 1 }}>
             {hasRunning ? (
               <CphNgButton
                 larger

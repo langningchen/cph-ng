@@ -163,7 +163,7 @@ export const TestcaseDataView = memo(
 
     if (value.type === 'string' && !value.data && readOnly) return null;
     return (
-      <CphNgFlex column smallGap>
+      <CphNgFlex column sx={{ gap: 0.5 }}>
         <CphNgFlex sx={{ justifyContent: 'space-between' }}>
           <CphNgFlex sx={{ flex: 1, flexWrap: 'wrap' }}>
             <CphNgLink

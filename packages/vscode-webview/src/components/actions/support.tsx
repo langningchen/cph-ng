@@ -52,39 +52,39 @@ export const HelpButton = () => {
       />
 
       <Menu anchorEl={anchorRef.current} open={open} onClose={handleClose}>
-        <MenuItem onClick={openLink(urls.github)}>
+        <MenuItem onClick={() => openLink(urls.github)}>
           <ListItemIcon>
             <GitHubIcon fontSize='small' />
           </ListItemIcon>
           {t('support.github')}
         </MenuItem>
-        <MenuItem onClick={openLink(urls.feedback)}>
+        <MenuItem onClick={() => openLink(urls.feedback)}>
           <ListItemIcon>
             <BugReportIcon fontSize='small' />
           </ListItemIcon>
           {t('support.feedback')}
         </MenuItem>
-        <MenuItem onClick={openLink(urls.docs)}>
+        <MenuItem onClick={() => openLink(urls.docs)}>
           <ListItemIcon>
             <DescriptionIcon fontSize='small' />
           </ListItemIcon>
           {t('support.docs')}
         </MenuItem>
         <Divider />
-        <MenuItem onClick={openLink(urls.edgeAddon)}>
+        <MenuItem onClick={() => openLink(urls.edgeAddon)}>
           <ListItemIcon>
             <ExtensionIcon fontSize='small' />
           </ListItemIcon>
           {t('support.edgeAddon')}
         </MenuItem>
-        <MenuItem onClick={openLink(urls.firefoxAddon)}>
+        <MenuItem onClick={() => openLink(urls.firefoxAddon)}>
           <ListItemIcon>
             <ExtensionIcon fontSize='small' />
           </ListItemIcon>
           {t('support.firefoxAddon')}
         </MenuItem>
         <Divider />
-        <MenuItem onClick={openLink(urls.joinQQ)}>
+        <MenuItem onClick={() => openLink(urls.joinQQ)}>
           <ListItemIcon>
             <GroupIcon fontSize='small' />
           </ListItemIcon>

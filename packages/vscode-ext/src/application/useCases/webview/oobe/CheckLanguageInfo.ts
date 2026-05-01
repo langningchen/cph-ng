@@ -41,7 +41,7 @@ export class CheckLanguageInfo implements IMsgHandle<CheckLanguageInfoMsg> {
         item: await language.checkCompiler(msg.path),
       });
     }
-    if (msg.executable === 'Interpreter') {
+    if (msg.executable === 'interpreter') {
       this.sidebarProvider.sendMessage({
         type: 'checkedLanguageInfo',
         language: msg.language,

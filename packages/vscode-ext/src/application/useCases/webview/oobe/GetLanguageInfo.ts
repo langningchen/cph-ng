@@ -45,7 +45,7 @@ export class GetLanguageInfo implements IMsgHandle<GetLanguageInfoMsg> {
         },
       });
     }
-    if (msg.executable === 'Interpreter') {
+    if (msg.executable === 'interpreter') {
       const runner = language.defaultValues.interpreter;
       this.sidebarProvider.sendMessage({
         type: 'languageInfo',

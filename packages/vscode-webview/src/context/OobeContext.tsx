@@ -55,6 +55,8 @@ const OobeContext = createContext<
         executable: LanguageExecutable,
         path: string,
       ) => Promise<ToolchainItem | null>;
+      updateSettings: (language: string, configs: ILanguageDefaultValues) => void;
+      oobeDone: () => void;
     }
   | undefined
 >(undefined);
@@ -76,7 +78,7 @@ const OobeReducer = (state: OobeState, data: WebviewHostEvent | WebviewMsg): Oob
     if (data.type === 'getLanguageInfo') {
       if (!draft.languages?.[data.language]) return;
       if (data.executable === 'compiler') delete draft.languages[data.language].compilers;
-      if (data.executable === 'Interpreter') delete draft.languages[data.language].interpreters;
+      if (data.executable === 'interpreter') delete draft.languages[data.language].interpreters;
     }
   });
 };
@@ -130,9 +132,25 @@ export const OobeProvider = ({ children }: { children: ReactNode }) => {
     },
     [],
   );
+  const updateSettings = useCallback((language: string, configs: ILanguageDefaultValues) => {
+    dispatch({ type: 'updateSettings', language, payload: configs } satisfies WebviewMsg);
+    vscode.postMessage({ type: 'updateSettings', language, payload: configs } satisfies WebviewMsg);
+  }, []);
+  const oobeDone = useCallback(() => {
+    vscode.postMessage({ type: 'oobeDone' } satisfies WebviewMsg);
+  }, []);
 
   return (
-    <OobeContext.Provider value={{ state, getLanguageList, getLanguageInfo, checkLanguageInfo }}>
+    <OobeContext.Provider
+      value={{
+        state,
+        getLanguageList,
+        getLanguageInfo,
+        checkLanguageInfo,
+        updateSettings,
+        oobeDone,
+      }}
+    >
       {children}
     </OobeContext.Provider>
   );

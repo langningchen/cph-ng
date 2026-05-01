@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { IOverrides } from './interfaces';
-import type { ProblemId, TestcaseId } from './types';
+import type { ILanguageDefaultValues, ProblemId, TestcaseId } from './types';
 
 interface BaseMsg {
   type: string;
@@ -115,7 +115,7 @@ export interface OpenTestlibMsg extends BaseMsg {
 export interface GetLanguageListMsg extends BaseMsg {
   type: 'getLanguageList';
 }
-export type LanguageExecutable = 'compiler' | 'Interpreter';
+export type LanguageExecutable = 'compiler' | 'interpreter';
 export interface GetLanguageInfoMsg extends BaseMsg {
   type: 'getLanguageInfo';
   language: string;
@@ -129,24 +129,8 @@ export interface CheckLanguageInfoMsg extends BaseMsg {
 }
 export interface UpdateSettingsMsg extends BaseMsg {
   type: 'updateSettings';
-  payload: {
-    defaultTimeLimit?: number;
-    defaultMemoryLimit?: number;
-    cppCompiler?: string;
-    cppCompilerArgs?: string;
-    javaCompiler?: string;
-    javaCompilerArgs?: string;
-    javaInterpreter?: string;
-    javaInterpreterArgs?: string;
-    pythonCompiler?: string;
-    pythonCompilerArgs?: string;
-    pythonInterpreter?: string;
-    pythonInterpreterArgs?: string;
-    javascriptInterpreter?: string;
-    javascriptInterpreterArgs?: string;
-    rustCompiler?: string;
-    rustCompilerArgs?: string;
-  };
+  language: string;
+  payload: ILanguageDefaultValues;
 }
 export interface OobeDoneMsg extends BaseMsg {
   type: 'oobeDone';

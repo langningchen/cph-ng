@@ -27,7 +27,7 @@ export const getCompile = (e: MouseEvent) => {
   return null;
 };
 
-export const openLink = (url: string) => () => {
+export const openLink = (url: string) => {
   const a = document.createElement('a');
   a.href = url;
   a.target = '_blank';
@@ -49,5 +49,7 @@ export const urls = {
   edgeAddon:
     'https://microsoftedge.microsoft.com/addons/detail/cphng-submit/hfpfdaggmljfccmnfljldojbgfhpfomb',
   firefoxAddon: 'https://addons.mozilla.org/firefox/addon/cph-ng-submit/',
+  addonDocs:
+    'https://github.com/langningchen/cph-ng/blob/main/docs/browser-extension/browser-extension.md',
   joinQQ: 'https://qm.qq.com/q/pXStina3jU',
 };

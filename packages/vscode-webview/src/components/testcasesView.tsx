@@ -161,7 +161,7 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
       ) : (
         <NoTestcases />
       )}
-      <CphNgFlex smallGap>
+      <CphNgFlex sx={{ gap: 0.5 }}>
         <InfoButton
           message={t('testcasesView.addTestcaseHint')}
           onClick={() => dispatch({ type: 'addTestcase', problemId })}

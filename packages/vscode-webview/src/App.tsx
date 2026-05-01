@@ -29,6 +29,7 @@ import { InitView } from '@/components/initView';
 import { OobeView } from '@/components/oobe/oobe';
 import { ProblemView } from '@/components/problemView';
 import { ConfigProvider, useConfigState } from '@/context/ConfigContext';
+import { OobeProvider } from '@/context/OobeContext';
 import { ProblemProvider, useProblem } from '@/context/ProblemContext';
 import langEn from '@/l10n/en.json';
 import langZh from '@/l10n/zh.json';
@@ -47,10 +48,13 @@ const Main = () => {
   const config = useConfigState();
   const { t } = useTranslation();
 
-  console.log(state.isReady, config.isReady);
-
   if (!state.isReady || !config.isReady) return <InitView />;
-  if (config.isReady && config.config.showOobe) return <OobeView />;
+  if (config.isReady && config.config.showOobe)
+    return (
+      <OobeProvider>
+        <OobeView />
+      </OobeProvider>
+    );
 
   return (
     <>
@@ -60,8 +64,7 @@ const Main = () => {
       <ErrorBoundary>
         <CphNgFlex
           column
-          smallGap
-          sx={{ height: '100%', boxSizing: 'border-box', padding: { xs: 0.5, md: 1 } }}
+          sx={{ gap: 0.5, height: '100%', boxSizing: 'border-box', padding: { xs: 0.5, md: 1 } }}
         >
           {state.currentProblem.type === 'active' ? (
             <ProblemView {...state.currentProblem} backgroundProblems={state.backgroundProblems} />
