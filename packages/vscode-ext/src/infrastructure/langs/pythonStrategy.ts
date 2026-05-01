@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileWithHash, ILanguageEnv, IOverrides } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnvFull, IOverrides } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type {
   CompileAdditionalData,
@@ -31,7 +31,7 @@ import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstra
 export class LangPython extends AbstractLanguageStrategy {
   public override readonly name = 'Python';
   public override readonly extensions = ['py'];
-  public override readonly defaultValues;
+  public override readonly defaultValues: ILanguageEnvFull;
   public override readonly compilerQuery = {
     filePatterns: ['python*', 'pypy*'],
     groupPatterns: [
@@ -57,23 +57,31 @@ export class LangPython extends AbstractLanguageStrategy {
   ) {
     super({ ...context, logger: logger.withScope('langsPython') });
     this.defaultValues = {
-      compiler: this.settings.languages.pythonCompiler,
-      compilerArgs: this.settings.languages.pythonCompilerArgs,
-      interpreter: this.settings.languages.pythonInterpreter,
-      interpreterArgs: this.settings.languages.pythonInterpreterArgs,
-    } satisfies ILanguageEnv;
-    this.settings.languages.onChangePythonCompiler(
-      (compiler) => (this.defaultValues.compiler = compiler),
-    );
-    this.settings.languages.onChangePythonCompilerArgs(
-      (args) => (this.defaultValues.compilerArgs = args),
-    );
-    this.settings.languages.onChangePythonInterpreter(
-      (interpreter) => (this.defaultValues.interpreter = interpreter),
-    );
-    this.settings.languages.onChangePythonInterpreterArgs(
-      (args) => (this.defaultValues.interpreterArgs = args),
-    );
+      get compiler(): string {
+        return context.settings.languages.pythonCompiler;
+      },
+      set compiler(value: string) {
+        context.settings.languages.pythonCompiler = value;
+      },
+      get compilerArgs(): string {
+        return context.settings.languages.pythonCompilerArgs;
+      },
+      set compilerArgs(value: string) {
+        context.settings.languages.pythonCompilerArgs = value;
+      },
+      get interpreter(): string {
+        return context.settings.languages.pythonInterpreter;
+      },
+      set interpreter(value: string) {
+        context.settings.languages.pythonInterpreter = value;
+      },
+      get interpreterArgs(): string {
+        return context.settings.languages.pythonInterpreterArgs;
+      },
+      set interpreterArgs(value: string) {
+        context.settings.languages.pythonInterpreterArgs = value;
+      },
+    };
   }
 
   protected override async internalCompile(

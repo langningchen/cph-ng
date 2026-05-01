@@ -126,7 +126,11 @@ importers:
         specifier: ^0.20.25
         version: 0.20.25(@types/node@22.19.15)(jiti@2.6.1)(rollup@4.59.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3)
 
-  packages/core: {}
+  packages/core:
+    dependencies:
+      type-fest:
+        specifier: 5.5.0
+        version: 5.5.0
 
   packages/vscode-ext:
     dependencies:
@@ -384,7 +388,7 @@ importers:
         version: 4.2.0
       webpack:
         specifier: ^5.106.2
-        version: 5.106.2(@swc/core@1.15.32)(webpack-cli@7.0.2)
+        version: 5.106.2(@swc/core@1.15.32)(esbuild@0.27.7)(webpack-cli@7.0.2)
       webpack-cli:
         specifier: ^7.0.2
         version: 7.0.2(webpack@5.106.2)
@@ -4805,6 +4809,10 @@ packages:
     resolution: {integrity: sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==}
     engines: {node: '>=16'}
 
+  type-fest@5.5.0:
+    resolution: {integrity: sha512-PlBfpQwiUvGViBNX84Yxwjsdhd1TUlXr6zjX7eoirtCPIr08NAmxwa+fcYBTeRQxHo9YC9wwF3m9i700sHma8g==}
+    engines: {node: '>=20'}
+
   type-fest@5.6.0:
     resolution: {integrity: sha512-8ZiHFm91orbSAe2PSAiSVBVko18pbhbiB3U9GglSzF/zCGkR+rxpHx6sEMCUm4kxY4LjDIUGgCfUMtwfZfjfUA==}
     engines: {node: '>=20'}
@@ -7442,7 +7450,7 @@ snapshots:
       schema-utils: 4.3.3
       serialize-javascript: 7.0.4
       tinyglobby: 0.2.15
-      webpack: 5.106.2(@swc/core@1.15.32)(webpack-cli@7.0.2)
+      webpack: 5.106.2(@swc/core@1.15.32)(esbuild@0.27.7)(webpack-cli@7.0.2)
 
   core-util-is@1.0.3: {}
 
@@ -9493,7 +9501,7 @@ snapshots:
     dependencies:
       '@swc/core': 1.15.32
       '@swc/counter': 0.1.3
-      webpack: 5.106.2(@swc/core@1.15.32)(webpack-cli@7.0.2)
+      webpack: 5.106.2(@swc/core@1.15.32)(esbuild@0.27.7)(webpack-cli@7.0.2)
 
   table@6.9.0:
     dependencies:
@@ -9541,16 +9549,6 @@ snapshots:
     optionalDependencies:
       '@swc/core': 1.15.32
       esbuild: 0.27.7
-
-  terser-webpack-plugin@5.5.0(@swc/core@1.15.32)(webpack@5.106.2):
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.31
-      jest-worker: 27.5.1
-      schema-utils: 4.3.3
-      terser: 5.46.2
-      webpack: 5.106.2(@swc/core@1.15.32)(webpack-cli@7.0.2)
-    optionalDependencies:
-      '@swc/core': 1.15.32
 
   terser@5.46.2:
     dependencies:
@@ -9658,6 +9656,10 @@ snapshots:
   type-fest@3.13.1: {}
 
   type-fest@4.41.0: {}
+
+  type-fest@5.5.0:
+    dependencies:
+      tagged-tag: 1.0.0
 
   type-fest@5.6.0:
     dependencies:
@@ -9911,7 +9913,7 @@ snapshots:
       import-local: 3.2.0
       interpret: 3.1.1
       rechoir: 0.8.0
-      webpack: 5.106.2(@swc/core@1.15.32)(webpack-cli@7.0.2)
+      webpack: 5.106.2(@swc/core@1.15.32)(esbuild@0.27.7)(webpack-cli@7.0.2)
       webpack-merge: 6.0.1
 
   webpack-merge@6.0.1:
@@ -9948,39 +9950,6 @@ snapshots:
       schema-utils: 4.3.3
       tapable: 2.3.2
       terser-webpack-plugin: 5.5.0(@swc/core@1.15.32)(esbuild@0.27.7)(webpack@5.106.2)
-      watchpack: 2.5.1
-      webpack-sources: 3.3.4
-    optionalDependencies:
-      webpack-cli: 7.0.2(webpack@5.106.2)
-    transitivePeerDependencies:
-      - '@swc/core'
-      - esbuild
-      - uglify-js
-
-  webpack@5.106.2(@swc/core@1.15.32)(webpack-cli@7.0.2):
-    dependencies:
-      '@types/eslint-scope': 3.7.7
-      '@types/estree': 1.0.8
-      '@types/json-schema': 7.0.15
-      '@webassemblyjs/ast': 1.14.1
-      '@webassemblyjs/wasm-edit': 1.14.1
-      '@webassemblyjs/wasm-parser': 1.14.1
-      acorn: 8.16.0
-      acorn-import-phases: 1.0.4(acorn@8.16.0)
-      browserslist: 4.28.2
-      chrome-trace-event: 1.0.4
-      enhanced-resolve: 5.20.1
-      es-module-lexer: 2.0.0
-      eslint-scope: 5.1.1
-      events: 3.3.0
-      glob-to-regexp: 0.4.1
-      graceful-fs: 4.2.11
-      loader-runner: 4.3.1
-      mime-db: 1.54.0
-      neo-async: 2.6.2
-      schema-utils: 4.3.3
-      tapable: 2.3.2
-      terser-webpack-plugin: 5.5.0(@swc/core@1.15.32)(webpack@5.106.2)
       watchpack: 2.5.1
       webpack-sources: 3.3.4
     optionalDependencies:

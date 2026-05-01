@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Merge } from 'type-fest';
+
 type Uuid = `${string}-${string}-${string}-${string}-${string}`;
 
 declare const BrandSym: unique symbol;
@@ -37,7 +39,15 @@ export interface ToolchainInfo {
   args?: string;
   list: ToolchainItem[];
 }
-
+export interface ILanguageEnvCompile {
+  compiler: string;
+  compilerArgs: string;
+}
+export interface ILanguageEnvInterpret {
+  interpreter: string;
+  interpreterArgs: string;
+}
+export type ILanguageEnvFull = Merge<ILanguageEnvCompile, ILanguageEnvInterpret>;
 export interface ILanguageEnv {
   compiler?: string;
   compilerArgs?: string;

@@ -1,4 +1,4 @@
-import type { IFileWithHash, ILanguageEnv } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnvCompile } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type {
@@ -19,7 +19,7 @@ export class LangCpp extends AbstractLanguageStrategy {
   public override readonly name = 'C++';
   public override readonly extensions = ['cpp', 'cc', 'cxx', 'c++'];
   public override readonly enableExternalRunner = true;
-  public override readonly defaultValues;
+  public override readonly defaultValues: ILanguageEnvCompile;
   public override readonly compilerQuery = {
     filePatterns: ['g++*', '*-g++*', 'clang++*', '*clang++*'],
     groupPatterns: [
@@ -46,15 +46,19 @@ export class LangCpp extends AbstractLanguageStrategy {
   ) {
     super({ ...context, logger: logger.withScope('langsCpp') });
     this.defaultValues = {
-      compiler: this.settings.languages.cppCompiler,
-      compilerArgs: this.settings.languages.cppCompilerArgs,
-    } satisfies ILanguageEnv;
-    this.settings.languages.onChangeCppCompiler(
-      (compiler) => (this.defaultValues.compiler = compiler),
-    );
-    this.settings.languages.onChangeCppCompilerArgs(
-      (args) => (this.defaultValues.compilerArgs = args),
-    );
+      get compiler(): string {
+        return context.settings.languages.cppCompiler;
+      },
+      set compiler(value: string) {
+        context.settings.languages.cppCompiler = value;
+      },
+      get compilerArgs(): string {
+        return context.settings.languages.cppCompilerArgs;
+      },
+      set compilerArgs(value: string) {
+        context.settings.languages.cppCompilerArgs = value;
+      },
+    };
   }
 
   protected override async internalCompile(

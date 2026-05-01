@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ILanguageEnv, IOverrides } from '@cph-ng/core';
+import type { ILanguageEnvInterpret, IOverrides } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
@@ -26,7 +26,7 @@ import { AbstractLanguageStrategy } from './abstractLanguageStrategy';
 export class LangJavascript extends AbstractLanguageStrategy {
   public override readonly name = 'JavaScript';
   public override readonly extensions = ['js'];
-  public override readonly defaultValues;
+  public override readonly defaultValues: ILanguageEnvInterpret;
   public override readonly interpreterQuery = {
     filePatterns: ['node', 'node.exe', 'bun', 'bun.exe', 'deno', 'deno.exe'],
     groupPatterns: [
@@ -55,15 +55,19 @@ export class LangJavascript extends AbstractLanguageStrategy {
   ) {
     super({ ...context, logger: logger.withScope('langsJavascript') });
     this.defaultValues = {
-      interpreter: this.settings.languages.javascriptInterpreter,
-      interpreterArgs: this.settings.languages.javascriptInterpreterArgs,
-    } satisfies ILanguageEnv;
-    this.settings.languages.onChangeJavascriptInterpreter(
-      (interpreter) => (this.defaultValues.interpreter = interpreter),
-    );
-    this.settings.languages.onChangeJavascriptInterpreterArgs(
-      (args) => (this.defaultValues.interpreterArgs = args),
-    );
+      get interpreter(): string {
+        return context.settings.languages.javascriptInterpreter;
+      },
+      set interpreter(value: string) {
+        context.settings.languages.javascriptInterpreter = value;
+      },
+      get interpreterArgs(): string {
+        return context.settings.languages.javascriptInterpreterArgs;
+      },
+      set interpreterArgs(value: string) {
+        context.settings.languages.javascriptInterpreterArgs = value;
+      },
+    };
   }
 
   public override async getInterpretCommand(

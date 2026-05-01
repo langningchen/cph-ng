@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileWithHash, ILanguageEnv, IOverrides } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnvFull, IOverrides } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type {
   CompileAdditionalData,
@@ -31,7 +31,7 @@ import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstra
 export class LangJava extends AbstractLanguageStrategy {
   public override readonly name = 'Java';
   public override readonly extensions = ['java'];
-  public override readonly defaultValues;
+  public override readonly defaultValues: ILanguageEnvFull;
   public override readonly compilerQuery = {
     filePatterns: ['javac', 'javac.exe'],
     groupPatterns: [
@@ -60,23 +60,31 @@ export class LangJava extends AbstractLanguageStrategy {
   ) {
     super({ ...context, logger: logger.withScope('langsJava') });
     this.defaultValues = {
-      compiler: this.settings.languages.javaCompiler,
-      compilerArgs: this.settings.languages.javaCompilerArgs,
-      interpreter: this.settings.languages.javaInterpreter,
-      interpreterArgs: this.settings.languages.javaInterpreterArgs,
-    } satisfies ILanguageEnv;
-    this.settings.languages.onChangeJavaCompiler(
-      (compiler) => (this.defaultValues.compiler = compiler),
-    );
-    this.settings.languages.onChangeJavaCompilerArgs(
-      (args) => (this.defaultValues.compilerArgs = args),
-    );
-    this.settings.languages.onChangeJavaInterpreter(
-      (interpreter) => (this.defaultValues.interpreter = interpreter),
-    );
-    this.settings.languages.onChangeJavaInterpreterArgs(
-      (args) => (this.defaultValues.interpreterArgs = args),
-    );
+      get compiler(): string {
+        return context.settings.languages.javaCompiler;
+      },
+      set compiler(value: string) {
+        context.settings.languages.javaCompiler = value;
+      },
+      get compilerArgs(): string {
+        return context.settings.languages.javaCompilerArgs;
+      },
+      set compilerArgs(value: string) {
+        context.settings.languages.javaCompilerArgs = value;
+      },
+      get interpreter(): string {
+        return context.settings.languages.javaInterpreter;
+      },
+      set interpreter(value: string) {
+        context.settings.languages.javaInterpreter = value;
+      },
+      get interpreterArgs(): string {
+        return context.settings.languages.javaInterpreterArgs;
+      },
+      set interpreterArgs(value: string) {
+        context.settings.languages.javaInterpreterArgs = value;
+      },
+    };
   }
 
   protected override async internalCompile(

@@ -16,12 +16,27 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { UpdateSettingsMsg } from '@cph-ng/core';
-import { injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
+import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
+import { TOKENS } from '@/composition/tokens';
 
 @injectable()
 export class UpdateSettings implements IMsgHandle<UpdateSettingsMsg> {
-  public async exec(_msg: UpdateSettingsMsg): Promise<void> {
-    // TO-DO
+  public constructor(
+    @inject(TOKENS.languageRegistry) private readonly languageRegistry: ILanguageRegistry,
+  ) {}
+
+  public async exec(msg: UpdateSettingsMsg): Promise<void> {
+    const language = this.languageRegistry.getLangByName(msg.language);
+    if (!language) throw new Error(`Language not found: ${msg.language}`);
+    if (language.defaultValues.compiler !== undefined)
+      language.defaultValues.compiler = msg.payload.compiler;
+    if (language.defaultValues.compilerArgs !== undefined)
+      language.defaultValues.compilerArgs = msg.payload.compilerArgs;
+    if (language.defaultValues.interpreter !== undefined)
+      language.defaultValues.interpreter = msg.payload.interpreter;
+    if (language.defaultValues.interpreterArgs !== undefined)
+      language.defaultValues.interpreterArgs = msg.payload.interpreterArgs;
   }
 }

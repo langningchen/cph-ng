@@ -1,4 +1,4 @@
-import type { IFileWithHash, ILanguageEnv } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnvCompile } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type {
@@ -19,7 +19,7 @@ export class LangC extends AbstractLanguageStrategy {
   public override readonly name = 'C';
   public override readonly extensions = ['c'];
   public override readonly enableExternalRunner = true;
-  public override readonly defaultValues;
+  public override readonly defaultValues: ILanguageEnvCompile;
   public override readonly compilerQuery = {
     filePatterns: ['gcc*', '*-gcc*', 'clang*', '*clang-*'],
     groupPatterns: [
@@ -45,15 +45,19 @@ export class LangC extends AbstractLanguageStrategy {
   ) {
     super({ ...context, logger: logger.withScope('langsC') });
     this.defaultValues = {
-      compiler: this.settings.languages.cCompiler,
-      compilerArgs: this.settings.languages.cCompilerArgs,
-    } satisfies ILanguageEnv;
-    this.settings.languages.onChangeCCompiler(
-      (compiler) => (this.defaultValues.compiler = compiler),
-    );
-    this.settings.languages.onChangeCCompilerArgs(
-      (args) => (this.defaultValues.compilerArgs = args),
-    );
+      get compiler(): string {
+        return context.settings.languages.cCompiler;
+      },
+      set compiler(value: string) {
+        context.settings.languages.cCompiler = value;
+      },
+      get compilerArgs(): string {
+        return context.settings.languages.cCompilerArgs;
+      },
+      set compilerArgs(value: string) {
+        context.settings.languages.cCompilerArgs = value;
+      },
+    };
   }
 
   protected override async internalCompile(
