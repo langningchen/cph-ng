@@ -21,7 +21,7 @@
   "oobe.done": "Done",
   "oobe.next": "Next",
   "oobe.skip": "Skip",
-  "oobe.step1.addMoreLater": "Preferred language not listed? Don't worry! You can always manually configure more languages later in the settings panel.",
+  "oobe.step1.addMoreLater": "Preferred language not listed? You can create an issue on GitHub and ask for support!",
   "oobe.step1.compiler": "Compiler",
   "oobe.step1.description": "Please select the programming language you want to use.",
   "oobe.step1.interpreter": "Interpreter",

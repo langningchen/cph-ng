@@ -21,7 +21,7 @@
   "oobe.done": "完成",
   "oobe.next": "下一步",
   "oobe.skip": "跳过",
-  "oobe.step1.addMoreLater": "喜欢的语言不在列表中？别担心！你以后可以在设置面板中手动配置更多语言。",
+  "oobe.step1.addMoreLater": "喜欢的语言不在列表中？你可以在 GitHub 中提交问题并要求支持！",
   "oobe.step1.compiler": "编译器",
   "oobe.step1.description": "请在下方选择你想使用的编程语言。",
   "oobe.step1.interpreter": "解释器",
