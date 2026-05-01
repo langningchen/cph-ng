@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileWithHash, ILanguageDefaultValues } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnv } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type {
@@ -58,7 +58,7 @@ export class LangRust extends AbstractLanguageStrategy {
     this.defaultValues = {
       compiler: this.settings.languages.rustCompiler,
       compilerArgs: this.settings.languages.rustCompilerArgs,
-    } satisfies ILanguageDefaultValues;
+    } satisfies ILanguageEnv;
     this.settings.languages.onChangeRustCompiler(
       (compiler) => (this.defaultValues.compiler = compiler),
     );

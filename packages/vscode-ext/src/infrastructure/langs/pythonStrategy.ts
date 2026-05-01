@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileWithHash, ILanguageDefaultValues, IOverrides } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnv, IOverrides } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type {
   CompileAdditionalData,
@@ -61,7 +61,7 @@ export class LangPython extends AbstractLanguageStrategy {
       compilerArgs: this.settings.languages.pythonCompilerArgs,
       interpreter: this.settings.languages.pythonInterpreter,
       interpreterArgs: this.settings.languages.pythonInterpreterArgs,
-    } satisfies ILanguageDefaultValues;
+    } satisfies ILanguageEnv;
     this.settings.languages.onChangePythonCompiler(
       (compiler) => (this.defaultValues.compiler = compiler),
     );

@@ -38,7 +38,7 @@ export interface ToolchainInfo {
   list: ToolchainItem[];
 }
 
-export interface ILanguageDefaultValues {
+export interface ILanguageEnv {
   compiler?: string;
   compilerArgs?: string;
   interpreter?: string;

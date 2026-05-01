@@ -15,12 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type {
-  IFileWithHash,
-  ILanguageDefaultValues,
-  IOverrides,
-  ToolchainItem,
-} from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnv, IOverrides, ToolchainItem } from '@cph-ng/core';
 
 export interface CompileAdditionalData {
   canUseWrapper: boolean;
@@ -52,7 +47,7 @@ export interface ILanguageStrategy {
   readonly name: string;
   readonly extensions: string[];
   readonly enableExternalRunner: boolean;
-  readonly defaultValues: ILanguageDefaultValues;
+  readonly defaultValues: ILanguageEnv;
 
   checkCompiler(path: string): Promise<ToolchainItem | null>;
   getCompilers(): Promise<ToolchainItem[]>;

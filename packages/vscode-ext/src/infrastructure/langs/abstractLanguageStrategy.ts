@@ -15,12 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type {
-  IFileWithHash,
-  ILanguageDefaultValues,
-  IOverrides,
-  ToolchainItem,
-} from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnv, IOverrides, ToolchainItem } from '@cph-ng/core';
 import SHA256 from 'crypto-js/sha256';
 import pathKey from 'path-key';
 import type { OutputChannel } from 'vscode';
@@ -56,7 +51,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
   public abstract readonly name: string;
   public abstract readonly extensions: string[];
   public readonly enableExternalRunner: boolean = false;
-  public abstract readonly defaultValues: ILanguageDefaultValues;
+  public abstract readonly defaultValues: ILanguageEnv;
   protected readonly compilerQuery?: ToolchainQuery;
   protected readonly interpreterQuery?: ToolchainQuery;
 

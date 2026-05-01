@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type {
-  ILanguageDefaultValues,
+  ILanguageEnv,
   LanguageExecutable,
   ToolchainInfo,
   ToolchainItem,
@@ -40,7 +40,7 @@ type OobeState = {
     {
       compilers?: ToolchainInfo;
       interpreters?: ToolchainInfo;
-      configs: ILanguageDefaultValues;
+      configs: ILanguageEnv;
     }
   >;
 };
@@ -55,7 +55,7 @@ const OobeContext = createContext<
         executable: LanguageExecutable,
         path: string,
       ) => Promise<ToolchainItem | null>;
-      updateSettings: (language: string, configs: ILanguageDefaultValues) => void;
+      updateSettings: (language: string, configs: ILanguageEnv) => void;
       oobeDone: () => void;
     }
   | undefined
@@ -132,7 +132,7 @@ export const OobeProvider = ({ children }: { children: ReactNode }) => {
     },
     [],
   );
-  const updateSettings = useCallback((language: string, configs: ILanguageDefaultValues) => {
+  const updateSettings = useCallback((language: string, configs: ILanguageEnv) => {
     dispatch({ type: 'updateSettings', language, payload: configs } satisfies WebviewMsg);
     vscode.postMessage({ type: 'updateSettings', language, payload: configs } satisfies WebviewMsg);
   }, []);

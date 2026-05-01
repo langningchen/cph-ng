@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { IOverrides } from './interfaces';
-import type { ILanguageDefaultValues, ProblemId, TestcaseId } from './types';
+import type { ILanguageEnv, ProblemId, TestcaseId } from './types';
 
 interface BaseMsg {
   type: string;
@@ -130,7 +130,7 @@ export interface CheckLanguageInfoMsg extends BaseMsg {
 export interface UpdateSettingsMsg extends BaseMsg {
   type: 'updateSettings';
   language: string;
-  payload: ILanguageDefaultValues;
+  payload: ILanguageEnv;
 }
 export interface OobeDoneMsg extends BaseMsg {
   type: 'oobeDone';

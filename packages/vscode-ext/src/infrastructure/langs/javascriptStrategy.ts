@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ILanguageDefaultValues, IOverrides } from '@cph-ng/core';
+import type { ILanguageEnv, IOverrides } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
@@ -57,7 +57,7 @@ export class LangJavascript extends AbstractLanguageStrategy {
     this.defaultValues = {
       interpreter: this.settings.languages.javascriptInterpreter,
       interpreterArgs: this.settings.languages.javascriptInterpreterArgs,
-    } satisfies ILanguageDefaultValues;
+    } satisfies ILanguageEnv;
     this.settings.languages.onChangeJavascriptInterpreter(
       (interpreter) => (this.defaultValues.interpreter = interpreter),
     );

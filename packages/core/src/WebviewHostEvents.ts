@@ -16,13 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { WithRevision } from './interfaces';
-import type {
-  ILanguageDefaultValues,
-  ProblemId,
-  TestcaseId,
-  ToolchainInfo,
-  ToolchainItem,
-} from './types';
+import type { ILanguageEnv, ProblemId, TestcaseId, ToolchainInfo, ToolchainItem } from './types';
 import type {
   IWebviewBackgroundProblem,
   IWebviewFileWithHash,
@@ -82,7 +76,7 @@ export type WebviewAddTestcasePayload = WithRevision<IWebviewTestcase>;
 export type WebviewDeleteTestcasePayload = WithRevision<NonNullable<unknown>>;
 export type WebviewPatchTestcasePayload = WithRevision<Partial<IWebviewTestcase>>;
 export type WebviewPatchTestcaseResultPayload = WithRevision<Partial<IWebviewTestcaseResult>>;
-export type WebviewLanguageListPayload = Record<string, ILanguageDefaultValues>;
+export type WebviewLanguageListPayload = Record<string, ILanguageEnv>;
 export type WebviewLanguageInfoPayload = {
   language: string;
   compilers?: ToolchainInfo;

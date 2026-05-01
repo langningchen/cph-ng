@@ -1,4 +1,4 @@
-import type { IFileWithHash, ILanguageDefaultValues } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnv } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type {
@@ -47,7 +47,7 @@ export class LangC extends AbstractLanguageStrategy {
     this.defaultValues = {
       compiler: this.settings.languages.cCompiler,
       compilerArgs: this.settings.languages.cCompilerArgs,
-    } satisfies ILanguageDefaultValues;
+    } satisfies ILanguageEnv;
     this.settings.languages.onChangeCCompiler(
       (compiler) => (this.defaultValues.compiler = compiler),
     );
