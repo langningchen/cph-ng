@@ -26,7 +26,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CphNgButton } from '@/components/base/cphNgButton';
 import { CphNgFlex } from '@/components/base/cphNgFlex';
@@ -199,6 +199,19 @@ export function OobeStep2({ language, onBack, onNext }: Step2Props) {
   const [interpreterArgs, setInterpreterArgs] = useState<string>('');
 
   const [hasInitialized, setHasInitialized] = useState(false);
+  const previousLanguageRef = useRef(language);
+
+  useEffect(() => {
+    if (previousLanguageRef.current === language) return;
+    previousLanguageRef.current = language;
+    setHasInitialized(false);
+    setCompiler('');
+    setCompilerArgs('');
+    setCompilerStatus('unknown');
+    setInterpreter('');
+    setInterpreterArgs('');
+    setInterpreterStatus('unknown');
+  }, [language]);
 
   useEffect(() => {
     getLanguageInfo(language, 'compiler');
