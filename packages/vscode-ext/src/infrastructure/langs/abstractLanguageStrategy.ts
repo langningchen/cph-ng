@@ -142,7 +142,7 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
           const matches = this.path.glob(this.path.join(dir, pattern));
           for await (const path of matches) {
             const stat = await this.fs.stat(path);
-            if (stat.isFile() && stat.mode & 0o111 && !found.includes(path)) {
+            if (stat.isFile() && !found.includes(path)) {
               found.push(path);
               promises.push(this.checkExecutable(path, groupPatterns));
             }
