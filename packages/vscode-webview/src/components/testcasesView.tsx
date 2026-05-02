@@ -28,7 +28,7 @@ import { ErrorBoundary } from '@/components/base/errorBoundary';
 import { NoTestcases } from '@/components/noTestcases';
 import { TestcaseView } from '@/components/testcaseView';
 import { useConfigState } from '@/context/ConfigContext';
-import { useProblemDispatch } from '@/context/ProblemContext';
+import { useProblem } from '@/context/ProblemContext';
 
 interface InfoButtonProps {
   sx?: SxProps<Theme>;
@@ -67,7 +67,7 @@ interface TestcasesViewProps {
 export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: TestcasesViewProps) => {
   const { t } = useTranslation();
   const { config } = useConfigState();
-  const dispatch = useProblemDispatch();
+  const { dispatch } = useProblem();
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
   const draggedIdxRef = useRef<number | null>(null);
@@ -161,7 +161,7 @@ export const TestcasesView = memo(({ problemId, testcaseOrder, testcases }: Test
       ) : (
         <NoTestcases />
       )}
-      <CphNgFlex smallGap>
+      <CphNgFlex sx={{ gap: 0.5 }}>
         <InfoButton
           message={t('testcasesView.addTestcaseHint')}
           onClick={() => dispatch({ type: 'addTestcase', problemId })}

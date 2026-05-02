@@ -37,7 +37,7 @@ import { CphNgTooltip } from '@/components/base/cphNgTooltip';
 import { ErrorBoundary } from '@/components/base/errorBoundary';
 import { RunButtonGroup } from '@/components/runButtonGroup';
 import { TestcaseDataView } from '@/components/testcaseDataView';
-import { useProblemDispatch } from '@/context/ProblemContext';
+import { useProblem } from '@/context/ProblemContext';
 
 interface TestcaseViewProp {
   problemId: ProblemId;
@@ -66,13 +66,13 @@ export const TestcaseView = memo(
     autoFocus = false,
   }: TestcaseViewProp) => {
     const { t } = useTranslation();
-    const dispatch = useProblemDispatch();
+    const { dispatch } = useProblem();
     const isRunning = testcase.result?.verdict.type === VerdictType.running;
     const expanded = testcase.isDisabled ? false : isExpand;
     const details = useMemo(
       () => (
         <CphNgFlex column>
-          <CphNgFlex smallGap column>
+          <CphNgFlex sx={{ gap: 0.5 }} column>
             <ErrorBoundary>
               <TestcaseDataView
                 label={t('testcaseView.stdin')}
@@ -154,7 +154,7 @@ export const TestcaseView = memo(
             </ErrorBoundary>
           </CphNgFlex>
           <Divider />
-          <CphNgFlex smallGap column>
+          <CphNgFlex sx={{ gap: 0.5 }} column>
             {!!testcase.result?.stdout && (
               <ErrorBoundary>
                 <TestcaseDataView
@@ -315,7 +315,7 @@ export const TestcaseView = memo(
               },
             }}
           >
-            <CphNgFlex smallGap>
+            <CphNgFlex sx={{ gap: 0.5 }}>
               <CphNgFlex sx={{ flex: 1 }}>
                 <CphNgTooltip title={testcaseId}>
                   <CphNgText sx={{ fontWeight: 'bold' }}>#{idx + 1}</CphNgText>

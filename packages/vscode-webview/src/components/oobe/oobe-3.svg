@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+    <defs>
+        <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.08" />
+        </filter>
+        <style>
+            .card { fill: #FFFFFF; stroke: #E0E0E0; filter: url(#shadow); }
+            .browser-header { fill: #F5F5F5; }
+            .browser-dot { fill: #E0E0E0; }
+            .line-light { fill: #EEEEEE; }
+            .extract-box { fill: rgba(25,118,210,0.05); stroke: #64B5F6; }
+            .primary-stroke { stroke: #1976D2; }
+            .primary-fill { fill: #1976D2; }
+            
+            @media (prefers-color-scheme: dark) {
+                .card { fill: #1E1E1E; stroke: #333333; filter: none; }
+                .browser-header { fill: #2C2C2C; }
+                .browser-dot { fill: #424242; }
+                .line-light { fill: #333333; }
+                .extract-box { fill: rgba(100,181,246,0.1); stroke: #90CAF9; }
+                .primary-stroke { stroke: #64B5F6; }
+                .primary-fill { fill: #64B5F6; }
+            }
+        </style>
+    </defs>
+
+    <!-- Left: Browser Outline -->
+    <g transform="translate(40, 50)">
+        <rect width="140" height="140" rx="8" class="card" stroke-width="1" />
+        <path d="M0 8 C0 3.58 3.58 0 8 0 L132 0 C136.42 0 140 3.58 140 8 L140 24 L0 24 Z" class="browser-header"/>
+        <circle cx="12" cy="12" r="3" class="browser-dot" />
+        <circle cx="22" cy="12" r="3" class="browser-dot" />
+        <rect x="34" y="8" width="90" height="8" rx="4" class="card" stroke-width="0" />
+        
+        <rect x="12" y="40" width="80" height="8" rx="4" class="primary-fill" opacity="0.8"/>
+        <rect x="12" y="60" width="116" height="6" rx="3" class="line-light"/>
+        <rect x="12" y="74" width="116" height="6" rx="3" class="line-light"/>
+        <rect x="12" y="88" width="90" height="6" rx="3" class="line-light"/>
+        
+        <!-- Extract Data Highlight Box -->
+        <rect x="8" y="34" width="124" height="66" rx="6" class="extract-box" stroke-width="1.5" stroke-dasharray="4 2"/>
+    </g>
+
+    <!-- Middle: Data Flow Arrows -->
+    <g transform="translate(195, 120)">
+        <path d="M0 -20 L40 -20" fill="none" class="primary-stroke" stroke-width="2" stroke-dasharray="4 4" />
+        <path d="M34 -25 L42 -20 L34 -15" fill="none" class="primary-stroke" stroke-width="2" stroke-linecap="round" />
+        <path d="M0 20 L40 20" fill="none" class="primary-stroke" stroke-width="2" stroke-dasharray="4 4" />
+        <path d="M34 15 L42 20 L34 25" fill="none" class="primary-stroke" stroke-width="2" stroke-linecap="round" />
+    </g>
+
+    <!-- Right: Stacked IO Cards -->
+    <g transform="translate(250, 60)">
+        <g transform="translate(10, 60)">
+            <rect width="100" height="70" rx="6" class="card" stroke-width="1"/>
+            <rect x="12" y="12" width="30" height="6" rx="3" fill="#FFB74D"/>
+            <rect x="12" y="30" width="76" height="4" rx="2" class="line-light"/>
+            <rect x="12" y="42" width="60" height="4" rx="2" class="line-light"/>
+            <rect x="12" y="54" width="40" height="4" rx="2" class="line-light"/>
+        </g>
+        <g transform="translate(0, 0)">
+            <rect width="100" height="70" rx="6" class="card" stroke-width="1"/>
+            <rect x="12" y="12" width="30" height="6" rx="3" fill="#81C784"/>
+            <rect x="12" y="30" width="76" height="4" rx="2" class="line-light"/>
+            <rect x="12" y="42" width="60" height="4" rx="2" class="line-light"/>
+        </g>
+    </g>
+</svg>

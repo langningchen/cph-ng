@@ -25,6 +25,11 @@ import { Init } from '@/application/useCases/webview/Init';
 import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { OpenFile } from '@/application/useCases/webview/OpenFile';
 import { OpenTestlib } from '@/application/useCases/webview/OpenTestlib';
+import { CheckLanguageInfo } from '@/application/useCases/webview/oobe/CheckLanguageInfo';
+import { GetLanguageInfo } from '@/application/useCases/webview/oobe/GetLanguageInfo';
+import { GetLanguageList } from '@/application/useCases/webview/oobe/GetLanguageList';
+import { OobeDone } from '@/application/useCases/webview/oobe/OobeDone';
+import { UpdateSettings } from '@/application/useCases/webview/oobe/UpdateSettings';
 import { ChooseSrcFile } from '@/application/useCases/webview/problem/ChooseSrcFile';
 import { EditProblemDetails } from '@/application/useCases/webview/problem/EditProblemDetails';
 import { CreateProblem } from '@/application/useCases/webview/problem/manage/CreateProblem';
@@ -51,6 +56,7 @@ import { TOKENS } from '@/composition/tokens';
 
 const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<WebviewMsg>>> = {
   addTestcase: AddTestcase,
+  checkLanguageInfo: CheckLanguageInfo,
   chooseSrcFile: ChooseSrcFile,
   chooseTestcaseFile: ChooseTestcaseFile,
   clearTestcaseStatus: ClearTestcaseStatus,
@@ -60,21 +66,25 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
   deleteTestcase: DeleteTestcase,
   dragDrop: DragDrop,
   editProblemDetails: EditProblemDetails,
+  getLanguageInfo: GetLanguageInfo,
+  getLanguageList: GetLanguageList,
   importProblem: ImportProblem,
   init: Init,
   loadTestcases: LoadTestcases,
+  oobeDone: OobeDone,
   openFile: OpenFile,
   openTestlib: OpenTestlib,
   removeSrcFile: RemoveSrcFile,
   reorderTestcase: ReorderTestcase,
-  runSingleTestcase: RunSingleTestcase,
   runAllTestcases: RunAllTestcases,
+  runSingleTestcase: RunSingleTestcase,
   setTestcaseString: SetTestcaseString,
   startStressTest: StartStressTest,
   stopStressTest: StopStressTest,
   stopTestcases: StopTestcases,
   submit: Submit,
   toggleTestcaseFile: ToggleTestcaseFile,
+  updateSettings: UpdateSettings,
   updateTestcase: UpdateTestcase,
 };
 
@@ -93,6 +103,9 @@ export class WebviewProtocolHandler {
     this.logger.trace('Received webview message', { msg });
     try {
       const useCaseToken = UseCaseRegistry[msg.type];
+      if (!useCaseToken) {
+        throw new Error(`Unsupported webview message type: ${msg.type}`);
+      }
       const useCase = container.resolve<IMsgHandle<WebviewMsg>>(useCaseToken);
       await useCase.exec(msg);
     } catch (e) {

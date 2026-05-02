@@ -66,6 +66,7 @@ export function createFileSystemMock(vol: InstanceType<typeof Volume> = new Volu
     const stats = await fs.promises.stat(path);
     return {
       size: stats.size as number,
+      mode: stats.mode as number,
       isFile: () => stats.isFile(),
       isDirectory: () => stats.isDirectory(),
     };

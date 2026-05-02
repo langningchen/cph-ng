@@ -1,10 +1,8 @@
-import type { IFileWithHash } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnvCompile } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
-import type { IPath } from '@/application/ports/node/IPath';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type {
   CompileAdditionalData,
-  ILanguageDefaultValues,
   LangCompileData,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
@@ -13,34 +11,53 @@ import { TOKENS } from '@/composition/tokens';
 import {
   AbstractLanguageStrategy,
   DefaultCompileAdditionalData,
-} from '@/infrastructure/problems/judge/langs/abstractLanguageStrategy';
-import { LanguageStrategyContext } from '@/infrastructure/problems/judge/langs/languageStrategyContext';
+} from '@/infrastructure/langs/abstractLanguageStrategy';
+import { LanguageStrategyContext } from '@/infrastructure/langs/languageStrategyContext';
 
 @injectable()
 export class LangC extends AbstractLanguageStrategy {
   public override readonly name = 'C';
   public override readonly extensions = ['c'];
-  public override readonly enableRunner = true;
-  public override readonly defaultValues;
+  public override readonly enableExternalRunner = true;
+  public override readonly defaultValues: ILanguageEnvCompile;
+  public override readonly compilerQuery = {
+    filePatterns: ['gcc*', '*-gcc*', 'clang*', '*clang-*'],
+    groupPatterns: [
+      {
+        group: 'gcc',
+        helpRegex: /^For bug reporting instructions, please see:$/m,
+        versionRegex: /^(?<name>.*) \((?<description>.+)\) (?<version>[0-9]+\.[0-9]+\.[0-9]+)$/m,
+      },
+      {
+        group: 'clang',
+        helpRegex: /^OVERVIEW: clang LLVM compiler$/m,
+        versionRegex:
+          /^(?<name>.*) version (?<version>[0-9]+\.[0-9]+\.[0-9]+) \((?<description>.+)\)$/m,
+      },
+    ],
+  };
 
   public constructor(
     @inject(LanguageStrategyContext) context: LanguageStrategyContext,
     @inject(TOKENS.logger) logger: ILogger,
-    @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
     @inject(TOKENS.system) private readonly sys: ISystem,
   ) {
     super({ ...context, logger: logger.withScope('langsC') });
     this.defaultValues = {
-      compiler: this.settings.languages.cCompiler,
-      compilerArgs: this.settings.languages.cCompilerArgs,
-    } satisfies ILanguageDefaultValues;
-    this.settings.languages.onChangeCCompiler(
-      (compiler) => (this.defaultValues.compiler = compiler),
-    );
-    this.settings.languages.onChangeCCompilerArgs(
-      (args) => (this.defaultValues.compilerArgs = args),
-    );
+      get compiler(): string {
+        return context.settings.languages.cCompiler;
+      },
+      set compiler(value: string) {
+        context.settings.languages.cCompiler = value;
+      },
+      get compilerArgs(): string {
+        return context.settings.languages.cCompilerArgs;
+      },
+      set compilerArgs(value: string) {
+        context.settings.languages.cCompilerArgs = value;
+      },
+    };
   }
 
   protected override async internalCompile(

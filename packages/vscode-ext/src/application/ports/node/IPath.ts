@@ -40,4 +40,10 @@ export interface IPath {
 
   /** Solve the relative path based on the current working directory. */
   relative(from: string, to: string): string;
+
+  /** Retrieves the files matching the specified pattern. */
+  glob(pattern: string): AsyncIterable<string>;
+
+  /** The platform-specific file delimiter. ';' or ':'. */
+  delimiter: string;
 }

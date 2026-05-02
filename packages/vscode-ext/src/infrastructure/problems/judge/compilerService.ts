@@ -27,7 +27,7 @@ export class CompilerService implements ICompilerService {
     signal: AbortSignal,
     forceCompile: boolean | null,
   ): Promise<LangCompileResult> {
-    const checkerLang = this.lang.getLang(file.path);
+    const checkerLang = this.lang.getLangByFile(file.path);
     if (checkerLang) return await checkerLang.compile(file, signal, forceCompile);
     return { path: file.path, hash: null };
   }
@@ -38,7 +38,7 @@ export class CompilerService implements ICompilerService {
     signal: AbortSignal,
   ): Promise<CompileResult> {
     // Compile source code
-    const srcLang = this.lang.getLang(problem.src.path);
+    const srcLang = this.lang.getLangByFile(problem.src.path);
     if (!srcLang) {
       return new Error(
         this.translator.t('Cannot determine the programming language of the source file: {file}.', {

@@ -24,7 +24,7 @@ import type { IProblemRepository } from '@/application/ports/problems/IProblemRe
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
-import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
+import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvider';
 import { TOKENS } from '@/composition/tokens';
 import { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
@@ -38,7 +38,7 @@ export class ProblemRepository implements IProblemRepository {
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
     @inject(TOKENS.activePathService) private readonly activePath: IActivePathService,
-    @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
+    @inject(TOKENS.sidebarProvider) private readonly sidebarProvider: ISidebarProvider,
   ) {
     this.logger = this.logger.withScope('problemRepository');
   }
@@ -50,7 +50,7 @@ export class ProblemRepository implements IProblemRepository {
         name: bgProblem.problem.name,
         srcPath: bgProblem.problem.src.path,
       });
-    this.eventBus.background(backgroundProblems);
+    this.sidebarProvider.sendMessage({ type: 'background', payload: backgroundProblems });
   }
 
   public async getByPath(srcPath: string): Promise<BackgroundProblem | null> {

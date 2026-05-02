@@ -32,11 +32,7 @@ import { CphNgButton } from '@/components/base/cphNgButton';
 import { CphNgFlex } from '@/components/base/cphNgFlex';
 import { RunButtonGroup } from '@/components/runButtonGroup';
 import { useConfigState } from '@/context/ConfigContext';
-import {
-  useProblemDispatch,
-  useProblemState,
-  useProblemUiDispatch,
-} from '@/context/ProblemContext';
+import { useProblem } from '@/context/ProblemContext';
 
 interface ProblemActionsProps {
   problemId: ProblemId;
@@ -50,11 +46,10 @@ export const ProblemActions = memo(
   ({ problemId, url, stressTest, hasRunning, backgroundProblems }: ProblemActionsProps) => {
     const { t } = useTranslation();
     const { config } = useConfigState();
-    const { submitDialogProblemId } = useProblemState();
-    const dispatch = useProblemDispatch();
-    const uiDispatch = useProblemUiDispatch();
+    const { dispatch } = useProblem();
     const [clickTime, setClickTime] = useState<number[]>([]);
     const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [isSubmitDialogOpen, setSubmitDialogOpen] = useState(false);
     const [isStressTestDialogOpen, setStressTestDialogOpen] = useState(false);
 
     useEffect(() => {
@@ -66,12 +61,11 @@ export const ProblemActions = memo(
     return (
       <>
         <CphNgFlex
-          smallGap
-          sx={{ justifyContent: 'center' }}
+          sx={{ gap: 0.5, justifyContent: 'center' }}
           onClick={() => setClickTime((times) => [...times, Date.now()].slice(-10))}
         >
           <HelpButton />
-          <CphNgFlex smallGap sx={{ flexWrap: 'wrap', justifyContent: 'center', flex: 1 }}>
+          <CphNgFlex sx={{ gap: 0.5, flexWrap: 'wrap', justifyContent: 'center', flex: 1 }}>
             {hasRunning ? (
               <CphNgButton
                 larger
@@ -113,7 +107,7 @@ export const ProblemActions = memo(
                 icon={BackupIcon}
                 color='secondary'
                 onClick={() => {
-                  if (config.confirmSubmit) uiDispatch({ type: 'openSubmitDialog', problemId });
+                  if (config.confirmSubmit) setSubmitDialogOpen(true);
                   else dispatch({ type: 'submit', problemId });
                 }}
               />
@@ -141,11 +135,11 @@ export const ProblemActions = memo(
         />
 
         <SubmitDialog
-          open={submitDialogProblemId === problemId}
-          onClose={() => uiDispatch({ type: 'closeSubmitDialog' })}
+          open={isSubmitDialogOpen}
+          onClose={() => setSubmitDialogOpen(false)}
           onConfirm={() => {
             dispatch({ type: 'submit', problemId });
-            uiDispatch({ type: 'closeSubmitDialog' });
+            setSubmitDialogOpen(false);
           }}
         />
 

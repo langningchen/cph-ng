@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileWithHash, IOverrides } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnv, IOverrides, ToolchainItem } from '@cph-ng/core';
 
 export interface CompileAdditionalData {
   canUseWrapper: boolean;
@@ -25,13 +25,6 @@ export interface CompileAdditionalData {
 export interface LangCompileData {
   path: string;
   hash: string | null;
-}
-
-export interface ILanguageDefaultValues {
-  compiler?: string;
-  compilerArgs?: string;
-  runner?: string;
-  runnerArgs?: string;
 }
 
 export class CompileError extends Error {
@@ -53,8 +46,13 @@ export type LangCompileResult = LangCompileData | CompileError | CompileAborted 
 export interface ILanguageStrategy {
   readonly name: string;
   readonly extensions: string[];
-  readonly enableRunner: boolean;
-  readonly defaultValues: ILanguageDefaultValues;
+  readonly enableExternalRunner: boolean;
+  readonly defaultValues: ILanguageEnv;
+
+  checkCompiler(path: string): Promise<ToolchainItem | null>;
+  getCompilers(): Promise<ToolchainItem[]>;
+  checkInterpreter(path: string): Promise<ToolchainItem | null>;
+  getInterpreters(): Promise<ToolchainItem[]>;
 
   compile(
     src: IFileWithHash,
@@ -63,5 +61,5 @@ export interface ILanguageStrategy {
     additionalData?: CompileAdditionalData,
   ): Promise<LangCompileResult>;
 
-  getRunCommand(target: string, overrides?: IOverrides): Promise<string[]>;
+  getInterpretCommand(target: string, overrides?: IOverrides): Promise<string[]>;
 }

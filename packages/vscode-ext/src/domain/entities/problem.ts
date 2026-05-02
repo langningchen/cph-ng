@@ -53,8 +53,8 @@ export class Problem {
     memoryLimitMb: null,
     compiler: null,
     compilerArgs: null,
-    runner: null,
-    runnerArgs: null,
+    interpreter: null,
+    interpreterArgs: null,
   };
   public readonly signals = new EventEmitter() as TypedEventEmitter<ProblemEvents>;
 

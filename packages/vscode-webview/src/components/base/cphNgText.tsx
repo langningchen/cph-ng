@@ -16,17 +16,19 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { SxProps, Theme } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
+import Typography, { type TypographyProps } from '@mui/material/Typography';
 
 interface CphNgTextProps {
   children: React.ReactNode;
   sx?: SxProps<Theme>;
+  variant?: TypographyProps['variant'];
 }
 
 export const CphNgText = (props: CphNgTextProps) => {
   return (
     <Typography
       component='span'
+      variant={props.variant}
       sx={{
         overflow: 'hidden',
         textOverflow: 'ellipsis',

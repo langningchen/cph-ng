@@ -21,7 +21,7 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { useTranslation } from 'react-i18next';
 import { CphNgFlex } from '@/components/base/cphNgFlex';
-import { useProblemDispatch } from '@/context/ProblemContext';
+import { useProblem } from '@/context/ProblemContext';
 
 interface CreateProblemProps {
   canImport: boolean;
@@ -29,7 +29,7 @@ interface CreateProblemProps {
 
 export const CreateProblemView = ({ canImport }: CreateProblemProps) => {
   const { t } = useTranslation();
-  const dispatch = useProblemDispatch();
+  const { dispatch } = useProblem();
   return (
     <CphNgFlex column sx={{ gap: 5, paddingY: 2 }}>
       <CphNgFlex column>

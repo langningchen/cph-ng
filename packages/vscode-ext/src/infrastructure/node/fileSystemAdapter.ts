@@ -80,10 +80,11 @@ export class FileSystemAdapter implements IFileSystem {
 
   public async stat(
     path: string,
-  ): Promise<{ size: number; isFile(): boolean; isDirectory(): boolean }> {
+  ): Promise<{ size: number; mode: number; isFile(): boolean; isDirectory(): boolean }> {
     const stats = await stat(path);
     return {
       size: stats.size,
+      mode: stats.mode,
       isFile: () => stats.isFile(),
       isDirectory: () => stats.isDirectory(),
     };

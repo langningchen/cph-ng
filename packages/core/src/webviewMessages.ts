@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { IOverrides } from './interfaces';
-import type { ProblemId, TestcaseId } from './types';
+import type { ILanguageEnv, ProblemId, TestcaseId } from './types';
 
 interface BaseMsg {
   type: string;
@@ -111,6 +111,31 @@ export interface OpenFileMsg extends BaseMsg {
 export interface OpenTestlibMsg extends BaseMsg {
   type: 'openTestlib';
 }
+
+export interface GetLanguageListMsg extends BaseMsg {
+  type: 'getLanguageList';
+}
+export type LanguageExecutable = 'compiler' | 'interpreter';
+export interface GetLanguageInfoMsg extends BaseMsg {
+  type: 'getLanguageInfo';
+  language: string;
+  executable: LanguageExecutable;
+}
+export interface CheckLanguageInfoMsg extends BaseMsg {
+  type: 'checkLanguageInfo';
+  language: string;
+  executable: LanguageExecutable;
+  path: string;
+}
+export interface UpdateSettingsMsg extends BaseMsg {
+  type: 'updateSettings';
+  language: string;
+  payload: ILanguageEnv;
+}
+export interface OobeDoneMsg extends BaseMsg {
+  type: 'oobeDone';
+}
+
 export type WebviewSrcFileTypes = 'checker' | 'interactor' | 'generator' | 'bruteForce';
 export interface ChooseSrcFileMsg extends ProblemBaseMsg {
   type: 'chooseSrcFile';
@@ -156,12 +181,17 @@ export type ProblemMsg =
   | StartStressTestMsg
   | StopStressTestMsg
   | SubmitMsg
-  | DragDropMsg;
+  | DragDropMsg
+  | CreateProblemMsg
+  | ImportProblemMsg;
 
 export type WebviewMsg =
   | ProblemMsg
-  | CreateProblemMsg
-  | ImportProblemMsg
   | InitMsg
   | OpenFileMsg
-  | OpenTestlibMsg;
+  | OpenTestlibMsg
+  | GetLanguageListMsg
+  | GetLanguageInfoMsg
+  | CheckLanguageInfoMsg
+  | UpdateSettingsMsg
+  | OobeDoneMsg;

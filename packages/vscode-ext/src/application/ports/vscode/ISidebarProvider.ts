@@ -15,10 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { WebviewHostEvent } from '@cph-ng/core';
 import type { WebviewViewProvider } from 'vscode';
 
 export interface ISidebarProvider extends WebviewViewProvider {
   viewType: string;
+  sendMessage(data: WebviewHostEvent): void;
   dispatchFullConfig(): void;
   flushPendingMessages(): void;
 }

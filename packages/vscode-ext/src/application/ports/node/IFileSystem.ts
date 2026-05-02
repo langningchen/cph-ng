@@ -65,7 +65,9 @@ export interface IFileSystem {
   readdir(path: string): Promise<string[]>;
 
   /** Get the status of a file or directory. */
-  stat(path: string): Promise<{ size: number; isFile(): boolean; isDirectory(): boolean }>;
+  stat(
+    path: string,
+  ): Promise<{ size: number; mode: number; isFile(): boolean; isDirectory(): boolean }>;
 
   /** Asynchronously copies `src` to `dest`. `dest` is overwritten if it already exists. */
   copyFile(src: string, dest: string): Promise<void>;

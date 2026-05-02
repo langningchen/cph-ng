@@ -2,6 +2,7 @@
   "Accepted": "通过",
   "All files": "所有文件",
   "All paths returned by user script must be absolute": "用户脚本返回的所有路径必须是绝对路径",
+  "Are you sure you want to submit this problem?": "你确定要提交这个题目吗？",
   "Attempting to establish connection": "正在尝试建立连接",
   "Browser extension not connected. Install or open the CPH-NG Submit browser extension.": "浏览器扩展未连接。请安装或打开 CPH-NG Submit 浏览器扩展。",
   "Brute Force": "暴力",

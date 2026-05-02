@@ -16,8 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import Alert from '@mui/material/Alert';
-import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import i18n from 'i18next';
 import { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -27,9 +26,11 @@ import { ErrorBoundary } from '@/components/base/errorBoundary';
 import { CreateProblemView } from '@/components/createProblemView';
 import { DragOverlay } from '@/components/dragOverlay';
 import { InitView } from '@/components/initView';
+import { OobeView } from '@/components/oobe/oobe';
 import { ProblemView } from '@/components/problemView';
 import { ConfigProvider, useConfigState } from '@/context/ConfigContext';
-import { ProblemProvider, useProblemState } from '@/context/ProblemContext';
+import { OobeProvider } from '@/context/OobeContext';
+import { ProblemProvider, useProblem } from '@/context/ProblemContext';
 import langEn from '@/l10n/en.json';
 import langZh from '@/l10n/zh.json';
 
@@ -43,13 +44,17 @@ i18n.use(initReactI18next).init({
 });
 
 const Main = () => {
-  const problem = useProblemState();
+  const { state } = useProblem();
   const config = useConfigState();
   const { t } = useTranslation();
-  const theme = useTheme();
-  const isNarrow = useMediaQuery(theme.breakpoints.down('xl'));
 
-  if (!problem.isReady || !config.isReady) return <InitView />;
+  if (!state.isReady || !config.isReady) return <InitView />;
+  if (config.isReady && config.config.showOobe)
+    return (
+      <OobeProvider>
+        <OobeView />
+      </OobeProvider>
+    );
 
   return (
     <>
@@ -59,22 +64,19 @@ const Main = () => {
       <ErrorBoundary>
         <CphNgFlex
           column
-          smallGap
-          sx={{ height: '100%', boxSizing: 'border-box', padding: { xs: 0.5, md: 1 } }}
+          sx={{ gap: 0.5, height: '100%', boxSizing: 'border-box', padding: { xs: 0.5, md: 1 } }}
         >
-          {problem.currentProblem.type === 'active' ? (
-            <ProblemView
-              {...problem.currentProblem}
-              backgroundProblems={problem.backgroundProblems}
-            />
+          {state.currentProblem.type === 'active' ? (
+            <ProblemView {...state.currentProblem} backgroundProblems={state.backgroundProblems} />
           ) : (
-            <CreateProblemView canImport={problem.currentProblem.canImport} />
+            <CreateProblemView canImport={state.currentProblem.canImport} />
           )}
-          {isNarrow && (
-            <Alert severity='info' sx={{ fontSize: '0.75rem', py: 0 }}>
-              {t('main.narrowWidthAlert')}
-            </Alert>
-          )}
+          <Alert
+            severity='info'
+            sx={{ fontSize: '0.75rem', py: 0, display: { sm: 'block', xl: 'none' } }}
+          >
+            {t('main.narrowWidthAlert')}
+          </Alert>
         </CphNgFlex>
       </ErrorBoundary>
     </>

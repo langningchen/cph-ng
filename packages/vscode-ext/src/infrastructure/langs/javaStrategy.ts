@@ -15,49 +15,76 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileWithHash, IOverrides } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnvFull, IOverrides } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
-import type { IPath } from '@/application/ports/node/IPath';
 import type {
   CompileAdditionalData,
-  ILanguageDefaultValues,
   LangCompileData,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
-import { LanguageStrategyContext } from '@/infrastructure/problems/judge/langs/languageStrategyContext';
+import { LanguageStrategyContext } from '@/infrastructure/langs/languageStrategyContext';
 import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstractLanguageStrategy';
 
 @injectable()
 export class LangJava extends AbstractLanguageStrategy {
   public override readonly name = 'Java';
   public override readonly extensions = ['java'];
-  public override readonly defaultValues;
+  public override readonly defaultValues: ILanguageEnvFull;
+  public override readonly compilerQuery = {
+    filePatterns: ['javac', 'javac.exe'],
+    groupPatterns: [
+      {
+        group: 'Java',
+        helpRegex: /^Usage: javac <options> <source files>$/m,
+        versionRegex: /^(?<name>.*) (?<version>[0-9]+\.[0-9]+\.[0-9]+)$/m,
+      },
+    ],
+  };
+  public override readonly interpreterQuery = {
+    filePatterns: ['java', 'java.exe'],
+    groupPatterns: [
+      {
+        group: 'Java',
+        helpRegex: /^Usage: java [options] <mainclass> [args...]$/m,
+        versionRegex: /^(?<name>.*) (?<version>[0-9]+\.[0-9]+\.[0-9]+) (?<description>.+)$/m,
+      },
+    ],
+  };
 
   public constructor(
     @inject(LanguageStrategyContext) context: LanguageStrategyContext,
     @inject(TOKENS.logger) logger: ILogger,
-    @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
   ) {
     super({ ...context, logger: logger.withScope('langsJava') });
     this.defaultValues = {
-      compiler: this.settings.languages.javaCompiler,
-      compilerArgs: this.settings.languages.javaCompilerArgs,
-      runner: this.settings.languages.javaRunner,
-      runnerArgs: this.settings.languages.javaRunnerArgs,
-    } satisfies ILanguageDefaultValues;
-    this.settings.languages.onChangeJavaCompiler(
-      (compiler) => (this.defaultValues.compiler = compiler),
-    );
-    this.settings.languages.onChangeJavaCompilerArgs(
-      (args) => (this.defaultValues.compilerArgs = args),
-    );
-    this.settings.languages.onChangeJavaRunner((runner) => (this.defaultValues.runner = runner));
-    this.settings.languages.onChangeJavaRunnerArgs(
-      (args) => (this.defaultValues.runnerArgs = args),
-    );
+      get compiler(): string {
+        return context.settings.languages.javaCompiler;
+      },
+      set compiler(value: string) {
+        context.settings.languages.javaCompiler = value;
+      },
+      get compilerArgs(): string {
+        return context.settings.languages.javaCompilerArgs;
+      },
+      set compilerArgs(value: string) {
+        context.settings.languages.javaCompilerArgs = value;
+      },
+      get interpreter(): string {
+        return context.settings.languages.javaInterpreter;
+      },
+      set interpreter(value: string) {
+        context.settings.languages.javaInterpreter = value;
+      },
+      get interpreterArgs(): string {
+        return context.settings.languages.javaInterpreterArgs;
+      },
+      set interpreterArgs(value: string) {
+        context.settings.languages.javaInterpreterArgs = value;
+      },
+    };
   }
 
   protected override async internalCompile(
@@ -89,11 +116,14 @@ export class LangJava extends AbstractLanguageStrategy {
     return { path, hash };
   }
 
-  public override async getRunCommand(target: string, overrides?: IOverrides): Promise<string[]> {
+  public override async getInterpretCommand(
+    target: string,
+    overrides?: IOverrides,
+  ): Promise<string[]> {
     this.logger.trace('runCommand', { target });
-    const runner = overrides?.runner || this.defaultValues.runner;
-    const runArgs = overrides?.runnerArgs || this.defaultValues.runnerArgs;
-    const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
-    return [runner, ...runArgsArray, target];
+    const interpreter = overrides?.interpreter || this.defaultValues.interpreter;
+    const args = overrides?.interpreterArgs || this.defaultValues.interpreterArgs;
+    const argsArray = args.split(/\s+/).filter(Boolean);
+    return [interpreter, ...argsArray, target];
   }
 }

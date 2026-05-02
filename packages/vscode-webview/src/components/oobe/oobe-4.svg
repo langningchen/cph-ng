@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+    <defs>
+        <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.08" />
+        </filter>
+        <style>
+            .main-card { fill: #FFFFFF; stroke: #1976D2; filter: url(#shadow); }
+            .success-bg { fill: #E8F5E9; }
+            .success-main { fill: #4CAF50; }
+            .line-dark { fill: #E0E0E0; }
+            
+            @media (prefers-color-scheme: dark) {
+                .main-card { fill: #1E1E1E; stroke: #64B5F6; filter: none; }
+                .success-bg { fill: rgba(76, 175, 80, 0.15); }
+                .success-main { fill: #66BB6A; }
+                .line-dark { fill: #424242; }
+            }
+        </style>
+    </defs>
+    
+    <!-- Colorful Celebration Decorations -->
+    <circle cx="80" cy="50" r="5" fill="#FFCA28" opacity="0.9" />
+    <rect x="60" y="100" width="8" height="8" rx="2" fill="#29B6F6" transform="rotate(25 64 104)" opacity="0.8" />
+    <rect x="90" y="180" width="10" height="10" fill="#F06292" transform="rotate(45 95 185)" opacity="0.9" />
+    <circle cx="120" cy="200" r="4" fill="#66BB6A" opacity="0.8" />
+    <rect x="290" y="45" width="10" height="10" fill="#AB47BC" transform="rotate(30 295 50)" opacity="0.8" />
+    <circle cx="330" cy="80" r="6" fill="#EF5350" opacity="0.9" />
+    <circle cx="280" cy="195" r="5" fill="#26A69A" opacity="0.8" />
+    <rect x="330" y="150" width="8" height="8" rx="2" fill="#FFA726" transform="rotate(-20 334 154)" opacity="0.9" />
+
+    <!-- Main Central Card -->
+    <g transform="translate(120, 45)">
+        <rect width="160" height="150" rx="12" class="main-card" stroke-width="2" />
+        
+        <!-- Big Success Checkmark -->
+        <g transform="translate(80, 55)">
+            <circle cx="0" cy="0" r="28" class="success-bg" />
+            <circle cx="0" cy="0" r="18" class="success-main" />
+            <path d="M-6 1 L-2 5 L7 -4" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+
+        <!-- Summary text lines -->
+        <rect x="30" y="105" width="100" height="6" rx="3" class="line-dark" />
+        <rect x="45" y="122" width="70" height="6" rx="3" class="line-dark" />
+    </g>
+</svg>

@@ -27,7 +27,7 @@ import { CphNgFlex } from '@/components/base/cphNgFlex';
 import { CphNgLink } from '@/components/base/cphNgLink';
 import { CphNgText } from '@/components/base/cphNgText';
 import { CphNgTooltip } from '@/components/base/cphNgTooltip';
-import { useProblemDispatch } from '@/context/ProblemContext';
+import { useProblem } from '@/context/ProblemContext';
 
 interface BackgroundProblemViewProps {
   backgroundProblems: IWebviewBackgroundProblem[];
@@ -35,7 +35,7 @@ interface BackgroundProblemViewProps {
 
 export const BackgroundProblemView = memo(({ backgroundProblems }: BackgroundProblemViewProps) => {
   const { t } = useTranslation();
-  const dispatch = useProblemDispatch();
+  const { dispatch } = useProblem();
   const [open, setOpen] = useState(false);
 
   if (backgroundProblems.length === 0) return null;

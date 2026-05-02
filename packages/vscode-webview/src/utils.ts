@@ -26,3 +26,30 @@ export const getCompile = (e: MouseEvent) => {
   }
   return null;
 };
+
+export const openLink = (url: string) => {
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
+
+export const urls = {
+  settings: 'command:workbench.action.openSettings?%5B%22%40ext%3Alangningchen.cph-ng%22%5D',
+  github: 'https://github.com/langningchen/cph-ng',
+  feedback: 'https://github.com/langningchen/cph-ng/issues',
+  docs: 'https://deepwiki.com/langningchen/cph-ng',
+  companionChromeAddon:
+    'https://chromewebstore.google.com/detail/competitive-companion/cjnmckjndlpiamhfimnnjmnckgghkjbl',
+  companionFirefoxAddon: 'https://addons.mozilla.org/en-US/firefox/addon/competitive-companion/',
+  edgeAddon:
+    'https://microsoftedge.microsoft.com/addons/detail/cphng-submit/hfpfdaggmljfccmnfljldojbgfhpfomb',
+  firefoxAddon: 'https://addons.mozilla.org/firefox/addon/cph-ng-submit/',
+  addonDocs:
+    'https://github.com/langningchen/cph-ng/blob/main/docs/browser-extension/browser-extension.md',
+  joinQQ: 'https://qm.qq.com/q/pXStina3jU',
+};

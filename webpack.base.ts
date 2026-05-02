@@ -21,10 +21,7 @@ import TerserPlugin from 'terser-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import type { Configuration } from 'webpack';
 
-export const makeBaseConfig = (
-  isProd: boolean,
-  tsconfigPath: string,
-): Configuration => ({
+export const makeBaseConfig = (isProd: boolean, tsconfigPath: string): Configuration => ({
   mode: isProd ? 'production' : 'development',
   devtool: 'source-map',
   resolve: {
@@ -54,6 +51,10 @@ export const makeBaseConfig = (
             },
           },
         },
+      },
+      {
+        test: /\.svg$/i,
+        type: 'asset/inline',
       },
     ],
   },

@@ -27,11 +27,11 @@ import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CphNgFlex } from '@/components/base/cphNgFlex';
-import { useProblemDispatch } from '@/context/ProblemContext';
+import { useProblem } from '@/context/ProblemContext';
 
 export const DragOverlay = () => {
   const { t } = useTranslation();
-  const dispatch = useProblemDispatch();
+  const { dispatch } = useProblem();
   const [dragData, setDragData] = useState<string[] | null | undefined>(null);
 
   useEffect(() => {

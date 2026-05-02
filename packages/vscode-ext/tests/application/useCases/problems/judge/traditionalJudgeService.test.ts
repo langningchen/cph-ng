@@ -69,8 +69,8 @@ describe('TraditionalJudgeService', () => {
 
   it('should judge successfully and call observer callbacks', async () => {
     const langMock = mock<ILanguageStrategy>();
-    langMock.getRunCommand.mockResolvedValue(['./solution']);
-    langRegistryMock.getLang.mockReturnValue(langMock);
+    langMock.getInterpretCommand.mockResolvedValue(['./solution']);
+    langRegistryMock.getLangByFile.mockReturnValue(langMock);
     problemServiceMock.getLimits.mockReturnValue({ timeLimitMs: 1000, memoryLimitMb: 512 });
 
     const execResult: ExecutionData = {
@@ -104,7 +104,7 @@ describe('TraditionalJudgeService', () => {
   });
 
   it('should call onResult with rejected when lang is not found', async () => {
-    langRegistryMock.getLang.mockReturnValue(undefined);
+    langRegistryMock.getLangByFile.mockReturnValue(undefined);
 
     await service.judge(makeCtx(), observerMock, signal);
 
@@ -115,8 +115,8 @@ describe('TraditionalJudgeService', () => {
 
   it('should call onResult with rejected when runner returns ExecutionRejected', async () => {
     const langMock = mock<ILanguageStrategy>();
-    langMock.getRunCommand.mockResolvedValue(['./solution']);
-    langRegistryMock.getLang.mockReturnValue(langMock);
+    langMock.getInterpretCommand.mockResolvedValue(['./solution']);
+    langRegistryMock.getLangByFile.mockReturnValue(langMock);
     problemServiceMock.getLimits.mockReturnValue({ timeLimitMs: 1000, memoryLimitMb: 512 });
 
     runnerMock.run.mockResolvedValue(new ExecutionRejected('rejected'));
@@ -130,8 +130,8 @@ describe('TraditionalJudgeService', () => {
 
   it('should call onError when runner throws unexpected error', async () => {
     const langMock = mock<ILanguageStrategy>();
-    langMock.getRunCommand.mockResolvedValue(['./solution']);
-    langRegistryMock.getLang.mockReturnValue(langMock);
+    langMock.getInterpretCommand.mockResolvedValue(['./solution']);
+    langRegistryMock.getLangByFile.mockReturnValue(langMock);
     problemServiceMock.getLimits.mockReturnValue({ timeLimitMs: 1000, memoryLimitMb: 512 });
 
     const error = new Error('unexpected');

@@ -1,10 +1,8 @@
-import type { IFileWithHash } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnvCompile } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
-import type { IPath } from '@/application/ports/node/IPath';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type {
   CompileAdditionalData,
-  ILanguageDefaultValues,
   LangCompileData,
 } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
@@ -13,35 +11,54 @@ import { TOKENS } from '@/composition/tokens';
 import {
   AbstractLanguageStrategy,
   DefaultCompileAdditionalData,
-} from '@/infrastructure/problems/judge/langs/abstractLanguageStrategy';
-import { LanguageStrategyContext } from '@/infrastructure/problems/judge/langs/languageStrategyContext';
+} from '@/infrastructure/langs/abstractLanguageStrategy';
+import { LanguageStrategyContext } from '@/infrastructure/langs/languageStrategyContext';
 
 @injectable()
 export class LangCpp extends AbstractLanguageStrategy {
   public override readonly name = 'C++';
   public override readonly extensions = ['cpp', 'cc', 'cxx', 'c++'];
-  public override readonly enableRunner = true;
-  public override readonly defaultValues;
+  public override readonly enableExternalRunner = true;
+  public override readonly defaultValues: ILanguageEnvCompile;
+  public override readonly compilerQuery = {
+    filePatterns: ['g++*', '*-g++*', 'clang++*', '*clang++*'],
+    groupPatterns: [
+      {
+        group: 'g++',
+        helpRegex: /^For bug reporting instructions, please see:$/m,
+        versionRegex: /^(?<name>.*) \((?<description>.+)\) (?<version>[0-9]+\.[0-9]+\.[0-9]+)$/m,
+      },
+      {
+        group: 'clang++',
+        helpRegex: /^OVERVIEW: clang LLVM compiler$/m,
+        versionRegex:
+          /^(?<name>.*) version (?<version>[0-9]+\.[0-9]+\.[0-9]+) \((?<description>.+)\)$/m,
+      },
+    ],
+  };
 
   public constructor(
     @inject(LanguageStrategyContext) context: LanguageStrategyContext,
     @inject(TOKENS.extensionPath) private readonly extPath: string,
     @inject(TOKENS.logger) logger: ILogger,
-    @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
     @inject(TOKENS.system) private readonly sys: ISystem,
   ) {
     super({ ...context, logger: logger.withScope('langsCpp') });
     this.defaultValues = {
-      compiler: this.settings.languages.cppCompiler,
-      compilerArgs: this.settings.languages.cppCompilerArgs,
-    } satisfies ILanguageDefaultValues;
-    this.settings.languages.onChangeCppCompiler(
-      (compiler) => (this.defaultValues.compiler = compiler),
-    );
-    this.settings.languages.onChangeCppCompilerArgs(
-      (args) => (this.defaultValues.compilerArgs = args),
-    );
+      get compiler(): string {
+        return context.settings.languages.cppCompiler;
+      },
+      set compiler(value: string) {
+        context.settings.languages.cppCompiler = value;
+      },
+      get compilerArgs(): string {
+        return context.settings.languages.cppCompilerArgs;
+      },
+      set compilerArgs(value: string) {
+        context.settings.languages.cppCompilerArgs = value;
+      },
+    };
   }
 
   protected override async internalCompile(

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.11/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -12,11 +12,11 @@
       "packages/*/entrypoints/**",
       "packages/*/tests/**",
       "packages/*/scripts/**",
-      "packages/*/webpack.config.ts",
       "packages/*/wxt.config.ts",
       "packages/*/l10n/**",
       "packages/*/public/_locales/**",
       "commitlint.config.ts",
+      "**/webpack.*.ts",
       "**/package.nls*.json",
       "**/l10n/**/*.json",
       "**/_locales/**/*.json"

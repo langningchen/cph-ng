@@ -35,6 +35,7 @@ export class WebviewHtmlRenderer {
       version: this.version,
       isDark: colorTheme === ColorThemeKind.Dark || colorTheme === ColorThemeKind.HighContrast,
       partyUri: getUri('res/party.gif').toString(),
+      cphNgUri: getUri('res/cph-ng.png').toString(),
       language: env.language,
     };
 

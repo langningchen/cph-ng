@@ -158,14 +158,21 @@ export class WebviewProblemMapper {
   }
   private overrideToDto(
     srcPath: string,
-    { timeLimitMs, memoryLimitMb, compiler, compilerArgs, runner, runnerArgs }: IOverrides,
+    {
+      timeLimitMs,
+      memoryLimitMb,
+      compiler,
+      compilerArgs,
+      interpreter,
+      interpreterArgs,
+    }: IOverrides,
   ): IWebviewOverrides {
     const { defaultTimeLimit, defaultMemoryLimit } = this.settings.problem;
-    const lang = this.lang.getLang(srcPath);
+    const lang = this.lang.getLangByFile(srcPath);
     const defaultCompiler = lang?.defaultValues.compiler;
     const defaultCompilerArgs = lang?.defaultValues.compilerArgs;
-    const defaultRunner = lang?.defaultValues.runner;
-    const defaultRunnerArgs = lang?.defaultValues.runnerArgs;
+    const defaultInterpreter = lang?.defaultValues.interpreter;
+    const defaultInterpreterArgs = lang?.defaultValues.interpreterArgs;
     return {
       timeLimitMs: { defaultValue: defaultTimeLimit, override: timeLimitMs },
       memoryLimitMb: { defaultValue: defaultMemoryLimit, override: memoryLimitMb },
@@ -173,9 +180,11 @@ export class WebviewProblemMapper {
       compilerArgs: defaultCompilerArgs
         ? { defaultValue: defaultCompilerArgs, override: compilerArgs }
         : undefined,
-      runner: defaultRunner ? { defaultValue: defaultRunner, override: runner } : undefined,
-      runnerArgs: defaultRunnerArgs
-        ? { defaultValue: defaultRunnerArgs, override: runnerArgs }
+      interpreter: defaultInterpreter
+        ? { defaultValue: defaultInterpreter, override: interpreter }
+        : undefined,
+      interpreterArgs: defaultInterpreterArgs
+        ? { defaultValue: defaultInterpreterArgs, override: interpreterArgs }
         : undefined,
     };
   }

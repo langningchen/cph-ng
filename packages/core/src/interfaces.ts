@@ -69,8 +69,8 @@ export interface IOverrides {
   memoryLimitMb: number | null;
   compiler: string | null;
   compilerArgs: string | null;
-  runner: string | null;
-  runnerArgs: string | null;
+  interpreter: string | null;
+  interpreterArgs: string | null;
 }
 
 export interface IProblem {

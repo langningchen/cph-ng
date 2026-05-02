@@ -31,11 +31,18 @@ export class LanguageRegistry implements ILanguageRegistry {
     this.logger = logger.withScope('LanguageRegistry');
   }
 
-  public getLang(filePath: string): ILanguageStrategy | undefined {
+  public getLangByFile(filePath: string): ILanguageStrategy | undefined {
     const ext = extname(filePath).toLowerCase().slice(1);
     const lang = this.langs.find((lang) => lang.extensions.includes(ext));
     if (lang) this.logger.debug('Detected language for', { filePath, lang: lang.name });
     else this.logger.debug('No language detected for', { filePath });
+    return lang;
+  }
+
+  public getLangByName(langName: string): ILanguageStrategy | undefined {
+    const lang = this.langs.find((lang) => lang.name === langName);
+    if (lang) this.logger.debug('Found language', { lang: lang.name });
+    else this.logger.debug('Language not found', { langName });
     return lang;
   }
 }

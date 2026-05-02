@@ -15,7 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { basename, dirname, extname, join, normalize, relative, resolve } from 'node:path';
+import { glob } from 'node:fs/promises';
+import {
+  basename,
+  delimiter,
+  dirname,
+  extname,
+  join,
+  normalize,
+  relative,
+  resolve,
+} from 'node:path';
 import { injectable } from 'tsyringe';
 import type { IPath } from '@/application/ports/node/IPath';
 
@@ -47,5 +57,13 @@ export class PathAdapter implements IPath {
 
   public relative(from: string, to: string): string {
     return relative(from, to);
+  }
+
+  public glob(pattern: string): AsyncIterable<string> {
+    return glob(pattern);
+  }
+
+  public get delimiter(): string {
+    return delimiter;
   }
 }

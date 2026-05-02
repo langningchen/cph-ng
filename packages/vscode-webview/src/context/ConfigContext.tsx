@@ -32,7 +32,12 @@ type ConfigState = ConfigStateLoading | ConfigStateReady;
 
 const ConfigContext = createContext<ConfigState | undefined>(undefined);
 
-const requiredKeys: (keyof WebviewConfig)[] = ['confirmSubmit', 'showAcGif', 'hiddenStatuses'];
+const requiredKeys: (keyof WebviewConfig)[] = [
+  'confirmSubmit',
+  'showAcGif',
+  'showOobe',
+  'hiddenStatuses',
+];
 
 const isConfigComplete = (config: Partial<WebviewConfig>): config is WebviewConfig => {
   return requiredKeys.every((key) => key in config && config[key] !== undefined);
@@ -52,7 +57,7 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const handleMessage = ({ data }: MessageEvent) => {
-      if (data.type === 'CONFIG_CHANGE') dispatch(data.payload);
+      if (data.type === 'configChange') dispatch(data.payload);
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
@@ -74,16 +79,4 @@ export const useConfig = (): WebviewConfig => {
       'useConfig called before config is ready. Use useConfigState to check isReady first.',
     );
   return state.config;
-};
-
-export const ConfigGuard = ({
-  children,
-  fallback = null,
-}: {
-  children: ReactNode;
-  fallback?: ReactNode;
-}) => {
-  const state = useConfigState();
-  if (!state.isReady) return <>{fallback}</>;
-  return <>{children}</>;
 };

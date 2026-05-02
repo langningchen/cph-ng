@@ -24,7 +24,7 @@ import type { IActivePathService } from '@/application/ports/vscode/IActivePathS
 import type { IExtensionContext } from '@/application/ports/vscode/IExtensionContext';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { IProblemFs } from '@/application/ports/vscode/IProblemFs';
-import type { IWebviewEventBus } from '@/application/ports/vscode/IWebviewEventBus';
+import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvider';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import type { Problem, ProblemMetaPayload } from '@/domain/entities/problem';
@@ -43,7 +43,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.problemFs) private readonly problemFs: IProblemFs,
     @inject(TOKENS.problemRepository) private readonly repo: IProblemRepository,
-    @inject(TOKENS.webviewEventBus) private readonly eventBus: IWebviewEventBus,
+    @inject(TOKENS.sidebarProvider) private readonly sidebarProvider: ISidebarProvider,
     @inject(WebviewProblemMapper) private readonly mapper: WebviewProblemMapper,
   ) {
     this.logger = this.logger.withScope('activeProblemCoordinator');
@@ -55,21 +55,29 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
   public async dispatchFullData() {
     if (this.active) {
       this.logger.trace('Dispatching full data for active problem', { active: this.active });
-      this.eventBus.fullProblem(this.active.problemId, this.mapper.toDto(this.active.problem));
+      this.sidebarProvider.sendMessage({
+        type: 'fullProblem',
+        problemId: this.active.problemId,
+        payload: this.mapper.toDto(this.active.problem),
+      });
       return;
     }
     const canImport = this.context.canImport;
     this.logger.trace('No active problem to dispatch', { canImport });
-    this.eventBus.noProblem(canImport);
+    this.sidebarProvider.sendMessage({ type: 'noProblem', canImport });
   }
 
   private onPatchMeta = async (payload: WithRevision<ProblemMetaPayload>) => {
     if (!this.active) return;
     const { revision, checker, interactor } = payload;
-    this.eventBus.patchMeta(this.active.problemId, {
-      revision,
-      checker: checker ? this.mapper.fileWithHashToDto(checker) : checker,
-      interactor: interactor ? this.mapper.fileWithHashToDto(interactor) : interactor,
+    this.sidebarProvider.sendMessage({
+      type: 'patchMeta',
+      problemId: this.active.problemId,
+      payload: {
+        revision,
+        checker: checker ? this.mapper.fileWithHashToDto(checker) : checker,
+        interactor: interactor ? this.mapper.fileWithHashToDto(interactor) : interactor,
+      },
     });
     this.problemFs.signals.emit('patchProblem', this.active.problem.src.path);
   };
@@ -77,25 +85,39 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
   private onPatchStressTest = async (payload: WithRevision<Partial<StressTest>>) => {
     if (!this.active) return;
     const { revision, ...rest } = payload;
-    this.eventBus.patchStressTest(this.active.problemId, {
-      ...this.mapper.stressTestToDto(rest),
-      revision,
+    this.sidebarProvider.sendMessage({
+      type: 'patchStressTest',
+      problemId: this.active.problemId,
+      payload: {
+        ...this.mapper.stressTestToDto(rest),
+        revision,
+      },
     });
     this.problemFs.signals.emit('patchProblem', this.active.problem.src.path);
   };
 
   private onAddTestcase = async (testcaseId: TestcaseId, payload: Testcase, revision: number) => {
     if (!this.active) return;
-    this.eventBus.addTestcase(this.active.problemId, testcaseId, {
-      ...this.mapper.testcaseToDto(payload),
-      revision,
+    this.sidebarProvider.sendMessage({
+      type: 'addTestcase',
+      problemId: this.active.problemId,
+      testcaseId,
+      payload: {
+        ...this.mapper.testcaseToDto(payload),
+        revision,
+      },
     });
     this.problemFs.signals.emit('addTestcase', this.active.problem.src.path, testcaseId, payload);
   };
 
   private onDeleteTestcase = async (testcaseId: TestcaseId, revision: number) => {
     if (!this.active) return;
-    this.eventBus.deleteTestcase(this.active.problemId, testcaseId, { revision });
+    this.sidebarProvider.sendMessage({
+      type: 'deleteTestcase',
+      problemId: this.active.problemId,
+      testcaseId,
+      payload: { revision },
+    });
     this.problemFs.signals.emit('deleteTestcase', this.active.problem.src.path, testcaseId);
   };
 
@@ -105,9 +127,14 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     revision: number,
   ) => {
     if (!this.active) return;
-    this.eventBus.patchTestcase(this.active.problemId, testcaseId, {
-      ...this.mapper.testcaseToDto(payload),
-      revision,
+    this.sidebarProvider.sendMessage({
+      type: 'patchTestcase',
+      problemId: this.active.problemId,
+      testcaseId,
+      payload: {
+        ...this.mapper.testcaseToDto(payload),
+        revision,
+      },
     });
     this.problemFs.signals.emit('patchTestcase', this.active.problem.src.path, testcaseId, payload);
   };
@@ -118,9 +145,14 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     revision: number,
   ) => {
     if (!this.active) return;
-    this.eventBus.patchTestcaseResult(this.active.problemId, testcaseId, {
-      ...this.mapper.testcaseResultToDto(payload),
-      revision,
+    this.sidebarProvider.sendMessage({
+      type: 'patchTestcaseResult',
+      problemId: this.active.problemId,
+      testcaseId,
+      payload: {
+        ...this.mapper.testcaseResultToDto(payload),
+        revision,
+      },
     });
     this.problemFs.signals.emit('patchTestcase', this.active.problem.src.path, testcaseId, payload);
   };
@@ -157,7 +189,7 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
     if (!filePath) {
       this.active = null;
       this.context.hasProblem = false;
-      this.eventBus.noProblem(false);
+      this.sidebarProvider.sendMessage({ type: 'noProblem', canImport: false });
       return;
     }
     const backgroundProblem = await this.repo.loadByPath(filePath);
@@ -167,14 +199,15 @@ export class ActiveProblemCoordinator implements IActiveProblemCoordinator {
       const canImport = await this.cph.canMigrate(filePath);
       this.context.hasProblem = false;
       this.context.canImport = canImport;
-      this.eventBus.noProblem(canImport);
+      this.sidebarProvider.sendMessage({ type: 'noProblem', canImport });
     } else {
       this.active = backgroundProblem;
       this.attachListeners(backgroundProblem.problem);
-      this.eventBus.fullProblem(
-        backgroundProblem.problemId,
-        this.mapper.toDto(backgroundProblem.problem),
-      );
+      this.sidebarProvider.sendMessage({
+        type: 'fullProblem',
+        problemId: backgroundProblem.problemId,
+        payload: this.mapper.toDto(backgroundProblem.problem),
+      });
       this.context.hasProblem = true;
       this.logger.debug('Set new active problem', { problemId: backgroundProblem.problemId });
     }

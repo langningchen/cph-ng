@@ -15,17 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileWithHash, IOverrides } from '@cph-ng/core';
+import type { IFileWithHash, ILanguageEnv, IOverrides, ToolchainItem } from '@cph-ng/core';
 import SHA256 from 'crypto-js/sha256';
+import pathKey from 'path-key';
 import type { OutputChannel } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
+import type { IPath } from '@/application/ports/node/IPath';
 import { AbortReason, type IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import {
   CompileAborted,
   type CompileAdditionalData,
   CompileError,
-  type ILanguageDefaultValues,
   type ILanguageStrategy,
   type LangCompileData,
   type LangCompileResult,
@@ -34,7 +35,13 @@ import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
-import type { LanguageStrategyContext } from '@/infrastructure/problems/judge/langs/languageStrategyContext';
+import type { LanguageStrategyContext } from '@/infrastructure/langs/languageStrategyContext';
+
+export type GroupPattern = { group: string; helpRegex: RegExp; versionRegex: RegExp };
+export interface ToolchainQuery {
+  filePatterns: string[];
+  groupPatterns: GroupPattern[];
+}
 
 export const DefaultCompileAdditionalData: CompileAdditionalData = {
   canUseWrapper: false,
@@ -43,27 +50,107 @@ export const DefaultCompileAdditionalData: CompileAdditionalData = {
 export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
   public abstract readonly name: string;
   public abstract readonly extensions: string[];
-  public readonly enableRunner: boolean = false;
-  public abstract readonly defaultValues: ILanguageDefaultValues;
+  public readonly enableExternalRunner: boolean = false;
+  public abstract readonly defaultValues: ILanguageEnv;
+  protected readonly compilerQuery?: ToolchainQuery;
+  protected readonly interpreterQuery?: ToolchainQuery;
 
+  protected readonly compilation: OutputChannel;
   protected readonly fs: IFileSystem;
   protected readonly logger: ILogger;
-  protected readonly settings: ISettings;
-  protected readonly translator: ITranslator;
+  protected readonly path: IPath;
   protected readonly processExecutor: IProcessExecutor;
-  protected readonly tmp: ITempStorage;
+  protected readonly settings: ISettings;
   protected readonly telemetry: ITelemetry;
-  protected readonly compilation: OutputChannel;
+  protected readonly tmp: ITempStorage;
+  protected readonly translator: ITranslator;
 
   public constructor(context: LanguageStrategyContext) {
+    this.compilation = context.compilation;
     this.fs = context.fs;
     this.logger = context.logger;
-    this.settings = context.settings;
-    this.translator = context.translator;
+    this.path = context.path;
     this.processExecutor = context.processExecutor;
-    this.tmp = context.tmp;
+    this.settings = context.settings;
     this.telemetry = context.telemetry;
-    this.compilation = context.compilation;
+    this.tmp = context.tmp;
+    this.translator = context.translator;
+  }
+
+  public async checkCompiler(path: string): Promise<ToolchainItem | null> {
+    if (!this.compilerQuery) return null;
+    return this.checkExecutable(path, this.compilerQuery.groupPatterns);
+  }
+  public async getCompilers(): Promise<ToolchainItem[]> {
+    if (!this.compilerQuery) return [];
+    return this.getExecutablesInPath(
+      this.compilerQuery.filePatterns,
+      this.compilerQuery.groupPatterns,
+    );
+  }
+  public async checkInterpreter(_path: string): Promise<ToolchainItem | null> {
+    if (!this.interpreterQuery) return null;
+    return this.checkExecutable(_path, this.interpreterQuery.groupPatterns);
+  }
+  public async getInterpreters(): Promise<ToolchainItem[]> {
+    if (!this.interpreterQuery) return [];
+    return this.getExecutablesInPath(
+      this.interpreterQuery.filePatterns,
+      this.interpreterQuery.groupPatterns,
+    );
+  }
+
+  protected async checkExecutable(
+    path: string,
+    groupPatterns: GroupPattern[],
+  ): Promise<ToolchainItem | null> {
+    const helpResult = await this.processExecutor.execute({ cmd: [path, '--help'] });
+    if (helpResult instanceof Error) return null;
+    const helpString = await this.fs.readFile(helpResult.stdoutPath);
+    this.tmp.dispose([helpResult.stdoutPath, helpResult.stderrPath]);
+    for (const { group, helpRegex, versionRegex } of groupPatterns) {
+      if (helpRegex.test(helpString)) {
+        const versionResult = await this.processExecutor.execute({ cmd: [path, '--version'] });
+        if (versionResult instanceof Error) return null;
+        const versionString = await this.fs.readFile(versionResult.stdoutPath);
+        this.tmp.dispose([versionResult.stdoutPath, versionResult.stderrPath]);
+        const versionMatch = versionString.match(versionRegex);
+        if (!versionMatch?.groups) return null;
+        const { name, version, description } = versionMatch.groups;
+        return {
+          name: name || this.path.basename(path),
+          group,
+          version,
+          description,
+          path,
+        } satisfies ToolchainItem;
+      }
+    }
+    return null;
+  }
+  protected async getExecutablesInPath(
+    filePatterns: string[],
+    groupPatterns: GroupPattern[],
+  ): Promise<ToolchainItem[]> {
+    const envPath = process.env[pathKey()] || '';
+    const directories = envPath.split(this.path.delimiter);
+    const found: string[] = [];
+    const promises: Promise<ToolchainItem | null>[] = [];
+    for (const pattern of filePatterns) {
+      for (const dir of directories) {
+        try {
+          const matches = this.path.glob(this.path.join(dir, pattern));
+          for await (const path of matches) {
+            const stat = await this.fs.stat(path);
+            if (stat.isFile() && !found.includes(path)) {
+              found.push(path);
+              promises.push(this.checkExecutable(path, groupPatterns));
+            }
+          }
+        } catch {}
+      }
+    }
+    return (await Promise.all(promises)).filter((v) => !!v);
   }
 
   public async compile(
@@ -150,7 +237,10 @@ export abstract class AbstractLanguageStrategy implements ILanguageStrategy {
     return { skip: false, hash };
   }
 
-  public async getRunCommand(target: string, _compilationSettings?: IOverrides): Promise<string[]> {
+  public async getInterpretCommand(
+    target: string,
+    _compilationSettings?: IOverrides,
+  ): Promise<string[]> {
     return [target];
   }
 }

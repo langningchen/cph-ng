@@ -3,6 +3,7 @@
     "target": "ES2022",
     "module": "esnext",
     "jsx": "react-jsx",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,

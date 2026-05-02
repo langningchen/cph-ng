@@ -17,9 +17,9 @@
 
 // biome-ignore-all lint/style/useNamingConvention: Version-specific identifiers are used to distinguish between historical data models during migration.
 export type {
-  IFileWithHash as IFileWithHash_0_6_1,
-  IProblem as IProblem_0_6_1,
-  ITestcaseIo as ITestcaseIo_0_6_1,
+  IFileWithHash as IFileWithHash_0_7_8,
+  IProblem as IProblem_0_7_8,
+  ITestcaseIo as ITestcaseIo_0_7_8,
 } from '@cph-ng/core';
 export type { Problem as IProblem_0_0_1 } from './0.0.1';
 export type { Problem as IProblem_0_0_3 } from './0.0.3';
@@ -38,3 +38,8 @@ export type {
   IProblem as IProblem_0_6_0,
   ITestcaseIo as ITestcaseIo_0_6_0,
 } from './0.6.0';
+export type {
+  IFileWithHash as IFileWithHash_0_6_1,
+  IProblem as IProblem_0_6_1,
+  ITestcaseIo as ITestcaseIo_0_6_1,
+} from './0.6.1';

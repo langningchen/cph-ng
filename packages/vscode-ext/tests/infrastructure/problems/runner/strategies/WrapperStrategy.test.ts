@@ -55,6 +55,8 @@ import {
 } from '@/application/ports/node/IProcessExecutor';
 import { TOKENS } from '@/composition/tokens';
 import type { ExecutionContext, ExecutionData } from '@/domain/execution';
+import { LangCpp } from '@/infrastructure/langs/cppStrategy';
+import { LanguageRegistry } from '@/infrastructure/langs/languageRegistry';
 import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
 import { CryptoAdapter } from '@/infrastructure/node/cryptoAdapter';
 import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
@@ -62,8 +64,6 @@ import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
 import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
-import { LangCpp } from '@/infrastructure/problems/judge/langs/cppStrategy';
-import { LanguageRegistry } from '@/infrastructure/problems/judge/langs/languageRegistry';
 import {
   type WrapperData,
   WrapperStrategy,
