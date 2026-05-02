@@ -93,8 +93,8 @@ export const ProblemTitle = memo(
     const [editedMemoryLimitMb, setEditedMemoryLimitMb] = useState<string | null>();
     const [editedCompiler, setEditedCompiler] = useState<string | null | undefined>();
     const [editedCompilerArgs, setEditedCompilerArgs] = useState<string | null | undefined>();
-    const [editedInterpreter, setEditedRunner] = useState<string | null | undefined>();
-    const [editedInterpreterArgs, setEditedRunnerArgs] = useState<string | null | undefined>();
+    const [editedInterpreter, setEditedInterpreter] = useState<string | null | undefined>();
+    const [editedInterpreterArgs, setEditedInterpreterArgs] = useState<string | null | undefined>();
     const [timeElapsed, setTimeElapsed] = useState(0);
 
     useEffect(() => {
@@ -104,8 +104,8 @@ export const ProblemTitle = memo(
       setEditedMemoryLimitMb(overrides.memoryLimitMb.override?.toString());
       setEditedCompiler(overrides.compiler?.override);
       setEditedCompilerArgs(overrides.compilerArgs?.override);
-      setEditedRunner(overrides.interpreter?.override);
-      setEditedRunnerArgs(overrides.interpreterArgs?.override);
+      setEditedInterpreter(overrides.interpreter?.override);
+      setEditedInterpreterArgs(overrides.interpreterArgs?.override);
     }, [name, url, overrides]);
     useEffect(() => {
       setTimeElapsed(Date.now() - startTime);
@@ -312,7 +312,7 @@ export const ProblemTitle = memo(
                     label={t('problemTitle.dialog.field.interpreter')}
                     value={editedInterpreter}
                     placeholder={overrides.interpreter.defaultValue.toString()}
-                    onChange={(e) => setEditedRunner(e.target.value)}
+                    onChange={(e) => setEditedInterpreter(e.target.value)}
                     fullWidth
                   />
                 )}
@@ -323,7 +323,7 @@ export const ProblemTitle = memo(
                     label={t('problemTitle.dialog.field.interpreterArgs')}
                     value={editedInterpreterArgs}
                     placeholder={overrides.interpreterArgs.defaultValue.toString()}
-                    onChange={(e) => setEditedRunnerArgs(e.target.value)}
+                    onChange={(e) => setEditedInterpreterArgs(e.target.value)}
                     fullWidth
                   />
                 )}

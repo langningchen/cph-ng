@@ -31,9 +31,6 @@ interface OOBEPageProps {
   children: React.ReactNode;
   onBack?: () => void;
   onNext?: () => void;
-  onDone?: () => void;
-  nextLabel?: string;
-  nextDisabled?: boolean;
 }
 
 export function OOBEPage({
