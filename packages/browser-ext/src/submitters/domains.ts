@@ -20,6 +20,7 @@ export const submitterDomains = {
   atcoder: ['atcoder.jp'],
   luogu: ['www.luogu.com.cn'],
   hydro: ['hydro.ac'],
+  vjudge: ['vjudge.net'],
 } as const;
 
 export const allDomains = Object.values(submitterDomains).flat();

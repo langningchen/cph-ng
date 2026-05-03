@@ -706,6 +706,11 @@
         "command": "cph-ng.stopTestcases",
         "key": "ctrl+alt+b",
         "when": "cph-ng.hasProblem && cph-ng.isRunning"
+      },
+      {
+        "command": "cph-ng.submit",
+        "key": "ctrl+alt+s",
+        "when": "cph-ng.hasProblem"
       }
     ],
     "menus": {
