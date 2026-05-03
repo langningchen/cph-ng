@@ -27,7 +27,7 @@ export class VjudgeSubmitter extends BaseSubmitter {
   }
 
   public async fill({ sourceCode }: SubmitData): Promise<void> {
-    const openSubmitBtn = await this.waitForElement<HTMLTextAreaElement>('#btn-submit');
+    const openSubmitBtn = await this.waitForElement<HTMLButtonElement>('#btn-submit');
     openSubmitBtn.click();
 
     const sourceCodeEl = await this.waitForElement<HTMLTextAreaElement>('#submit-solution');
