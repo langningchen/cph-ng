@@ -41,6 +41,7 @@ const generateSchema = () => {
             [
               'exec',
               'ts-json-schema-generator',
+              '--no-type-check',
               '--path',
               resolve(__dirname, '../core/src/index.ts'),
               '--type',
