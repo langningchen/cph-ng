@@ -2,6 +2,17 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.8
+
+- **feat**(browser-ext): vjudge submitter ([#236](https://github.com/langningchen/cph-ng/issues/236))
+- **feat**(vscode-webview): oobe ([#203](https://github.com/langningchen/cph-ng/issues/203))
+- **chore**(deps): bump softprops/action-gh-release from 2 to 3 ([#235](https://github.com/langningchen/cph-ng/issues/235))
+- **chore**(deps): bump the npm-non-major group across 1 directory with 11 updates ([#234](https://github.com/langningchen/cph-ng/issues/234))
+- **chore**(deps): bump @hono/node-server from 1.19.14 to 2.0.0 ([#233](https://github.com/langningchen/cph-ng/issues/233))
+- **fix**(vscode-ext): run submissions in source cwd ([#231](https://github.com/langningchen/cph-ng/issues/231))
+- **chore**(deps): bump the npm-non-major group with 10 updates ([#230](https://github.com/langningchen/cph-ng/issues/230))
+- **fix**(vscode-ext): dispatch editor change after import ([#229](https://github.com/langningchen/cph-ng/issues/229))
+
 ## 0.7.7
 
 - **fix**(vscode-router): shutdown immediately after all clients closed ([#227](https://github.com/langningchen/cph-ng/issues/227))
