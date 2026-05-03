@@ -34,7 +34,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useCallback, useEffect, useState } from 'react';
 
-const theme = createTheme({ palette: { mode: 'dark' } });
+const theme = createTheme({ colorSchemes: { dark: true } });
 
 interface SubmitLog {
   submissionId: string;
