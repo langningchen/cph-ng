@@ -22,12 +22,14 @@ import type { BaseSubmitter } from '@b/submitters/base';
 import { CodeforcesSubmitter } from '@b/submitters/codeforces';
 import { HydroSubmitter } from '@b/submitters/hydro';
 import { LuoguSubmitter } from '@b/submitters/luogu';
+import { VjudgeSubmitter } from '@b/submitters/vjudge';
 
 const submitters: readonly BaseSubmitter[] = [
   new CodeforcesSubmitter(),
   new AtCoderSubmitter(),
   new LuoguSubmitter(),
   new HydroSubmitter(),
+  new VjudgeSubmitter(),
 ];
 
 export const findSubmitter = ({ hostname }: URL): BaseSubmitter | null => {
