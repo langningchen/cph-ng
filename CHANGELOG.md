@@ -446,15 +446,15 @@ Aggregated from prereleases 0.3.1~0.3.8.
 
 ## 0.3.6
 
-Nothing changed, just dump version to publish a new version.
+Nothing changed, just bump version to publish a new version.
 
 ## 0.3.5
 
-Nothing changed, just dump version to publish a new version.
+Nothing changed, just bump version to publish a new version.
 
 ## 0.3.4
 
-Nothing changed, just dump version to publish a new version.
+Nothing changed, just bump version to publish a new version.
 
 ## 0.3.3
 
@@ -629,7 +629,7 @@ changes are released as stable**
 
 ## 0.1.6
 
-Nothing changed, just dump version to publish a new version.
+Nothing changed, just bump version to publish a new version.
 
 ## 0.1.5
 
