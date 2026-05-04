@@ -131,7 +131,7 @@ const commits = execSync(`git log v${releaseConfig.previousVersion}..HEAD --form
 })
   .trim()
   .split('\n')
-  .filter((line) => !line.startsWith('chore: dump version to '))
+  .filter((line) => !line.startsWith('chore(version): bump version to '))
   .map((line) => {
     const match = line.match(commitLogPattern);
     if (!match) return null;
@@ -175,9 +175,9 @@ if (commits.length === 0) {
 
 const commitAndExit = (version: string) => {
   console.log(`\n🚀 Committing changes...`);
-  execSync(`git checkout -b chore/version-dump-${version}`);
+  execSync(`git checkout -b chore/version-bump-${version}`);
   execSync('git add -A', { stdio: 'inherit' });
-  execSync(`git commit -m "chore: dump version to ${version}"`, { stdio: 'inherit' });
+  execSync(`git commit -m "chore: bump version to ${version}"`, { stdio: 'inherit' });
   console.log(`\n✅ Successfully committed version ${version}.`);
 };
 
