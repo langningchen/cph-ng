@@ -747,7 +747,7 @@
     "postinstall": "pnpm generate-settings"
   },
   "devDependencies": {
-    "@swc/core": "^1.15.32",
+    "@swc/core": "^1.15.33",
     "@types/adm-zip": "^0.5.8",
     "@types/crypto-js": "^4.2.2",
     "@types/lodash": "^4.17.24",
