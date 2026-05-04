@@ -177,7 +177,7 @@ const commitAndExit = (version: string) => {
   console.log(`\n🚀 Committing changes...`);
   execSync(`git checkout -b chore/version-bump-${version}`);
   execSync('git add -A', { stdio: 'inherit' });
-  execSync(`git commit -m "chore: bump version to ${version}"`, { stdio: 'inherit' });
+  execSync(`git commit -m "chore(version): bump version to ${version}"`, { stdio: 'inherit' });
   console.log(`\n✅ Successfully committed version ${version}.`);
 };
 
