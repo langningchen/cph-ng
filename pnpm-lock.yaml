@@ -2901,9 +2901,6 @@ packages:
     resolution: {integrity: sha512-N+MeXYoqr3pOgn8xfyRPREN7gHakLYjhsHhWGT3fWAiL4IkAt0iDw14QiiEm2bE30c5XX5q0FtAA3CK5f9/BUg==}
     engines: {node: '>=12'}
 
-  defu@6.1.4:
-    resolution: {integrity: sha512-mEQCMmwJu317oSz8CwdIOdwf3xMif1ttiM8LTufzc3g6kR+9Pe236twL8j3IYT1F7GfRgGcW6MWxzZjLIkuHIg==}
-
   defu@6.1.7:
     resolution: {integrity: sha512-7z22QmUWiQ/2d0KkdYmANbRUVABpZ9SNYyH5vx6PZ+nE5bcC0l7uFvEfHlyld/HcGBFTL536ClDt3DEcSlEJAQ==}
 
@@ -7256,7 +7253,7 @@ snapshots:
 
   '@wxt-dev/auto-icons@1.1.1(wxt@0.20.26(@types/node@22.19.15)(jiti@2.7.0)(oxc-parser@0.130.0)(rolldown@1.0.1)(rollup@4.59.0)(terser@5.47.1)(tsx@4.22.1)(yaml@2.9.0))':
     dependencies:
-      defu: 6.1.4
+      defu: 6.1.7
       fs-extra: 11.3.4
       sharp: 0.34.5
       wxt: 0.20.26(@types/node@22.19.15)(jiti@2.7.0)(oxc-parser@0.130.0)(rolldown@1.0.1)(rollup@4.59.0)(terser@5.47.1)(tsx@4.22.1)(yaml@2.9.0)
@@ -7733,8 +7730,6 @@ snapshots:
   define-lazy-prop@2.0.0: {}
 
   define-lazy-prop@3.0.0: {}
-
-  defu@6.1.4: {}
 
   defu@6.1.7: {}
 
