@@ -44,6 +44,9 @@ export interface EditProblemDetailsMsg extends ProblemBaseMsg {
 export interface DeleteProblemMsg extends ProblemBaseMsg {
   type: 'deleteProblem';
 }
+export interface CopyProblemMsg extends ProblemBaseMsg {
+  type: 'copyProblem';
+}
 export interface RunAllTestcasesMsg extends ProblemBaseMsg {
   type: 'runAllTestcases';
   forceCompile: boolean | null;
@@ -162,6 +165,7 @@ export interface DragDropMsg extends BaseMsg {
 
 export type ProblemMsg =
   | EditProblemDetailsMsg
+  | CopyProblemMsg
   | DeleteProblemMsg
   | RunAllTestcasesMsg
   | StopTestcasesMsg

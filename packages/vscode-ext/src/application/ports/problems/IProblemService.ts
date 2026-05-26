@@ -23,6 +23,7 @@ export interface IProblemService {
   getDataPath(srcPath: string): string | null;
   getTestcasePath(srcPath: string, id: TestcaseId, ext: string): string | null;
   create(srcPath: string): Promise<Problem | null>;
+  copy(problem: Problem, srcPath: string): Promise<Problem>;
   loadBySrc(srcPath: string): Promise<Problem | null>;
   loadTestcases(problem: Problem, file: boolean): Promise<void>;
   applyTestcases(problem: Problem, testcases: Testcase[]): void;

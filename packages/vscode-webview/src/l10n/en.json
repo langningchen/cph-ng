@@ -57,6 +57,7 @@
   "oobe.step4.source.description": "View the project source on GitHub.",
   "oobe.step4.subtitle": "You're ready to start using CPH-NG. Here's a quick summary and a few helpful links.",
   "oobe.step4.title": "You're All Set!",
+  "problemActions.copyProblem": "Copy Problem",
   "problemActions.deleteDialog.cancel": "Cancel",
   "problemActions.deleteDialog.confirm": "Confirm",
   "problemActions.deleteDialog.content": "Are you sure you want to delete this problem? This action cannot be undone.",
