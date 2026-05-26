@@ -83,6 +83,24 @@ export class ProblemService implements IProblemService {
     return problem;
   }
 
+  public async copy(problem: Problem, srcPath: string): Promise<Problem> {
+    const oldBinPath = this.getDataPath(problem.src.path);
+    const newBinPath = this.getDataPath(srcPath);
+    if (!newBinPath) throw new Error(this.translator.t('Cannot resolve copied problem data path'));
+    if (oldBinPath === newBinPath)
+      throw new Error(this.translator.t('Copied problem data path conflicts with current problem'));
+    if (await this.fs.exists(newBinPath))
+      throw new Error(this.translator.t('Copied problem data path already exists'));
+
+    await this.fs.copyFile(problem.src.path, srcPath);
+    const dto = this.mapper.toDto(problem);
+    dto.src = { ...dto.src, path: srcPath };
+    dto.name = this.path.basename(srcPath, this.path.extname(srcPath));
+    const copiedProblem = this.mapper.toEntity(dto);
+    await this.save(copiedProblem);
+    return copiedProblem;
+  }
+
   public async loadBySrc(srcPath: string): Promise<Problem | null> {
     const binPath = this.getDataPath(srcPath);
     if (!binPath) return null;

@@ -57,6 +57,7 @@
   "oobe.step4.source.description": "在 GitHub 上查看项目源码。",
   "oobe.step4.subtitle": "你已经可以开始使用 CPH-NG 了。这里有一份快速摘要和一些实用链接。",
   "oobe.step4.title": "一切就绪！",
+  "problemActions.copyProblem": "复制题目",
   "problemActions.deleteDialog.cancel": "取消",
   "problemActions.deleteDialog.confirm": "确认",
   "problemActions.deleteDialog.content": "你确定要删除这个题目吗？此操作无法撤销。",

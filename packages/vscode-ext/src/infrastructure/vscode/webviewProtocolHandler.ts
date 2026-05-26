@@ -32,6 +32,7 @@ import { OobeDone } from '@/application/useCases/webview/oobe/OobeDone';
 import { UpdateSettings } from '@/application/useCases/webview/oobe/UpdateSettings';
 import { ChooseSrcFile } from '@/application/useCases/webview/problem/ChooseSrcFile';
 import { EditProblemDetails } from '@/application/useCases/webview/problem/EditProblemDetails';
+import { CopyProblem } from '@/application/useCases/webview/problem/manage/CopyProblem';
 import { CreateProblem } from '@/application/useCases/webview/problem/manage/CreateProblem';
 import { DeleteProblem } from '@/application/useCases/webview/problem/manage/DeleteProblem';
 import { ImportProblem } from '@/application/useCases/webview/problem/manage/ImportProblem';
@@ -61,6 +62,7 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
   chooseTestcaseFile: ChooseTestcaseFile,
   clearTestcaseStatus: ClearTestcaseStatus,
   compareTestcase: CompareTestcase,
+  copyProblem: CopyProblem,
   createProblem: CreateProblem,
   deleteProblem: DeleteProblem,
   deleteTestcase: DeleteTestcase,
