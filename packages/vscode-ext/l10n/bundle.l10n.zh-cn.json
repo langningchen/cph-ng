@@ -68,7 +68,7 @@
   "Judged": "已评测",
   "Judging": "正在评测",
   "Memory Limit Exceed": "内存超限",
-  "New file name": "新文件名",
+  "New file name (defaults to current name)": "新文件名（默认使用当前名称）",
   "No": "否",
   "No CPH problem files found.": "未找到 CPH 题目文件。",
   "No batches to claim": "没有待认领的批次",
