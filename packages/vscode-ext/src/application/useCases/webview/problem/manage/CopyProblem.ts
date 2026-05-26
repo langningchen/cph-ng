@@ -52,17 +52,15 @@ export class CopyProblem extends BaseProblemUseCase<CopyProblemMsg> {
     const input = await this.ui.input({
       prompt: this.translator.t('New file name (defaults to current name)'),
       value: defaultName,
-      placeHolder: defaultName,
     });
     if (input === undefined) return;
 
     let fileName = input.trim();
-    if (!fileName) return;
-    if (fileName.includes('/') || fileName.includes('\\')) {
-      throw new Error(this.translator.t('File name must not contain path separators'));
-    }
+    const validationError = this.validateFileName(fileName);
+    if (validationError) throw new Error(validationError);
 
-    if (ext && fileName.endsWith(ext)) fileName = fileName.slice(0, -ext.length);
+    const inputExt = this.path.extname(fileName);
+    if (inputExt) fileName = this.path.basename(fileName, inputExt);
     fileName += ext;
     const destPath = this.path.join(this.path.dirname(srcPath), fileName);
     if (destPath === srcPath)
@@ -72,5 +70,21 @@ export class CopyProblem extends BaseProblemUseCase<CopyProblemMsg> {
 
     await this.service.copy(problem, destPath);
     this.ui.openFile(Uri.file(destPath));
+  }
+
+  private validateFileName(fileName: string): string | null {
+    if (!fileName) return this.translator.t('File name must not be empty');
+    if (fileName === '.' || fileName === '..')
+      return this.translator.t('File name must not be . or ..');
+    const hasControlCharacter = [...fileName].some((char) => char.charCodeAt(0) < 32);
+    if (/[<>:"/\\|?*]/.test(fileName) || hasControlCharacter)
+      return this.translator.t('File name must not contain invalid characters');
+    if (/[. ]$/.test(fileName))
+      return this.translator.t('File name must not end with a dot or space');
+
+    const baseName = this.path.basename(fileName, this.path.extname(fileName));
+    if (/^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(baseName))
+      return this.translator.t('File name is reserved on Windows');
+    return null;
   }
 }
