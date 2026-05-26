@@ -47,7 +47,8 @@ export class CopyProblem extends BaseProblemUseCase<CopyProblemMsg> {
   ): Promise<void> {
     const { problem } = backgroundProblem;
     const srcPath = problem.src.path;
-    const defaultName = this.path.basename(srcPath);
+    const ext = this.path.extname(srcPath);
+    const defaultName = this.path.basename(srcPath, ext);
     const input = await this.ui.input({
       prompt: this.translator.t('New file name'),
       value: defaultName,
@@ -61,8 +62,8 @@ export class CopyProblem extends BaseProblemUseCase<CopyProblemMsg> {
       throw new Error(this.translator.t('File name must not contain path separators'));
     }
 
-    const ext = this.path.extname(srcPath);
-    if (ext && !this.path.extname(fileName)) fileName += ext;
+    if (ext && fileName.endsWith(ext)) fileName = fileName.slice(0, -ext.length);
+    fileName += ext;
     const destPath = this.path.join(this.path.dirname(srcPath), fileName);
     if (destPath === srcPath)
       throw new Error(this.translator.t('The new file name must be different'));
