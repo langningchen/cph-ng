@@ -50,7 +50,7 @@ export class CopyProblem extends BaseProblemUseCase<CopyProblemMsg> {
     const ext = this.path.extname(srcPath);
     const defaultName = this.path.basename(srcPath, ext);
     const input = await this.ui.input({
-      prompt: this.translator.t('New file name'),
+      prompt: this.translator.t('New file name (defaults to current name)'),
       value: defaultName,
       placeHolder: defaultName,
     });
