@@ -378,6 +378,40 @@ describe('ProblemService', () => {
       expect(recopied.getTestcase(secondId).answer.path).toBe('/data/1841D_copy.87654321.ans');
     });
 
+    it('overwrites orphaned copied testcase files when the copied source and problem data were removed externally', async () => {
+      const { fileSystemMock, service } = createService();
+      const testcaseId = '36a4e745-aaaa' as TestcaseId;
+      await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source v1');
+      await fileSystemMock.safeWriteFile('/data/1841D.36a4e745.in', 'input');
+      await fileSystemMock.safeWriteFile('/data/1841D.36a4e745.ans', 'answer v1');
+
+      const problem = new Problem('1841D', '/src/1841D.cpp');
+      problem.addTestcase(
+        testcaseId,
+        new Testcase(
+          new TestcaseIo({ path: '/data/1841D.36a4e745.in' }),
+          new TestcaseIo({ path: '/data/1841D.36a4e745.ans' }),
+        ),
+      );
+
+      await service.copy(problem, '/src/1841D-graph-test.cpp');
+      await fileSystemMock.rm('/src/1841D-graph-test.cpp', { force: true });
+      await fileSystemMock.rm('/data/1841D-graph-test.bin', { force: true });
+      await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source v2');
+      await fileSystemMock.safeWriteFile('/data/1841D.36a4e745.ans', 'answer v2');
+
+      const copied = await service.copy(problem, '/src/1841D-graph-test.cpp');
+
+      expect(await fileSystemMock.readFile('/src/1841D-graph-test.cpp')).toBe('source v2');
+      expect(await fileSystemMock.readFile('/data/1841D-graph-test.36a4e745.in')).toBe('input');
+      expect(await fileSystemMock.readFile('/data/1841D-graph-test.36a4e745.ans')).toBe(
+        'answer v2',
+      );
+      expect(copied.getTestcase(testcaseId).answer.path).toBe(
+        '/data/1841D-graph-test.36a4e745.ans',
+      );
+    });
+
     it('does not copy anything when the copied problem data path already exists', async () => {
       const { fileSystemMock, service } = createService();
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
