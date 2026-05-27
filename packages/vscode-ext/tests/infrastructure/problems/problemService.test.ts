@@ -428,7 +428,7 @@ describe('ProblemService', () => {
       expect(fileSystemMock.copyFile).not.toHaveBeenCalled();
     });
 
-    it('rolls back the copied source when a testcase destination already exists', async () => {
+    it('overwrites orphaned copied testcase input files when copying the same name again', async () => {
       const { fileSystemMock, service } = createService();
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
@@ -445,16 +445,15 @@ describe('ProblemService', () => {
         ),
       );
 
-      await expect(service.copy(problem, '/src/1841D_brute.cpp')).rejects.toThrow(
-        'Copied problem file path already exists',
-      );
+      const copied = await service.copy(problem, '/src/1841D_brute.cpp');
 
-      await expect(fileSystemMock.exists('/src/1841D_brute.cpp')).resolves.toBe(false);
-      expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.in')).toBe('occupied');
-      await expect(fileSystemMock.exists('/data/1841D_brute.12345678.out')).resolves.toBe(false);
+      expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
+      expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.in')).toBe('input');
+      expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.out')).toBe('answer');
+      expect(copied.getTestcase(testcaseId).stdin.path).toBe('/data/1841D_brute.12345678.in');
     });
 
-    it('rolls back already copied auxiliary files when a later auxiliary path conflicts', async () => {
+    it('overwrites orphaned copied auxiliary files when copying the same name again', async () => {
       const { fileSystemMock, service } = createService();
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/tools/checker.cpp', 'checker');
@@ -465,13 +464,13 @@ describe('ProblemService', () => {
       problem.checker = { path: '/tools/checker.cpp', hash: 'checker-hash' };
       problem.interactor = { path: '/tools/interactor.cpp', hash: 'interactor-hash' };
 
-      await expect(service.copy(problem, '/src/1841D_brute.cpp')).rejects.toThrow(
-        'Copied problem file path already exists',
-      );
+      const copied = await service.copy(problem, '/src/1841D_brute.cpp');
 
-      await expect(fileSystemMock.exists('/src/1841D_brute.cpp')).resolves.toBe(false);
-      await expect(fileSystemMock.exists('/data/1841D_brute.checker.cpp')).resolves.toBe(false);
-      expect(await fileSystemMock.readFile('/data/1841D_brute.interactor.cpp')).toBe('occupied');
+      expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
+      expect(await fileSystemMock.readFile('/data/1841D_brute.checker.cpp')).toBe('checker');
+      expect(await fileSystemMock.readFile('/data/1841D_brute.interactor.cpp')).toBe('interactor');
+      expect(copied.checker?.path).toBe('/data/1841D_brute.checker.cpp');
+      expect(copied.interactor?.path).toBe('/data/1841D_brute.interactor.cpp');
     });
 
     it('rolls back copied files when saving the copied problem fails', async () => {
