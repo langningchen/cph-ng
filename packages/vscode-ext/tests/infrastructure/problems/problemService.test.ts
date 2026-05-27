@@ -318,6 +318,7 @@ describe('ProblemService', () => {
           new TestcaseIo({ path: '/data/1841D.12345678.out' }),
         ),
       );
+      await service.save(problem);
       const copied = await service.copy(problem, '/src/1841D_brute.cpp');
 
       await service.delete(problem);
