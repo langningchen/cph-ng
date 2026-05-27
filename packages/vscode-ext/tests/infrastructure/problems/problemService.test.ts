@@ -264,6 +264,119 @@ describe('ProblemService', () => {
       expect(recopied.getTestcase(testcaseId).stdin.path).toBe('/data/1841D_brute.12345678.in');
     });
 
+    it('deletes copied auxiliary files without deleting the original auxiliary files', async () => {
+      const { fileSystemMock, service } = createService();
+      await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
+      await fileSystemMock.safeWriteFile('/tools/checker.cpp', 'checker');
+      await fileSystemMock.safeWriteFile('/tools/interactor.cpp', 'interactor');
+      await fileSystemMock.safeWriteFile('/tools/gen.cpp', 'generator');
+      await fileSystemMock.safeWriteFile('/tools/brute.cpp', 'brute');
+
+      const problem = new Problem('1841D', '/src/1841D.cpp');
+      problem.checker = { path: '/tools/checker.cpp', hash: 'checker-hash' };
+      problem.interactor = { path: '/tools/interactor.cpp', hash: 'interactor-hash' };
+      problem.stressTest = new StressTest(
+        { path: '/tools/gen.cpp', hash: 'gen-hash' },
+        { path: '/tools/brute.cpp', hash: 'brute-hash' },
+        3,
+        StressTestState.inactive,
+      );
+
+      const copied = await service.copy(problem, '/src/1841D_brute.cpp');
+
+      await service.delete(copied);
+
+      expect(await fileSystemMock.readFile('/tools/checker.cpp')).toBe('checker');
+      expect(await fileSystemMock.readFile('/tools/interactor.cpp')).toBe('interactor');
+      expect(await fileSystemMock.readFile('/tools/gen.cpp')).toBe('generator');
+      expect(await fileSystemMock.readFile('/tools/brute.cpp')).toBe('brute');
+      await expect(fileSystemMock.exists('/data/1841D_brute.checker.cpp')).resolves.toBe(false);
+      await expect(fileSystemMock.exists('/data/1841D_brute.interactor.cpp')).resolves.toBe(false);
+      await expect(fileSystemMock.exists('/data/1841D_brute.generator.cpp')).resolves.toBe(false);
+      await expect(fileSystemMock.exists('/data/1841D_brute.bruteForce.cpp')).resolves.toBe(false);
+
+      const recopied = await service.copy(problem, '/src/1841D_brute.cpp');
+
+      expect(recopied.checker?.path).toBe('/data/1841D_brute.checker.cpp');
+      expect(recopied.interactor?.path).toBe('/data/1841D_brute.interactor.cpp');
+      expect(recopied.stressTest.generator?.path).toBe('/data/1841D_brute.generator.cpp');
+      expect(recopied.stressTest.bruteForce?.path).toBe('/data/1841D_brute.bruteForce.cpp');
+    });
+
+    it('deletes the original problem after copying without deleting copied testcase files', async () => {
+      const { fileSystemMock, service } = createService();
+      const testcaseId = '12345678-aaaa' as TestcaseId;
+      await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
+      await fileSystemMock.safeWriteFile('/data/1841D.12345678.in', 'input');
+      await fileSystemMock.safeWriteFile('/data/1841D.12345678.out', 'answer');
+
+      const problem = new Problem('1841D', '/src/1841D.cpp');
+      problem.addTestcase(
+        testcaseId,
+        new Testcase(
+          new TestcaseIo({ path: '/data/1841D.12345678.in' }),
+          new TestcaseIo({ path: '/data/1841D.12345678.out' }),
+        ),
+      );
+      const copied = await service.copy(problem, '/src/1841D_brute.cpp');
+
+      await service.delete(problem);
+
+      await expect(fileSystemMock.exists('/src/1841D.cpp')).resolves.toBe(false);
+      await expect(fileSystemMock.exists('/data/1841D.bin')).resolves.toBe(false);
+      await expect(fileSystemMock.exists('/data/1841D.12345678.in')).resolves.toBe(false);
+      await expect(fileSystemMock.exists('/data/1841D.12345678.out')).resolves.toBe(false);
+      expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
+      expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.in')).toBe('input');
+      expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.out')).toBe('answer');
+      expect(copied.getTestcase(testcaseId).stdin.path).toBe('/data/1841D_brute.12345678.in');
+    });
+
+    it('deletes every copied testcase file before copying the same name again', async () => {
+      const { fileSystemMock, service } = createService();
+      const firstId = '12345678-aaaa' as TestcaseId;
+      const secondId = '87654321-bbbb' as TestcaseId;
+      await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
+      await fileSystemMock.safeWriteFile('/data/1841D.12345678.in', 'input 1');
+      await fileSystemMock.safeWriteFile('/data/1841D.12345678.out', 'answer 1');
+      await fileSystemMock.safeWriteFile('/data/1841D.87654321.in', 'input 2');
+      await fileSystemMock.safeWriteFile('/data/1841D.87654321.ans', 'answer 2');
+
+      const problem = new Problem('1841D', '/src/1841D.cpp');
+      problem.addTestcase(
+        firstId,
+        new Testcase(
+          new TestcaseIo({ path: '/data/1841D.12345678.in' }),
+          new TestcaseIo({ path: '/data/1841D.12345678.out' }),
+        ),
+      );
+      problem.addTestcase(
+        secondId,
+        new Testcase(
+          new TestcaseIo({ path: '/data/1841D.87654321.in' }),
+          new TestcaseIo({ path: '/data/1841D.87654321.ans' }),
+        ),
+      );
+
+      const copied = await service.copy(problem, '/src/1841D_copy.cpp');
+
+      await service.delete(copied);
+
+      await expect(fileSystemMock.exists('/data/1841D_copy.12345678.in')).resolves.toBe(false);
+      await expect(fileSystemMock.exists('/data/1841D_copy.12345678.out')).resolves.toBe(false);
+      await expect(fileSystemMock.exists('/data/1841D_copy.87654321.in')).resolves.toBe(false);
+      await expect(fileSystemMock.exists('/data/1841D_copy.87654321.ans')).resolves.toBe(false);
+
+      const recopied = await service.copy(problem, '/src/1841D_copy.cpp');
+
+      expect(await fileSystemMock.readFile('/data/1841D_copy.12345678.in')).toBe('input 1');
+      expect(await fileSystemMock.readFile('/data/1841D_copy.12345678.out')).toBe('answer 1');
+      expect(await fileSystemMock.readFile('/data/1841D_copy.87654321.in')).toBe('input 2');
+      expect(await fileSystemMock.readFile('/data/1841D_copy.87654321.ans')).toBe('answer 2');
+      expect(recopied.getTestcase(firstId).stdin.path).toBe('/data/1841D_copy.12345678.in');
+      expect(recopied.getTestcase(secondId).answer.path).toBe('/data/1841D_copy.87654321.ans');
+    });
+
     it('does not copy anything when the copied problem data path already exists', async () => {
       const { fileSystemMock, service } = createService();
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
