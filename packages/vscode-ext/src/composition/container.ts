@@ -41,6 +41,7 @@ import { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEv
 import { ExecutionStrategyFactoryAdapter } from '@/infrastructure/problems/judge/runner/executionStrategyFactoryAdapter';
 import { SolutionRunnerAdapter } from '@/infrastructure/problems/judge/runner/solutionRunnerAdapter';
 import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
+import { ProblemCopyService } from '@/infrastructure/problems/problemCopyService';
 import { ProblemMigrationService } from '@/infrastructure/problems/problemMigrationService';
 import { ProblemRepository } from '@/infrastructure/problems/problemRepository';
 import { ProblemService } from '@/infrastructure/problems/problemService';
@@ -96,6 +97,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.problemFs, ProblemFs);
   container.registerSingleton(TOKENS.problemMigrationService, ProblemMigrationService);
   container.registerSingleton(TOKENS.problemRepository, ProblemRepository);
+  container.registerSingleton(TOKENS.problemCopyService, ProblemCopyService);
   container.registerSingleton(TOKENS.problemService, ProblemService);
   container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
   container.registerSingleton(TOKENS.resultEvaluator, ResultEvaluatorAdaptor);

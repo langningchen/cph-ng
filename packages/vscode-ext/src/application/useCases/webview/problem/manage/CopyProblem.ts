@@ -20,8 +20,8 @@ import { inject, injectable } from 'tsyringe';
 import { Uri } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
+import type { IProblemCopyService } from '@/application/ports/problems/IProblemCopyService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
-import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
@@ -34,7 +34,7 @@ export class CopyProblem extends BaseProblemUseCase<CopyProblemMsg> {
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.path) private readonly path: IPath,
-    @inject(TOKENS.problemService) private readonly service: IProblemService,
+    @inject(TOKENS.problemCopyService) private readonly copyService: IProblemCopyService,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
   ) {
@@ -68,7 +68,7 @@ export class CopyProblem extends BaseProblemUseCase<CopyProblemMsg> {
     if (await this.fs.exists(destPath))
       throw new Error(this.translator.t('File already exists: {fileName}', { fileName }));
 
-    await this.service.copy(problem, destPath);
+    await this.copyService.copy(problem, destPath);
     this.ui.openFile(Uri.file(destPath));
   }
 
