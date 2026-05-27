@@ -218,11 +218,11 @@ describe('ProblemService', () => {
       await service.copy(problem, '/src/1841D_brute.cpp');
       const loadedCopy = await service.loadBySrc('/src/1841D_brute.cpp');
 
-      expect(loadedCopy).not.toBeNull();
-      const copiedTestcase = loadedCopy!.getTestcase(testcaseId);
+      if (!loadedCopy) throw new Error('Copied problem should be loadable');
+      const copiedTestcase = loadedCopy.getTestcase(testcaseId);
       expect(copiedTestcase.stdin.path).toBe('/data/1841D_brute.12345678.in');
       expect(copiedTestcase.answer.path).toBe('/data/1841D_brute.12345678.out');
-      expect(loadedCopy!.clearTestcases()).toEqual([
+      expect(loadedCopy.clearTestcases()).toEqual([
         '/data/1841D_brute.12345678.in',
         '/data/1841D_brute.12345678.out',
       ]);
