@@ -18,11 +18,12 @@ import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import type { TestcaseScanner } from '@/domain/services/TestcaseScanner';
 import { PathAdapter } from '@/infrastructure/node/pathAdapter';
+import { ProblemCopyService } from '@/infrastructure/problems/problemCopyService';
 import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 import { ProblemService } from '@/infrastructure/problems/problemService';
 
-describe('ProblemService', () => {
-  const createService = () => {
+describe('ProblemCopyService', () => {
+  const createServices = () => {
     const { fileSystemMock } = createFileSystemMock();
     const path = new PathAdapter();
     const resolver = mock<IPathResolver>();
@@ -45,6 +46,7 @@ describe('ProblemService', () => {
     const migration = mock<IProblemMigrationService>();
     migration.migrate.mockImplementation((raw) => raw as unknown as IProblem);
 
+    const mapper = new ProblemMapper('1.0.0');
     const service = new ProblemService(
       mock<ICrypto>(),
       fileSystemMock,
@@ -57,16 +59,23 @@ describe('ProblemService', () => {
       migration,
       translatorMock,
       mock<IUi>(),
-      new ProblemMapper('1.0.0'),
+      mapper,
       mock<TestcaseScanner>(),
     );
+    const copyService = new ProblemCopyService(
+      fileSystemMock,
+      path,
+      service,
+      translatorMock,
+      mapper,
+    );
 
-    return { fileSystemMock, service };
+    return { fileSystemMock, service, copyService };
   };
 
   describe('copy', () => {
     it('copies source, testcase files, custom files, and problem data independently', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, copyService } = createServices();
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/data/1841D.12345678.in', 'input');
@@ -99,7 +108,7 @@ describe('ProblemService', () => {
         StressTestState.inactive,
       );
 
-      const copied = await service.copy(problem, '/src/1841D_brute.cpp');
+      const copied = await copyService.copy(problem, '/src/1841D_brute.cpp');
 
       expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
       expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.in')).toBe('input');
@@ -141,7 +150,7 @@ describe('ProblemService', () => {
     });
 
     it('copies inline testcase data without creating testcase files', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, copyService } = createServices();
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
 
@@ -156,7 +165,7 @@ describe('ProblemService', () => {
         ),
       );
 
-      const copied = await service.copy(problem, '/src/1841D_brute.cpp');
+      const copied = await copyService.copy(problem, '/src/1841D_brute.cpp');
 
       expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
       await expect(fileSystemMock.exists('/data/1841D_brute.12345678.in')).resolves.toBe(false);
@@ -174,7 +183,7 @@ describe('ProblemService', () => {
     });
 
     it('uses fallback testcase extensions when source testcase files have no extension', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, copyService } = createServices();
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/data/input-file', 'input');
@@ -189,7 +198,7 @@ describe('ProblemService', () => {
         ),
       );
 
-      const copied = await service.copy(problem, '/src/1841D_brute.cpp');
+      const copied = await copyService.copy(problem, '/src/1841D_brute.cpp');
 
       expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.in')).toBe('input');
       expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.out')).toBe('answer');
@@ -200,7 +209,7 @@ describe('ProblemService', () => {
     });
 
     it('persists copied testcase paths so later cleanup targets the copied files', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, service, copyService } = createServices();
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/data/1841D.12345678.in', 'input');
@@ -215,7 +224,7 @@ describe('ProblemService', () => {
         ),
       );
 
-      await service.copy(problem, '/src/1841D_brute.cpp');
+      await copyService.copy(problem, '/src/1841D_brute.cpp');
       const loadedCopy = await service.loadBySrc('/src/1841D_brute.cpp');
 
       if (!loadedCopy) throw new Error('Copied problem should be loadable');
@@ -229,7 +238,7 @@ describe('ProblemService', () => {
     });
 
     it('deletes copied problem files without deleting the original files and allows copying the same name again', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, service, copyService } = createServices();
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/data/1841D.12345678.in', 'input');
@@ -244,7 +253,7 @@ describe('ProblemService', () => {
         ),
       );
 
-      const copied = await service.copy(problem, '/src/1841D_brute.cpp');
+      const copied = await copyService.copy(problem, '/src/1841D_brute.cpp');
 
       await service.delete(copied);
 
@@ -256,7 +265,7 @@ describe('ProblemService', () => {
       await expect(fileSystemMock.exists('/data/1841D_brute.12345678.in')).resolves.toBe(false);
       await expect(fileSystemMock.exists('/data/1841D_brute.12345678.out')).resolves.toBe(false);
 
-      const recopied = await service.copy(problem, '/src/1841D_brute.cpp');
+      const recopied = await copyService.copy(problem, '/src/1841D_brute.cpp');
 
       expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
       expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.in')).toBe('input');
@@ -265,7 +274,7 @@ describe('ProblemService', () => {
     });
 
     it('deletes copied auxiliary files without deleting the original auxiliary files', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, service, copyService } = createServices();
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/tools/checker.cpp', 'checker');
       await fileSystemMock.safeWriteFile('/tools/interactor.cpp', 'interactor');
@@ -282,7 +291,7 @@ describe('ProblemService', () => {
         StressTestState.inactive,
       );
 
-      const copied = await service.copy(problem, '/src/1841D_brute.cpp');
+      const copied = await copyService.copy(problem, '/src/1841D_brute.cpp');
 
       await service.delete(copied);
 
@@ -295,7 +304,7 @@ describe('ProblemService', () => {
       await expect(fileSystemMock.exists('/data/1841D_brute.generator.cpp')).resolves.toBe(false);
       await expect(fileSystemMock.exists('/data/1841D_brute.bruteForce.cpp')).resolves.toBe(false);
 
-      const recopied = await service.copy(problem, '/src/1841D_brute.cpp');
+      const recopied = await copyService.copy(problem, '/src/1841D_brute.cpp');
 
       expect(recopied.checker?.path).toBe('/data/1841D_brute.checker.cpp');
       expect(recopied.interactor?.path).toBe('/data/1841D_brute.interactor.cpp');
@@ -304,7 +313,7 @@ describe('ProblemService', () => {
     });
 
     it('deletes the original problem after copying without deleting copied testcase files', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, service, copyService } = createServices();
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/data/1841D.12345678.in', 'input');
@@ -319,7 +328,7 @@ describe('ProblemService', () => {
         ),
       );
       await service.save(problem);
-      const copied = await service.copy(problem, '/src/1841D_brute.cpp');
+      const copied = await copyService.copy(problem, '/src/1841D_brute.cpp');
 
       await service.delete(problem);
 
@@ -334,7 +343,7 @@ describe('ProblemService', () => {
     });
 
     it('deletes every copied testcase file before copying the same name again', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, service, copyService } = createServices();
       const firstId = '12345678-aaaa' as TestcaseId;
       const secondId = '87654321-bbbb' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
@@ -359,7 +368,7 @@ describe('ProblemService', () => {
         ),
       );
 
-      const copied = await service.copy(problem, '/src/1841D_copy.cpp');
+      const copied = await copyService.copy(problem, '/src/1841D_copy.cpp');
 
       await service.delete(copied);
 
@@ -368,7 +377,7 @@ describe('ProblemService', () => {
       await expect(fileSystemMock.exists('/data/1841D_copy.87654321.in')).resolves.toBe(false);
       await expect(fileSystemMock.exists('/data/1841D_copy.87654321.ans')).resolves.toBe(false);
 
-      const recopied = await service.copy(problem, '/src/1841D_copy.cpp');
+      const recopied = await copyService.copy(problem, '/src/1841D_copy.cpp');
 
       expect(await fileSystemMock.readFile('/data/1841D_copy.12345678.in')).toBe('input 1');
       expect(await fileSystemMock.readFile('/data/1841D_copy.12345678.out')).toBe('answer 1');
@@ -379,7 +388,7 @@ describe('ProblemService', () => {
     });
 
     it('overwrites orphaned copied testcase files when the copied source and problem data were removed externally', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, copyService } = createServices();
       const testcaseId = '36a4e745-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source v1');
       await fileSystemMock.safeWriteFile('/data/1841D.36a4e745.in', 'input');
@@ -394,13 +403,13 @@ describe('ProblemService', () => {
         ),
       );
 
-      await service.copy(problem, '/src/1841D-graph-test.cpp');
+      await copyService.copy(problem, '/src/1841D-graph-test.cpp');
       await fileSystemMock.rm('/src/1841D-graph-test.cpp', { force: true });
       await fileSystemMock.rm('/data/1841D-graph-test.bin', { force: true });
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source v2');
       await fileSystemMock.safeWriteFile('/data/1841D.36a4e745.ans', 'answer v2');
 
-      const copied = await service.copy(problem, '/src/1841D-graph-test.cpp');
+      const copied = await copyService.copy(problem, '/src/1841D-graph-test.cpp');
 
       expect(await fileSystemMock.readFile('/src/1841D-graph-test.cpp')).toBe('source v2');
       expect(await fileSystemMock.readFile('/data/1841D-graph-test.36a4e745.in')).toBe('input');
@@ -413,13 +422,13 @@ describe('ProblemService', () => {
     });
 
     it('does not copy anything when the copied problem data path already exists', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, copyService } = createServices();
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/data/1841D_brute.bin', 'occupied');
 
       const problem = new Problem('1841D', '/src/1841D.cpp');
 
-      await expect(service.copy(problem, '/src/1841D_brute.cpp')).rejects.toThrow(
+      await expect(copyService.copy(problem, '/src/1841D_brute.cpp')).rejects.toThrow(
         'Copied problem data path already exists',
       );
 
@@ -429,7 +438,7 @@ describe('ProblemService', () => {
     });
 
     it('overwrites orphaned copied testcase input files when copying the same name again', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, copyService } = createServices();
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/data/1841D.12345678.in', 'input');
@@ -445,7 +454,7 @@ describe('ProblemService', () => {
         ),
       );
 
-      const copied = await service.copy(problem, '/src/1841D_brute.cpp');
+      const copied = await copyService.copy(problem, '/src/1841D_brute.cpp');
 
       expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
       expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.in')).toBe('input');
@@ -454,7 +463,7 @@ describe('ProblemService', () => {
     });
 
     it('overwrites orphaned copied auxiliary files when copying the same name again', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, copyService } = createServices();
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/tools/checker.cpp', 'checker');
       await fileSystemMock.safeWriteFile('/tools/interactor.cpp', 'interactor');
@@ -464,7 +473,7 @@ describe('ProblemService', () => {
       problem.checker = { path: '/tools/checker.cpp', hash: 'checker-hash' };
       problem.interactor = { path: '/tools/interactor.cpp', hash: 'interactor-hash' };
 
-      const copied = await service.copy(problem, '/src/1841D_brute.cpp');
+      const copied = await copyService.copy(problem, '/src/1841D_brute.cpp');
 
       expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
       expect(await fileSystemMock.readFile('/data/1841D_brute.checker.cpp')).toBe('checker');
@@ -474,7 +483,7 @@ describe('ProblemService', () => {
     });
 
     it('rolls back copied files when saving the copied problem fails', async () => {
-      const { fileSystemMock, service } = createService();
+      const { fileSystemMock, service, copyService } = createServices();
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/data/1841D.12345678.in', 'input');
@@ -490,7 +499,9 @@ describe('ProblemService', () => {
       );
       vi.spyOn(service, 'save').mockRejectedValueOnce(new Error('save failed'));
 
-      await expect(service.copy(problem, '/src/1841D_brute.cpp')).rejects.toThrow('save failed');
+      await expect(copyService.copy(problem, '/src/1841D_brute.cpp')).rejects.toThrow(
+        'save failed',
+      );
 
       await expect(fileSystemMock.exists('/src/1841D_brute.cpp')).resolves.toBe(false);
       await expect(fileSystemMock.exists('/data/1841D_brute.12345678.in')).resolves.toBe(false);
