@@ -22,6 +22,12 @@ import { ProblemCopyService } from '@/infrastructure/problems/problemCopyService
 import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 import { ProblemService } from '@/infrastructure/problems/problemService';
 
+// Auxiliary copy paths are built with the real node `path` adapter, so their
+// separators are platform-native (`\` on Windows). Testcase paths come from the
+// mocked resolver template and stay POSIX. Normalize before comparing so the
+// assertions hold on every platform.
+const toPosix = (path: string | undefined) => path?.replaceAll('\\', '/');
+
 describe('ProblemCopyService', () => {
   const createServices = () => {
     const { fileSystemMock } = createFileSystemMock();
@@ -122,22 +128,14 @@ describe('ProblemCopyService', () => {
       expect(copiedTestcase.stdin.path).toBe('/data/1841D_brute.12345678.in');
       expect(copiedTestcase.answer.path).toBe('/data/1841D_brute.12345678.ans');
       expect(copiedTestcase.result).toBeNull();
-      expect(copied.checker).toEqual({
-        path: '/data/1841D_brute.checker.cpp',
-        hash: 'checker-hash',
-      });
-      expect(copied.interactor).toEqual({
-        path: '/data/1841D_brute.interactor.cpp',
-        hash: 'interactor-hash',
-      });
-      expect(copied.stressTest.generator).toEqual({
-        path: '/data/1841D_brute.generator.cpp',
-        hash: 'gen-hash',
-      });
-      expect(copied.stressTest.bruteForce).toEqual({
-        path: '/data/1841D_brute.bruteForce.cpp',
-        hash: 'brute-hash',
-      });
+      expect(toPosix(copied.checker?.path)).toBe('/data/1841D_brute.checker.cpp');
+      expect(copied.checker?.hash).toBe('checker-hash');
+      expect(toPosix(copied.interactor?.path)).toBe('/data/1841D_brute.interactor.cpp');
+      expect(copied.interactor?.hash).toBe('interactor-hash');
+      expect(toPosix(copied.stressTest.generator?.path)).toBe('/data/1841D_brute.generator.cpp');
+      expect(copied.stressTest.generator?.hash).toBe('gen-hash');
+      expect(toPosix(copied.stressTest.bruteForce?.path)).toBe('/data/1841D_brute.bruteForce.cpp');
+      expect(copied.stressTest.bruteForce?.hash).toBe('brute-hash');
 
       const originalTestcase = problem.getTestcase(testcaseId);
       expect(originalTestcase.stdin.path).toBe('/data/1841D.12345678.in');
@@ -306,10 +304,12 @@ describe('ProblemCopyService', () => {
 
       const recopied = await copyService.copy(problem, '/src/1841D_brute.cpp');
 
-      expect(recopied.checker?.path).toBe('/data/1841D_brute.checker.cpp');
-      expect(recopied.interactor?.path).toBe('/data/1841D_brute.interactor.cpp');
-      expect(recopied.stressTest.generator?.path).toBe('/data/1841D_brute.generator.cpp');
-      expect(recopied.stressTest.bruteForce?.path).toBe('/data/1841D_brute.bruteForce.cpp');
+      expect(toPosix(recopied.checker?.path)).toBe('/data/1841D_brute.checker.cpp');
+      expect(toPosix(recopied.interactor?.path)).toBe('/data/1841D_brute.interactor.cpp');
+      expect(toPosix(recopied.stressTest.generator?.path)).toBe('/data/1841D_brute.generator.cpp');
+      expect(toPosix(recopied.stressTest.bruteForce?.path)).toBe(
+        '/data/1841D_brute.bruteForce.cpp',
+      );
     });
 
     it('deletes the original problem after copying without deleting copied testcase files', async () => {
@@ -478,8 +478,8 @@ describe('ProblemCopyService', () => {
       expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
       expect(await fileSystemMock.readFile('/data/1841D_brute.checker.cpp')).toBe('checker');
       expect(await fileSystemMock.readFile('/data/1841D_brute.interactor.cpp')).toBe('interactor');
-      expect(copied.checker?.path).toBe('/data/1841D_brute.checker.cpp');
-      expect(copied.interactor?.path).toBe('/data/1841D_brute.interactor.cpp');
+      expect(toPosix(copied.checker?.path)).toBe('/data/1841D_brute.checker.cpp');
+      expect(toPosix(copied.interactor?.path)).toBe('/data/1841D_brute.interactor.cpp');
     });
 
     it('rolls back copied files when saving the copied problem fails', async () => {
