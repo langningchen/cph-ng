@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { dirname, extname, relative } from 'node:path';
+import { dirname, extname, isAbsolute, relative } from 'node:path';
 import { gunzipSync, gzipSync } from 'node:zlib';
 import type { IFileWithHash, IProblem, ITestcase, ITestcaseIo, TestcaseId } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
@@ -155,13 +155,35 @@ export class ProblemService implements IProblemService {
   public async delete(problem: Problem): Promise<void> {
     const binPath = this.getDataPath(problem.src.path);
     if (!binPath) return;
+    const paths = this.getOwnedProblemPaths(problem, binPath);
     try {
-      await this.fs.rm(binPath);
+      await Promise.all(paths.map((path) => this.fs.rm(path, { force: true })));
       this.logger.info('Deleted problem', problem.src.path);
     } catch (e) {
       this.telemetry.error('deleteError', e);
       throw e;
     }
+  }
+
+  private getOwnedProblemPaths(problem: Problem, binPath: string): string[] {
+    const paths = new Set<string>([binPath, problem.src.path]);
+    const dataDir = this.path.dirname(binPath);
+    const addDataFile = (path: string) => {
+      if (this.isInsideDirectory(path, dataDir)) paths.add(path);
+    };
+
+    for (const testcase of problem.testcases.values())
+      for (const path of testcase.getDisposables()) addDataFile(path);
+    if (problem.checker) addDataFile(problem.checker.path);
+    if (problem.interactor) addDataFile(problem.interactor.path);
+    if (problem.stressTest.generator) addDataFile(problem.stressTest.generator.path);
+    if (problem.stressTest.bruteForce) addDataFile(problem.stressTest.bruteForce.path);
+    return [...paths];
+  }
+
+  private isInsideDirectory(path: string, directory: string): boolean {
+    const relativePath = this.path.relative(directory, path);
+    return relativePath !== '' && !relativePath.startsWith('..') && !isAbsolute(relativePath);
   }
 
   public isRelated(problem: Problem, path: string): boolean {

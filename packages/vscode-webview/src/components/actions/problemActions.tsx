@@ -18,6 +18,7 @@
 import type { IWebviewBackgroundProblem, IWebviewStressTest, ProblemId } from '@cph-ng/core';
 import BackupIcon from '@mui/icons-material/Backup';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
@@ -112,6 +113,13 @@ export const ProblemActions = memo(
                 }}
               />
             )}
+            <CphNgButton
+              sx={{ display: { xs: 'none', sm: 'block' } }}
+              larger
+              name={t('problemActions.copyProblem')}
+              icon={ContentCopyIcon}
+              onClick={() => dispatch({ type: 'copyProblem', problemId })}
+            />
             <CphNgButton
               sx={{ display: { xs: 'none', sm: 'block' } }}
               larger

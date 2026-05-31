@@ -27,6 +27,7 @@ import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
+import type { IProblemCopyService } from '@/application/ports/problems/IProblemCopyService';
 import type { IProblemMigrationService } from '@/application/ports/problems/IProblemMigrationService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
@@ -92,6 +93,7 @@ export const TOKENS = {
   cphMigrationService: 'ports.CphMigrationService' as InjectionToken<ICphMigrationService>,
   path: 'ports.Path' as InjectionToken<IPath>,
   pathResolver: 'ports.PathResolver' as InjectionToken<IPathResolver>,
+  problemCopyService: 'ports.ProblemCopyService' as InjectionToken<IProblemCopyService>,
   problemService: 'ports.ProblemService' as InjectionToken<IProblemService>,
   processExecutor: 'ports.ProcessExecutor' as InjectionToken<IProcessExecutor>,
   resultEvaluator: 'ports.ResultEvaluator' as InjectionToken<IResultEvaluator>,
