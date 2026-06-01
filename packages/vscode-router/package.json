@@ -14,7 +14,7 @@
     "@cph-ng/core": "workspace:*",
     "@hono/node-server": "^2.0.4",
     "@hono/node-ws": "^1.3.1",
-    "commander": "^14.0.3",
+    "commander": "^15.0.0",
     "hono": "^4.12.23",
     "proper-lockfile": "^4.1.2",
     "socket.io": "^4.8.3"
