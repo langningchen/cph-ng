@@ -18,7 +18,7 @@
     "@mui/material": "^9.0.1",
     "anser": "^2.3.5",
     "crypto-js": "^4.2.0",
-    "i18next": "^26.2.0",
+    "i18next": "^26.3.0",
     "immer": "^11.1.8",
     "lodash": "^4.18.1",
     "react": "^19.2.6",
@@ -35,7 +35,7 @@
     "copy-webpack-plugin": "^14.0.0",
     "swc-loader": "^0.2.7",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
-    "webpack": "^5.107.1",
-    "webpack-cli": "^7.0.2"
+    "webpack": "^5.107.2",
+    "webpack-cli": "^7.0.3"
   }
 }
