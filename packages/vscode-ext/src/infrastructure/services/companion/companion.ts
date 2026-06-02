@@ -19,6 +19,7 @@ import type { BatchId, CompanionProblem, SubmitData } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ICompanion } from '@/application/ports/services/ICompanion';
+import type { ICppHeaderExpander } from '@/application/ports/services/ICppHeaderExpander';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
@@ -43,6 +44,8 @@ export class Companion implements ICompanion {
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.ui) private readonly ui: IUi,
     @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.cppHeaderExpander)
+    private readonly cppHeaderExpander: ICppHeaderExpander,
     @inject(CompanionCommunicationService) private readonly ws: CompanionCommunicationService,
     @inject(CompanionStatusbarService) private readonly statusbar: CompanionStatusbarService,
     @inject(ImportCompanionProblems) private readonly importUseCase: ImportCompanionProblems,
@@ -181,9 +184,17 @@ export class Companion implements ICompanion {
       return;
     }
 
+    const expanded = await this.cppHeaderExpander.expand(problem.src.path);
+    if (expanded !== null) {
+      this.logger.info('Submitting with custom headers expanded', {
+        srcPath: problem.src.path,
+        originalLength: sourceCode.length,
+        expandedLength: expanded.length,
+      });
+    }
     this.ws.submit({
       url: problem.url,
-      sourceCode,
+      sourceCode: expanded ?? sourceCode,
     } satisfies SubmitData);
   }
 }

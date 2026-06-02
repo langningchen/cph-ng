@@ -51,6 +51,7 @@
   "Failed to import problem {name}: {msg}": "导入题目 {name} 失败：{msg}",
   "Failed to import problems: {msg}": "导入题目失败：{msg}",
   "Failed to prepare runner utility: {codeOrSignal}": "准备运行器工具失败: {codeOrSignal}",
+  "Failed to read source file: {msg}": "读取源文件失败：{msg}",
   "Failed to use template file: {msg}, creating empty file instead": "使用模板文件失败：{msg}，将创建空文件",
   "Fetched": "已获取",
   "Fetching CPH-NG problem context...": "正在获取 CPH-NG 题目上下文...",
