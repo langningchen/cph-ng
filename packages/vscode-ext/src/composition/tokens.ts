@@ -81,9 +81,9 @@ export const TOKENS = {
   archive: 'ports.Archive' as InjectionToken<IArchive>,
   activeProblemCoordinator:
     'ports.ActiveProblemCoordinator' as InjectionToken<IActiveProblemCoordinator>,
-  cppHeaderExpander: 'ports.CppHeaderExpander' as InjectionToken<ICppHeaderExpander>,
   buildInfo: 'ports.BuildInfo' as InjectionToken<IBuildInfo>,
   checkerRunner: 'ports.CheckerRunner' as InjectionToken<ICheckerRunner>,
+  cppHeaderExpander: 'ports.CppHeaderExpander' as InjectionToken<ICppHeaderExpander>,
   clock: 'ports.Clock' as InjectionToken<IClock>,
   compilerService: 'ports.CompilerService' as InjectionToken<ICompilerService>,
   crypto: 'ports.Crypto' as InjectionToken<ICrypto>,

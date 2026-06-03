@@ -39,16 +39,16 @@ export class Companion implements ICompanion {
   private batchesToClaim: BatchList = new Map();
 
   public constructor(
-    @inject(TOKENS.translator) private readonly translator: ITranslator,
-    @inject(TOKENS.settings) private readonly settings: ISettings,
-    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.ui) private readonly ui: IUi,
-    @inject(TOKENS.logger) private readonly logger: ILogger,
     @inject(TOKENS.cppHeaderExpander)
     private readonly cppHeaderExpander: ICppHeaderExpander,
-    @inject(CompanionCommunicationService) private readonly ws: CompanionCommunicationService,
-    @inject(CompanionStatusbarService) private readonly statusbar: CompanionStatusbarService,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(ImportCompanionProblems) private readonly importUseCase: ImportCompanionProblems,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(CompanionStatusbarService) private readonly statusbar: CompanionStatusbarService,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TOKENS.ui) private readonly ui: IUi,
+    @inject(CompanionCommunicationService) private readonly ws: CompanionCommunicationService,
   ) {
     this.logger = this.logger.withScope('companion');
     this.ws.signals.on('statusChanged', this.updateStatusbar);
