@@ -107,14 +107,26 @@ describe('CppHeaderExpander', () => {
     expect(result).toContain('int main() { return 0; }');
   });
 
-  it('replaces missing header with a not-found comment instead of failing', async () => {
+  it('returns null (no expansion) when all headers are missing/unresolved', async () => {
     makeCppLang();
     vol.fromJSON({
       '/src/main.cpp': '#include "ghost.hpp"\nint main() { return 0; }\n',
     });
     const result = await expander.expand('/src/main.cpp');
+    expect(result).toBeNull();
+  });
+
+  it('keeps missing header unchanged while expanding others in a mixed source', async () => {
+    makeCppLang();
+    vol.fromJSON({
+      '/src/main.cpp': '#include "qio.hpp"\n#include "ghost.hpp"\nint main() { return 0; }\n',
+      '/src/qio.hpp': 'void hello() {}\n',
+    });
+    const result = await expander.expand('/src/main.cpp');
     expect(result).not.toBeNull();
-    expect(result).toContain('// Header not found: ghost.hpp');
+    expect(result).toContain('// --- Begin of qio.hpp ---');
+    expect(result).toContain('void hello() {}');
+    expect(result).toContain('#include "ghost.hpp"');
   });
 
   it('expands headers transitively', async () => {
@@ -194,8 +206,7 @@ describe('CppHeaderExpander', () => {
       '/proj/src/main.cpp': '#include "./qio.hpp"\nint main() { return 0; }\n',
     });
     const result = await expander.expand('/proj/src/main.cpp');
-    expect(result).not.toBeNull();
-    expect(result).toContain('// Header not found: ./qio.hpp');
+    expect(result).toBeNull();
   });
 
   it('writes the expanded source to a temporary project directory', async () => {

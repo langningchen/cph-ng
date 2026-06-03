@@ -32,7 +32,6 @@ const INCLUDE_REGEX = /^\s*#\s*include\s*"([^"]+)"\s*$/;
 const BEGIN_MARKER = (name: string): string => `// --- Begin of ${name} ---`;
 const END_MARKER = (name: string): string => `// --- End of ${name} ---`;
 const SKIPPED_MARKER = (name: string): string => `// Skipped duplicate of ${name}`;
-const NO_HEADER_LINE = (name: string): string => `// Header not found: ${name}`;
 
 @injectable()
 export class CppHeaderExpander implements ICppHeaderExpander {
@@ -91,7 +90,7 @@ export class CppHeaderExpander implements ICppHeaderExpander {
       const resolved = await this.resolveHeader(baseDir, headerName);
       if (!resolved) {
         this.logger.warn('Custom header not found', { headerName, baseDir });
-        expandedLines.push(NO_HEADER_LINE(headerName));
+        expandedLines.push(rawLine);
         continue;
       }
 
@@ -183,7 +182,7 @@ export class CppHeaderExpander implements ICppHeaderExpander {
       const headerName = match[1];
       const resolved = await this.resolveHeader(baseDir, headerName);
       if (!resolved) {
-        out.push(NO_HEADER_LINE(headerName));
+        out.push(rawLine);
         continue;
       }
       const childKey = this.path.resolve(resolved);
