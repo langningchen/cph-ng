@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-only",
-  "packageManager": "pnpm@10.33.2",
   "scripts": {
     "compile": "pnpm -r --parallel compile",
     "package": "tsx scripts/package.ts",
