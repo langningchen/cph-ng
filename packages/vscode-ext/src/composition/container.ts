@@ -49,6 +49,7 @@ import { TestcaseIoService } from '@/infrastructure/problems/testcaseIoService';
 import { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
 import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
 import { Companion } from '@/infrastructure/services/companion/companion';
+import { CppHeaderExpander } from '@/infrastructure/services/cppHeaderExpander';
 import { PathResolverAdapter } from '@/infrastructure/services/pathResolverAdapter';
 import { TemplateRenderer } from '@/infrastructure/services/templateRenderer';
 import { UserScriptService } from '@/infrastructure/services/userScriptService';
@@ -83,6 +84,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.clock, ClockAdapter);
   container.registerSingleton(TOKENS.companion, Companion);
   container.registerSingleton(TOKENS.compilerService, CompilerService);
+  container.registerSingleton(TOKENS.cppHeaderExpander, CppHeaderExpander);
   container.registerSingleton(TOKENS.cphMigrationService, CphMigrationService);
   container.registerSingleton(TOKENS.crypto, CryptoAdapter);
   container.registerSingleton(TOKENS.document, DocumentAdapter);
