@@ -19,11 +19,11 @@
     "prepare": "tsx scripts/install-hooks.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.16",
+    "@biomejs/biome": "^2.5.0",
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
     "@commitlint/types": "^21.0.1",
-    "@swc/core": "^1.15.40",
+    "@swc/core": "^1.15.41",
     "@types/node": "~22.19.7",
     "@vitest/coverage-v8": "4.1.8",
     "@vitest/ui": "^4.1.8",
