@@ -1,0 +1,46 @@
+[package]
+name = "cph-ng-judge"
+version = "0.7.8"
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1.38", features = ["full"] }
+async-trait = "0.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+flate2 = "1.0"
+thiserror = "1.0"
+uuid = { version = "1.8", features = ["v4", "serde"] }
+path-clean = "1.0"
+clap = { version = "4.5", features = ["derive", "env"] }
+indexmap = { version = "2.14.0", features = ["serde"] }
+derive_more = { version = "2.1.1", features = ["display", "as_ref"] }
+md5 = "0.8.0"
+xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
+figment = { version = "0.10.19", features = ["toml", "env"] }
+toml = "0.8"
+toml_edit = "0.25.12"
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_debug_implementations = "warn"
+unnecessary_qualifications = "warn"
+
+[lints.clippy]
+correctness = "deny"
+suspicious = "deny"
+style = "warn"
+complexity = "warn"
+perf = "warn"
+
+pedantic = { level = "warn", priority = -1 }
+
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "warn"
+unimplemented = "deny"
+indexing_slicing = "warn"
+
+mod_module_files = "deny"
