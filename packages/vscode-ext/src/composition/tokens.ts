@@ -44,6 +44,7 @@ import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { IArchive } from '@/application/ports/services/IArchive';
 import type { ICompanion } from '@/application/ports/services/ICompanion';
+import type { ICppHeaderExpander } from '@/application/ports/services/ICppHeaderExpander';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ITemplateRenderer } from '@/application/ports/services/ITemplateRenderer';
 import type { IUserScriptService } from '@/application/ports/services/IUserScriptService';
@@ -82,6 +83,7 @@ export const TOKENS = {
     'ports.ActiveProblemCoordinator' as InjectionToken<IActiveProblemCoordinator>,
   buildInfo: 'ports.BuildInfo' as InjectionToken<IBuildInfo>,
   checkerRunner: 'ports.CheckerRunner' as InjectionToken<ICheckerRunner>,
+  cppHeaderExpander: 'ports.CppHeaderExpander' as InjectionToken<ICppHeaderExpander>,
   clock: 'ports.Clock' as InjectionToken<IClock>,
   compilerService: 'ports.CompilerService' as InjectionToken<ICompilerService>,
   crypto: 'ports.Crypto' as InjectionToken<ICrypto>,

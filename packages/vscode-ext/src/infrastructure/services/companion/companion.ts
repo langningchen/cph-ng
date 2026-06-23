@@ -19,6 +19,7 @@ import type { BatchId, CompanionProblem, SubmitData } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { ICompanion } from '@/application/ports/services/ICompanion';
+import type { ICppHeaderExpander } from '@/application/ports/services/ICppHeaderExpander';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
@@ -38,14 +39,16 @@ export class Companion implements ICompanion {
   private batchesToClaim: BatchList = new Map();
 
   public constructor(
-    @inject(TOKENS.translator) private readonly translator: ITranslator,
-    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(TOKENS.cppHeaderExpander)
+    private readonly cppHeaderExpander: ICppHeaderExpander,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
-    @inject(TOKENS.ui) private readonly ui: IUi,
-    @inject(TOKENS.logger) private readonly logger: ILogger,
-    @inject(CompanionCommunicationService) private readonly ws: CompanionCommunicationService,
-    @inject(CompanionStatusbarService) private readonly statusbar: CompanionStatusbarService,
     @inject(ImportCompanionProblems) private readonly importUseCase: ImportCompanionProblems,
+    @inject(TOKENS.logger) private readonly logger: ILogger,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
+    @inject(CompanionStatusbarService) private readonly statusbar: CompanionStatusbarService,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TOKENS.ui) private readonly ui: IUi,
+    @inject(CompanionCommunicationService) private readonly ws: CompanionCommunicationService,
   ) {
     this.logger = this.logger.withScope('companion');
     this.ws.signals.on('statusChanged', this.updateStatusbar);
@@ -181,9 +184,17 @@ export class Companion implements ICompanion {
       return;
     }
 
+    const expanded = await this.cppHeaderExpander.expand(problem.src.path);
+    if (expanded !== null) {
+      this.logger.info('Submitting with custom headers expanded', {
+        srcPath: problem.src.path,
+        originalLength: sourceCode.length,
+        expandedLength: expanded.length,
+      });
+    }
     this.ws.submit({
       url: problem.url,
-      sourceCode,
+      sourceCode: expanded ?? sourceCode,
     } satisfies SubmitData);
   }
 }
