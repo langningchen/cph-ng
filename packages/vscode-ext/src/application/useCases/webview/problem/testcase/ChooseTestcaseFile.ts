@@ -24,7 +24,7 @@ import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import { TestcaseIo } from '@/domain/entities/testcaseIo';
+import { TestcaseScanner } from '@/domain/services/TestcaseScanner';
 
 @injectable()
 export class ChooseTestcaseFile extends BaseProblemUseCase<ChooseTestcaseFileMsg> {
@@ -33,6 +33,7 @@ export class ChooseTestcaseFile extends BaseProblemUseCase<ChooseTestcaseFileMsg
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.ui) private readonly ui: IUi,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TestcaseScanner) private readonly testcaseScanner: TestcaseScanner,
   ) {
     super(repo);
   }
@@ -59,8 +60,8 @@ export class ChooseTestcaseFile extends BaseProblemUseCase<ChooseTestcaseFileMsg
     });
     if (!path?.length) return;
     const testcase = problem.getTestcase(msg.testcaseId);
-    const testcaseIo = new TestcaseIo({ path });
-    if (isInput) testcase.stdin = testcaseIo;
-    else testcase.answer = testcaseIo;
+    const matchedTestcase = await this.testcaseScanner.fromFile(path);
+    testcase.stdin = matchedTestcase.stdin;
+    testcase.answer = matchedTestcase.answer;
   }
 }
