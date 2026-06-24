@@ -25,32 +25,12 @@ type FigmentCacheKey = (PathBuf, Option<PathBuf>);
 static FIGMENT_CACHE: OnceLock<RwLock<HashMap<FigmentCacheKey, Figment>>> = OnceLock::new();
 
 impl TomlFileConfigAdapter {
-    #[allow(clippy::missing_const_for_fn)]
     pub fn new(store_root: PathBuf) -> Self {
         Self { store_root }
     }
 
     fn global_config_path(&self) -> PathBuf {
         self.store_root.join("config.toml")
-    }
-
-    pub fn template_toml() -> &'static str {
-        r#"# CPH-NG Global Configuration Template
-
-[judge]
-# 默认编译器路径 (例如: "g++", "clang++")
-# compiler = "g++"
-
-# 默认编译参数
-# compiler_args = ["-O3", "-Wall"]
-
-# 默认运行限制
-time_limit_ms = 1000
-memory_limit_mb = 256
-
-[system]
-# 系统级逻辑配置
-"#
     }
 
     fn get_figment(&self, path: Option<&Path>) -> Result<Figment, ConfigError> {
@@ -69,12 +49,13 @@ memory_limit_mb = 256
 
         let mut figment = Figment::new()
             .merge(Serialized::defaults(GlobalConfig::default()))
-            .merge(Toml::file(self.global_config_path()))
-            .merge(Env::prefixed("CPH_").split("__"));
-
-        if let Some(path) = path {
-            figment = figment.merge(Toml::file(path));
-        }
+            .merge(Toml::file(self.global_config_path()));
+        figment = if let Some(path) = path {
+            figment.merge(Toml::file(path))
+        } else {
+            figment
+        };
+        figment = figment.merge(Env::prefixed("CPH_").split("__"));
 
         cache_lock
             .write()
@@ -91,10 +72,32 @@ impl ConfigRepository for TomlFileConfigAdapter {
             if let Some(parent) = global_path.parent() {
                 std::fs::create_dir_all(parent)?;
             }
-            std::fs::write(&global_path, Self::template_toml())?;
+            std::fs::write(
+                &global_path,
+                include_str!("../../../assets/default_config.toml"),
+            )?;
         }
 
         let figment = self.get_figment(path)?;
         figment.extract::<GlobalConfig>().map_err(ConfigError::from)
+    }
+
+    fn format_config(&self, path: Option<&Path>) -> Result<String, ConfigError> {
+        let config = self.get_config(path)?;
+        toml::to_string_pretty(&config).map_err(|e| ConfigError::Format(e.to_string()))
+    }
+
+    fn get_config_sources(&self, path: Option<&Path>) -> Vec<&'static str> {
+        let mut sources = vec!["defaults"];
+        if self.global_config_path().exists() {
+            sources.push("global");
+        }
+        if path.is_some_and(Path::exists) {
+            sources.push("workspace");
+        }
+        if std::env::vars().any(|(k, _)| k.starts_with("CPH_")) {
+            sources.push("env");
+        }
+        sources
     }
 }

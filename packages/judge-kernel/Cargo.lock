@@ -198,7 +198,6 @@ dependencies = [
 name = "cph-ng-judge"
 version = "0.7.8"
 dependencies = [
- "anstyle",
  "async-trait",
  "bincode",
  "clap",

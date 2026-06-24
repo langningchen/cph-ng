@@ -21,6 +21,13 @@ xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
 figment = { version = "0.10.19", features = ["toml", "env"] }
 toml = "0.8"
 toml_edit = "0.25.12"
+anstyle = "1.0"
+syntect = { version = "5.3", default-features = false, features = [
+    "parsing",
+    "yaml-load",
+    "plist-load",
+    "regex-onig",
+] }
 
 [lints.rust]
 unsafe_code = "forbid"

@@ -62,8 +62,8 @@ pub enum ConfigAction {
     Path,
     /// Open the config file in your editor
     Edit,
-    /// Show the current merged configuration
-    List,
+    /// Show the current merged configuration with source annotations
+    Show,
 }
 
 /// Parse CLI args and execute the matching command.
