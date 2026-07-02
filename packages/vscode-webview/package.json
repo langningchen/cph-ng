@@ -1,6 +1,6 @@
 {
   "name": "@cph-ng/vscode-webview",
-  "version": "0.7.8",
+  "version": "0.7.9",
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-only",
@@ -13,12 +13,12 @@
   },
   "dependencies": {
     "@cph-ng/core": "workspace:*",
-    "@mui/icons-material": "^9.0.1",
+    "@mui/icons-material": "^9.1.1",
     "@mui/lab": "9.0.0-beta.5",
-    "@mui/material": "^9.0.1",
+    "@mui/material": "^9.1.2",
     "anser": "^2.3.5",
     "crypto-js": "^4.2.0",
-    "i18next": "^26.3.1",
+    "i18next": "^26.3.3",
     "immer": "^11.1.8",
     "lodash": "^4.18.1",
     "react": "^19.2.7",
@@ -35,7 +35,7 @@
     "copy-webpack-plugin": "^14.0.0",
     "swc-loader": "^0.2.7",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
-    "webpack": "^5.107.2",
-    "webpack-cli": "^7.0.3"
+    "webpack": "^5.108.1",
+    "webpack-cli": "^7.1.0"
   }
 }
