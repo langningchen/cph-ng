@@ -253,6 +253,7 @@ jobs:
           echo "::group::Publishing to VS Code Marketplace"
           VERSION="${{ needs.build.outputs.version }}"
           pnpm -C packages/vscode-ext exec vsce publish --allow-star-activation --no-dependencies -i ../../dist/cph-ng-$VERSION.vsix
+          echo "::endgroup::"
 
   publish-chrome:
     needs: [build, release-github]
@@ -353,6 +354,7 @@ jobs:
           echo "::group::Publishing to Browser Stores"
           VERSION="${{ needs.build.outputs.version }}"
           pnpm -C packages/browser-ext exec wxt submit --firefox-zip ../../dist/cph-ng-submit-$VERSION-firefox.zip --firefox-sources-zip ../../dist/cph-ng-submit-$VERSION-sources.zip
+          echo "::endgroup::"
 
   post-publish:
     if: always() && needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
