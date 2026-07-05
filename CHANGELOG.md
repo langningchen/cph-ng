@@ -2,6 +2,14 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.10
+
+- **fix**(actions): added `echo "::endgroup::"` to match every group
+- **feat**(actions): made ci actions more robust
+- **fix**(browser-ext): adapted to new luogu frontend
+- **feat**(vscode-ext): use problem id to generate filename for qoj problems ([#305](https://github.com/langningchen/cph-ng/issues/305))
+- **feat**(vscode-ext): use problem id to generate filename for qoj problems
+
 ## 0.7.9
 
 - **chore**(deps): bump actions/checkout from 6 to 7 ([#300](https://github.com/langningchen/cph-ng/issues/300))
