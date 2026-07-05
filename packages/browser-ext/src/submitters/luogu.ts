@@ -43,16 +43,16 @@ export class LuoguSubmitter extends BaseSubmitter {
   }
 
   public async fill({ sourceCode }: SubmitData): Promise<void> {
-    const showSubmit = await this.waitForElement<HTMLButtonElement>(
-      '#app > div.main-container.lside-nav > div > header > div > div > div > div.bottom-row > div.left > div > ul > li:nth-child(2)',
+    const showSubmit = await this.waitForElement<HTMLLIElement>(
+      '#app > div.main-container > div > header > div > div > div > div.bottom-row > div.left > div > ul > li:nth-child(2)',
     );
     showSubmit.click();
 
-    const cmContent = await this.waitForElement<HTMLElement>('.cm-editor');
+    const cmContent = await this.waitForElement<HTMLElement>('.cm-content');
     cmContent.innerText = sourceCode;
 
     const submitBtn = await this.waitForElement<HTMLButtonElement>(
-      '#app > div.main-container.lside-nav > div > main > div > div > div.main > div > div.body > button',
+      '#app > div.main-container > div > main > div > div > div.main > div > div.body > button',
     );
     submitBtn.click();
 
