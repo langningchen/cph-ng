@@ -192,8 +192,39 @@ jobs:
         with:
           subject-path: dist/*
 
-  publish:
+  release-github:
     needs: [build]
+    if: needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: cph-ng-artifacts
+          path: dist/
+      - name: Create tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ needs.build.outputs.version }}"
+          git push origin "v${{ needs.build.outputs.version }}"
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ needs.build.outputs.version }}
+          name: v${{ needs.build.outputs.version }}
+          files: ./dist/*
+          prerelease: ${{ needs.build.outputs.pre_release }}
+          generate_release_notes: true
+
+  publish-vscode:
+    needs: [build, release-github]
     if: needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
@@ -205,27 +236,17 @@ jobs:
           submodules: true
       - name: Setup Node and pnpm
         uses: ./.github/actions/setup-node-pnpm
-
-      - name: Create tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag "v${{ needs.build.outputs.version }}"
-          git push origin "v${{ needs.build.outputs.version }}"
       - name: Download artifacts
         uses: actions/download-artifact@v8
         with:
           name: cph-ng-artifacts
           path: dist/
-
       - name: Check Artifacts
         run: |
           echo "::group::Verifying artifacts"
           ls -lh dist/
           echo "::endgroup::"
-
       - name: Publish VS Code
-        continue-on-error: true
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
@@ -234,13 +255,97 @@ jobs:
           pnpm -C packages/vscode-ext exec vsce publish --allow-star-activation --no-dependencies -i ../../dist/cph-ng-$VERSION.vsix
           echo "::endgroup::"
 
-      - name: Publish Browser
-        continue-on-error: true
+  publish-chrome:
+    needs: [build, release-github]
+    if: needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: cph-ng-artifacts
+          path: dist/
+      - name: Check Artifacts
+        run: |
+          echo "::group::Verifying artifacts"
+          ls -lh dist/
+          echo "::endgroup::"
+      - name: Publish Chrome
+        env:
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+        run: |
+          VERSION="${{ needs.build.outputs.version }}"
+          pnpm -C packages/browser-ext exec wxt submit --chrome-zip ../../dist/cph-ng-submit-$VERSION-chrome.zip
+
+  publish-edge:
+    needs: [build, release-github]
+    if: needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: cph-ng-artifacts
+          path: dist/
+      - name: Check Artifacts
+        run: |
+          echo "::group::Verifying artifacts"
+          ls -lh dist/
+          echo "::endgroup::"
+      - name: Publish Edge
         env:
           EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
           EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
           EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
           EDGE_SKIP_SUBMIT_REVIEW: ${{ secrets.EDGE_SKIP_SUBMIT_REVIEW }}
+        run: |
+          VERSION="${{ needs.build.outputs.version }}"
+          pnpm -C packages/browser-ext exec wxt submit --edge-zip ../../dist/cph-ng-submit-$VERSION-chrome.zip
+
+  publish-firefox:
+    needs: [build, release-github]
+    if: needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: cph-ng-artifacts
+          path: dist/
+      - name: Check Artifacts
+        run: |
+          echo "::group::Verifying artifacts"
+          ls -lh dist/
+          echo "::endgroup::"
+      - name: Publish Firefox
+        env:
           FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
@@ -248,23 +353,16 @@ jobs:
         run: |
           echo "::group::Publishing to Browser Stores"
           VERSION="${{ needs.build.outputs.version }}"
-          pnpm -C packages/browser-ext exec wxt submit \
-            --firefox-zip ../../dist/cph-ng-submit-$VERSION-firefox.zip \
-            --firefox-sources-zip ../../dist/cph-ng-submit-$VERSION-sources.zip \
-            --edge-zip ../../dist/cph-ng-submit-$VERSION-chrome.zip
+          pnpm -C packages/browser-ext exec wxt submit --firefox-zip ../../dist/cph-ng-submit-$VERSION-firefox.zip --firefox-sources-zip ../../dist/cph-ng-submit-$VERSION-sources.zip
           echo "::endgroup::"
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: v${{ needs.build.outputs.version }}
-          name: v${{ needs.build.outputs.version }}
-          files: ./dist/*
-          prerelease: ${{ needs.build.outputs.pre_release }}
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+  post-publish:
+    if: always() && needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
+    needs: [build, publish-vscode, publish-chrome, publish-edge, publish-firefox]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
       - name: Move cards in project
         env:
           GITHUB_TOKEN: ${{ secrets.PROJECTS_GITHUB_TOKEN }}
