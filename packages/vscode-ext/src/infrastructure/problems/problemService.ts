@@ -166,7 +166,7 @@ export class ProblemService implements IProblemService {
   }
 
   private getOwnedProblemPaths(problem: Problem, binPath: string): string[] {
-    const paths = new Set<string>([binPath, problem.src.path]);
+    const paths = new Set<string>([binPath]);
     const dataDir = this.path.dirname(binPath);
     const addDataFile = (path: string) => {
       if (this.isInsideDirectory(path, dataDir)) paths.add(path);
