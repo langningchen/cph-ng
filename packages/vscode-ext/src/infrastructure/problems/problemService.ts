@@ -178,7 +178,9 @@ export class ProblemService implements IProblemService {
     if (problem.interactor) addDataFile(problem.interactor.path);
     if (problem.stressTest.generator) addDataFile(problem.stressTest.generator.path);
     if (problem.stressTest.bruteForce) addDataFile(problem.stressTest.bruteForce.path);
-    return [...paths];
+    // Never delete the user's source code file, even if
+    // problemFilePath is configured to resolve to src.path.
+    return [...paths].filter((p) => p !== problem.src.path);
   }
 
   private isInsideDirectory(path: string, directory: string): boolean {
