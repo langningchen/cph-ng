@@ -235,7 +235,7 @@ describe('ProblemCopyService', () => {
       ]);
     });
 
-    it('deletes copied problem files without deleting the original files and allows copying the same name again', async () => {
+    it('deletes copied problem files without deleting the original files', async () => {
       const { fileSystemMock, service, copyService } = createServices();
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
@@ -360,6 +360,12 @@ describe('ProblemCopyService', () => {
       await expect(fileSystemMock.exists('/data/1841D_copy.12345678.out')).resolves.toBe(false);
       await expect(fileSystemMock.exists('/data/1841D_copy.87654321.in')).resolves.toBe(false);
       await expect(fileSystemMock.exists('/data/1841D_copy.87654321.ans')).resolves.toBe(false);
+
+      // The copied source file survives deletion, so re-copying to the
+      // same path must be rejected.
+      await expect(copyService.copy(problem, '/src/1841D_copy.cpp')).rejects.toThrow(
+        'Copied problem file path already exists',
+      );
     });
 
     it('overwrites orphaned copied testcase files when the copied source and problem data were removed externally', async () => {
