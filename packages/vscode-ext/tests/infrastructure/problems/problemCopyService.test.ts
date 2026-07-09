@@ -235,7 +235,7 @@ describe('ProblemCopyService', () => {
       ]);
     });
 
-    it('deletes copied problem files without deleting the original files', async () => {
+    it('deletes copied problem data files without deleting any source files', async () => {
       const { fileSystemMock, service, copyService } = createServices();
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
