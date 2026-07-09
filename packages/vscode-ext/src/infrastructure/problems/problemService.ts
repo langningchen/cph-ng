@@ -69,7 +69,7 @@ export class ProblemService implements IProblemService {
     if (!rendered) return null;
     // If problemFilePath is misconfigured to resolve to the source file
     // itself, refuse to use it -- save() would overwrite the user's code.
-    if (rendered === srcPath) {
+    if (rendered === this.path.resolve(srcPath)) {
       this.logger.warn(
         'problemFilePath resolves to the source file path; refusing to use source as data file',
       );
@@ -195,7 +195,8 @@ export class ProblemService implements IProblemService {
     if (problem.stressTest.bruteForce) addDataFile(problem.stressTest.bruteForce.path);
     // Never delete the user's source code file, even if
     // problemFilePath is configured to resolve to src.path.
-    return [...paths].filter((p) => p !== problem.src.path);
+    const srcPath = this.path.resolve(problem.src.path);
+    return [...paths].filter((p) => this.path.resolve(p) !== srcPath);
   }
 
   private isInsideDirectory(path: string, directory: string): boolean {
