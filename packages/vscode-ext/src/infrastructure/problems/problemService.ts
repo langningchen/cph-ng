@@ -61,8 +61,23 @@ export class ProblemService implements IProblemService {
   }
 
   public getDataPath(srcPath: string): string | null {
-    return this.resolver.renderPathWithFile(this.settings.problem.problemFilePath, srcPath, true);
+    const rendered = this.resolver.renderPathWithFile(
+      this.settings.problem.problemFilePath,
+      srcPath,
+      true,
+    );
+    if (!rendered) return null;
+    // If problemFilePath is misconfigured to resolve to the source file
+    // itself, refuse to use it -- save() would overwrite the user's code.
+    if (rendered === srcPath) {
+      this.logger.warn(
+        'problemFilePath resolves to the source file path; refusing to use source as data file',
+      );
+      return null;
+    }
+    return rendered;
   }
+
   public getTestcasePath(srcPath: string, id: TestcaseId, ext: string): string | null {
     const result = this.resolver.renderPathWithFile(
       this.settings.problem.testcaseFilePath,

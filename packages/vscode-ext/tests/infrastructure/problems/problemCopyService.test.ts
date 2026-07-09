@@ -258,7 +258,7 @@ describe('ProblemCopyService', () => {
       expect(await fileSystemMock.readFile('/src/1841D.cpp')).toBe('source');
       expect(await fileSystemMock.readFile('/data/1841D.12345678.in')).toBe('input');
       expect(await fileSystemMock.readFile('/data/1841D.12345678.out')).toBe('answer');
-      await expect(fileSystemMock.exists('/src/1841D_brute.cpp')).resolves.toBe(true);
+      expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
       await expect(fileSystemMock.exists('/data/1841D_brute.bin')).resolves.toBe(false);
       await expect(fileSystemMock.exists('/data/1841D_brute.12345678.in')).resolves.toBe(false);
       await expect(fileSystemMock.exists('/data/1841D_brute.12345678.out')).resolves.toBe(false);
@@ -316,7 +316,7 @@ describe('ProblemCopyService', () => {
 
       await service.delete(problem);
 
-      await expect(fileSystemMock.exists('/src/1841D.cpp')).resolves.toBe(true);
+      expect(await fileSystemMock.readFile('/src/1841D.cpp')).toBe('source');
       await expect(fileSystemMock.exists('/data/1841D.bin')).resolves.toBe(false);
       await expect(fileSystemMock.exists('/data/1841D.12345678.in')).resolves.toBe(false);
       await expect(fileSystemMock.exists('/data/1841D.12345678.out')).resolves.toBe(false);
