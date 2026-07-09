@@ -61,8 +61,23 @@ export class ProblemService implements IProblemService {
   }
 
   public getDataPath(srcPath: string): string | null {
-    return this.resolver.renderPathWithFile(this.settings.problem.problemFilePath, srcPath, true);
+    const rendered = this.resolver.renderPathWithFile(
+      this.settings.problem.problemFilePath,
+      srcPath,
+      true,
+    );
+    if (!rendered) return null;
+    // If problemFilePath is misconfigured to resolve to the source file
+    // itself, refuse to use it -- save() would overwrite the user's code.
+    if (rendered === this.path.resolve(srcPath)) {
+      this.logger.warn(
+        'problemFilePath resolves to the source file path; refusing to use source as data file',
+      );
+      return null;
+    }
+    return rendered;
   }
+
   public getTestcasePath(srcPath: string, id: TestcaseId, ext: string): string | null {
     const result = this.resolver.renderPathWithFile(
       this.settings.problem.testcaseFilePath,
@@ -166,7 +181,7 @@ export class ProblemService implements IProblemService {
   }
 
   private getOwnedProblemPaths(problem: Problem, binPath: string): string[] {
-    const paths = new Set<string>([binPath, problem.src.path]);
+    const paths = new Set<string>([binPath]);
     const dataDir = this.path.dirname(binPath);
     const addDataFile = (path: string) => {
       if (this.isInsideDirectory(path, dataDir)) paths.add(path);
@@ -178,7 +193,10 @@ export class ProblemService implements IProblemService {
     if (problem.interactor) addDataFile(problem.interactor.path);
     if (problem.stressTest.generator) addDataFile(problem.stressTest.generator.path);
     if (problem.stressTest.bruteForce) addDataFile(problem.stressTest.bruteForce.path);
-    return [...paths];
+    // Never delete the user's source code file, even if
+    // problemFilePath is configured to resolve to src.path.
+    const srcPath = this.path.resolve(problem.src.path);
+    return [...paths].filter((p) => this.path.resolve(p) !== srcPath);
   }
 
   private isInsideDirectory(path: string, directory: string): boolean {
