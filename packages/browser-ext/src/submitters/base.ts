@@ -31,18 +31,11 @@ export abstract class BaseSubmitter {
         return;
       }
 
-      const deadline = Date.now() + 30000;
       const check = setInterval(() => {
         const result = condition();
         if (result) {
           clearInterval(check);
           resolve();
-          return;
-        }
-        if (Date.now() >= deadline) {
-          clearInterval(check);
-          reject(new Error('Timeout waiting for condition'));
-          return;
         }
       }, 100);
     });
