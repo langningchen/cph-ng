@@ -1,0 +1,7 @@
+{
+    "git.openRepositoryInParentFolders": "always",
+    "rust-analyzer.check.command": "clippy",
+    "cSpell.words": [
+        "interactor"
+    ]
+}
