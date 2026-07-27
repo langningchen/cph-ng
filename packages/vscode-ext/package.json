@@ -772,7 +772,7 @@
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
     "vitest-mock-extended": "^5.1.0",
-    "webpack": "^5.108.4",
+    "webpack": "^5.109.0",
     "webpack-cli": "^7.2.1"
   },
   "dependencies": {
@@ -786,7 +786,7 @@
     "natural-orderby": "^5.0.0",
     "p-memoize": "^8.0.0",
     "path-key": "^4.0.0",
-    "react": "^19.2.7",
+    "react": "^19.2.8",
     "reflect-metadata": "^0.2.2",
     "semver": "^7.8.5",
     "socket.io-client": "^4.8.3",
