@@ -18,7 +18,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.2.0",
     "@mui/material": "^9.2.0",
-    "@webext-core/messaging": "^3.0.2",
+    "@webext-core/messaging": "^4.0.0",
     "onnxruntime-web": "^1.27.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
