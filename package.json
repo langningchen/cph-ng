@@ -19,11 +19,11 @@
     "prepare": "tsx scripts/install-hooks.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.5",
+    "@biomejs/biome": "^2.5.6",
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
     "@commitlint/types": "^21.2.0",
-    "@swc/core": "^1.15.46",
+    "@swc/core": "^1.15.47",
     "@types/node": "~22.19.7",
     "@vitest/coverage-v8": "4.1.10",
     "@vitest/ui": "^4.1.10",
@@ -38,8 +38,8 @@
     "tsx": "^4.23.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
-    "webpack": "^5.109.0",
-    "webpack-cli": "^7.2.1"
+    "webpack": "^5.109.2",
+    "webpack-cli": "^7.2.2"
   },
   "pnpm": {
     "patchedDependencies": {
