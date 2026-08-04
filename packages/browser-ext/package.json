@@ -18,17 +18,17 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.2.0",
     "@mui/material": "^9.2.0",
-    "@webext-core/messaging": "^3.0.2",
+    "@webext-core/messaging": "^4.0.0",
     "onnxruntime-web": "^1.27.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
     "@types/node": "~22.19.7",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "@wxt-dev/auto-icons": "^1.1.1",
-    "wxt": "^0.20.27"
+    "wxt": "^0.21.2"
   }
 }
