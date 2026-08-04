@@ -35,6 +35,7 @@ import type { IJudgeObserver } from '@/application/ports/problems/judge/IJudgeOb
 import type { JudgeContext } from '@/application/ports/problems/judge/IJudgeService';
 import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
 import type { FinalResult } from '@/application/ports/problems/judge/IResultEvaluator';
+import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
@@ -54,6 +55,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.judgeServiceFactory) private readonly judgeFactory: IJudgeServiceFactory,
+    @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.problemService) private readonly problemService: IProblemService,
@@ -101,6 +103,14 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
 
     const genCwd = this.path.dirname(stressTest.generator.path);
     const bfCwd = this.path.dirname(stressTest.bruteForce.path);
+    const genCmd = await this.getRunCommand(
+      stressTest.generator.path,
+      artifacts.stressTest.generator.path,
+    );
+    const bfCmd = await this.getRunCommand(
+      stressTest.bruteForce.path,
+      artifacts.stressTest.bruteForce.path,
+    );
     const judgeService = this.judgeFactory.create(problem);
     stressTest.clearCnt();
 
@@ -109,7 +119,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
         stressTest.count();
         stressTest.state = StressTestState.generating;
         const genRes = await this.runStep({
-          cmd: [artifacts.stressTest.generator.path],
+          cmd: genCmd,
           cwd: genCwd,
           timeoutMs: this.settings.stressTest.generatorTimeLimit,
           signal: ac.signal,
@@ -118,7 +128,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
 
         stressTest.state = StressTestState.runningBruteForce;
         const bfRes = await this.runStep({
-          cmd: [artifacts.stressTest.bruteForce.path],
+          cmd: bfCmd,
           cwd: bfCwd,
           timeoutMs: this.settings.stressTest.bruteForceTimeLimit,
           signal: ac.signal,
@@ -207,6 +217,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
     this.tmp.dispose(this.tempFiles);
     this.tempFiles = [];
   }
+
   private async runStep(params: ProcessOptions) {
     const res = await this.executor.execute(params);
     if (res instanceof Error) throw res;
@@ -214,6 +225,12 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
     this.tempFiles.push(res.stdoutPath, res.stderrPath);
     return res;
   }
+
+  private async getRunCommand(srcPath: string, artifactPath: string): Promise<string[]> {
+    const lang = this.lang.getLangByFile(srcPath);
+    return lang ? await lang.getInterpretCommand(artifactPath) : [artifactPath];
+  }
+
   private handleError(stressTest: StressTest, error: Error) {
     stressTest.state = StressTestState.internalError;
     this.ui.alert('warn', error.message);
