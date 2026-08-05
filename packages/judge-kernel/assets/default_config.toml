@@ -1,0 +1,15 @@
+# CPH-NG Judge Kernel Global Configuration Template
+
+[judge]
+# 默认编译器路径 (例如: "g++", "clang++")
+# compiler = "g++"
+
+# 默认编译参数
+# compiler_args = ["-O3", "-Wall"]
+
+# 默认运行限制
+time_limit_ms = 1000
+memory_limit_mb = 256
+
+[system]
+# 系统级逻辑配置
