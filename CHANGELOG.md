@@ -2,6 +2,27 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.11
+
+- **chore**(deps): bump hono from 4.12.34 to 4.13.0 ([#330](https://github.com/langningchen/cph-ng/issues/330))
+- **fix**(vscode-ext): use getInterpretCommand to generate the command instead of running `.pyc` directly
+- **chore**(deps): bump hono from 4.12.32 to 4.12.34 ([#329](https://github.com/langningchen/cph-ng/issues/329))
+- **chore**(deps-dev): bump the npm-non-major group with 7 updates ([#327](https://github.com/langningchen/cph-ng/issues/327))
+- **chore**(deps): bump actions/labeler from 6 to 7 ([#324](https://github.com/langningchen/cph-ng/issues/324))
+- **chore**(deps): bump @webext-core/messaging from 3.0.2 to 4.0.0 ([#323](https://github.com/langningchen/cph-ng/issues/323))
+- **chore**(deps): bump the npm-non-major group with 9 updates ([#322](https://github.com/langningchen/cph-ng/issues/322))
+- **chore**(deps-dev): bump vitest-mock-extended from 4.0.0 to 5.1.0 ([#321](https://github.com/langningchen/cph-ng/issues/321))
+- **chore**(deps): bump the npm-non-major group with 7 updates ([#320](https://github.com/langningchen/cph-ng/issues/320))
+- **chore**(deps): bump the npm-non-major group with 13 updates ([#316](https://github.com/langningchen/cph-ng/issues/316))
+- **fix**(vscode-ext): shouldn't delete source code when deleting problems ([#314](https://github.com/langningchen/cph-ng/issues/314))
+- **fix**(vscode-ext): fixed route comparison
+- **fix**(vscode-ext): changed description of unittest
+- **fix**(vscode-ext): made changes according to copilot's review
+- **feat**(browser-ext): support submitting to codeforces gym ([#315](https://github.com/langningchen/cph-ng/issues/315))
+- **fix**(vscode-ext): fixed unittest behavior
+- **fix**(vscode-ext): changed expected behavior of tests
+- **fix**(vscode-ext): shouldn't delete source code when deleting problems
+
 ## 0.7.10
 
 - **fix**(actions): added `echo "::endgroup::"` to match every group
