@@ -1,15 +1,16 @@
+import { createFileSystemMock } from '@t/infrastructure/node/fileSystemMock';
 import { pathMock } from '@t/infrastructure/node/pathMock';
+import { systemMock } from '@t/infrastructure/node/systemMock';
 import { translatorMock } from '@t/infrastructure/vscode/translatorMock';
 import { mock } from '@t/mock';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MockProxy } from 'vitest-mock-extended';
-import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IProblemCopyService } from '@/application/ports/problems/IProblemCopyService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { IUi } from '@/application/ports/vscode/IUi';
-import { moveProblem } from '@/application/useCases/webview/problem/manage/MoveProblem';
+import { MoveProblem } from '@/application/useCases/webview/problem/manage/MoveProblem';
 import { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import { Problem } from '@/domain/entities/problem';
 
@@ -22,19 +23,21 @@ vi.mock('vscode', () => ({
 
 const PROBLEM_ID = '00000000-0000-0000-0000-000000000000';
 
-describe('moveProblem', () => {
+describe('MoveProblem', () => {
+  let service: MoveProblem;
   let repoMock: MockProxy<IProblemRepository>;
   let coordinatorMock: MockProxy<IActiveProblemCoordinator>;
-  let fsMock: MockProxy<IFileSystem>;
+  let fileSystemMock: ReturnType<typeof createFileSystemMock>['fileSystemMock'];
   let copyServiceMock: MockProxy<IProblemCopyService>;
   let serviceMock: MockProxy<IProblemService>;
   let uiMock: MockProxy<IUi>;
   let background: BackgroundProblem;
 
   beforeEach(() => {
+    systemMock.platform.mockReturnValue('linux');
     repoMock = mock<IProblemRepository>();
     coordinatorMock = mock<IActiveProblemCoordinator>();
-    fsMock = mock<IFileSystem>();
+    fileSystemMock = createFileSystemMock().fileSystemMock;
     copyServiceMock = mock<IProblemCopyService>();
     serviceMock = mock<IProblemService>();
     uiMock = mock<IUi>();
@@ -45,29 +48,26 @@ describe('moveProblem', () => {
     repoMock.unload.mockResolvedValue(true);
     serviceMock.delete.mockResolvedValue();
     copyServiceMock.copy.mockResolvedValue(background.problem);
-    fsMock.exists.mockResolvedValue(false);
-    fsMock.rm.mockResolvedValue();
     uiMock.openDialog.mockResolvedValue('/newdir');
     uiMock.input.mockResolvedValue('main');
     uiMock.openFile.mockImplementation(() => {});
     coordinatorMock.onActiveEditorChanged.mockResolvedValue();
     coordinatorMock.dispatchFullData.mockResolvedValue();
+
+    service = new MoveProblem(
+      repoMock,
+      coordinatorMock,
+      fileSystemMock,
+      pathMock,
+      copyServiceMock,
+      serviceMock,
+      systemMock,
+      translatorMock,
+      uiMock,
+    );
   });
 
-  const exec = () =>
-    moveProblem(
-      {
-        repo: repoMock,
-        coordinator: coordinatorMock,
-        fs: fsMock,
-        path: pathMock,
-        copyService: copyServiceMock,
-        service: serviceMock,
-        translator: translatorMock,
-        ui: uiMock,
-      },
-      { type: 'moveProblem', problemId: PROBLEM_ID },
-    );
+  const exec = () => service.exec({ type: 'moveProblem', problemId: PROBLEM_ID });
 
   it('moves the problem to the chosen folder', async () => {
     await exec();
@@ -78,7 +78,7 @@ describe('moveProblem', () => {
     expect(copyServiceMock.copy).toHaveBeenCalledWith(background.problem, '/newdir/main.cpp');
     expect(repoMock.unload).toHaveBeenCalledWith(PROBLEM_ID);
     expect(serviceMock.delete).toHaveBeenCalledWith(background.problem);
-    expect(fsMock.rm).toHaveBeenCalledWith('/src/main.cpp', { force: true });
+    expect(fileSystemMock.rm).toHaveBeenCalledWith('/src/main.cpp', { force: true });
     expect(uiMock.openFile).toHaveBeenCalledWith(
       expect.objectContaining({ scheme: 'file', path: '/newdir/main.cpp' }),
     );
@@ -93,7 +93,7 @@ describe('moveProblem', () => {
 
     expect(copyServiceMock.copy).not.toHaveBeenCalled();
     expect(serviceMock.delete).not.toHaveBeenCalled();
-    expect(fsMock.rm).not.toHaveBeenCalled();
+    expect(fileSystemMock.rm).not.toHaveBeenCalled();
   });
 
   it('rejects moving to the same path', async () => {
@@ -105,9 +105,20 @@ describe('moveProblem', () => {
   });
 
   it('rejects when the destination file already exists', async () => {
-    fsMock.exists.mockResolvedValue(true);
+    fileSystemMock.exists.mockResolvedValue(true);
 
     await expect(exec()).rejects.toThrow('File already exists');
     expect(copyServiceMock.copy).not.toHaveBeenCalled();
+  });
+
+  it('rejects reserved file names only on Windows', async () => {
+    systemMock.platform.mockReturnValue('win32');
+    uiMock.input.mockResolvedValue('CON');
+    await expect(exec()).rejects.toThrow('File name is reserved on Windows');
+  });
+
+  it('allows reserved file names on non-Windows platforms', async () => {
+    uiMock.input.mockResolvedValue('CON');
+    await expect(exec()).resolves.toBeUndefined();
   });
 });

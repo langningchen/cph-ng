@@ -15,11 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { MoveProblemMsg } from '@cph-ng/core';
 import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { container } from 'tsyringe';
 import { type ExtensionContext, window } from 'vscode';
-import { moveProblem } from '@/application/useCases/webview/problem/manage/MoveProblem';
 import { LangCpp } from '@/infrastructure/langs/cppStrategy';
 import { LangC } from '@/infrastructure/langs/cStrategy';
 import { LangJava } from '@/infrastructure/langs/javaStrategy';
@@ -124,25 +122,6 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(LlmTestcaseEditor);
   container.registerSingleton(LlmProblemContext);
 
-  container.register(TOKENS.moveProblem, {
-    useFactory: (depContainer) => ({
-      exec: (msg: MoveProblemMsg) =>
-        moveProblem(
-          {
-            repo: depContainer.resolve(TOKENS.problemRepository),
-            coordinator: depContainer.resolve(TOKENS.activeProblemCoordinator),
-            fs: depContainer.resolve(TOKENS.fileSystem),
-            path: depContainer.resolve(TOKENS.path),
-            copyService: depContainer.resolve(TOKENS.problemCopyService),
-            service: depContainer.resolve(TOKENS.problemService),
-            translator: depContainer.resolve(TOKENS.translator),
-            ui: depContainer.resolve(TOKENS.ui),
-          },
-          msg,
-        ),
-    }),
-  });
-
   container.register(TOKENS.languageStrategy, { useClass: LangC });
   container.register(TOKENS.languageStrategy, { useClass: LangCpp });
   container.register(TOKENS.languageStrategy, { useClass: LangJava });
@@ -182,7 +161,7 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
     connectionString,
     [],
     { additionalCommonProperties: { commitHash } },
-    async (url, init) => {
+    async (url, init) => {  
       logger.trace('Telemetry sent', { url, init });
       const res = await fetch(url, init);
       return {

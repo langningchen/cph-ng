@@ -1,84 +1,101 @@
 import type { MoveProblemMsg } from '@cph-ng/core';
+import { inject, injectable } from 'tsyringe';
 import { Uri } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
+import type { ISystem } from '@/application/ports/node/ISystem';
 import type { IProblemCopyService } from '@/application/ports/problems/IProblemCopyService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
+import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
+import { TOKENS } from '@/composition/tokens';
+import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
-export interface MoveProblemDeps {
-  repo: IProblemRepository;
-  coordinator: IActiveProblemCoordinator;
-  fs: IFileSystem;
-  path: IPath;
-  copyService: IProblemCopyService;
-  service: IProblemService;
-  translator: ITranslator;
-  ui: IUi;
-}
+@injectable()
+export class MoveProblem extends BaseProblemUseCase<MoveProblemMsg> {
+  public constructor(
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(TOKENS.activeProblemCoordinator)
+    private readonly coordinator: IActiveProblemCoordinator,
+    @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
+    @inject(TOKENS.path) private readonly path: IPath,
+    @inject(TOKENS.problemCopyService) private readonly copyService: IProblemCopyService,
+    @inject(TOKENS.problemService) private readonly service: IProblemService,
+    @inject(TOKENS.system) private readonly system: ISystem,
+    @inject(TOKENS.translator) private readonly translator: ITranslator,
+    @inject(TOKENS.ui) private readonly ui: IUi,
+  ) {
+    super(repo);
+  }
 
-function validateFileName(fileName: string, translator: ITranslator, path: IPath): string | null {
-  if (!fileName) return translator.t('File name must not be empty');
-  if (fileName === '.' || fileName === '..') return translator.t('File name must not be . or ..');
-  const hasControlCharacter = [...fileName].some((char) => char.charCodeAt(0) < 32);
-  if (/[<>:"/\\|?*]/.test(fileName) || hasControlCharacter)
-    return translator.t('File name must not contain invalid characters');
-  if (/[. ]$/.test(fileName)) return translator.t('File name must not end with a dot or space');
+  protected async performAction(
+    backgroundProblem: BackgroundProblem,
+    _msg: MoveProblemMsg,
+  ): Promise<void> {
+    backgroundProblem.abort();
+    const { problemId, problem } = backgroundProblem;
+    const srcPath = problem.src.path;
+    const ext = this.path.extname(srcPath);
+    const defaultName = this.path.basename(srcPath, ext);
 
-  const baseName = path.basename(fileName, path.extname(fileName));
-  if (/^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(baseName))
-    return translator.t('File name is reserved on Windows');
-  return null;
-}
+    const folder = await this.ui.openDialog({
+      title: this.translator.t('Choose a folder to move the problem to'),
+      canSelectFolders: true,
+      canSelectFiles: false,
+      defaultPath: this.path.dirname(srcPath),
+    });
+    if (folder === undefined) return;
 
-export async function moveProblem(deps: MoveProblemDeps, msg: MoveProblemMsg): Promise<void> {
-  const { repo, coordinator, fs, path, copyService, service, translator, ui } = deps;
-  const backgroundProblem = await repo.get(msg.problemId);
-  if (!backgroundProblem) throw new Error('Problem not found');
-  backgroundProblem.abort();
-  const { problemId, problem } = backgroundProblem;
-  const srcPath = problem.src.path;
-  const ext = path.extname(srcPath);
-  const defaultName = path.basename(srcPath, ext);
+    const input = await this.ui.input({
+      prompt: this.translator.t('New file name (defaults to current name)'),
+      value: defaultName,
+    });
+    if (input === undefined) return;
 
-  const folder = await ui.openDialog({
-    title: translator.t('Choose a folder to move the problem to'),
-    canSelectFolders: true,
-    canSelectFiles: false,
-    defaultPath: path.dirname(srcPath),
-  });
-  if (folder === undefined) return;
+    let fileName = input.trim();
+    const validationError = this.validateFileName(fileName);
+    if (validationError) throw new Error(validationError);
 
-  const input = await ui.input({
-    prompt: translator.t('New file name (defaults to current name)'),
-    value: defaultName,
-  });
-  if (input === undefined) return;
+    const inputExt = this.path.extname(fileName);
+    if (inputExt) fileName = this.path.basename(fileName, inputExt);
+    fileName += ext;
+    const destSrcPath = this.path.join(folder, fileName);
+    if (destSrcPath === srcPath)
+      throw new Error(this.translator.t('The new file name must be different'));
+    if (await this.fs.exists(destSrcPath))
+      throw new Error(this.translator.t('File already exists: {fileName}', { fileName }));
 
-  let fileName = input.trim();
-  const validationError = validateFileName(fileName, translator, path);
-  if (validationError) throw new Error(validationError);
+    await this.copyService.copy(problem, destSrcPath);
 
-  const inputExt = path.extname(fileName);
-  if (inputExt) fileName = path.basename(fileName, inputExt);
-  fileName += ext;
-  const destSrcPath = path.join(folder, fileName);
-  if (destSrcPath === srcPath)
-    throw new Error(translator.t('The new file name must be different'));
-  if (await fs.exists(destSrcPath))
-    throw new Error(translator.t('File already exists: {fileName}', { fileName }));
+    await this.repo.unload(problemId);
+    await this.service.delete(problem);
 
-  await copyService.copy(problem, destSrcPath);
+    await this.fs.rm(srcPath, { force: true });
 
-  await repo.unload(problemId);
-  await service.delete(problem);
+    this.ui.openFile(Uri.file(destSrcPath));
+    await this.coordinator.onActiveEditorChanged();
+    await this.coordinator.dispatchFullData();
+  }
 
-  await fs.rm(srcPath, { force: true });
+  private validateFileName(fileName: string): string | null {
+    if (!fileName) return this.translator.t('File name must not be empty');
+    if (fileName === '.' || fileName === '..')
+      return this.translator.t('File name must not be . or ..');
+    const hasControlCharacter = [...fileName].some((char) => char.charCodeAt(0) < 32);
+    if (/[<>:"/\\|?*]/.test(fileName) || hasControlCharacter)
+      return this.translator.t('File name must not contain invalid characters');
+    if (/[. ]$/.test(fileName))
+      return this.translator.t('File name must not end with a dot or space');
 
-  ui.openFile(Uri.file(destSrcPath));
-  await coordinator.onActiveEditorChanged();
-  await coordinator.dispatchFullData();
+    const baseName = this.path.basename(fileName, this.path.extname(fileName));
+    if (
+      this.system.platform() === 'win32' &&
+      /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(baseName)
+    )
+      return this.translator.t('File name is reserved on Windows');
+    return null;
+  }
 }

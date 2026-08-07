@@ -36,6 +36,7 @@ import { CopyProblem } from '@/application/useCases/webview/problem/manage/CopyP
 import { CreateProblem } from '@/application/useCases/webview/problem/manage/CreateProblem';
 import { DeleteProblem } from '@/application/useCases/webview/problem/manage/DeleteProblem';
 import { ImportProblem } from '@/application/useCases/webview/problem/manage/ImportProblem';
+import { MoveProblem } from '@/application/useCases/webview/problem/manage/MoveProblem';
 import { RemoveSrcFile } from '@/application/useCases/webview/problem/RemoveSrcFile';
 import { Submit } from '@/application/useCases/webview/problem/Submit';
 import { StartStressTest } from '@/application/useCases/webview/problem/stressTest/StartStressTest';
@@ -73,7 +74,7 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
   importProblem: ImportProblem,
   init: Init,
   loadTestcases: LoadTestcases,
-  moveProblem: TOKENS.moveProblem,
+  moveProblem: MoveProblem,
   oobeDone: OobeDone,
   openFile: OpenFile,
   openTestlib: OpenTestlib,
