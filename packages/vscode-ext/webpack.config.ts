@@ -153,7 +153,7 @@ export default (_env: Record<string, unknown>, argv: Record<string, unknown>): C
       new CopyPlugin({
         patterns: [
           { from: resolve(__dirname, '../../testlib/testlib.h'), to: 'testlib/testlib.h' },
-          { from: resolve(__dirname, '../../testlib/checkers/*.cpp'), to: 'testlib/[name].cpp' },
+          { from: resolve(__dirname, '../../testlib/checkers/*.cpp').replaceAll('\\', '/'), to: 'testlib/[name].cpp' },
           { from: resolve(__dirname, 'res/compare.cpp'), to: 'testlib/compare.cpp' },
         ],
       }),

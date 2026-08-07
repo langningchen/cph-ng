@@ -44,6 +44,9 @@ export interface EditProblemDetailsMsg extends ProblemBaseMsg {
 export interface DeleteProblemMsg extends ProblemBaseMsg {
   type: 'deleteProblem';
 }
+export interface MoveProblemMsg extends ProblemBaseMsg {
+  type: 'moveProblem';
+}
 export interface CopyProblemMsg extends ProblemBaseMsg {
   type: 'copyProblem';
 }
@@ -166,6 +169,7 @@ export interface DragDropMsg extends BaseMsg {
 export type ProblemMsg =
   | EditProblemDetailsMsg
   | CopyProblemMsg
+  | MoveProblemMsg
   | DeleteProblemMsg
   | RunAllTestcasesMsg
   | StopTestcasesMsg

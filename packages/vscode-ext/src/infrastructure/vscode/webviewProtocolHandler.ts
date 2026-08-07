@@ -73,6 +73,7 @@ const UseCaseRegistry: Record<WebviewMsg['type'], InjectionToken<IMsgHandle<Webv
   importProblem: ImportProblem,
   init: Init,
   loadTestcases: LoadTestcases,
+  moveProblem: TOKENS.moveProblem,
   oobeDone: OobeDone,
   openFile: OpenFile,
   openTestlib: OpenTestlib,

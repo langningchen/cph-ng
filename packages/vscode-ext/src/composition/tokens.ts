@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { MoveProblemMsg } from '@cph-ng/core';
 import type { TelemetryReporter } from '@vscode/extension-telemetry';
 import type { InjectionToken } from 'tsyringe';
 import type { LogOutputChannel, OutputChannel } from 'vscode';
@@ -60,6 +61,7 @@ import type { ITelemetry } from '@/application/ports/vscode/ITelemetry';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import type { IUi } from '@/application/ports/vscode/IUi';
 import type { IWorkspace } from '@/application/ports/vscode/IWorkspace';
+import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 
 // Centralized DI tokens for tsyringe registrations
 // Keep these as string literals to avoid circular imports and enable tree-shaking
@@ -121,4 +123,5 @@ export const TOKENS = {
   problemRepository: 'repositories.ProblemRepository' as InjectionToken<IProblemRepository>,
   sidebarProvider: 'ports.SidebarProvider' as InjectionToken<ISidebarProvider>,
   problemFs: 'ports.ProblemFs' as InjectionToken<IProblemFs>,
+  moveProblem: 'useCases.MoveProblem' as InjectionToken<IMsgHandle<MoveProblemMsg>>,
 };
