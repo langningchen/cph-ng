@@ -20,6 +20,7 @@ import { inject, injectable } from 'tsyringe';
 import { Uri } from 'vscode';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
+import type { ISystem } from '@/application/ports/node/ISystem';
 import type { IProblemCopyService } from '@/application/ports/problems/IProblemCopyService';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
@@ -27,6 +28,7 @@ import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import { normalizeFileName, validateFileName } from './fileName';
 
 @injectable()
 export class CopyProblem extends BaseProblemUseCase<CopyProblemMsg> {
@@ -34,6 +36,7 @@ export class CopyProblem extends BaseProblemUseCase<CopyProblemMsg> {
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.path) private readonly path: IPath,
+    @inject(TOKENS.system) private readonly system: ISystem,
     @inject(TOKENS.problemCopyService) private readonly copyService: IProblemCopyService,
     @inject(TOKENS.translator) private readonly translator: ITranslator,
     @inject(TOKENS.ui) private readonly ui: IUi,
@@ -56,12 +59,15 @@ export class CopyProblem extends BaseProblemUseCase<CopyProblemMsg> {
     if (input === undefined) return;
 
     let fileName = input.trim();
-    const validationError = this.validateFileName(fileName);
+    const validationError = validateFileName(
+      fileName,
+      this.path,
+      this.translator,
+      this.system.platform(),
+    );
     if (validationError) throw new Error(validationError);
 
-    const inputExt = this.path.extname(fileName);
-    if (inputExt) fileName = this.path.basename(fileName, inputExt);
-    fileName += ext;
+    fileName = normalizeFileName(fileName, ext, this.path);
     const destPath = this.path.join(this.path.dirname(srcPath), fileName);
     if (destPath === srcPath)
       throw new Error(this.translator.t('The new file name must be different'));
@@ -70,21 +76,5 @@ export class CopyProblem extends BaseProblemUseCase<CopyProblemMsg> {
 
     await this.copyService.copy(problem, destPath);
     this.ui.openFile(Uri.file(destPath));
-  }
-
-  private validateFileName(fileName: string): string | null {
-    if (!fileName) return this.translator.t('File name must not be empty');
-    if (fileName === '.' || fileName === '..')
-      return this.translator.t('File name must not be . or ..');
-    const hasControlCharacter = [...fileName].some((char) => char.charCodeAt(0) < 32);
-    if (/[<>:"/\\|?*]/.test(fileName) || hasControlCharacter)
-      return this.translator.t('File name must not contain invalid characters');
-    if (/[. ]$/.test(fileName))
-      return this.translator.t('File name must not end with a dot or space');
-
-    const baseName = this.path.basename(fileName, this.path.extname(fileName));
-    if (/^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(baseName))
-      return this.translator.t('File name is reserved on Windows');
-    return null;
   }
 }

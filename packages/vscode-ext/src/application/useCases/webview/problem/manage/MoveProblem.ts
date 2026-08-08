@@ -13,6 +13,7 @@ import type { IUi } from '@/application/ports/vscode/IUi';
 import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import { normalizeFileName, validateFileName } from './fileName';
 
 @injectable()
 export class MoveProblem extends BaseProblemUseCase<MoveProblemMsg> {
@@ -35,7 +36,6 @@ export class MoveProblem extends BaseProblemUseCase<MoveProblemMsg> {
     backgroundProblem: BackgroundProblem,
     _msg: MoveProblemMsg,
   ): Promise<void> {
-    backgroundProblem.abort();
     const { problemId, problem } = backgroundProblem;
     const srcPath = problem.src.path;
     const ext = this.path.extname(srcPath);
@@ -56,17 +56,22 @@ export class MoveProblem extends BaseProblemUseCase<MoveProblemMsg> {
     if (input === undefined) return;
 
     let fileName = input.trim();
-    const validationError = this.validateFileName(fileName);
+    const validationError = validateFileName(
+      fileName,
+      this.path,
+      this.translator,
+      this.system.platform(),
+    );
     if (validationError) throw new Error(validationError);
 
-    const inputExt = this.path.extname(fileName);
-    if (inputExt) fileName = this.path.basename(fileName, inputExt);
-    fileName += ext;
+    fileName = normalizeFileName(fileName, ext, this.path);
     const destSrcPath = this.path.join(folder, fileName);
     if (destSrcPath === srcPath)
       throw new Error(this.translator.t('The new file name must be different'));
     if (await this.fs.exists(destSrcPath))
       throw new Error(this.translator.t('File already exists: {fileName}', { fileName }));
+
+    backgroundProblem.abort();
 
     await this.copyService.copy(problem, destSrcPath);
 
@@ -78,24 +83,5 @@ export class MoveProblem extends BaseProblemUseCase<MoveProblemMsg> {
     this.ui.openFile(Uri.file(destSrcPath));
     await this.coordinator.onActiveEditorChanged();
     await this.coordinator.dispatchFullData();
-  }
-
-  private validateFileName(fileName: string): string | null {
-    if (!fileName) return this.translator.t('File name must not be empty');
-    if (fileName === '.' || fileName === '..')
-      return this.translator.t('File name must not be . or ..');
-    const hasControlCharacter = [...fileName].some((char) => char.charCodeAt(0) < 32);
-    if (/[<>:"/\\|?*]/.test(fileName) || hasControlCharacter)
-      return this.translator.t('File name must not contain invalid characters');
-    if (/[. ]$/.test(fileName))
-      return this.translator.t('File name must not end with a dot or space');
-
-    const baseName = this.path.basename(fileName, this.path.extname(fileName));
-    if (
-      this.system.platform() === 'win32' &&
-      /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(baseName)
-    )
-      return this.translator.t('File name is reserved on Windows');
-    return null;
   }
 }
