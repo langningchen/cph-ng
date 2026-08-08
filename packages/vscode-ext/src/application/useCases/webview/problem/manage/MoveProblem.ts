@@ -17,12 +17,12 @@ import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 @injectable()
 export class MoveProblem extends BaseProblemUseCase<MoveProblemMsg> {
   public constructor(
-    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.activeProblemCoordinator)
     private readonly coordinator: IActiveProblemCoordinator,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.problemCopyService) private readonly copyService: IProblemCopyService,
+    @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
     @inject(TOKENS.problemService) private readonly service: IProblemService,
     @inject(TOKENS.system) private readonly system: ISystem,
     @inject(TOKENS.translator) private readonly translator: ITranslator,

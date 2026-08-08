@@ -55,11 +55,11 @@ describe('MoveProblem', () => {
     coordinatorMock.dispatchFullData.mockResolvedValue();
 
     service = new MoveProblem(
-      repoMock,
       coordinatorMock,
       fileSystemMock,
       pathMock,
       copyServiceMock,
+      repoMock,
       serviceMock,
       systemMock,
       translatorMock,
