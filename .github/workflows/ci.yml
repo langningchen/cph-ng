@@ -255,6 +255,38 @@ jobs:
           pnpm -C packages/vscode-ext exec vsce publish --allow-star-activation --no-dependencies -i ../../dist/cph-ng-$VERSION.vsix
           echo "::endgroup::"
 
+  publish-openvsx:
+    needs: [build, release-github]
+    if: needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: cph-ng-artifacts
+          path: dist/
+      - name: Check Artifacts
+        run: |
+          echo "::group::Verifying artifacts"
+          ls -lh dist/
+          echo "::endgroup::"
+      - name: Publish VS Code
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          echo "::group::Publishing to Open VSX Marketplace"
+          VERSION="${{ needs.build.outputs.version }}"
+          pnpm -C packages/vscode-ext dlx ovsx publish --no-dependencies -i ../../dist/cph-ng-$VERSION.vsix
+          echo "::endgroup::"
+
   publish-chrome:
     needs: [build, release-github]
     if: needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
@@ -358,7 +390,7 @@ jobs:
 
   post-publish:
     if: always() && needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
-    needs: [build, publish-vscode, publish-chrome, publish-edge, publish-firefox]
+    needs: [build, publish-vscode, publish-openvsx, publish-edge, publish-firefox]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
