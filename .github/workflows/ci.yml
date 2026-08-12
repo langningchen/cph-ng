@@ -252,7 +252,7 @@ jobs:
         run: |
           echo "::group::Publishing to VS Code Marketplace"
           VERSION="${{ needs.build.outputs.version }}"
-          pnpm -C packages/vscode-ext exec vsce publishallow-star-activation --no-dependencies -i ../../dist/cph-ng-$VERSION.vsix
+          pnpm -C packages/vscode-ext exec vsce publish --allow-star-activation --no-dependencies -i ../../dist/cph-ng-$VERSION.vsix
           echo "::endgroup::"
 
   publish-oepnvsx:
