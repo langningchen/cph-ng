@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-only",
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@11.21.0",
   "scripts": {
     "compile": "pnpm -r --parallel compile",
     "package": "tsx scripts/package.ts",
@@ -40,24 +40,5 @@
     "vitest": "^4.1.10",
     "webpack": "^5.109.2",
     "webpack-cli": "^7.2.2"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "ts-json-schema-generator@2.9.0": "patches/ts-json-schema-generator.patch"
-    },
-    "updateConfig": {
-      "ignoreDependencies": [
-        "@types/vscode",
-        "@types/node"
-      ]
-    },
-    "onlyBuiltDependencies": [
-      "@getgrit/cli",
-      "@swc/core",
-      "esbuild",
-      "protobufjs",
-      "sharp",
-      "spawn-sync"
-    ]
   }
 }
