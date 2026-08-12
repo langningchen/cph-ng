@@ -284,7 +284,7 @@ jobs:
         run: |
           echo "::group::Publishing to Open VSX Marketplace"
           VERSION="${{ needs.build.outputs.version }}"
-          pnpm -C packages/vscode-ext exec ovsx publish --no-dependencies -i ../../dist/cph-ng-$VERSION.vsix
+          pnpm -C packages/vscode-ext dlx ovsx publish --no-dependencies -i ../../dist/cph-ng-$VERSION.vsix
           echo "::endgroup::"
 
   publish-chrome:
