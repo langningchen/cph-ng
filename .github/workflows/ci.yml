@@ -390,7 +390,7 @@ jobs:
 
   post-publish:
     if: always() && needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
-    needs: [build, publish-vscode, publish-chrome, publish-edge, publish-firefox]
+    needs: [build, publish-vscode, publish-openvsx, publish-edge, publish-firefox]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
