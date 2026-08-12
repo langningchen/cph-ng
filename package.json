@@ -13,7 +13,7 @@
     "typecheck": "tsc --build",
     "lint": "biome check",
     "format": "biome check --write",
-    "clean": "pnpm -r --parallel clean && rimraf dist out scripts/out",
+    "clean": "pnpm run --parallel clean && rimraf dist out scripts/out",
     "check-translations": "pnpm -r --parallel check-translations",
     "bump": "tsx scripts/bump-version.ts",
     "prepare": "tsx scripts/install-hooks.ts"
