@@ -6,3 +6,6 @@ out/
 node_modules/
 coverage/
 *.tsbuildinfo
+# pnpm
+.pnpm-debug.log
+.pnpm-store/
