@@ -22,14 +22,15 @@ import type { SubmitData } from '@cph-ng/core';
 
 export class CodeforcesSubmitter extends BaseSubmitter {
   public readonly supportedDomains = submitterDomains.codeforces;
-  private readonly contestRegex = /^\/contest\/(?<contest>\d+)\/problem\/(?<problem>\w+)/;
+  private readonly contestRegex =
+    /^\/(?<type>contest|gym)\/(?<contest>\d+)\/problem\/(?<problem>\w+)/;
   private readonly problemRegex = /^\/problemset\/problem\/(?<contest>\d+)\/(?<problem>\w+)/;
 
   public getSubmitUrl(data: SubmitData) {
     const url = new URL(data.url);
     const contest = url.pathname.match(this.contestRegex)?.groups;
     const problem = url.pathname.match(this.problemRegex)?.groups;
-    if (contest) url.pathname = `/contest/${contest.contest}/submit`;
+    if (contest) url.pathname = `/${contest.type}/${contest.contest}/submit`;
     else if (problem) url.pathname = `/problemset/submit`;
     else throw new ExtractError('type');
     return url.toString();

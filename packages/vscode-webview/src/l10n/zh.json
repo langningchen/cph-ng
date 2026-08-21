@@ -64,6 +64,7 @@
   "problemActions.deleteDialog.title": "确认删除",
   "problemActions.deleteProblem": "删除题目",
   "problemActions.easterEgg": "彩蛋",
+  "problemActions.moveProblem": "移动题目",
   "problemActions.runAllTestcases": "运行所有测试样例",
   "problemActions.stopTestcases": "停止运行测试样例",
   "problemActions.stressTest": "对拍",

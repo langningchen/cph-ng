@@ -64,6 +64,7 @@
   "problemActions.deleteDialog.title": "Confirm Deletion",
   "problemActions.deleteProblem": "Delete Problem",
   "problemActions.easterEgg": "Easter egg",
+  "problemActions.moveProblem": "Move Problem",
   "problemActions.runAllTestcases": "Run All Test Cases",
   "problemActions.stopTestcases": "Stop Test Case",
   "problemActions.stressTest": "Stress Test",

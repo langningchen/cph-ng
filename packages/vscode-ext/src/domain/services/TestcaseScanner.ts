@@ -54,7 +54,9 @@ export class TestcaseScanner {
       const pairExts = isInput ? outputExts : inputExts;
 
       for (const ext of pairExts) {
-        const pairPath = path.replace(this.path.extname(path), ext);
+        const dir = this.path.dirname(path);
+        const nameWithoutExt = this.path.basename(path, this.path.extname(path));
+        const pairPath = this.path.join(dir, nameWithoutExt + ext);
         if (await this.fs.exists(pairPath)) {
           const confirmed =
             behavior === 'ask'

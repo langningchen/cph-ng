@@ -1,6 +1,23 @@
 packages:
   - "packages/*"
 
+patchedDependencies:
+  ts-json-schema-generator@2.9.0: patches/ts-json-schema-generator.patch
+
+allowBuilds:
+  "@getgrit/cli": true
+  "@swc/core": true
+  "@vscode/vsce-sign": true
+  "esbuild": true
+  "keytar": true
+  "protobufjs": true
+  "sharp": true
+  "spawn-sync": true
+updateConfig:
+  ignoreDependencies:
+    - "@types/vscode"
+    - "@types/node"
+
 fetchRetryFactor: 2
 fetchRetryMintimeout: 1000
 fetchTimeout: 30000

@@ -82,6 +82,16 @@ const process = async () => {
               });
             }
           }
+          if (!filename && isHost('qoj.ac')) {
+            const match = url.match(/problem\/(\w+)/);
+            if (match) {
+              filename = `qoj${match[1]}.${ext}`;
+              logger.info('Detected QOJ URL, generating filename', {
+                url,
+                filename,
+              });
+            }
+          }
           if (!filename && isHost('atcoder.jp')) {
             const match = url.match(/tasks\/(\w+)_(\w+)/);
             if (match) {

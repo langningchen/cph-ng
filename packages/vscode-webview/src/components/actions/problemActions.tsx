@@ -20,6 +20,7 @@ import BackupIcon from '@mui/icons-material/Backup';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import { memo, useEffect, useState } from 'react';
@@ -119,6 +120,13 @@ export const ProblemActions = memo(
               name={t('problemActions.copyProblem')}
               icon={ContentCopyIcon}
               onClick={() => dispatch({ type: 'copyProblem', problemId })}
+            />
+            <CphNgButton
+              sx={{ display: { xs: 'none', sm: 'block' } }}
+              larger
+              name={t('problemActions.moveProblem')}
+              icon={DriveFileMoveIcon}
+              onClick={() => dispatch({ type: 'moveProblem', problemId })}
             />
             <CphNgButton
               sx={{ display: { xs: 'none', sm: 'block' } }}

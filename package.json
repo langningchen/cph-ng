@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-only",
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@11.21.0",
   "scripts": {
     "compile": "pnpm -r --parallel compile",
     "package": "tsx scripts/package.ts",
@@ -13,51 +13,32 @@
     "typecheck": "tsc --build",
     "lint": "biome check",
     "format": "biome check --write",
-    "clean": "pnpm -r --parallel clean && rimraf dist out scripts/out",
+    "clean": "pnpm run --parallel clean && rimraf dist out scripts/out",
     "check-translations": "pnpm -r --parallel check-translations",
     "bump": "tsx scripts/bump-version.ts",
     "prepare": "tsx scripts/install-hooks.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.16",
-    "@commitlint/cli": "^21.0.2",
-    "@commitlint/config-conventional": "^21.0.2",
-    "@commitlint/types": "^21.0.1",
-    "@swc/core": "^1.15.40",
+    "@biomejs/biome": "^2.5.8",
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
+    "@commitlint/types": "^21.2.0",
+    "@swc/core": "^1.15.47",
     "@types/node": "~22.19.7",
-    "@vitest/coverage-v8": "4.1.8",
-    "@vitest/ui": "^4.1.8",
+    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/ui": "^4.1.10",
     "@vscode/vsce": "^3.9.2",
     "copy-webpack-plugin": "^14.0.0",
-    "ignore": "^7.0.5",
-    "knip": "^6.16.1",
+    "ignore": "^7.0.6",
+    "knip": "^6.32.2",
     "rimraf": "^6.1.3",
     "swc-loader": "^0.2.7",
     "terser-webpack-plugin": "^5.6.1",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
-    "tsx": "^4.22.4",
+    "tsx": "^4.23.12",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.8",
-    "webpack": "^5.107.2",
-    "webpack-cli": "^7.0.3"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "ts-json-schema-generator@2.9.0": "patches/ts-json-schema-generator.patch"
-    },
-    "updateConfig": {
-      "ignoreDependencies": [
-        "@types/vscode",
-        "@types/node"
-      ]
-    },
-    "onlyBuiltDependencies": [
-      "@getgrit/cli",
-      "@swc/core",
-      "esbuild",
-      "protobufjs",
-      "sharp",
-      "spawn-sync"
-    ]
+    "vitest": "^4.1.10",
+    "webpack": "^5.109.2",
+    "webpack-cli": "^7.2.2"
   }
 }

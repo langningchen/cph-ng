@@ -2,6 +2,69 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.11
+
+- **chore**(deps): bump hono from 4.12.34 to 4.13.0 ([#330](https://github.com/langningchen/cph-ng/issues/330))
+- **fix**(vscode-ext): use getInterpretCommand to generate the command instead of running `.pyc` directly
+- **chore**(deps): bump hono from 4.12.32 to 4.12.34 ([#329](https://github.com/langningchen/cph-ng/issues/329))
+- **chore**(deps-dev): bump the npm-non-major group with 7 updates ([#327](https://github.com/langningchen/cph-ng/issues/327))
+- **chore**(deps): bump actions/labeler from 6 to 7 ([#324](https://github.com/langningchen/cph-ng/issues/324))
+- **chore**(deps): bump @webext-core/messaging from 3.0.2 to 4.0.0 ([#323](https://github.com/langningchen/cph-ng/issues/323))
+- **chore**(deps): bump the npm-non-major group with 9 updates ([#322](https://github.com/langningchen/cph-ng/issues/322))
+- **chore**(deps-dev): bump vitest-mock-extended from 4.0.0 to 5.1.0 ([#321](https://github.com/langningchen/cph-ng/issues/321))
+- **chore**(deps): bump the npm-non-major group with 7 updates ([#320](https://github.com/langningchen/cph-ng/issues/320))
+- **chore**(deps): bump the npm-non-major group with 13 updates ([#316](https://github.com/langningchen/cph-ng/issues/316))
+- **fix**(vscode-ext): shouldn't delete source code when deleting problems ([#314](https://github.com/langningchen/cph-ng/issues/314))
+- **fix**(vscode-ext): fixed route comparison
+- **fix**(vscode-ext): changed description of unittest
+- **fix**(vscode-ext): made changes according to copilot's review
+- **feat**(browser-ext): support submitting to codeforces gym ([#315](https://github.com/langningchen/cph-ng/issues/315))
+- **fix**(vscode-ext): fixed unittest behavior
+- **fix**(vscode-ext): changed expected behavior of tests
+- **fix**(vscode-ext): shouldn't delete source code when deleting problems
+
+## 0.7.10
+
+- **fix**(actions): added `echo "::endgroup::"` to match every group
+- **feat**(actions): made ci actions more robust
+- **fix**(browser-ext): adapted to new luogu frontend
+- **feat**(vscode-ext): use problem id to generate filename for qoj problems ([#305](https://github.com/langningchen/cph-ng/issues/305))
+- **feat**(vscode-ext): use problem id to generate filename for qoj problems
+
+## 0.7.9
+
+- **chore**(deps): bump actions/checkout from 6 to 7 ([#300](https://github.com/langningchen/cph-ng/issues/300))
+- **fix**: new Luogu ([#298](https://github.com/langningchen/cph-ng/issues/298))
+- **fix**(vscode-ext): fix testcase parser's weird behavior ([#295](https://github.com/langningchen/cph-ng/issues/295))
+- **fix**(vscode-ext): fix testcase parser's weird behavior
+- **chore**(deps): bump @mui/lab from 9.0.0-beta.3 to 9.0.0-beta.5 ([#288](https://github.com/langningchen/cph-ng/issues/288))
+- **chore**(deps): bump hono from 4.12.23 to 4.12.25 ([#292](https://github.com/langningchen/cph-ng/issues/292))
+- **feat**(vscode-ext): cpp header expansion ([#280](https://github.com/langningchen/cph-ng/issues/280))
+- **chore**: pin pnpm 10 ([#283](https://github.com/langningchen/cph-ng/issues/283))
+- **chore**(deps): bump the npm-non-major group with 10 updates ([#284](https://github.com/langningchen/cph-ng/issues/284))
+- **chore**: pin pnpm@10.33.2 via packageManager field ([#281](https://github.com/langningchen/cph-ng/issues/281))
+- **chore**(deps): bump the npm-non-major group across 1 directory with 14 updates ([#279](https://github.com/langningchen/cph-ng/issues/279))
+- **chore**(deps): bump commander from 14.0.3 to 15.0.0 ([#278](https://github.com/langningchen/cph-ng/issues/278))
+- **feat**(vscode-ext): add copy problem action ([#274](https://github.com/langningchen/cph-ng/issues/274))
+- **chore**(deps): bump the npm-non-major group across 1 directory with 11 updates ([#271](https://github.com/langningchen/cph-ng/issues/271))
+- **chore**(deps): bump @webext-core/messaging from 2.3.0 to 3.0.1 ([#272](https://github.com/langningchen/cph-ng/issues/272))
+- **chore**(deps): bump protobufjs from 7.5.7 to 7.6.0 ([#267](https://github.com/langningchen/cph-ng/issues/267))
+- **chore**(deps): bump ws from 8.18.3 to 8.20.1 ([#264](https://github.com/langningchen/cph-ng/issues/264))
+- **chore**(deps): bump serialize-javascript from 7.0.4 to 7.0.5 ([#265](https://github.com/langningchen/cph-ng/issues/265))
+- **chore**(deps): bump defu from 6.1.4 to 6.1.7 ([#266](https://github.com/langningchen/cph-ng/issues/266))
+- **chore**(deps): bump which from 6.0.1 to 7.0.0 ([#263](https://github.com/langningchen/cph-ng/issues/263))
+- **chore**(deps): bump the npm-non-major group with 12 updates ([#262](https://github.com/langningchen/cph-ng/issues/262))
+- **chore**(deps-dev): bump @commitlint/cli from 20.5.3 to 21.0.0 ([#254](https://github.com/langningchen/cph-ng/issues/254))
+- **chore**(deps-dev): bump @commitlint/types from 20.5.0 to 21.0.0 ([#253](https://github.com/langningchen/cph-ng/issues/253))
+- **chore**(deps-dev): bump @commitlint/config-conventional ([#252](https://github.com/langningchen/cph-ng/issues/252))
+- **chore**(deps): bump @mui/lab from 9.0.0-beta.2 to 9.0.0-beta.3 ([#251](https://github.com/langningchen/cph-ng/issues/251))
+- **chore**(deps): bump the npm-non-major group with 14 updates ([#250](https://github.com/langningchen/cph-ng/issues/250))
+- **chore**(deps): bump hono from 4.12.16 to 4.12.18 ([#248](https://github.com/langningchen/cph-ng/issues/248))
+- **chore**(deps): bump the npm-non-major group with 11 updates ([#241](https://github.com/langningchen/cph-ng/issues/241))
+- **chore**(version): update commit messages to reflect version bump ([#240](https://github.com/langningchen/cph-ng/issues/240))
+- **chore**(version): update commit messages to reflect version bump ([#239](https://github.com/langningchen/cph-ng/issues/239))
+- **fix**(browser-ext): update theme configuration to use colorSchemes ([#238](https://github.com/langningchen/cph-ng/issues/238))
+
 ## 0.7.8
 
 - **feat**(browser-ext): vjudge submitter ([#236](https://github.com/langningchen/cph-ng/issues/236))

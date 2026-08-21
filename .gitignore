@@ -7,3 +7,5 @@ node_modules/
 coverage/
 *.tsbuildinfo
 target/
+.pnpm-debug.log
+.pnpm-store/

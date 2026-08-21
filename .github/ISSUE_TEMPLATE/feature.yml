@@ -1,7 +1,7 @@
 name: Feature Request
 description: A new feature or enhancement
 labels: enhancement
-assignees: langningchen
+assignees: [langningchen, a1fredbao]
 title: "feat: "
 body:
   - type: markdown
