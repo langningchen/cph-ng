@@ -769,7 +769,7 @@
     "ts-json-schema-generator": "^2.9.0",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
     "tsx": "^4.23.12",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.11",
     "vitest-mock-extended": "^5.1.1",
     "webpack": "^5.109.2",
