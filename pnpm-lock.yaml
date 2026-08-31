@@ -106,7 +106,7 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  ts-json-schema-generator@2.9.0: 6abb5e7e4fb436703225dfd7da9ca78532297f36099100de7230e53bc8ce7ed4
+  ts-json-schema-generator: b63b7f5dab2b5082a48d72fd514eb220f64d28acb56196a5680c0eb8693bbcf2
 
 importers:
 
@@ -350,7 +350,7 @@ importers:
         version: 10.2.1(typescript@6.0.3)
       ts-json-schema-generator:
         specifier: ^2.9.0
-        version: 2.9.0(patch_hash=6abb5e7e4fb436703225dfd7da9ca78532297f36099100de7230e53bc8ce7ed4)
+        version: 2.9.0(patch_hash=b63b7f5dab2b5082a48d72fd514eb220f64d28acb56196a5680c0eb8693bbcf2)
       tsconfig-paths-webpack-plugin:
         specifier: ^4.2.0
         version: 4.2.0
@@ -8830,7 +8830,7 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  ts-json-schema-generator@2.9.0(patch_hash=6abb5e7e4fb436703225dfd7da9ca78532297f36099100de7230e53bc8ce7ed4):
+  ts-json-schema-generator@2.9.0(patch_hash=b63b7f5dab2b5082a48d72fd514eb220f64d28acb56196a5680c0eb8693bbcf2):
     dependencies:
       '@types/json-schema': 7.0.15
       commander: 14.0.3
