@@ -14,7 +14,7 @@
   "dependencies": {
     "@cph-ng/core": "workspace:*",
     "@mui/icons-material": "^9.4.0",
-    "@mui/lab": "9.0.0-beta.8",
+    "@mui/lab": "9.0.0-beta.9",
     "@mui/material": "^9.4.0",
     "anser": "^2.3.5",
     "crypto-js": "^4.2.0",
