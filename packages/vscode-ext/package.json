@@ -753,7 +753,7 @@
     "@types/lodash": "^4.17.25",
     "@types/node": "~22.19.7",
     "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
+    "@types/react-dom": "^19.2.5",
     "@types/semver": "^7.8.0",
     "@types/source-map-support": "^0.5.10",
     "@types/vscode": "1.97.0",
@@ -772,7 +772,7 @@
     "typescript": "^6.0.3",
     "vitest": "^4.1.11",
     "vitest-mock-extended": "^5.1.1",
-    "webpack": "^5.109.2",
+    "webpack": "^5.110.1",
     "webpack-cli": "^7.2.2"
   },
   "dependencies": {

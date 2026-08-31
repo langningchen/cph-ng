@@ -16,10 +16,10 @@
     "@cph-ng/core": "workspace:*",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^9.3.1",
-    "@mui/material": "^9.3.1",
+    "@mui/icons-material": "^9.4.0",
+    "@mui/material": "^9.4.0",
     "@webext-core/messaging": "^4.0.0",
-    "onnxruntime-web": "^1.27.0",
+    "onnxruntime-web": "^1.29.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "socket.io-client": "^4.8.3"
@@ -27,7 +27,7 @@
   "devDependencies": {
     "@types/node": "~22.19.7",
     "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
+    "@types/react-dom": "^19.2.5",
     "@wxt-dev/auto-icons": "^1.1.2",
     "wxt": "^0.21.4"
   }
