@@ -59,8 +59,14 @@ async fn special_interactive_and_stress_commands_reuse_the_judge() -> anyhow::Re
     assert!(problem.required("/generator")?.is_null());
     assert!(problem.required("/checker")?.is_null());
     assert!(problem.required("/interactor")?.is_null());
-    assert_eq!(problem.required("/testcases/0/stdin")?, "25 2\n");
-    assert_eq!(problem.required("/testcases/0/answer")?, "23\n");
+    assert_eq!(
+        problem.text("/testcases/0/stdin")?.replace("\r\n", "\n"),
+        "25 2\n"
+    );
+    assert_eq!(
+        problem.text("/testcases/0/answer")?.replace("\r\n", "\n"),
+        "23\n"
+    );
     ws.file("brute.py", "a,b=map(int,input().split());print(a+b)\n")?;
     ws.ok(&[
         "problem",

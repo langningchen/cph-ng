@@ -1,4 +1,7 @@
-use super::super::{CompilerRegistry, command::CompilationPaths};
+use super::super::{
+    CompilerRegistry,
+    command::{CompilationPaths, path_argument},
+};
 use crate::{
     application::tasks::{Cancellation, TaskFailure},
     domain::LanguageId,
@@ -72,7 +75,7 @@ pub(super) async fn key(
     let args: Vec<_> = command
         .args
         .iter()
-        .map(|arg| arg.replace(paths.workdir.to_string_lossy().as_ref(), "<build>"))
+        .map(|arg| arg.replace(&path_argument(paths.workdir), "<build>"))
         .collect();
     let signature = json!({"schema":1, "kernel":env!("CARGO_PKG_VERSION"), "os":std::env::consts::OS,
         "arch":std::env::consts::ARCH, "path":paths.original, "source":digest(source), "program":resolved,

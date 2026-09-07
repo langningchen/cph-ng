@@ -9,7 +9,10 @@ use tokio::io::AsyncWriteExt;
 #[tokio::test]
 async fn stdin_piping_and_argument_validation() -> anyhow::Result<()> {
     let ws = Workspace::new()?;
-    ws.file("echo.py", "print(input())\n")?;
+    ws.file(
+        "echo.py",
+        "import sys\nsys.stdout.buffer.write((input()+'\\n').encode())\n",
+    )?;
     let mut child = ws
         .command(&[
             "run",
@@ -39,7 +42,8 @@ async fn stdin_piping_and_argument_validation() -> anyhow::Result<()> {
     assert_eq!(
         output.status.code(),
         Some(0),
-        "{}",
+        "stdout: {}\nstderr: {}",
+        String::from_utf8_lossy(&output.stdout),
         String::from_utf8_lossy(&output.stderr)
     );
     ws.json(&["run", "echo.py", "--input", "-", "--answer-file", "-"], 2)

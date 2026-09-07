@@ -1,4 +1,5 @@
 //! Child process supervision. No shell is involved in compilation or execution.
+mod process_tree;
 use crate::application::error::ErrorCode;
 use std::{
     process::Stdio,
@@ -185,31 +186,21 @@ pub async fn process_tree_usage(pid: u32) -> (u64, usize) {
             true,
             sysinfo::ProcessRefreshKind::nothing().with_memory(),
         );
-        let mut descendants = std::collections::HashSet::from([sysinfo::Pid::from_u32(pid)]);
-        loop {
-            let before = descendants.len();
-            for (id, process) in system.processes() {
-                if process
-                    .parent()
-                    .is_some_and(|parent| descendants.contains(&parent))
-                {
-                    descendants.insert(*id);
-                }
-            }
-            if descendants.len() == before {
-                break;
-            }
-        }
-        let processes: Vec<_> = descendants
+        let samples = system
+            .processes()
             .iter()
-            .filter_map(|id| system.process(*id))
+            .map(|(id, process)| {
+                (
+                    id.as_u32(),
+                    process_tree::Sample {
+                        parent: process.parent().map(sysinfo::Pid::as_u32),
+                        start: process.start_time(),
+                        memory: process.memory(),
+                    },
+                )
+            })
             .collect();
-        let memory = processes
-            .iter()
-            .map(|process| process.memory())
-            .sum::<u64>()
-            .div_ceil(1024);
-        (memory, processes.len())
+        process_tree::usage(pid, &samples)
     })
     .await
     .unwrap_or((0, 0))

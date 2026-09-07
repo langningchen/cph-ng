@@ -46,7 +46,14 @@ async fn inline_differences_and_diff_use_the_original_answer_snapshot() -> anyho
     .await?;
     let diff = ws.ok(&["diff", task_id(&result)?]).await?;
     assert_eq!(diff.text("/answer")?, "1 right\n");
-    assert_eq!(diff.text("/stdout")?, "1.0001 wrong\n");
+    assert_eq!(
+        diff.text("/stdout")?,
+        if cfg!(windows) {
+            "1.0001 wrong\r\n"
+        } else {
+            "1.0001 wrong\n"
+        }
+    );
     assert!(
         diff.text("/comparison_diff")?
             .contains("-1 right\n+1.0001 wrong")

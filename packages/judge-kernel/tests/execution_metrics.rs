@@ -1,5 +1,3 @@
-#![cfg(unix)]
-
 use cph_ng_judge::{
     application::tasks::Cancellation,
     infrastructure::executor::ProcessExecutor,
@@ -16,7 +14,7 @@ async fn memory_measurements_report_samples_without_claiming_zero_usage() -> any
     let measured = ProcessExecutor
         .run(
             &CommandSpec {
-                program: "python3".into(),
+                program: if cfg!(windows) { "python" } else { "python3" }.into(),
                 args: vec![
                     "-c".into(),
                     "import time; a=bytearray(32*1024*1024); time.sleep(0.2)".into(),
@@ -37,8 +35,12 @@ async fn memory_measurements_report_samples_without_claiming_zero_usage() -> any
     let quick = ProcessExecutor
         .run(
             &CommandSpec {
-                program: "/bin/true".into(),
-                args: vec![],
+                program: if cfg!(windows) { "cmd" } else { "true" }.into(),
+                args: if cfg!(windows) {
+                    vec!["/C".into(), "exit 0".into()]
+                } else {
+                    vec![]
+                },
                 cwd: dir.path().into(),
             },
             &[],

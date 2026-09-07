@@ -18,8 +18,8 @@ impl CompilerRegistry {
         language: LanguageId,
         paths: &CompilationPaths<'_>,
     ) -> CommandSpec {
-        let source_arg = paths.snapshot.to_string_lossy().into_owned();
-        let artifact_arg = paths.artifact.to_string_lossy().into_owned();
+        let source_arg = path_argument(&paths.snapshot);
+        let artifact_arg = path_argument(&paths.artifact);
         let settings = self.config.languages.get(&language);
         let (compiler, mut args): (&str, Vec<String>) = match language {
             LanguageId::Cpp => (
@@ -59,7 +59,7 @@ impl CompilerRegistry {
         if matches!(language, LanguageId::C | LanguageId::Cpp)
             && let Some(parent) = paths.original.parent()
         {
-            args.extend(["-iquote".into(), parent.to_string_lossy().into_owned()]);
+            args.extend(["-iquote".into(), path_argument(parent)]);
         }
         args.push(source_arg.clone());
         if matches!(language, LanguageId::C | LanguageId::Cpp | LanguageId::Rust) {
@@ -77,7 +77,7 @@ impl CompilerRegistry {
         paths: &CompilationPaths<'_>,
         memory_mb: u64,
     ) -> Result<CommandSpec, TaskFailure> {
-        let source_arg = paths.snapshot.to_string_lossy().into_owned();
+        let source_arg = path_argument(&paths.snapshot);
         let settings = self.config.languages.get(&language);
         let (runtime, args) = match language {
             LanguageId::Python => (
@@ -93,7 +93,7 @@ impl CompilerRegistry {
                 vec![
                     format!("-Xmx{memory_mb}m"),
                     "-cp".into(),
-                    paths.workdir.to_string_lossy().into_owned(),
+                    path_argument(paths.workdir),
                     paths
                         .original
                         .file_stem()
@@ -120,5 +120,46 @@ impl CompilerRegistry {
             args,
             cwd: paths.workdir.to_path_buf(),
         })
+    }
+}
+
+// Filesystem operations keep canonical paths, but external tools such as MinGW
+// do not understand Windows verbatim prefixes. Forward slashes also keep depfiles
+// unambiguous without changing Unix filenames containing literal backslashes.
+pub(crate) fn path_argument(path: &Path) -> String {
+    let value = path.to_string_lossy();
+    #[cfg(windows)]
+    {
+        if let Some(unc) = value.strip_prefix(r"\\?\UNC\") {
+            return format!("//{}", unc.replace('\\', "/"));
+        }
+        value
+            .strip_prefix(r"\\?\")
+            .unwrap_or(&value)
+            .replace('\\', "/")
+    }
+    #[cfg(not(windows))]
+    value.into_owned()
+}
+
+#[cfg(all(test, windows))]
+mod tests {
+    use super::path_argument;
+    use std::path::Path;
+
+    #[test]
+    fn external_tools_receive_drive_and_unc_paths_without_verbatim_prefixes() {
+        assert_eq!(
+            path_argument(Path::new(r"\\?\C:\source dir\main.cpp")),
+            "C:/source dir/main.cpp"
+        );
+        assert_eq!(
+            path_argument(Path::new(r"\\?\UNC\server\share\main.cpp")),
+            "//server/share/main.cpp"
+        );
+        assert_eq!(
+            path_argument(Path::new(r"C:\source dir\main.cpp")),
+            "C:/source dir/main.cpp"
+        );
     }
 }

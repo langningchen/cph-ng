@@ -1,7 +1,10 @@
 mod dependencies;
 mod fingerprint;
 mod manifest;
-use super::{CompilerRegistry, command::CompilationPaths};
+use super::{
+    CompilerRegistry,
+    command::{CompilationPaths, path_argument},
+};
 use crate::{
     application::{
         error::ErrorCode,
@@ -46,11 +49,7 @@ impl CompilerRegistry {
             ));
         }
         let mut command = self.compilation_command(language, paths);
-        let depfile = paths
-            .workdir
-            .join("dependencies.d")
-            .to_string_lossy()
-            .into_owned();
+        let depfile = path_argument(&paths.workdir.join("dependencies.d"));
         match language {
             LanguageId::C | LanguageId::Cpp => command.args.extend([
                 "-MD".into(),

@@ -35,7 +35,10 @@ async fn package_rpc_respects_roots_force_and_source_references() -> anyhow::Res
         )
         .await?;
     let finished = client.finished(run.text("/task_id")?).await?;
-    assert_eq!(finished.required("/result/testcases/0/stdout")?, "2\n");
+    assert_eq!(
+        finished.text("/result/testcases/0/stdout")?,
+        if cfg!(windows) { "2\r\n" } else { "2\n" }
+    );
     assert_eq!(finished.required("/code_id")?, linked.required("/code_id")?);
     let first_history = client
         .ok(
