@@ -15,11 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TestcaseId } from '@cph-ng/core';
+import type { CompanionProblem, TestcaseId } from '@cph-ng/core';
 import type { Problem } from '@/domain/entities/problem';
 import type { Testcase } from '@/domain/entities/testcase';
 
 export interface IProblemService {
+  importCompanion?(source: string, problem: CompanionProblem): Promise<void>;
+  move?(problem: Problem, destination: string): Promise<void>;
   getDataPath(srcPath: string): string | null;
   getTestcasePath(srcPath: string, id: TestcaseId, ext: string): string | null;
   create(srcPath: string): Promise<Problem | null>;

@@ -1,0 +1,77 @@
+/** Kernel protocol 1.0 method names, matching judge-kernel/src/application/method.rs. */
+export const rpcMethod = {
+  systemAttach: 'system.attach',
+  configInit: 'config.init',
+  configGet: 'config.get',
+  configSet: 'config.set',
+  toolchainDetect: 'toolchain.detect',
+  toolchainCheck: 'toolchain.check',
+  systemHello: 'system.hello',
+  systemPing: 'system.ping',
+  systemCapabilities: 'system.capabilities',
+  systemShutdown: 'system.shutdown',
+  taskCreate: 'task.create',
+  taskList: 'task.list',
+  taskGet: 'task.get',
+  taskCancel: 'task.cancel',
+  taskEventsSince: 'task.events_since',
+  historyList: 'history.list',
+  historyLoad: 'history.load',
+  problemList: 'problem.list',
+  problemLoad: 'problem.load',
+  problemCreate: 'problem.create',
+  problemImport: 'problem.import',
+  problemExport: 'problem.export',
+  problemLink: 'problem.link',
+  problemSources: 'problem.sources',
+  problemUpdate: 'problem.update',
+  problemDelete: 'problem.delete',
+  problemMove: 'problem.move',
+  indexResolve: 'index.resolve',
+  indexReindexFile: 'index.reindex_file',
+  indexRebuild: 'index.rebuild',
+  testcaseList: 'testcase.list',
+  testcaseAdd: 'testcase.add',
+  testcaseUpdate: 'testcase.update',
+  testcaseDelete: 'testcase.delete',
+  testcaseReorder: 'testcase.reorder',
+  testcaseRun: 'testcase.run',
+  testcaseRunAll: 'testcase.run_all',
+  judgeRun: 'judge.run',
+  judgeCancel: 'judge.cancel',
+  stressStart: 'stress.start',
+  stressStop: 'stress.stop',
+} as const;
+export type RpcMethod = (typeof rpcMethod)[keyof typeof rpcMethod];
+
+/** Known errors match judge-kernel/src/application/error.rs; remote errors may add codes. */
+export const rpcErrorCode = {
+  parseError: -32700,
+  invalidRequest: -32600,
+  methodNotFound: -32601,
+  invalidParams: -32602,
+  internalRpc: -32603,
+  notIndexed: -32001,
+  conflict: -32002,
+  notFound: -32003,
+  taskState: -32004,
+  unsupportedLanguage: -32005,
+  busy: -32006,
+  compilationFailed: -32010,
+  executionFailed: -32011,
+  checkerFailed: -32012,
+  internalError: -32099,
+} as const;
+export type RpcErrorCode = (typeof rpcErrorCode)[keyof typeof rpcErrorCode];
+
+/** Known notifications; incoming unknown notifications are still forwarded to listeners. */
+export const rpcEventMethod = {
+  taskFinished: 'event.task.finished',
+  taskProgress: 'event.task.progress',
+  taskStarted: 'event.task.started',
+  taskQueued: 'event.task.queued',
+  serverReady: 'event.server.ready',
+  serverShuttingDown: 'event.server.shutting_down',
+  serverEventsLost: 'event.server.events_lost',
+} as const;
+export type RpcEventMethod = (typeof rpcEventMethod)[keyof typeof rpcEventMethod];

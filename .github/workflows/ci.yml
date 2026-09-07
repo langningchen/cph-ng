@@ -8,9 +8,14 @@ on:
   workflow_dispatch:
     inputs:
       force_publish:
+        description: "Force a version change; publishing remains disabled during the Rust rewrite"
         required: true
         type: boolean
         default: false
+
+env:
+  # Re-enable extension publishing only after the Rust rewrite is ready for users.
+  EXTENSION_RELEASES_ENABLED: 'false'
 
 permissions:
   contents: write
@@ -51,13 +56,59 @@ jobs:
       - name: Setup Node and pnpm
         uses: ./.github/actions/setup-node-pnpm
       - name: Run tests
-        run: pnpm test
+        run: pnpm test:run
+
+  judge-kernel:
+    timeout-minutes: 45
+    name: Judge kernel on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-22.04-arm, windows-2022, macos-15-intel, macos-14]
+    defaults:
+      run:
+        shell: bash
+        working-directory: packages/judge-kernel
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+      - name: Setup Python for kernel quality checks
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable --profile minimal --component clippy,rustfmt
+      - name: Check formatting and Rust file lengths
+        run: |
+          cargo fmt -p cph-ng-judge --check
+          python scripts/check_quality.py
+          python -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Test resident server and resource limits
+        run: cargo test --locked -p cph-ng-judge -- --test-threads=4
+      - name: Check Rust code
+        run: cargo clippy --locked -p cph-ng-judge --all-targets -- -D warnings
+      - name: Build bundled kernel
+        run: node ../vscode-ext/scripts/build-kernel.mjs
+      - name: Test VS Code RPC client against native kernel
+        run: |
+          export CPH_NG_JUDGE="$(node -p "require('node:path').resolve('../vscode-ext/bin', process.platform + '-' + process.arch, process.platform === 'win32' ? 'cph-ng-judge.exe' : 'cph-ng-judge')")"
+          pnpm -C ../vscode-ext exec vitest run tests/infrastructure/rpc
+      - name: Upload native kernel
+        uses: actions/upload-artifact@v7
+        with:
+          name: judge-kernel-${{ runner.os }}-${{ runner.arch }}
+          path: packages/vscode-ext/bin/
+          if-no-files-found: error
 
   build:
-    needs: [lint, test]
+    needs: [lint, test, judge-kernel]
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.versions.outputs.version }}
+      release_enabled: ${{ steps.versions.outputs.release_enabled }}
       version_changed: ${{ steps.versions.outputs.version_changed }}
       pre_release: ${{ steps.versions.outputs.pre_release }}
     steps:
@@ -73,6 +124,7 @@ jobs:
         id: versions
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
+          echo "release_enabled=$EXTENSION_RELEASES_ENABLED" >> "$GITHUB_OUTPUT"
           echo "::group::Detecting version"
           CURRENT_VERSION=$(node -p "require('./.cph-ng-release.json').version")
           PREV_VERSION=$(git show HEAD^:.cph-ng-release.json 2>/dev/null | node -p "JSON.parse(require('fs').readFileSync(0, 'utf-8')).version" || echo "0.0.0")
@@ -95,12 +147,20 @@ jobs:
           echo "Version changed: $VERSION_CHANGED"
           echo "::endgroup::"
 
+      - name: Download native kernels
+        uses: actions/download-artifact@v8
+        with:
+          pattern: judge-kernel-*
+          merge-multiple: true
+          path: packages/vscode-ext/bin
+
       - name: Build all packages
         run: |
           echo "::group::Building packages"
           pnpm package
           echo "::endgroup::"
         env:
+          CPH_NG_KERNEL_PREBUILT: '1'
           BUILD_TYPE: Auto Build
           PRE_RELEASE: ${{ steps.versions.outputs.pre_release }}
 
@@ -113,6 +173,9 @@ jobs:
       - name: Build Summary
         run: |
           echo "## 📦 Build Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "> **Rust rewrite in progress:** these builds are unusable for everyday use. Extension publishing is paused. See the README and https://github.com/langningchen/cph-ng/discussions/285." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Summary table
@@ -194,7 +257,9 @@ jobs:
 
   release-github:
     needs: [build]
-    if: needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
+    # Pause extension releases and dependent marketplace publishing during the Rust rewrite.
+    # See https://github.com/langningchen/cph-ng/discussions/285 and README.md.
+    if: needs.build.outputs.release_enabled == 'true' && needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -389,7 +454,8 @@ jobs:
           echo "::endgroup::"
 
   post-publish:
-    if: always() && needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
+    # Resume project updates together with extension publishing after the rewrite.
+    if: always() && needs.build.outputs.release_enabled == 'true' && needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
     needs: [build, publish-vscode, publish-openvsx, publish-edge, publish-firefox]
     runs-on: ubuntu-latest
     steps:

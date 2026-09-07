@@ -73,6 +73,21 @@ export class MoveProblem extends BaseProblemUseCase<MoveProblemMsg> {
 
     backgroundProblem.abort();
 
+    if (this.service.move) {
+      await this.fs.copyFile(srcPath, destSrcPath);
+      try {
+        await this.service.move(problem, destSrcPath);
+      } catch (error) {
+        await this.fs.rm(destSrcPath, { force: true });
+        throw error;
+      }
+      await this.repo.unload(problemId);
+      await this.fs.rm(srcPath, { force: true });
+      this.ui.openFile(Uri.file(destSrcPath));
+      await this.coordinator.onActiveEditorChanged();
+      await this.coordinator.dispatchFullData();
+      return;
+    }
     await this.copyService.copy(problem, destSrcPath);
 
     await this.repo.unload(problemId);

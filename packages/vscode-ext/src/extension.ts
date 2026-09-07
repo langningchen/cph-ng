@@ -20,6 +20,7 @@ import { install } from 'source-map-support';
 import { container } from 'tsyringe';
 import type { ExtensionContext } from 'vscode';
 import { setupContainer } from '@/composition/container';
+import { KernelService } from '@/infrastructure/rpc/kernelService';
 import { ExtensionManager } from '@/infrastructure/vscode/extensionManager';
 
 install();
@@ -30,5 +31,9 @@ export const activate = async (context: ExtensionContext) => {
   await extensionManager.activate(context);
 };
 export const deactivate = async () => {
-  await extensionManager?.deactivate();
+  try {
+    await extensionManager?.deactivate();
+  } finally {
+    if (container.isRegistered(KernelService)) await container.resolve(KernelService).dispose();
+  }
 };

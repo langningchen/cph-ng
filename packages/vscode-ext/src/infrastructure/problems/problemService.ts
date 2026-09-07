@@ -39,10 +39,12 @@ import { Problem } from '@/domain/entities/problem';
 import type { Testcase } from '@/domain/entities/testcase';
 import { TestcaseScanner } from '@/domain/services/TestcaseScanner';
 import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
+import { KernelConfiguration } from '@/infrastructure/rpc/configuration';
 
 @injectable()
 export class ProblemService implements IProblemService {
   public constructor(
+    @inject(KernelConfiguration) private readonly configuration: KernelConfiguration,
     @inject(TOKENS.crypto) private readonly crypto: ICrypto,
     @inject(TOKENS.fileSystem) private readonly fs: IFileSystem,
     @inject(TOKENS.logger) private readonly logger: ILogger,
@@ -142,6 +144,8 @@ export class ProblemService implements IProblemService {
   }
 
   public applyTestcases(problem: Problem, testcases: Testcase[]): void {
+    // Canceling selection or finding no pairs must preserve the existing tests.
+    if (testcases.length === 0) return;
     if (this.settings.problem.clearBeforeLoad) this.tmp.dispose(problem.clearTestcases());
     for (const testcase of testcases) {
       const testcaseId = this.crypto.randomUUID() as TestcaseId;
@@ -259,8 +263,14 @@ export class ProblemService implements IProblemService {
 
   public getLimits(problem: Problem) {
     return {
-      timeLimitMs: problem.overrides?.timeLimitMs ?? this.settings.problem.defaultTimeLimit,
-      memoryLimitMb: problem.overrides?.memoryLimitMb ?? this.settings.problem.defaultMemoryLimit,
+      timeLimitMs:
+        problem.overrides?.timeLimitMs ??
+        this.configuration.current?.config.problem.time_limit ??
+        1000,
+      memoryLimitMb:
+        problem.overrides?.memoryLimitMb ??
+        this.configuration.current?.config.problem.memory_limit ??
+        256,
     };
   }
 }

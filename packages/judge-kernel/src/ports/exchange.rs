@@ -1,12 +1,9 @@
-use std::{collections::HashMap, convert::TryFrom, fmt::Display, path::Path};
+use std::{collections::HashMap, path::Path};
 
 use thiserror::Error;
 use toml_edit::DocumentMut;
 
-use crate::{
-    domain::{Problem, TestcaseId},
-    ports::inquire::Inquire,
-};
+use crate::domain::{Problem, TestcaseId};
 
 #[derive(Error, Debug)]
 pub enum ExchangeError {
@@ -20,28 +17,22 @@ pub enum ExchangeError {
     ValueOverflow(String, u64, u64),
 }
 
-/// Try to convert a `u64` to `T`. If overflow, ask via `inquire` whether to clamp or abort.
-pub fn clamp_or_abort<T>(
-    field: &str,
-    value: u64,
-    max: T,
-    inquire: &dyn Inquire,
-) -> Result<T, ExchangeError>
+/// Validate an imported integer without prompting or changing its value.
+///
+/// # Errors
+/// Returns the field, rejected value and upper bound if it is out of range.
+pub fn checked_import_value<T>(field: &str, value: u64, max: T) -> Result<T, ExchangeError>
 where
-    T: TryFrom<u64> + Copy + Display + Into<u64>,
+    T: TryFrom<u64> + Into<u64>,
 {
-    if let Ok(v) = T::try_from(value) {
-        return Ok(v);
+    let max = max.into();
+    if value > max {
+        return Err(ExchangeError::ValueOverflow(field.into(), value, max));
     }
-    let max_u64: u64 = max.into();
-    let error = ExchangeError::ValueOverflow(field.to_string(), value, max_u64);
-    if inquire.confirm(&error) {
-        Ok(max)
-    } else {
-        Err(error)
-    }
+    T::try_from(value).map_err(|_| ExchangeError::ValueOverflow(field.into(), value, max))
 }
 
+#[derive(Debug)]
 pub struct ImportedData {
     pub problem: Problem,
     pub language_env: DocumentMut,
@@ -50,9 +41,15 @@ pub struct ImportedData {
 
 pub trait ProblemImporter: Send + Sync {
     fn can_import(&self, path: &Path) -> bool;
-    fn import(&self, path: &Path, inquire: &dyn Inquire) -> Result<ImportedData, ExchangeError>;
+
+    /// # Errors
+    /// Returns an I/O, serialization or range-validation error without changing the imported
+    /// values.
+    fn import(&self, path: &Path) -> Result<ImportedData, ExchangeError>;
 }
 
 pub trait ProblemExporter: Send + Sync {
+    /// # Errors
+    /// Returns an I/O or serialization error if the destination cannot be written.
     fn export(&self, problem: &Problem, export_path: &Path) -> Result<(), ExchangeError>;
 }

@@ -19,6 +19,7 @@ import type { ProblemId } from '@cph-ng/core';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 
 export interface IProblemRepository {
+  save?(problemId: ProblemId): Promise<void>;
   fireBackgroundEvent(): void;
   loadByPath(srcPath: string, allowCreate?: boolean): Promise<BackgroundProblem | null>;
   get(problemId?: ProblemId): Promise<BackgroundProblem | undefined>;

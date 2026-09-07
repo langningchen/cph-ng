@@ -1,14 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 use crate::domain::{
-    HistoryIndexEntry,
-    Memory,
-    ProblemId,
-    ProblemJudgingStatus,
-    SourcePath,
-    StressTestConfig,
-    Testcase,
-    Time,
+    HistoryIndexEntry, Memory, ProblemId, ProblemJudgingStatus, SourcePath, StressTestConfig,
+    Testcase, Time,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -29,6 +23,7 @@ pub struct Problem {
 }
 
 impl Problem {
+    #[must_use]
     pub fn new(name: String, source_path: SourcePath) -> Self {
         Self {
             version: 1,

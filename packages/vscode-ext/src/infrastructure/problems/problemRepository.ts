@@ -123,6 +123,11 @@ export class ProblemRepository implements IProblemRepository {
     return true;
   }
 
+  public async save(problemId: ProblemId): Promise<void> {
+    const background = this.backgroundProblems.get(problemId);
+    if (background && !background.ac) await this.problemService.save(background.problem);
+  }
+
   public async dispose(): Promise<void> {
     this.logger.debug('Disposing problem repository, unloading all problems');
     for (const problemId of this.backgroundProblems.keys()) await this.unload(problemId);

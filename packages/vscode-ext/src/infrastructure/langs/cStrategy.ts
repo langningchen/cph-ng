@@ -1,93 +1,12 @@
-import type { IFileWithHash, ILanguageEnvCompile } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
-import type { ISystem } from '@/application/ports/node/ISystem';
-import type {
-  CompileAdditionalData,
-  LangCompileData,
-} from '@/application/ports/problems/judge/langs/ILanguageStrategy';
-import type { IPathResolver } from '@/application/ports/services/IPathResolver';
-import type { ILogger } from '@/application/ports/vscode/ILogger';
-import { TOKENS } from '@/composition/tokens';
-import {
-  AbstractLanguageStrategy,
-  DefaultCompileAdditionalData,
-} from '@/infrastructure/langs/abstractLanguageStrategy';
-import { LanguageStrategyContext } from '@/infrastructure/langs/languageStrategyContext';
+import { KernelConfiguration } from '@/infrastructure/rpc/configuration';
+import { AbstractLanguageStrategy } from './abstractLanguageStrategy';
 
 @injectable()
 export class LangC extends AbstractLanguageStrategy {
   public override readonly name = 'C';
   public override readonly extensions = ['c'];
-  public override readonly enableExternalRunner = true;
-  public override readonly defaultValues: ILanguageEnvCompile;
-  public override readonly compilerQuery = {
-    filePatterns: ['gcc*', '*-gcc*', 'clang*', '*clang-*'],
-    groupPatterns: [
-      {
-        group: 'gcc',
-        helpRegex: /^For bug reporting instructions, please see:$/m,
-        versionRegex: /^(?<name>.*) \((?<description>.+)\) (?<version>[0-9]+\.[0-9]+\.[0-9]+)$/m,
-      },
-      {
-        group: 'clang',
-        helpRegex: /^OVERVIEW: clang LLVM compiler$/m,
-        versionRegex:
-          /^(?<name>.*) version (?<version>[0-9]+\.[0-9]+\.[0-9]+) \((?<description>.+)\)$/m,
-      },
-    ],
-  };
-
-  public constructor(
-    @inject(LanguageStrategyContext) context: LanguageStrategyContext,
-    @inject(TOKENS.logger) logger: ILogger,
-    @inject(TOKENS.pathResolver) private readonly resolver: IPathResolver,
-    @inject(TOKENS.system) private readonly sys: ISystem,
-  ) {
-    super({ ...context, logger: logger.withScope('langsC') });
-    this.defaultValues = {
-      get compiler(): string {
-        return context.settings.languages.cCompiler;
-      },
-      set compiler(value: string) {
-        context.settings.languages.cCompiler = value;
-      },
-      get compilerArgs(): string {
-        return context.settings.languages.cCompilerArgs;
-      },
-      set compilerArgs(value: string) {
-        context.settings.languages.cCompilerArgs = value;
-      },
-    };
-  }
-
-  protected override async internalCompile(
-    src: IFileWithHash,
-    signal: AbortSignal,
-    forceCompile: boolean | null,
-    additionalData: CompileAdditionalData = DefaultCompileAdditionalData,
-  ): Promise<LangCompileData> {
-    const path = this.path.join(
-      this.resolver.renderPath(this.settings.cache.directory),
-      this.path.basename(src.path, this.path.extname(src.path)) +
-        (this.sys.platform() === 'win32' ? '.exe' : ''),
-    );
-
-    const compiler = additionalData.overrides?.compiler || this.defaultValues.compiler;
-    const args = additionalData.overrides?.compilerArgs || this.defaultValues.compilerArgs;
-    const { unlimitedStack } = this.settings.run;
-
-    const { skip, hash } = await this.checkHash(
-      src,
-      path,
-      compiler + args + unlimitedStack,
-      forceCompile,
-    );
-    if (skip) return { path, hash };
-
-    const compilerArgs = args.split(/\s+/).filter(Boolean);
-    const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
-    if (unlimitedStack && this.sys.platform() === 'win32') cmd.push('-Wl,--stack,268435456');
-    await this.executeCompiler(cmd, signal);
-    return { path, hash };
+  public constructor(@inject(KernelConfiguration) configuration: KernelConfiguration) {
+    super(configuration);
   }
 }

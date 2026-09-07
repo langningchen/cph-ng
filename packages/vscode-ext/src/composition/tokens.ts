@@ -17,13 +17,12 @@
 
 import type { TelemetryReporter } from '@vscode/extension-telemetry';
 import type { InjectionToken } from 'tsyringe';
-import type { LogOutputChannel, OutputChannel } from 'vscode';
+import type { LogOutputChannel } from 'vscode';
 import type { IBuildInfo } from '@/application/ports/node/IBuildInfo';
 import type { IClock } from '@/application/ports/node/IClock';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
-import type { IProcessExecutor } from '@/application/ports/node/IProcessExecutor';
 import type { ISystem } from '@/application/ports/node/ISystem';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
 import type { ICphMigrationService } from '@/application/ports/problems/ICphMigrationService';
@@ -32,15 +31,8 @@ import type { IProblemMigrationService } from '@/application/ports/problems/IPro
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
-import type { ICheckerRunner } from '@/application/ports/problems/judge/ICheckerRunner';
-import type { ICompilerService } from '@/application/ports/problems/judge/ICompilerService';
-import type { IJudgeServiceFactory } from '@/application/ports/problems/judge/IJudgeServiceFactory';
-import type { IResultEvaluator } from '@/application/ports/problems/judge/IResultEvaluator';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { ILanguageStrategy } from '@/application/ports/problems/judge/langs/ILanguageStrategy';
-import type { IExecutionStrategyFactory } from '@/application/ports/problems/judge/runner/execution/IExecutionStrategyFactory';
-import type { IRunnerProvider } from '@/application/ports/problems/judge/runner/execution/strategies/IRunnerProvider';
-import type { ISolutionRunner } from '@/application/ports/problems/judge/runner/ISolutionRunner';
 import type { IActiveProblemCoordinator } from '@/application/ports/services/IActiveProblemCoordinator';
 import type { IArchive } from '@/application/ports/services/IArchive';
 import type { ICompanion } from '@/application/ports/services/ICompanion';
@@ -72,7 +64,6 @@ export const TOKENS = {
   extensionContext: 'vscode.ExtensionContext' as InjectionToken<IExtensionContext>,
   extensionPath: 'vscode.ExtensionPath' as InjectionToken<string>,
   logOutputChannel: 'vscode.LogOutputChannel' as InjectionToken<LogOutputChannel>,
-  compilationOutputChannel: 'vscode.CompilationOutputChannel' as InjectionToken<OutputChannel>,
   userScriptOutputChannel: 'vscode.UserScriptOutputChannel' as InjectionToken<LogOutputChannel>,
   telemetryReporter: 'vscode.TelemetryReporter' as InjectionToken<TelemetryReporter>,
   version: 'vscode.Version' as InjectionToken<string>,
@@ -82,13 +73,10 @@ export const TOKENS = {
   activeProblemCoordinator:
     'ports.ActiveProblemCoordinator' as InjectionToken<IActiveProblemCoordinator>,
   buildInfo: 'ports.BuildInfo' as InjectionToken<IBuildInfo>,
-  checkerRunner: 'ports.CheckerRunner' as InjectionToken<ICheckerRunner>,
   cppHeaderExpander: 'ports.CppHeaderExpander' as InjectionToken<ICppHeaderExpander>,
   clock: 'ports.Clock' as InjectionToken<IClock>,
-  compilerService: 'ports.CompilerService' as InjectionToken<ICompilerService>,
   crypto: 'ports.Crypto' as InjectionToken<ICrypto>,
   fileSystem: 'ports.FileSystem' as InjectionToken<IFileSystem>,
-  judgeServiceFactory: 'ports.JudgeServiceFactory' as InjectionToken<IJudgeServiceFactory>,
   languageRegistry: 'ports.LanguageRegistry' as InjectionToken<ILanguageRegistry>,
   languageStrategy: 'ports.LanguageStrategy' as InjectionToken<ILanguageStrategy>,
   logger: 'ports.Logger' as InjectionToken<ILogger>,
@@ -97,11 +85,7 @@ export const TOKENS = {
   pathResolver: 'ports.PathResolver' as InjectionToken<IPathResolver>,
   problemCopyService: 'ports.ProblemCopyService' as InjectionToken<IProblemCopyService>,
   problemService: 'ports.ProblemService' as InjectionToken<IProblemService>,
-  processExecutor: 'ports.ProcessExecutor' as InjectionToken<IProcessExecutor>,
-  resultEvaluator: 'ports.ResultEvaluator' as InjectionToken<IResultEvaluator>,
-  runnerProvider: 'ports.RunnerProvider' as InjectionToken<IRunnerProvider>,
   settings: 'ports.Settings' as InjectionToken<ISettings>,
-  solutionRunner: 'ports.SolutionRunner' as InjectionToken<ISolutionRunner>,
   system: 'ports.System' as InjectionToken<ISystem>,
   templateRenderer: 'ports.TemplateRenderer' as InjectionToken<ITemplateRenderer>,
   testcaseIoService: 'ports.TestcaseIoService' as InjectionToken<ITestcaseIoService>,
@@ -114,8 +98,6 @@ export const TOKENS = {
   workspace: 'ports.Workspace' as InjectionToken<IWorkspace>,
   problemMigrationService:
     'ports.ProblemMigrationService' as InjectionToken<IProblemMigrationService>,
-  executionStrategyFactory:
-    'ports.ExecutionStrategyFactory' as InjectionToken<IExecutionStrategyFactory>,
 
   // Repositories
   problemRepository: 'repositories.ProblemRepository' as InjectionToken<IProblemRepository>,

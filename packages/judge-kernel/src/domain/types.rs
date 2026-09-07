@@ -55,3 +55,18 @@ impl std::fmt::Display for LanguageId {
         write!(f, "{s}")
     }
 }
+
+impl LanguageId {
+    #[must_use]
+    pub fn from_path(path: &std::path::Path) -> Option<Self> {
+        match path.extension()?.to_str()?.to_ascii_lowercase().as_str() {
+            "c" => Some(Self::C),
+            "cpp" | "cc" | "cxx" => Some(Self::Cpp),
+            "py" => Some(Self::Python),
+            "rs" => Some(Self::Rust),
+            "js" | "cjs" | "mjs" => Some(Self::Javascript),
+            "java" => Some(Self::Java),
+            _ => None,
+        }
+    }
+}

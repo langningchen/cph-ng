@@ -26,6 +26,7 @@ export abstract class BaseProblemUseCase<T extends { problemId: ProblemId }> {
     const backgroundProblem = await this.repo.get(msg.problemId);
     if (!backgroundProblem) throw new Error('Problem not found');
     await this.performAction(backgroundProblem, msg);
+    await this.repo.save?.(msg.problemId);
   }
 
   protected abstract performAction(backgroundProblem: BackgroundProblem, msg: T): Promise<void>;
