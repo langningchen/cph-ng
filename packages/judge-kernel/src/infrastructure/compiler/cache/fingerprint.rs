@@ -82,6 +82,10 @@ pub(super) async fn key(
         "modified":format!("{modified:?}"), "size":metadata.map(|data| data.len()), "args":args,
         "settings":registry.config.languages.get(&language), "environment":environment,
         "version":[version.stdout, version.stderr]});
+    #[cfg(debug_assertions)]
+    if std::env::var_os("CPH_NG_CACHE_DIAGNOSTICS").is_some() {
+        eprintln!("Compiler version probe: {version:?}\nCache fingerprint: {signature}");
+    }
     Ok(digest(
         &serde_json::to_vec(&signature).map_err(TaskFailure::internal)?,
     ))

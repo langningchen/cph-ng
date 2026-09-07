@@ -19,9 +19,9 @@ async fn compilation_cache_modes_validate_source_dependencies_and_artifacts() ->
             .text("/error/message")?
             .contains("No valid compilation cache")
     );
-    let first = ws.ok(&run).await?;
+    let first = diagnostic_run(&ws, &run).await?;
     assert_eq!(first.required("/result/compilation/builds")?, 1);
-    let cached = ws.ok(&run).await?;
+    let cached = diagnostic_run(&ws, &run).await?;
     assert_eq!(
         cached.required("/result/compilation/hits")?,
         1,
@@ -172,4 +172,23 @@ fn cache_diagnostics(ws: &Workspace) -> anyhow::Result<String> {
         }
     }
     Ok(output)
+}
+
+async fn diagnostic_run(ws: &Workspace, args: &[&str]) -> anyhow::Result<serde_json::Value> {
+    let output = tokio::time::timeout(
+        std::time::Duration::from_secs(30),
+        ws.command(args)
+            .arg("--json")
+            .env("CPH_NG_CACHE_DIAGNOSTICS", "1")
+            .output(),
+    )
+    .await??;
+    // Rust's test harness only prints this captured output if the test fails.
+    eprintln!("{}", String::from_utf8_lossy(&output.stderr));
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stdout)
+    );
+    Ok(serde_json::from_slice(&output.stdout)?)
 }

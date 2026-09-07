@@ -77,6 +77,7 @@ impl Manifest {
             let destination = workdir.join(&artifact.path);
             repo.write_owned(&destination, &fs::read(source).await?)
                 .await?;
+            #[cfg(unix)]
             executable(&destination, artifact.executable).await?;
         }
         Ok(true)
@@ -171,17 +172,12 @@ fn relative(path: &Path) -> bool {
             .components()
             .all(|part| matches!(part, Component::Normal(_)))
 }
+#[cfg(unix)]
 async fn executable(path: &Path, value: bool) -> std::io::Result<()> {
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        fs::set_permissions(
-            path,
-            std::fs::Permissions::from_mode(if value { 0o700 } else { 0o600 }),
-        )
-        .await?;
-    }
-    #[cfg(not(unix))]
-    let _ = (path, value);
-    Ok(())
+    use std::os::unix::fs::PermissionsExt;
+    fs::set_permissions(
+        path,
+        std::fs::Permissions::from_mode(if value { 0o700 } else { 0o600 }),
+    )
+    .await
 }
