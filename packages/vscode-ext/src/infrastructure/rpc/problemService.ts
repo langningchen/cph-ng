@@ -12,6 +12,7 @@ import { ProblemService as LegacyProblemService } from '@/infrastructure/problem
 import { RpcRemoteError, type TaskInfo } from './client';
 import { KernelConfiguration, languageIds, quoteArgument } from './configuration';
 import { KernelService, splitArguments } from './kernelService';
+import { editorProblem } from './paths';
 import { problemChanges, sameProblemData } from './problemChanges';
 import { rpcErrorCode, rpcMethod } from './protocol';
 
@@ -89,6 +90,7 @@ export class RpcProblemService implements IProblemService {
   }
   private async entity(dto: ProblemDto): Promise<Problem> {
     await this.configuration.get();
+    dto = editorProblem(dto);
     const problem = new Problem(dto.name, dto.source_path);
     this.ids.set(problem, dto.id);
     this.codeIds.set(problem, dto.code_id ?? dto.id);
@@ -238,13 +240,16 @@ export class RpcProblemService implements IProblemService {
       id = stored.id;
       local.id = id;
       this.ids.set(problem, id);
+      stored = editorProblem(stored);
       base = structuredClone(stored);
       this.baselines.set(problem, base);
       problem.overrides.timeLimitMs ??= stored.time_limit_ms;
       problem.overrides.memoryLimitMb ??= stored.memory_limit_mb;
     } else {
       if (!base) throw new Error('Reopen the problem before saving.');
-      stored = await client.request<ProblemDto>(rpcMethod.problemLoad, { problem_id: id });
+      stored = editorProblem(
+        await client.request<ProblemDto>(rpcMethod.problemLoad, { problem_id: id }),
+      );
     }
     const change = problemChanges(base, local, stored);
     // Advance only successfully committed portions of the baseline so retries retain unsaved edits.

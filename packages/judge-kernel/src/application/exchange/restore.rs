@@ -157,7 +157,9 @@ async fn write_file(
 ) -> Result<PathBuf, TaskFailure> {
     let name = file
         .path
-        .file_name()
+        .to_str()
+        .and_then(|path| path.rsplit(['/', '\\']).next())
+        .filter(|name| !name.is_empty() && !matches!(*name, "." | ".."))
         .ok_or_else(|| TaskFailure::invalid("Invalid package filename"))?;
     let dir = context.paths.create_directory(&root.join(folder)).await?;
     context.paths.create(&dir.join(name), &file.content).await

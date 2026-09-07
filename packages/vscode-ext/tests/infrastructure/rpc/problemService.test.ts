@@ -37,7 +37,7 @@ const second = '00000000-0000-0000-0000-000000000002' as TestcaseId;
 const third = '00000000-0000-0000-0000-000000000003' as TestcaseId;
 const fourth = '00000000-0000-0000-0000-000000000004' as TestcaseId;
 
-async function windows() {
+async function windows(paths: Partial<ProblemDto> = {}) {
   const remote: ProblemDto = {
     id: '00000000-0000-0000-0000-000000000010',
     source_path: '/work/main.cpp',
@@ -49,6 +49,7 @@ async function windows() {
     interactor: null,
     generator: null,
     brute_force: null,
+    ...paths,
     testcases: [
       { id: first, stdin: '1', answer: 'one' },
       { id: second, stdin: '2', answer: 'two' },
@@ -309,4 +310,54 @@ it('attaches selected auxiliary sources before saving and reattaches them on unc
   await a.save(left);
   expect(sources.every((source) => attached.has(source))).toBe(true);
   expect(mutations).toEqual([]);
+});
+
+it('normalizes Windows kernel paths for editor matching without spurious auxiliary updates', async () => {
+  vi.stubGlobal('process', { ...process, platform: 'win32' });
+  try {
+    const { a, left, mutations } = await windows({
+      source_path: String.raw`\\?\C:\work\Main.cpp`,
+      checker: String.raw`\\?\UNC\server\share\checker.cpp`,
+      interactor: String.raw`\\?\C:\tools\interactor.cpp`,
+      generator: String.raw`\\?\C:\tools\generator.cpp`,
+      brute_force: String.raw`\\?\C:\tools\brute.cpp`,
+    });
+    expect(left.src.path).toBe(String.raw`c:\work\Main.cpp`);
+    for (const path of [
+      String.raw`c:\work\Main.cpp`,
+      String.raw`\\server\share\checker.cpp`,
+      String.raw`c:\tools\interactor.cpp`,
+      String.raw`c:\tools\generator.cpp`,
+      String.raw`c:\tools\brute.cpp`,
+    ])
+      expect(left.isRelated(path)).toBe(true);
+    await a.save(left);
+    expect(mutations).toEqual([]);
+    left.name = 'Renamed';
+    await a.save(left);
+    expect(mutations).toEqual([
+      {
+        method: rpcMethod.problemUpdate,
+        params: { problem_id: '00000000-0000-0000-0000-000000000010', name: 'Renamed' },
+      },
+    ]);
+    const save = vi.fn(async () => {});
+    const judge = new RpcJudgeService(
+      {
+        forSource: async () => ({
+          runTask: async () => ({ state: 'succeeded', result: { testcases: [] } }),
+        }),
+      } as unknown as KernelService,
+      a,
+      { save } as unknown as IDocument,
+      { problem: { expandBehavior: 'firstFailed' } } as ISettings,
+    );
+    await judge.run(
+      new BackgroundProblem('00000000-0000-0000-0000-000000000010' as ProblemId, left, 0),
+      first,
+    );
+    expect(save).toHaveBeenCalledWith(String.raw`c:\work\Main.cpp`);
+  } finally {
+    vi.unstubAllGlobals();
+  }
 });

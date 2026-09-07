@@ -223,3 +223,51 @@ async fn check_restored_sources(ws: &Workspace, restored: &Value) -> anyhow::Res
     }
     Ok(())
 }
+
+#[tokio::test]
+async fn native_import_preserves_filenames_from_other_operating_systems() -> anyhow::Result<()> {
+    let ws = Workspace::new()?;
+    ws.file("Main.java", "public class Main {}\n")?;
+    ws.file("checker.py", "import sys; sys.exit(0)\n")?;
+    ws.ok(&["problem", "create", "Main.java", "--checker", "checker.py"])
+        .await?;
+    ws.ok(&["export", "Main.java", "--destination", "portable.cph"])
+        .await?;
+    let original: Value =
+        serde_json::from_slice(&std::fs::read(ws.dir.path().join("portable.cph"))?)?;
+    for (i, directory) in [r"C:\work", r"\\?\C:\work", r"\\server\share", "/work"]
+        .iter()
+        .enumerate()
+    {
+        let mut archive = original.clone();
+        let separator = if directory.starts_with('/') {
+            '/'
+        } else {
+            '\\'
+        };
+        let source = format!("{directory}{separator}Main.java");
+        let checker = format!("{directory}{separator}checker.py");
+        for (pointer, path) in [
+            ("/problem/src", &source),
+            ("/sources/0/path", &source),
+            ("/problem/checker", &checker),
+            ("/auxiliary/0/path", &checker),
+        ] {
+            *archive.pointer_mut(pointer).context("packaged file path")? = json!(path);
+        }
+        let file = format!("portable-{i}.cph");
+        ws.file(&file, &archive.to_string())?;
+        let restored = ws
+            .ok(&["import", &file, "--destination", &format!("restored-{i}")])
+            .await?;
+        for (field, name, content) in [
+            ("/source_path", "Main.java", "public class Main {}\n"),
+            ("/checker", "checker.py", "import sys; sys.exit(0)\n"),
+        ] {
+            let path = std::path::Path::new(restored.text(field)?);
+            assert_eq!(path.file_name().context("restored filename")?, name);
+            assert_eq!(std::fs::read_to_string(path)?, content);
+        }
+    }
+    Ok(())
+}
