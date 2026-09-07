@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::path::{Component, Path, PathBuf};
 use tokio::fs;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub(super) struct Dependency {
     pub path: PathBuf,
     pub hash: String,
@@ -28,8 +28,13 @@ pub(super) struct Manifest {
 }
 
 impl Manifest {
-    pub async fn restore(repo: &WorkspaceProblemRepository, cache: &Path, workdir: &Path) -> bool {
-        Self::try_restore(repo, cache, workdir)
+    pub async fn restore(
+        repo: &WorkspaceProblemRepository,
+        cache: &Path,
+        workdir: &Path,
+        current_dependencies: Option<&[Dependency]>,
+    ) -> bool {
+        Self::try_restore(repo, cache, workdir, current_dependencies)
             .await
             .unwrap_or(false)
     }
@@ -37,12 +42,16 @@ impl Manifest {
         repo: &WorkspaceProblemRepository,
         cache: &Path,
         workdir: &Path,
+        current_dependencies: Option<&[Dependency]>,
     ) -> Result<bool, Box<dyn std::error::Error + Send + Sync>> {
         let file = fs::canonicalize(cache.join("manifest.json")).await?;
         if !file.starts_with(repo.root()) || fs::metadata(&file).await?.len() > 4 * 1024 * 1024 {
             return Ok(false);
         }
         let manifest: Self = serde_json::from_slice(&fs::read(file).await?)?;
+        if current_dependencies.is_some_and(|current| current != manifest.dependencies) {
+            return Ok(false);
+        }
         if manifest
             .environment
             .iter()

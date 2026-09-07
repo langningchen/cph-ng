@@ -111,6 +111,7 @@ impl CompilerRegistry {
     async fn run_compiler(
         &self,
         command: &CommandSpec,
+        input: &[u8],
         cancel: &Cancellation,
     ) -> Result<(), TaskFailure> {
         let time_ms = self.config.compilation_timeout_ms.unwrap_or(30_000);
@@ -127,7 +128,7 @@ impl CompilerRegistry {
             file_bytes: 128 * 1024 * 1024,
             processes: 128,
         };
-        let result = ProcessExecutor.run(command, &[], &limits, cancel).await?;
+        let result = ProcessExecutor.run(command, input, &limits, cancel).await?;
         if result.reason == ExitReason::Canceled {
             return Err(TaskFailure::canceled());
         }

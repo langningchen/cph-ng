@@ -8,6 +8,7 @@ use std::{
 pub(super) async fn collect(
     language: LanguageId,
     workdir: &Path,
+    cwd: &Path,
 ) -> std::io::Result<Vec<Dependency>> {
     if !matches!(language, LanguageId::Cpp | LanguageId::C | LanguageId::Rust) {
         return Ok(Vec::new());
@@ -18,7 +19,7 @@ pub(super) async fn collect(
         let path = if path.is_absolute() {
             path
         } else {
-            workdir.join(path)
+            cwd.join(path)
         };
         // Keep the spelling used by the compiler: retargeting a symlink must
         // invalidate the cache even if the previous target still exists.

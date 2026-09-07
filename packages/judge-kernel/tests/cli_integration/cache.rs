@@ -106,13 +106,14 @@ async fn compiler_flags_invalidate_cache_without_changing_judge_defaults() -> an
 #[tokio::test]
 async fn rust_cache_tracks_included_files() -> anyhow::Result<()> {
     let ws = Workspace::new()?;
-    let include = ws.file("value.txt", "one")?;
+    ws.file("value.txt", "one")?;
+    ws.file(
+        "helper.rs",
+        "pub fn value() -> &'static str { include_str!(\"value.txt\") }",
+    )?;
     ws.file(
         "cached.rs",
-        &format!(
-            "fn main() {{ print!(\"{{}}\", include_str!({})); }}",
-            serde_json::to_string(&include)?
-        ),
+        "mod helper; fn main() { print!(\"{}\", helper::value()); }",
     )?;
     let run = ["run", "cached.rs", "--stdin", "", "--answer", "one"];
     assert_eq!(
@@ -225,6 +226,57 @@ async fn failed_version_probes_never_publish_or_reuse_compilation_caches() -> an
         ws.ok(&[&run[..], &["--skip-compile"]].concat())
             .await?
             .required("/result/compilation/hits")?,
+        1
+    );
+    Ok(())
+}
+
+#[tokio::test]
+async fn newly_shadowing_headers_invalidate_compilation_cache() -> anyhow::Result<()> {
+    let ws = Workspace::new()?;
+    let first = ws.dir.path().join("first");
+    let second = ws.dir.path().join("second");
+    std::fs::create_dir_all(&first)?;
+    std::fs::create_dir_all(&second)?;
+    std::fs::create_dir_all(&ws.store)?;
+    std::fs::write(second.join("config.h"), "#define VALUE 1\n")?;
+    ws.file(
+        "main.cpp",
+        "#include <cstdio>\n#include <config.h>\nint main(){printf(\"%d\",VALUE);}",
+    )?;
+    let args = vec![
+        format!("-I{}", first.display()),
+        format!("-I{}", second.display()),
+    ];
+    std::fs::write(
+        ws.store.join("config.toml"),
+        format!(
+            "[languages.cpp]\ncompiler='g++'\ncompiler_args={}\n",
+            serde_json::to_string(&args)?
+        ),
+    )?;
+    let run = ["run", "main.cpp", "--stdin", "", "--answer", "1"];
+    ws.ok(&run).await?;
+    ws.ok(&[&run[..], &["--skip-compile"]].concat()).await?;
+    std::fs::write(first.join("config.h"), "#define VALUE 2\n")?;
+    ws.json(&[&run[..], &["--skip-compile"]].concat(), 3)
+        .await?;
+    let changed = ws
+        .ok(&["run", "main.cpp", "--stdin", "", "--answer", "2"])
+        .await?;
+    assert_eq!(changed.required("/result/compilation/builds")?, 1);
+    assert_eq!(
+        ws.ok(&[
+            "run",
+            "main.cpp",
+            "--stdin",
+            "",
+            "--answer",
+            "2",
+            "--skip-compile"
+        ])
+        .await?
+        .required("/result/compilation/hits")?,
         1
     );
     Ok(())

@@ -61,14 +61,29 @@ impl CompilerRegistry {
         {
             args.extend(["-iquote".into(), path_argument(parent)]);
         }
-        args.push(source_arg.clone());
+        // rustc resolves modules and include! paths relative to its input file.
+        // Reading the captured entry from stdin in the original directory keeps
+        // that resolution while never rereading mutable entry-file contents.
+        args.push(if language == LanguageId::Rust {
+            "-".into()
+        } else {
+            source_arg.clone()
+        });
         if matches!(language, LanguageId::C | LanguageId::Cpp | LanguageId::Rust) {
             args.extend(["-o".into(), artifact_arg.clone()]);
         }
         CommandSpec {
             program,
             args,
-            cwd: paths.workdir.to_path_buf(),
+            cwd: if language == LanguageId::Rust {
+                paths
+                    .original
+                    .parent()
+                    .unwrap_or(paths.workdir)
+                    .to_path_buf()
+            } else {
+                paths.workdir.to_path_buf()
+            },
         }
     }
     pub(super) fn runtime_command(

@@ -13,12 +13,13 @@ import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import type { LanguageRegistry } from '@/infrastructure/langs/languageRegistry';
 import type { ProblemService as LegacyProblemService } from '@/infrastructure/problems/problemService';
+import { RpcRemoteError } from '@/infrastructure/rpc/client';
 import type { KernelConfiguration } from '@/infrastructure/rpc/configuration';
 import { RpcJudgeService } from '@/infrastructure/rpc/judgeService';
 import type { KernelService } from '@/infrastructure/rpc/kernelService';
 import { ProblemPreferences } from '@/infrastructure/rpc/preferences';
 import { type ProblemDto, RpcProblemService } from '@/infrastructure/rpc/problemService';
-import { rpcMethod } from '@/infrastructure/rpc/protocol';
+import { rpcErrorCode, rpcMethod } from '@/infrastructure/rpc/protocol';
 
 vi.mock('@/infrastructure/rpc/configuration', async () => ({
   KernelConfiguration: class {},
@@ -56,11 +57,23 @@ async function windows(paths: Partial<ProblemDto> = {}) {
       { id: third, stdin: '3', answer: 'three' },
     ],
   };
+  let present = true;
+  const legacyLoad = vi.fn(async (): Promise<Problem | null> => null);
+  const legacyDelete = vi.fn(async () => {
+    legacyLoad.mockResolvedValue(null);
+  });
   const attached = new Set<string>();
   const runTask = vi.fn(async () => ({ state: 'succeeded', result: { testcases: [] } }));
   const mutations: Array<{ method: string; params: Record<string, unknown> }> = [];
   const request = async (method: string, params: Record<string, unknown>) => {
-    if (method === rpcMethod.problemLoad) return structuredClone(remote);
+    if (method === rpcMethod.problemLoad) {
+      if (!present) throw new RpcRemoteError(rpcErrorCode.notIndexed, 'No problem');
+      return structuredClone(remote);
+    }
+    if (method === rpcMethod.problemDelete) {
+      present = false;
+      return {};
+    }
     if (method === rpcMethod.testcaseList) return structuredClone(remote.testcases);
     if (method === rpcMethod.historyList) return [];
     mutations.push({ method, params: structuredClone(params) });
@@ -124,11 +137,13 @@ async function windows(paths: Partial<ProblemDto> = {}) {
     } as unknown as KernelConfiguration;
     const languages = { getLangByFile: () => ({ name: 'C++' }) } as unknown as LanguageRegistry;
     const legacy = {
+      loadBySrc: legacyLoad,
+      delete: legacyDelete,
       getLimits: (problem: Problem) => ({
         timeLimitMs: problem.overrides.timeLimitMs ?? 1000,
         memoryLimitMb: problem.overrides.memoryLimitMb ?? 256,
       }),
-    } as LegacyProblemService;
+    } as unknown as LegacyProblemService;
     const io = {
       readContent: async (value: TestcaseIo) =>
         value.path ? readFile(value.path, 'utf8') : (value.data ?? ''),
@@ -140,7 +155,19 @@ async function windows(paths: Partial<ProblemDto> = {}) {
   const left = await a.loadBySrc(remote.source_path),
     right = await b.loadBySrc(remote.source_path);
   if (!left || !right) throw new Error('Fixture problem was not loaded');
-  return { a, b, left, right, remote, mutations, forSource, attached, runTask };
+  return {
+    a,
+    b,
+    left,
+    right,
+    remote,
+    mutations,
+    forSource,
+    attached,
+    runTask,
+    legacyLoad,
+    legacyDelete,
+  };
 }
 
 describe('two windows sharing a kernel', () => {
@@ -360,4 +387,13 @@ it('normalizes Windows kernel paths for editor matching without spurious auxilia
   } finally {
     vi.unstubAllGlobals();
   }
+});
+
+it('retires legacy metadata before deleting a migrated problem so editor refresh cannot reimport it', async () => {
+  const { a, b, left, legacyLoad, legacyDelete } = await windows();
+  legacyLoad.mockResolvedValue(left);
+  await a.delete(left);
+  expect(legacyDelete).toHaveBeenCalledWith(left);
+  expect(await a.loadBySrc(left.src.path)).toBeNull();
+  expect(await b.loadBySrc(left.src.path)).toBeNull();
 });

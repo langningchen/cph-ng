@@ -33,9 +33,53 @@ impl CompilerRegistry {
         };
         let key = fingerprint::key(self, language, paths, source, cancel).await?;
         let cache = key.map(|key| self.repo.root().join("cache/compilation").join(key));
+        let mut command = self.compilation_command(language, paths);
+        let input = if language == LanguageId::Rust {
+            source
+        } else {
+            &[]
+        };
+        let tracks_resolution =
+            matches!(language, LanguageId::C | LanguageId::Cpp | LanguageId::Rust);
+        let mut current_dependencies = None;
+        if self.mode != CompilationMode::Force
+            && tracks_resolution
+            && cache
+                .as_ref()
+                .is_some_and(|cache| cache.join("manifest.json").is_file())
+        {
+            let mut probe = command.clone();
+            let depfile = path_argument(&paths.workdir.join("dependencies.d"));
+            if language == LanguageId::Rust {
+                probe.args.push(format!("--emit=dep-info={depfile}"));
+            } else {
+                probe.args.extend([
+                    "-M".into(),
+                    "-MF".into(),
+                    depfile,
+                    "-MT".into(),
+                    "cph-cache".into(),
+                ]);
+            }
+            if self.run_compiler(&probe, input, cancel).await.is_ok() {
+                current_dependencies = dependencies::collect(language, paths.workdir, &probe.cwd)
+                    .await
+                    .ok();
+            }
+            if cancel.is_canceled() {
+                return Err(TaskFailure::canceled());
+            }
+        }
         if self.mode != CompilationMode::Force
             && let Some(cache) = &cache
-            && manifest::Manifest::restore(&self.repo, cache, paths.workdir).await
+            && (!tracks_resolution || current_dependencies.is_some())
+            && manifest::Manifest::restore(
+                &self.repo,
+                cache,
+                paths.workdir,
+                current_dependencies.as_deref(),
+            )
+            .await
         {
             self.hits.fetch_add(1, Ordering::Relaxed);
             return Ok(());
@@ -49,7 +93,6 @@ impl CompilerRegistry {
                 ),
             ));
         }
-        let mut command = self.compilation_command(language, paths);
         let depfile = path_argument(&paths.workdir.join("dependencies.d"));
         match language {
             LanguageId::C | LanguageId::Cpp => command.args.extend([
@@ -63,12 +106,13 @@ impl CompilerRegistry {
             _ => {}
         }
         self.builds.fetch_add(1, Ordering::Relaxed);
-        self.run_compiler(&command, cancel).await?;
+        self.run_compiler(&command, input, cancel).await?;
         if cancel.is_canceled() {
             return Err(TaskFailure::canceled());
         }
         if let Some(cache) = cache
-            && let Ok(dependencies) = dependencies::collect(language, paths.workdir).await
+            && let Ok(dependencies) =
+                dependencies::collect(language, paths.workdir, &command.cwd).await
         {
             // A cache write failure cannot invalidate an otherwise successful compilation.
             let _ = manifest::Manifest::save(&self.repo, &cache, paths.workdir, dependencies).await;

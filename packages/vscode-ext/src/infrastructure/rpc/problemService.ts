@@ -328,6 +328,9 @@ export class RpcProblemService implements IProblemService {
     return selected;
   }
   public async delete(problem: Problem): Promise<void> {
+    // Remove legacy metadata first: a missing kernel record otherwise triggers
+    // automatic migration again when the active editor refreshes after deletion.
+    await this.legacy.delete(problem);
     const client = await this.kernel.forSource(problem.src.path);
     await client.request(
       rpcMethod.problemDelete,
