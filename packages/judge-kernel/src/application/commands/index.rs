@@ -35,13 +35,13 @@ pub(super) async fn index_reindex_file(
 ) -> Result<Value, CommandError> {
     let p: ReindexParams = params(&p)?;
     let path = context.paths.read(&p.source_path).await?;
+    let lock = context.tasks.locks.get(&p.problem_id.to_string()).await;
+    let _guard = lock.lock().await;
     let mut problem = context
         .repo
         .load_by_id(ProblemId(p.problem_id))
         .await
         .map_err(repo_error)?;
-    let lock = context.tasks.locks.get(&problem.id.0.to_string()).await;
-    let _guard = lock.lock().await;
     context
         .index
         .rebuild(&path, problem.id)

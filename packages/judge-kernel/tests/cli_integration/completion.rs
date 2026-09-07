@@ -172,6 +172,9 @@ async fn completion_silently_handles_busy_and_invalid_stores() -> anyhow::Result
             .contains(id(&problem)?)
     );
     drop(lock);
+    // A separate store has no surviving WAL that could restore a valid database.
+    let ws = Workspace::new()?;
+    std::fs::create_dir_all(&ws.store)?;
     std::fs::write(ws.store.join("index.sqlite3"), "invalid sqlite")?;
     assert!(
         complete(&ws, &["cph-ng-judge", "r", "--problem-id", ""])

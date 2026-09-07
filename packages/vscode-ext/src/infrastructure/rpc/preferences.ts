@@ -7,6 +7,7 @@ interface PreferenceStore {
 }
 interface SavedPreferences {
   version: 1 | 2;
+  timeElapsedMs?: number;
   overrides?: Problem['overrides'];
   pendingLegacyOverrides?: Problem['overrides'];
   testcases: Record<string, { isExpand: boolean; isDisabled: boolean }>;
@@ -19,6 +20,12 @@ export class ProblemPreferences {
   public restore(id: string, problem: Problem): void {
     const saved = this.store.get<SavedPreferences>(`judge.preferences.${id}`);
     if (!saved || ![1, 2].includes(saved.version)) return;
+    if (
+      typeof saved.timeElapsedMs === 'number' &&
+      Number.isFinite(saved.timeElapsedMs) &&
+      saved.timeElapsedMs >= 0
+    )
+      problem.addTimeElapsed(saved.timeElapsedMs - problem.timeElapsedMs);
     for (const [id, state] of Object.entries(saved.testcases)) {
       const testcase = problem.testcases.get(id as TestcaseId);
       if (!testcase) continue;
@@ -31,6 +38,7 @@ export class ProblemPreferences {
     const previous = this.store.get<SavedPreferences>(`judge.preferences.${id}`);
     const saved: SavedPreferences = {
       version: 2,
+      timeElapsedMs: problem.timeElapsedMs,
       // Preserve old data for the explicit migration command without applying it to runs.
       pendingLegacyOverrides: previous?.overrides ?? previous?.pendingLegacyOverrides,
       testcases: Object.fromEntries(
@@ -54,6 +62,7 @@ export class ProblemPreferences {
     await this.store.update(`judge.preferences.${id}`, {
       version: 2,
       testcases: saved?.testcases ?? {},
+      timeElapsedMs: saved?.timeElapsedMs,
       pendingLegacyOverrides: { ...overrides },
     });
   }
@@ -61,7 +70,11 @@ export class ProblemPreferences {
   public async finishMigration(id: string): Promise<void> {
     const saved = this.store.get<SavedPreferences>(`judge.preferences.${id}`);
     if (!saved) return;
-    await this.store.update(`judge.preferences.${id}`, { version: 2, testcases: saved.testcases });
+    await this.store.update(`judge.preferences.${id}`, {
+      version: 2,
+      testcases: saved.testcases,
+      timeElapsedMs: saved.timeElapsedMs,
+    });
   }
 
   public async remove(id: string): Promise<void> {

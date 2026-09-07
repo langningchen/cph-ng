@@ -67,25 +67,31 @@ export async function connectSharedKernel(
     if (error instanceof RpcRemoteError) throw error;
   }
   const logPath = join(storeRoot, 'kernel.log');
-  const fd = openSync(logPath, 'a', 0o600);
-  try {
-    const args = ['serve', '--store-root', storeRoot, '--transport'];
-    args.push(...(process.platform === 'win32' ? ['pipe', '--pipe'] : ['unix', '--socket']));
-    args.push(endpoint);
-    const child = spawn(command, args, {
-      detached: true,
-      stdio: ['ignore', 'ignore', fd],
-      windowsHide: true,
-      shell: false,
-    });
-    await new Promise<void>((resolve, reject) => {
-      child.once('spawn', resolve);
-      child.once('error', reject);
-    });
-    child.unref();
-  } finally {
-    closeSync(fd);
-  }
+  const launch = async () => {
+    const fd = openSync(logPath, 'a', 0o600);
+    try {
+      const args = ['serve', '--store-root', storeRoot, '--transport'];
+      args.push(...(process.platform === 'win32' ? ['pipe', '--pipe'] : ['unix', '--socket']));
+      args.push(endpoint);
+      const child = spawn(command, args, {
+        detached: true,
+        stdio: ['ignore', 'ignore', fd],
+        windowsHide: true,
+        shell: false,
+      });
+      await new Promise<void>((resolve, reject) => {
+        child.once('spawn', resolve);
+        child.once('error', reject);
+      });
+      child.unref();
+      return child;
+    } finally {
+      closeSync(fd);
+    }
+  };
+  let child = await launch();
+  let nextLaunch = Date.now() + 250;
+  let backoff = 250;
   log(`Connecting to shared judge kernel at ${endpoint}; server log: ${logPath}\n`);
   const deadline = Date.now() + 10_000;
   let lastError: unknown;
@@ -95,6 +101,14 @@ export async function connectSharedKernel(
     } catch (error) {
       if (error instanceof RpcRemoteError) throw error;
       lastError = error;
+    }
+    // During shutdown the old process may still own the pipe/socket. A new
+    // contender can exit before that ownership is released; retry that launch
+    // with bounded backoff, but never spawn over a child that is still starting.
+    if ((child.exitCode !== null || child.signalCode !== null) && Date.now() >= nextLaunch) {
+      child = await launch();
+      backoff = Math.min(backoff * 2, 2000);
+      nextLaunch = Date.now() + backoff;
     }
     await new Promise<void>((resolve) => setTimeout(resolve, 100));
   }

@@ -1,5 +1,6 @@
 mod cache;
 mod command;
+mod javascript;
 use crate::application::error::ErrorCode;
 use crate::ports::language::{CompilationMode, CompilationStats};
 use std::{
@@ -106,7 +107,7 @@ impl CompilerRegistry {
         };
         self.prepare_cached(language, &paths, source, cancel)
             .await?;
-        self.runtime_command(language, &paths, memory_mb)
+        self.runtime_command(language, &paths, memory_mb).await
     }
     async fn run_compiler(
         &self,

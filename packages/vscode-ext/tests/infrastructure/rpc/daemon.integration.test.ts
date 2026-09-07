@@ -1,5 +1,5 @@
 // biome-ignore-all lint/style/useNamingConvention: Requests exercise the Rust wire schema.
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { expect, it } from 'vitest';
@@ -47,6 +47,9 @@ it.skipIf(!process.env.CPH_NG_JUDGE)(
       await disconnected;
       // The same client can start a replacement daemon and reattach its roots.
       expect(await second.request(rpcMethod.problemList)).toHaveLength(2);
+    } catch (error) {
+      process.stderr.write(await readFile(join(root, 'kernel.log'), 'utf8').catch(() => ''));
+      throw error;
     } finally {
       const active = clients.at(-1);
       if (active) {

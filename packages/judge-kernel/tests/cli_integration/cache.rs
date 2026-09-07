@@ -83,19 +83,19 @@ async fn compilation_cache_modes_validate_source_dependencies_and_artifacts() ->
 #[tokio::test]
 async fn compiler_flags_invalidate_cache_without_changing_judge_defaults() -> anyhow::Result<()> {
     let ws = Workspace::new()?;
-    ws.file("flags.cpp", "#include <cstdio>\n#ifndef VALUE\n#define VALUE 1\n#endif\nint main(){printf(\"%d\",VALUE);}\n")?;
-    ws.ok(&["run", "flags.cpp", "--stdin", "", "--answer", "1"])
+    ws.file("flags.c++", "#include <cstdio>\n#ifndef VALUE\n#define VALUE 1\n#endif\nint main(){printf(\"%d\",VALUE);}\n")?;
+    ws.ok(&["run", "flags.c++", "--stdin", "", "--answer", "1"])
         .await?;
     std::fs::write(
         ws.store.join("config.toml"),
         "[languages.cpp]\ncompiler='g++'\ncompiler_args=['-DVALUE=2']\n",
     )?;
     let result = ws
-        .ok(&["run", "flags.cpp", "--stdin", "", "--answer", "2"])
+        .ok(&["run", "flags.c++", "--stdin", "", "--answer", "2"])
         .await?;
     assert_eq!(result.required("/result/compilation/builds")?, 1);
     assert_eq!(
-        ws.ok(&["run", "flags.cpp", "--stdin", "", "--answer", "2"])
+        ws.ok(&["run", "flags.c++", "--stdin", "", "--answer", "2"])
             .await?
             .required("/result/compilation/hits")?,
         1

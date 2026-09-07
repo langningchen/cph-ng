@@ -61,7 +61,7 @@ impl LanguageId {
     pub fn from_path(path: &std::path::Path) -> Option<Self> {
         match path.extension()?.to_str()?.to_ascii_lowercase().as_str() {
             "c" => Some(Self::C),
-            "cpp" | "cc" | "cxx" => Some(Self::Cpp),
+            "cpp" | "cc" | "cxx" | "c++" => Some(Self::Cpp),
             "py" => Some(Self::Python),
             "rs" => Some(Self::Rust),
             "js" | "cjs" | "mjs" => Some(Self::Javascript),

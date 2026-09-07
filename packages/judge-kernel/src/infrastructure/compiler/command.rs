@@ -86,7 +86,7 @@ impl CompilerRegistry {
             },
         }
     }
-    pub(super) fn runtime_command(
+    pub(super) async fn runtime_command(
         &self,
         language: LanguageId,
         paths: &CompilationPaths<'_>,
@@ -101,7 +101,7 @@ impl CompilerRegistry {
             ),
             LanguageId::Javascript => (
                 PathBuf::from("node"),
-                vec![format!("--max-old-space-size={memory_mb}"), source_arg],
+                self.javascript_args(paths, memory_mb).await?,
             ),
             LanguageId::Java => (
                 PathBuf::from("java"),

@@ -277,6 +277,7 @@ pub(super) async fn problem_move(
     let destination = context.paths.read(&p.destination).await?;
     let lock = context.tasks.locks.get(&problem.id.0.to_string()).await;
     let _guard = lock.lock().await;
+    let problem = context.load(&p.reference).await?;
     let sources = context
         .index
         .sources(Some(problem.id))
