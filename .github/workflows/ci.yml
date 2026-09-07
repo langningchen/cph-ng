@@ -87,7 +87,7 @@ jobs:
           python scripts/check_quality.py
           python -m unittest discover -s scripts -p 'test_*.py' -v
       - name: Test resident server and resource limits
-        run: cargo test --locked -p cph-ng-judge -- --test-threads=4
+        run: cargo test --locked -p cph-ng-judge --no-fail-fast -- --test-threads=4
       - name: Check Rust code
         run: cargo clippy --locked -p cph-ng-judge --all-targets -- -D warnings
       - name: Build bundled kernel

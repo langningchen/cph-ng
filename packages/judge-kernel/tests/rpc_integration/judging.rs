@@ -173,11 +173,11 @@ async fn checker_failure_and_source_identity_survive_manual_moves() -> anyhow::R
             .ok(Method::ProblemLoad, json ! ({ "problem_id" : problem }))
             .await?)
             .required("/source_path")?,
-        &json!(moved)
+        &json!(moved.canonicalize()?)
     );
     assert_eq!(
         (client.ok(Method::ProblemList, json!({})).await?).required("/0/source_path")?,
-        &json!(moved)
+        &json!(moved.canonicalize()?)
     );
     let rebuilt = client.ok(Method::IndexRebuild, json!({})).await?;
     assert_eq!(

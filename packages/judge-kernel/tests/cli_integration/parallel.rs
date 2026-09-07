@@ -5,19 +5,21 @@ use serde_json::Value;
 #[tokio::test]
 async fn parallel_cases_are_bounded_isolated_and_returned_in_source_order() -> anyhow::Result<()> {
     let ws = Workspace::new()?;
-    let trace = ws.file("trace.txt", "")?;
+    let trace = ws.dir.path().join("trace");
+    std::fs::create_dir(&trace)?;
     let trace_path = serde_json::to_string(&trace)?;
     ws.file(
         "parallel.py",
         &format!(
             r"
-import time
+import json, pathlib, time
 n = int(input())
-with open({trace_path}, 'a') as log: log.write('start ' + str(n) + '\n')
+start = time.monotonic_ns()
 with open('local.txt', 'x') as local: local.write(str(n))
 time.sleep(0.5 if n == 1 else 0.1)
 print(n)
-with open({trace_path}, 'a') as log: log.write('end ' + str(n) + '\n')
+end = time.monotonic_ns()
+(pathlib.Path({trace_path}) / str(n)).write_text(json.dumps([start, end]))
 "
         ),
     )?;
@@ -57,22 +59,7 @@ with open({trace_path}, 'a') as log: log.write('end ' + str(n) + '\n')
         assert_eq!(case.text("/testcase_id")?, id);
         assert_eq!(case.text("/verdict")?, "accepted");
     }
-    let mut running = 0_i32;
-    let mut peak = 0;
-    for line in std::fs::read_to_string(trace)?.lines() {
-        if line.starts_with("start") {
-            running += 1;
-            peak = peak.max(running);
-        } else {
-            running -= 1;
-        }
-        assert!(running >= 0);
-    }
-    assert_eq!(running, 0);
-    assert!(peak <= i32::try_from(cap)?);
-    if cap > 1 {
-        assert!(peak > 1, "testcases must actually overlap");
-    }
+    assert_concurrency(&trace, cap)?;
     let events = ws
         .ok(&["task", "events", "--task-id", task_id(&result)?])
         .await?;
@@ -98,6 +85,31 @@ with open({trace_path}, 'a') as log: log.write('end ' + str(n) + '\n')
     assert_eq!(serial.required("/result/jobs")?, 1);
     for value in ["0", "257"] {
         ws.json(&["run", "parallel.py", "--jobs", value], 2).await?;
+    }
+    Ok(())
+}
+
+fn assert_concurrency(trace: &std::path::Path, cap: usize) -> anyhow::Result<()> {
+    // Separate trace files avoid concurrent append races on Windows.
+    let mut timeline = Vec::new();
+    for index in 1..=4 {
+        let [start, end]: [u64; 2] =
+            serde_json::from_slice(&std::fs::read(trace.join(index.to_string()))?)?;
+        assert!(end > start);
+        timeline.extend([(start, 1_i32), (end, -1)]);
+    }
+    timeline.sort_unstable();
+    let mut running = 0_i32;
+    let mut peak = 0;
+    for (_, delta) in timeline {
+        running += delta;
+        peak = peak.max(running);
+        assert!(running >= 0);
+    }
+    assert_eq!(running, 0);
+    assert!(peak <= i32::try_from(cap)?);
+    if cap > 1 {
+        assert!(peak > 1, "testcases must actually overlap");
     }
     Ok(())
 }
