@@ -141,6 +141,9 @@ async fn signals_cancel_owned_tasks_but_leave_observed_tasks_running() -> anyhow
         .command(&["task", "wait", &tid, "--json"])
         .spawn()
         .context("test fixture or response")?;
+    #[cfg(target_os = "linux")]
+    wait_for_sigint_handler(observer.id().context("observer PID")?).await?;
+    #[cfg(not(target_os = "linux"))]
     tokio::time::sleep(Duration::from_millis(250)).await;
     rustix::process::kill_process(
         rustix::process::Pid::from_raw(
@@ -223,6 +226,9 @@ async fn ctrl_c_interrupts_piped_input_before_admission() -> anyhow::Result<()> 
         .spawn()
         .context("test fixture or response")?;
     let _stdin = child.stdin.take().context("test fixture or response")?;
+    #[cfg(target_os = "linux")]
+    wait_for_sigint_handler(child.id().context("child PID")?).await?;
+    #[cfg(not(target_os = "linux"))]
     tokio::time::sleep(Duration::from_millis(250)).await;
     rustix::process::kill_process(
         rustix::process::Pid::from_raw(
@@ -285,5 +291,28 @@ async fn suspended_owner_reports_pending_cancellation_and_releases_lock_after_re
         ws.ok(&["task", "create"]).await?.required("/state")?,
         "succeeded"
     );
+    Ok(())
+}
+
+#[cfg(target_os = "linux")]
+async fn wait_for_sigint_handler(pid: u32) -> anyhow::Result<()> {
+    // SIGINT is signal 2: wait for its caught bit instead of assuming startup
+    // finishes within a fixed delay on a loaded CI runner.
+    tokio::time::timeout(Duration::from_secs(10), async {
+        loop {
+            let status = tokio::fs::read_to_string(format!("/proc/{pid}/status")).await?;
+            let caught = status
+                .lines()
+                .find_map(|line| line.strip_prefix("SigCgt:"))
+                .context("caught signal mask")?;
+            let mask = u64::from_str_radix(caught.trim(), 16)?;
+            if mask & 2 != 0 {
+                return Ok::<_, anyhow::Error>(());
+            }
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    })
+    .await
+    .context("SIGINT handler did not become ready")??;
     Ok(())
 }
