@@ -105,19 +105,32 @@ async fn javascript_syntax_checks_keep_explicit_package_module_mode() -> anyhow:
     let source = root.path().join("main.js");
     tokio::fs::write(&source, "throw new Error('changed entry')").await?;
     let package = root.path().join("package.json");
-    tokio::fs::write(&package, r#"{"type":"module"}"#).await?;
+    tokio::fs::write(
+        &package,
+        [b"\xef\xbb\xbf".as_slice(), br#"{"type":"module"}"#].concat(),
+    )
+    .await?;
     let repo = WorkspaceProblemRepository::new(root.path().join("store")).await?;
     let workdir = repo.root().join("module");
+    // Use Node itself: launchers such as Volta parse package.json independently
+    // and can reject BOM metadata before Node gets a chance to handle it.
+    let node = tokio::process::Command::new("node")
+        .args(["-p", "process.execPath"])
+        .output()
+        .await?;
+    assert!(node.status.success());
+    let node = String::from_utf8(node.stdout)?;
     // Disable Node 24's automatic detection to exercise older Node module semantics.
     let config = serde_json::from_value(
-        serde_json::json!({"languages":{"javascript":{"interpreter":"node","interpreter_args":["--no-experimental-detect-module"]}}}),
+        serde_json::json!({"languages":{"javascript":{"interpreter":node.trim(),"interpreter_args":["--no-experimental-detect-module"]}}}),
     )?;
     let compiler = CompilerRegistry::new(config, repo.clone());
     let cancel = Cancellation::new();
     let source_code = b"export {}; console.log(42)";
     let command = compiler
         .compile_snapshot(&source, &workdir, 256, &cancel, source_code)
-        .await?;
+        .await
+        .map_err(|error| anyhow::anyhow!("{error:?}"))?;
     let result = ProcessExecutor
         .run(
             &command,

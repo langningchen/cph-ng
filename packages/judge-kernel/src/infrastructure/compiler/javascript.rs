@@ -50,8 +50,9 @@ pub(super) async fn snapshot_path(
         }
         match tokio::fs::read(parent.join("package.json")).await {
             Ok(bytes) => {
+                let bytes = bytes.strip_prefix(b"\xef\xbb\xbf").unwrap_or(&bytes);
                 let package: serde_json::Value =
-                    serde_json::from_slice(&bytes).map_err(TaskFailure::internal)?;
+                    serde_json::from_slice(bytes).map_err(TaskFailure::internal)?;
                 return Ok(
                     match package.get("type").and_then(serde_json::Value::as_str) {
                         Some("module") => snapshot.with_extension("mjs"),

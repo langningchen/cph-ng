@@ -78,6 +78,10 @@ export class ProblemRepository implements IProblemRepository {
         return null;
       }
     }
+    // Loading can overlap between automatic and explicit requests. Registration
+    // must recheck synchronously after the awaits so each source has one owner.
+    for (const background of this.backgroundProblems.values())
+      if (background.problem.isRelated(srcPath)) return background;
     this.logger.debug('Loaded problem', problem.src.path, 'for path', srcPath);
     const problemId = this.crypto.randomUUID() as ProblemId;
     const backgroundProblem = new BackgroundProblem(problemId, problem, this.clock.now());

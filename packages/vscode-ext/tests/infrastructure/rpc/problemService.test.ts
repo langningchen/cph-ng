@@ -475,3 +475,26 @@ it('copies problem-local kernel configuration without applying legacy overrides 
   await a.save(copied);
   expect(configure).not.toHaveBeenCalled();
 });
+
+it('registers one background instance when automatic and explicit loads overlap', async () => {
+  const { a } = await windows();
+  const logger = { withScope: () => logger, debug: () => {}, error: () => {} };
+  let sequence = 0;
+  const sendMessage = vi.fn();
+  const repository = new ProblemRepository(
+    { now: () => 0 } as IClock,
+    { randomUUID: () => `editor-${++sequence}` } as unknown as ICrypto,
+    logger as unknown as ILogger,
+    a,
+    {} as IActivePathService,
+    { sendMessage } as unknown as ISidebarProvider,
+  );
+  const source = editorPath('/work/main.cpp');
+  const [automatic, explicit] = await Promise.all([
+    repository.loadByPath(source),
+    repository.loadByPath(source, true),
+  ]);
+  expect(automatic).not.toBeNull();
+  expect(automatic).toBe(explicit);
+  expect(sendMessage).toHaveBeenCalledTimes(1);
+});
