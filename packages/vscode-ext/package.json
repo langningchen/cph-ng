@@ -241,188 +241,10 @@
         }
       },
       {
-        "id": "languages",
-        "order": 1,
-        "title": "%config.languages%",
-        "properties": {
-          "cph-ng.languages.cCompiler": {
-            "type": "string",
-            "default": "gcc",
-            "markdownDescription": "%config.languages.cCompiler%"
-          },
-          "cph-ng.languages.cCompilerArgs": {
-            "type": "string",
-            "default": "-O2 -std=c11 -Wall -DCPH",
-            "markdownDescription": "%config.languages.cCompilerArgs%"
-          },
-          "cph-ng.languages.cppCompiler": {
-            "type": "string",
-            "default": "g++",
-            "markdownDescription": "%config.languages.cppCompiler%"
-          },
-          "cph-ng.languages.cppCompilerArgs": {
-            "type": "string",
-            "default": "-O2 -std=c++14 -Wall -DCPH",
-            "markdownDescription": "%config.languages.cppCompilerArgs%"
-          },
-          "cph-ng.languages.cppObjcopy": {
-            "type": "string",
-            "default": "objcopy",
-            "markdownDescription": "%config.languages.cppObjcopy%"
-          },
-          "cph-ng.languages.rustCompiler": {
-            "type": "string",
-            "default": "rustc",
-            "markdownDescription": "%config.languages.rustCompiler%"
-          },
-          "cph-ng.languages.rustCompilerArgs": {
-            "type": "string",
-            "default": "-C opt-level=2",
-            "markdownDescription": "%config.languages.rustCompilerArgs%"
-          },
-          "cph-ng.languages.javaCompiler": {
-            "type": "string",
-            "default": "javac",
-            "markdownDescription": "%config.languages.javaCompiler%"
-          },
-          "cph-ng.languages.javaCompilerArgs": {
-            "type": "string",
-            "default": "-cp .",
-            "markdownDescription": "%config.languages.javaCompilerArgs%"
-          },
-          "cph-ng.languages.javaInterpreter": {
-            "type": "string",
-            "default": "java",
-            "markdownDescription": "%config.languages.javaInterpreter%"
-          },
-          "cph-ng.languages.javaInterpreterArgs": {
-            "type": "string",
-            "default": "",
-            "markdownDescription": "%config.languages.javaInterpreterArgs%"
-          },
-          "cph-ng.languages.pythonCompiler": {
-            "type": "string",
-            "default": "pypy3",
-            "markdownDescription": "%config.languages.pythonCompiler%"
-          },
-          "cph-ng.languages.pythonCompilerArgs": {
-            "type": "string",
-            "default": "",
-            "markdownDescription": "%config.languages.pythonCompilerArgs%"
-          },
-          "cph-ng.languages.pythonInterpreter": {
-            "type": "string",
-            "default": "pypy3",
-            "markdownDescription": "%config.languages.pythonInterpreter%"
-          },
-          "cph-ng.languages.pythonInterpreterArgs": {
-            "type": "string",
-            "default": "",
-            "markdownDescription": "%config.languages.pythonInterpreterArgs%"
-          },
-          "cph-ng.languages.javascriptInterpreter": {
-            "type": "string",
-            "default": "node",
-            "markdownDescription": "%config.languages.javascriptInterpreter%"
-          },
-          "cph-ng.languages.javascriptInterpreterArgs": {
-            "type": "string",
-            "default": "",
-            "markdownDescription": "%config.languages.javascriptInterpreterArgs%"
-          }
-        }
-      },
-      {
-        "id": "run",
-        "order": 2,
-        "title": "%config.run%",
-        "properties": {
-          "cph-ng.run.compilationTimeout": {
-            "type": "number",
-            "default": 10000,
-            "markdownDescription": "%config.run.compilationTimeout%"
-          },
-          "cph-ng.run.useWrapper": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "%config.run.useWrapper%"
-          },
-          "cph-ng.run.useHook": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "%config.run.useHook%"
-          },
-          "cph-ng.run.useRunner": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "%config.run.useRunner%"
-          },
-          "cph-ng.run.timeAddition": {
-            "type": "number",
-            "default": 1000,
-            "markdownDescription": "%config.run.timeAddition%"
-          },
-          "cph-ng.run.unlimitedStack": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "%config.run.unlimitedStack%"
-          }
-        }
-      },
-      {
-        "id": "comparing",
-        "order": 3,
-        "title": "%config.comparing%",
-        "properties": {
-          "cph-ng.comparing.oleSize": {
-            "type": "number",
-            "default": 8,
-            "markdownDescription": "%config.comparing.oleSize%"
-          },
-          "cph-ng.comparing.regardPEAsAC": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "%config.comparing.regardPEAsAC%"
-          },
-          "cph-ng.comparing.ignoreError": {
-            "type": "boolean",
-            "default": true,
-            "markdownDescription": "%config.comparing.ignoreError%"
-          }
-        }
-      },
-      {
-        "id": "stressTest",
-        "order": 4,
-        "title": "%config.stressTest%",
-        "properties": {
-          "cph-ng.stressTest.generatorTimeLimit": {
-            "type": "number",
-            "default": 10000,
-            "markdownDescription": "%config.stressTest.generatorTimeLimit%"
-          },
-          "cph-ng.stressTest.bruteForceTimeLimit": {
-            "type": "number",
-            "default": 60000,
-            "markdownDescription": "%config.stressTest.bruteForceTimeLimit%"
-          }
-        }
-      },
-      {
         "id": "problem",
         "order": 5,
         "title": "%config.problem%",
         "properties": {
-          "cph-ng.problem.defaultTimeLimit": {
-            "type": "number",
-            "default": 1000,
-            "markdownDescription": "%config.problem.defaultTimeLimit%"
-          },
-          "cph-ng.problem.defaultMemoryLimit": {
-            "type": "number",
-            "default": 512,
-            "markdownDescription": "%config.problem.defaultMemoryLimit%"
-          },
           "cph-ng.problem.foundMatchTestcaseBehavior": {
             "type": "string",
             "default": "always",
@@ -551,17 +373,6 @@
         "order": 8,
         "title": "%config.companion%",
         "properties": {
-          "cph-ng.companion.listenPort": {
-            "type": "number",
-            "scope": "machine",
-            "default": 27121,
-            "markdownDescription": "%config.companion.listenPort%"
-          },
-          "cph-ng.companion.logFile": {
-            "type": "string",
-            "default": "${home}/.cph-ng-router.log",
-            "markdownDescription": "%config.companion.logFile%"
-          },
           "cph-ng.companion.confirmSubmit": {
             "type": "boolean",
             "default": false,
@@ -650,6 +461,19 @@
             "markdownDescription": "%config.sidebar.showOobe%"
           }
         }
+      },
+      {
+        "title": "%config.kernel%",
+        "properties": {
+          "cph-ng.kernel.executablePath": {
+            "type": "string",
+            "default": "",
+            "scope": "machine",
+            "markdownDescription": "%config.kernel.executablePath%"
+          }
+        },
+        "id": "kernel",
+        "order": 12
       }
     ],
     "commands": [
@@ -684,6 +508,23 @@
       {
         "command": "cph-ng.submit",
         "title": "%commands.submit%"
+      },
+      {
+        "command": "cph-ng.showJudgeHistory",
+        "title": "%command.showJudgeHistory%"
+      },
+      {
+        "command": "cph-ng.openKernelSettings",
+        "title": "%commands.openKernelSettings%",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "cph-ng.migrateKernelSettings",
+        "title": "%commands.migrateKernelSettings%"
+      },
+      {
+        "command": "cph-ng.pairBrowser",
+        "title": "%commands.pairBrowser%"
       }
     ],
     "keybindings": [
@@ -730,6 +571,13 @@
           "when": "cph-ng.hasProblem && cph-ng.isRunning",
           "group": "navigation"
         }
+      ],
+      "view/title": [
+        {
+          "command": "cph-ng.openKernelSettings",
+          "when": "view == cphNgSidebar",
+          "group": "navigation"
+        }
       ]
     }
   },
@@ -743,8 +591,9 @@
     "test:ui": "vitest --ui --coverage",
     "check-translations": "tsx --tsconfig scripts/tsconfig.json scripts/check-translations.ts",
     "generate-settings": "tsx scripts/generate-settings.ts",
-    "package": "tsx scripts/package.ts",
-    "postinstall": "pnpm generate-settings"
+    "package": "pnpm build:kernel && tsx scripts/package.ts",
+    "postinstall": "pnpm generate-settings",
+    "build:kernel": "node scripts/build-kernel.mjs"
   },
   "devDependencies": {
     "@swc/core": "^1.16.1",
@@ -757,7 +606,6 @@
     "@types/semver": "^7.8.0",
     "@types/source-map-support": "^0.5.10",
     "@types/vscode": "1.97.0",
-    "@types/which": "^3.0.4",
     "@vitest/coverage-v8": "5.0.0",
     "@vitest/ui": "^4.1.11",
     "@vscode/vsce": "^3.9.2",
@@ -773,7 +621,8 @@
     "vitest": "^4.1.11",
     "vitest-mock-extended": "^5.1.1",
     "webpack": "^5.110.3",
-    "webpack-cli": "^7.2.3"
+    "webpack-cli": "^7.2.3",
+    "@types/ws": "^8.18.1"
   },
   "dependencies": {
     "@cph-ng/core": "workspace:*",
@@ -785,15 +634,13 @@
     "memfs": "^4.69.1",
     "natural-orderby": "^5.0.0",
     "p-memoize": "^8.0.0",
-    "path-key": "^4.0.0",
     "react": "^19.2.8",
     "reflect-metadata": "^0.2.2",
     "semver": "^7.8.5",
-    "socket.io-client": "^4.8.3",
     "source-map-support": "^0.5.21",
     "tsyringe": "^4.10.0",
     "type-fest": "^5.9.0",
     "typed-emitter": "^2.1.0",
-    "which": "^7.0.0"
+    "ws": "^8.20.1"
   }
 }

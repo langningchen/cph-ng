@@ -65,7 +65,7 @@ export class ProblemRepository implements IProblemRepository {
   ): Promise<BackgroundProblem | null> => {
     const existingProblem = await this.getByPath(srcPath);
     if (existingProblem) return existingProblem;
-    let problem = await this.problemService.loadBySrc(srcPath);
+    let problem = await this.problemService.loadBySrc(srcPath, allowCreate);
     if (!problem) {
       if (!allowCreate) {
         this.logger.debug('No problem found for path', srcPath);
@@ -78,6 +78,10 @@ export class ProblemRepository implements IProblemRepository {
         return null;
       }
     }
+    // Loading can overlap between automatic and explicit requests. Registration
+    // must recheck synchronously after the awaits so each source has one owner.
+    for (const background of this.backgroundProblems.values())
+      if (background.problem.isRelated(srcPath)) return background;
     this.logger.debug('Loaded problem', problem.src.path, 'for path', srcPath);
     const problemId = this.crypto.randomUUID() as ProblemId;
     const backgroundProblem = new BackgroundProblem(problemId, problem, this.clock.now());
@@ -86,7 +90,7 @@ export class ProblemRepository implements IProblemRepository {
     return backgroundProblem;
   };
   public loadByPath = pMemoize(this._loadByPath, {
-    cacheKey: ([srcPath]) => srcPath,
+    cacheKey: ([srcPath, allowCreate]) => JSON.stringify([srcPath, Boolean(allowCreate)]),
     cache: false,
   });
 
@@ -121,6 +125,11 @@ export class ProblemRepository implements IProblemRepository {
     this.fireBackgroundEvent();
     this.logger.debug('Unloaded problem', problemId);
     return true;
+  }
+
+  public async save(problemId: ProblemId): Promise<void> {
+    const background = this.backgroundProblems.get(problemId);
+    if (background && !background.ac) await this.problemService.save(background.problem);
   }
 
   public async dispose(): Promise<void> {

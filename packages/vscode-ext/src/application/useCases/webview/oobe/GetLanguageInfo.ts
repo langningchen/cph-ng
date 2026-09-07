@@ -17,20 +17,22 @@
 
 import type { GetLanguageInfoMsg } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
-import which from 'which';
 import type { ILanguageRegistry } from '@/application/ports/problems/judge/langs/ILanguageRegistry';
 import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvider';
 import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { TOKENS } from '@/composition/tokens';
+import { KernelConfiguration } from '@/infrastructure/rpc/configuration';
 
 @injectable()
 export class GetLanguageInfo implements IMsgHandle<GetLanguageInfoMsg> {
   public constructor(
+    @inject(KernelConfiguration) private readonly configuration: KernelConfiguration,
     @inject(TOKENS.languageRegistry) private readonly languageRegistry: ILanguageRegistry,
     @inject(TOKENS.sidebarProvider) private readonly sidebarProvider: ISidebarProvider,
   ) {}
 
   public async exec(msg: GetLanguageInfoMsg): Promise<void> {
+    await this.configuration.get();
     const language = this.languageRegistry.getLangByName(msg.language);
     if (!language) throw new Error(`Language not found: ${msg.language}`);
     if (msg.executable === 'compiler') {
@@ -39,7 +41,7 @@ export class GetLanguageInfo implements IMsgHandle<GetLanguageInfoMsg> {
         type: 'languageInfo',
         language: language.name,
         compilers: {
-          default: compiler ? await which(compiler, { nothrow: true }) : null,
+          default: compiler ?? null,
           args: language.defaultValues.compilerArgs,
           list: await language.getCompilers(),
         },
@@ -51,7 +53,7 @@ export class GetLanguageInfo implements IMsgHandle<GetLanguageInfoMsg> {
         type: 'languageInfo',
         language: language.name,
         interpreters: {
-          default: runner ? await which(runner, { nothrow: true }) : null,
+          default: runner ?? null,
           args: language.defaultValues.interpreterArgs,
           list: await language.getInterpreters(),
         },

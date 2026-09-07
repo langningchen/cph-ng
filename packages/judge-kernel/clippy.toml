@@ -1,0 +1,4 @@
+# Clippy counts function bodies, not entire source files.
+too-many-lines-threshold = 100
+# Rust files are capped at 400 physical lines by scripts/check_quality.py;
+# the limit is configured in Cargo.toml [package.metadata.quality].

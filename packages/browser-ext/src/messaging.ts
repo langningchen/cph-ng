@@ -45,6 +45,7 @@ interface ProtocolMap {
   getStatus(): StatusResponse;
   connect(): void;
   disconnect(): void;
+  setPairingToken(data: { token: string }): void;
   setPort(data: { port: number }): void;
   setActive(): void;
   pageReady(): SubmitData | null;

@@ -1,15 +1,44 @@
-# CPH-NG Judge Kernel Global Configuration Template
+compilation_timeout_ms = 30000
 
+# Default judge limits. Source paths are restricted by serve --workspace-root.
+[problem]
+time_limit = 1000
+memory_limit = 256
+
+# Programs and argument arrays are trusted local configuration, never shell strings.
+[languages.cpp]
+compiler = "g++"
+compiler_args = ["-std=c++17", "-O2", "-pipe"]
+
+[languages.c]
+compiler = "gcc"
+compiler_args = ["-std=c17", "-O2", "-pipe"]
+
+[languages.python]
+interpreter = "python3"
+interpreter_args = []
+
+[languages.rust]
+compiler = "rustc"
+compiler_args = ["--edition=2021", "-O"]
+
+[languages.javascript]
+interpreter = "node"
+interpreter_args = []
+
+[languages.java]
+compiler = "javac"
+compiler_args = ["-encoding", "UTF-8"]
+interpreter = "java"
+interpreter_args = []
+
+# Defaults for new judge requests. Explicit request options override these values.
 [judge]
-# 默认编译器路径 (例如: "g++", "clang++")
-# compiler = "g++"
+checker_mode = "tokens"
+tolerance = 0.000001
+output_limit_bytes = 1048576
+iterations = 1000
 
-# 默认编译参数
-# compiler_args = ["-O3", "-Wall"]
-
-# 默认运行限制
-time_limit_ms = 1000
-memory_limit_mb = 256
-
-[system]
-# 系统级逻辑配置
+[judge.legacy_comparison]
+ignore_stderr = true
+regard_pe_as_ac = false

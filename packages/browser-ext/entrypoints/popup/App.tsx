@@ -50,6 +50,7 @@ const PopupInner = () => {
     port: 27121,
   });
   const [portInput, setPortInput] = useState('27121');
+  const [tokenInput, setTokenInput] = useState('');
   const [logs, setLogs] = useState<SubmitLog[]>([]);
 
   useEffect(() => {
@@ -135,6 +136,26 @@ const PopupInner = () => {
           </Button>
         </Stack>
 
+        <Stack spacing={1} sx={{ mt: 2 }}>
+          <TextField
+            label={t('labelPairingToken')}
+            type='password'
+            value={tokenInput}
+            onChange={(event) => setTokenInput(event.target.value)}
+            size='small'
+            helperText={t('pairingHelp')}
+          />
+          <Button
+            variant='outlined'
+            disabled={tokenInput.trim().length < 32}
+            onClick={() => {
+              sendMessage('setPairingToken', { token: tokenInput });
+              setTokenInput('');
+            }}
+          >
+            {t('btnPair')}
+          </Button>
+        </Stack>
         <Stack direction='row' spacing={1} sx={{ mt: 1 }}>
           {status.connected ? (
             <Button variant='contained' color='error' size='small' onClick={handleDisconnect}>

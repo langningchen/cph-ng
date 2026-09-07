@@ -17,6 +17,9 @@
   "btnDisconnect": {
     "message": "Disconnect"
   },
+  "btnPair": {
+    "message": "Save and connect"
+  },
   "btnSet": {
     "message": "Set"
   },
@@ -42,11 +45,17 @@
   "internalErrorMessage": {
     "message": "An internal error occurred. Please try again. If the problem persists, please report it on GitHub."
   },
+  "labelPairingToken": {
+    "message": "Pairing token"
+  },
   "labelPort": {
     "message": "Port"
   },
   "longTimeSubmission": {
     "message": "The submission is taking longer than expected. Please wait patiently or try again. If the problem persists, please report it on GitHub."
+  },
+  "pairingHelp": {
+    "message": "Run “CPH-NG: Copy Browser Pairing Token” in VS Code, then paste it here."
   },
   "recentSubmissions": {
     "message": "Recent Submissions"

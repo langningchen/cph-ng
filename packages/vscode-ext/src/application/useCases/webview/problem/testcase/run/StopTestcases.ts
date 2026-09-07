@@ -22,11 +22,13 @@ import type { IProblemRepository } from '@/application/ports/problems/IProblemRe
 import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
+import { RpcJudgeService } from '@/infrastructure/rpc/judgeService';
 
 @injectable()
 export class StopTestcases extends BaseProblemUseCase<StopTestcasesMsg> {
   public constructor(
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
+    @inject(RpcJudgeService) private readonly judge: RpcJudgeService,
   ) {
     super(repo);
   }
@@ -45,6 +47,6 @@ export class StopTestcases extends BaseProblemUseCase<StopTestcasesMsg> {
         )
           testcase.updateResult({ verdict: VerdictName.rejected });
       }
-    } else bgProblem.abort(msg.testcaseId);
+    } else await this.judge.stop(bgProblem, msg.testcaseId);
   }
 }

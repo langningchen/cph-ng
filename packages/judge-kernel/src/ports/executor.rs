@@ -1,43 +1,62 @@
-use std::{io::Error, path::Path, process::ExitStatus};
+use std::path::PathBuf;
 
-use thiserror::Error;
+use serde::{Deserialize, Serialize};
 
-use crate::domain::{ExecutablePath, IoPath, Memory, Time};
+use crate::application::tasks::{Cancellation, TaskFailure};
 
-#[derive(Debug)]
-pub enum InputSource {
-    Data(String),
-    File(IoPath),
+#[derive(Debug, Clone)]
+pub struct CommandSpec {
+    pub program: PathBuf,
+    pub args: Vec<String>,
+    pub cwd: PathBuf,
 }
-
-#[derive(Debug)]
-pub struct ExecutionContext<'a> {
-    pub exec: &'a ExecutablePath,
-    pub args: Option<Vec<String>>,
-    pub input: Option<InputSource>,
-    pub time_limit: Option<Time>,
-    pub memory_limit: Option<Memory>,
-    pub cwd: Option<&'a Path>,
+#[derive(Debug, Clone)]
+pub struct ExecutionLimits {
+    pub time_ms: u64,
+    pub memory_mb: u64,
+    pub output_bytes: usize,
+    /// Maximum size of each file created by the process, separate from captured output.
+    pub file_bytes: u64,
+    pub processes: usize,
 }
-
-#[derive(Debug)]
+impl Default for ExecutionLimits {
+    fn default() -> Self {
+        Self {
+            time_ms: 1000,
+            memory_mb: 256,
+            output_bytes: 1024 * 1024,
+            file_bytes: 1024 * 1024,
+            processes: 64,
+        }
+    }
+}
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ExitReason {
+    Exited,
+    TimeLimit,
+    MemoryLimit,
+    OutputLimit,
+    ProcessLimit,
+    Canceled,
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExecutionResult {
-    pub status: ExitStatus,
+    pub exit_code: Option<i32>,
+    pub reason: ExitReason,
     pub stdout: String,
     pub stderr: String,
-    pub time_used: Time,
-    pub memory_used: Memory,
+    pub time_ms: u64,
+    /// Peak sampled resident memory in MiB; None when no usable sample was obtained.
+    pub memory_mb: Option<u64>,
 }
-
-#[derive(Error, Debug)]
-pub enum ExecutorError {
-    #[error("Process launch failed: {0}")]
-    LaunchFailed(Error),
-    #[error("Timeout occurred")]
-    Timeout,
-}
-
 #[async_trait::async_trait]
-pub trait ExecutorPort: Send + Sync {
-    async fn run(&self, ctx: ExecutionContext<'_>) -> Result<ExecutionResult, ExecutorError>;
+pub trait ExecutorPort: Send + Sync + std::fmt::Debug {
+    async fn run(
+        &self,
+        command: &CommandSpec,
+        input: &[u8],
+        limits: &ExecutionLimits,
+        cancel: &Cancellation,
+    ) -> Result<ExecutionResult, TaskFailure>;
 }

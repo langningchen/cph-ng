@@ -57,7 +57,7 @@ export class ProblemCopyService implements IProblemCopyService {
       dto.name = this.path.basename(destSrcPath, this.path.extname(destSrcPath));
       dto.timeElapsedMs = 0;
       const copiedProblem = this.mapper.toEntity(dto);
-      await this.problemService.save(copiedProblem);
+      await this.problemService.save(copiedProblem, problem);
       return copiedProblem;
     } catch (e) {
       await this.rollbackCopy(copiedPaths);

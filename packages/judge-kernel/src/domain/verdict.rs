@@ -73,3 +73,20 @@ pub enum TestcaseVerdict {
     /// The solution was rejected (e.g., due to an invalid configuration)
     Rejected,
 }
+
+/// Wire verdict for the current judge API. Legacy snapshot enums above retain their format.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum JudgeVerdict {
+    Accepted,
+    WrongAnswer,
+    TimeLimitExceeded,
+    MemoryLimitExceeded,
+    OutputLimitExceeded,
+    RuntimeError,
+    CompilationError,
+    PresentationError,
+    PartiallyCorrect,
+    Rejected,
+    Skipped,
+}

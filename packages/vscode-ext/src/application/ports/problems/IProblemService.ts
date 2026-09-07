@@ -15,18 +15,20 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TestcaseId } from '@cph-ng/core';
+import type { CompanionProblem, TestcaseId } from '@cph-ng/core';
 import type { Problem } from '@/domain/entities/problem';
 import type { Testcase } from '@/domain/entities/testcase';
 
 export interface IProblemService {
+  importCompanion?(source: string, problem: CompanionProblem): Promise<void>;
+  move?(problem: Problem, destination: string): Promise<void>;
   getDataPath(srcPath: string): string | null;
   getTestcasePath(srcPath: string, id: TestcaseId, ext: string): string | null;
   create(srcPath: string): Promise<Problem | null>;
-  loadBySrc(srcPath: string): Promise<Problem | null>;
+  loadBySrc(srcPath: string, allowCreate?: boolean): Promise<Problem | null>;
   loadTestcases(problem: Problem, file: boolean): Promise<void>;
   applyTestcases(problem: Problem, testcases: Testcase[]): void;
-  save(problem: Problem): Promise<void>;
+  save(problem: Problem, copyFrom?: Problem): Promise<void>;
   delete(problem: Problem): Promise<void>;
   isRelated(problem: Problem, path: string): boolean;
   getLimits(problem: Problem): { timeLimitMs: number; memoryLimitMb: number };

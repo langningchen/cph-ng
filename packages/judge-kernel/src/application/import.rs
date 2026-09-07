@@ -2,13 +2,7 @@ use std::path::PathBuf;
 
 use thiserror::Error;
 
-use crate::ports::{
-    ExchangeError,
-    ProblemImporter,
-    ProblemRepository,
-    RepoError,
-    inquire::Inquire,
-};
+use crate::ports::{ExchangeError, ProblemImporter, ProblemRepository, RepoError};
 
 #[derive(Error, Debug)]
 pub enum MigrateError {
@@ -20,24 +14,23 @@ pub enum MigrateError {
     RepoError(RepoError),
 }
 
+/// # Errors
+/// Returns an unsupported-format error, importer validation/I/O error, or repository
+/// persistence error.
 pub async fn import_file(
     input: PathBuf,
     importers: &[&dyn ProblemImporter],
     repo: &dyn ProblemRepository,
-    inquire: &dyn Inquire,
 ) -> Result<(), MigrateError> {
     let imported_data = importers
         .iter()
         .find(|importer| importer.can_import(&input))
         .ok_or(MigrateError::UnsupportedFormat)?
-        .import(&input, inquire)
+        .import(&input)
         .map_err(MigrateError::ImportFailed)?;
 
     let src_path = &imported_data.problem.src.0;
-    repo.save_problem(&imported_data.problem)
-        .await
-        .map_err(MigrateError::RepoError)?;
-    repo.save_testcases(src_path, &imported_data.testcase_payloads)
+    repo.save_problem_with_testcases(&imported_data.problem, &imported_data.testcase_payloads)
         .await
         .map_err(MigrateError::RepoError)?;
     let configs = imported_data.language_env;

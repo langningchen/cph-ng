@@ -35,7 +35,11 @@ export type BatchList = Map<BatchId, CompanionProblem[]>;
 @injectable()
 export class Companion implements ICompanion {
   private abortControllers: Map<BatchId, AbortController> = new Map();
-  private readingProgress: Map<BatchId, (count: number, size: number) => void> = new Map();
+  private readingProgress: Map<
+    BatchId,
+    { update: (count: number, size: number) => void; done: () => void }
+  > = new Map();
+  private importing = new Set<BatchId>();
   private batchesToClaim: BatchList = new Map();
 
   public constructor(
@@ -63,12 +67,18 @@ export class Companion implements ICompanion {
     this.batchesToClaim.delete(batchId);
   }
   private updateStatusbar = () => {
+    if (this.ws.getStatus() !== 'ONLINE') {
+      for (const progress of this.readingProgress.values()) progress.done();
+      this.readingProgress.clear();
+      this.batchesToClaim.clear();
+      this.abortControllers.clear();
+    }
     this.statusbar.update(this.ws.getStatus(), this.batchesToClaim);
   };
 
   private handleStatusBarClick = async () => {
     this.logger.debug('Status bar item clicked');
-    if (this.ws.getStatus() !== 'ONLINE') return this.ws.spawnRouter();
+    if (this.ws.getStatus() !== 'ONLINE') return this.ws.connect();
     if (this.batchesToClaim.size === 0) this.logger.info('No batches to claim');
     else if (this.batchesToClaim.size === 1) {
       const batchId = Array.from(this.batchesToClaim.keys())[0];
@@ -99,21 +109,25 @@ export class Companion implements ICompanion {
         this.translator.t('Reading problems from companion...'),
         () => this.ws.cancelBatch(batchId),
       );
-      this.readingProgress.set(batchId, (count, size) => {
-        progress.report({ increment: (1 / size) * 100 });
-        if (count >= size) {
-          progress.done();
-          this.readingProgress.delete(batchId);
-        }
+      this.readingProgress.set(batchId, {
+        done: () => progress.done(),
+        update: (count, size) => {
+          progress.report({ increment: (1 / size) * 100 });
+          if (count >= size) {
+            progress.done();
+            this.readingProgress.delete(batchId);
+          }
+        },
       });
     }
-    this.readingProgress.get(batchId)?.(count, size);
+    this.readingProgress.get(batchId)?.update(count, size);
   };
   private batchAvailable = async (
     batchId: BatchId,
     problems: CompanionProblem[],
     autoImport: boolean,
   ) => {
+    if (this.importing.has(batchId)) return;
     const controller = new AbortController();
     this.abortControllers.set(batchId, controller);
     if (autoImport) {
@@ -130,15 +144,24 @@ export class Companion implements ICompanion {
   };
 
   private async claimAndImport(batchId: BatchId, problems: CompanionProblem[]) {
+    if (this.importing.has(batchId)) return;
+    this.importing.add(batchId);
+    let claimed = false;
     try {
-      this.ws.claimBatch(batchId);
+      await this.ws.claimBatch(batchId);
+      claimed = true;
       await this.importUseCase.exec(problems);
+      await this.ws.completeBatch(batchId);
     } catch (e) {
+      if (claimed) this.batchesToClaim.set(batchId, problems);
       this.logger.error('Failed to import companion problems', e);
       this.ui.alert(
         'error',
         this.translator.t('Failed to import problems: {msg}', { msg: (e as Error).message }),
       );
+    } finally {
+      this.importing.delete(batchId);
+      this.updateStatusbar();
     }
   }
 
@@ -146,6 +169,9 @@ export class Companion implements ICompanion {
     this.logger.info('Batch claimed', { batchId });
     const controller = this.abortControllers.get(batchId);
     if (controller) controller.abort();
+    this.removeBatch(batchId);
+    this.readingProgress.get(batchId)?.done();
+    this.readingProgress.delete(batchId);
     this.updateStatusbar();
   };
 
@@ -192,7 +218,7 @@ export class Companion implements ICompanion {
         expandedLength: expanded.length,
       });
     }
-    this.ws.submit({
+    await this.ws.submit({
       url: problem.url,
       sourceCode: expanded ?? sourceCode,
     } satisfies SubmitData);
