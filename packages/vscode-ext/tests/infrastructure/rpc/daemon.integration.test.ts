@@ -62,7 +62,8 @@ it.skipIf(!process.env.CPH_NG_JUDGE)(
       await Promise.all(clients.map((client) => client.dispose()));
       await Promise.all(
         [root, firstWorkspace, secondWorkspace].map((path) =>
-          rm(path, { recursive: true, force: true }),
+          // Socket disconnection precedes process exit and SQLite handle release.
+          rm(path, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }),
         ),
       );
     }

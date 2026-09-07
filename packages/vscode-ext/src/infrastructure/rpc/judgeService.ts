@@ -60,7 +60,7 @@ export class RpcJudgeService {
     const { problem } = background;
     const controller = new AbortController();
     background.ac = controller;
-    let selected = testcaseId ? [testcaseId] : problem.getEnabledTestcaseIds();
+    let selected = stress ? [] : testcaseId ? [testcaseId] : problem.getEnabledTestcaseIds();
     const completed = new Set<TestcaseId>();
     const canceled = new Set<TestcaseId>();
     let client: KernelRpcClient | undefined;
@@ -94,6 +94,7 @@ export class RpcJudgeService {
     };
     try {
       await this.document.save(problem.src.path);
+      await this.problems.save(problem);
       const reference = await this.problems.reference(problem);
       client = await this.kernel.forSource(problem.src.path);
       if (!stress && !testcaseId) selected = await this.problems.enabledTestcaseIds(problem);
@@ -113,7 +114,7 @@ export class RpcJudgeService {
         {
           ...reference,
           compilation: forceCompile === true ? 'force' : forceCompile === false ? 'skip' : 'auto',
-          ...(testcaseId ? { testcase_id: testcaseId } : { testcase_ids: selected }),
+          ...(stress ? {} : testcaseId ? { testcase_id: testcaseId } : { testcase_ids: selected }),
         },
         controller.signal,
         (event) => this.progress(problem, event, applyResult),

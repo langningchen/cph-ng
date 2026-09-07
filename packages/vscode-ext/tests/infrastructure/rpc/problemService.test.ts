@@ -1,13 +1,20 @@
 // biome-ignore-all lint/style/useNamingConvention: RPC fields and named class exports keep their wire/module names.
-import type { TestcaseId } from '@cph-ng/core';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import type { ProblemId, TestcaseId } from '@cph-ng/core';
 import { describe, expect, it, vi } from 'vitest';
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
+import type { IDocument } from '@/application/ports/vscode/IDocument';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
+import { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import type { Problem } from '@/domain/entities/problem';
 import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import type { LanguageRegistry } from '@/infrastructure/langs/languageRegistry';
 import type { ProblemService as LegacyProblemService } from '@/infrastructure/problems/problemService';
 import type { KernelConfiguration } from '@/infrastructure/rpc/configuration';
+import { RpcJudgeService } from '@/infrastructure/rpc/judgeService';
 import type { KernelService } from '@/infrastructure/rpc/kernelService';
 import { ProblemPreferences } from '@/infrastructure/rpc/preferences';
 import { type ProblemDto, RpcProblemService } from '@/infrastructure/rpc/problemService';
@@ -48,6 +55,8 @@ async function windows() {
       { id: third, stdin: '3', answer: 'three' },
     ],
   };
+  const attached = new Set<string>();
+  const runTask = vi.fn(async () => ({ state: 'succeeded', result: { testcases: [] } }));
   const mutations: Array<{ method: string; params: Record<string, unknown> }> = [];
   const request = async (method: string, params: Record<string, unknown>) => {
     if (method === rpcMethod.problemLoad) return structuredClone(remote);
@@ -55,6 +64,9 @@ async function windows() {
     if (method === rpcMethod.historyList) return [];
     mutations.push({ method, params: structuredClone(params) });
     if (method === rpcMethod.problemUpdate) {
+      for (const field of ['checker', 'interactor', 'generator', 'brute_force'])
+        if (typeof params[field] === 'string' && !attached.has(params[field] as string))
+          throw new Error('Auxiliary source is outside attached roots');
       const { problem_id: _, ...patch } = params;
       Object.assign(remote, patch);
       return structuredClone(remote);
@@ -86,10 +98,14 @@ async function windows() {
     } else throw new Error(`Unexpected mutation ${method}`);
     return {};
   };
+  const forSource = vi.fn(async (source: string) => {
+    attached.add(source);
+    return { request, runTask };
+  });
   function windowService() {
     const preferenceData = new Map<string, unknown>();
     const kernel = {
-      forSource: async () => ({ request }),
+      forSource,
       preferences: new ProblemPreferences({
         get<T>(key: string) {
           return preferenceData.get(key) as T | undefined;
@@ -112,7 +128,10 @@ async function windows() {
         memoryLimitMb: problem.overrides.memoryLimitMb ?? 256,
       }),
     } as LegacyProblemService;
-    const io = { readContent: async (value: TestcaseIo) => value.data ?? '' } as ITestcaseIoService;
+    const io = {
+      readContent: async (value: TestcaseIo) =>
+        value.path ? readFile(value.path, 'utf8') : (value.data ?? ''),
+    } as ITestcaseIoService;
     return new RpcProblemService(configuration, languages, kernel, legacy, io);
   }
   const a = windowService(),
@@ -120,7 +139,7 @@ async function windows() {
   const left = await a.loadBySrc(remote.source_path),
     right = await b.loadBySrc(remote.source_path);
   if (!left || !right) throw new Error('Fixture problem was not loaded');
-  return { a, b, left, right, remote, mutations };
+  return { a, b, left, right, remote, mutations, forSource, attached, runTask };
 }
 
 describe('two windows sharing a kernel', () => {
@@ -232,4 +251,62 @@ describe('two windows sharing a kernel', () => {
     expect(mutations).toEqual([]);
     expect(remote.testcases.map((testcase) => testcase.id)).not.toContain(first);
   });
+});
+
+it.each([true, false])('synchronizes disk edits before a run (single=%s)', async (single) => {
+  const { a, b, left, right, remote, forSource, runTask } = await windows();
+  const directory = await mkdtemp(join(tmpdir(), 'cph-testcase-sync-'));
+  try {
+    const input = join(directory, 'input.txt');
+    await writeFile(input, '1');
+    right.getTestcase(first).stdin = new TestcaseIo({ path: input });
+    await b.save(right);
+    left.getTestcase(first).answer = new TestcaseIo({ data: 'remote answer' });
+    await a.save(left);
+    await writeFile(input, 'edited on disk');
+    const judge = new RpcJudgeService(
+      { forSource } as unknown as KernelService,
+      b,
+      { save: vi.fn().mockResolvedValue(undefined) } as unknown as IDocument,
+      { problem: { expandBehavior: 'same' } } as ISettings,
+    );
+    let judged: ProblemDto['testcases'] | undefined;
+    runTask.mockImplementation(async () => {
+      judged = structuredClone(remote.testcases);
+      return { state: 'succeeded', result: { testcases: [] } };
+    });
+    await judge.run(
+      new BackgroundProblem(remote.id as ProblemId, right, 0),
+      single ? first : undefined,
+    );
+    expect(judged?.find((testcase) => testcase.id === first)).toEqual({
+      id: first,
+      stdin: 'edited on disk',
+      answer: 'remote answer',
+    });
+    expect(runTask).toHaveBeenCalledOnce();
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+it('attaches selected auxiliary sources before saving and reattaches them on unchanged saves', async () => {
+  const { a, left, attached, mutations } = await windows();
+  left.checker = { path: '/checker/check.py', hash: null };
+  left.interactor = { path: '/interactor/interact.py', hash: null };
+  left.stressTest.generator = { path: '/generator/gen.py', hash: null };
+  left.stressTest.bruteForce = { path: '/brute/solve.py', hash: null };
+  const sources = [
+    left.checker.path,
+    left.interactor.path,
+    left.stressTest.generator.path,
+    left.stressTest.bruteForce.path,
+  ];
+  await a.save(left);
+  expect(sources.every((source) => attached.has(source))).toBe(true);
+  attached.clear();
+  mutations.length = 0;
+  await a.save(left);
+  expect(sources.every((source) => attached.has(source))).toBe(true);
+  expect(mutations).toEqual([]);
 });

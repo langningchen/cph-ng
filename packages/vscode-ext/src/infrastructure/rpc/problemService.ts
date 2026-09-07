@@ -204,11 +204,20 @@ export class RpcProblemService implements IProblemService {
     const local = await this.snapshot(problem);
     let id = this.ids.get(problem);
     let base = this.baselines.get(problem);
+    const client = await this.kernel.forSource(problem.src.path);
+    // Auxiliary files were explicitly selected by the user. Reattach their roots
+    // even on an unchanged save, so they also work after the daemon restarts.
+    for (const source of new Set([
+      local.checker,
+      local.interactor,
+      local.generator,
+      local.brute_force,
+    ]))
+      if (source) await this.kernel.forSource(source);
     if (id && base && sameProblemData(base, local)) {
       await this.kernel.preferences.save(id, problem);
       return;
     }
-    const client = await this.kernel.forSource(problem.src.path);
     let stored: ProblemDto;
     if (!id) {
       stored = await client.request<ProblemDto>(rpcMethod.problemImport, {

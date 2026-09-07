@@ -1,6 +1,6 @@
 // biome-ignore-all lint/style/useNamingConvention: RPC fields and mocked class exports match the wire/module names.
 import type { TestcaseId } from '@cph-ng/core';
-import { VerdictName } from '@cph-ng/core';
+import { StressTestState, VerdictName } from '@cph-ng/core';
 import { describe, expect, it, vi } from 'vitest';
 import type { IProblemRepository } from '@/application/ports/problems/IProblemRepository';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
@@ -55,6 +55,7 @@ function setup(behavior: ISettings['problem']['expandBehavior'] = 'firstFailed')
     request: vi.fn().mockResolvedValue({}),
   };
   const problems = {
+    save: vi.fn().mockResolvedValue(undefined),
     reference: vi.fn().mockResolvedValue({ problem_id: bg.problemId }),
     enabledTestcaseIds: vi.fn().mockResolvedValue(ids),
   };
@@ -86,6 +87,11 @@ describe('Rust judge controls', () => {
           forceCompile,
         } as never);
         expect(client.runTask.mock.calls[0][0]).toBe(method);
+        const params = client.runTask.mock.calls[0][1];
+        if (method === rpcMethod.stressStart) {
+          expect(params).not.toHaveProperty('testcase_id');
+          expect(params).not.toHaveProperty('testcase_ids');
+        }
         expect(client.runTask.mock.calls[0][1].compilation).toBe(
           forceCompile === true ? 'force' : forceCompile === false ? 'skip' : 'auto',
         );
@@ -153,3 +159,30 @@ describe('Rust judge controls', () => {
     },
   );
 });
+
+it.each(['success', 'canceled', 'compilation failure'] as const)(
+  'preserves stored testcase results when stress testing ends with %s',
+  async (outcome) => {
+    const { judge, client, bg, problem } = setup();
+    for (const id of ids) problem.getTestcase(id).updateResult({ verdict: VerdictName.accepted });
+    const previous = ids.map((id) => ({ ...problem.getTestcase(id).result }));
+    client.runTask.mockImplementation(async (_method, params, _signal, onEvent) => {
+      expect(params).not.toHaveProperty('testcase_ids');
+      expect(ids.map((id) => problem.getTestcase(id).result)).toEqual(previous);
+      onEvent?.({ ...event(ids[0]), result: { phase: 'stress_iteration' } } as TaskEvent);
+      if (outcome !== 'success')
+        throw new RpcRemoteError(
+          outcome === 'canceled' ? rpcErrorCode.taskState : rpcErrorCode.compilationFailed,
+          outcome,
+        );
+      return { ...finished([]), result: { found_difference: false } } as TaskInfo;
+    });
+    await judge.run(bg, undefined, true);
+    expect(ids.map((id) => problem.getTestcase(id).result)).toEqual(previous);
+    expect(problem.stressTest.state).toBe(
+      outcome === 'compilation failure'
+        ? StressTestState.compilationError
+        : StressTestState.inactive,
+    );
+  },
+);
