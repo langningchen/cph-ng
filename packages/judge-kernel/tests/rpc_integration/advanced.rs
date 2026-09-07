@@ -16,7 +16,8 @@ async fn imports_cpp_compilation_spj_interactive_and_stress() -> anyhow::Result<
     )
     .await
     .context("test fixture or response")?;
-    let problem = client.ok(Method::ProblemImport, json!({"source_path": source, "format": "companion", "problem": {"name": "Sum", "timeLimit": 1000, "memoryLimit": 256, "tests": [{"input": "1 2", "output": "3"}]}})).await?;
+    // Exercise functionality without assuming subsecond startup on loaded native runners.
+    let problem = client.ok(Method::ProblemImport, json!({"source_path": source, "format": "companion", "problem": {"name": "Sum", "timeLimit": 5000, "memoryLimit": 256, "tests": [{"input": "1 2", "output": "3"}]}})).await?;
     let id = &problem.required("/id")?;
     let task = client
         .ok(Method::JudgeRun, json!({"problem_id": id}))

@@ -19,6 +19,15 @@ from terminal_screen import reset_styles, visible_text
 binary, store, source, scenario = sys.argv[1:]
 
 
+def prepare_terminal():
+    # Popen has created a new session; attach its standard input as its terminal.
+    fcntl.ioctl(0, termios.TIOCSCTTY, 0)
+    if sys.platform == "darwin":
+        # Set S_CTTYREF so Darwin drains output on exit instead of discarding it.
+        # https://bugs.ruby-lang.org/issues/20682
+        os.close(os.open("/dev/tty", os.O_RDWR))
+
+
 def terminal(args, *, env=None, code=0, interrupt=False, width=120):
     environment = os.environ.copy()
     for key in ["NO_COLOR", "CLICOLOR", "CLICOLOR_FORCE", "FORCE_COLOR"]:
@@ -32,9 +41,9 @@ def terminal(args, *, env=None, code=0, interrupt=False, width=120):
     process = subprocess.Popen(
         [binary, "--store-root", store, *args],
         stdin=slave, stdout=slave, stderr=slave, env=environment,
+        start_new_session=True, preexec_fn=prepare_terminal,
     )
-    # Keep a slave descriptor until output is drained. On macOS, the last
-    # slave close can discard unread output from a quickly exiting command.
+    # Keep a slave descriptor until output is drained.
     output = bytearray()
     deadline = time.monotonic() + 15
     try:

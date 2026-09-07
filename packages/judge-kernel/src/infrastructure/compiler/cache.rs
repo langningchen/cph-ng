@@ -32,9 +32,10 @@ impl CompilerRegistry {
             guard = CACHE_LOCK.lock() => guard,
         };
         let key = fingerprint::key(self, language, paths, source, cancel).await?;
-        let cache = self.repo.root().join("cache/compilation").join(key);
+        let cache = key.map(|key| self.repo.root().join("cache/compilation").join(key));
         if self.mode != CompilationMode::Force
-            && manifest::Manifest::restore(&self.repo, &cache, paths.workdir).await
+            && let Some(cache) = &cache
+            && manifest::Manifest::restore(&self.repo, cache, paths.workdir).await
         {
             self.hits.fetch_add(1, Ordering::Relaxed);
             return Ok(());
@@ -66,7 +67,9 @@ impl CompilerRegistry {
         if cancel.is_canceled() {
             return Err(TaskFailure::canceled());
         }
-        if let Ok(dependencies) = dependencies::collect(language, paths.workdir).await {
+        if let Some(cache) = cache
+            && let Ok(dependencies) = dependencies::collect(language, paths.workdir).await
+        {
             // A cache write failure cannot invalidate an otherwise successful compilation.
             let _ = manifest::Manifest::save(&self.repo, &cache, paths.workdir, dependencies).await;
         }

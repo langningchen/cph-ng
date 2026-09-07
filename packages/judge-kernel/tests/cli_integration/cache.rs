@@ -192,3 +192,40 @@ async fn diagnostic_run(ws: &Workspace, args: &[&str]) -> anyhow::Result<serde_j
     );
     Ok(serde_json::from_slice(&output.stdout)?)
 }
+
+#[cfg(unix)]
+#[tokio::test]
+async fn failed_version_probes_never_publish_or_reuse_compilation_caches() -> anyhow::Result<()> {
+    use std::os::unix::fs::PermissionsExt;
+    let ws = Workspace::new()?;
+    let compiler = ws.file("compiler", "#!/bin/sh\nif [ \"$1\" = --version ]; then echo unavailable >&2; exit 1; fi\nexec python3 \"$@\"\n")?;
+    std::fs::set_permissions(&compiler, std::fs::Permissions::from_mode(0o700))?;
+    std::fs::create_dir_all(&ws.store)?;
+    std::fs::write(
+        ws.store.join("config.toml"),
+        format!(
+            "[languages.python]\ncompiler={}\n",
+            serde_json::to_string(&compiler)?
+        ),
+    )?;
+    ws.file("probe.py", "print(1)\n")?;
+    let run = ["run", "probe.py", "--stdin", "", "--answer", "1"];
+    for _ in 0..2 {
+        assert_eq!(
+            ws.ok(&run).await?.required("/result/compilation/builds")?,
+            1
+        );
+    }
+    assert!(!ws.store.join("cache/compilation").exists());
+    ws.json(&[&run[..], &["--skip-compile"]].concat(), 3)
+        .await?;
+    ws.file("compiler", "#!/bin/sh\nif [ \"$1\" = --version ]; then echo fixture-python; exit 0; fi\nexec python3 \"$@\"\n")?;
+    ws.ok(&run).await?;
+    assert_eq!(
+        ws.ok(&[&run[..], &["--skip-compile"]].concat())
+            .await?
+            .required("/result/compilation/hits")?,
+        1
+    );
+    Ok(())
+}

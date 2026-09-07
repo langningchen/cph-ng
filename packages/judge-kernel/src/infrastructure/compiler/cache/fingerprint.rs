@@ -5,7 +5,7 @@ use super::super::{
 use crate::{
     application::tasks::{Cancellation, TaskFailure},
     domain::LanguageId,
-    ports::executor::{CommandSpec, ExecutionLimits, ExecutorPort},
+    ports::executor::{CommandSpec, ExecutionLimits, ExecutorPort, ExitReason},
 };
 use serde_json::json;
 use sha2::{Digest, Sha256};
@@ -21,7 +21,7 @@ pub(super) async fn key(
     paths: &CompilationPaths<'_>,
     source: &[u8],
     cancel: &Cancellation,
-) -> Result<String, TaskFailure> {
+) -> Result<Option<String>, TaskFailure> {
     let command = registry.compilation_command(language, paths);
     let resolved = crate::infrastructure::toolchain::resolve(&command.program)
         .await
@@ -37,7 +37,8 @@ pub(super) async fn key(
             },
             &[],
             &ExecutionLimits {
-                time_ms: 5000,
+                time_ms: registry.config.compilation_timeout_ms.unwrap_or(30_000),
+                memory_mb: 2048,
                 output_bytes: 65536,
                 ..ExecutionLimits::default()
             },
@@ -46,6 +47,18 @@ pub(super) async fn key(
         .await?;
     if cancel.is_canceled() {
         return Err(TaskFailure::canceled());
+    }
+    #[cfg(debug_assertions)]
+    if std::env::var_os("CPH_NG_CACHE_DIAGNOSTICS").is_some() {
+        eprintln!("Compiler version probe: {version:?}");
+    }
+    // A timed-out/failed probe is not a compiler identity. Compilation may still
+    // succeed, but cache reads and writes must be bypassed until a probe succeeds.
+    if version.reason != ExitReason::Exited
+        || version.exit_code != Some(0)
+        || (version.stdout.trim().is_empty() && version.stderr.trim().is_empty())
+    {
+        return Ok(None);
     }
     let environment: Vec<_> = [
         "PATH",
@@ -84,11 +97,11 @@ pub(super) async fn key(
         "version":[version.stdout, version.stderr]});
     #[cfg(debug_assertions)]
     if std::env::var_os("CPH_NG_CACHE_DIAGNOSTICS").is_some() {
-        eprintln!("Compiler version probe: {version:?}\nCache fingerprint: {signature}");
+        eprintln!("Cache fingerprint: {signature}");
     }
-    Ok(digest(
+    Ok(Some(digest(
         &serde_json::to_vec(&signature).map_err(TaskFailure::internal)?,
-    ))
+    )))
 }
 
 pub(super) async fn file_hash(path: &Path) -> std::io::Result<String> {
