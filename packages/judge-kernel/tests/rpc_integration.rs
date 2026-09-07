@@ -95,7 +95,10 @@ impl Client {
         Ok(value.required("/result")?.clone())
     }
     async fn finished(&mut self, id: &str) -> anyhow::Result<Value> {
-        tokio::time::timeout(Duration::from_secs(20), async {
+        // Match the CLI harness: compilation phases can legitimately outlast 20 s
+        // on loaded native runners. Resource-limit assertions use separate budgets.
+        let mut latest = None;
+        tokio::time::timeout(Duration::from_secs(120), async {
             loop {
                 let task = self.ok(Method::TaskGet, json!({"task_id": id})).await?;
                 if matches!(
@@ -104,11 +107,12 @@ impl Client {
                 ) {
                     return Ok::<_, anyhow::Error>(task);
                 }
+                latest = Some(task);
                 tokio::time::sleep(Duration::from_millis(10)).await;
             }
         })
         .await
-        .context("test fixture or response")?
+        .with_context(|| format!("Task {id} timed out; last state: {latest:?}"))?
     }
     async fn problem(
         &mut self,

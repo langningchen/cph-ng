@@ -9,6 +9,10 @@ use serde_json::Value;
 use tempfile::TempDir;
 use tokio::process::Command;
 
+// Version probing, dependency validation and compilation each have a 30 s budget.
+// The harness must allow them to finish before deciding the CLI is stuck.
+const COMMAND_TIMEOUT: Duration = Duration::from_secs(120);
+
 struct Workspace {
     dir: TempDir,
     store: PathBuf,
@@ -38,17 +42,17 @@ impl Workspace {
         Ok(path)
     }
     async fn raw(&self, args: &[&str]) -> anyhow::Result<std::process::Output> {
-        tokio::time::timeout(Duration::from_secs(30), self.command(args).output())
+        tokio::time::timeout(COMMAND_TIMEOUT, self.command(args).output())
             .await
-            .context("test fixture or response")?
+            .with_context(|| format!("CLI command timed out: {args:?}"))?
             .context("test fixture or response")
     }
     async fn json(&self, args: &[&str], code: i32) -> anyhow::Result<Value> {
         let mut command = self.command(args);
         command.arg("--json");
-        let output = tokio::time::timeout(Duration::from_secs(30), command.output())
+        let output = tokio::time::timeout(COMMAND_TIMEOUT, command.output())
             .await
-            .context("test fixture or response")?
+            .with_context(|| format!("CLI command timed out: {args:?}"))?
             .context("test fixture or response")?;
         assert_eq!(
             output.status.code(),

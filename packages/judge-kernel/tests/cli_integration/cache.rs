@@ -177,7 +177,7 @@ fn cache_diagnostics(ws: &Workspace) -> anyhow::Result<String> {
 
 async fn diagnostic_run(ws: &Workspace, args: &[&str]) -> anyhow::Result<serde_json::Value> {
     let output = tokio::time::timeout(
-        std::time::Duration::from_secs(30),
+        super::COMMAND_TIMEOUT,
         ws.command(args)
             .arg("--json")
             .env("CPH_NG_CACHE_DIAGNOSTICS", "1")
