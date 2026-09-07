@@ -33,12 +33,15 @@ def terminal(args, *, env=None, code=0, interrupt=False, width=120):
         [binary, "--store-root", store, *args],
         stdin=slave, stdout=slave, stderr=slave, env=environment,
     )
-    os.close(slave)
+    # Keep a slave descriptor until output is drained. On macOS, the last
+    # slave close can discard unread output from a quickly exiting command.
     output = bytearray()
     deadline = time.monotonic() + 15
     try:
         while time.monotonic() < deadline:
             if not select.select([master], [], [], 0.1)[0]:
+                if process.poll() is not None:
+                    break
                 continue
             try:
                 chunk = os.read(master, 65536)
@@ -60,6 +63,7 @@ def terminal(args, *, env=None, code=0, interrupt=False, width=120):
         process.kill() if process.poll() is None else None
         process.wait()
         os.close(master)
+        os.close(slave)
 
 
 run = ["run", source, "--stdin", "1 2", "--answer", "3"]
