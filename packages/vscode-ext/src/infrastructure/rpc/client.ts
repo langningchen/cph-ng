@@ -298,6 +298,7 @@ export class KernelRpcClient {
     params: Record<string, unknown>,
     signal?: AbortSignal,
     onEvent?: (event: TaskEvent) => void,
+    onStarted?: (task: TaskInfo) => Promise<void>,
   ): Promise<TaskInfo> {
     if (signal?.aborted) throw new RpcRemoteError(rpcErrorCode.taskState, 'Task canceled');
     const request = { client_request_id: randomUUID(), ...params };
@@ -308,6 +309,7 @@ export class KernelRpcClient {
       if (error instanceof RpcRemoteError || this.disposed) throw error;
       task = await this.request<TaskInfo>(method, request);
     }
+    await onStarted?.(task);
     return this.waitTask(task.task_id, signal, onEvent);
   }
   public async waitTask(

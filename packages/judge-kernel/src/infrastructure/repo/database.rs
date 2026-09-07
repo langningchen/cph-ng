@@ -20,7 +20,9 @@ pub async fn open(root: &Path) -> Result<SqlitePool, sqlx::Error> {
                 .busy_timeout(Duration::from_secs(10)),
         )
         .await?;
-    let mut tx = pool.begin().await?;
+    // Migration reads precede writes even when the schema already exists. Reserve
+    // the writer first so another process cannot invalidate our WAL snapshot.
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     for statement in [
         "CREATE TABLE IF NOT EXISTS problem_index (problem_id TEXT PRIMARY KEY, marker TEXT, device INTEGER, inode INTEGER, content_hash TEXT NOT NULL)",
         "CREATE INDEX IF NOT EXISTS idx_marker ON problem_index(marker)",

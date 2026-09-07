@@ -22,7 +22,12 @@ async fn compilation_cache_modes_validate_source_dependencies_and_artifacts() ->
     let first = ws.ok(&run).await?;
     assert_eq!(first.required("/result/compilation/builds")?, 1);
     let cached = ws.ok(&run).await?;
-    assert_eq!(cached.required("/result/compilation/hits")?, 1);
+    assert_eq!(
+        cached.required("/result/compilation/hits")?,
+        1,
+        "{cached:#}\n{}",
+        cache_diagnostics(&ws)?
+    );
     assert_eq!(cached.required("/result/compilation/builds")?, 0);
     ws.ok(&[&run[..], &["--skip-compile", "--time-limit-ms", "5000"]].concat())
         .await?;
@@ -144,4 +149,27 @@ async fn syntax_checks_are_cached_and_reported_in_human_output() -> anyhow::Resu
         .await?;
     ws.json(&run, 3).await?;
     Ok(())
+}
+
+fn cache_diagnostics(ws: &Workspace) -> anyhow::Result<String> {
+    let mut output = String::new();
+    let mut directories = vec![ws.store.clone()];
+    while let Some(dir) = directories.pop() {
+        for entry in std::fs::read_dir(dir)? {
+            let entry = entry?;
+            if entry.file_type()?.is_dir() {
+                directories.push(entry.path());
+            } else if entry.file_name() == "manifest.json" || entry.file_name() == "dependencies.d"
+            {
+                use std::fmt::Write;
+                writeln!(
+                    output,
+                    "{}: {}",
+                    entry.path().display(),
+                    std::fs::read_to_string(entry.path())?
+                )?;
+            }
+        }
+    }
+    Ok(output)
 }

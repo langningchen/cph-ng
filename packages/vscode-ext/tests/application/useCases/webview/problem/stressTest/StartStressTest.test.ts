@@ -23,7 +23,7 @@ describe('StartStressTest RPC migration', () => {
       judge as unknown as RpcJudgeService,
     );
     await service.exec({ problemId, type: 'startStressTest', forceCompile: null });
-    expect(judge.run).toHaveBeenCalledWith(background, undefined, true);
+    expect(judge.run).toHaveBeenCalledWith(background, undefined, true, null);
     expect(repo.save).toHaveBeenCalledWith(problemId);
   });
 });

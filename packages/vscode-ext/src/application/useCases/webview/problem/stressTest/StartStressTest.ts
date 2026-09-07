@@ -14,7 +14,7 @@ export class StartStressTest extends BaseProblemUseCase<StartStressTestMsg> {
   ) {
     super(repo);
   }
-  protected async performAction(bg: BackgroundProblem): Promise<void> {
-    await this.judge.run(bg, undefined, true);
+  protected async performAction(bg: BackgroundProblem, msg: StartStressTestMsg): Promise<void> {
+    await this.judge.run(bg, undefined, true, msg.forceCompile);
   }
 }

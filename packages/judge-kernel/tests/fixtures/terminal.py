@@ -119,9 +119,10 @@ elif scenario == "compact":
     assert piped.returncode == 0 and not piped.stderr, piped
     assert plain.startswith("Accepted  1/1 testcases passed\n"), plain
     assert len(plain.splitlines()) == 4 and "\x1b" not in plain, plain
-    listing = terminal(["problem", "list"], env={"NO_COLOR": "1"})
+    listing = terminal(["problem", "list"], env={"NO_COLOR": "1"},
+                       width=max(120, len(str(Path(source).resolve())) + 80))
     assert listing.startswith("Problems (1)\n"), listing
-    assert len(listing.splitlines()) == 3 and source in listing, listing
+    assert len(listing.splitlines()) == 3 and str(Path(source).resolve()) in listing, listing
     history = terminal(["history", "list", source], env={"NO_COLOR": "1"})
     assert history.startswith("Run history (2)\n"), history
     assert len(history.splitlines()) == 4 and history.count("Accepted") == 2, history

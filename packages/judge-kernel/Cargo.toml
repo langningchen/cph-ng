@@ -33,7 +33,7 @@ axum = { version = "0.7.9", features = ["ws"] }
 futures-util = "0.3"
 unicode-width = "0.2"
 unicode-segmentation = "1.13"
-crossterm = { version = "0.29", default-features = false }
+crossterm = { version = "0.29", default-features = false, features = ["windows"] }
 similar = "2.7"
 
 [lints.rust]

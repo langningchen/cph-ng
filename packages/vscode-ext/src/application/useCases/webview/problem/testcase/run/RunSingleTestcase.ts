@@ -15,6 +15,6 @@ export class RunSingleTestcase extends BaseProblemUseCase<RunSingleTestcaseMsg> 
     super(repo);
   }
   protected async performAction(bg: BackgroundProblem, msg: RunSingleTestcaseMsg): Promise<void> {
-    await this.judge.run(bg, msg.testcaseId);
+    await this.judge.run(bg, msg.testcaseId, false, msg.forceCompile);
   }
 }

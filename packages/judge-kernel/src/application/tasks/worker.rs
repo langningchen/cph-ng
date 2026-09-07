@@ -63,6 +63,7 @@ impl TaskManager {
             ActiveTask {
                 info: info.clone(),
                 cancel: cancel.clone(),
+                testcases: std::collections::HashMap::new(),
             },
         );
         let _ = self.events.send(event);

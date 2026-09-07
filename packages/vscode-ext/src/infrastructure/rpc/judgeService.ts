@@ -1,13 +1,14 @@
 // biome-ignore-all lint/style/useNamingConvention: JSON-RPC fields follow the Rust wire schema.
-import { StressTestState, type TestcaseId, VerdictName } from '@cph-ng/core';
+import { StressTestState, type TestcaseId, VerdictName, Verdicts, VerdictType } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
+import type { ISettings } from '@/application/ports/vscode/ISettings';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
 import type { Problem } from '@/domain/entities/problem';
 import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
-import { RpcRemoteError, type TaskEvent } from './client';
+import { type KernelRpcClient, RpcRemoteError, type TaskEvent } from './client';
 import { KernelService } from './kernelService';
 import { RpcProblemService } from './problemService';
 import { rpcErrorCode, rpcMethod } from './protocol';
@@ -34,27 +35,67 @@ interface CaseResult {
 }
 @injectable()
 export class RpcJudgeService {
+  private readonly cancellations = new WeakMap<
+    BackgroundProblem,
+    (id: TestcaseId) => Promise<void>
+  >();
+
+  public async stop(background: BackgroundProblem, testcaseId?: TestcaseId): Promise<void> {
+    if (testcaseId) await this.cancellations.get(background)?.(testcaseId);
+    else background.abort();
+  }
+
   public constructor(
     @inject(KernelService) private readonly kernel: KernelService,
     @inject(RpcProblemService) private readonly problems: RpcProblemService,
     @inject(TOKENS.document) private readonly document: IDocument,
+    @inject(TOKENS.settings) private readonly settings: ISettings,
   ) {}
   public async run(
     background: BackgroundProblem,
     testcaseId?: TestcaseId,
     stress = false,
+    forceCompile: boolean | null = null,
   ): Promise<void> {
     const { problem } = background;
     const controller = new AbortController();
     background.ac = controller;
     let selected = testcaseId ? [testcaseId] : problem.getEnabledTestcaseIds();
+    const completed = new Set<TestcaseId>();
+    const canceled = new Set<TestcaseId>();
+    let client: KernelRpcClient | undefined;
+    let taskId: string | undefined;
+    const flushCancellations = async () => {
+      if (!client || !taskId) return;
+      for (const id of canceled) {
+        try {
+          await client.request(rpcMethod.taskCancel, { task_id: taskId, testcase_id: id });
+        } catch (error) {
+          if (!(error instanceof RpcRemoteError) || error.code !== rpcErrorCode.taskState)
+            throw error;
+        }
+        canceled.delete(id);
+      }
+    };
+    const cancelCase = async (id: TestcaseId) => {
+      if (stress || !selected.includes(id) || completed.has(id)) return;
+      canceled.add(id);
+      await flushCancellations();
+    };
+    this.cancellations.set(background, cancelCase);
+    const applyResult = (result: CaseResult) => {
+      this.result(problem, result);
+      completed.add(result.testcase_id as TestcaseId);
+      if (!stress && !testcaseId) this.expand(problem, selected, completed);
+    };
     const update = (verdict: VerdictName, msg?: string) => {
-      for (const id of selected) problem.getTestcase(id).updateResult({ verdict, msg });
+      for (const id of selected)
+        if (!completed.has(id)) problem.getTestcase(id).updateResult({ verdict, msg });
     };
     try {
       await this.document.save(problem.src.path);
       const reference = await this.problems.reference(problem);
-      const client = await this.kernel.forSource(problem.src.path);
+      client = await this.kernel.forSource(problem.src.path);
       if (!stress && !testcaseId) selected = await this.problems.enabledTestcaseIds(problem);
       if (!stress && selected.length === 0) return;
       for (const id of selected) problem.getTestcase(id).clearResult();
@@ -71,10 +112,15 @@ export class RpcJudgeService {
             : rpcMethod.testcaseRunAll,
         {
           ...reference,
+          compilation: forceCompile === true ? 'force' : forceCompile === false ? 'skip' : 'auto',
           ...(testcaseId ? { testcase_id: testcaseId } : { testcase_ids: selected }),
         },
         controller.signal,
-        (event) => this.progress(problem, event),
+        (event) => this.progress(problem, event, applyResult),
+        async (task) => {
+          taskId = task.task_id;
+          await flushCancellations();
+        },
       );
       if (stress) {
         const result = task.result;
@@ -93,8 +139,7 @@ export class RpcJudgeService {
           problem.stressTest.state = StressTestState.foundDifference;
         } else problem.stressTest.state = StressTestState.inactive;
       } else
-        for (const result of (task.result?.testcases ?? []) as CaseResult[])
-          this.result(problem, result);
+        for (const result of (task.result?.testcases ?? []) as CaseResult[]) applyResult(result);
     } catch (error) {
       const code = error instanceof RpcRemoteError ? error.code : rpcErrorCode.internalError;
       const message = error instanceof Error ? error.message : String(error);
@@ -121,16 +166,38 @@ export class RpcJudgeService {
               ? StressTestState.compilationError
               : StressTestState.internalError;
     } finally {
-      background.abort();
+      if (this.cancellations.get(background) === cancelCase) this.cancellations.delete(background);
+      if (background.ac === controller) background.abort();
     }
   }
-  private progress(problem: Problem, event: TaskEvent): void {
+  private expand(problem: Problem, selected: TestcaseId[], completed: Set<TestcaseId>): void {
+    const behavior = this.settings.problem.expandBehavior;
+    if (behavior === 'same') return;
+    let expanded = false;
+    for (const id of selected) {
+      if (!completed.has(id)) continue;
+      const testcase = problem.getTestcase(id);
+      const failed =
+        !!testcase.result && Verdicts[testcase.result.verdict].type === VerdictType.failed;
+      testcase.isExpand =
+        behavior === 'always' ||
+        (behavior === 'failed' && failed) ||
+        (behavior === 'first' && id === selected[0]) ||
+        (behavior === 'firstFailed' && failed && !expanded);
+      expanded ||= testcase.isExpand;
+    }
+  }
+  private progress(
+    problem: Problem,
+    event: TaskEvent,
+    applyResult: (result: CaseResult) => void,
+  ): void {
     const result = event.result;
     if (result?.phase === 'running' && typeof result.testcase_id === 'string')
       problem
         .getTestcase(result.testcase_id as TestcaseId)
         .updateResult({ verdict: VerdictName.judging });
-    if (result?.phase === 'testcase_finished') this.result(problem, result.testcase as CaseResult);
+    if (result?.phase === 'testcase_finished') applyResult(result.testcase as CaseResult);
     if (result?.phase === 'stress_iteration') {
       problem.stressTest.count();
       problem.stressTest.state = StressTestState.runningSolution;

@@ -16,8 +16,12 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import { execSync } from 'node:child_process';
-import { chmodSync, readdirSync } from 'node:fs';
+import { chmodSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+
+if (!existsSync('bin')) {
+  throw new Error('Native kernels are missing. Run pnpm build:kernel before packaging.');
+}
 
 // Artifact downloads reset Unix permissions; VSIX entries must remain executable.
 for (const platform of readdirSync('bin', { withFileTypes: true })) {

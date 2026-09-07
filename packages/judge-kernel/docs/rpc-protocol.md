@@ -174,3 +174,7 @@ CLI 的 `diff RUN_UUID --case N` 为本地历史查看功能，读取该运行�
 源码绑定新增 `role: "primary" | "linked"`，表示当前有效默认源码。按问题 ID 加载/评测以及 `problem.list` 优先选择原绑定（`code_id == problem_id`）；若它不是可读普通文件，则按首次绑定时间、Code ID 的稳定顺序选择可用关联源码。原文件恢复后重新优先选择原绑定；全部不可用时保留原绑定用于诊断。选择不修改任何 ID、绑定或历史。明确指定路径或 Code ID 时不回退。调用方应读取 `role`，不再用两个 ID 相等来判断当前 Primary。
 
 任务事件的 `kind` 和进度 `phase` 在内核中使用闭合枚举，并验证各阶段的字段。原有 JSON 表示不变，包括索引重建进度的 `{ "rebuilt": N }`（无 `phase`）；未知事件类别、阶段或评测 verdict 不会被当作有效内部状态接受。
+
+### Cancel one testcase
+
+`task.cancel` accepts an optional `testcase_id` UUID for `testcase.run` and `testcase.runAll` tasks owned by the connected server. It cancels only that case, including a case that has not started yet; other cases continue, completed results are retained, and the canceled case receives a `rejected` verdict. A UUID not selected by the task has no effect. Omitting `testcase_id` retains whole-task cancellation, including cancellation from an external CLI observer. Per-case cancellation of a finished, external, or non-testcase task returns the task-state error.

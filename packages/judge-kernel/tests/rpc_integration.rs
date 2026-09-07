@@ -179,3 +179,6 @@ mod unix;
 #[cfg(windows)]
 #[path = "rpc_integration/windows.rs"]
 mod windows;
+
+#[path = "rpc_integration/case_cancellation.rs"]
+mod case_cancellation;

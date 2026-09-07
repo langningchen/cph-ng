@@ -23,6 +23,7 @@ pub use types::{
 struct ActiveTask {
     info: TaskInfo,
     cancel: Cancellation,
+    testcases: HashMap<uuid::Uuid, Cancellation>,
 }
 #[derive(Debug, Default)]
 struct ManagerState {

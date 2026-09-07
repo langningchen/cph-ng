@@ -14,7 +14,7 @@ export class RunAllTestcases extends BaseProblemUseCase<RunAllTestcasesMsg> {
   ) {
     super(repo);
   }
-  protected async performAction(bg: BackgroundProblem): Promise<void> {
-    await this.judge.run(bg);
+  protected async performAction(bg: BackgroundProblem, msg: RunAllTestcasesMsg): Promise<void> {
+    await this.judge.run(bg, undefined, false, msg.forceCompile);
   }
 }

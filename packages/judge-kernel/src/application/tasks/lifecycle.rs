@@ -84,6 +84,37 @@ impl TaskManager {
         }
     }
 
+    /// Cancel only the selected testcase of a batch owned by this server.
+    /// Requests made before the testcase starts remain effective when it is scheduled.
+    ///
+    /// # Errors
+    /// Returns an invalid-state error for finished, external or non-judging tasks.
+    pub async fn cancel_testcase(
+        &self,
+        id: &str,
+        testcase: uuid::Uuid,
+    ) -> Result<TaskInfo, TaskFailure> {
+        let mut state = self.state.lock().await;
+        let task = state.active.get_mut(id).ok_or_else(|| {
+            TaskFailure::new(
+                ErrorCode::TaskState,
+                "Testcase cancellation requires an active task on this server",
+            )
+        })?;
+        if !matches!(
+            task.info.kind,
+            crate::application::method::Method::TestcaseRun
+                | crate::application::method::Method::TestcaseRunAll
+        ) {
+            return Err(TaskFailure::new(
+                ErrorCode::TaskState,
+                "Task does not run saved testcases",
+            ));
+        }
+        task.testcases.entry(testcase).or_default().cancel();
+        Ok(task.info.clone())
+    }
+
     /// # Errors
     /// Returns a storage error if a remaining task cannot be finalized after the grace
     /// period.

@@ -45,12 +45,18 @@ pub(super) async fn task_get(p: Value, context: &CommandService) -> Result<Value
 }
 
 pub(super) async fn task_cancel(p: Value, context: &CommandService) -> Result<Value, CommandError> {
-    value(
-        context
-            .tasks
-            .cancel(&params::<TaskParams>(&p)?.task_id)
-            .await?,
-    )
+    #[derive(serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    struct CancelParams {
+        task_id: String,
+        testcase_id: Option<uuid::Uuid>,
+    }
+    let p: CancelParams = params(&p)?;
+    value(if let Some(testcase) = p.testcase_id {
+        context.tasks.cancel_testcase(&p.task_id, testcase).await?
+    } else {
+        context.tasks.cancel(&p.task_id).await?
+    })
 }
 
 pub(super) async fn task_events_since(

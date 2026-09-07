@@ -57,7 +57,7 @@ async fn missing_primary_uses_linked_source_without_changing_identity() -> anyho
     let json = ws.ok(&["problem", "list"]).await?;
     assert_eq!(
         json.text("/0/source_path")?,
-        replacement.to_str().context("path")?
+        replacement.canonicalize()?.to_str().context("path")?
     );
     assert_eq!(
         json.required("/0/sources")?

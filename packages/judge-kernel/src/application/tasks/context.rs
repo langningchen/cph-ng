@@ -7,6 +7,23 @@ pub struct TaskContext {
     pub(super) manager: TaskManager,
 }
 impl TaskContext {
+    /// Create a cancellation scope for one testcase without canceling sibling cases.
+    ///
+    /// # Errors
+    /// Returns cancellation if the owning task is no longer active.
+    pub async fn for_testcase(&self, id: uuid::Uuid) -> Result<Self, TaskFailure> {
+        let mut state = self.manager.state.lock().await;
+        let task = state
+            .active
+            .get_mut(&self.task_id)
+            .ok_or_else(TaskFailure::canceled)?;
+        let cancel = task.testcases.entry(id).or_default().clone();
+        Ok(Self {
+            cancel,
+            ..self.clone()
+        })
+    }
+
     /// # Errors
     /// Returns cancellation if this task is no longer active, or a storage error while
     /// recording the snapshot and event.

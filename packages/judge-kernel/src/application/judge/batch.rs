@@ -143,9 +143,28 @@ impl JudgeService {
             completed: index,
         })
         .await?;
-        let mut result = self
-            .run_case(problem, &artifacts, &input, &answer, options, ctx)
-            .await?;
+        let case_context = ctx.for_testcase(id.0).await?;
+        let outcome = self
+            .run_case(problem, &artifacts, &input, &answer, options, &case_context)
+            .await;
+        let mut result = match outcome {
+            Err(error)
+                if error.code == ErrorCode::TaskState && case_context.cancel.is_canceled() =>
+            {
+                CaseResult {
+                    testcase_id: Some(id.0),
+                    verdict: JudgeVerdict::Rejected,
+                    message: "Testcase canceled".into(),
+                    time_ms: 0,
+                    memory_mb: None,
+                    stdout: String::new(),
+                    stderr: String::new(),
+                    exit_code: None,
+                    comparison: None,
+                }
+            }
+            result => result?,
+        };
         result.testcase_id = Some(id.0);
         // Keep the original answer independently of mutable testcases and JSON output limits.
         self.repo
