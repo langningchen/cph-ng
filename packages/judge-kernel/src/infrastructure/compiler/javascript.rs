@@ -35,3 +35,35 @@ impl CompilerRegistry {
         ])
     }
 }
+
+pub(super) async fn snapshot_path(
+    original: &std::path::Path,
+    snapshot: std::path::PathBuf,
+) -> Result<std::path::PathBuf, TaskFailure> {
+    if original.extension().and_then(|value| value.to_str()) != Some("js") {
+        return Ok(snapshot);
+    }
+    let mut directory = original.parent();
+    while let Some(parent) = directory {
+        if parent.file_name().and_then(|value| value.to_str()) == Some("node_modules") {
+            break;
+        }
+        match tokio::fs::read(parent.join("package.json")).await {
+            Ok(bytes) => {
+                let package: serde_json::Value =
+                    serde_json::from_slice(&bytes).map_err(TaskFailure::internal)?;
+                return Ok(
+                    match package.get("type").and_then(serde_json::Value::as_str) {
+                        Some("module") => snapshot.with_extension("mjs"),
+                        Some("commonjs") => snapshot.with_extension("cjs"),
+                        _ => snapshot,
+                    },
+                );
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => return Err(TaskFailure::internal(error)),
+        }
+        directory = parent.parent();
+    }
+    Ok(snapshot)
+}

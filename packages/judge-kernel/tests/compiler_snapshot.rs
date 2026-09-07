@@ -98,3 +98,52 @@ async fn javascript_snapshots_preserve_commonjs_and_esm_resolution() -> anyhow::
     }
     Ok(())
 }
+
+#[tokio::test]
+async fn javascript_syntax_checks_keep_explicit_package_module_mode() -> anyhow::Result<()> {
+    let root = tempfile::TempDir::new()?;
+    let source = root.path().join("main.js");
+    tokio::fs::write(&source, "throw new Error('changed entry')").await?;
+    let package = root.path().join("package.json");
+    tokio::fs::write(&package, r#"{"type":"module"}"#).await?;
+    let repo = WorkspaceProblemRepository::new(root.path().join("store")).await?;
+    let workdir = repo.root().join("module");
+    // Disable Node 24's automatic detection to exercise older Node module semantics.
+    let config = serde_json::from_value(
+        serde_json::json!({"languages":{"javascript":{"interpreter":"node","interpreter_args":["--no-experimental-detect-module"]}}}),
+    )?;
+    let compiler = CompilerRegistry::new(config, repo.clone());
+    let cancel = Cancellation::new();
+    let source_code = b"export {}; console.log(42)";
+    let command = compiler
+        .compile_snapshot(&source, &workdir, 256, &cancel, source_code)
+        .await?;
+    let result = ProcessExecutor
+        .run(
+            &command,
+            &[],
+            &ExecutionLimits {
+                time_ms: 5000,
+                ..ExecutionLimits::default()
+            },
+            &cancel,
+        )
+        .await?;
+    assert_eq!(result.exit_code, Some(0), "{result:?}");
+    assert_eq!(result.stdout.trim(), "42");
+    tokio::fs::write(&package, r#"{"type":"commonjs"}"#).await?;
+    // Same source/compiler, but the changed package mode must also invalidate syntax caching.
+    assert!(
+        compiler
+            .compile_snapshot(
+                &source,
+                &repo.root().join("commonjs"),
+                256,
+                &cancel,
+                source_code
+            )
+            .await
+            .is_err()
+    );
+    Ok(())
+}

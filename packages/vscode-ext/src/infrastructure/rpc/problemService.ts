@@ -1,4 +1,5 @@
 // biome-ignore-all lint/style/useNamingConvention: JSON-RPC fields follow the Rust wire schema.
+import { basename, extname } from 'node:path';
 import type { CompanionProblem, TestcaseId } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
@@ -66,16 +67,21 @@ export class RpcProblemService implements IProblemService {
   public async create(source: string): Promise<Problem> {
     const client = await this.kernel.forSource(source);
     return this.entity(
-      await client.request<ProblemDto>(rpcMethod.problemCreate, { source_path: source }),
+      await client.request<ProblemDto>(rpcMethod.problemCreate, {
+        source_path: source,
+        name: basename(source, extname(source)),
+      }),
     );
   }
-  public async loadBySrc(source: string): Promise<Problem | null> {
+  public async loadBySrc(source: string, allowCreate = false): Promise<Problem | null> {
     const client = await this.kernel.forSource(source);
     try {
       return this.entity(
         await client.request<ProblemDto>(rpcMethod.problemLoad, { source_path: source }),
       );
     } catch (error) {
+      if (allowCreate && error instanceof RpcRemoteError && error.code === rpcErrorCode.conflict)
+        return null;
       if (!(error instanceof RpcRemoteError) || error.code !== rpcErrorCode.notIndexed) throw error;
       // Older compressed JSON formats remain readable during migration.
       const old = await this.legacy.loadBySrc(source);
@@ -168,10 +174,17 @@ export class RpcProblemService implements IProblemService {
     if (!id) throw new Error('Problem has no kernel identity');
     return { problem_id: id, source_path: problem.src.path };
   }
-  public save(problem: Problem): Promise<void> {
+  public save(problem: Problem, copyFrom?: Problem): Promise<void> {
     const pending = (this.writes.get(problem) ?? Promise.resolve())
       .catch(() => {})
-      .then(() => this.persist(problem));
+      .then(async () => {
+        await this.persist(problem);
+        if (copyFrom) {
+          const { local_config } = await this.configuration.get(copyFrom.src.path);
+          if (Object.keys(local_config).length)
+            await this.configuration.set({ patch: local_config }, problem.src.path);
+        }
+      });
     this.writes.set(problem, pending);
     return pending;
   }

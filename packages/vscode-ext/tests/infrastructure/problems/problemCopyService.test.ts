@@ -107,7 +107,8 @@ describe('ProblemCopyService', () => {
 
   describe('copy', () => {
     it('copies source, testcase files, custom files, and problem data independently', async () => {
-      const { fileSystemMock, copyService } = createServices();
+      const { fileSystemMock, service, copyService } = createServices();
+      const save = vi.spyOn(service, 'save');
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/data/1841D.12345678.in', 'input');
@@ -141,6 +142,7 @@ describe('ProblemCopyService', () => {
       );
 
       const copied = await copyService.copy(problem, '/src/1841D_brute.cpp');
+      expect(save).toHaveBeenCalledWith(copied, problem);
 
       expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
       expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.in')).toBe('input');

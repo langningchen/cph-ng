@@ -86,10 +86,13 @@ impl CompilerRegistry {
                 "Source file exceeds size limit",
             ));
         }
-        let source_path = workdir
+        let mut source_path = workdir
             .join(path.file_name().ok_or_else(|| {
                 TaskFailure::new(ErrorCode::InvalidParams, "Invalid source path")
             })?);
+        if language == LanguageId::Javascript {
+            source_path = javascript::snapshot_path(path, source_path).await?;
+        }
         self.repo
             .write_owned(&source_path, source)
             .await

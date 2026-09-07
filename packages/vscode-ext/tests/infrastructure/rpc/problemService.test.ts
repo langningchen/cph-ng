@@ -4,19 +4,26 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { ProblemId, TestcaseId } from '@cph-ng/core';
 import { describe, expect, it, vi } from 'vitest';
+import type { IClock } from '@/application/ports/node/IClock';
+import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
+import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
+import type { ILogger } from '@/application/ports/vscode/ILogger';
 import type { ISettings } from '@/application/ports/vscode/ISettings';
+import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvider';
 import { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import type { Problem } from '@/domain/entities/problem';
+import { Problem } from '@/domain/entities/problem';
 import { Testcase } from '@/domain/entities/testcase';
 import { TestcaseIo } from '@/domain/entities/testcaseIo';
 import type { LanguageRegistry } from '@/infrastructure/langs/languageRegistry';
+import { ProblemRepository } from '@/infrastructure/problems/problemRepository';
 import type { ProblemService as LegacyProblemService } from '@/infrastructure/problems/problemService';
 import { RpcRemoteError } from '@/infrastructure/rpc/client';
 import type { KernelConfiguration } from '@/infrastructure/rpc/configuration';
 import { RpcJudgeService } from '@/infrastructure/rpc/judgeService';
 import type { KernelService } from '@/infrastructure/rpc/kernelService';
+import { editorPath } from '@/infrastructure/rpc/paths';
 import { ProblemPreferences } from '@/infrastructure/rpc/preferences';
 import { type ProblemDto, RpcProblemService } from '@/infrastructure/rpc/problemService';
 import { rpcErrorCode, rpcMethod } from '@/infrastructure/rpc/protocol';
@@ -62,10 +69,14 @@ async function windows(paths: Partial<ProblemDto> = {}) {
   const legacyDelete = vi.fn(async () => {
     legacyLoad.mockResolvedValue(null);
   });
+  const configs = new Map<string, Record<string, unknown>>();
+  const configure = vi.fn(async (change: { patch: Record<string, unknown> }, source: string) => {
+    configs.set(editorPath(source), structuredClone(change.patch));
+  });
   const attached = new Set<string>();
   const runTask = vi.fn(async () => ({ state: 'succeeded', result: { testcases: [] } }));
   const mutations: Array<{ method: string; params: Record<string, unknown> }> = [];
-  const request = async (method: string, params: Record<string, unknown>) => {
+  const request = vi.fn(async (method: string, params: Record<string, unknown>) => {
     if (method === rpcMethod.problemLoad) {
       if (!present) throw new RpcRemoteError(rpcErrorCode.notIndexed, 'No problem');
       return structuredClone(remote);
@@ -77,6 +88,18 @@ async function windows(paths: Partial<ProblemDto> = {}) {
     if (method === rpcMethod.testcaseList) return structuredClone(remote.testcases);
     if (method === rpcMethod.historyList) return [];
     mutations.push({ method, params: structuredClone(params) });
+    if (method === rpcMethod.problemCreate || method === rpcMethod.problemImport) {
+      remote.id = '00000000-0000-0000-0000-000000000020';
+      remote.source_path = String(params.source_path);
+      const imported = params.problem as
+        | { name: string; tests: Array<{ id: string; input: string; output: string }> }
+        | undefined;
+      remote.name = imported?.name ?? String(params.name);
+      remote.testcases =
+        imported?.tests.map((test) => ({ id: test.id, stdin: test.input, answer: test.output })) ??
+        [];
+      return structuredClone(remote);
+    }
     if (method === rpcMethod.problemUpdate) {
       for (const field of ['checker', 'interactor', 'generator', 'brute_force'])
         if (typeof params[field] === 'string' && !attached.has(params[field] as string))
@@ -111,7 +134,7 @@ async function windows(paths: Partial<ProblemDto> = {}) {
       remote.testcases.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
     } else throw new Error(`Unexpected mutation ${method}`);
     return {};
-  };
+  });
   const forSource = vi.fn(async (source: string) => {
     attached.add(source);
     return { request, runTask };
@@ -130,10 +153,11 @@ async function windows(paths: Partial<ProblemDto> = {}) {
       }),
     } as unknown as KernelService;
     const configuration = {
-      get: async () => ({
+      get: async (source?: string) => ({
         config: { problem: { time_limit: 1000, memory_limit: 256 }, languages: {} },
-        local_config: {},
+        local_config: source ? (configs.get(editorPath(source)) ?? {}) : {},
       }),
+      set: configure,
     } as unknown as KernelConfiguration;
     const languages = { getLangByFile: () => ({ name: 'C++' }) } as unknown as LanguageRegistry;
     const legacy = {
@@ -167,6 +191,9 @@ async function windows(paths: Partial<ProblemDto> = {}) {
     runTask,
     legacyLoad,
     legacyDelete,
+    request,
+    configs,
+    configure,
   };
 }
 
@@ -396,4 +423,55 @@ it('retires legacy metadata before deleting a migrated problem so editor refresh
   expect(legacyDelete).toHaveBeenCalledWith(left);
   expect(await a.loadBySrc(left.src.path)).toBeNull();
   expect(await b.loadBySrc(left.src.path)).toBeNull();
+});
+
+it('keeps automatic identity conflicts visible while allowing explicit creation of a template copy', async () => {
+  const { a, request } = await windows();
+  const logger = { withScope: () => logger, debug: () => {}, error: () => {} };
+  const repository = new ProblemRepository(
+    { now: () => 0 } as IClock,
+    { randomUUID: () => 'new-editor-id' } as unknown as ICrypto,
+    logger as unknown as ILogger,
+    a,
+    {} as IActivePathService,
+    { sendMessage: () => {} } as unknown as ISidebarProvider,
+  );
+  request.mockRejectedValueOnce(new RpcRemoteError(rpcErrorCode.conflict, 'Ambiguous source'));
+  request.mockRejectedValueOnce(new RpcRemoteError(rpcErrorCode.conflict, 'Ambiguous source'));
+  const automatic = repository.loadByPath('/work/template.cpp');
+  const explicit = repository.loadByPath('/work/template.cpp', true);
+  const [auto, created] = await Promise.allSettled([automatic, explicit]);
+  expect(auto.status).toBe('rejected');
+  expect(created.status).toBe('fulfilled');
+  if (created.status === 'fulfilled') expect(created.value?.problem.name).toBe('template');
+  expect(request).toHaveBeenCalledWith(rpcMethod.problemCreate, {
+    source_path: '/work/template.cpp',
+    name: 'template',
+  });
+});
+
+it('copies problem-local kernel configuration without applying legacy overrides during ordinary saves', async () => {
+  const { a, left, configs, configure } = await windows();
+  const local = {
+    languages: {
+      cpp: {
+        compiler: 'g++',
+        compiler_args: ['-std=c++20'],
+        interpreter: 'runner',
+        interpreter_args: ['--trace'],
+      },
+    },
+    judge: { checker_mode: 'exact' },
+  };
+  configs.set(left.src.path, local);
+  const copied = new Problem('Copy', '/work/copy.cpp');
+  copied.overrides = { ...left.overrides, compilerArgs: '-std=c++20' };
+  await a.save(copied, left);
+  expect(configure).toHaveBeenCalledWith({ patch: local }, copied.src.path);
+  const reopened = await a.loadBySrc(copied.src.path);
+  expect(reopened?.overrides.compilerArgs).toBe('-std=c++20');
+  expect(reopened?.overrides.interpreterArgs).toBe('--trace');
+  configure.mockClear();
+  await a.save(copied);
+  expect(configure).not.toHaveBeenCalled();
 });

@@ -65,7 +65,7 @@ export class ProblemRepository implements IProblemRepository {
   ): Promise<BackgroundProblem | null> => {
     const existingProblem = await this.getByPath(srcPath);
     if (existingProblem) return existingProblem;
-    let problem = await this.problemService.loadBySrc(srcPath);
+    let problem = await this.problemService.loadBySrc(srcPath, allowCreate);
     if (!problem) {
       if (!allowCreate) {
         this.logger.debug('No problem found for path', srcPath);
@@ -86,7 +86,7 @@ export class ProblemRepository implements IProblemRepository {
     return backgroundProblem;
   };
   public loadByPath = pMemoize(this._loadByPath, {
-    cacheKey: ([srcPath]) => srcPath,
+    cacheKey: ([srcPath, allowCreate]) => JSON.stringify([srcPath, Boolean(allowCreate)]),
     cache: false,
   });
 
