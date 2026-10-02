@@ -138,7 +138,7 @@ async fn rebuild_receipts_distinguish_empty_success_partial_and_failed_results()
         }
         let output = ws.raw(&["index", "rebuild"]).await?;
         assert_eq!(output.status.code(), Some(code));
-        assert!(output.stderr.is_empty());
+        assert_eq!(output.stderr.as_slice(), &[] as &[u8]);
         let text = String::from_utf8(output.stdout)?;
         assert!(text.starts_with(title) && text.contains(summary), "{text}");
         for stale in [

@@ -42,6 +42,9 @@ missing_debug_implementations = "warn"
 unused_qualifications = "warn"
 
 [lints.clippy]
+# async-trait adds `#[must_use]` to methods that already return a must-use future.
+# Remove this once async-trait stops emitting the redundant attribute.
+double_must_use = "allow"
 correctness = "deny"
 suspicious = "deny"
 style = "warn"

@@ -1,5 +1,5 @@
 diff --git a/dist/src/NodeParser/IntersectionNodeParser.js b/dist/src/NodeParser/IntersectionNodeParser.js
-index b20953243f9e1ed0361a48f5216e2c2d4e2e3f29..bb9fcaec288ade428485d3a9144b9653d214cf60 100644
+index b20953243f9e1ed0361a48f5216e2c2d4e2e3f29..a9770a7673fc33869238aa4dfd12151c1fa6f948 100644
 --- a/dist/src/NodeParser/IntersectionNodeParser.js
 +++ b/dist/src/NodeParser/IntersectionNodeParser.js
 @@ -8,6 +8,7 @@ const Errors_js_1 = require("../Error/Errors.js");
@@ -32,7 +32,7 @@ index b20953243f9e1ed0361a48f5216e2c2d4e2e3f29..bb9fcaec288ade428485d3a9144b9653
          if (types.length === 2 && types.some((t) => isEmptyObject(t))) {
              if (types.some((t) => t instanceof StringType_js_1.StringType)) {
 diff --git a/dist/src/NodeParser/MappedTypeNodeParser.js b/dist/src/NodeParser/MappedTypeNodeParser.js
-index da11506197c635b3cdc7d4554a6325ddfcd7e235..4bd36d2c43f0998680d3882654bdf464fe41ad72 100644
+index da11506197c635b3cdc7d4554a6325ddfcd7e235..fb2c34b9402cfaca08afe443c059181a5ef83535 100644
 --- a/dist/src/NodeParser/MappedTypeNodeParser.js
 +++ b/dist/src/NodeParser/MappedTypeNodeParser.js
 @@ -9,6 +9,7 @@ const AnnotatedType_js_1 = require("../Type/AnnotatedType.js");
