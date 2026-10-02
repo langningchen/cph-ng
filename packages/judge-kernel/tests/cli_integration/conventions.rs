@@ -59,8 +59,8 @@ async fn symmetric_data_flags_aliases_and_usage_errors() -> anyhow::Result<()> {
         ])
         .await?;
     assert_eq!(literal.status.code(), Some(2));
-    assert!(literal.stdout.is_empty());
-    assert!(!literal.stderr.is_empty());
+    assert_eq!(literal.stdout.as_slice(), &[] as &[u8]);
+    assert_ne!(literal.stderr.as_slice(), &[] as &[u8]);
     for args in [
         vec!["tc", "list", "--problem-id", "invalid"],
         vec![
@@ -85,7 +85,7 @@ async fn symmetric_data_flags_aliases_and_usage_errors() -> anyhow::Result<()> {
         .await?;
     let error: Value = serde_json::from_slice(&output.stdout)?;
     assert_eq!(error.required("/type")?, "error");
-    assert!(output.stderr.is_empty());
+    assert_eq!(output.stderr.as_slice(), &[] as &[u8]);
     Ok(())
 }
 
@@ -199,7 +199,7 @@ async fn service_failures_keep_stdout_available_for_rpc() -> anyhow::Result<()> 
     lock.try_lock()?;
     let output = ws.raw(&["serve", "--json"]).await?;
     assert_eq!(output.status.code(), Some(2));
-    assert!(output.stdout.is_empty());
+    assert_eq!(output.stdout.as_slice(), &[] as &[u8]);
     let error: Value = serde_json::from_slice(&output.stderr)?;
     assert_eq!(error.required("/error/code")?, -32006);
     Ok(())

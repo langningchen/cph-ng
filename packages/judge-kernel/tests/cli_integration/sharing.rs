@@ -37,12 +37,13 @@ async fn copied_markers_do_not_steal_identity_and_moves_keep_source_history() ->
     assert_ne!(b.required("/code_id")?, a.required("/code_id")?);
     let run = ws.ok(&["run", "b.py"]).await?;
     assert_eq!(run.required("/code_id")?, b.required("/code_id")?);
-    assert!(
+    assert_eq!(
         ws.ok(&["history", "list", "a.py"])
             .await?
             .as_array()
             .context("history")?
-            .is_empty()
+            .as_slice(),
+        &[] as &[serde_json::Value]
     );
     ws.ok(&["problem", "move", "b.py", "--destination", "moved.py"])
         .await?;
@@ -147,12 +148,13 @@ async fn legacy_history_migration_preserves_the_original_source_identity() -> an
     let linked = ws
         .ok(&["problem", "link", "original.py", "--destination", "copy.py"])
         .await?;
-    assert!(
+    assert_eq!(
         ws.ok(&["history", "list", "--code-id", linked.text("/code_id")?])
             .await?
             .as_array()
             .context("history")?
-            .is_empty()
+            .as_slice(),
+        &[] as &[serde_json::Value]
     );
     ws.ok(&["problem", "delete", "original.py"]).await?;
     assert_eq!(

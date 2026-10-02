@@ -87,7 +87,7 @@ async fn index_tracks_renames_and_hash_fallback_and_rejects_ambiguity() -> anyho
             .fetch_one(index.pool())
             .await
             .context("required test fixture or kernel response")?;
-    assert!(!stored.is_empty());
+    assert_ne!(stored, "");
 
     Ok(())
 }

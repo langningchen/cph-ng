@@ -46,7 +46,10 @@ async fn package_rpc_respects_roots_force_and_source_references() -> anyhow::Res
             json!({"source_path":source,"problem_id":problem.required("/id")?}),
         )
         .await?;
-    assert!(first_history.as_array().context("history")?.is_empty());
+    assert_eq!(
+        first_history.as_array().context("history")?.as_slice(),
+        &[] as &[serde_json::Value]
+    );
     let denied = client
         .call(
             Method::ProblemExport,

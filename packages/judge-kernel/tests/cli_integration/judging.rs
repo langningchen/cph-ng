@@ -64,7 +64,7 @@ async fn ad_hoc_judging_jsonl_and_history_do_not_modify_saved_cases_or_limits() 
         ])
         .await?;
     assert_eq!(human.status.code(), Some(1));
-    assert!(human.stderr.is_empty());
+    assert_eq!(human.stderr.as_slice(), &[] as &[u8]);
     assert!(String::from_utf8_lossy(&human.stdout).contains("Wrong answer"));
     assert!(!human.stdout.contains(&27));
 

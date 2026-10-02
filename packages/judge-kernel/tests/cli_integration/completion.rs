@@ -13,7 +13,7 @@ async fn complete(ws: &Workspace, args: &[&str]) -> anyhow::Result<String> {
         "{}",
         String::from_utf8_lossy(&output.stderr)
     );
-    assert!(output.stderr.is_empty());
+    assert_eq!(output.stderr.as_slice(), &[] as &[u8]);
     Ok(String::from_utf8(output.stdout)?)
 }
 
@@ -21,7 +21,7 @@ async fn complete(ws: &Workspace, args: &[&str]) -> anyhow::Result<String> {
 async fn completion_reads_contextual_ids_without_mutating_the_store() -> anyhow::Result<()> {
     let ws = Workspace::new()?;
     let empty = complete(&ws, &["cph-ng-judge", "tc", "list", "--problem-id", ""]).await?;
-    assert!(empty.is_empty());
+    assert_eq!(empty, "");
     assert!(!ws.store.exists());
     ws.file("space name.py", "print(1)")?;
     let problem = ws
@@ -176,10 +176,9 @@ async fn completion_silently_handles_busy_and_invalid_stores() -> anyhow::Result
     let ws = Workspace::new()?;
     std::fs::create_dir_all(&ws.store)?;
     std::fs::write(ws.store.join("index.sqlite3"), "invalid sqlite")?;
-    assert!(
-        complete(&ws, &["cph-ng-judge", "r", "--problem-id", ""])
-            .await?
-            .is_empty()
+    assert_eq!(
+        complete(&ws, &["cph-ng-judge", "r", "--problem-id", ""]).await?,
+        ""
     );
     assert!(
         complete(&ws, &["cph-ng-judge", "tc", ""])

@@ -137,7 +137,7 @@ async fn judging_failures_have_distinct_exit_codes() -> anyhow::Result<()> {
         failed.required("/error/code")?,
         &json!(ErrorCode::CompilationFailed)
     );
-    assert!(!failed.text("/error/data/stderr")?.is_empty());
+    assert_ne!(failed.text("/error/data/stderr")?, "");
     assert_eq!(
         (ws.ok(&["task", "get", task_id(&failed)?]).await?).required("/state")?,
         "failed"

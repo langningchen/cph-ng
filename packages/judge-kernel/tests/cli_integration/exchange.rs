@@ -121,12 +121,13 @@ async fn compatibility_exports_require_force_and_all_have_matching_imports() -> 
         assert_eq!(preview.required("/requires_force")?, true);
         assert!(!ws.dir.path().join(&file).exists());
         let rejected = ws.json(&args, 2).await?;
-        assert!(
-            !rejected
+        assert_ne!(
+            rejected
                 .required("/error/data/losses")?
                 .as_array()
                 .context("losses")?
-                .is_empty()
+                .as_slice(),
+            &[] as &[Value]
         );
         assert!(!ws.dir.path().join(&file).exists());
         ws.ok(&[args.as_slice(), &["--force"]].concat()).await?;
