@@ -1,7 +1,21 @@
+import { transform } from '@swc/core';
 import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
 
 export default defineConfig({
+  plugins: [{
+    name: 'typescript-legacy-decorators',
+    enforce: 'pre',
+    async transform(code, id) {
+      const filename = id.split('?')[0].replaceAll('\\', '/');
+      if (!/\.tsx?$/.test(filename) || filename.includes('/node_modules/')) return;
+      return transform(code, {
+        filename,
+        jsc: { target: 'es2022', parser: { syntax: 'typescript', tsx: filename.endsWith('.tsx'), decorators: true }, transform: { legacyDecorator: true, decoratorMetadata: true } },
+        module: { type: 'es6' }, sourceMaps: true,
+      });
+    },
+  }],
   test: {
     clearMocks: true,
     globals: true,

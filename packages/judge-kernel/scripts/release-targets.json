@@ -1,0 +1,34 @@
+{
+  "include": [
+    {
+      "os": "ubuntu-22.04",
+      "target": "x86_64-unknown-linux-gnu",
+      "binary": "cph-ng-judge",
+      "rustflags": ""
+    },
+    {
+      "os": "ubuntu-22.04-arm",
+      "target": "aarch64-unknown-linux-gnu",
+      "binary": "cph-ng-judge",
+      "rustflags": ""
+    },
+    {
+      "os": "windows-2022",
+      "target": "x86_64-pc-windows-msvc",
+      "binary": "cph-ng-judge.exe",
+      "rustflags": "-C target-feature=+crt-static"
+    },
+    {
+      "os": "macos-15-intel",
+      "target": "x86_64-apple-darwin",
+      "binary": "cph-ng-judge",
+      "rustflags": ""
+    },
+    {
+      "os": "macos-14",
+      "target": "aarch64-apple-darwin",
+      "binary": "cph-ng-judge",
+      "rustflags": ""
+    }
+  ]
+}

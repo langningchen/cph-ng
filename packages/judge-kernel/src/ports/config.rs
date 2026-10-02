@@ -22,11 +22,27 @@ impl From<figment::Error> for ConfigError {
     }
 }
 
-pub trait ConfigRepository: Send + Sync {
+pub trait ConfigRepository: Send + Sync + std::fmt::Debug {
+    /// Validate a replacement layer without writing it.
+    ///
+    /// # Errors
+    /// Returns a parse or deserialization error.
+    fn validate_content(
+        &self,
+        path: Option<&Path>,
+        content: &str,
+    ) -> Result<GlobalConfig, ConfigError>;
     /// Get the fully merged configuration.
+    ///
+    /// # Errors
+    /// Returns a configuration error when a source cannot be read, merged or deserialized.
     fn get_config(&self, path: Option<&Path>) -> Result<GlobalConfig, ConfigError>;
 
     /// Return the configuration formatted as a display string.
+    ///
+    /// # Errors
+    /// Returns a configuration error if a source cannot be read or merged, or a formatting
+    /// error if the merged configuration cannot be serialized.
     fn format_config(&self, path: Option<&Path>) -> Result<String, ConfigError>;
 
     /// List active config sources in priority order (defaults, global, workspace, env).

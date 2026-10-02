@@ -40,6 +40,8 @@ describe('MoveProblem', () => {
     fileSystemMock = createFileSystemMock().fileSystemMock;
     copyServiceMock = mock<IProblemCopyService>();
     serviceMock = mock<IProblemService>();
+    serviceMock.move = undefined;
+    repoMock.save = vi.fn().mockResolvedValue(undefined);
     uiMock = mock<IUi>();
 
     const problem = new Problem('main', '/src/main.cpp');

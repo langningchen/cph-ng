@@ -17,6 +17,9 @@
   "btnDisconnect": {
     "message": "断开"
   },
+  "btnPair": {
+    "message": "保存并连接"
+  },
   "btnSet": {
     "message": "设置"
   },
@@ -42,11 +45,17 @@
   "internalErrorMessage": {
     "message": "发生内部错误，请重试。如果问题持续存在，请在 GitHub 上报告。"
   },
+  "labelPairingToken": {
+    "message": "配对令牌"
+  },
   "labelPort": {
     "message": "端口"
   },
   "longTimeSubmission": {
     "message": "提交正在进行中，可能需要比预期更长的时间。请耐心等待或重试。如果问题持续存在，请在 GitHub 上报告。"
+  },
+  "pairingHelp": {
+    "message": "在 VS Code 运行“CPH-NG: 复制浏览器配对令牌”，然后粘贴到这里。"
   },
   "recentSubmissions": {
     "message": "最近提交"

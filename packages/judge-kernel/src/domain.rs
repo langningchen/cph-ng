@@ -13,3 +13,5 @@ pub use stress_test::*;
 pub use testcase::*;
 pub use types::*;
 pub use verdict::*;
+
+pub mod checker;

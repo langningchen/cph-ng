@@ -1,14 +1,7 @@
-mod adapters;
-mod application;
-mod domain;
-mod ports;
-
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let result = crate::adapters::cli::run().await;
-    if let Err(e) = result {
-        eprintln!("Error: {e}");
-        std::process::exit(1);
-    }
-    Ok(())
+async fn main() {
+    let code = cph_ng_judge::interface::cli::run().await;
+    // Tokio's blocking stdin reader cannot be interrupted by a signal. Owned
+    // tasks and SQLite connections are drained before either entry point returns.
+    std::process::exit(i32::from(code));
 }

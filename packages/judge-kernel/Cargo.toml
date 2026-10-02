@@ -3,6 +3,9 @@ name = "cph-ng-judge"
 version = "0.7.8"
 edition = "2024"
 
+[package.metadata.quality]
+max-rust-file-lines = 400
+
 [dependencies]
 tokio = { version = "1.38", features = ["full"] }
 async-trait = "0.1"
@@ -13,26 +16,30 @@ flate2 = "1.0"
 thiserror = "1.0"
 uuid = { version = "1.8", features = ["v4", "serde"] }
 path-clean = "1.0"
-clap = { version = "4.5", features = ["derive", "env"] }
+clap = { version = "4.5", features = ["derive", "env", "wrap_help"] }
+clap_complete = { version = "4.5", features = ["unstable-dynamic"] }
+anstream = "1.0"
 indexmap = { version = "2.14.0", features = ["serde"] }
 derive_more = { version = "2.1.1", features = ["display", "as_ref"] }
 md5 = "0.8.0"
+sqlx = { version = "0.8.6", features = ["runtime-tokio", "sqlite", "macros"] }
+sha2 = "0.10.9"
+sysinfo = { version = "0.38.4", default-features = false, features = ["system"] }
 xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
 figment = { version = "0.10.19", features = ["toml", "env"] }
 toml = "0.8"
 toml_edit = "0.25.12"
-anstyle = "1.0"
-syntect = { version = "5.3", default-features = false, features = [
-    "parsing",
-    "yaml-load",
-    "plist-load",
-    "regex-onig",
-] }
+axum = { version = "0.7.9", features = ["ws"] }
+futures-util = "0.3"
+unicode-width = "0.2"
+unicode-segmentation = "1.13"
+crossterm = { version = "0.29", default-features = false, features = ["windows"] }
+similar = "2.7"
 
 [lints.rust]
 unsafe_code = "forbid"
 missing_debug_implementations = "warn"
-unnecessary_qualifications = "warn"
+unused_qualifications = "warn"
 
 [lints.clippy]
 correctness = "deny"
@@ -51,3 +58,15 @@ unimplemented = "deny"
 indexing_slicing = "warn"
 
 mod_module_files = "deny"
+too_many_lines = "deny"
+
+[target.'cfg(unix)'.dependencies]
+rustix = { version = "1.1.4", features = ["fs", "process"] }
+
+[dev-dependencies]
+tempfile = "3.27"
+anyhow = "1.0"
+tokio-tungstenite = "0.24"
+
+[target.'cfg(windows)'.dependencies]
+winapi-util = "0.1.11"

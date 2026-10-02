@@ -1,0 +1,146 @@
+name: Judge kernel release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'judge-kernel-v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: judge-kernel-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  metadata:
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
+      prerelease: ${{ steps.metadata.outputs.prerelease }}
+      matrix: ${{ steps.metadata.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Validate version and select native targets
+        id: metadata
+        working-directory: packages/judge-kernel
+        env:
+          RELEASE_EVENT: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          args=()
+          if [[ "$RELEASE_EVENT" == push ]]; then
+            args+=(--tag "$RELEASE_TAG")
+          fi
+          python scripts/release.py metadata --github-output "$GITHUB_OUTPUT" "${args[@]}"
+
+  build:
+    needs: metadata
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.metadata.outputs.matrix) }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: packages/judge-kernel
+    env:
+      RUST_TARGET: ${{ matrix.target }}
+      RUSTFLAGS: ${{ matrix.rustflags }}
+      CARGO_PROFILE_RELEASE_STRIP: debuginfo
+      CARGO_TERM_COLOR: never
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install stable Rust
+        run: |
+          rustup toolchain install stable --profile minimal --component clippy,rustfmt
+          rustup target add "$RUST_TARGET" --toolchain stable
+      - name: Check toolchains used by integration tests
+        run: |
+          rustc --version
+          g++ --version
+          gcc --version
+          python --version
+          node --version
+      - name: Validate formatting and package assembly
+        run: |
+          cargo fmt -p cph-ng-judge --check
+          python scripts/check_quality.py
+          python -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Run native CLI and RPC tests
+        run: cargo test --locked -p cph-ng-judge --target "$RUST_TARGET" -- --test-threads=4
+      - name: Check Rust code
+        run: cargo clippy --locked -p cph-ng-judge --all-targets --target "$RUST_TARGET" -- -D warnings
+      - name: Build release
+        run: cargo build --release --locked -p cph-ng-judge --target "$RUST_TARGET"
+      - name: Smoke test and package the native executable
+        env:
+          KERNEL_BINARY: ${{ matrix.binary }}
+          KERNEL_VERSION: ${{ needs.metadata.outputs.version }}
+        run: |
+          binary="../../target/$RUST_TARGET/release/$KERNEL_BINARY"
+          test "$("$binary" --version)" = "cph-ng-judge $KERNEL_VERSION"
+          "$binary" capabilities --json
+          python scripts/release.py package --target "$RUST_TARGET" --binary "$binary" --output-dir dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: judge-cli-${{ matrix.target }}
+          path: packages/judge-kernel/dist/*
+          if-no-files-found: error
+          compression-level: 0
+
+  publish:
+    needs: [metadata, build]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/judge-kernel-v')
+    runs-on: ubuntu-22.04
+    environment: production
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: judge-cli-*
+          merge-multiple: true
+          path: release-assets
+      - name: Verify the complete release asset set
+        run: python packages/judge-kernel/scripts/release.py checksums --output-dir release-assets --require-all
+      - name: Publish the kernel release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          KERNEL_VERSION: ${{ needs.metadata.outputs.version }}
+          IS_PRERELEASE: ${{ needs.metadata.outputs.prerelease }}
+        run: |
+          cat > release-notes.md <<'NOTES'
+          Standalone CPH-NG judge and RPC kernel. Download the archive for your OS and CPU, extract it, and place the executable on PATH. Each archive contains the CLI guide, an example configuration, license and build information. Verify downloads against SHA256SUMS.
+
+          Commands run without confirmation prompts or an editor. Install the compiler/interpreter for the language you want to judge separately. Linux GNU archives are built on Ubuntu 22.04; Alpine/musl is not included. These archives are not Developer ID / Authenticode signed.
+          NOTES
+          flags=(--verify-tag --latest=false --title "Judge kernel $KERNEL_VERSION" --notes-file release-notes.md)
+          if [[ "$IS_PRERELEASE" == true ]]; then
+            flags+=(--prerelease)
+          fi
+          gh release create "$RELEASE_TAG" "${flags[@]}" release-assets/*

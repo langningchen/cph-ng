@@ -12,7 +12,7 @@ updates:
         update-types:
           - "minor"
           - "patch"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0 # Routine updates paused during the Rust rewrite.
     labels:
       - "dependencies"
     ignore:
@@ -30,6 +30,6 @@ updates:
         update-types:
           - "minor"
           - "patch"
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 0 # Routine updates paused during the Rust rewrite.
     labels:
       - "dependencies"

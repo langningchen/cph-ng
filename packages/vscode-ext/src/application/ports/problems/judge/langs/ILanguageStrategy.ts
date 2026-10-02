@@ -15,51 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { IFileWithHash, ILanguageEnv, IOverrides, ToolchainItem } from '@cph-ng/core';
+import type { ILanguageEnv, ToolchainItem } from '@cph-ng/core';
 
-export interface CompileAdditionalData {
-  canUseWrapper: boolean;
-  overrides?: IOverrides;
-}
-
-export interface LangCompileData {
-  path: string;
-  hash: string | null;
-}
-
-export class CompileError extends Error {
-  public constructor(message: string) {
-    super(message);
-    this.name = 'CompileError';
-  }
-}
-
-export class CompileAborted extends Error {
-  public constructor(message: string) {
-    super(message);
-    this.name = 'CompileAborted';
-  }
-}
-
-export type LangCompileResult = LangCompileData | CompileError | CompileAborted | Error;
-
+/** Toolchain discovery and editor settings; compilation and judging belong to Rust. */
 export interface ILanguageStrategy {
   readonly name: string;
   readonly extensions: string[];
-  readonly enableExternalRunner: boolean;
   readonly defaultValues: ILanguageEnv;
-
   checkCompiler(path: string): Promise<ToolchainItem | null>;
   getCompilers(): Promise<ToolchainItem[]>;
   checkInterpreter(path: string): Promise<ToolchainItem | null>;
   getInterpreters(): Promise<ToolchainItem[]>;
-
-  compile(
-    src: IFileWithHash,
-    signal: AbortSignal,
-    forceCompile: boolean | null,
-    additionalData?: CompileAdditionalData,
-  ): Promise<LangCompileResult>;
-
-  getInterpretCommand(target: string, overrides?: IOverrides): Promise<string[]>;
 }

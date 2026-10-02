@@ -21,13 +21,12 @@
     "@webext-core/messaging": "^4.0.0",
     "onnxruntime-web": "^1.29.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "socket.io-client": "^4.8.3"
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@types/node": "~22.19.7",
     "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.5",
+    "@types/react-dom": "^19.2.7",
     "@wxt-dev/auto-icons": "^1.1.2",
     "wxt": "^0.21.4"
   }

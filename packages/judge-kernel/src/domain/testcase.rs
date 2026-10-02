@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::domain::verdict::TestcaseJudgingStatus;
-use crate::domain::{TestcaseId, types::IoPath};
+use crate::domain::{TestcaseId, types::IoPath, verdict::TestcaseJudgingStatus};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RunResult {

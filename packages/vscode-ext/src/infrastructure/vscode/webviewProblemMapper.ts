@@ -39,10 +39,12 @@ import type { Problem } from '@/domain/entities/problem';
 import { isRunningState, type StressTest } from '@/domain/entities/stressTest';
 import type { Testcase, TestcaseResult } from '@/domain/entities/testcase';
 import type { TestcaseIo } from '@/domain/entities/testcaseIo';
+import { KernelConfiguration } from '@/infrastructure/rpc/configuration';
 
 @injectable()
 export class WebviewProblemMapper {
   public constructor(
+    @inject(KernelConfiguration) private readonly configuration: KernelConfiguration,
     @inject(TOKENS.path) private readonly path: IPath,
     @inject(TOKENS.settings) private readonly settings: ISettings,
     @inject(TOKENS.languageRegistry) private readonly lang: ILanguageRegistry,
@@ -167,7 +169,8 @@ export class WebviewProblemMapper {
       interpreterArgs,
     }: IOverrides,
   ): IWebviewOverrides {
-    const { defaultTimeLimit, defaultMemoryLimit } = this.settings.problem;
+    const defaultTimeLimit = this.configuration.current?.config.problem.time_limit ?? 1000;
+    const defaultMemoryLimit = this.configuration.current?.config.problem.memory_limit ?? 256;
     const lang = this.lang.getLangByFile(srcPath);
     const defaultCompiler = lang?.defaultValues.compiler;
     const defaultCompilerArgs = lang?.defaultValues.compilerArgs;

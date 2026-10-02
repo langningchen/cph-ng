@@ -21,15 +21,18 @@ import type { ILanguageStrategy } from '@/application/ports/problems/judge/langs
 import type { ISidebarProvider } from '@/application/ports/vscode/ISidebarProvider';
 import type { IMsgHandle } from '@/application/useCases/webview/msgHandle';
 import { TOKENS } from '@/composition/tokens';
+import { KernelConfiguration } from '@/infrastructure/rpc/configuration';
 
 @injectable()
 export class GetLanguageList implements IMsgHandle<GetLanguageListMsg> {
   public constructor(
+    @inject(KernelConfiguration) private readonly configuration: KernelConfiguration,
     @inject(TOKENS.sidebarProvider) private readonly sidebarProvider: ISidebarProvider,
     @injectAll(TOKENS.languageStrategy) private readonly langs: ILanguageStrategy[],
   ) {}
 
   public async exec(_msg: GetLanguageListMsg): Promise<void> {
+    await this.configuration.get();
     this.sidebarProvider.sendMessage({
       type: 'languageList',
       payload: Object.fromEntries(this.langs.map((lang) => [lang.name, lang.defaultValues])),

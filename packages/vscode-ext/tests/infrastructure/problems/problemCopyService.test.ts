@@ -21,6 +21,12 @@ import { PathAdapter } from '@/infrastructure/node/pathAdapter';
 import { ProblemCopyService } from '@/infrastructure/problems/problemCopyService';
 import { ProblemMapper } from '@/infrastructure/problems/problemMapper';
 import { ProblemService } from '@/infrastructure/problems/problemService';
+import type { KernelConfiguration } from '@/infrastructure/rpc/configuration';
+
+vi.mock('@/infrastructure/rpc/configuration', () => ({
+  // biome-ignore lint/style/useNamingConvention: The mock exports the named class.
+  KernelConfiguration: class {},
+}));
 
 // Auxiliary copy paths are built with the real node `path` adapter, so their
 // separators are platform-native (`\` on Windows). Testcase paths come from the
@@ -54,6 +60,7 @@ describe('ProblemCopyService', () => {
 
     const mapper = new ProblemMapper('1.0.0');
     const service = new ProblemService(
+      mock<KernelConfiguration>(),
       mock<ICrypto>(),
       fileSystemMock,
       loggerMock,
@@ -79,9 +86,29 @@ describe('ProblemCopyService', () => {
     return { fileSystemMock, service, copyService };
   };
 
+  it('preserves existing testcases when import selection is canceled or empty', () => {
+    const { service } = createServices();
+    const previous = settingsMock.problem.clearBeforeLoad;
+    settingsMock.problem.clearBeforeLoad = true;
+    try {
+      const problem = new Problem('Existing', '/src/main.cpp');
+      const id = '12345678-aaaa' as TestcaseId;
+      const testcase = new Testcase(
+        new TestcaseIo({ data: 'input' }),
+        new TestcaseIo({ data: 'answer' }),
+      );
+      problem.addTestcase(id, testcase);
+      service.applyTestcases(problem, []);
+      expect([...problem.testcases.entries()]).toEqual([[id, testcase]]);
+    } finally {
+      settingsMock.problem.clearBeforeLoad = previous;
+    }
+  });
+
   describe('copy', () => {
     it('copies source, testcase files, custom files, and problem data independently', async () => {
-      const { fileSystemMock, copyService } = createServices();
+      const { fileSystemMock, service, copyService } = createServices();
+      const save = vi.spyOn(service, 'save');
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/data/1841D.12345678.in', 'input');
@@ -115,6 +142,7 @@ describe('ProblemCopyService', () => {
       );
 
       const copied = await copyService.copy(problem, '/src/1841D_brute.cpp');
+      expect(save).toHaveBeenCalledWith(copied, problem);
 
       expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
       expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.in')).toBe('input');

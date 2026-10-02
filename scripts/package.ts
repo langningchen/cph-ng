@@ -32,7 +32,6 @@ run('pnpm clean');
 
 run('pnpm compile');
 copyDirFiles('packages/vscode-webview/dist', 'packages/vscode-ext/dist');
-copyDirFiles('packages/vscode-router/dist', 'packages/vscode-ext/dist');
 
 run('pnpm -r --parallel package');
 copyDirFiles('packages/vscode-ext', 'dist', '.vsix');

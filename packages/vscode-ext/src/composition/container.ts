@@ -30,22 +30,17 @@ import { ClockAdapter } from '@/infrastructure/node/clockAdapter';
 import { CryptoAdapter } from '@/infrastructure/node/cryptoAdapter';
 import { FileSystemAdapter } from '@/infrastructure/node/fileSystemAdapter';
 import { PathAdapter } from '@/infrastructure/node/pathAdapter';
-import { ProcessExecutorAdapter } from '@/infrastructure/node/processExecutorAdapter';
 import { SystemAdapter } from '@/infrastructure/node/systemAdapter';
 import { TempStorageAdapter } from '@/infrastructure/node/tempStorageAdapter';
 import { CphMigrationService } from '@/infrastructure/problems/cphMigrationService';
-import { CheckerRunnerAdapter } from '@/infrastructure/problems/judge/checkerRunnerAdapter';
-import { CompilerService } from '@/infrastructure/problems/judge/compilerService';
-import { JudgeServiceFactory } from '@/infrastructure/problems/judge/judgeServiceFactoryAdapter';
-import { ResultEvaluatorAdaptor } from '@/infrastructure/problems/judge/resultEvaluatorAdaptor';
-import { ExecutionStrategyFactoryAdapter } from '@/infrastructure/problems/judge/runner/executionStrategyFactoryAdapter';
-import { SolutionRunnerAdapter } from '@/infrastructure/problems/judge/runner/solutionRunnerAdapter';
-import { RunnerProviderAdapter } from '@/infrastructure/problems/judge/runner/strategies/runnerProviderAdapter';
 import { ProblemCopyService } from '@/infrastructure/problems/problemCopyService';
 import { ProblemMigrationService } from '@/infrastructure/problems/problemMigrationService';
 import { ProblemRepository } from '@/infrastructure/problems/problemRepository';
-import { ProblemService } from '@/infrastructure/problems/problemService';
 import { TestcaseIoService } from '@/infrastructure/problems/testcaseIoService';
+import { KernelConfiguration } from '@/infrastructure/rpc/configuration';
+import { RpcJudgeService } from '@/infrastructure/rpc/judgeService';
+import { KernelService } from '@/infrastructure/rpc/kernelService';
+import { RpcProblemService } from '@/infrastructure/rpc/problemService';
 import { ActiveProblemCoordinator } from '@/infrastructure/services/activeProblemCoordinator';
 import { ArchiveAdapter } from '@/infrastructure/services/archiveAdapter';
 import { Companion } from '@/infrastructure/services/companion/companion';
@@ -61,6 +56,7 @@ import { EditorWatcherModule } from '@/infrastructure/vscode/extensionModule/edi
 import { EnvironmentModule } from '@/infrastructure/vscode/extensionModule/environmentModule';
 import { LlmModule } from '@/infrastructure/vscode/extensionModule/llmModule';
 import { ProviderModule } from '@/infrastructure/vscode/extensionModule/providerModule';
+import { KernelSettingsPanel } from '@/infrastructure/vscode/kernelSettingsPanel';
 import { LlmDataInspector } from '@/infrastructure/vscode/llmTools/llmDataInspector';
 import { LlmProblemContext } from '@/infrastructure/vscode/llmTools/llmProblemContext';
 import { LlmTestcaseRunner } from '@/infrastructure/vscode/llmTools/llmTcRunner';
@@ -76,22 +72,24 @@ import { WorkspaceAdapter } from '@/infrastructure/vscode/workspaceAdapter';
 import { TOKENS } from './tokens';
 
 export async function setupContainer(context: ExtensionContext): Promise<void> {
+  container.registerInstance(KernelService, new KernelService(context));
+  container.registerSingleton(KernelConfiguration);
+  new KernelSettingsPanel(context, container.resolve(KernelConfiguration));
+  container.registerSingleton(RpcProblemService);
+  container.registerSingleton(RpcJudgeService);
+
   container.registerSingleton(TOKENS.activePathService, ActivePathService);
   container.registerSingleton(TOKENS.activeProblemCoordinator, ActiveProblemCoordinator);
   container.registerSingleton(TOKENS.archive, ArchiveAdapter);
   container.registerSingleton(TOKENS.buildInfo, BuildInfoAdapter);
-  container.registerSingleton(TOKENS.checkerRunner, CheckerRunnerAdapter);
   container.registerSingleton(TOKENS.clock, ClockAdapter);
   container.registerSingleton(TOKENS.companion, Companion);
-  container.registerSingleton(TOKENS.compilerService, CompilerService);
   container.registerSingleton(TOKENS.cppHeaderExpander, CppHeaderExpander);
   container.registerSingleton(TOKENS.cphMigrationService, CphMigrationService);
   container.registerSingleton(TOKENS.crypto, CryptoAdapter);
   container.registerSingleton(TOKENS.document, DocumentAdapter);
-  container.registerSingleton(TOKENS.executionStrategyFactory, ExecutionStrategyFactoryAdapter);
   container.registerSingleton(TOKENS.extensionContext, ExtensionContextAdapter);
   container.registerSingleton(TOKENS.fileSystem, FileSystemAdapter);
-  container.registerSingleton(TOKENS.judgeServiceFactory, JudgeServiceFactory);
   container.registerSingleton(TOKENS.languageRegistry, LanguageRegistry);
   container.registerSingleton(TOKENS.logger, LoggerAdapter);
   container.registerSingleton(TOKENS.path, PathAdapter);
@@ -100,13 +98,9 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerSingleton(TOKENS.problemMigrationService, ProblemMigrationService);
   container.registerSingleton(TOKENS.problemRepository, ProblemRepository);
   container.registerSingleton(TOKENS.problemCopyService, ProblemCopyService);
-  container.registerSingleton(TOKENS.problemService, ProblemService);
-  container.registerSingleton(TOKENS.processExecutor, ProcessExecutorAdapter);
-  container.registerSingleton(TOKENS.resultEvaluator, ResultEvaluatorAdaptor);
-  container.registerSingleton(TOKENS.runnerProvider, RunnerProviderAdapter);
+  container.register(TOKENS.problemService, { useToken: RpcProblemService });
   container.registerSingleton(TOKENS.settings, SettingsAdapter);
   container.registerSingleton(TOKENS.sidebarProvider, SidebarProvider);
-  container.registerSingleton(TOKENS.solutionRunner, SolutionRunnerAdapter);
   container.registerSingleton(TOKENS.system, SystemAdapter);
   container.registerSingleton(TOKENS.telemetry, TelemetryAdapter);
   container.registerSingleton(TOKENS.templateRenderer, TemplateRenderer);
@@ -142,8 +136,6 @@ export async function setupContainer(context: ExtensionContext): Promise<void> {
   container.registerInstance(TOKENS.logOutputChannel, logOutputChannel);
 
   const translator = container.resolve(TOKENS.translator);
-  const compilationOutputChannel = window.createOutputChannel(translator.t('CPH-NG Compilation'));
-  container.registerInstance(TOKENS.compilationOutputChannel, compilationOutputChannel);
   const userScriptOutputChannel = window.createOutputChannel(translator.t('CPH-NG User Script'), {
     log: true,
   });
