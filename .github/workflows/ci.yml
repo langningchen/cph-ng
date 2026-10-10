@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  pull_request_review:
+    types: [submitted]
   workflow_dispatch:
     inputs:
       force_publish:
@@ -25,7 +27,72 @@ permissions:
   attestations: write
 
 jobs:
+  judge-kernel-approval:
+    name: Check judge-kernel approval
+    if: |
+      github.event.pull_request.base.ref == 'main' &&
+      (
+        github.event_name == 'pull_request' ||
+        (
+          github.event_name == 'pull_request_review' &&
+          github.event.review.state == 'approved'
+        )
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      approved: ${{ steps.check.outputs.approved }}
+    steps:
+      - name: Check for an owner or collaborator approval
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          approved=$(
+            gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/reviews" |
+              jq '
+                add
+                | map(select(
+                    .state == "APPROVED" or
+                    .state == "CHANGES_REQUESTED" or
+                    .state == "DISMISSED"
+                  ))
+                | sort_by(.submitted_at)
+                | group_by(.user.login)
+                | map(sort_by(.submitted_at) | last)
+                | map(select(
+                    .state == "APPROVED" and
+                    (
+                      .author_association == "OWNER" or
+                      .author_association == "MEMBER" or
+                      .author_association == "COLLABORATOR"
+                    )
+                  ))
+                | length
+              '
+          )
+
+          if [ "$approved" -gt 0 ]; then
+            echo "approved=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "approved=false" >> "$GITHUB_OUTPUT"
+          fi
+
   lint:
+    needs: [judge-kernel-approval]
+    if: |
+      !cancelled() &&
+      (
+        github.event_name != 'pull_request_review' ||
+        needs['judge-kernel-approval'].outputs.approved == 'true'
+      )
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,6 +110,15 @@ jobs:
 
   test:
     name: Test on ${{ matrix.os }}
+    needs: [judge-kernel-approval]
+    if: |
+      !cancelled() &&
+      (
+        github.event_name != 'pull_request_review' ||
+        needs['judge-kernel-approval'].outputs.approved == 'true'
+      )
+    permissions:
+      contents: read
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -59,6 +135,18 @@ jobs:
         run: pnpm test:run
 
   judge-kernel:
+    needs: [judge-kernel-approval]
+    if: |
+      !cancelled() &&
+      (
+        (
+          github.event_name != 'pull_request' &&
+          github.event_name != 'pull_request_review'
+        ) ||
+        needs['judge-kernel-approval'].outputs.approved == 'true'
+      )
+    permissions:
+      contents: read
     timeout-minutes: 45
     name: Judge kernel on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -105,6 +193,8 @@ jobs:
 
   build:
     needs: [lint, test, judge-kernel]
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.versions.outputs.version }}
@@ -247,16 +337,39 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
+  attest-build:
+    name: Generate build provenance
+    needs: [build]
+    if: |
+      (
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        (
+          (
+            github.event_name == 'pull_request' ||
+            github.event_name == 'pull_request_review'
+          ) &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        )
+      )
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: cph-ng-artifacts
+          path: dist/
       - name: Generate Provenance
-        if: |
-          (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.action != 'closed') &&
-          (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         uses: actions/attest-build-provenance@v4
         with:
           subject-path: dist/*
 
   release-github:
-    needs: [build]
+    needs: [build, attest-build]
     # Pause extension releases and dependent marketplace publishing during the Rust rewrite.
     # See https://github.com/langningchen/cph-ng/discussions/285 and README.md.
     if: needs.build.outputs.release_enabled == 'true' && needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
