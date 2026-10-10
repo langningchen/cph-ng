@@ -2,6 +2,7 @@
 import { basename, extname } from 'node:path';
 import type { CompanionProblem, TestcaseId } from '@cph-ng/core';
 import { inject, injectable } from 'tsyringe';
+import { ProblemCopyRollbackError } from '@/application/ports/problems/IProblemCopyService';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
 import { TOKENS } from '@/composition/tokens';
@@ -178,11 +179,32 @@ export class RpcProblemService implements IProblemService {
     const pending = (this.writes.get(problem) ?? Promise.resolve())
       .catch(() => {})
       .then(async () => {
-        await this.persist(problem);
-        if (copyFrom) {
-          const { local_config } = await this.configuration.get(copyFrom.src.path);
-          if (Object.keys(local_config).length)
-            await this.configuration.set({ patch: local_config }, problem.src.path);
+        const isNewCopy = Boolean(copyFrom) && !this.ids.has(problem);
+        try {
+          await this.persist(problem);
+          if (copyFrom) {
+            const { local_config } = await this.configuration.get(copyFrom.src.path);
+            if (Object.keys(local_config).length)
+              await this.configuration.set({ patch: local_config }, problem.src.path);
+          }
+        } catch (error) {
+          const id = this.ids.get(problem);
+          if (isNewCopy && id) {
+            try {
+              const client = await this.kernel.forSource(problem.src.path);
+              await client.request(rpcMethod.problemDelete, { problem_id: id });
+            } catch (rollbackError) {
+              throw new ProblemCopyRollbackError(
+                [error, rollbackError],
+                'Copy failed and the kernel record could not be removed. Copied files were retained for recovery.',
+              );
+            }
+            this.ids.delete(problem);
+            this.codeIds.delete(problem);
+            this.baselines.delete(problem);
+            await this.kernel.preferences.remove(id);
+          }
+          throw error;
         }
       });
     this.writes.set(problem, pending);

@@ -6,6 +6,7 @@ import type { ProblemId, TestcaseId } from '@cph-ng/core';
 import { describe, expect, it, vi } from 'vitest';
 import type { IClock } from '@/application/ports/node/IClock';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
+import { ProblemCopyRollbackError } from '@/application/ports/problems/IProblemCopyService';
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
@@ -497,4 +498,33 @@ it('registers one background instance when automatic and explicit loads overlap'
   expect(automatic).not.toBeNull();
   expect(automatic).toBe(explicit);
   expect(sendMessage).toHaveBeenCalledTimes(1);
+});
+
+describe('copy rollback', () => {
+  it('removes only the newly imported copy when copying configuration fails', async () => {
+    const { a, left, remote, configs, configure, request } = await windows();
+    const originalId = remote.id;
+    configs.set(left.src.path, { languages: { cpp: { compiler: 'custom' } } });
+    configure.mockRejectedValueOnce(new Error('configuration failed'));
+    const copy = new Problem('copy', '/work/copy.cpp');
+    await expect(a.save(copy, left)).rejects.toThrow('configuration failed');
+    expect(request).toHaveBeenCalledWith(rpcMethod.problemDelete, { problem_id: remote.id });
+    expect(remote.id).not.toBe(originalId);
+    expect(request).not.toHaveBeenCalledWith(rpcMethod.problemDelete, { problem_id: originalId });
+  });
+
+  it('marks copy rollback failure so the caller can retain its source files', async () => {
+    const { a, left, configs, configure, request } = await windows();
+    const dispatch = request.getMockImplementation();
+    if (!dispatch) throw new Error('Missing fixture dispatch');
+    configs.set(left.src.path, { languages: { cpp: { compiler: 'custom' } } });
+    configure.mockRejectedValueOnce(new Error('configuration failed'));
+    request.mockImplementation(async (method, params) => {
+      if (method === rpcMethod.problemDelete) throw new Error('delete failed');
+      return dispatch(method, params);
+    });
+    await expect(a.save(new Problem('copy', '/work/copy.cpp'), left)).rejects.toBeInstanceOf(
+      ProblemCopyRollbackError,
+    );
+  });
 });
