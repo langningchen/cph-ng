@@ -1,5 +1,6 @@
 use super::CommandService;
 use super::params;
+use super::problem_revision::with_revision;
 use super::repo_error;
 use super::value;
 use crate::application::error::CommandError;
@@ -288,17 +289,27 @@ pub(super) async fn problem_move(
         .find(|s| s.source_path == problem.src.0)
         .map(|s| s.code_id)
         .ok_or_else(|| CommandError::new(ErrorCode::NotFound, "Source identity not found"))?;
+    // Prepare all fallible reads before committing the authoritative source binding.
+    let mut response = context.problem_dto(problem).await?;
+    if let Some(path) = response.get_mut("source_path") {
+        *path = json!(destination);
+    }
+    if let Some(sources) = response.get_mut("sources").and_then(Value::as_array_mut) {
+        *sources = context
+            .index
+            .preview_rebind(code_id, &destination)
+            .await
+            .map_err(super::index_error)?
+            .into_iter()
+            .map(|source| json!(source))
+            .collect();
+    }
     context
         .index
         .rebind(code_id, &destination)
         .await
         .map_err(super::index_error)?;
-    let mut problem = problem;
-    problem.src.0 = destination;
-    context
-        .repo
-        .update_problem(&problem)
-        .await
-        .map_err(repo_error)?;
-    context.problem_dto(problem).await
+    // Repository reads select the primary path from source_index. No second
+    // metadata commit is needed, including when moving a linked source.
+    Ok(with_revision(response))
 }
