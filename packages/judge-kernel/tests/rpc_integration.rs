@@ -98,7 +98,7 @@ impl Client {
         // Match the CLI harness: compilation phases can legitimately outlast 20 s
         // on loaded native runners. Resource-limit assertions use separate budgets.
         let mut latest = None;
-        tokio::time::timeout(Duration::from_secs(120), async {
+        tokio::time::timeout(Duration::from_mins(2), async {
             loop {
                 let task = self.ok(Method::TaskGet, json!({"task_id": id})).await?;
                 if matches!(

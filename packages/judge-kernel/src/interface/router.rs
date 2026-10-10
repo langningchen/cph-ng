@@ -92,7 +92,7 @@ async fn shutdown(state: state::Shared) {
             if inner.editor_count() > 0 {
                 last_editor = tokio::time::Instant::now();
             }
-            if last_editor.elapsed() >= Duration::from_secs(60) {
+            if last_editor.elapsed() >= Duration::from_mins(1) {
                 return;
             }
         }
