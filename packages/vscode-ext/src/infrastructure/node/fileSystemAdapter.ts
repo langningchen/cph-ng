@@ -70,8 +70,9 @@ export class FileSystemAdapter implements IFileSystem {
     }
   }
 
-  public async mkdir(path: string): Promise<void> {
-    await mkdir(path, { recursive: true });
+  public async mkdir(path: string, exclusive = false): Promise<void> {
+    if (exclusive) await mkdir(this.path.dirname(path), { recursive: true });
+    await mkdir(path, { recursive: !exclusive });
   }
 
   public async readdir(path: string): Promise<string[]> {

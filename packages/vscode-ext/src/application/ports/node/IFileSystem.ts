@@ -58,8 +58,8 @@ export interface IFileSystem {
   /** Checks if a file or directory exists. */
   existsSync(path: string): boolean;
 
-  /** Recursive creates a directory. */
-  mkdir(path: string): Promise<void>;
+  /** Creates parents recursively; exclusive creation rejects an existing final directory. */
+  mkdir(path: string, exclusive?: boolean): Promise<void>;
 
   /** Reads the contents of a directory. */
   readdir(path: string): Promise<string[]>;

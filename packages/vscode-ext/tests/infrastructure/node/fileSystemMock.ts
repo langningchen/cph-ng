@@ -55,8 +55,9 @@ export function createFileSystemMock(vol: InstanceType<typeof Volume> = new Volu
       return false;
     }
   });
-  fileSystemMock.mkdir.mockImplementation(async (path) => {
-    await fs.promises.mkdir(path, { recursive: true });
+  fileSystemMock.mkdir.mockImplementation(async (path, exclusive = false) => {
+    if (exclusive) await fs.promises.mkdir(dirname(path), { recursive: true });
+    await fs.promises.mkdir(path, { recursive: !exclusive });
   });
   fileSystemMock.readdir.mockImplementation(async (path) => {
     const result = await fs.promises.readdir(path, { encoding: 'utf8' });
