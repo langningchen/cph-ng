@@ -1,5 +1,6 @@
 use super::CommandService;
 use super::params;
+use super::problem_revision::with_revision;
 use super::repo_error;
 use super::value;
 use crate::application::error::CommandError;
@@ -15,7 +16,9 @@ use crate::domain::Problem;
 use crate::domain::ProblemId;
 use crate::domain::SourcePath;
 use crate::domain::StressTestConfig;
+use crate::domain::{IoPath, Testcase, TestcaseId, TestcaseJudgingStatus};
 use serde_json::{Value, json};
+use std::collections::{HashMap, HashSet};
 
 impl CommandService {
     pub(crate) async fn load(&self, reference: &ProblemRef) -> Result<Problem, CommandError> {
@@ -101,7 +104,7 @@ impl CommandService {
         let mut dto = ProblemDto::from_problem(problem, testcases);
         dto.code_id = code_id;
         dto.sources = sources;
-        value(dto)
+        Ok(with_revision(value(dto)?))
     }
     pub(super) async fn details(
         &self,
@@ -236,20 +239,70 @@ pub(super) async fn problem_update(
     p: Value,
     context: &CommandService,
 ) -> Result<Value, CommandError> {
-    let data: UpdateProblem = params(&p)?;
+    let mut data: UpdateProblem = params(&p)?;
+    if let Some(path) = data.testcases_file {
+        if data.testcases.is_some() {
+            return Err(CommandError::invalid(
+                "Supply either testcases or testcases_file",
+            ));
+        }
+        let path = context.paths.read(&path).await?;
+        data.testcases = Some(
+            serde_json::from_value(super::import::read_document(&path).await?).map_err(
+                |error| CommandError::invalid(format!("Invalid testcase JSON: {error}")),
+            )?,
+        );
+    }
     let problem = context.load(&data.reference).await?;
     let lock = context.tasks.locks.get(&problem.id.0.to_string()).await;
     let _guard = lock.lock().await;
     let mut problem = context.load(&data.reference).await?;
+    if let Some(expected) = data.expected_revision {
+        let current = context.problem_dto(problem.clone()).await?;
+        if current.get("revision").and_then(Value::as_str) != Some(&expected) {
+            return Err(CommandError::new(
+                ErrorCode::Conflict,
+                "Problem changed while saving. Reopen the problem before saving this change.",
+            ));
+        }
+    }
     if let Some(name) = data.name {
         problem.name = name;
     }
     context.details(&mut problem, data.details, &p).await?;
-    context
-        .repo
-        .update_problem(&problem)
-        .await
-        .map_err(repo_error)?;
+    if let Some(testcases) = data.testcases {
+        let mut ids = HashSet::new();
+        let mut payloads = HashMap::new();
+        problem.testcases.clear();
+        for testcase in testcases {
+            let id = TestcaseId(testcase.id);
+            if !ids.insert(id) {
+                return Err(CommandError::invalid("Testcase IDs must be unique"));
+            }
+            let (stdin, answer) = context
+                .repo
+                .paths_for_id(problem.id)
+                .get_testcase_paths(&id);
+            problem.testcases.push(Testcase {
+                id,
+                stdin: IoPath(stdin),
+                answer: IoPath(answer),
+                status: TestcaseJudgingStatus::Waiting,
+            });
+            payloads.insert(id, (testcase.stdin, testcase.answer));
+        }
+        context
+            .repo
+            .save_problem_with_testcases(&problem, &payloads)
+            .await
+            .map_err(repo_error)?;
+    } else {
+        context
+            .repo
+            .update_problem(&problem)
+            .await
+            .map_err(repo_error)?;
+    }
     context.problem_dto(problem).await
 }
 

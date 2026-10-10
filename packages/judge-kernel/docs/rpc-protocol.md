@@ -44,7 +44,7 @@ VS Code 使用同一 store 的共享 socket/pipe 服务，关闭窗口只断开�
 | `problem.list` | 返回题目摘要数组；测试点详情通过 load/list 获取 |
 | `problem.load` | 题目引用；返回题目及测试点内容 |
 | `problem.create` | `source_path`, 可选 `name`, `source_code`, 题目配置；提供 source_code 时只创建不存在的文件 |
-| `problem.update` | 题目引用；可选 `name`, `url`, `time_limit_ms`, `memory_limit_mb`, `checker`, `interactor`, `generator`, `brute_force` |
+| `problem.update` | 题目引用；可选 `name`, `url`, `time_limit_ms`, `memory_limit_mb`, `checker`, `interactor`, `generator`, `brute_force`；可选 `expected_revision` 和完整 `testcases:[{id,stdin,answer}]` |
 | `problem.delete` | 删除题目数据与索引，保留源文件及独立运行历史 |
 | `problem.move` | 题目引用、`destination`；编辑器先移动/复制源文件，再重新绑定同一 UUID |
 | `problem.import` | `input` 为原生/Companion/旧格式路径；原生还需 `destination` 新目录，Companion 需 `source_path`；也可使用 `document` JSON 或原有 inline `problem` |
@@ -58,6 +58,8 @@ VS Code 使用同一 store 的共享 socket/pipe 服务，关闭窗口只断开�
 | `testcase.reorder` | 题目引用、`testcase_ids`；必须恰好包含全部 ID，不允许重复或缺失 |
 
 `url`、`checker`、`interactor` 可设为 null 清除；清除 generator 或 brute_force 会清除压力测试配置。所有 RPC 文件读取都受 store root 与启动时或 `system.attach` 添加的 workspace roots 约束，符号链接经过规范化检查。测试点内容、题目元数据保存在 SQLite，并在同一事务中保存；写入失败保留原有记录。每题输入与答案总量最多 16 MiB，旧格式文件及 `.bin` 解压后内容也各限 16 MiB；原生包文件最多 128 MiB。大型包用 `input` 路径导入，不放进有消息大小限制的 RPC 请求中。运行用输入文件由内核在 store 中生成。
+
+`problem.load/create/import/update/move` 返回的完整题目快照包含不透明的 `revision`。保存时传入 `expected_revision`，内核在题目锁内重新读取并比较版本；版本不符返回 Conflict，不写入任何题目字段或测试点。传入 `testcases` 会在一次数据库事务中替换全部测试点及顺序，与题目字段一起提交；ID 必须唯一，总内容仍受 16 MiB 限制。大批量可改用 `testcases_file` 指向包含相同数组的 JSON 文件，不能同时传入 `testcases`；文件读取仍受路径策略和 128 MiB JSON 文件上限约束，避免扩大 RPC 消息限额。省略这些参数的旧调用继续支持字段更新。`problem.list` 是摘要，其空 revision 不用于条件保存。插件保留三方合并，并用条件批量更新关闭读取到提交之间的竞争窗口。
 
 Companion 示例：
 

@@ -232,7 +232,7 @@ async fn from_file(
     Ok(imported)
 }
 
-async fn read_document(path: &std::path::Path) -> Result<Value, CommandError> {
+pub(super) async fn read_document(path: &std::path::Path) -> Result<Value, CommandError> {
     use tokio::io::AsyncReadExt;
     let limit = crate::application::exchange::MAX_PACKAGE_BYTES;
     let mut bytes = Vec::new();
@@ -244,8 +244,8 @@ async fn read_document(path: &std::path::Path) -> Result<Value, CommandError> {
         .await
         .map_err(CommandError::internal)?;
     if bytes.len() > limit {
-        return Err(CommandError::invalid("Import exceeds 128 MiB"));
+        return Err(CommandError::invalid("JSON document exceeds 128 MiB"));
     }
     serde_json::from_slice(&bytes)
-        .map_err(|e| CommandError::invalid(format!("Invalid import JSON: {e}")))
+        .map_err(|e| CommandError::invalid(format!("Invalid JSON document: {e}")))
 }

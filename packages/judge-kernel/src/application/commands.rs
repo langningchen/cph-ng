@@ -17,6 +17,7 @@ mod import;
 mod index;
 mod judge;
 mod problem;
+mod problem_revision;
 mod sharing;
 mod task;
 mod testcase;
