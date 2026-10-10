@@ -107,8 +107,9 @@ export class ProblemService implements IProblemService {
     let data: Buffer<ArrayBuffer>;
     try {
       data = await this.fs.readRawFile(binPath);
-    } catch {
-      return null;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
+      throw error;
     }
 
     let oldProblem: OldProblem;

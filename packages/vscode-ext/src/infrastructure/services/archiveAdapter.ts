@@ -27,7 +27,12 @@ export class ArchiveAdapter implements IArchive {
 
   public async unzip(zipPath: string, destPath: string): Promise<void> {
     const zip = new AdmZip(zipPath);
-    await this.fs.mkdir(destPath);
-    zip.extractAllTo(destPath, true);
+    await this.fs.mkdir(destPath, true);
+    try {
+      zip.extractAllTo(destPath, false);
+    } catch (error) {
+      await this.fs.rm(destPath, { recursive: true, force: true });
+      throw error;
+    }
   }
 }

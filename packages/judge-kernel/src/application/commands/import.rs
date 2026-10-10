@@ -124,14 +124,22 @@ async fn persist(imported: ImportedData, context: &CommandService) -> Result<Val
         .get(&format!("path:{}", problem.src.0.display()))
         .await;
     let _guard = lock.lock().await;
+    // Importers allocate a new identity. Prepare its configuration before the
+    // database commit so a configuration write failure cannot publish a copy.
+    match context.repo.load_by_id(problem.id).await {
+        Ok(_) => return Err(repo_error(crate::ports::RepoError::AlreadyExists)),
+        Err(crate::ports::RepoError::NotIndexed) => {}
+        Err(error) => return Err(repo_error(error)),
+    }
+    let config_path = context.repo.paths_for_id(problem.id).config_path;
     context
         .repo
-        .save_problem_with_testcases(&problem, &payloads)
+        .write_owned(&config_path, config.to_string().as_bytes())
         .await
         .map_err(repo_error)?;
     context
         .repo
-        .save_config(&problem.src.0, &config)
+        .save_problem_with_testcases(&problem, &payloads)
         .await
         .map_err(repo_error)?;
     context.problem_dto(problem).await
@@ -232,7 +240,7 @@ async fn from_file(
     Ok(imported)
 }
 
-async fn read_document(path: &std::path::Path) -> Result<Value, CommandError> {
+pub(super) async fn read_document(path: &std::path::Path) -> Result<Value, CommandError> {
     use tokio::io::AsyncReadExt;
     let limit = crate::application::exchange::MAX_PACKAGE_BYTES;
     let mut bytes = Vec::new();
@@ -244,8 +252,8 @@ async fn read_document(path: &std::path::Path) -> Result<Value, CommandError> {
         .await
         .map_err(CommandError::internal)?;
     if bytes.len() > limit {
-        return Err(CommandError::invalid("Import exceeds 128 MiB"));
+        return Err(CommandError::invalid("JSON document exceeds 128 MiB"));
     }
     serde_json::from_slice(&bytes)
-        .map_err(|e| CommandError::invalid(format!("Invalid import JSON: {e}")))
+        .map_err(|e| CommandError::invalid(format!("Invalid JSON document: {e}")))
 }

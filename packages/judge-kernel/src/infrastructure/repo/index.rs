@@ -306,4 +306,27 @@ impl SourceIndex for ProblemIndex {
             .ok_or_else(|| IndexError::NotFound(path.clone()))?;
         self.persist(&path, row.binding()?).await
     }
+    async fn preview_rebind(
+        &self,
+        code_id: Uuid,
+        path: &Path,
+    ) -> Result<Vec<SourceBinding>, IndexError> {
+        let path = regular(path).await?;
+        let row = self
+            .candidates("code_id", &code_id.to_string())
+            .await?
+            .into_iter()
+            .next()
+            .ok_or_else(|| IndexError::NotFound(path.clone()))?;
+        let mut sources = self
+            .sources(Some(ProblemId(row.binding()?.problem_id)))
+            .await?;
+        for source in &mut sources {
+            if source.code_id == code_id {
+                source.source_path.clone_from(&path);
+            }
+        }
+        primary::assign(&mut sources).await;
+        Ok(sources)
+    }
 }

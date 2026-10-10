@@ -15,7 +15,21 @@ use crate::domain::Problem;
 use crate::domain::ProblemId;
 use crate::domain::SourcePath;
 use crate::domain::StressTestConfig;
+use crate::domain::{IoPath, Testcase, TestcaseId, TestcaseJudgingStatus};
 use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
+use std::collections::{HashMap, HashSet};
+
+fn with_revision(mut dto: Value) -> Value {
+    if let Some(revision) = dto.get_mut("revision") {
+        *revision = json!("");
+    }
+    let digest = format!("{:x}", Sha256::digest(dto.to_string().as_bytes()));
+    if let Some(revision) = dto.get_mut("revision") {
+        *revision = json!(digest);
+    }
+    dto
+}
 
 impl CommandService {
     pub(crate) async fn load(&self, reference: &ProblemRef) -> Result<Problem, CommandError> {
@@ -101,7 +115,7 @@ impl CommandService {
         let mut dto = ProblemDto::from_problem(problem, testcases);
         dto.code_id = code_id;
         dto.sources = sources;
-        value(dto)
+        Ok(with_revision(value(dto)?))
     }
     pub(super) async fn details(
         &self,
@@ -236,20 +250,70 @@ pub(super) async fn problem_update(
     p: Value,
     context: &CommandService,
 ) -> Result<Value, CommandError> {
-    let data: UpdateProblem = params(&p)?;
+    let mut data: UpdateProblem = params(&p)?;
+    if let Some(path) = data.testcases_file {
+        if data.testcases.is_some() {
+            return Err(CommandError::invalid(
+                "Supply either testcases or testcases_file",
+            ));
+        }
+        let path = context.paths.read(&path).await?;
+        data.testcases = Some(
+            serde_json::from_value(super::import::read_document(&path).await?).map_err(
+                |error| CommandError::invalid(format!("Invalid testcase JSON: {error}")),
+            )?,
+        );
+    }
     let problem = context.load(&data.reference).await?;
     let lock = context.tasks.locks.get(&problem.id.0.to_string()).await;
     let _guard = lock.lock().await;
     let mut problem = context.load(&data.reference).await?;
+    if let Some(expected) = data.expected_revision {
+        let current = context.problem_dto(problem.clone()).await?;
+        if current.get("revision").and_then(Value::as_str) != Some(&expected) {
+            return Err(CommandError::new(
+                ErrorCode::Conflict,
+                "Problem changed while saving. Reopen the problem before saving this change.",
+            ));
+        }
+    }
     if let Some(name) = data.name {
         problem.name = name;
     }
     context.details(&mut problem, data.details, &p).await?;
-    context
-        .repo
-        .update_problem(&problem)
-        .await
-        .map_err(repo_error)?;
+    if let Some(testcases) = data.testcases {
+        let mut ids = HashSet::new();
+        let mut payloads = HashMap::new();
+        problem.testcases.clear();
+        for testcase in testcases {
+            let id = TestcaseId(testcase.id);
+            if !ids.insert(id) {
+                return Err(CommandError::invalid("Testcase IDs must be unique"));
+            }
+            let (stdin, answer) = context
+                .repo
+                .paths_for_id(problem.id)
+                .get_testcase_paths(&id);
+            problem.testcases.push(Testcase {
+                id,
+                stdin: IoPath(stdin),
+                answer: IoPath(answer),
+                status: TestcaseJudgingStatus::Waiting,
+            });
+            payloads.insert(id, (testcase.stdin, testcase.answer));
+        }
+        context
+            .repo
+            .save_problem_with_testcases(&problem, &payloads)
+            .await
+            .map_err(repo_error)?;
+    } else {
+        context
+            .repo
+            .update_problem(&problem)
+            .await
+            .map_err(repo_error)?;
+    }
     context.problem_dto(problem).await
 }
 
@@ -288,17 +352,27 @@ pub(super) async fn problem_move(
         .find(|s| s.source_path == problem.src.0)
         .map(|s| s.code_id)
         .ok_or_else(|| CommandError::new(ErrorCode::NotFound, "Source identity not found"))?;
+    // Prepare all fallible reads before committing the authoritative source binding.
+    let mut response = context.problem_dto(problem).await?;
+    if let Some(path) = response.get_mut("source_path") {
+        *path = json!(destination);
+    }
+    if let Some(sources) = response.get_mut("sources").and_then(Value::as_array_mut) {
+        *sources = context
+            .index
+            .preview_rebind(code_id, &destination)
+            .await
+            .map_err(super::index_error)?
+            .into_iter()
+            .map(|source| json!(source))
+            .collect();
+    }
     context
         .index
         .rebind(code_id, &destination)
         .await
         .map_err(super::index_error)?;
-    let mut problem = problem;
-    problem.src.0 = destination;
-    context
-        .repo
-        .update_problem(&problem)
-        .await
-        .map_err(repo_error)?;
-    context.problem_dto(problem).await
+    // Repository reads select the primary path from source_index. No second
+    // metadata commit is needed, including when moving a linked source.
+    Ok(with_revision(response))
 }

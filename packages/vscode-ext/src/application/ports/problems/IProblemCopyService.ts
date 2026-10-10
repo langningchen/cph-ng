@@ -20,3 +20,6 @@ import type { Problem } from '@/domain/entities/problem';
 export interface IProblemCopyService {
   copy(problem: Problem, destSrcPath: string): Promise<Problem>;
 }
+
+/** The copied kernel record could not be removed; its files must remain available. */
+export class ProblemCopyRollbackError extends AggregateError {}

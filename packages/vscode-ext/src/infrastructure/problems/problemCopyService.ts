@@ -19,7 +19,10 @@ import type { IFileWithHash, IProblem, ITestcaseIo, TestcaseId } from '@cph-ng/c
 import { inject, injectable } from 'tsyringe';
 import type { IFileSystem } from '@/application/ports/node/IFileSystem';
 import type { IPath } from '@/application/ports/node/IPath';
-import type { IProblemCopyService } from '@/application/ports/problems/IProblemCopyService';
+import {
+  type IProblemCopyService,
+  ProblemCopyRollbackError,
+} from '@/application/ports/problems/IProblemCopyService';
 import type { IProblemService } from '@/application/ports/problems/IProblemService';
 import type { ITranslator } from '@/application/ports/vscode/ITranslator';
 import { TOKENS } from '@/composition/tokens';
@@ -44,12 +47,10 @@ export class ProblemCopyService implements IProblemCopyService {
       throw new Error(this.translator.t('Copied problem data path conflicts with current problem'));
     if (await this.fs.exists(newBinPath))
       throw new Error(this.translator.t('Copied problem data path already exists'));
-    await this.removeOrphanedCopiedFiles(problem, destSrcPath, newBinPath);
 
     const copiedPaths: string[] = [];
     try {
       await this.copyPath(problem.src.path, destSrcPath, copiedPaths);
-      copiedPaths.push(newBinPath);
 
       const dto = this.mapper.toDto(problem);
       await this.copyProblemFiles(dto, destSrcPath, newBinPath, copiedPaths);
@@ -60,6 +61,7 @@ export class ProblemCopyService implements IProblemCopyService {
       await this.problemService.save(copiedProblem, problem);
       return copiedProblem;
     } catch (e) {
+      if (e instanceof ProblemCopyRollbackError) throw e;
       await this.rollbackCopy(copiedPaths);
       throw e;
     }
@@ -119,45 +121,6 @@ export class ProblemCopyService implements IProblemCopyService {
     );
   }
 
-  private async removeOrphanedCopiedFiles(
-    problem: Problem,
-    destSrcPath: string,
-    newBinPath: string,
-  ): Promise<void> {
-    if (await this.fs.exists(destSrcPath)) return;
-    const dto = this.mapper.toDto(problem);
-    const paths = this.getCopiedProblemFilePaths(dto, destSrcPath, newBinPath);
-    await Promise.all(paths.map((path) => this.fs.rm(path, { force: true }).catch(() => {})));
-  }
-
-  private getCopiedProblemFilePaths(
-    problem: IProblem,
-    destSrcPath: string,
-    newBinPath: string,
-  ): string[] {
-    const paths: string[] = [];
-    for (const [testcaseId, testcase] of Object.entries(problem.testcases)) {
-      const id = testcaseId as TestcaseId;
-      for (const [io, fallbackExt] of [
-        [testcase.stdin, 'in'],
-        [testcase.answer, 'out'],
-      ] as const) {
-        if (!('path' in io)) continue;
-        const ext = this.path.extname(io.path).substring(1) || fallbackExt;
-        const destPath = this.problemService.getTestcasePath(destSrcPath, id, ext);
-        if (destPath) paths.push(destPath);
-      }
-    }
-    for (const [file, role] of [
-      [problem.checker, 'checker'],
-      [problem.interactor, 'interactor'],
-      [problem.stressTest.generator, 'generator'],
-      [problem.stressTest.bruteForce, 'bruteForce'],
-    ] as const)
-      if (file) paths.push(this.getAuxiliaryCopyPath(destSrcPath, newBinPath, role, file.path));
-    return paths;
-  }
-
   private async copyTestcaseIo(
     io: ITestcaseIo,
     destSrcPath: string,
@@ -202,7 +165,7 @@ export class ProblemCopyService implements IProblemCopyService {
   private async copyPath(srcPath: string, destPath: string, copiedPaths: string[]): Promise<void> {
     if (await this.fs.exists(destPath))
       throw new Error(this.translator.t('Copied problem file path already exists'));
-    await this.fs.copyFile(srcPath, destPath);
+    await this.fs.copyFile(srcPath, destPath, true);
     copiedPaths.push(destPath);
   }
 

@@ -105,7 +105,7 @@ impl State {
         let expired: Vec<String> = self
             .batches
             .iter()
-            .filter(|(_, batch)| batch.updated.elapsed() >= Duration::from_secs(600))
+            .filter(|(_, batch)| batch.updated.elapsed() >= Duration::from_mins(10))
             .map(|(id, _)| id.clone())
             .collect();
         for id in expired {

@@ -9,6 +9,7 @@ import { mock } from '@t/mock';
 import { describe, expect, it, vi } from 'vitest';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
 import type { ITempStorage } from '@/application/ports/node/ITempStorage';
+import { ProblemCopyRollbackError } from '@/application/ports/problems/IProblemCopyService';
 import type { IProblemMigrationService } from '@/application/ports/problems/IProblemMigrationService';
 import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { IUi } from '@/application/ports/vscode/IUi';
@@ -396,7 +397,7 @@ describe('ProblemCopyService', () => {
       );
     });
 
-    it('overwrites orphaned copied testcase files when the copied source and problem data were removed externally', async () => {
+    it('preserves existing testcase files even when source and metadata are absent', async () => {
       const { fileSystemMock, copyService } = createServices();
       const testcaseId = '36a4e745-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source v1');
@@ -418,16 +419,13 @@ describe('ProblemCopyService', () => {
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source v2');
       await fileSystemMock.safeWriteFile('/data/1841D.36a4e745.ans', 'answer v2');
 
-      const copied = await copyService.copy(problem, '/src/1841D-graph-test.cpp');
-
-      expect(await fileSystemMock.readFile('/src/1841D-graph-test.cpp')).toBe('source v2');
-      expect(await fileSystemMock.readFile('/data/1841D-graph-test.36a4e745.in')).toBe('input');
+      await expect(copyService.copy(problem, '/src/1841D-graph-test.cpp')).rejects.toThrow(
+        'Copied problem file path already exists',
+      );
       expect(await fileSystemMock.readFile('/data/1841D-graph-test.36a4e745.ans')).toBe(
-        'answer v2',
+        'answer v1',
       );
-      expect(copied.getTestcase(testcaseId).answer.path).toBe(
-        '/data/1841D-graph-test.36a4e745.ans',
-      );
+      expect(await fileSystemMock.exists('/src/1841D-graph-test.cpp')).toBe(false);
     });
 
     it('does not copy anything when the copied problem data path already exists', async () => {
@@ -446,7 +444,7 @@ describe('ProblemCopyService', () => {
       expect(fileSystemMock.copyFile).not.toHaveBeenCalled();
     });
 
-    it('overwrites orphaned copied testcase input files when copying the same name again', async () => {
+    it('preserves existing testcase input files when copying the same name again', async () => {
       const { fileSystemMock, copyService } = createServices();
       const testcaseId = '12345678-aaaa' as TestcaseId;
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
@@ -463,15 +461,15 @@ describe('ProblemCopyService', () => {
         ),
       );
 
-      const copied = await copyService.copy(problem, '/src/1841D_brute.cpp');
-
-      expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
-      expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.in')).toBe('input');
-      expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.out')).toBe('answer');
-      expect(copied.getTestcase(testcaseId).stdin.path).toBe('/data/1841D_brute.12345678.in');
+      await expect(copyService.copy(problem, '/src/1841D_brute.cpp')).rejects.toThrow(
+        'Copied problem file path already exists',
+      );
+      expect(await fileSystemMock.readFile('/data/1841D_brute.12345678.in')).toBe('occupied');
+      expect(await fileSystemMock.exists('/src/1841D_brute.cpp')).toBe(false);
+      expect(await fileSystemMock.exists('/data/1841D_brute.12345678.out')).toBe(false);
     });
 
-    it('overwrites orphaned copied auxiliary files when copying the same name again', async () => {
+    it('preserves existing auxiliary files and removes only newly copied files', async () => {
       const { fileSystemMock, copyService } = createServices();
       await fileSystemMock.safeWriteFile('/src/1841D.cpp', 'source');
       await fileSystemMock.safeWriteFile('/tools/checker.cpp', 'checker');
@@ -482,13 +480,12 @@ describe('ProblemCopyService', () => {
       problem.checker = { path: '/tools/checker.cpp', hash: 'checker-hash' };
       problem.interactor = { path: '/tools/interactor.cpp', hash: 'interactor-hash' };
 
-      const copied = await copyService.copy(problem, '/src/1841D_brute.cpp');
-
-      expect(await fileSystemMock.readFile('/src/1841D_brute.cpp')).toBe('source');
-      expect(await fileSystemMock.readFile('/data/1841D_brute.checker.cpp')).toBe('checker');
-      expect(await fileSystemMock.readFile('/data/1841D_brute.interactor.cpp')).toBe('interactor');
-      expect(toPosix(copied.checker?.path)).toBe('/data/1841D_brute.checker.cpp');
-      expect(toPosix(copied.interactor?.path)).toBe('/data/1841D_brute.interactor.cpp');
+      await expect(copyService.copy(problem, '/src/1841D_brute.cpp')).rejects.toThrow(
+        'Copied problem file path already exists',
+      );
+      expect(await fileSystemMock.readFile('/data/1841D_brute.interactor.cpp')).toBe('occupied');
+      expect(await fileSystemMock.exists('/src/1841D_brute.cpp')).toBe(false);
+      expect(await fileSystemMock.exists('/data/1841D_brute.checker.cpp')).toBe(false);
     });
 
     it('rolls back copied files when saving the copied problem fails', async () => {
@@ -515,6 +512,18 @@ describe('ProblemCopyService', () => {
       await expect(fileSystemMock.exists('/src/1841D_brute.cpp')).resolves.toBe(false);
       await expect(fileSystemMock.exists('/data/1841D_brute.12345678.in')).resolves.toBe(false);
       await expect(fileSystemMock.exists('/data/1841D_brute.12345678.out')).resolves.toBe(false);
+    });
+
+    it('retains copied files when the kernel record could not be rolled back', async () => {
+      const { fileSystemMock, service, copyService } = createServices();
+      await fileSystemMock.safeWriteFile('/src/main.cpp', 'source');
+      const error = new ProblemCopyRollbackError([new Error('delete failed')], 'rollback failed');
+      vi.spyOn(service, 'save').mockRejectedValueOnce(error);
+      await expect(
+        copyService.copy(new Problem('main', '/src/main.cpp'), '/src/copy.cpp'),
+      ).rejects.toBe(error);
+      expect(await fileSystemMock.readFile('/src/copy.cpp')).toBe('source');
+      expect(await fileSystemMock.readFile('/src/main.cpp')).toBe('source');
     });
   });
 });

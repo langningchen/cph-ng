@@ -17,6 +17,7 @@
 
 import {
   accessSync,
+  constants,
   createReadStream,
   createWriteStream,
   mkdirSync,
@@ -70,8 +71,9 @@ export class FileSystemAdapter implements IFileSystem {
     }
   }
 
-  public async mkdir(path: string): Promise<void> {
-    await mkdir(path, { recursive: true });
+  public async mkdir(path: string, exclusive = false): Promise<void> {
+    if (exclusive) await mkdir(this.path.dirname(path), { recursive: true });
+    await mkdir(path, { recursive: !exclusive });
   }
 
   public async readdir(path: string): Promise<string[]> {
@@ -90,9 +92,9 @@ export class FileSystemAdapter implements IFileSystem {
     };
   }
 
-  public async copyFile(src: string, dest: string): Promise<void> {
+  public async copyFile(src: string, dest: string, exclusive = false): Promise<void> {
     await mkdir(this.path.dirname(dest), { recursive: true });
-    await copyFile(src, dest);
+    await copyFile(src, dest, exclusive ? constants.COPYFILE_EXCL : 0);
   }
 
   public async rm(path: string, options?: RmOptions): Promise<void> {

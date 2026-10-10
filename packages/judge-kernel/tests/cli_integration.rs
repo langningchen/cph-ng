@@ -11,7 +11,7 @@ use tokio::process::Command;
 
 // Version probing, dependency validation and compilation each have a 30 s budget.
 // The harness must allow them to finish before deciding the CLI is stuck.
-const COMMAND_TIMEOUT: Duration = Duration::from_secs(120);
+const COMMAND_TIMEOUT: Duration = Duration::from_mins(2);
 
 struct Workspace {
     dir: TempDir,
@@ -25,6 +25,8 @@ impl Workspace {
     }
     fn command(&self, args: &[&str]) -> Command {
         let mut command = Command::new(env!("CARGO_BIN_EXE_cph-ng-judge"));
+        #[cfg(windows)]
+        command.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
         command
             .arg("--store-root")
             .arg(&self.store)

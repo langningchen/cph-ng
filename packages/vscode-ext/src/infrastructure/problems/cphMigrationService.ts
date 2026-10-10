@@ -45,7 +45,6 @@ export class CphMigrationService implements ICphMigrationService {
 
   public async migrateFromSource(srcPath: string): Promise<Problem | undefined> {
     const probPath = this.getProbFilePath(srcPath);
-    if (!(await this.fs.exists(probPath))) return undefined;
     return this.loadProbFile(probPath);
   }
 
@@ -66,8 +65,9 @@ export class CphMigrationService implements ICphMigrationService {
       const data = JSON.parse(content) as ICphProblem;
       return this.convertToDomain(data);
     } catch (e) {
+      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return undefined;
       this.logger.error(`Failed to read CPH problem file: ${probPath}`, e);
-      return undefined;
+      throw e;
     }
   }
 

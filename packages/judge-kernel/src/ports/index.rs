@@ -15,6 +15,11 @@ pub trait SourceIndex: Send + Sync + std::fmt::Debug {
         id: crate::domain::ProblemId,
     ) -> Result<SourceBinding, IndexError>;
     async fn rebind(&self, code_id: uuid::Uuid, path: &std::path::Path) -> Result<(), IndexError>;
+    async fn preview_rebind(
+        &self,
+        code_id: uuid::Uuid,
+        path: &std::path::Path,
+    ) -> Result<Vec<SourceBinding>, IndexError>;
     async fn rebuild(
         &self,
         path: &std::path::Path,

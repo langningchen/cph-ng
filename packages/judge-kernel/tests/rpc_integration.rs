@@ -21,7 +21,10 @@ struct Client {
 }
 impl Client {
     async fn start(root: &Path, extra: &[&str]) -> anyhow::Result<Self> {
-        let mut child = Command::new(env!("CARGO_BIN_EXE_cph-ng-judge"))
+        let mut command = Command::new(env!("CARGO_BIN_EXE_cph-ng-judge"));
+        #[cfg(windows)]
+        command.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
+        let mut child = command
             .arg("serve")
             .arg("--store-root")
             .arg(root)
@@ -98,7 +101,7 @@ impl Client {
         // Match the CLI harness: compilation phases can legitimately outlast 20 s
         // on loaded native runners. Resource-limit assertions use separate budgets.
         let mut latest = None;
-        tokio::time::timeout(Duration::from_secs(120), async {
+        tokio::time::timeout(Duration::from_mins(2), async {
             loop {
                 let task = self.ok(Method::TaskGet, json!({"task_id": id})).await?;
                 if matches!(

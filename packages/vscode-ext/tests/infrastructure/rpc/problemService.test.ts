@@ -6,6 +6,7 @@ import type { ProblemId, TestcaseId } from '@cph-ng/core';
 import { describe, expect, it, vi } from 'vitest';
 import type { IClock } from '@/application/ports/node/IClock';
 import type { ICrypto } from '@/application/ports/node/ICrypto';
+import { ProblemCopyRollbackError } from '@/application/ports/problems/IProblemCopyService';
 import type { ITestcaseIoService } from '@/application/ports/problems/ITestcaseIoService';
 import type { IActivePathService } from '@/application/ports/vscode/IActivePathService';
 import type { IDocument } from '@/application/ports/vscode/IDocument';
@@ -64,6 +65,7 @@ async function windows(paths: Partial<ProblemDto> = {}) {
       { id: third, stdin: '3', answer: 'three' },
     ],
   };
+  const snapshot = () => ({ ...structuredClone(remote), revision: JSON.stringify(remote) });
   let present = true;
   const legacyLoad = vi.fn(async (): Promise<Problem | null> => null);
   const legacyDelete = vi.fn(async () => {
@@ -79,7 +81,7 @@ async function windows(paths: Partial<ProblemDto> = {}) {
   const request = vi.fn(async (method: string, params: Record<string, unknown>) => {
     if (method === rpcMethod.problemLoad) {
       if (!present) throw new RpcRemoteError(rpcErrorCode.notIndexed, 'No problem');
-      return structuredClone(remote);
+      return snapshot();
     }
     if (method === rpcMethod.problemDelete) {
       present = false;
@@ -98,15 +100,17 @@ async function windows(paths: Partial<ProblemDto> = {}) {
       remote.testcases =
         imported?.tests.map((test) => ({ id: test.id, stdin: test.input, answer: test.output })) ??
         [];
-      return structuredClone(remote);
+      return snapshot();
     }
     if (method === rpcMethod.problemUpdate) {
       for (const field of ['checker', 'interactor', 'generator', 'brute_force'])
         if (typeof params[field] === 'string' && !attached.has(params[field] as string))
           throw new Error('Auxiliary source is outside attached roots');
-      const { problem_id: _, ...patch } = params;
+      if (params.expected_revision !== JSON.stringify(remote))
+        throw new RpcRemoteError(rpcErrorCode.conflict, 'Problem changed while saving');
+      const { problem_id: _, expected_revision: _revision, ...patch } = params;
       Object.assign(remote, patch);
-      return structuredClone(remote);
+      return snapshot();
     }
     if (method === rpcMethod.testcaseAdd) {
       if (remote.testcases.some((testcase) => testcase.id === params.testcase_id))
@@ -198,6 +202,56 @@ async function windows(paths: Partial<ProblemDto> = {}) {
 }
 
 describe('two windows sharing a kernel', () => {
+  it('rejects a change committed between load and update, then retries without losing the draft', async () => {
+    const { a, left, remote, request } = await windows();
+    const dispatch = request.getMockImplementation();
+    if (!dispatch) throw new Error('Missing fixture dispatch');
+    let race = true;
+    request.mockImplementation(async (method, params) => {
+      if (method === rpcMethod.problemUpdate && race) {
+        race = false;
+        remote.testcases.push({ id: fourth, stdin: 'remote', answer: 'addition' });
+      }
+      return dispatch(method, params);
+    });
+    left.name = 'local draft';
+    left.getTestcase(first).stdin = new TestcaseIo({ data: 'local input' });
+    await expect(a.save(left)).rejects.toThrow('changed while saving');
+    expect(remote.name).toBe('Original');
+    expect(remote.testcases[0].stdin).toBe('1');
+    await a.save(left);
+    expect(remote.name).toBe('local draft');
+    expect(remote.testcases[0].stdin).toBe('local input');
+    expect(remote.testcases.find((item) => item.id === fourth)?.stdin).toBe('remote');
+  });
+
+  it('removes only the newly imported copy when copying configuration fails', async () => {
+    const { a, left, remote, configs, configure, request } = await windows();
+    const originalId = remote.id;
+    configs.set(left.src.path, { languages: { cpp: { compiler: 'custom' } } });
+    configure.mockRejectedValueOnce(new Error('configuration failed'));
+    const copy = new Problem('copy', '/work/copy.cpp');
+    await expect(a.save(copy, left)).rejects.toThrow('configuration failed');
+    expect(request).toHaveBeenCalledWith(rpcMethod.problemDelete, { problem_id: remote.id });
+    expect(remote.id).not.toBe(originalId);
+    expect(request).not.toHaveBeenCalledWith(rpcMethod.problemDelete, { problem_id: originalId });
+  });
+
+  it('marks copy rollback failure so the caller can retain its source files', async () => {
+    const { a, left, configs, configure, request } = await windows();
+    const dispatch = request.getMockImplementation();
+    if (!dispatch) throw new Error('Missing fixture dispatch');
+    configs.set(left.src.path, { languages: { cpp: { compiler: 'custom' } } });
+    configure.mockRejectedValueOnce(new Error('configuration failed'));
+    request.mockImplementation(async (method, params) => {
+      if (method === rpcMethod.problemDelete) throw new Error('delete failed');
+      return dispatch(method, params);
+    });
+    await expect(a.save(new Problem('copy', '/work/copy.cpp'), left)).rejects.toBeInstanceOf(
+      ProblemCopyRollbackError,
+    );
+  });
+
   it('does not persist a stale view when obtaining run/history references and runs newly added cases', async () => {
     const { a, b, left, right, remote, mutations } = await windows();
     left.name = 'Renamed elsewhere';
@@ -234,12 +288,15 @@ describe('two windows sharing a kernel', () => {
     expect(mutations).toEqual([]);
     right.getTestcase(first).stdin = new TestcaseIo({ data: 'edited by B' });
     await b.save(right);
-    expect(mutations).toEqual([
-      {
-        method: rpcMethod.testcaseUpdate,
-        params: { problem_id: remote.id, testcase_id: first, stdin: 'edited by B' },
+    expect(mutations).toHaveLength(1);
+    expect(mutations[0]).toMatchObject({
+      method: rpcMethod.problemUpdate,
+      params: {
+        problem_id: remote.id,
+        expected_revision: expect.any(String),
+        testcases: remote.testcases,
       },
-    ]);
+    });
     expect(remote.testcases.find((testcase) => testcase.id === first)).toEqual({
       id: first,
       stdin: 'edited by B',
@@ -389,12 +446,15 @@ it('normalizes Windows kernel paths for editor matching without spurious auxilia
     expect(mutations).toEqual([]);
     left.name = 'Renamed';
     await a.save(left);
-    expect(mutations).toEqual([
-      {
-        method: rpcMethod.problemUpdate,
-        params: { problem_id: '00000000-0000-0000-0000-000000000010', name: 'Renamed' },
+    expect(mutations).toHaveLength(1);
+    expect(mutations[0]).toMatchObject({
+      method: rpcMethod.problemUpdate,
+      params: {
+        problem_id: '00000000-0000-0000-0000-000000000010',
+        name: 'Renamed',
+        expected_revision: expect.any(String),
       },
-    ]);
+    });
     const save = vi.fn(async () => {});
     const judge = new RpcJudgeService(
       {

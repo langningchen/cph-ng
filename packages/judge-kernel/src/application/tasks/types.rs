@@ -83,7 +83,7 @@ impl Default for TaskLimits {
             workers: 2,
             stress_workers: 1,
             queued: 128,
-            timeout: Duration::from_secs(300),
+            timeout: Duration::from_mins(5),
         }
     }
 }

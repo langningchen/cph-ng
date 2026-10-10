@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
+import { constants } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { mock } from '@t/mock';
 import { createFsFromVolume, Volume } from 'memfs';
@@ -55,8 +56,9 @@ export function createFileSystemMock(vol: InstanceType<typeof Volume> = new Volu
       return false;
     }
   });
-  fileSystemMock.mkdir.mockImplementation(async (path) => {
-    await fs.promises.mkdir(path, { recursive: true });
+  fileSystemMock.mkdir.mockImplementation(async (path, exclusive = false) => {
+    if (exclusive) await fs.promises.mkdir(dirname(path), { recursive: true });
+    await fs.promises.mkdir(path, { recursive: !exclusive });
   });
   fileSystemMock.readdir.mockImplementation(async (path) => {
     const result = await fs.promises.readdir(path, { encoding: 'utf8' });
@@ -71,9 +73,9 @@ export function createFileSystemMock(vol: InstanceType<typeof Volume> = new Volu
       isDirectory: () => stats.isDirectory(),
     };
   });
-  fileSystemMock.copyFile.mockImplementation(async (src, dest) => {
+  fileSystemMock.copyFile.mockImplementation(async (src, dest, exclusive = false) => {
     await fs.promises.mkdir(dirname(dest), { recursive: true });
-    await fs.promises.copyFile(src, dest);
+    await fs.promises.copyFile(src, dest, exclusive ? constants.COPYFILE_EXCL : 0);
   });
   fileSystemMock.rm.mockImplementation(async (path, options?) => {
     await fs.promises.rm(path, options);
