@@ -25,6 +25,8 @@ impl Workspace {
     }
     fn command(&self, args: &[&str]) -> Command {
         let mut command = Command::new(env!("CARGO_BIN_EXE_cph-ng-judge"));
+        #[cfg(windows)]
+        command.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
         command
             .arg("--store-root")
             .arg(&self.store)

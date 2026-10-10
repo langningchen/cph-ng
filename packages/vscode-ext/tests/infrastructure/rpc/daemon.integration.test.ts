@@ -32,6 +32,8 @@ it.skipIf(!process.env.CPH_NG_JUDGE)(
       await writeFile(other, 'print(1)\n');
       const problem = await first.request<{ id: string }>(rpcMethod.problemCreate, {
         source_path: source,
+        // This checks daemon ownership and task survival, not interpreter startup speed.
+        time_limit_ms: 10_000,
       });
       await second.request(rpcMethod.problemCreate, { source_path: other });
       await first.request(rpcMethod.testcaseAdd, { problem_id: problem.id, answer: '7' });

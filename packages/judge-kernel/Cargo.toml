@@ -73,3 +73,4 @@ tokio-tungstenite = "0.24"
 
 [target.'cfg(windows)'.dependencies]
 winapi-util = "0.1.11"
+win32job = "2.0.3"

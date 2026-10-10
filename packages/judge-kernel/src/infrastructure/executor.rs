@@ -27,6 +27,9 @@ pub struct ProcessExecutor;
 pub struct ProcessGuard {
     pub child: Child,
     pid: u32,
+    cleaned: bool,
+    #[cfg(windows)]
+    job: Option<win32job::Job>,
 }
 impl ProcessGuard {
     /// # Errors
@@ -54,6 +57,9 @@ impl ProcessGuard {
             .kill_on_drop(true);
         #[cfg(unix)]
         command.process_group(0);
+        // Compiler/runtime streams are piped; background judging needs no console.
+        #[cfg(windows)]
+        command.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
         let child = command.spawn().map_err(|error| {
             eprintln!(
                 "Could not start configured program {}: {error}",
@@ -64,16 +70,48 @@ impl ProcessGuard {
                 "Could not start configured compiler or runtime",
             )
         })?;
+        #[cfg(windows)]
+        let mut child = child;
         let pid = child.id().ok_or_else(|| {
             TaskFailure::new(ErrorCode::ExecutionFailed, "Child exited during startup")
         })?;
-        Ok(Self { child, pid })
+        #[cfg(windows)]
+        let job = {
+            let mut info = win32job::ExtendedLimitInfo::new();
+            info.limit_kill_on_job_close();
+            let job =
+                win32job::Job::create_with_limit_info(&info).map_err(TaskFailure::internal)?;
+            let handle = child.raw_handle().ok_or_else(|| {
+                TaskFailure::new(ErrorCode::ExecutionFailed, "Missing child process handle")
+            })?;
+            match job.assign_process(handle as isize) {
+                Ok(()) => Some(job),
+                Err(error) => {
+                    // A very short-lived child may finish before assignment. Only
+                    // tolerate assignment failure after confirming it has exited.
+                    if child.try_wait().map_err(TaskFailure::internal)?.is_none() {
+                        return Err(TaskFailure::internal(error));
+                    }
+                    None
+                }
+            }
+        };
+        Ok(Self {
+            child,
+            pid,
+            cleaned: false,
+            #[cfg(windows)]
+            job,
+        })
     }
     #[must_use]
     pub fn pid(&self) -> u32 {
         self.pid
     }
     pub fn kill_tree(&mut self) {
+        if self.cleaned {
+            return;
+        }
         #[cfg(unix)]
         if let Some(pid) =
             rustix::process::Pid::from_raw(i32::try_from(self.pid).unwrap_or(i32::MAX))
@@ -82,13 +120,11 @@ impl ProcessGuard {
         }
         #[cfg(windows)]
         {
-            let _ = std::process::Command::new("taskkill")
-                .args(["/PID", &self.pid.to_string(), "/T", "/F"])
-                .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .status();
+            // Closing the job kills its descendants even after the parent exits.
+            self.job.take();
         }
         let _ = self.child.start_kill();
+        self.cleaned = true;
     }
 }
 impl Drop for ProcessGuard {
@@ -268,6 +304,7 @@ impl ExecutorPort for ProcessExecutor {
                 }
             }
         };
+        let time_ms = u64::try_from(start.elapsed().as_millis()).unwrap_or(u64::MAX);
         process.kill_tree();
         if status.is_none() {
             let _ = process.child.wait().await;
@@ -296,7 +333,7 @@ impl ExecutorPort for ProcessExecutor {
             reason,
             stdout: String::from_utf8_lossy(&stdout).into_owned(),
             stderr: String::from_utf8_lossy(&stderr).into_owned(),
-            time_ms: u64::try_from(start.elapsed().as_millis()).unwrap_or(u64::MAX),
+            time_ms,
             memory_mb: sampled_memory(peak.max(peak_memory.load(Ordering::Relaxed))),
         })
     }
