@@ -20,6 +20,7 @@ pub struct TestcaseDto {
 }
 #[derive(Debug, Clone, Serialize)]
 pub struct ProblemDto {
+    pub revision: String,
     pub sources: Vec<crate::ports::index::SourceBinding>,
     pub schema_version: u32,
     pub id: Uuid,
@@ -39,6 +40,7 @@ impl ProblemDto {
     #[must_use]
     pub fn from_problem(problem: Problem, testcases: Vec<TestcaseDto>) -> Self {
         Self {
+            revision: String::new(),
             sources: vec![],
             schema_version: 1,
             id: problem.id.0,
@@ -91,6 +93,9 @@ pub struct UpdateProblem {
     pub name: Option<String>,
     #[serde(flatten)]
     pub details: ProblemDetails,
+    pub expected_revision: Option<String>,
+    pub testcases: Option<Vec<TestcaseDto>>,
+    pub testcases_file: Option<PathBuf>,
 }
 #[derive(Debug, Deserialize)]
 pub struct MoveProblem {

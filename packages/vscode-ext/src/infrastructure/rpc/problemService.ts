@@ -14,10 +14,12 @@ import { RpcRemoteError, type TaskInfo } from './client';
 import { KernelConfiguration, languageIds, quoteArgument } from './configuration';
 import { KernelService, splitArguments } from './kernelService';
 import { editorProblem } from './paths';
-import { problemChanges, sameProblemData } from './problemChanges';
+import { applyProblemChanges, problemChanges, sameProblemData } from './problemChanges';
+import { updateProblem } from './problemUpdate';
 import { rpcErrorCode, rpcMethod } from './protocol';
 
 export interface ProblemDto {
+  revision?: string;
   id: string;
   code_id?: string;
   source_path: string;
@@ -265,39 +267,25 @@ export class RpcProblemService implements IProblemService {
       );
     }
     const change = problemChanges(base, local, stored);
-    // Advance only successfully committed portions of the baseline so retries retain unsaved edits.
-    if (Object.keys(change.details).length) {
-      await client.request(rpcMethod.problemUpdate, { problem_id: id, ...change.details });
-      Object.assign(base, change.details);
-    }
-    for (const testcaseId of change.deleted) {
-      await client.request(rpcMethod.testcaseDelete, { problem_id: id, testcase_id: testcaseId });
-      base.testcases = base.testcases.filter((testcase) => testcase.id !== testcaseId);
-    }
-    for (const testcase of change.added) {
-      await client.request(rpcMethod.testcaseAdd, {
+    if (
+      Object.keys(change.details).length ||
+      change.deleted.length ||
+      change.added.length ||
+      change.updated.length ||
+      change.order
+    ) {
+      if (!stored.revision)
+        throw new Error(
+          'The judge kernel must support atomic problem updates. Update the kernel and reopen the problem.',
+        );
+      const merged = applyProblemChanges(stored, change);
+      await updateProblem(client, this.kernel, {
         problem_id: id,
-        testcase_id: testcase.id,
-        stdin: testcase.stdin,
-        answer: testcase.answer,
+        expected_revision: stored.revision,
+        ...change.details,
+        testcases: merged.testcases,
       });
-      base.testcases.push({ ...testcase });
     }
-    for (const testcase of change.updated) {
-      const { id: testcaseId, ...patch } = testcase;
-      await client.request(rpcMethod.testcaseUpdate, {
-        problem_id: id,
-        testcase_id: testcaseId,
-        ...patch,
-      });
-      const previous = base.testcases.find((item) => item.id === testcaseId);
-      if (previous) Object.assign(previous, patch);
-    }
-    if (change.order)
-      await client.request(rpcMethod.testcaseReorder, {
-        problem_id: id,
-        testcase_ids: change.order,
-      });
     this.baselines.set(problem, local);
     await this.kernel.preferences.save(id, problem);
   }

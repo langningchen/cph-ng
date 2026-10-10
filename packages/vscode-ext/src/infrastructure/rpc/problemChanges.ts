@@ -41,6 +41,24 @@ export function sameProblemData(a: ProblemDto, b: ProblemDto): boolean {
   );
 }
 
+/** Apply the merged draft to current remote data for one atomic kernel save. */
+export function applyProblemChanges(remote: ProblemDto, change: ProblemChanges): ProblemDto {
+  const deleted = new Set(change.deleted);
+  const cases = new Map(
+    remote.testcases
+      .filter((testcase) => !deleted.has(testcase.id))
+      .map((testcase) => [testcase.id, { ...testcase }]),
+  );
+  for (const testcase of change.added) cases.set(testcase.id, { ...testcase });
+  const getCase = (id: string): Case => {
+    const testcase = cases.get(id);
+    return testcase ?? conflict('Testcase');
+  };
+  for (const testcase of change.updated) Object.assign(getCase(testcase.id), testcase);
+  const order = change.order ?? [...cases.keys()];
+  return { ...remote, ...change.details, testcases: order.map(getCase) };
+}
+
 /** Three-way comparison: base is what this window saw, local is its draft, remote is current Rust data. */
 export function problemChanges(
   base: ProblemDto,
