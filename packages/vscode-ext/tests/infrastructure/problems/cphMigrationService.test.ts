@@ -40,6 +40,12 @@ describe('CphMigrationService', () => {
   });
 
   describe('migrateFromSource', () => {
+    it('surfaces permission errors instead of treating the problem as absent', async () => {
+      const error = Object.assign(new Error('permission denied'), { code: 'EACCES' });
+      fileSystemMock.readFile.mockRejectedValueOnce(error);
+      await expect(service.migrateFromSource('/workspace/main.cpp')).rejects.toBe(error);
+    });
+
     it('should return undefined when no .prob file', async () => {
       const result = await service.migrateFromSource('/workspace/main.cpp');
       expect(result).toBeUndefined();
@@ -75,14 +81,13 @@ describe('CphMigrationService', () => {
       expect(result?.testcaseOrder).toHaveLength(2);
     });
 
-    it('should return undefined for invalid JSON', async () => {
+    it('should surface invalid JSON', async () => {
       const srcPath = '/workspace/main.cpp';
       const hash = cryptoMock.md5(srcPath);
       const probPath = `/workspace/.cph/.main.cpp_${hash}.prob`;
       await fileSystemMock.safeWriteFile(probPath, 'invalid json');
 
-      const result = await service.migrateFromSource(srcPath);
-      expect(result).toBeUndefined();
+      await expect(service.migrateFromSource(srcPath)).rejects.toBeInstanceOf(SyntaxError);
     });
   });
 
