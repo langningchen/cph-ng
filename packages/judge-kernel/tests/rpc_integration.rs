@@ -21,7 +21,10 @@ struct Client {
 }
 impl Client {
     async fn start(root: &Path, extra: &[&str]) -> anyhow::Result<Self> {
-        let mut child = Command::new(env!("CARGO_BIN_EXE_cph-ng-judge"))
+        let mut command = Command::new(env!("CARGO_BIN_EXE_cph-ng-judge"));
+        #[cfg(windows)]
+        command.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
+        let mut child = command
             .arg("serve")
             .arg("--store-root")
             .arg(root)

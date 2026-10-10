@@ -183,8 +183,8 @@ pub async fn interactive(
             },
         }
     };
-    solution.kill_tree();
-    interactor.kill_tree();
+    let time_ms = u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX);
+    cleanup(&mut solution, &mut interactor);
     if solution_status.is_none() {
         let _ = solution.child.wait().await;
     }
@@ -205,7 +205,7 @@ pub async fn interactive(
         reason,
         stdout: String::from_utf8_lossy(&output.map_err(TaskFailure::internal)?).into_owned(),
         stderr: String::from_utf8_lossy(&errors.map_err(TaskFailure::internal)?).into_owned(),
-        time_ms: u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX),
+        time_ms,
         memory_mb: sampled_memory(memory.max(peak.load(std::sync::atomic::Ordering::Relaxed))),
     };
     let verdict = interactor_verdict(
@@ -214,6 +214,10 @@ pub async fn interactive(
         &checker_errors,
     )?;
     Ok((result, verdict))
+}
+fn cleanup(solution: &mut ProcessGuard, interactor: &mut ProcessGuard) {
+    solution.kill_tree();
+    interactor.kill_tree();
 }
 fn interactor_verdict(
     result: &ExecutionResult,
