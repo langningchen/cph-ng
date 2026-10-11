@@ -74,15 +74,23 @@ export class MoveProblem extends BaseProblemUseCase<MoveProblemMsg> {
     backgroundProblem.abort();
 
     if (this.service.move) {
-      await this.fs.copyFile(srcPath, destSrcPath);
+      await this.fs.copyFile(srcPath, destSrcPath, true);
       try {
         await this.service.move(problem, destSrcPath);
       } catch (error) {
         await this.fs.rm(destSrcPath, { force: true });
         throw error;
       }
+      try {
+        await this.fs.rm(srcPath, { force: true });
+      } catch (error) {
+        // Keep both files if restoring the old binding fails, so no indexed
+        // source is removed while the caller handles the recovery error.
+        await this.service.move(problem, srcPath);
+        await this.fs.rm(destSrcPath, { force: true });
+        throw error;
+      }
       await this.repo.unload(problemId);
-      await this.fs.rm(srcPath, { force: true });
       this.ui.openFile(Uri.file(destSrcPath));
       await this.coordinator.onActiveEditorChanged();
       await this.coordinator.dispatchFullData();

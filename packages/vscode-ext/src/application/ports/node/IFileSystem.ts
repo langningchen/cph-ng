@@ -69,8 +69,8 @@ export interface IFileSystem {
     path: string,
   ): Promise<{ size: number; mode: number; isFile(): boolean; isDirectory(): boolean }>;
 
-  /** Asynchronously copies `src` to `dest`. `dest` is overwritten if it already exists. */
-  copyFile(src: string, dest: string): Promise<void>;
+  /** Copies a file; exclusive copies reject an existing destination. */
+  copyFile(src: string, dest: string, exclusive?: boolean): Promise<void>;
 
   /** Removes a file. */
   rm(path: string, options?: RmOptions): Promise<void>;

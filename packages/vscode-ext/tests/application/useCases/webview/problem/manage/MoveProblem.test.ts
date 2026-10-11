@@ -71,6 +71,60 @@ describe('MoveProblem', () => {
 
   const exec = () => service.exec({ type: 'moveProblem', problemId: PROBLEM_ID });
 
+  async function kernelMove() {
+    await fileSystemMock.safeWriteFile('/src/main.cpp', 'source');
+    serviceMock.move = vi.fn(async (problem, destination) => {
+      problem.src.path = destination;
+    });
+    return serviceMock.move;
+  }
+
+  it('moves through the kernel while preserving the problem identity', async () => {
+    await kernelMove();
+    await exec();
+    expect(serviceMock.move).toHaveBeenCalledWith(background.problem, '/newdir/main.cpp');
+    expect(fileSystemMock.copyFile).toHaveBeenCalledWith('/src/main.cpp', '/newdir/main.cpp', true);
+    expect(await fileSystemMock.readFile('/newdir/main.cpp')).toBe('source');
+    expect(await fileSystemMock.exists('/src/main.cpp')).toBe(false);
+    expect(serviceMock.delete).not.toHaveBeenCalled();
+    expect(copyServiceMock.copy).not.toHaveBeenCalled();
+  });
+
+  it('removes its new file if the kernel refuses the move', async () => {
+    const move = await kernelMove();
+    vi.mocked(move).mockRejectedValueOnce(new Error('move failed'));
+    await expect(exec()).rejects.toThrow('move failed');
+    expect(await fileSystemMock.readFile('/src/main.cpp')).toBe('source');
+    expect(await fileSystemMock.exists('/newdir/main.cpp')).toBe(false);
+    expect(repoMock.unload).not.toHaveBeenCalled();
+  });
+
+  it('restores the original binding when deleting the source fails', async () => {
+    await kernelMove();
+    fileSystemMock.rm.mockRejectedValueOnce(new Error('source is busy'));
+    await expect(exec()).rejects.toThrow('source is busy');
+    expect(serviceMock.move).toHaveBeenLastCalledWith(background.problem, '/src/main.cpp');
+    expect(background.problem.src.path).toBe('/src/main.cpp');
+    expect(await fileSystemMock.readFile('/src/main.cpp')).toBe('source');
+    expect(await fileSystemMock.exists('/newdir/main.cpp')).toBe(false);
+    expect(repoMock.unload).not.toHaveBeenCalled();
+  });
+
+  it('retains both sources when restoring the binding also fails', async () => {
+    const move = await kernelMove();
+    fileSystemMock.rm.mockRejectedValueOnce(new Error('source is busy'));
+    vi.mocked(move)
+      .mockImplementationOnce(async (problem, destination) => {
+        problem.src.path = destination;
+      })
+      .mockRejectedValueOnce(new Error('restore failed'));
+    await expect(exec()).rejects.toThrow('restore failed');
+    expect(await fileSystemMock.readFile('/src/main.cpp')).toBe('source');
+    expect(await fileSystemMock.readFile('/newdir/main.cpp')).toBe('source');
+    expect(background.problem.src.path).toBe('/newdir/main.cpp');
+    expect(repoMock.unload).not.toHaveBeenCalled();
+  });
+
   it('moves the problem to the chosen folder', async () => {
     await exec();
 
