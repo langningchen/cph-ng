@@ -2,6 +2,32 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.12
+
+- **fix**: recompile runner when another window clears the cache ([#360](https://github.com/langningchen/cph-ng/issues/360)) ([#375](https://github.com/langningchen/cph-ng/issues/375))
+- **ci**: refresh CodeQL after restoring TypeScript
+- **chore**(deps): update TypeScript workspace dependencies
+- **refactor**: restore TypeScript implementation on main
+- **ci**: add approval step before running the job `judge-kernel` ([#374](https://github.com/langningchen/cph-ng/issues/374))
+- **chore**(deps): update pnpm to version 12.8.1 ([#361](https://github.com/langningchen/cph-ng/issues/361))
+- **chore**(deps): bump adm-zip from 0.6.0 to 0.6.1 ([#358](https://github.com/langningchen/cph-ng/issues/358))
+- **chore**(deps): bump ws from 8.21.0 to 8.21.3 ([#357](https://github.com/langningchen/cph-ng/issues/357))
+- **chore**(deps): bump ws from 8.20.1 to 8.21.0 ([#356](https://github.com/langningchen/cph-ng/issues/356))
+- **refactor**: migrate to Rust kernel and update rewrite build policy ([#355](https://github.com/langningchen/cph-ng/issues/355))
+- **chore**(deps-dev): bump @vitest/coverage-v8 from 4.1.11 to 5.0.0 ([#354](https://github.com/langningchen/cph-ng/issues/354))
+- **chore**(deps): bump the npm-non-major group with 11 updates ([#353](https://github.com/langningchen/cph-ng/issues/353))
+- **chore**(deps): bump @mui/lab from 9.0.0-beta.8 to 9.0.0-beta.9 ([#348](https://github.com/langningchen/cph-ng/issues/348))
+- **chore**(deps): bump the npm-non-major group with 8 updates ([#347](https://github.com/langningchen/cph-ng/issues/347))
+- **chore**: add mailmap and update schema ([#346](https://github.com/langningchen/cph-ng/issues/346))
+- **refactor**(rust-kernel): rust kernel ([#294](https://github.com/langningchen/cph-ng/issues/294))
+- **chore**(deps): bump the npm-non-major group with 9 updates ([#344](https://github.com/langningchen/cph-ng/issues/344))
+- **chore**(deps): bump the npm-non-major group with 9 updates ([#342](https://github.com/langningchen/cph-ng/issues/342))
+- **chore**(deps): upgrade pnpm to v11.21.0 ([#340](https://github.com/langningchen/cph-ng/issues/340))
+- **ci**: publish to openvsx ([#339](https://github.com/langningchen/cph-ng/issues/339))
+- **chore**(deps): bump @mui/lab from 9.0.0-beta.6 to 9.0.0-beta.8 ([#335](https://github.com/langningchen/cph-ng/issues/335))
+- **chore**(deps): bump the npm-non-major group with 13 updates ([#334](https://github.com/langningchen/cph-ng/issues/334))
+- **feat**(vscode-ext): add move problem action ([#333](https://github.com/langningchen/cph-ng/issues/333))
+
 ## 0.7.11
 
 - **chore**(deps): bump hono from 4.12.34 to 4.13.0 ([#330](https://github.com/langningchen/cph-ng/issues/330))
