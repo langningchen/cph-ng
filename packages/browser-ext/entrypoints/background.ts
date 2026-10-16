@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BrowserGateway } from '@b/gateway';
 import { onMessage, sendMessage } from '@b/messaging';
 import { findSubmitter } from '@b/submitters';
-import type { SubmitData } from '@cph-ng/core';
+import type { B2rMsg, R2bMsg, SubmitData } from '@cph-ng/core';
+import { io, type Socket } from 'socket.io-client';
 import { browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
 import { storage } from 'wxt/utils/storage';
@@ -26,11 +26,9 @@ import { storage } from 'wxt/utils/storage';
 const routerPort = storage.defineItem<number>('local:routerPort', {
   fallback: 27121,
 });
-const pairingToken = storage.defineItem<string>('local:pairingToken', { fallback: '' });
 interface ConnectionState {
-  socket: BrowserGateway | null;
+  socket: Socket<R2bMsg, B2rMsg> | null;
   port: number;
-  token: string;
   connected: boolean;
   isActive: boolean;
 }
@@ -54,11 +52,10 @@ const setupCaptchaRuntime = async (): Promise<void> => {
 export default defineBackground(() => {
   void setupCaptchaRuntime();
 
-  Promise.all([routerPort.getValue(), pairingToken.getValue()]).then(([port, token]) => {
+  routerPort.getValue().then((port) => {
     const state: ConnectionState = {
       socket: null,
       port,
-      token,
       connected: false,
       isActive: false,
     };
@@ -78,44 +75,44 @@ export default defineBackground(() => {
     };
 
     const connect = () => {
-      state.socket?.close();
-      state.connected = false;
-      state.isActive = false;
+      if (state.socket?.connected) return;
+      if (state.socket) state.socket.close();
+
+      state.socket = io(`ws://localhost:${state.port}`, {
+        path: '/ws',
+        query: { type: 'browser' },
+        transports: ['websocket'],
+        reconnectionDelay: 3000,
+        autoConnect: true,
+      });
       broadcastStatus();
-      const socket = new BrowserGateway(state.port, state.token);
-      state.socket = socket;
-      socket.onStatus = (connected) => {
-        if (state.socket !== socket) return;
-        state.connected = connected;
-        if (!connected) state.isActive = false;
+
+      state.socket.on('connect', () => {
+        state.connected = true;
+        console.log('[cph-ng-submit] Connected to router');
         broadcastStatus();
-      };
-      socket.onNotification = (method, data) => {
-        if (state.socket !== socket) return;
-        if (method === 'event.router.status') {
-          state.isActive = data.isActive === true;
-          broadcastStatus();
-        } else if (
-          method === 'event.router.submit_request' &&
-          typeof data.url === 'string' &&
-          typeof data.sourceCode === 'string'
-        )
-          handleSubmitRequest({ url: data.url, sourceCode: data.sourceCode });
-      };
-      socket.connect();
+      });
+      state.socket.on('disconnect', () => {
+        state.connected = false;
+        state.isActive = false;
+        console.log('[cph-ng-submit] Disconnected from router');
+        broadcastStatus();
+      });
+      state.socket.on('status', ({ isActive }) => {
+        state.isActive = isActive;
+        console.log('[cph-ng-submit] Active status changed:', isActive);
+        broadcastStatus();
+      });
+      state.socket.on('submitRequest', (request) => {
+        console.log('[cph-ng-submit] Received submit request:', request);
+        handleSubmitRequest(request);
+      });
     };
 
     const pendingSubmissions = new Map<number, SubmitData>();
 
     const handleSubmitRequest = (request: SubmitData) => {
-      let url: URL;
-      try {
-        url = new URL(request.url);
-      } catch {
-        showError('Invalid submission URL');
-        return;
-      }
-      const submitter = findSubmitter(url);
+      const submitter = findSubmitter(new URL(request.url));
       if (!submitter) {
         showError(`No submitter found for URL: ${request.url}`);
         return;
@@ -141,7 +138,7 @@ export default defineBackground(() => {
     }));
 
     onMessage('setActive', () => {
-      state.socket?.send('router.set_active');
+      state.socket?.emit('setActive');
     });
 
     onMessage('connect', () => {
@@ -149,21 +146,11 @@ export default defineBackground(() => {
     });
 
     onMessage('disconnect', () => {
-      state.socket?.close();
-      state.connected = false;
-      state.isActive = false;
-      broadcastStatus();
+      state.socket?.disconnect();
       state.socket = null;
     });
 
-    onMessage('setPairingToken', async ({ data }) => {
-      state.token = data.token.trim();
-      await pairingToken.setValue(state.token);
-      connect();
-    });
-
     onMessage('setPort', ({ data }) => {
-      if (!Number.isInteger(data.port) || data.port < 1 || data.port > 65535) return;
       state.port = data.port;
       routerPort.setValue(data.port);
       connect();

@@ -21,12 +21,10 @@ import type { IProblemRepository } from '@/application/ports/problems/IProblemRe
 import { BaseProblemUseCase } from '@/application/useCases/webview/problem/BaseProblemUseCase';
 import { TOKENS } from '@/composition/tokens';
 import type { BackgroundProblem } from '@/domain/entities/backgroundProblem';
-import { RpcProblemService } from '@/infrastructure/rpc/problemService';
 
 @injectable()
 export class EditProblemDetails extends BaseProblemUseCase<EditProblemDetailsMsg> {
   public constructor(
-    @inject(RpcProblemService) private readonly problems: RpcProblemService,
     @inject(TOKENS.problemRepository) protected readonly repo: IProblemRepository,
   ) {
     super(repo);
@@ -38,6 +36,6 @@ export class EditProblemDetails extends BaseProblemUseCase<EditProblemDetailsMsg
   ): Promise<void> {
     problem.name = msg.name;
     problem.url = msg.url;
-    await this.problems.updateOverrides(problem, msg.overrides);
+    problem.overrides = msg.overrides;
   }
 }

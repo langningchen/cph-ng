@@ -6,6 +6,9 @@ out/
 node_modules/
 coverage/
 *.tsbuildinfo
-target/
+# pnpm
 .pnpm-debug.log
 .pnpm-store/
+
+# Local build artifacts from the Rust development branch
+/target/

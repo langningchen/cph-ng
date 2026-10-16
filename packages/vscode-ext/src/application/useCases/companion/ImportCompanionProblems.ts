@@ -128,9 +128,7 @@ export class ImportCompanionProblems {
         }
 
         // Save the problem
-        if (this.problemService.importCompanion)
-          await this.problemService.importCompanion(srcPath, companionProblem);
-        else await this.problemService.save(problem);
+        await this.problemService.save(problem);
         await this.repo.loadByPath(srcPath);
         createdPaths.push(srcPath);
 

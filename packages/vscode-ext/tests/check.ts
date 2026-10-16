@@ -15,12 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
-import { execFileSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import { platform } from 'node:os';
+import { settingsMock } from '@t/infrastructure/vscode/settingsMock';
 
 export const hasCppCompiler = (() => {
   try {
-    execFileSync('g++', ['--version'], {
+    execSync(`${settingsMock.languages.cppCompiler} --version`, {
       stdio: 'ignore',
     });
     return true;
