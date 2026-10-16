@@ -47,7 +47,9 @@ export class RunnerProviderAdapter implements IRunnerProvider {
   }
 
   public async getRunnerPath(signal: AbortSignal): Promise<string> {
-    if (this.cachedPath) return this.cachedPath;
+    // Another window may have cleaned the shared cache and deleted the compiled
+    // runner, so only trust the cached path while the file still exists.
+    if (this.cachedPath && (await this.fs.exists(this.cachedPath))) return this.cachedPath;
     if (this.compilationPromise) return this.compilationPromise;
     this.compilationPromise = this.resolveOrCompile(signal);
     try {
