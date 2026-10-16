@@ -17,8 +17,7 @@
 
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
-import ignore from 'ignore';
-import type { LeftHandSideExpression, Node } from 'typescript';
+import type { LeftHandSideExpression, Node } from '@typescript/typescript6';
 import {
   createSourceFile,
   forEachChild,
@@ -28,7 +27,8 @@ import {
   isPropertyAccessExpression,
   isStringLiteral,
   ScriptTarget,
-} from 'typescript';
+} from '@typescript/typescript6';
+import ignore from 'ignore';
 
 export interface TranslationConfig {
   title: string;
