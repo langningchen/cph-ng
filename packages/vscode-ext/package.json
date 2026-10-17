@@ -589,6 +589,11 @@
             "default": true,
             "markdownDescription": "%config.sidebar.showAcGif%"
           },
+          "cph-ng.sidebar.showTimer": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "%config.sidebar.showTimer%"
+          },
           "cph-ng.sidebar.hiddenStatuses": {
             "type": "array",
             "items": {
