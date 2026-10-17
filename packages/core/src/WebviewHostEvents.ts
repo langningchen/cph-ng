@@ -30,6 +30,7 @@ import type { LanguageExecutable } from './webviewMessages';
 export interface WebviewConfig {
   confirmSubmit: boolean;
   showAcGif: boolean;
+  showTimer: boolean;
   showOobe: boolean;
   hiddenStatuses: string[];
 }

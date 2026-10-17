@@ -35,6 +35,7 @@ const ConfigContext = createContext<ConfigState | undefined>(undefined);
 const requiredKeys: (keyof WebviewConfig)[] = [
   'confirmSubmit',
   'showAcGif',
+  'showTimer',
   'showOobe',
   'hiddenStatuses',
 ];
