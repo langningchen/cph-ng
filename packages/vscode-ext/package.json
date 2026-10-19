@@ -788,7 +788,7 @@
     "lodash": "^4.18.1",
     "memfs": "^4.80.0",
     "natural-orderby": "^5.0.0",
-    "p-memoize": "^8.0.0",
+    "p-memoize": "^9.0.0",
     "path-key": "^4.0.0",
     "react": "^19.3.1",
     "reflect-metadata": "^0.2.2",
