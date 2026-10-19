@@ -23,7 +23,7 @@
     "@types/proper-lockfile": "^4.1.4",
     "swc-loader": "^0.2.7",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
-    "webpack": "^5.111.1",
+    "webpack": "^5.112.0",
     "webpack-cli": "^7.2.3"
   }
 }
