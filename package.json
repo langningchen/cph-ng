@@ -19,18 +19,18 @@
     "prepare": "tsx scripts/install-hooks.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.15",
-    "@commitlint/cli": "^21.2.3",
-    "@commitlint/config-conventional": "^21.2.3",
+    "@biomejs/biome": "^2.6.2",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@commitlint/types": "^21.2.3",
-    "@swc/core": "^1.16.18",
+    "@swc/core": "^1.16.20",
     "@types/node": "~22.20.5",
     "@vitest/coverage-v8": "5.0.5",
     "@vitest/ui": "^5.0.5",
     "@vscode/vsce": "^4.0.0",
     "copy-webpack-plugin": "^14.0.0",
-    "ignore": "^7.0.12",
-    "knip": "^6.41.0",
+    "ignore": "^7.0.13",
+    "knip": "^6.42.1",
     "rimraf": "^6.1.3",
     "swc-loader": "^0.2.7",
     "terser-webpack-plugin": "^5.6.1",
@@ -38,7 +38,7 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5",
-    "webpack": "^5.112.0",
+    "webpack": "^5.112.1",
     "webpack-cli": "^7.2.3"
   }
 }
