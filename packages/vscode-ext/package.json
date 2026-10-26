@@ -752,9 +752,9 @@
     "postinstall": "pnpm generate-settings"
   },
   "devDependencies": {
-    "@swc/core": "^1.16.18",
+    "@swc/core": "^1.16.20",
     "@types/crypto-js": "^4.2.2",
-    "@types/lodash": "^4.17.26",
+    "@types/lodash": "^4.17.27",
     "@types/node": "~22.20.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
@@ -766,7 +766,7 @@
     "@vitest/ui": "^5.0.5",
     "@vscode/vsce": "^4.0.0",
     "copy-webpack-plugin": "^14.0.0",
-    "ignore": "^7.0.12",
+    "ignore": "^7.0.13",
     "swc-loader": "^0.2.7",
     "terser-webpack-plugin": "^5.6.1",
     "ts-essentials": "^10.2.1",
@@ -776,7 +776,7 @@
     "typescript": "^7.0.2",
     "vitest": "^5.0.5",
     "vitest-mock-extended": "^5.1.1",
-    "webpack": "^5.112.0",
+    "webpack": "^5.112.1",
     "webpack-cli": "^7.2.3"
   },
   "dependencies": {
