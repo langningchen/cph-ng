@@ -13,6 +13,7 @@ import {
   DefaultCompileAdditionalData,
 } from '@/infrastructure/langs/abstractLanguageStrategy';
 import { LanguageStrategyContext } from '@/infrastructure/langs/languageStrategyContext';
+import { parseCommandArgs } from '@/infrastructure/langs/parseCommandArgs';
 
 @injectable()
 export class LangC extends AbstractLanguageStrategy {
@@ -84,7 +85,7 @@ export class LangC extends AbstractLanguageStrategy {
     );
     if (skip) return { path, hash };
 
-    const compilerArgs = args.split(/\s+/).filter(Boolean);
+    const compilerArgs = parseCommandArgs(args);
     const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
     if (unlimitedStack && this.sys.platform() === 'win32') cmd.push('-Wl,--stack,268435456');
     await this.executeCompiler(cmd, signal);
