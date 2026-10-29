@@ -40,6 +40,8 @@ export const batches = new Map<
 >();
 
 let isRestarting = false;
+let reconnectShutdownTimer: NodeJS.Timeout | undefined;
+const RECONNECT_GRACE_MS = 5_000;
 let currentRunningPort = config.port;
 let currentRunningBindAddress = config.bindAddress;
 const restartServer = async () => {
@@ -62,6 +64,17 @@ const restartServer = async () => {
     error('Error during server restart', err);
   } finally {
     isRestarting = false;
+    const vscodeClientsCount = io.sockets.adapter.rooms.get('vscode-clients')?.size ?? 0;
+    if (!isStopping && vscodeClientsCount === 0) {
+      reconnectShutdownTimer = setTimeout(() => {
+        reconnectShutdownTimer = undefined;
+        const reconnectingClients = io.sockets.adapter.rooms.get('vscode-clients')?.size ?? 0;
+        if (!isStopping && reconnectingClients === 0) {
+          info(`No clients reconnected, shutting down router`);
+          stopServer();
+        }
+      }, RECONNECT_GRACE_MS);
+    }
   }
 };
 
@@ -203,6 +216,10 @@ const startServer = () => {
     const type = socket.handshake.query.type;
 
     if (type === 'vscode') {
+      if (reconnectShutdownTimer) {
+        clearTimeout(reconnectShutdownTimer);
+        reconnectShutdownTimer = undefined;
+      }
       socket.join('vscode-clients');
       info('VSCode connected', { id: socket.id });
 
