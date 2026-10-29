@@ -795,6 +795,7 @@
     "semver": "^7.8.5",
     "socket.io-client": "^4.8.4",
     "source-map-support": "^0.5.21",
+    "string-argv": "^0.4.0",
     "tsyringe": "^4.10.0",
     "type-fest": "^5.10.0",
     "typed-emitter": "^2.1.0",

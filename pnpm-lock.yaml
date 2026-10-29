@@ -339,6 +339,9 @@ importers:
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
+      string-argv:
+        specifier: ^0.4.0
+        version: 0.4.0
       tsyringe:
         specifier: ^4.10.0
         version: 4.10.0
@@ -3947,6 +3950,10 @@ packages:
 
   std-env@4.3.0:
     resolution: {integrity: sha512-OtU/EgQ1kIm5KwqQpBC6ZEMXrZRui11w8zgfTWp8cdO9B8OaPsbA8bTHO2P+HNo1VlUTGMVBwPhydu6poeXiag==}
+
+  string-argv@0.4.0:
+    resolution: {integrity: sha512-UOtaksJ3SK3KLHba2i9I27fvuZNfBlImDP5wKsCOxCDMRDNxlipCe8rmnUAaDpqlQ93upnA0SzF2pjWhttozSA==}
+    engines: {node: '>=16.20.0'}
 
   string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
@@ -7666,6 +7673,8 @@ snapshots:
       stacktrace-gps: 3.1.2
 
   std-env@4.3.0: {}
+
+  string-argv@0.4.0: {}
 
   string-width@4.2.3:
     dependencies:

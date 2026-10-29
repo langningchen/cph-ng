@@ -13,6 +13,7 @@ import {
   DefaultCompileAdditionalData,
 } from '@/infrastructure/langs/abstractLanguageStrategy';
 import { LanguageStrategyContext } from '@/infrastructure/langs/languageStrategyContext';
+import { parseCommandArgs } from '@/infrastructure/langs/parseCommandArgs';
 
 @injectable()
 export class LangCpp extends AbstractLanguageStrategy {
@@ -88,7 +89,7 @@ export class LangCpp extends AbstractLanguageStrategy {
 
     const compileCommands: string[][] = [];
     const postCommands: string[][] = [];
-    const compilerArgs = args.split(/\s+/).filter(Boolean);
+    const compilerArgs = parseCommandArgs(args);
     if (additionalData.canUseWrapper && useWrapper) {
       const linkObjs = [];
 
