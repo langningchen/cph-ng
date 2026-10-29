@@ -1,5 +1,8 @@
 # The CPH-NG Project
 
+`main` 保留 TypeScript 实现；Rust 内核重构在 `refactor/rust-kernel` 分支继续开发。
+The TypeScript implementation is maintained on `main`; Rust kernel development continues on `refactor/rust-kernel`.
+
 > Quickly compile, run and judge competitive programming problems in VSCode.
 > Automatically download testcases, or write & test your own problems.
 

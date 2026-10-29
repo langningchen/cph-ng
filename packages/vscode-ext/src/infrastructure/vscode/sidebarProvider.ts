@@ -58,6 +58,9 @@ export class SidebarProvider implements ISidebarProvider {
     this.settings.sidebar.onChangeShowAcGif((showAcGif) =>
       this.emitter.emit('message', { type: 'configChange', payload: { showAcGif } }),
     );
+    this.settings.sidebar.onChangeShowTimer((showTimer) =>
+      this.emitter.emit('message', { type: 'configChange', payload: { showTimer } }),
+    );
     this.settings.sidebar.onChangeShowOobe((showOobe) =>
       this.emitter.emit('message', { type: 'configChange', payload: { showOobe } }),
     );
@@ -88,6 +91,7 @@ export class SidebarProvider implements ISidebarProvider {
       payload: {
         confirmSubmit: this.settings.companion.confirmSubmit,
         showAcGif: this.settings.sidebar.showAcGif,
+        showTimer: this.settings.sidebar.showTimer,
         showOobe: this.settings.sidebar.showOobe,
         hiddenStatuses: this.settings.sidebar.hiddenStatuses,
       },

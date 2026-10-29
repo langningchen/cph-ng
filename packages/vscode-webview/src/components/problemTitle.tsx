@@ -39,6 +39,7 @@ import { CphNgLink } from '@/components/base/cphNgLink';
 import { CphNgMenu } from '@/components/base/cphNgMenu';
 import { CphNgText } from '@/components/base/cphNgText';
 import { CphNgTooltip } from '@/components/base/cphNgTooltip';
+import { useConfig } from '@/context/ConfigContext';
 import { useProblem } from '@/context/ProblemContext';
 
 interface ProblemTitleProps {
@@ -84,6 +85,7 @@ export const ProblemTitle = memo(
     startTime,
   }: ProblemTitleProps) => {
     const { t } = useTranslation();
+    const { showTimer } = useConfig();
     const { dispatch } = useProblem();
     const [isEditDialogOpen, setEditDialogOpen] = useState(false);
     const [tabValue, setTabValue] = useState('basic');
@@ -108,12 +110,13 @@ export const ProblemTitle = memo(
       setEditedInterpreterArgs(overrides.interpreterArgs?.override);
     }, [name, url, overrides]);
     useEffect(() => {
+      if (!showTimer) return;
       setTimeElapsed(Date.now() - startTime);
       const interval = setInterval(() => {
         setTimeElapsed(Date.now() - startTime);
       }, 1000);
       return () => clearInterval(interval);
-    }, [startTime]);
+    }, [startTime, showTimer]);
 
     const handleEditTitle = () => {
       setEditDialogOpen(true);
@@ -193,11 +196,13 @@ export const ProblemTitle = memo(
                   </CphNgLink>
                 </Subtitle>
               )}
-              <CphNgTooltip title={t('problemTitle.timeElapsed')}>
-                <Subtitle className='defaultBlur' sx={{ display: { xs: 'none', md: 'inline' } }}>
-                  {formatDuration(timeElapsedMs + timeElapsed)}
-                </Subtitle>
-              </CphNgTooltip>
+              {showTimer ? (
+                <CphNgTooltip title={t('problemTitle.timeElapsed')}>
+                  <Subtitle className='defaultBlur' sx={{ display: { xs: 'none', md: 'inline' } }}>
+                    {formatDuration(timeElapsedMs + timeElapsed)}
+                  </Subtitle>
+                </CphNgTooltip>
+              ) : null}
             </CphNgFlex>
           </CphNgFlex>
           <CphNgMenu

@@ -9,8 +9,8 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     retry: 3,
     alias: {
-      '@/': resolve(__dirname, 'src') + '/',
-      '@t/': resolve(__dirname, 'tests') + '/'
+      '@/': resolve(import.meta.dirname, 'src') + '/',
+      '@t/': resolve(import.meta.dirname, 'tests') + '/'
     },
     coverage: {
       provider: 'v8',

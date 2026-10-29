@@ -16,7 +16,7 @@
 // along with cph-ng.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { IWebviewTestcase, TestcaseId } from '@cph-ng/core';
-import { VerdictType } from '@cph-ng/core';
+import { VerdictName, VerdictType } from '@cph-ng/core';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
@@ -47,7 +47,10 @@ export const VerdictSummary = memo(({ testcaseOrder, testcases }: VerdictSummary
       if (!tc || tc.isDisabled) continue;
       if (!tc.result?.verdict) {
         pending++;
-      } else if (tc.result.verdict.type === VerdictType.passed) {
+      } else if (
+        tc.result.verdict.type === VerdictType.passed &&
+        tc.result.verdict.name === VerdictName.accepted
+      ) {
         passed++;
       } else if (tc.result.verdict.type === VerdictType.running) {
         running++;

@@ -1,6 +1,6 @@
 {
   "name": "@cph-ng/browser-ext",
-  "version": "0.7.11",
+  "version": "0.7.12",
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-only",
@@ -16,18 +16,18 @@
     "@cph-ng/core": "workspace:*",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^9.3.1",
-    "@mui/material": "^9.3.1",
+    "@mui/icons-material": "^9.5.0",
+    "@mui/material": "^9.5.0",
     "@webext-core/messaging": "^4.0.0",
-    "onnxruntime-web": "^1.27.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "socket.io-client": "^4.8.3"
+    "onnxruntime-web": "^1.30.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "socket.io-client": "^4.8.4"
   },
   "devDependencies": {
-    "@types/node": "~22.19.7",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
+    "@types/node": "~22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@wxt-dev/auto-icons": "^1.1.2",
     "wxt": "^0.21.4"
   }

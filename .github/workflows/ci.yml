@@ -21,6 +21,8 @@ permissions:
 
 jobs:
   lint:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -38,6 +40,8 @@ jobs:
 
   test:
     name: Test on ${{ matrix.os }}
+    permissions:
+      contents: read
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -51,10 +55,12 @@ jobs:
       - name: Setup Node and pnpm
         uses: ./.github/actions/setup-node-pnpm
       - name: Run tests
-        run: pnpm test
+        run: pnpm test:run
 
   build:
     needs: [lint, test]
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.versions.outputs.version }}
@@ -184,16 +190,36 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
+  attest-build:
+    name: Generate build provenance
+    needs: [build]
+    if: |
+      (
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        )
+      )
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: cph-ng-artifacts
+          path: dist/
       - name: Generate Provenance
-        if: |
-          (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.action != 'closed') &&
-          (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         uses: actions/attest-build-provenance@v4
         with:
           subject-path: dist/*
 
   release-github:
-    needs: [build]
+    needs: [build, attest-build]
     if: needs.build.outputs.version_changed == 'true' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
