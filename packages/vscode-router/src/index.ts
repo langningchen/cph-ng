@@ -52,10 +52,7 @@ const restartServer = async () => {
       debug(
         `Listener mismatch detected. Restarting: ${currentRunningBindAddress}:${currentRunningPort} -> ${targetBindAddress}:${targetPort}`,
       );
-      io.close();
-      await new Promise<void>((resolve) => {
-        server.close(() => resolve());
-      });
+      await io.close();
       server = startServer();
       currentRunningPort = targetPort;
       currentRunningBindAddress = targetBindAddress;
@@ -194,7 +191,7 @@ const startServer = () => {
   const server = serve({
     fetch: app.fetch,
     port: config.port,
-    hostname: config.bindAddress,
+    hostname: config.bindAddress === '0.0.0.0' ? undefined : config.bindAddress,
   });
 
   io = new Server(server, {
@@ -235,7 +232,7 @@ const startServer = () => {
       });
       socket.on('updateConfig', ({ config }) => {
         updateConfig(config);
-        if (config.port !== undefined) restartServer();
+        if (config.port !== undefined || config.bindAddress !== undefined) void restartServer();
         info('Config updated dynamically', config);
       });
     } else if (type === 'browser') {
@@ -255,7 +252,7 @@ const startServer = () => {
       }
       refreshAllStatus();
       const vscodeClientsCount = io.sockets.adapter.rooms.get('vscode-clients')?.size ?? 0;
-      if (vscodeClientsCount === 0) {
+      if (vscodeClientsCount === 0 && !isRestarting) {
         info(`No clients connected, shutting down router`);
         stopServer();
       }
@@ -265,7 +262,7 @@ const startServer = () => {
   return server;
 };
 const stopServer = () => {
-  if (isStopping) return;
+  if (isStopping || isRestarting) return;
   isStopping = true;
 
   io.disconnectSockets(true);
