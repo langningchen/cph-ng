@@ -41,20 +41,25 @@ export const batches = new Map<
 
 let isRestarting = false;
 let currentRunningPort = config.port;
+let currentRunningBindAddress = config.bindAddress;
 const restartServer = async () => {
   if (isRestarting) return;
   isRestarting = true;
   try {
-    while (config.port !== undefined && currentRunningPort !== config.port) {
+    while (currentRunningPort !== config.port || currentRunningBindAddress !== config.bindAddress) {
       const targetPort = config.port;
-      debug(`Port mismatch detected. Restarting: ${currentRunningPort} -> ${targetPort}`);
+      const targetBindAddress = config.bindAddress;
+      debug(
+        `Listener mismatch detected. Restarting: ${currentRunningBindAddress}:${currentRunningPort} -> ${targetBindAddress}:${targetPort}`,
+      );
       io.close();
       await new Promise<void>((resolve) => {
         server.close(() => resolve());
       });
       server = startServer();
       currentRunningPort = targetPort;
-      info(`Server successfully moved to port ${currentRunningPort}`);
+      currentRunningBindAddress = targetBindAddress;
+      info(`Server successfully moved to ${currentRunningBindAddress}:${currentRunningPort}`);
     }
   } catch (err) {
     error('Error during server restart', err);
@@ -186,7 +191,11 @@ app.post('/', async (ctx) => {
 let activeBrowserId: string | null = null;
 
 const startServer = () => {
-  const server = serve({ fetch: app.fetch, port: config.port });
+  const server = serve({
+    fetch: app.fetch,
+    port: config.port,
+    hostname: config.bindAddress,
+  });
 
   io = new Server(server, {
     path: '/ws',
@@ -269,4 +278,4 @@ const stopServer = () => {
 
 export let server = startServer();
 
-info(`Router started on port ${config.port}`, { config });
+info(`Router started on ${config.bindAddress}:${config.port}`, { config });

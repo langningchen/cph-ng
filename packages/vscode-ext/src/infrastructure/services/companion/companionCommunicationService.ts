@@ -64,6 +64,9 @@ export class CompanionCommunicationService {
     this.clientId = this.crypto.randomUUID() as ClientId;
     this.logger = this.logger.withScope('companionCommunication');
     this.routerLogger = this.logger.withScope('companionRouter');
+    this.settings.companion.onChangeBindAddress((bindAddress) =>
+      this.updateConfig({ bindAddress }),
+    );
   }
 
   public spawnRouter() {
@@ -71,21 +74,23 @@ export class CompanionCommunicationService {
     const node = process.execPath;
     const routerPath = this.path.join(this.extPath, 'dist', 'router.cjs');
     const port = this.settings.companion.listenPort.toString();
+    const bindAddress = this.settings.companion.bindAddress;
     const logFile = this.pathResolver.renderPath(this.settings.companion.logFile);
 
     this.logger.debug('Router spawn parameters', {
       node,
       routerPath,
       port,
+      bindAddress,
       logFile,
     });
-    const childProcess = spawn(node, [routerPath, '-p', port, '-l', logFile], {
+    const childProcess = spawn(node, [routerPath, '-p', port, '-a', bindAddress, '-l', logFile], {
       detached: true,
       stdio: 'ignore',
       env: process.env,
     });
     childProcess.unref();
-    this.logger.info(`Router process spawned on port ${port}`);
+    this.logger.info(`Router process spawned on ${bindAddress}:${port}`);
   }
 
   public connect() {

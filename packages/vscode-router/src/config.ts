@@ -17,7 +17,7 @@
 
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import type { RouterConfig } from '@cph-ng/core';
+import type { RouterBindAddress, RouterConfig } from '@cph-ng/core';
 import { Command } from 'commander';
 import { lock } from 'proper-lockfile';
 
@@ -29,6 +29,14 @@ program
     if (Number.isNaN(p) || p <= 0 || p > 65535) throw new Error('Invalid port');
     return p;
   })
+  .requiredOption(
+    '-a, --bind-address <address>',
+    'Bind address (0.0.0.0 or 127.0.0.1)',
+    (value): RouterBindAddress => {
+      if (value !== '0.0.0.0' && value !== '127.0.0.1') throw new Error('Invalid bind address');
+      return value;
+    },
+  )
   .requiredOption('-l, --log-file <path>', 'Path to the log file')
   .parse(process.argv);
 
@@ -36,6 +44,7 @@ const options = program.opts();
 
 export const config: RouterConfig = {
   port: options.port,
+  bindAddress: options.bindAddress,
   logFile: resolve(options.logFile),
 };
 

@@ -18,8 +18,11 @@
 import type { BatchId } from './types';
 
 // Router Config
+export type RouterBindAddress = '0.0.0.0' | '127.0.0.1';
+
 export interface RouterConfig {
   port: number;
+  bindAddress: RouterBindAddress;
   logFile: string;
 }
 
