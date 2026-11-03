@@ -557,6 +557,16 @@
             "default": 27121,
             "markdownDescription": "%config.companion.listenPort%"
           },
+          "cph-ng.companion.bindAddress": {
+            "type": "string",
+            "scope": "machine",
+            "enum": [
+              "0.0.0.0",
+              "127.0.0.1"
+            ],
+            "default": "0.0.0.0",
+            "markdownDescription": "%config.companion.bindAddress%"
+          },
           "cph-ng.companion.logFile": {
             "type": "string",
             "default": "${home}/.cph-ng-router.log",
