@@ -30,6 +30,7 @@ import {
   DefaultCompileAdditionalData,
 } from '@/infrastructure/langs/abstractLanguageStrategy';
 import { LanguageStrategyContext } from '@/infrastructure/langs/languageStrategyContext';
+import { parseCommandArgs } from '@/infrastructure/langs/parseCommandArgs';
 
 @injectable()
 export class LangRust extends AbstractLanguageStrategy {
@@ -89,7 +90,7 @@ export class LangRust extends AbstractLanguageStrategy {
     const { skip, hash } = await this.checkHash(src, path, compiler + args, forceCompile);
     if (skip) return { path, hash };
 
-    const compilerArgs = args.split(/\s+/).filter(Boolean);
+    const compilerArgs = parseCommandArgs(args);
     const cmd = [compiler, src.path, ...compilerArgs, '-o', path];
     if (this.settings.run.unlimitedStack && this.sys.platform() === 'win32') {
       cmd.push('-C', 'link-args=-Wl,--stack,268435456');

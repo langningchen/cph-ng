@@ -25,6 +25,7 @@ import type { IPathResolver } from '@/application/ports/services/IPathResolver';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
 import { LanguageStrategyContext } from '@/infrastructure/langs/languageStrategyContext';
+import { parseCommandArgs } from '@/infrastructure/langs/parseCommandArgs';
 import { AbstractLanguageStrategy, DefaultCompileAdditionalData } from './abstractLanguageStrategy';
 
 @injectable()
@@ -104,7 +105,7 @@ export class LangJava extends AbstractLanguageStrategy {
     const { skip, hash } = await this.checkHash(src, path, compiler + args, forceCompile);
     if (skip) return { path, hash };
 
-    const compilerArgs = args.split(/\s+/).filter(Boolean);
+    const compilerArgs = parseCommandArgs(args);
     const cmd = [
       compiler,
       ...compilerArgs,
@@ -123,7 +124,7 @@ export class LangJava extends AbstractLanguageStrategy {
     this.logger.trace('runCommand', { target });
     const interpreter = overrides?.interpreter || this.defaultValues.interpreter;
     const args = overrides?.interpreterArgs || this.defaultValues.interpreterArgs;
-    const argsArray = args.split(/\s+/).filter(Boolean);
+    const argsArray = parseCommandArgs(args);
     return [interpreter, ...argsArray, target];
   }
 }

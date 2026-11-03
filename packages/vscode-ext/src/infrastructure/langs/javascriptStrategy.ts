@@ -20,6 +20,7 @@ import { inject, injectable } from 'tsyringe';
 import type { ILogger } from '@/application/ports/vscode/ILogger';
 import { TOKENS } from '@/composition/tokens';
 import { LanguageStrategyContext } from '@/infrastructure/langs/languageStrategyContext';
+import { parseCommandArgs } from '@/infrastructure/langs/parseCommandArgs';
 import { AbstractLanguageStrategy } from './abstractLanguageStrategy';
 
 @injectable()
@@ -77,7 +78,7 @@ export class LangJavascript extends AbstractLanguageStrategy {
     this.logger.trace('runCommand', { target });
     const runner = overrides?.interpreter || this.defaultValues.interpreter;
     const runArgs = overrides?.interpreterArgs || this.defaultValues.interpreterArgs;
-    const runArgsArray = runArgs.split(/\s+/).filter(Boolean);
+    const runArgsArray = parseCommandArgs(runArgs);
     return [runner, ...runArgsArray, target];
   }
 }

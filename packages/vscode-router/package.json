@@ -14,7 +14,7 @@
     "@cph-ng/core": "workspace:*",
     "@hono/node-server": "^2.1.5",
     "commander": "^15.0.0",
-    "hono": "^4.13.13",
+    "hono": "^4.13.14",
     "proper-lockfile": "^4.1.2",
     "socket.io": "^4.8.4"
   },
@@ -23,7 +23,7 @@
     "@types/proper-lockfile": "^4.1.4",
     "swc-loader": "^0.2.7",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
-    "webpack": "^5.112.1",
+    "webpack": "^5.112.2",
     "webpack-cli": "^7.2.3"
   }
 }
