@@ -49,7 +49,7 @@ export class LuoguSubmitter extends BaseSubmitter {
     showSubmit.click();
 
     const cmContent = await this.waitForElement<HTMLElement>('.cm-content');
-    cmContent.innerText = sourceCode;
+    cmContent.textContent = sourceCode;
 
     const submitBtn = await this.waitForElement<HTMLButtonElement>(
       '#app > div.main-container > div > main > div > div > div.main > div > div.body > button',
