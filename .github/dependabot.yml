@@ -33,3 +33,14 @@ updates:
     open-pull-requests-limit: 3
     labels:
       - "dependencies"
+
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      submodules:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
