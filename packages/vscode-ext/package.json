@@ -762,7 +762,7 @@
     "postinstall": "pnpm generate-settings"
   },
   "devDependencies": {
-    "@swc/core": "^1.16.20",
+    "@swc/core": "^1.16.21",
     "@types/crypto-js": "^4.2.2",
     "@types/lodash": "^4.17.27",
     "@types/node": "~22.20.5",
@@ -772,8 +772,8 @@
     "@types/source-map-support": "^0.5.10",
     "@types/vscode": "1.97.0",
     "@types/which": "^3.0.4",
-    "@vitest/coverage-v8": "5.0.5",
-    "@vitest/ui": "^5.0.5",
+    "@vitest/coverage-v8": "5.1.0",
+    "@vitest/ui": "^5.1.0",
     "@vscode/vsce": "^4.1.0",
     "copy-webpack-plugin": "^14.0.0",
     "ignore": "^7.0.14",
@@ -784,10 +784,10 @@
     "tsconfig-paths-webpack-plugin": "^4.2.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.5",
+    "vitest": "^5.1.0",
     "vitest-mock-extended": "^5.1.1",
     "webpack": "^5.112.2",
-    "webpack-cli": "^7.2.3"
+    "webpack-cli": "^7.3.1"
   },
   "dependencies": {
     "@cph-ng/core": "workspace:*",
@@ -802,7 +802,7 @@
     "path-key": "^4.0.0",
     "react": "^19.3.1",
     "reflect-metadata": "^0.2.2",
-    "semver": "^7.8.5",
+    "semver": "^7.8.6",
     "socket.io-client": "^4.8.4",
     "source-map-support": "^0.5.21",
     "string-argv": "^0.4.0",
