@@ -217,6 +217,7 @@ jobs:
         uses: actions/attest-build-provenance@v4
         with:
           subject-path: dist/*
+          create-storage-record: false
 
   release-github:
     needs: [build, attest-build]
