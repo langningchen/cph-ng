@@ -2,6 +2,21 @@
 
 All notable changes to the "cph-ng" extension will be documented in this file.
 
+## 0.7.13
+
+- **style**: cope with some warnings emitted by biome.js ([#396](https://github.com/langningchen/cph-ng/issues/396))
+- **feat**: enable users to choose to bind competitive companion to 127.0.0.1 or 0.0.0.0 ([#387](https://github.com/langningchen/cph-ng/issues/387))
+- **chore**(deps): bump the npm-non-major group with 12 updates ([#395](https://github.com/langningchen/cph-ng/issues/395))
+- **fix**(ci): use absolute artifact path for Open VSX publishing ([#394](https://github.com/langningchen/cph-ng/issues/394))
+- **chore**: update pnpm to v12.16.1 ([#392](https://github.com/langningchen/cph-ng/issues/392))
+- **ci**: automatically close stale issues and pull requests ([#391](https://github.com/langningchen/cph-ng/issues/391))
+- **fix**: remove RJ/SK from passed verdict summary ([#389](https://github.com/langningchen/cph-ng/issues/389))
+- **fix**: use string-argv to parse command args ([#388](https://github.com/langningchen/cph-ng/issues/388))
+- **chore**(deps): bump the npm-non-major group with 11 updates ([#383](https://github.com/langningchen/cph-ng/issues/383))
+- **chore**(deps): bump p-memoize from 8.0.0 to 9.0.0 ([#381](https://github.com/langningchen/cph-ng/issues/381))
+- **chore**(deps): bump the npm-non-major group with 6 updates ([#380](https://github.com/langningchen/cph-ng/issues/380))
+- **feat**(sidebar): allow hiding the problem timer ([#378](https://github.com/langningchen/cph-ng/issues/378))
+
 ## 0.7.12
 
 - **fix**: recompile runner when another window clears the cache ([#360](https://github.com/langningchen/cph-ng/issues/360)) ([#375](https://github.com/langningchen/cph-ng/issues/375))
