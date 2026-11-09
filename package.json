@@ -23,7 +23,7 @@
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
     "@commitlint/types": "^21.2.3",
-    "@swc/core": "^1.16.21",
+    "@swc/core": "^1.16.22",
     "@types/node": "~22.20.5",
     "@vitest/coverage-v8": "5.1.0",
     "@vitest/ui": "^5.1.0",
