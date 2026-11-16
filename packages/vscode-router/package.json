@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@cph-ng/core": "workspace:*",
-    "@hono/node-server": "^2.1.6",
-    "commander": "^15.0.0",
-    "hono": "^4.13.16",
+    "@hono/node-server": "^2.1.8",
+    "commander": "^15.1.0",
+    "hono": "^4.13.18",
     "proper-lockfile": "^4.1.2",
     "socket.io": "^4.8.4"
   },
