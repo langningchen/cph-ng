@@ -15,7 +15,7 @@
     "clean": "rimraf out"
   },
   "dependencies": {
-    "type-fest": "5.10.0"
+    "type-fest": "6.0.3"
   },
   "devDependencies": {
     "@typescript/typescript6": "^6.0.2"

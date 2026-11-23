@@ -285,8 +285,8 @@ importers:
   packages/core:
     dependencies:
       type-fest:
-        specifier: 5.10.0
-        version: 5.10.0
+        specifier: 6.0.3
+        version: 6.0.3
     devDependencies:
       '@typescript/typescript6':
         specifier: ^6.0.2
@@ -346,8 +346,8 @@ importers:
         specifier: ^4.10.0
         version: 4.10.0
       type-fest:
-        specifier: ^5.10.0
-        version: 5.10.0
+        specifier: ^6.0.3
+        version: 6.0.3
       typed-emitter:
         specifier: ^2.1.0
         version: 2.1.0
@@ -4118,9 +4118,9 @@ packages:
     resolution: {integrity: sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==}
     engines: {node: '>=0.6.11 <=0.7.0 || >=0.7.3'}
 
-  type-fest@5.10.0:
-    resolution: {integrity: sha512-NoSdpq/WEiAg5sjmBkmV/hfxv6HJH4NqPNrqjtSO5CwRmpsDfaf4begxW34KdJykH/l1yHtwBWQkCRdoXO8mPA==}
-    engines: {node: '>=20'}
+  type-fest@6.0.3:
+    resolution: {integrity: sha512-MOJXegkac3h+sWdVb6VY/ACclsa71z3BprNpedGV8ljIzYCo+LRWgyIkWhidKNoiNJOb6kUds1pNCyzQ2p6hJQ==}
+    engines: {node: '>=22'}
 
   typed-emitter@2.1.0:
     resolution: {integrity: sha512-g/KzbYKbH5C2vPkaXGu8DJlHrGKHLsM25Zg9WuC9pMGfuvT+X25tZQWo5fK1BjBm8+UrVE9LDCvaY0CQk+fXDA==}
@@ -7741,7 +7741,7 @@ snapshots:
 
   tunnel@0.0.6: {}
 
-  type-fest@5.10.0:
+  type-fest@6.0.3:
     dependencies:
       tagged-tag: 1.0.0
 
